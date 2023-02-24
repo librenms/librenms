@@ -1,6 +1,3 @@
-source: Alerting/Rules.md
-path: blob/master/doc/
-
 # Rules
 
 Rules are defined using a logical language.
@@ -9,14 +6,6 @@ The GUI provides a simple way of creating rules.
 
 Creating more complicated rules which may include maths calculations
 and MySQL queries can be done using [macros](Macros.md)
-
-#### Video on how the alert rules work in LibreNMS
-
-[Alert Rules](https://youtu.be/ryv0j8GEkhM)
-
-#### Video on how to use alert rule with wildcards
-
-[Alert Rules wildcard](https://youtu.be/eYYioFNcrAk)
 
 ## Syntax
 
@@ -30,12 +19,12 @@ __Conditions__ can be any of:
 - Not Equals `!=`
 - In `IN`
 - Not In `NOT IN`
-- Begins with `LIKE ('%...')`
-- Doesn't begin with `NOT LIKE ('%...')`
+- Begins with `LIKE ('...%')`
+- Doesn't begin with `NOT LIKE ('...%')`
 - Contains `LIKE ('%...%')`
 - Doesn't Contain `NOT LIKE ('%...%')`
-- Ends with `LIKE ('...%')`
-- Doesn't end with `NOT LIKE ('...%')`
+- Ends with `LIKE ('%...')`
+- Doesn't end with `NOT LIKE ('%...')`
 - Between `BETWEEN`
 - Not Between `NOT BETWEEN`
 - Is Empty `= ''`
@@ -83,7 +72,11 @@ On the Advanced tab, you can specify some additional options for the alert rule:
 - An example of this would be an average rule for all CPUs over 10%
 
 ```sql
-SELECT *,AVG(processors.processor_usage) as cpu_avg FROM devices,processors WHERE (devices.device_id = ? AND devices.device_id = processors.device_id) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 HAVING AVG(processors.processor_usage)  > 10
+SELECT *,AVG(processors.processor_usage) as cpu_avg FROM
+devices,processors WHERE (devices.device_id = ? AND devices.device_id
+= processors.device_id) AND (devices.status = 1 && (devices.disabled =
+0 && devices.ignore = 0)) = 1 HAVING AVG(processors.processor_usage)
+> 10
 ```
 
 > The 10 would then contain the average CPU usage value, you can

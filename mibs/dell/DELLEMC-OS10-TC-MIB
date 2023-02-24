@@ -1,0 +1,219 @@
+-- *****************************************************************
+-- DELLEMC-OS10-TC-MIB
+--
+--
+-- Copyright (c) 2017 by Dell Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+DELLEMC-OS10-TC-MIB	DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Dell EMC Networking OS10
+--  Textual Convention MIB.
+--
+--  This module will be extended, as needed.
+
+IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        os10
+            FROM DELLEMC-OS10-SMI-MIB;
+
+os10TextualConventionsMib MODULE-IDENTITY
+        LAST-UPDATED "201907031200Z"
+        ORGANIZATION "Dell EMC"
+        CONTACT-INFO "http://www.dell.com/support"
+        DESCRIPTION
+            "The Textual Convention of Dell EMC Networking  OS10 MIB."
+
+        REVISION     "201907031200Z"
+        DESCRIPTION
+            "Add N3248TE and Mt. Evans products." 
+
+        REVISION     "201903071200Z"
+        DESCRIPTION
+            "Add Z9332F and Mt. Echo products." 
+
+        REVISION     "201805151200Z"
+        DESCRIPTION
+            "Add Z9232F and Mt. Princeton products." 
+
+        REVISION     "201801261200Z"
+        DESCRIPTION
+            "Add z9264F product." 
+
+        REVISION     "201710271200Z"
+        DESCRIPTION
+            "Add s4112F and s4112T products." 
+
+        REVISION     "201710111200Z"
+        DESCRIPTION
+            "Add s4248FB and s4248FBL products. 
+             Depreciate s4200."
+
+        REVISION     "201709061200Z"
+        DESCRIPTION
+            "Add new card types S5148F and Z9100"
+
+        REVISION     "201706211200Z"
+        DESCRIPTION
+            "Removed OS9 products and updated with OS10 products"
+
+        REVISION     "201701251200Z"
+        DESCRIPTION
+            "First revision of Dell EMC Networking OS10 TC MIB."
+
+	::= { os10 1 }
+
+
+   Os10ChassisDefType ::= TEXTUAL-CONVENTION
+            STATUS       current
+            DESCRIPTION
+                "Dell EMC Networking OS10 chassis type."
+            SYNTAX    INTEGER {
+                s6000on(1),	   -- Dell EMC Networking OS10 S6000-ON access switch
+                s4048on(2),        -- Dell EMC Networking OS10 S4048-ON access switch
+                s4048Ton(3),       -- Dell EMC Networking OS10 S4048T-ON access switch
+                s3048on(4),        -- Dell EMC Networking OS10 S3048-ON access switch
+                s6010on(5),        -- Dell EMC Networking OS10 S6010-ON access switch
+                s4148Fon(6),       -- Dell EMC Networking OS10 S4148F-ON access switch
+                s4128Fon(7),       -- Dell EMC Networking OS10 S4128F-ON access switch
+                s4148Ton(8),       -- Dell EMC Networking OS10 S4148T-ON access switch
+                s4128Ton(9),       -- Dell EMC Networking OS10 S4128T-ON access switch
+                s4148FEon(10),     -- Dell EMC Networking OS10 S4148FE-ON access switch
+                s4148Uon(11),      -- Dell EMC Networking OS10 S4148U-ON access switch
+                s4200on(12),       -- Depreciated Dell EMC Networking OS10 S4200-ON access switch
+                mx5108Non(13),     -- Dell EMC Networking OS10 MX5108N-ON access switch
+                mx9116Non(14),     -- Dell EMC Networking OS10 MX9116N-ON access switch
+                s5148Fon(15),      -- Dell EMC Networking OS10 S5148F-ON access switch
+                z9100on(16),       -- Dell EMC Networking OS10 Z9100-ON access switch
+                s4248FBon(17),     -- Dell EMC Networking OS10 S4248FB-ON access switch
+                s4248FBLon(18),    -- Dell EMC Networking OS10 S4248FBL-ON access switch
+                s4112Fon(19),      -- Dell EMC Networking OS10 S4112F-ON access switch
+                s4112Ton(20),      -- Dell EMC Networking OS10 S4112T-ON access switch
+                z9264Fon(21),      -- Dell EMC Networking OS10 Z9264F-ON access switch
+                z9224Fon(22),      -- Dell EMC Networking OS10 Z9232F-ON access switch
+                s5212Fon(23),      -- Dell EMC Networking OS10 S5212F-ON access switch
+                s5224Fon(24),      -- Dell EMC Networking OS10 S5224F-ON access switch
+                s5232Fon(25),      -- Dell EMC Networking OS10 S5232F-ON access switch
+                s5248Fon(26),      -- Dell EMC Networking OS10 S5248F-ON access switch
+                s5296Fon(27),      -- Dell EMC Networking OS10 S5296F-ON access switch
+                z9332Fon(28),      -- Dell EMC Networking OS10 Z9332F-ON access switch
+                n3248TEon(29),     -- Dell EMC Networking OS10 N3248TE-ON access switch
+                unknown(9999)
+		    }
+
+   Os10InterfaceType ::= TEXTUAL-CONVENTION
+            STATUS       current
+            DESCRIPTION
+                "Interface types supported by the Dell EMC Networking OS10 line cards.
+                "
+            SYNTAX    INTEGER {
+                ethernetManagement(1),     -- Ethernet Mangement port
+                ethernet100M(2),           -- Ethernet 100Mb
+                ethernet1GB(3),            -- Ethernet 1 GB interface
+                ethernet1GBCopper(4),      -- Ethernet Copper 1 GB interface
+                ethernet10GB(5),           -- Ethernet 10 GB interface
+                ethernet10GBCopper(6),     -- Ethernet Copper 10 GB interface
+                ethernet25GB(7),           -- Ethernet 25 GB interface
+                ethernet50GB(8),           -- Ethernet 50 GB interface
+                ethernet40GB(9),           -- Ethernet 40 GB interface
+                ethernet100GB(10),         -- Ethernet 100 GB interface
+                fc(11)                     -- Fiber Channel interface
+            }
+
+    Os10SystemCardType ::= TEXTUAL-CONVENTION
+            STATUS    current
+            DESCRIPTION
+                "The processor card supported by the Dell EMC Networking OS10
+                products ."
+            SYNTAX    INTEGER {
+                notPresent(0),
+                s6000on(1),        -- S6000-ON 32 x 40Gbe QSFP+ Interface Module
+                s4048on(2),        -- S4048-ON 48 x 10Gbe, 6 x 40Gbe QSFP+ Interface module
+                s4048Ton(3),       -- S4048T-ON 48 x 10Gbe copper, 6 x 40Gbe QSFP+ Interface module
+                s3048on(4),        -- S3048-ON 48 x 1Gbe copper, 4 x 10Gbe SFP+ Interface module
+                s6010on(5),        -- S6010-ON 32 x 40Gbe QSFP+ Interface Module
+                s4148Fon(6),       -- S4148F-ON 48 x 10Gbe, 2 x 40Gbe QSFP+, 4 x 100Gbe QSFP28 Interface module
+                s4128Fon(7),       -- S4128F-ON 28 x 10Gbe, 2 x 100Gbe QSFP28 Interface module
+                s4148Ton(8),       -- S4148T-ON 48 x 10Gbe copper, 2 x 40Gbe QSFP+, 4 x 100Gbe QSFP28 Interface module
+                s4128Ton(9),       -- S4128T-ON 28 x 10Gbe copper, 2 x 100Gbe QSFP28 Interface module
+                s4148FEon(10),     -- S4148FE-ON 48 x 10Gbe, 2 x 40Gbe QSFP+, 4 x 100Gbe QSFP28 Interface module
+                s4148Uon(11),      -- S4148U-ON 24 x 8GFC/10Gbe 24 x 10Gbe, 2 x 40Gbe QSFP+, 4 x 100Gbe QSFP28 Interface module
+                s4200on(12),       -- Deprecated: S4200-ON 40 x 10Gbe, 2 x 40Gbe QSFP+, 6 x 100Gbe QSFP28 Interface module
+                mx5108Non(13),     -- MX5108N-ON 8 x 25Gbe server ports, 4x 10Gbe copper, 1 x 40Gbe QSFP+, 2 x 100Gbe QSFP28  Interface module
+                mx9116Non(14),     -- MX9116N-ON  16 x 25Gbe server ports, 12 x 200Gbe DDQSFP, 4 x 100Gbe QSFP28 Interface module
+                s5148Fon(15),      -- S5148F-ON 48x25GbE, 6x100GbE QSFP28 Interface Module
+                z9100on(16),       -- Z9100-ON 32x100GbE QSFP28, 2x10GbE SFP+ Interface Module
+                s4248FBon(17),     -- S4248FB-ON 40 x 10Gbe, 2 x 40Gbe QSFP+, 6 x 100Gbe QSFP28 Interface module
+                s4248FBLon(18),    -- S4248FBL-ON 40 x 10Gbe, 2 x 40Gbe QSFP+, 6 x 100Gbe QSFP28 Interface module
+                s4112Fon(19),      -- S4112F-ON Maverick 12x10GbE Base-T, 3x100GbE Interface Module
+                s4112Ton(20),      -- S4112T-ON Maverick 12x10GbE, 3x100GbE Interface Module
+                z9264Fon(21),      -- Z9264F-ON Tomahawk 2 64x100G, 2x10Gbe Interface Module
+                z9232Fon(22),      -- Z9232F-ON 32x200GbE DD-QSFP28, 4x10GbE SFP+ Interface Module
+                s5212Fon(23),      -- S5212F-ON 12x25GbE SFP28, 3x100GbE QSFP28 Interface Module"
+                s5224Fon(24),      -- S5224F-ON 24x25GbE SFP28, 4x100GbE QSFP28 Interface Module
+                s5232Fon(25),      -- S5232F-ON 32x100GbE QSFP28, 2x10GbE SFP28 Interface Module
+                s5248Fon(26),      -- S5248F-ON 48x100GbE SFP28, 4x100GbE QSFP28, 2x200GbE QSFP-DD Interface Module
+                s5296Fon(27),      -- S5296F-ON 96x25GbE SFP28, 8x100GbE QSFP28 Interface Module
+                z9332Fon(28),      -- Z9332F-ON Tomahawk 3 32x400G, 2x10Gbe Interface Module
+                n3248TEon(29),     -- N3248TE-ON 48x1G, 4x10G, SFP+ Interface Module
+                unknown(9999)      -- unknown line card
+            }
+
+    Os10CardOperStatus ::= TEXTUAL-CONVENTION
+            STATUS        current
+            DESCRIPTION
+                "The operational status provides further condition of
+                the card. If AdminStatus is changed to 'up', then the
+                valid state is
+                'ready' - the card is present and ready and operational
+                          packets can be passed
+                If AdminStatus is changed to 'down', the states can be
+                as followed:
+                'cardMisMatch'- the card does not match what is configured
+                'cardProblem' - the card detects hardware problems
+                'diagMode'    - the card in the diagnostic mode
+                'cardAbsent'  - the card is not present
+                'offline'     - the card is not used."
+            SYNTAX          INTEGER {
+                ready(1),
+                cardMisMatch(2),
+                cardProblem(3),
+                diagMode(4),
+                cardAbsent(5),
+                offline(6)
+            }
+
+    Os10DeviceType ::= TEXTUAL-CONVENTION
+            STATUS      current
+            DESCRIPTION
+                "The device category running  the Dell EMC Networking OS10"
+            SYNTAX     INTEGER {
+				chassis(1),            -- Chassis
+				stack(2),              -- Stackable unit
+				rpm(3),                -- Route Processor Module
+				supervisor(4),         -- supervisor Module
+				linecard(5)            -- Line Card
+		    }
+
+    Os10CmnOperStatus ::= TEXTUAL-CONVENTION
+            STATUS      current
+            DESCRIPTION
+                "The common operating status for a device component."
+            SYNTAX     INTEGER {
+                up(1),
+                down(2),
+                testing(3),       -- in test mode
+                unknown(4),       -- status cannot be determined
+                dormant(5),
+                notPresent(6),    -- component missing
+                lowerLayerDown(7),
+                failed(8)
+            }
+
+
+END

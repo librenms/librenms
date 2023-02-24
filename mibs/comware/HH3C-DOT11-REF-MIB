@@ -1,0 +1,671 @@
+-- =============================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide root node and TC for 802.11 MIB series.
+-- Reference:
+-- Version: V2.2
+-- History:
+--   V1.0 created by shiyang (Richard)
+--     Initial version 2006-05-10
+--   V1.1 2007-04-27 modified by shiyang(Richard)
+--        Add "none" and "all" enumerate for Hh3cDot11AuthenType.
+--        Add Hh3cDot11RFModeType.
+--        Add none(1) for Hh3cDot11AKMType.
+--   V1.2 2007-06-21 modified by Vikas K
+--        Added Hh3cDot11AssocFailType.
+--        Added Hh3cDot11AuthorFailType.
+--        Added Hh3cDot11QosAcType.
+--   V1.3 2008-8-23 modified by Wang Lu
+--        Add Hh3cDot11RadioElementIndex
+--        Add enumerations to Hh3cDot11RadioType.
+--        Remove hyphen in enumerations of Hh3cDot11QosAcType.
+--        Add hh3cDot11ElementGroup.
+--   V1.4 2008-11-18 modified by Wang Lu
+--        Add Hh3cDot11WorkMode and Hh3cDot11CirMode
+--   V1.5 2009-05-07 modified by Wang Shaojie
+--        Modify Hh3cDot11SSIDEncryptModeType
+--   V1.6 2010-01-07 modified by Wang Shaojie
+--        Modify Hh3cDot11SecIEStatusType, Hh3cDot11CipherType
+--        2010-03-18 modified by Wang Lu
+--        Modify Hh3cDot11AKMType and Hh3cDot11CipherType
+--   V1.7 2011-08-10 modified by limingjin
+--        Add Hh3cDot11RadioType2
+--   V1.8 2011-08-26 modified by Wang Lu
+--        Add Hh3cDot11SaIntfDevType
+--   V1.9 2013-12-21 modified by wubin
+--        Modify Hh3cDot11RadioType, Hh3cDot11RadioType2
+--   V2.0 2014-02-14 modified by Xiao min
+--        Add Hh3cDot11TruthValueCM
+--   V2.1 2016-03-11 modified by yubo 04460
+--        Modify Hh3cDot11RadioType, Hh3cDot11RadioType2
+--   V2.2 2021-01-08 modified by suting
+--        Modify Hh3cDot11RadioType and Hh3cDot11RadioType2
+-- =============================================================================
+HH3C-DOT11-REF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        Integer32, Unsigned32, OBJECT-TYPE
+    FROM SNMPv2-SMI
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+hh3cDot11 MODULE-IDENTITY
+    LAST-UPDATED "202101081800Z"        -- Jan 08, 2021 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB defines the root node and TC for 802.11 features.
+        By this way, the MIB series for 802.11 will be easily maintained.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        IEEE 802.11a
+        This is a high speed physical layer extension to
+        the 802.11 standard on the 5 GHz band.
+
+        IEEE 802.11b
+        High-rate wireless LAN standard for wireless
+        data transfer at up to 11 Mbps.
+
+        IEEE 802.11g
+        Higher Speed Physical Layer (PHY) Extension to
+        IEEE 802.11b, will boost wireless LAN speed to 54
+        Mbps by using OFDM (orthogonal frequency division
+        multiplexing).  The IEEE 802.11g specification is
+        backward compatible with the widely deployed IEEE
+        802.11b standard.
+        When configure radio with as bg mode, it means that
+        radio will be compatible to 802.11b and 802.11g.
+        When configure radio with as g mode, it means that
+        radio will be only compatible to 802.11g.
+
+        IEEE 802.11i
+        As 802.11 has lot of deficiency in wireless security
+        domain, especially for enterprise custom, IEEE defined
+        a new standard 802.11i to extend security feature of
+        802.11 standard.
+
+        AKM
+        The authentication and key management method defined by
+        802.11i, and which includes 802.1x and pre-shared key."
+    REVISION "202101081800Z"        -- Jan 08, 2021 at 18:00 GMT
+    DESCRIPTION
+        "Modified to fix some issue."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to fix some issue."
+    REVISION "201001072000Z"        -- Jan 7, 2010 at 20:00 GMT
+    DESCRIPTION
+        "Modified for CMCC of GuangDong province."
+    REVISION "200905072000Z"        -- May 7, 2009 at 20:00 GMT
+    DESCRIPTION
+        "Modified for CMCC of GuangDong province."
+    REVISION "200706212000Z"        -- Jun 21, 2007 at 20:00 GMT
+    DESCRIPTION
+        "Modified for CMCC(China Mobile Communication Corporation)
+        requirements."
+    REVISION "200704272000Z"        -- Apr 27, 2007 at 20:00 GMT
+    DESCRIPTION
+        "Modified to add new TC."
+    REVISION "200605101900Z"        -- May 10, 2006 at 19:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 75 }
+
+-- *****************************************************************************
+-- *  Textual conventions from 802 definitions
+-- *****************************************************************************
+--  Common TEXTUAL-CONVENTION
+Hh3cDot11ObjectIDType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents AP identifier value type."
+    SYNTAX      OCTET STRING(SIZE(0..127))
+
+Hh3cDot11RadioScopeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents radio value scope."
+    SYNTAX      Integer32
+
+Hh3cDot11RadioType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents AP 802.11 radio type of 802.11a/b/g/n/ac/gac as per
+        the standard.
+        The following values are supported:
+        dot11a  - 802.11a
+        dot11b  - 802.11b
+        dot11g  - 802.11g
+        dot11n  - 802.11n
+        dot11gn  - 802.11gn
+        dot11an  - 802.11an
+        dot11ac  - 802.11ac
+        dot11gac - 802.11gac
+        dot11ax  - 802.11ax
+        dot11gax - 802.11gax
+        "
+    SYNTAX      INTEGER
+        {
+            dot11a(1),
+            dot11b(2),
+            dot11g(4),
+            dot11n(8),
+            dot11gn(16),
+            dot11an(32),
+            dot11ac(64),
+            dot11gac(128),
+            dot11ax(256),
+            dot11gax(512)
+        }
+
+Hh3cDot11RadioType2 ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents AP 802.11 radio type of 802.11a/b/g/an/gn/ac/gac as per
+        the standard.
+        The following values are supported:
+        dot11a   - 802.11a
+        dot11b   - 802.11b
+        dot11g   - 802.11g
+        dot11an  - 802.11an
+        dot11gn  - 802.11gn
+        dot11ac  - 802.11ac
+        dot11gac - 802.11gac
+        dot11ax  - 802.11ax
+        dot11gax - 802.11gax
+        "
+    SYNTAX      INTEGER
+        {
+            dot11a(1),
+            dot11b(2),
+            dot11g(4),
+            dot11an(8),
+            dot11gn(16),
+            dot11ac(32),
+            dot11gac(64),
+            dot11ax(128),
+            dot11gax(256)
+        }
+
+Hh3cDot11MACModeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "CAPWAP defines three kinds MAC modes for fit AP.
+        The management packet will be exchanged between AP and AC by
+        CAPWAP control tunnel.
+        For data packet, the following MAC mode are supported:
+        split        - AP will tunnel 802.11 data message
+        - to AC by CAPWAP,
+        localtunnel  - AP will convert data to 802.3, then tunnel
+        - it to AC by CAPWAP,
+        localbridge  - AP will directly handle data packet without
+        - sending to AC to process,
+        fatAP        - For fat AP, it will handle all 802.11 frames
+        - by itself."
+    SYNTAX      INTEGER
+        {
+            split(1),
+            localtunnel(2),
+            localbridge(3),
+            fatAP(4)
+        }
+
+Hh3cDot11ChannelScopeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel scope which consists of 802.11a/b/g."
+    SYNTAX      Integer32
+
+Hh3cDot11NotifyReasonType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The explanation string is for the event notification of dot11."
+    SYNTAX      OCTET STRING(SIZE(0..255))
+
+Hh3cDot11SSIDStringType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "SSID is a string to identify ESS for wireless network."
+    SYNTAX      OCTET STRING
+
+Hh3cDot11ServicePolicyIDType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of service policy ID."
+    SYNTAX      Integer32
+
+Hh3cDot11SSIDEncryptModeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents encryption mode for the specific ESS:
+        The following values are supported:
+        cleartxt  - clear txt,
+        cipher    - WPA and 802.11i,
+        ext       - ext."
+    SYNTAX      INTEGER
+        {
+            cleartxt(1),
+            cipher(2),
+            ext(3)
+        }
+
+Hh3cDot11PreambleType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the current radio preamble type.
+        The following values are supported:
+        long  - long preambles,
+        short - short preambles."
+    SYNTAX      INTEGER
+        {
+            long(1),
+            short(2)
+        }
+
+Hh3cDot11TxPwrLevelScopeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the Tx power level scope for 802.11."
+    SYNTAX      Integer32
+
+Hh3cDot11RFModeType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents RF management mode.
+        The following values are supported:
+        manual  - Configure RF parameter by manual,
+        auto    - Automaticall configure."
+    SYNTAX      INTEGER
+        {
+            manual(1),
+            auto(2)
+        }
+
+--  CAPWAP TEXTUAL-CONVENTION
+Hh3cDot11TunnelSecSchemType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents which security scheme option is available for
+        CAPWAP tunnel.
+        The following values are supported:
+        cleartxt  - No encryption protection,
+        dtls      - Encrypted by DTLS,
+        ipsec     - Encrypted by IPSEC."
+    SYNTAX      INTEGER
+        {
+            cleartxt(1),
+            dtls(2),
+            ipsec(3)
+        }
+
+--  802.11i TEXTUAL-CONVENTION
+Hh3cDot11SecIEStatusType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "To enable the WPA Information element in the beacon and probe
+        response frames sent by AP.
+        The following values are supported:
+        none - both wpa and rsn are disabled,
+        rsn  - only enable rsn,
+        wpa  - only enable wpa,
+        all  - both wpa and rsn are enabled,
+        ext - only enable ext."
+    SYNTAX      INTEGER
+        {
+            none(1),
+            rsn(2),
+            wpa(3),
+            all(4),
+            ext(5)
+        }
+
+Hh3cDot11CipherType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the frame encryption cipher types for
+        frames on IEEE 802.11 radio interfaces.
+        The MIB defines TC by referring to the 802.11i protocol.
+        The following values are supported:
+        none     - clear text or no cipher method is configure,
+        wep40    - 40-bit WEP key,
+        tkip     - WPA Temporal Key encryption,
+        aesccmp  - WPA AES CCMP encryption,
+        wep104   - 104-bit WEP key,
+        wpisms4  - ext encryption,
+        wep128   - 128-bit WEP key."
+    SYNTAX      INTEGER
+        {
+            none(1),
+            wep40(2),
+            tkip(4),
+            aesccmp(16),
+            wep104(32),
+            wpisms4(64),
+            wep128(128)
+        }
+
+Hh3cDot11AuthenType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the Authentication mode defined by 802.11.
+        The following values are supported:
+        none         - No authentication mode configured,
+        opensystem   - In fact,no real authentication happened,
+        sharedkey    - System will use challenge message to
+        - authenticate the access user,
+        all          - both open system and shared key."
+    SYNTAX      INTEGER
+        {
+            none(1),
+            opensystem(2),
+            sharedkey(3),
+            all(4)
+        }
+
+Hh3cDot11AKMType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the key management mode defined by 802.11i.
+        The following values are supported:
+        none         - No key management mode configured,
+        psk          - pre-shared key authentication,
+        dot1x        - 802.1x authentication,
+        ext          - ext."
+    SYNTAX      INTEGER
+        {
+            none(1),
+            psk(2),
+            dot1x(3),
+            ext(4)
+        }
+
+Hh3cDot11AssocFailType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons for station association failure.
+        including:
+        unknownfailure          - unknown failure,
+        toomanyassoc            - too many association,
+        invalidie               - information element is invalid,
+        unsupportedrate         - rate is not supported,
+        unsupportedpwrcap       - power capability is not supported,
+        unsupportedcap          - capability is not supported"
+    SYNTAX      INTEGER
+        {
+            unknownfailure(1),
+            toomanyassoc(2),
+            invalidie(3),
+            unsupportedrate(4),
+            unsupportedpwrcap(5),
+            unsupportedcap(6)
+        }
+
+Hh3cDot11AuthorFailType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the reasons for station authorization failure.
+        including:
+        unknownfailure           - unknown failure,
+        invalidie                - information element is invalid,
+        rsnieversionunsupported  - rsn information element version
+        is not supported,
+        wpaieversionunsupported  - wpa information element version
+        is not supported,
+        groupcipherinvalid       - group cipher is invalid,
+        pairwisecipherinvalid    - pairwise cipher is invalid,
+        akminvalid               - akm is invalid"
+    SYNTAX      INTEGER
+        {
+            unknownfailure(1),
+            invalidie(2),
+            rsnieversionunsupported(3),
+            wpaieversionunsupported(4),
+            groupcipherinvalid(5),
+            pairwisecipherinvalid(6),
+            akminvalid(7)
+        }
+
+--  802.11e TEXTUAL-CONVENTION
+Hh3cDot11QosAcType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "802.11e defines four types of access category, including:
+        acbk      - for background access category,
+        acbe      - for besteffort access category,
+        acvi      - for voice access category,
+        acvo      - for video access category
+        "
+    SYNTAX      INTEGER
+        {
+            acbk(1),
+            acbe(2),
+            acvi(3),
+            acvo(4)
+        }
+
+Hh3cDot11RadioElementIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Represents index of radio.  For split architecture, It comprises two parts.
+    The lowest 8 bits mean radio ID.  The highest 8 bits are reserved.  The
+    highest 8 bits stand for AP ID.  The meaning is shown as follows:
+    31             23                15             7             0
+    + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    |  reserved   |             AP  ID              | radio ID    |
+    + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+
+    For FAT AP, the type represents ifIndex of radio.
+    "
+    SYNTAX Unsigned32
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+
+Hh3cDot11WorkMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Work mode of device.
+    In normal mode, the device will provide WLAN service.
+    In monitor mode, the device will monitor the environment.
+    In hybrid mode, the device will provide WLAN service while monitoring the
+    environment."
+    SYNTAX INTEGER
+    {
+        normal(1),
+        monitor(2),
+        hybrid(3)
+    }
+
+Hh3cDot11CirMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "The mode of committed information rate.
+    'static' means station will use the configured CIR separately.
+    For example, if the CIR is 1Mbps, every station can enjoy 1Mbps.
+    'dynamic' means all stations will share the configured CIR in common."
+    SYNTAX INTEGER
+    {
+        static(1),
+        dynamic(2)
+    }
+
+Hh3cDot11SaIntfDevType ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of interference device."
+    SYNTAX INTEGER
+        {
+            microwave(1),
+            microwaveInverter(2),
+            bluetooth(3),
+            fixedFreqOthers(4),
+            fixedFreqCordlessPhone(5),
+            fixedFreqVideo(6),
+            fixedFreqAudio(7),
+            freqHopperOthers(8),
+            freqHopperCordlessBase(9),
+            freqHopperCordlessNetwork(10),
+            freqHopperXbox(11),
+            genericInterferer(12)
+        }
+
+Hh3cDot11TruthValueCM ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a boolean value."
+    SYNTAX INTEGER
+        {
+            dot11false(0),
+            dot11true(1)
+        }
+
+hh3cDot11Common OBJECT IDENTIFIER ::= { hh3cDot11 12 }
+
+hh3cDot11ElementGroup OBJECT IDENTIFIER ::= { hh3cDot11Common 1 }
+
+-- *****************************************************************************
+-- *  hh3cDot11APElementTable Definition
+-- *****************************************************************************
+hh3cDot11APElementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11APElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to represent fat AP and AP template on AC
+        as one kind of AP element."
+    ::= { hh3cDot11ElementGroup 1 }
+
+hh3cDot11APElementEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11APElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information for each AP element."
+    INDEX
+        {
+            hh3cDot11APElementIndex
+        }
+    ::= { hh3cDot11APElementTable 1 }
+
+Hh3cDot11APElementEntry ::= SEQUENCE
+    {
+        hh3cDot11APElementIndex             Integer32,
+        hh3cDot11APElementTemplateName      OCTET STRING,
+        hh3cDot11APElementSerialID          OCTET STRING,
+        hh3cDot11APElementModelAlias        OCTET STRING
+    }
+
+hh3cDot11APElementIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the index of AP element."
+    ::= { hh3cDot11APElementEntry 1 }
+
+hh3cDot11APElementTemplateName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the template name of AP element."
+    ::= { hh3cDot11APElementEntry 2 }
+
+hh3cDot11APElementSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of AP element."
+    ::= { hh3cDot11APElementEntry 3 }
+
+hh3cDot11APElementModelAlias OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the alias of AP element model name."
+    ::= { hh3cDot11APElementEntry 4 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11APElementTable Definition
+-- *****************************************************************************
+-- *****************************************************************************
+-- *  hh3cDot11RadioElementTable Definition
+-- *****************************************************************************
+hh3cDot11RadioElementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RadioElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to represent the radio element of fat AP and AC."
+    ::= { hh3cDot11ElementGroup 2 }
+
+hh3cDot11RadioElementEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioElementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information for each radio element."
+    INDEX
+        {
+            hh3cDot11APElementIndex,
+            hh3cDot11RadioElementRadioNum
+        }
+    ::= { hh3cDot11RadioElementTable 1 }
+
+Hh3cDot11RadioElementEntry ::= SEQUENCE
+    {
+        hh3cDot11RadioElementRadioNum       Unsigned32,
+        hh3cDot11RadioElementRadioPolicy    OCTET STRING,
+        hh3cDot11RadioElementRadioIndex     Unsigned32
+    }
+
+hh3cDot11RadioElementRadioNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the number of the radio element."
+    ::= { hh3cDot11RadioElementEntry 1 }
+
+hh3cDot11RadioElementRadioPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the radio policy of the radio element."
+    ::= { hh3cDot11RadioElementEntry 2 }
+
+hh3cDot11RadioElementRadioIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the index of the radio element.
+        On AC, the higher 24 bits stand for the AP index,
+        and the last 8 bits stand for the radio index.
+        On fat AP, the index stands for the interface index of radio
+        interface."
+    ::= { hh3cDot11RadioElementEntry 3 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11RadioElementTable Definition
+-- *****************************************************************************
+END

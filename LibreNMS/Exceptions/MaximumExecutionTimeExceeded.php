@@ -15,32 +15,32 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Illuminate\Support\Str;
-use Symfony\Component\Debug\Exception\FatalErrorException;
+use LibreNMS\Interfaces\Exceptions\UpgradeableException;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 
 class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableException
 {
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
-     * @return static
+     * @param  \Exception  $exception
+     * @return static|null
      */
     public static function upgrade($exception)
     {
         // cannot write to storage directory
-        if ($exception instanceof FatalErrorException &&
+        if ($exception instanceof FatalError &&
             Str::startsWith($exception->getMessage(), 'Maximum execution time of')) {
             return new static($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -51,7 +51,6 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

@@ -19,10 +19,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -31,22 +31,23 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\OspfNbr;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-use Log;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {
-    //Test OSPF neighbor state down trap
-    public function testOspfNbrDown()
-    {
-        $device = factory(Device::class)->create();
+    use RequiresDatabase;
+    use DatabaseTransactions;
 
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+    //Test OSPF neighbor state down trap
+    public function testOspfNbrDown(): void
+    {
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
-        $trapText = "$device->hostname
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:07:16.06
 SNMPv2-MIB::snmpTrapOID.0 OSPF-TRAP-MIB::ospfNbrStateChange
@@ -55,30 +56,26 @@ OSPF-MIB::ospfNbrIpAddr.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrIpAddr
 OSPF-MIB::ospfNbrAddressLessIndex.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrAddressLessIndex
 OSPF-MIB::ospfNbrRtrId.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrRtrId
 OSPF-MIB::ospfNbrState.$ospfNbr->ospf_nbr_id down
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ";
-
-        $trap = new Trap($trapText);
-
-        $message = "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to down";
-
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ospfNbrStateChange down');
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ",
+            "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to down",
+            'Could not handle ospfNbrStateChange down',
+            [5],
+            $device,
+        );
 
         $ospfNbr = $ospfNbr->fresh();
         $this->assertEquals($ospfNbr->ospfNbrState, 'down');
     }
 
     //Test OSPF neighbor state full trap
-    public function testOspfNbrFull()
+    public function testOspfNbrFull(): void
     {
-        $device = factory(Device::class)->create();
-
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'down']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'down']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
-        $trapText = "$device->hostname
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:07:16.06
 SNMPv2-MIB::snmpTrapOID.0 OSPF-TRAP-MIB::ospfNbrStateChange
@@ -87,30 +84,26 @@ OSPF-MIB::ospfNbrIpAddr.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrIpAddr
 OSPF-MIB::ospfNbrAddressLessIndex.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrAddressLessIndex
 OSPF-MIB::ospfNbrRtrId.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrRtrId
 OSPF-MIB::ospfNbrState.$ospfNbr->ospf_nbr_id full
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ";
-
-        $trap = new Trap($trapText);
-
-        $message = "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to full";
-
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ospfNbrStateChange full');
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ",
+            "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to full",
+            'Could not handle ospfNbrStateChange full',
+            [1],
+            $device,
+        );
 
         $ospfNbr = $ospfNbr->fresh();
         $this->assertEquals($ospfNbr->ospfNbrState, 'full');
     }
 
     //Test OSPF neighbor state trap any other state
-    public function testOspfNbrOther()
+    public function testOspfNbrOther(): void
     {
-        $device = factory(Device::class)->create();
-
-        $ospfNbr = factory(OspfNbr::class)->make(['device_id' => $device->device_id, 'ospfNbrState' => 'full']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
         $ospfNbr->ospf_nbr_id = "$ospfNbr->ospfNbrIpAddr.$ospfNbr->ospfNbrAddressLessIndex";
         $device->ospfNbrs()->save($ospfNbr);
 
-        $trapText = "$device->hostname
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:07:16.06
 SNMPv2-MIB::snmpTrapOID.0 OSPF-TRAP-MIB::ospfNbrStateChange
@@ -119,15 +112,12 @@ OSPF-MIB::ospfNbrIpAddr.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrIpAddr
 OSPF-MIB::ospfNbrAddressLessIndex.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrAddressLessIndex
 OSPF-MIB::ospfNbrRtrId.$ospfNbr->ospf_nbr_id $ospfNbr->ospfNbrRtrId
 OSPF-MIB::ospfNbrState.$ospfNbr->ospf_nbr_id exstart
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ";
-
-        $trap = new Trap($trapText);
-
-        $message = "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to exstart";
-
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ospfNbrStateChange exstart');
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240 ",
+            "OSPF neighbor $ospfNbr->ospfNbrRtrId changed state to exstart",
+            'Could not handle ospfNbrStateChange exstart',
+            [4],
+            $device,
+        );
 
         $ospfNbr = $ospfNbr->fresh();
         $this->assertEquals($ospfNbr->ospfNbrState, 'exstart');

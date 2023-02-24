@@ -1,0 +1,64 @@
+mib: XUPS-MIB:EATON-OIDS:EATON-EMP-MIB:UPS-MIB
+modules:
+    os:
+        hardware: XUPS-MIB::xupsIdentModel.0
+        version: XUPS-MIB::xupsIdentSoftwareVersion.0
+        serial: UPS-MIB::upsIdentName.0
+        serial_regex: '/ID: (?<serial>[^ ]+)/'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvAmbientTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.1.{{ $index }}'
+                    descr: 'Ambient'
+                    index: 'xupsEnvAmbientTemp.{{ $index }}'
+        load:
+            data:
+                -
+                    oid: xupsOutput
+                    value: xupsOutputLoad
+                    num_oid: '.1.3.6.1.4.1.534.1.4.1.{{ $index }}'
+                    descr: 'Output Load'
+                    index: 'xupsOutputLoad.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: xupsBattery
+                    value: xupsBatteryAbmStatus
+                    num_oid: '.1.3.6.1.4.1.534.1.2.5.{{ $index }}'
+                    descr: 'Battery Status {{ $index }}'
+                    index: 'xupsBatteryAbmStatus.{{ $index }}'
+                    states:
+                        - { value: 2, descr: batteryDischarging, graph: 1, generic: 2 }
+                        - { value: 3, descr: batteryFloating, graph: 1, generic: 0 }
+                        - { value: 4, descr: batteryResting, graph: 1, generic: 0 }
+                        - { value: 5, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 6, descr: batteryDisconnected, graph: 1, generic: 2 }
+                        - { value: 7, descr: batteryUnderTest, graph: 1, generic: 0 }
+                        - { value: 8, descr: checkBattery, graph: 1, generic: 2 }
+                -
+                    oid: xupsTest
+                    value: xupsTestBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.534.1.8.2.0.{{ $index }}'
+                    descr: 'Battery Test Status {{ $index }}'
+                    index: 'xupsTestBatteryStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: passed, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
+                        - { value: 4, descr: inProgress, graph: 1, generic: 0 }
+                        - { value: 5, descr: notSupported, graph: 1, generic: 0 }
+                        - { value: 6, descr: inhibited, graph: 1, generic: 2 }
+                        - { value: 7, descr: scheduled, graph: 1, generic: 0 }
+        runtime:
+            data:
+                -
+                    oid: xupsBattery
+                    value: xupsBatTimeRemaining
+                    num_oid: '.1.3.6.1.4.1.534.1.2.1.{{ $index }}'
+                    descr: 'Runtime'
+                    index: 'xupsBatTimeRemaining.{{ $index }}'
+                    divisor: 60
+

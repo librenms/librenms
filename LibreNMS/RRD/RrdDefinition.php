@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,17 +46,17 @@ class RrdDefinition
      * Add a dataset to this definition.
      * See https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html for more information.
      *
-     * @param string $name Textual name for this dataset. Must be [a-zA-Z0-9_], max length 19.
-     * @param string $type GAUGE | COUNTER | DERIVE | DCOUNTER | DDERIVE | ABSOLUTE.
-     * @param int $min Minimum allowed value.  null means undefined.
-     * @param int $max Maximum allowed value.  null means undefined.
-     * @param int $heartbeat Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string  $name  Textual name for this dataset. Must be [a-zA-Z0-9_], max length 19.
+     * @param  string  $type  GAUGE | COUNTER | DERIVE | DCOUNTER | DDERIVE | ABSOLUTE.
+     * @param  int  $min  Minimum allowed value.  null means undefined.
+     * @param  int  $max  Maximum allowed value.  null means undefined.
+     * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
      * @return RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         if (empty($name)) {
-            d_echo("DS must be set to a non-empty string.");
+            d_echo('DS must be set to a non-empty string.');
         }
 
         $name = $this->escapeName($name);
@@ -86,7 +86,7 @@ class RrdDefinition
     /**
      * Check if the give dataset name is valid for this definition
      *
-     * @param $name
+     * @param  string  $name
      * @return bool
      */
     public function isValidDataset($name)
@@ -103,34 +103,38 @@ class RrdDefinition
     public function disableNameChecking()
     {
         $this->skipNameCheck = true;
+
         return $this;
     }
 
     /**
      * Check that the data set type is valid.
      *
-     * @param string $type
+     * @param  string  $type
      * @return mixed
+     *
      * @throws InvalidRrdTypeException
      */
     private function checkType($type)
     {
-        if (!in_array($type, self::$types)) {
+        if (! in_array($type, self::$types)) {
             $msg = "$type is not valid, must be: " . implode(' | ', self::$types);
             throw new InvalidRrdTypeException($msg);
         }
+
         return $type;
     }
 
     /**
      * Remove all invalid characters from the name and truncate to 19 characters.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     private function escapeName($name)
     {
         $name = preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
+
         return substr($name, 0, 19);
     }
 }

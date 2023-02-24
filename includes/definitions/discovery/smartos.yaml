@@ -1,5 +1,7 @@
 mib: MSERIES-ENVMON-MIB:MSERIES-PORT-MIB
 modules:
+    os:
+        sysDescr_regex: '/Smart[Oo]ptics, (M-Series )?(?<hardware>\S+( [^,]+))(, SmartOS (?<version>\S+))?/'
     sensors:
         state:
             data:

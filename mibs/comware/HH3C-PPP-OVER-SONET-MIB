@@ -1,0 +1,542 @@
+--==============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: PPP Over Sonet MIB
+-- Reference:
+-- Version: V1.5
+-- History:
+--  V1.0 2004-10-28 created by fuzhenyu
+--  V1.1 2004-12-13 add notifications(9-13) under hh3cPosMIBNotifications by fuzhenyu.
+--  V1.2 2005-04-12 add hh3cPosFlagJ0Type, hh3cPosFlagJ1Type in hh3cPosParamTable by zhaotingqi.
+--  V1.3 2007-07-19 add hh3cPosNormalAlarm in hh3cPosMIBNotifications by chenfangchun
+--  V1.4 2010-05-19 modified by Tong Wei for TCA (Threshold Crossing Alarms)
+--                  add hh3cPosB1TCAThreshold, hh3cPosB2TCAThreshold, hh3cPosB3TCAThreshold,
+--                      hh3cPosB1TCAEnable, hh3cPosB2TCAEnable and hh3cPosB3TCAEnable
+--                      in hh3cPosParamTable
+--                  add hh3cPosB1TCAlarm, hh3cPosB2TCAlarm and hh3cPosB3TCAlarm
+--                      in hh3cPosMIBNotifications
+--  V1.5 2013-10-10 modify hh3cPosEncapsulation and hh3cPosMTU
+--                  in hh3cPosParamTable by chenzhouhui.  
+--  V1.6 2016-09-09 modify hh3cPosEncapsulation in hh3cPosParamTable by zhengwei.
+--==============================================================================
+HH3C-PPP-OVER-SONET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        ifIndex, ifDescr
+    FROM IF-MIB
+        Counter64, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        DisplayString, TruthValue
+    FROM SNMPv2-TC
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+hh3cPos MODULE-IDENTITY
+    LAST-UPDATED "201609091700Z"        -- Sep 09, 2016  GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB manages POS(PPP Over Sonet)interfaces by providing
+        an operational table which controls parameters of each POS
+        interface and reports alarm conditions.
+        "
+    REVISION "201609091700Z"        -- Sep 09, 2016 at 17:00 GMT
+    DESCRIPTION "Update the version of this MIB module"
+    REVISION "201310101700Z"        -- Oct 10, 2013 at 17:00 GMT
+    DESCRIPTION "Update the version of this MIB module"
+    REVISION "201005191700Z"        -- May 19, 2010 at 17:00 GMT
+    DESCRIPTION "Update the version of this MIB module"
+    REVISION "200707191700Z"        -- Jul 19, 2007 at 17:00 GMT
+    DESCRIPTION "The initial version of this MIB module"
+    ::= { hh3cCommon 19 }
+
+hh3cPosMIBObjects OBJECT IDENTIFIER ::= { hh3cPos 1 }
+
+hh3cPosParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPosParamTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The pos parameter table."
+    ::= { hh3cPosMIBObjects 1 }
+
+hh3cPosParamTableEntry OBJECT-TYPE
+    SYNTAX      Hh3cPosParamTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of pos table."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cPosParamTable 1 }
+
+Hh3cPosParamTableEntry ::= SEQUENCE
+    {
+        hh3cPosCRC                 INTEGER,
+        hh3cPosMTU                 Integer32,
+        hh3cPosScramble            TruthValue,
+        hh3cPosClockSource         INTEGER,
+        hh3cPosSdhFlagJ0           DisplayString,
+        hh3cPosSdhFlagJ1           DisplayString,
+        hh3cPosSonetFlagJ0         Integer32,
+        hh3cPosSonetFlagJ1         DisplayString,
+        hh3cPosFlagC2              Integer32,
+        hh3cPosFrameType           INTEGER,
+        hh3cPosBindVlanId          Integer32,
+        hh3cPosEncapsulation       INTEGER,
+        hh3cPoskeepaliveTimeout    Integer32,
+        hh3cPosBERthresholdSF      Integer32,
+        hh3cPosBERthresholdSD      Integer32,
+        hh3cPosB1Error             Counter64,
+        hh3cPosB2Error             Counter64,
+        hh3cPosB3Error             Counter64,
+        hh3cPosM1Error             Counter64,
+        hh3cPosG1Error             Counter64,
+        hh3cPosFlagJ0Type          INTEGER,
+        hh3cPosFlagJ1Type          INTEGER,
+        hh3cPosB1TCAThreshold      Integer32,
+        hh3cPosB2TCAThreshold      Integer32,
+        hh3cPosB3TCAThreshold      Integer32,
+        hh3cPosB1TCAEnable         INTEGER,
+        hh3cPosB2TCAEnable         INTEGER,
+        hh3cPosB3TCAEnable         INTEGER
+    }
+
+hh3cPosCRC OBJECT-TYPE
+    SYNTAX      INTEGER{crc32(1),crc16(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The length of CRC"
+    DEFVAL { crc32 }
+    ::={ hh3cPosParamTableEntry 1 }
+
+hh3cPosMTU OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Transfer Unit (MTU) of POS interface"
+    ::={ hh3cPosParamTableEntry 2 }
+
+hh3cPosScramble OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Scrambling is used to avoid continuous 0 or 1 in signals. This
+        object is to decide whether to scramble or not"
+    DEFVAL { true }
+    ::={ hh3cPosParamTableEntry 3 }
+
+hh3cPosClockSource OBJECT-TYPE
+    SYNTAX      INTEGER{system(1),line(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value indicates the source of clock signal. System indicates
+        that clock signals are from device itself and line for clock signals
+        from remote"
+    DEFVAL { line }
+    ::={ hh3cPosParamTableEntry 4 }
+
+hh3cPosSdhFlagJ0 OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The section trace byte. This node is used when the frame type is sdh."
+    ::={ hh3cPosParamTableEntry 5 }
+
+hh3cPosSdhFlagJ1 OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The path trace byte. This node is used when the frame type is sdh."
+    ::={ hh3cPosParamTableEntry 6 }
+
+hh3cPosSonetFlagJ0 OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The section trace byte. This node is used when the frame type is sonet."
+    ::={ hh3cPosParamTableEntry 7 }
+
+hh3cPosSonetFlagJ1 OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..62))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The path trace byte. This node is used when the frame type is sonet."
+    ::={ hh3cPosParamTableEntry 8 }
+
+
+hh3cPosFlagC2 OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The parameter for the channel signal value of C2 byte"
+    DEFVAL { 22 }
+    ::={ hh3cPosParamTableEntry 9 }
+
+hh3cPosFrameType OBJECT-TYPE
+    SYNTAX      INTEGER{sdh(1),sonet(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frame type that encapsulates the packet. Default frame type is
+        sdh(Synchronous Digital Hierarchy) It also can be configured using
+        sonet type(Synchronous Optical Network)."
+    DEFVAL      { sdh }
+    ::={ hh3cPosParamTableEntry 10 }
+
+hh3cPosBindVlanId OBJECT-TYPE
+    SYNTAX      Integer32(0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The vlan that this pos port binds. The vlan can not include any other
+        port, otherwise error will be returned. If the vlan has a virtual
+        interface, the status of virtual interface will be up or down according
+        to the link status or this pos."
+    ::={ hh3cPosParamTableEntry 11 }
+
+hh3cPosEncapsulation OBJECT-TYPE
+    SYNTAX      INTEGER{ppp(1),hdlc(2),fr(3),mfr(4)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of encapsulation "
+    DEFVAL      { ppp }
+    ::={ hh3cPosParamTableEntry 12 }
+
+hh3cPoskeepaliveTimeout OBJECT-TYPE
+    SYNTAX      Integer32(0..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The keeplive of ppp, hdlc, fr or mfr. It is the query interval of link status. Two
+        members of a link should have same keeplive. The default 0 prohibits
+        detecting status of link."
+    ::={ hh3cPosParamTableEntry 13 }
+
+hh3cPosBERthresholdSF OBJECT-TYPE
+    SYNTAX      Integer32(3..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The bit-error rate threshold for Signal Fault. SF threshold should
+        be greater than SD threshold."
+    DEFVAL      { 3 }
+    ::={ hh3cPosParamTableEntry 14 }
+
+hh3cPosBERthresholdSD OBJECT-TYPE
+    SYNTAX      Integer32(3..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The bit-error rate threshold for Signal Degrade. SD threshold should
+        be less than SF threshold."
+    DEFVAL      { 6 }
+    ::={ hh3cPosParamTableEntry 15 }
+
+hh3cPosB1Error OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter for SBIPE(Section Bit Interleave Parity Error)"
+    ::={ hh3cPosParamTableEntry 16 }
+
+hh3cPosB2Error OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter for LBIPE(Line Bit Interleave Parity Error)"
+    ::={ hh3cPosParamTableEntry 17 }
+
+hh3cPosB3Error OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter for PBIPE(Path Bit Interleave Parity Error)"
+    ::={ hh3cPosParamTableEntry 18 }
+
+hh3cPosM1Error OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How many times does LREI(Line Remote Error Indication) occur"
+    ::={ hh3cPosParamTableEntry 19 }
+
+hh3cPosG1Error OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How many times does PREI(Path Remote Error Indication) occur"
+    ::={ hh3cPosParamTableEntry 20 }
+
+hh3cPosFlagJ0Type OBJECT-TYPE
+    SYNTAX      INTEGER{sdh(1),sonet(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frame type that encapsulates the flag J0. Default frame type is
+        sdh(Synchronous Digital Hierarchy). It also can be configured using
+        sonet(Synchronous Optical Network) type."
+    DEFVAL      { sdh }
+    ::={ hh3cPosParamTableEntry 21 }
+
+hh3cPosFlagJ1Type OBJECT-TYPE
+    SYNTAX      INTEGER{sdh(1),sonet(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frame type that encapsulates the flag J1. Default frame type is
+        sdh(Synchronous Digital Hierarchy). It also can be configured using
+        sonet(Synchronous Optical Network) type."
+    DEFVAL      { sdh }
+    ::={ hh3cPosParamTableEntry 22 }
+
+hh3cPosB1TCAThreshold OBJECT-TYPE
+    SYNTAX  Integer32 (3..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold for B1 TCA."
+    DEFVAL { 6 }
+    ::={ hh3cPosParamTableEntry 23 }
+
+hh3cPosB2TCAThreshold OBJECT-TYPE
+    SYNTAX  Integer32 (3..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold for B2 TCA."
+    DEFVAL { 6 }
+    ::={ hh3cPosParamTableEntry 24 }
+
+hh3cPosB3TCAThreshold OBJECT-TYPE
+    SYNTAX  Integer32 (3..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold for B3 TCA."
+    DEFVAL { 6 }
+    ::={ hh3cPosParamTableEntry 25 }
+
+hh3cPosB1TCAEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable traps of B1 TCA."
+    DEFVAL { enable }
+    ::={ hh3cPosParamTableEntry 26 }
+
+hh3cPosB2TCAEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable traps of B2 TCA."
+    DEFVAL { enable }
+    ::={ hh3cPosParamTableEntry 27 }
+
+hh3cPosB3TCAEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable traps of B3 TCA."
+    DEFVAL { enable }
+    ::={ hh3cPosParamTableEntry 28 }
+
+hh3cPosMIBNotificationsPrefix OBJECT IDENTIFIER ::= { hh3cPos 2 }
+hh3cPosMIBNotifications OBJECT IDENTIFIER ::= { hh3cPosMIBNotificationsPrefix 0 }
+
+hh3cPosLOSAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates loss of signal"
+    ::={ hh3cPosMIBNotifications 1 }
+
+hh3cPosLOFAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates loss of frame"
+    ::={ hh3cPosMIBNotifications 2 }
+
+hh3cPosOOFAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates out of frame"
+    ::={ hh3cPosMIBNotifications 3 }
+
+hh3cPosLAISAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm when LAIS(Line  Alarm  Indication  Signal) arrives"
+    ::={ hh3cPosMIBNotifications 4 }
+
+hh3cPosLRDIAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm when LRDI(Line  Remote  Defect  Indication) arrives"
+    ::={ hh3cPosMIBNotifications 5 }
+
+hh3cPosPRDIAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm when PRDI(Path  Remote  Defect  Indication) arrives"
+    ::={ hh3cPosMIBNotifications 6 }
+
+hh3cPosPAISAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm when PAIS(Path  Alarm  Indication  Signal) arrives"
+    ::={ hh3cPosMIBNotifications 7 }
+
+hh3cPosLOPAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates loss of pointer"
+    ::={ hh3cPosMIBNotifications 8 }
+
+hh3cPosSTIMAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates inconsistency between sent and received J0 bytes."
+    ::={ hh3cPosMIBNotifications 9 }
+
+hh3cPosPTIMAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates inconsistency between sent and received J1 bytes."
+    ::={ hh3cPosMIBNotifications 10 }
+
+hh3cPosPSLMAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates a mismatched C2 byte."
+    ::={ hh3cPosMIBNotifications 11 }
+
+hh3cPosLSDAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates that the B2 bit-error rate exceeds SD threshold."
+    ::={ hh3cPosMIBNotifications 12 }
+
+hh3cPosLSFAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates that the B2 bit-error rate exceeds SF threshold."
+    ::={ hh3cPosMIBNotifications 13 }
+
+hh3cPosNormalAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "Alarm indicates that the Pos interface state returns normal."
+    ::={ hh3cPosMIBNotifications 14 }
+
+hh3cPosB1TCAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS      current
+    DESCRIPTION
+        "Threshold crossing alarms for B1."
+    ::={ hh3cPosMIBNotifications 15 }
+
+hh3cPosB2TCAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS      current
+    DESCRIPTION
+        "Threshold crossing alarms for B2."
+    ::={ hh3cPosMIBNotifications 16 }
+
+hh3cPosB3TCAlarm NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS      current
+    DESCRIPTION
+        "Threshold crossing alarms for B3."
+    ::={ hh3cPosMIBNotifications 17 }
+
+END

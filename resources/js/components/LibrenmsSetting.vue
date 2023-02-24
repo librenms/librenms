@@ -14,10 +14,10 @@
   - GNU General Public License for more details.
   -
   - You should have received a copy of the GNU General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -
   - @package    LibreNMS
-  - @link       http://librenms.org
+  - @link       https://www.librenms.org
   - @copyright  2019 Tony Murray
   - @author     Tony Murray <murraytony@gmail.com>
   -->
@@ -36,14 +36,15 @@
                        :disabled="setting.overridden"
                        :required="setting.required"
                        :options="setting.options"
+                       :update-status="updateStatus"
                        @input="changeValue($event)"
                        @change="changeValue($event)"
             ></component>
             <span class="form-control-feedback"></span>
         </div>
         <div class="col-sm-2">
-            <button :style="{'opacity': showResetToDefault()?1:0}" @click="resetToDefault" class="btn btn-default" type="button" v-tooltip="{ content: $t('Reset to default') }"><i class="fa fa-refresh"></i></button>
-            <button :style="{'opacity': showUndo()?1:0}" @click="resetToInitial" class="btn btn-primary" type="button" v-tooltip="{ content: $t('Undo') }"><i class="fa fa-undo"></i></button>
+            <button :style="{'opacity': showResetToDefault()?1:0}" @click="resetToDefault" class="btn btn-default" :class="{'disable-events': ! showResetToDefault()}" type="button" v-tooltip="{ content: $t('Reset to default') }"><i class="fa fa-refresh"></i></button>
+            <button :style="{'opacity': showUndo()?1:0}" @click="resetToInitial" class="btn btn-primary" :class="{'disable-events': ! showUndo()}" type="button" v-tooltip="{ content: $t('Undo') }"><i class="fa fa-undo"></i></button>
             <div v-if="hasHelp()" v-tooltip="{content: getHelp(), trigger: 'hover click'}" class="fa fa-fw fa-lg fa-question-circle"></div>
         </div>
     </div>
@@ -60,20 +61,24 @@
         data() {
             return {
                 value: this.setting.value,
+                updateStatus: 'none',
                 feedback: ''
             }
         },
         methods: {
             persistValue(value) {
+                this.updateStatus = 'pending';
                 axios.put(route(this.prefix + '.update', this.getRouteParams()), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
+                        this.updateStatus = 'success';
                         this.feedback = 'has-success';
                         setTimeout(() => this.feedback = '', 3000);
                     })
                     .catch((error) => {
                         this.feedback = 'has-error';
+                        this.updateStatus = 'error';
                         toastr.error(error.response.data.message);
 
                         // don't reset certain types back to actual value on error
@@ -163,5 +168,7 @@
 </script>
 
 <style scoped>
-
+.disable-events {
+    pointer-events: none;
+}
 </style>

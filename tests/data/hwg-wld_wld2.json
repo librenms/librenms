@@ -1,0 +1,206 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.21796.4.9",
+                    "sysDescr": "WLD2 1.4.3",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "hwg-wld",
+                    "type": "environment",
+                    "serial": "27F5010000000008",
+                    "icon": "hwg.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.21796.4.5.4.1.3.1",
+                    "sensor_index": "wldState.1",
+                    "sensor_type": "wldState",
+                    "sensor_descr": "\"Sonde Nord\" state",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "wldState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.21796.4.5.4.1.6.1",
+                    "sensor_index": "wldValue.1",
+                    "sensor_type": "wldValue",
+                    "sensor_descr": "\"Sonde Nord\" detailed state",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "wldValue"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.21796.4.5.4.1.6.2",
+                    "sensor_index": "wldValue.2",
+                    "sensor_type": "wldValue",
+                    "sensor_descr": "\"Water 502\" detailed state",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "wldValue"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.21796.4.5.4.1.6.3",
+                    "sensor_index": "wldValue.3",
+                    "sensor_type": "wldValue",
+                    "sensor_descr": "\"Water 503\" detailed state",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "wldValue"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.21796.4.5.4.1.6.4",
+                    "sensor_index": "wldValue.4",
+                    "sensor_type": "wldValue",
+                    "sensor_descr": "\"Water 504\" detailed state",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "wldValue"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "wldState",
+                    "state_descr": "invalid",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "wldState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "wldState",
+                    "state_descr": "alarm",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "wldValue",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "wldValue",
+                    "state_descr": "flooded",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "wldValue",
+                    "state_descr": "disconnect",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "wldValue",
+                    "state_descr": "invalid",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

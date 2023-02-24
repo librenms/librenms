@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\PollerCluster;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PollerClusterPolicy
@@ -96,7 +96,6 @@ class PollerClusterPolicy
      * Determine whether the user can manage the poller cluster.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\PollerCluster  $pollerCluster
      * @return mixed
      */
     public function manage(User $user)

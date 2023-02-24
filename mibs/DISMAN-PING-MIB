@@ -1,9 +1,8 @@
-
 DISMAN-PING-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32,
-    Unsigned32, mib-2,
+    Unsigned32, Gauge32, mib-2,
     NOTIFICATION-TYPE, OBJECT-IDENTITY
         FROM SNMPv2-SMI                  -- RFC2578
     TEXTUAL-CONVENTION, RowStatus,
@@ -15,32 +14,64 @@ IMPORTS
     InterfaceIndexOrZero                 -- RFC2863
         FROM IF-MIB
     SnmpAdminString
-        FROM SNMP-FRAMEWORK-MIB          -- RFC2571
+        FROM SNMP-FRAMEWORK-MIB          -- RFC3411
     InetAddressType, InetAddress
-        FROM INET-ADDRESS-MIB;           -- RFC2851
+        FROM INET-ADDRESS-MIB;           -- RFC4001
 
  pingMIB MODULE-IDENTITY
-    LAST-UPDATED "200009210000Z"         -- 21 September 2000
+    LAST-UPDATED "200606130000Z"         -- 13 June 2006
     ORGANIZATION "IETF Distributed Management Working Group"
     CONTACT-INFO
-        "Kenneth White
+        "Juergen Quittek
 
-        International Business Machines Corporation
-        Network Computing Software Division
-        Research Triangle Park, NC, USA
+        NEC Europe Ltd.
+        Network Laboratories
+        Kurfuersten-Anlage 36
+        69115 Heidelberg
+        Germany
 
-        E-mail: wkenneth@us.ibm.com"
+        Phone: +49 6221 4342-115
+
+        Email: quittek@netlab.nec.de"
     DESCRIPTION
         "The Ping MIB (DISMAN-PING-MIB) provides the capability of
         controlling the use of the ping function at a remote
-        host."
+        host.
+
+        Copyright (C) The Internet Society (2006).  This version of
+        this MIB module is part of RFC 4560; see the RFC itself for
+        full legal notices."
 
      --  Revision history
+
+     REVISION     "200606130000Z"         -- 13 June 2006
+     DESCRIPTION
+         "Updated version, published as RFC 4560.
+             - Correctly considered IPv6 in DESCRIPTION
+               clause of pingCtlDataSize
+             - Replaced references to RFC 2575 by RFC 3415
+             - Replaced references to RFC 2571 by RFC 3411
+             - Replaced references to RFC 2851 by RFC 4001
+             - Added DEFVAL { {} } to definition of
+               pingCtlTrapGeneration
+             - Changed DEFVAL of object pingCtlDescr from
+               DEFVAL { '00'H } to DEFVAL { ''H }
+             - Changed DEFVAL of object pingCtlSourceAddressType
+               from DEFVAL { ipv4 } to DEFVAL { unknown }
+             - Extended DESCRIPTION clause of pingResultsTable
+               describing re-initialization of entries
+             - Changed SYNTAX of pingResultsProbeResponses and
+               pingResultsSentProbes from Unsigned32 to Gauge32
+             - Changed status of pingCompliance to deprecated
+             - Added pingFullCompliance and pingMinimumCompliance
+             - Changed status of pingGroup and pingTimeStampGroup
+               to deprecated
+             - Added pingMinimumGroup, pingCtlRowStatusGroup,
+               and pingHistoryGroup"
 
      REVISION     "200009210000Z"         -- 21 September 2000
      DESCRIPTION
          "Initial version, published as RFC 2925."
-
     ::= { mib-2 80 }
 
  -- Textual Conventions
@@ -50,7 +81,7 @@ IMPORTS
     DESCRIPTION
         "Used to report the result of an operation:
 
-         responseReceived(1) - Operation completes successfully.
+         responseReceived(1) - Operation is completed successfully.
          unknown(2) - Operation failed due to unknown error.
          internalError(3) - An implementation detected an error
               in its own processing that caused an operation
@@ -61,10 +92,10 @@ IMPORTS
               address.
          noRouteToTarget(6) - Could not find a route to target.
          interfaceInactiveToTarget(7) - The interface to be
-              used in sending a probe is inactive without an
-              alternate route existing.
+              used in sending a probe is inactive, and an
+              alternate route does not exist.
          arpFailure(8) - Unable to resolve a target address to a
-              media specific address.
+              media-specific address.
          maxConcurrentLimitReached(9) - The maximum number of
               concurrent active operations would have been exceeded
               if the corresponding operation was allowed.
@@ -90,10 +121,8 @@ IMPORTS
  -- Top level structure of the MIB
 
  pingNotifications              OBJECT IDENTIFIER ::= { pingMIB 0 }
- pingObjects                    OBJECT IDENTIFIER 
-    ::= { pingMIB 1 }
+ pingObjects                    OBJECT IDENTIFIER ::= { pingMIB 1 }
  pingConformance                OBJECT IDENTIFIER ::= { pingMIB 2 }
-
 
  -- The registration node (point) for ping implementation types
 
@@ -118,8 +147,8 @@ IMPORTS
  pingSnmpQuery OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION
-        "Indicates that an implementation is an SNMP query to
-        calculate a round trip time."
+        "Indicates that an implementation is using an SNMP query
+         to calculate a round trip time."
     ::= { pingImplementationTypeDomains 3 }
 
  pingTcpConnectionAttempt OBJECT-IDENTITY
@@ -129,7 +158,6 @@ IMPORTS
         connect to a TCP port in order to calculate a round
         trip time."
     ::= { pingImplementationTypeDomains 4 }
-
 
  -- Simple Object Definitions
 
@@ -142,7 +170,12 @@ IMPORTS
        "The maximum number of concurrent active ping requests
        that are allowed within an agent implementation.  A value
        of 0 for this object implies that there is no limit for
-       the number of concurrent active requests in effect."
+       the number of concurrent active requests in effect.
+
+       The limit applies only to new requests being activated.
+       When a new value is set, the agent will continue processing
+       all the requests already active, even if their number
+       exceeds the limit just imposed."
     DEFVAL { 10 }
     ::= { pingObjects 1 }
 
@@ -168,8 +201,8 @@ IMPORTS
         "Defines an entry in the pingCtlTable.  The first index
         element, pingCtlOwnerIndex, is of type SnmpAdminString,
         a textual convention that allows for use of the SNMPv3
-        View-Based Access Control Model (RFC 2575 [11], VACM)
-        and allows an management application to identify its
+        View-Based Access Control Model (RFC 3415, VACM)
+        and that allows a management application to identify its
         entries.  The second index, pingCtlTestName (also an
         SnmpAdminString), enables the same management
         application to have multiple outstanding requests."
@@ -214,14 +247,14 @@ IMPORTS
        "To facilitate the provisioning of access control by a
        security administrator using the View-Based Access
        Control Model (RFC 2575, VACM) for tables in which
-       multiple users may need to independently create or
-       modify entries, the initial index is used as an 'owner
-       index'.  Such an initial index has a syntax of
-       SnmpAdminString, and can thus be trivially mapped to a
-       securityName or groupName as defined in VACM, in
+       multiple users may need to create or
+       modify entries independently, the initial index is used
+       as an 'owner index'.  Such an initial index has a syntax
+       of SnmpAdminString and can thus be trivially mapped to a
+       securityName or groupName defined in VACM, in
        accordance with a security policy.
 
-       When used in conjunction with such a security policy all
+       When used in conjunction with such a security policy, all
        entries in the table belonging to a particular user (or
        group) will have the same value for this initial index.
        For a given user's entries in a particular table, the
@@ -242,7 +275,7 @@ IMPORTS
     STATUS      current
     DESCRIPTION
         "The name of the ping test.  This is locally unique, within
-        the scope of an pingCtlOwnerIndex."
+        the scope of a pingCtlOwnerIndex."
     ::= { pingCtlEntry 2 }
 
  pingCtlTargetAddressType OBJECT-TYPE
@@ -262,8 +295,9 @@ IMPORTS
     DESCRIPTION
         "Specifies the host address to be used at a remote host for
         performing a ping operation.  The host address type is
-        determined by the object value of corresponding
+        determined by the value of the corresponding
         pingCtlTargetAddressType.
+
         A value for this object MUST be set prior to transitioning
         its corresponding pingCtlEntry to active(1) via
         pingCtlRowStatus."
@@ -277,13 +311,23 @@ IMPORTS
     STATUS      current
     DESCRIPTION
         "Specifies the size of the data portion to be
-        transmitted in a ping operation in octets.  A ping
-        request is usually an ICMP message encoded
-        into an IP packet.  An IP packet has a maximum size
-        of 65535 octets.  Subtracting the size of the ICMP
-        or UDP header (both 8 octets) and the size of the IP
-        header (20 octets) yields a maximum size of 65507
-        octets."
+        transmitted in a ping operation, in octets.  Whether this
+        value can be applied depends on the selected
+        implementation method for performing a ping operation,
+        indicated by pingCtlType in the same conceptual row.
+        If the method used allows applying the value contained
+
+        in this object, then it MUST be applied.  If the specified
+        size is not appropriate for the chosen ping method, the
+        implementation SHOULD use whatever size (appropriate to
+        the method) is closest to the specified size.
+
+        The maximum value for this object was computed by
+        subtracting the smallest possible IP header size of
+        20 octets (IPv4 header with no options) and the UDP
+        header size of 8 octets from the maximum IP packet size.
+        An IP packet has a maximum size of 65535 octets
+        (excluding IPv6 Jumbograms)."
     DEFVAL { 0 }
     ::= { pingCtlEntry 5 }
 
@@ -305,7 +349,7 @@ IMPORTS
     STATUS      current
     DESCRIPTION
         "Specifies the number of times to perform a ping
-        operation at a remote host."
+        operation at a remote host as part of a single ping test."
     DEFVAL { 1 }
     ::= { pingCtlEntry 7 }
 
@@ -340,7 +384,7 @@ IMPORTS
         corresponding pingCtlDataSize value to determine how to
         fill the data portion of a probe packet.  The option of
         selecting a data fill pattern can be useful when links
-        are compressed or have data pattern sensitivities. The
+        are compressed or have data pattern sensitivities.  The
         contents of pingCtlDataFill should be repeated in a ping
         packet when the size of the data portion of the ping
         packet is greater than the size of pingCtlDataFill."
@@ -360,7 +404,7 @@ IMPORTS
         A single ping test consists of a series of ping probes.
         The number of probes is determined by the value of the
         corresponding pingCtlProbeCount object.  After a single
-        test completes the number of seconds as defined by the
+        test is completed the number of seconds as defined by the
         value of pingCtlFrequency MUST elapse before the
         next ping test is started.
 
@@ -376,11 +420,11 @@ IMPORTS
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The maximum number of entries allowed in the
-        pingProbeHistoryTable.  An implementation of this
-        MIB will remove the oldest entry in the
+        "The maximum number of corresponding entries allowed
+        in the pingProbeHistoryTable.  An implementation of this
+        MIB will remove the oldest corresponding entry in the
         pingProbeHistoryTable to allow the addition of an
-        new entry once the number of rows in the
+        new entry once the number of corresponding rows in the
         pingProbeHistoryTable reaches this value.
 
         Old entries are not removed when a new test is
@@ -413,26 +457,27 @@ IMPORTS
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of this object determines when and if
+        "The value of this object determines when and whether
         to generate a notification for this entry:
 
         probeFailure(0)   - Generate a pingProbeFailed
             notification subject to the value of
             pingCtlTrapProbeFailureFilter.  The object
             pingCtlTrapProbeFailureFilter can be used
-            to specify the number of successive probe failures
-            that are required before a pingProbeFailed
-            notification can be generated.
+            to specify the number of consecutive probe
+            failures that are required before a
+            pingProbeFailed notification can be generated.
         testFailure(1)    - Generate a pingTestFailed
-            notification. In this instance the object
+            notification.  In this instance the object
             pingCtlTrapTestFailureFilter can be used to
             determine the number of probe failures that
             signal when a test fails.
         testCompletion(2) - Generate a pingTestCompleted
             notification.
 
-        The value of this object defaults to zero, indicating
-        that none of the above options have been selected."
+        By default, no bits are set, indicating that
+        none of the above options is selected."
+    DEFVAL { {} }  -- no bits set.
     ::= { pingCtlEntry 13 }
 
  pingCtlTrapProbeFailureFilter OBJECT-TYPE
@@ -443,12 +488,14 @@ IMPORTS
         "The value of this object is used to determine when
         to generate a pingProbeFailed NOTIFICATION.
 
-        Setting pingCtlTrapGeneration
-        to probeFailure(0) implies that a pingProbeFailed
-        NOTIFICATION is generated only when the number of
-        successive probe failures as indicated by the
-        value of pingCtlTrapPrbefailureFilter fail within
-        a given ping test."
+        Setting BIT probeFailure(0) of object
+        pingCtlTrapGeneration to '1' implies that a
+        pingProbeFailed NOTIFICATION is generated only when
+
+        a number of consecutive ping probes equal to the
+        value of pingCtlTrapProbeFailureFilter fail within
+        a given ping test.  After triggering the notification,
+        the probe failure counter is reset to zero."
     DEFVAL { 1 }
     ::= { pingCtlEntry 14 }
 
@@ -460,11 +507,14 @@ IMPORTS
         "The value of this object is used to determine when
         to generate a pingTestFailed NOTIFICATION.
 
-        Setting pingCtlTrapGeneration to testFailure(1)
-        implies that a pingTestFailed NOTIFICATION is
-        generated only when the number of ping failures
-        within a test exceed the value of
-        pingCtlTrapTestFailureFilter."
+        Setting BIT testFailure(1) of object
+
+        pingCtlTrapGeneration to '1' implies that a
+        pingTestFailed NOTIFICATION is generated only when
+        a number of consecutive ping tests equal to the
+        value of pingCtlTrapProbeFailureFilter fail.
+        After triggering the notification, the test failure
+        counter is reset to zero."
     DEFVAL { 1 }
     ::= { pingCtlEntry 15 }
 
@@ -473,14 +523,14 @@ IMPORTS
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of this object is used to either report or
-        select the implementation method to be used for
+        "The value of this object is used either to report or
+        to select the implementation method to be used for
         calculating a ping response time.  The value of this
         object MAY be selected from pingImplementationTypeDomains.
 
         Additional implementation types SHOULD be allocated as
         required by implementers of the DISMAN-PING-MIB under
-        their enterprise specific registration point and not
+        their enterprise-specific registration point and not
         beneath pingImplementationTypeDomains."
     DEFVAL { pingIcmpEcho }
     ::= { pingCtlEntry 16 }
@@ -492,7 +542,7 @@ IMPORTS
     DESCRIPTION
         "The purpose of this object is to provide a
         descriptive name of the remote ping test."
-    DEFVAL { '00'H }
+    DEFVAL { ''H }
     ::= { pingCtlEntry 17 }
 
  pingCtlSourceAddressType OBJECT-TYPE
@@ -502,8 +552,8 @@ IMPORTS
     DESCRIPTION
         "Specifies the type of the source address,
         pingCtlSourceAddress, to be used at a remote host
-        when performing a ping operation."
-    DEFVAL { ipv4 }
+        when a ping operation is performed."
+    DEFVAL { unknown }
     ::= { pingCtlEntry 18 }
 
   pingCtlSourceAddress OBJECT-TYPE
@@ -511,17 +561,14 @@ IMPORTS
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Use the specified IP address (which must be given
-        in numeric form, not as a hostname) as the source
-        address in outgoing probe packets.  On hosts with
-        more than one IP address, this option can be used
-        to force the source address to be something other
-        than the primary IP address of the interface the
-        probe packet is sent on.  If the IP address is not
-        one of this machine's interface addresses, an error
-        is returned and nothing is sent.  A zero length
-        octet string value for this object disables source
-        address specification.
+        "Use the specified IP address (which must be given in
+        numeric form, not as a hostname) as the source address
+        in outgoing probe packets.  On hosts with more than one
+        IP address, this option can be used to select the address
+        to be used.  If the IP address is not one of this
+        machine's interface addresses, an error is returned and
+        nothing is sent.  A zero-length octet string value for
+        this object disables source address specification.
 
         The address type (InetAddressType) that relates to
         this object is specified by the corresponding value
@@ -543,19 +590,19 @@ IMPORTS
     ::= { pingCtlEntry 20 }
 
  pingCtlByPassRouteTable OBJECT-TYPE
-    SYNTAX TruthValue
+    SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-       "The purpose of this object is to optionally enable
+       "The purpose of this object is to enable optional
        bypassing the route table.  If enabled, the remote
        host will bypass the normal routing tables and send
        directly to a host on an attached network.  If the
-       host is not on a directly-attached network, an
+       host is not on a directly attached network, an
        error is returned.  This option can be used to perform
        the ping operation to a local host through an
        interface that has no route defined (e.g., after the
-       interface was dropped by routed)."
+       interface was dropped by the routing daemon at the host)."
     DEFVAL { false }
     ::= { pingCtlEntry 21 }
 
@@ -564,25 +611,28 @@ IMPORTS
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the value to store in the Differentiated
-        Services (DS) Field in the IP packet used to
-        encapsulate the ping probe.  The DS Field is defined
-        as the Type of Service (TOS) octet in a IPv4 header
-        or as the Traffic Class octet in a IPv6 header.
+        "Specifies the value to store in the Type of Service
+        (TOS) octet in the IPv4 header or in the Traffic
+        Class octet in the IPv6 header, respectively, of the
+        IP packet used to encapsulate the ping probe.
 
-        The value of this object must be a decimal integer
-        in the range from 0 to 255.  This option can be used
-        to determine what effect an explicit DS Field setting
-        has on a ping response.  Not all values are legal or
-        meaningful.  A value of 0 means that the function
-     represented by this option is not supported.  DS Field
-     usage is often not supported by IP implementations and
-     not all values are supported.  Refer to RFC 2474 for
-     guidance on usage of this field."
+        The octet to be set in the IP header contains the
+        Differentiated Services (DS) Field in the six most
+        significant bits.
+
+        This option can be used to determine what effect an
+        explicit DS Field setting has on a ping response.
+        Not all values are legal or meaningful.  A value of 0
+        means that the function represented by this option is
+        not supported.  DS Field usage is often not supported
+        by IP implementations, and not all values are supported.
+        Refer to RFC 2474 and RFC 3260 for guidance on usage of
+        this field."
     REFERENCE
-        "Refer to RFC 2474 for the definition of the
-        Differentiated Services Field and to RFC 1812
-        Section 5.3.2 for Type of Service (TOS)."
+        "Refer to RFC 1812 for the definition of the IPv4 TOS
+        octet and to RFC 2460 for the definition of the IPv6
+        Traffic Class octet.  Refer to RFC 2474 and RFC 3260
+        for the definition of the Differentiated Services Field."
     DEFVAL { 0 }
     ::= { pingCtlEntry 22 }
 
@@ -593,22 +643,24 @@ IMPORTS
     DESCRIPTION
         "This object allows entries to be created and deleted
         in the pingCtlTable.  Deletion of an entry in this
-        table results in all corresponding (same
+        table results in the deletion of all corresponding (same
         pingCtlOwnerIndex and pingCtlTestName index values)
-        pingResultsTable and pingProbeHistoryTable entries
-        being deleted.
+        pingResultsTable and pingProbeHistoryTable entries.
 
         A value MUST be specified for pingCtlTargetAddress
-        prior to a transition to active(1) state being
-        accepted.
+        prior to acceptance of a transition to active(1) state.
+
+        When a value for pingCtlTargetAddress is set,
+        the value of object pingCtlRowStatus changes
+        from notReady(3) to notInService(2).
 
         Activation of a remote ping operation is controlled
-        via pingCtlAdminStatus and not by changing
+        via pingCtlAdminStatus, not by changing
         this object's value to active(1).
 
         Transitions in and out of active(1) state are not
         allowed while an entry's pingResultsOperStatus is
-        active(1) with the exception that deletion of
+        active(1), with the exception that deletion of
         an entry in this table by setting its RowStatus
         object to destroy(6) will stop an active
         ping operation.
@@ -631,11 +683,20 @@ IMPORTS
         "Defines the Ping Results Table for providing
         the capability of performing ping operations at
         a remote host.  The results of these operations are
-        stored in the pingResultsTable and the pingPastProbeTable.
+        stored in the pingResultsTable and the pingProbeHistoryTable.
 
         An entry is added to the pingResultsTable when an
         pingCtlEntry is started by successful transition
         of its pingCtlAdminStatus object to enabled(1).
+
+        If the object pingCtlAdminStatus already has the value
+        enabled(1), and if the corresponding pingResultsOperStatus
+        object has the value completed(3), then successfully writing
+        enabled(1) to object pingCtlAdminStatus re-initializes the
+        already existing entry in the pingResultsTable.  The values
+        of objects in the re-initialized entry are the same as the
+        values of objects in a new entry would be.
+
         An entry is removed from the pingResultsTable when
         its corresponding pingCtlEntry is deleted."
    ::= { pingObjects 3 }
@@ -647,8 +708,8 @@ IMPORTS
     DESCRIPTION
         "Defines an entry in the pingResultsTable.  The
         pingResultsTable has the same indexing as the
-        pingCtlTable in order for a pingResultsEntry to
-        correspond to the pingCtlEntry that caused it to
+        pingCtlTable so that a pingResultsEntry
+        corresponds to the pingCtlEntry that caused it to
         be created."
     INDEX {
              pingCtlOwnerIndex,
@@ -664,23 +725,26 @@ IMPORTS
         pingResultsMinRtt              Unsigned32,
         pingResultsMaxRtt              Unsigned32,
         pingResultsAverageRtt          Unsigned32,
-        pingResultsProbeResponses      Unsigned32,
-        pingResultsSentProbes          Unsigned32,
+        pingResultsProbeResponses      Gauge32,
+        pingResultsSentProbes          Gauge32,
         pingResultsRttSumOfSquares     Unsigned32,
         pingResultsLastGoodProbe       DateAndTime
      }
 
  pingResultsOperStatus OBJECT-TYPE
     SYNTAX      INTEGER {
-                          enabled(1),  -- test is in progress
-                          disabled(2)  -- test has stopped
+                          enabled(1),   -- test is in progress
+                          disabled(2),  -- test has stopped
+                          completed(3)  -- test is completed
                         }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Reflects the operational state of a pingCtlEntry:
-           enabled(1)   - Test is active.
-           disabled(2)  - Test has stopped."
+
+           enabled(1)    - Test is active.
+           disabled(2)   - Test has stopped.
+           completed(3)  - Test is completed."
     ::= { pingResultsEntry 1 }
 
  pingResultsIpTargetAddressType OBJECT-TYPE
@@ -688,7 +752,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This objects indicates the type of address stored
+        "This object indicates the type of address stored
         in the corresponding pingResultsIpTargetAddress
         object."
     DEFVAL { unknown }
@@ -699,12 +763,16 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This objects reports the IP address associated
+        "This object reports the IP address associated
         with a pingCtlTargetAddress value when the destination
         address is specified as a DNS name.  The value of
-        this object should be a zero length octet string
+        this object should be a zero-length octet string
         when a DNS name is not specified or when a
-        specified DNS name fails to resolve."
+        specified DNS name fails to resolve.
+
+        The address type (InetAddressType) that relates to
+        this object is specified by the corresponding value
+        of pingResultsIpTargetAddressType."
     DEFVAL { ''H }
     ::= { pingResultsEntry 3 }
 
@@ -738,7 +806,7 @@ IMPORTS
     ::= { pingResultsEntry 6 }
 
   pingResultsProbeResponses OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Gauge32
     UNITS       "responses"
     MAX-ACCESS  read-only
     STATUS      current
@@ -750,7 +818,7 @@ IMPORTS
     ::= { pingResultsEntry 7 }
 
   pingResultsSentProbes OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Gauge32
     UNITS       "probes"
     MAX-ACCESS  read-only
     STATUS      current
@@ -790,10 +858,10 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines a table for storing the results of a ping
-        operation.  Entries in this table are limited by
-        the value of the corresponding pingCtlMaxRows
-        object.
+        "Defines a table for storing the results of ping
+        operations.  The number of entries in this table is
+        limited per entry in the pingCtlTable by the value
+        of the corresponding pingCtlMaxRows object.
 
         An entry in this table is created when the result of
         a ping probe is determined.  The initial 2 instance
@@ -803,10 +871,12 @@ IMPORTS
         its corresponding pingCtlEntry is deleted.
 
         An implementation of this MIB will remove the oldest
-        entry in the pingProbeHistoryTable to allow the
-        addition of an new entry once the number of rows in
-        the pingProbeHistoryTable reaches the value specified
-        by pingCtlMaxRows."
+        entry in the pingProbeHistoryTable of the
+        corresponding entry in the pingCtlTable to allow
+        the addition of an new entry once the number of rows
+        in the pingProbeHistoryTable reaches the value
+        specified by pingCtlMaxRows for the corresponding
+        entry in the pingCtlTable."
    ::= { pingObjects 4 }
 
  pingProbeHistoryEntry OBJECT-TYPE
@@ -820,6 +890,7 @@ IMPORTS
         to.  The third index element selects a single
         probe result."
     INDEX {
+
              pingCtlOwnerIndex,
              pingCtlTestName,
              pingProbeHistoryIndex
@@ -877,11 +948,14 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The last implementation method specific reply code received.
-        If the ICMP Echo capability is being used then a successful
+        "The last implementation-method-specific reply code received.
+        If the ICMP Echo capability is being used, then a successful
         probe ends when an ICMP response is received that contains
-        the code ICMP_ECHOREPLY(0).  The ICMP responses are defined
-        normally in the ip_icmp include file."
+        the code ICMP_ECHOREPLY(0).  The ICMP codes are maintained
+        by IANA.  Standardized ICMP codes are listed at
+        http://www.iana.org/assignments/icmp-parameters.
+        The ICMPv6 codes are listed at
+        http://www.iana.org/assignments/icmpv6-parameters."
     ::= { pingProbeHistoryEntry 4 }
 
  pingProbeHistoryTime OBJECT-TYPE
@@ -891,7 +965,6 @@ IMPORTS
     DESCRIPTION
         "Timestamp for when this probe result was determined."
     ::= { pingProbeHistoryEntry 5 }
-
 
  -- Notification Definition section
 
@@ -912,12 +985,13 @@ IMPORTS
       }
       STATUS  current
       DESCRIPTION
-          "Generated when a probe failure is detected when the
+          "Generated when a probe failure is detected, when the
+
           corresponding pingCtlTrapGeneration object is set to
-          probeFailure(0) subject to the value of
+          probeFailure(0), subject to the value of
           pingCtlTrapProbeFailureFilter.  The object
           pingCtlTrapProbeFailureFilter can be used to specify the
-          number of successive probe failures that are required
+          number of consecutive probe failures that are required
           before this notification can be generated."
       ::= { pingNotifications 1 }
 
@@ -938,12 +1012,12 @@ IMPORTS
       }
       STATUS  current
       DESCRIPTION
-          "Generated when a ping test is determined to have failed
+          "Generated when a ping test is determined to have failed,
           when the corresponding pingCtlTrapGeneration object is
-          set to testFailure(1).  In this instance
+          set to testFailure(1).  In this instance,
           pingCtlTrapTestFailureFilter should specify the number of
           probes in a test required to have failed in order to
-          consider the test as failed."
+          consider the test failed."
       ::= { pingNotifications 2 }
 
  pingTestCompleted NOTIFICATION-TYPE
@@ -960,15 +1034,17 @@ IMPORTS
         pingResultsSentProbes,
         pingResultsRttSumOfSquares,
         pingResultsLastGoodProbe
+
       }
       STATUS  current
       DESCRIPTION
           "Generated at the completion of a ping test when the
-          corresponding pingCtlTrapGeneration object is set to
-          testCompletion(4)."
+          corresponding pingCtlTrapGeneration object has the
+          testCompletion(2) bit set."
       ::= { pingNotifications 3 }
 
  -- Conformance information
+
  -- Compliance statements
 
  pingCompliances OBJECT IDENTIFIER ::= { pingConformance 1 }
@@ -976,10 +1052,292 @@ IMPORTS
 
  -- Compliance statements
 
- pingCompliance MODULE-COMPLIANCE
+ pingFullCompliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
-            "The compliance statement for the DISMAN-PING-MIB."
+            "The compliance statement for SNMP entities that
+            fully implement the DISMAN-PING-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                            pingMinimumGroup,
+                            pingCtlRowStatusGroup,
+                            pingHistoryGroup,
+                            pingNotificationsGroup
+                          }
+
+        OBJECT pingMaxConcurrentRequests
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "The agent is not required to support set
+            operations to this object."
+
+        OBJECT pingCtlStorageType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT pingCtlType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  In addition, the only
+            value that MUST be supported by an implementation is
+            pingIcmpEcho."
+
+        OBJECT pingCtlSourceAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access to this object is not required by
+            implementations that are not capable of binding the
+            send socket with a source address.  An implementation
+            is only required to support IPv4 and IPv6 addresses."
+
+        OBJECT pingCtlSourceAddress
+        SYNTAX  InetAddress (SIZE(0|4|16))
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access to this object is not required by
+            implementations that are not capable of binding the
+            send socket with a source address.  An implementation
+            is only required to support IPv4 and IPv6 addresses."
+
+        OBJECT pingCtlIfIndex
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+            not supported, return a 0 as the value of this object.
+            A value of 0 means that the function represented by
+            this option is not supported."
+
+        OBJECT pingCtlByPassRouteTable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access to this object is not required by
+            implementations that are not capable of its
+            implementation.  The function represented by this
+            object is implementable if the setsockopt
+            SOL_SOCKET SO_DONTROUTE option is supported."
+
+        OBJECT pingCtlDSField
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+            not supported, return a 0 as the value of this object.
+            A value of 0 means that the function represented by
+            this option is not supported."
+
+        OBJECT pingResultsIpTargetAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+        DESCRIPTION
+            "An implementation is only required to
+
+            support IPv4 and IPv6 addresses."
+
+        OBJECT pingResultsIpTargetAddress
+        SYNTAX  InetAddress (SIZE(0|4|16))
+        DESCRIPTION
+            "An implementation is only required to
+            support IPv4 and globally unique IPv6 addresses."
+
+        OBJECT pingResultsLastGoodProbe
+        DESCRIPTION
+            "This object is mandatory for implementations that have
+            access to a system clock and that are capable of setting
+            the values for DateAndTime objects.  It is RECOMMENDED
+            that when this object is not supported its values
+            be reported as '0000000000000000'H."
+
+        OBJECT pingProbeHistoryTime
+        DESCRIPTION
+            "This object is mandatory for implementations that have
+            access to a system clock and that are capable of setting
+            the values for DateAndTime objects.  It is RECOMMENDED
+            that when this object is not supported its values
+            be reported as '0000000000000000'H."
+    ::= { pingCompliances 2 }
+
+ pingMinimumCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The minimum compliance statement for SNMP entities
+            that implement the minimal subset of the
+            DISMAN-PING-MIB.  Implementors might choose this
+            subset for small devices with limited resources."
+    MODULE  -- this module
+        MANDATORY-GROUPS { pingMinimumGroup }
+
+        GROUP pingCtlRowStatusGroup
+        DESCRIPTION
+            "A compliant implementation does not have to implement
+            the pingCtlRowStatusGroup."
+
+        GROUP pingHistoryGroup
+        DESCRIPTION
+            "A compliant implementation does not have to implement
+            the pingHistoryGroup."
+
+        GROUP pingNotificationsGroup
+        DESCRIPTION
+            "A compliant implementation does not have to implement
+
+            the pingNotificationsGroup."
+
+        OBJECT pingMaxConcurrentRequests
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "The agent is not required to support set
+            operations to this object."
+
+        OBJECT pingCtlDataFill
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "The agent is not required to support set
+            operations to this object."
+
+        OBJECT pingCtlFrequency
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+            not supported, return a 0 as the value of this object.
+            A value of 0 means that the function represented by
+            this option is not supported."
+
+        OBJECT pingCtlMaxRows
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If the
+            pingHistoryGroup is not implemented, then write
+            access to this object MUST be disabled, and the object
+            MUST return a value of 0 when retrieved."
+
+        OBJECT pingCtlStorageType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT pingCtlTrapGeneration
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If the
+            pingNotificationsGroup is not implemented, then write
+            access to this object MUST be disabled, and the object
+            MUST return a value with no bit set when retrieved.
+            No bit set indicates that not notification is
+            generated."
+
+        OBJECT pingCtlTrapProbeFailureFilter
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "If write access to pingCtlTrapGeneration is not
+            supported, then write access to this object must also
+            not be supported.  In this case, return 0 as the value
+            of this object."
+
+        OBJECT pingCtlTrapTestFailureFilter
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "If write access to pingCtlTrapGeneration is not
+            supported, then write access to this object must also
+            not be supported.  In this case, return 0 as the value
+            of this object."
+
+        OBJECT pingCtlType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  In addition, the only
+            value that MUST be supported by an implementation is
+            pingIcmpEcho."
+
+        OBJECT pingCtlDescr
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "The agent is not required to support set
+            operations to this object."
+
+        OBJECT pingCtlSourceAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access to this object is not required by
+            implementations that are not capable of binding the
+            send socket with a source address.  An implementation
+            is only required to support IPv4 and IPv6 addresses."
+
+        OBJECT pingCtlSourceAddress
+        SYNTAX  InetAddress (SIZE(0|4|16))
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access to this object is not required by
+            implementations that are not capable of binding the
+            send socket with a source address.  An implementation
+            is only required to support IPv4 and IPv6 addresses."
+
+        OBJECT pingCtlIfIndex
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+
+            not supported, return a 0 as the value of this object.
+            A value of 0 means that the function represented by
+            this option is not supported."
+
+        OBJECT pingCtlByPassRouteTable
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+            not supported, return false(2) as the value of this
+            object.  A value of false(2) means that the function
+            represented by this option is not supported."
+
+        OBJECT pingCtlDSField
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.  If write access is
+            not supported, return a 0 as the value of this object.
+            A value of 0 means that the function represented by
+            this option is not supported."
+
+        OBJECT pingResultsIpTargetAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+        DESCRIPTION
+            "An implementation is only required to
+            support IPv4 and IPv6 addresses."
+
+        OBJECT pingResultsIpTargetAddress
+        SYNTAX  InetAddress (SIZE(0|4|16))
+        DESCRIPTION
+            "An implementation is only required to
+            support IPv4 and globally unique IPv6 addresses."
+
+        OBJECT pingResultsLastGoodProbe
+        DESCRIPTION
+            "This object is mandatory for implementations that have
+            access to a system clock and that are capable of setting
+            the values for DateAndTime objects.  It is RECOMMENDED
+            that when this object is not supported its values
+            be reported as '0000000000000000'H."
+
+        OBJECT pingProbeHistoryTime
+        DESCRIPTION
+            "If the pingHistoryGroup is implemented, then this
+            object is mandatory for implementations that have
+            access to a system clock and that are capable of setting
+            the values for DateAndTime objects.  It is RECOMMENDED
+            that when this object is not supported its values
+
+            be reported as '0000000000000000'H."
+    ::= { pingCompliances 3 }
+
+ pingCompliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+            "The compliance statement for the DISMAN-PING-MIB.  This
+            compliance statement has been deprecated because the
+            group pingGroup and the pingTimeStampGroup have been
+            split and deprecated.  The pingFullCompliance statement
+            is semantically identical to the deprecated
+            pingCompliance statement."
+
     MODULE  -- this module
         MANDATORY-GROUPS {
                             pingGroup,
@@ -988,9 +1346,9 @@ IMPORTS
         GROUP pingTimeStampGroup
         DESCRIPTION
             "This group is mandatory for implementations that have
-            access to a system clock and are capable of setting
+            access to a system clock and that are capable of setting
             the values for DateAndTime objects.  It is RECOMMENDED
-            that when this group is not supported that the values
+            that when this group is not supported the values
             for the objects in this group be reported as
             '0000000000000000'H."
 
@@ -1004,7 +1362,7 @@ IMPORTS
         MIN-ACCESS  read-only
         DESCRIPTION
             "Write access is not required.  It is also allowed
-            for implementations to support only the volatile
+            that implementations support only the volatile
             StorageType enumeration."
 
         OBJECT pingCtlType
@@ -1024,12 +1382,12 @@ IMPORTS
             supported."
 
         OBJECT pingCtlSourceAddressType
-        SYNTAX  InetAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
         MIN-ACCESS  read-only
         DESCRIPTION
             "This object is not required by implementations that
             are not capable of binding the send socket with a
-            source address. An implementation is only required to
+            source address.  An implementation is only required to
             support IPv4 and IPv6 addresses."
 
         OBJECT pingCtlSourceAddress
@@ -1038,27 +1396,27 @@ IMPORTS
         DESCRIPTION
             "This object is not required by implementations that
             are not capable of binding the send socket with a
-            source address. An implementation is only required to
+            source address.  An implementation is only required to
             support IPv4 and globally unique IPv6 addresses."
 
         OBJECT pingCtlIfIndex
         MIN-ACCESS  read-only
         DESCRIPTION
-            "Write access is not required.   When write access is
-            not supported return a 0 as the value of this object.
+            "Write access is not required.  When write access is
+            not supported, return a 0 as the value of this object.
             A value of 0 means that the function represented by
             this option is not supported."
 
         OBJECT pingCtlDSField
         MIN-ACCESS  read-only
         DESCRIPTION
-            "Write access is not required.   When write access is
-            not supported return a 0 as the value of this object.
+            "Write access is not required.  When write access is
+            not supported, return a 0 as the value of this object.
             A value of 0 means that the function represented by
             this option is not supported."
 
         OBJECT pingResultsIpTargetAddressType
-        SYNTAX  InetAddressType
+        SYNTAX  InetAddressType { unknown(0), ipv4(1), ipv6(2) }
         DESCRIPTION
             "An implementation is only required to
             support IPv4 and IPv6 addresses."
@@ -1068,10 +1426,83 @@ IMPORTS
         DESCRIPTION
             "An implementation is only required to
             support IPv4 and globally unique IPv6 addresses."
-
     ::= { pingCompliances 1 }
 
  -- MIB groupings
+
+ pingMinimumGroup OBJECT-GROUP
+   OBJECTS {
+             pingMaxConcurrentRequests,
+             pingCtlTargetAddressType,
+             pingCtlTargetAddress,
+             pingCtlDataSize,
+             pingCtlTimeOut,
+             pingCtlProbeCount,
+             pingCtlAdminStatus,
+             pingCtlDataFill,
+             pingCtlFrequency,
+             pingCtlMaxRows,
+             pingCtlStorageType,
+             pingCtlTrapGeneration,
+             pingCtlTrapProbeFailureFilter,
+             pingCtlTrapTestFailureFilter,
+             pingCtlType,
+             pingCtlDescr,
+             pingCtlByPassRouteTable,
+             pingCtlSourceAddressType,
+             pingCtlSourceAddress,
+             pingCtlIfIndex,
+             pingCtlDSField,
+             pingResultsOperStatus,
+             pingResultsIpTargetAddressType,
+             pingResultsIpTargetAddress,
+             pingResultsMinRtt,
+             pingResultsMaxRtt,
+             pingResultsAverageRtt,
+             pingResultsProbeResponses,
+             pingResultsSentProbes,
+             pingResultsRttSumOfSquares,
+             pingResultsLastGoodProbe
+           }
+   STATUS  current
+   DESCRIPTION
+       "The group of objects that constitute the remote ping
+       capability."
+    ::= { pingGroups 4 }
+
+ pingCtlRowStatusGroup OBJECT-GROUP
+   OBJECTS {
+             pingCtlRowStatus
+           }
+   STATUS  current
+   DESCRIPTION
+       "The RowStatus object of the pingCtlTable."
+    ::= { pingGroups 5 }
+
+ pingHistoryGroup OBJECT-GROUP
+   OBJECTS {
+             pingProbeHistoryResponse,
+             pingProbeHistoryStatus,
+             pingProbeHistoryLastRC,
+             pingProbeHistoryTime
+           }
+   STATUS  current
+   DESCRIPTION
+       "The group of objects that constitute the history
+       capability."
+    ::= { pingGroups 6 }
+
+ pingNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS {
+             pingProbeFailed,
+             pingTestFailed,
+             pingTestCompleted
+          }
+   STATUS        current
+   DESCRIPTION
+       "The notification that are required to be supported by
+       implementations of this MIB."
+   ::= { pingGroups 3 }
 
  pingGroup OBJECT-GROUP
    OBJECTS {
@@ -1110,32 +1541,21 @@ IMPORTS
              pingProbeHistoryStatus,
              pingProbeHistoryLastRC
            }
-   STATUS  current
+   STATUS  deprecated
    DESCRIPTION
-       "The group of objects that comprise the remote ping
+       "The group of objects that constitute the remote ping
        capability."
     ::= { pingGroups 1 }
 
  pingTimeStampGroup OBJECT-GROUP
+
    OBJECTS {
              pingResultsLastGoodProbe,
              pingProbeHistoryTime
            }
-   STATUS  current
+   STATUS  deprecated
    DESCRIPTION
        "The group of DateAndTime objects."
     ::= { pingGroups 2 }
-
- pingNotificationsGroup NOTIFICATION-GROUP
-   NOTIFICATIONS {
-             pingProbeFailed,
-             pingTestFailed,
-             pingTestCompleted
-          }
-   STATUS        current
-   DESCRIPTION
-       "The notification which are required to be supported by
-       implementations of this MIB."
-   ::= { pingGroups 3 }
 
 END

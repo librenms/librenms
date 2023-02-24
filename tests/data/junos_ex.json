@@ -6,46 +6,33 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.4.131.2",
                     "sysDescr": "Juniper Networks, Inc. ex3400-48t Ethernet Switch, kernel JUNOS 15.1X53-D59.4, Build date: 2018-09-14 21:00:55 UTC Copyright (c) 1996-2018 Juniper Networks, Inc.",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "junos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "junos.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.4.131.2",
-                    "sysDescr": "Juniper Networks, Inc. ex3400-48t Ethernet Switch, kernel JUNOS 15.1X53-D59.4, Build date: 2018-09-14 21:00:55 UTC Copyright (c) 1996-2018 Juniper Networks, Inc.",
                     "sysContact": "<private>",
                     "version": "15.1X53-D59.4",
                     "hardware": "Juniper EX3400-48T",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "bgp-peers": {
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -57,17 +44,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -79,17 +67,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -101,22 +90,22 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.43",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -128,17 +117,18 @@
                     "bgpPeerInUpdateElapsedTime": 21748,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.185",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -150,17 +140,18 @@
                     "bgpPeerInUpdateElapsedTime": 785386,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.225",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -172,13 +163,9 @@
                     "bgpPeerInUpdateElapsedTime": 774040,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "processors": {
@@ -216,14 +203,18 @@
                 {
                     "mempool_index": "7.1.0.0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "junos",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1048576,
                     "mempool_descr": "FPC: EX3400-48T @ 0/*/*",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 13,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.2636.3.1.13.1.11.7.1.0.0",
+                    "mempool_used": 265814016,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1778909184,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2044723200,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -232,14 +223,18 @@
                 {
                     "mempool_index": "9.1.0.0",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "junos",
-                    "mempool_precision": 1,
+                    "mempool_class": "system",
+                    "mempool_precision": 1048576,
                     "mempool_descr": "Routing Engine 0",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 13,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.2636.3.1.13.1.11.9.1.0.0",
+                    "mempool_used": 265814016,
+                    "mempool_used_oid": null,
+                    "mempool_free": 1778909184,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2044723200,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -247,42 +242,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "7.1.0.0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "junos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "FPC: EX3400-48T @ 0/*/*",
-                    "mempool_perc": 13,
-                    "mempool_used": 265814016,
-                    "mempool_free": 1778909184,
-                    "mempool_total": 2044723200,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "9.1.0.0",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "junos",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Routing Engine 0",
-                    "mempool_perc": 13,
-                    "mempool_used": 265814016,
-                    "mempool_free": 1778909184,
-                    "mempool_total": 2044723200,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -309,6 +269,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -333,6 +294,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -357,6 +319,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -381,6 +344,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -405,6 +369,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -429,6 +394,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -453,6 +419,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -477,6 +444,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -501,6 +469,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -525,6 +494,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -549,6 +519,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 },
                 {
@@ -573,6 +544,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -597,6 +569,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

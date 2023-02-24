@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @copyright  2017 Falk Stern <https://github.com/fstern/>
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class Graphite extends BaseDatastore
@@ -43,7 +43,9 @@ class Graphite extends BaseDatastore
         $host = Config::get('graphite.host');
         $port = Config::get('graphite.port', 2003);
         try {
-            $this->connection = $socketFactory->createClient("$host:$port");
+            if (self::isEnabled() && $host && $port) {
+                $this->connection = $socketFactory->createClient("$host:$port");
+            }
         } catch (\Exception $e) {
             d_echo($e->getMessage());
         }
@@ -76,16 +78,17 @@ class Graphite extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param array $device
-     * @param string $measurement Name of this measurement
-     * @param array $tags tags for the data (or to control rrdtool)
-     * @param array|mixed $fields The data to update in an associative array, the order must be consistent with rrd_def,
-     *                            single values are allowed and will be paired with $measurement
+     * @param  array  $device
+     * @param  string  $measurement  Name of this measurement
+     * @param  array  $tags  tags for the data (or to control rrdtool)
+     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
+     *                               single values are allowed and will be paired with $measurement
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             d_echo("Graphite Error: not connected\n");
+
             return;
         }
 
@@ -102,29 +105,29 @@ class Graphite extends BaseDatastore
         $measurement = preg_replace('/\|/', '.', $measurement);
         $measurement_name = preg_replace('/\./', '_', $tags['rrd_name']);
         if (is_array($measurement_name)) {
-            $ms_name = implode(".", $measurement_name);
+            $ms_name = implode('.', $measurement_name);
         } else {
             $ms_name = $measurement_name;
         }
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', $ms_name)) {
-            $ms_name = "";
+            $ms_name = '';
         }
 
         foreach ($fields as $k => $v) {
-            // Send zero for fields without values
-            if (empty($v)) {
-                $v = 0;
+            // Skip fields without values
+            if (is_null($v)) {
+                continue;
             }
-            $metric = implode(".", array_filter([$this->prefix, $hostname, $measurement, $ms_name, $k]));
+            $metric = implode('.', array_filter([$this->prefix, $hostname, $measurement, $ms_name, $k]));
             $this->writeData($metric, $v, $timestamp);
         }
     }
 
     /**
-     * @param $metric
-     * @param $value
-     * @param $timestamp
+     * @param  string  $metric
+     * @param  mixed  $value
+     * @param  mixed  $timestamp
      */
     private function writeData($metric, $value, $timestamp)
     {
@@ -134,7 +137,7 @@ class Graphite extends BaseDatastore
             // Further sanitize the full metric before sending, whitespace isn't allowed
             $metric = preg_replace('/\s+/', '_', $metric);
 
-            $line = implode(" ", [$metric, $value, $timestamp]);
+            $line = implode(' ', [$metric, $value, $timestamp]);
             Log::debug("Sending to Graphite: $line\n");
             $this->connection->write("$line\n");
 

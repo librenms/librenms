@@ -12,15 +12,15 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-ltm-bwc');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-ltm-bwc'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'LTM Bandwidth Controller       Now      Avg      Max\\n'";
 $colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'));
 $colcount = 0;
@@ -30,8 +30,8 @@ $count = 0;
 foreach ($components as $compid => $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
-    $rrd_filename = rrd_name($device['hostname'], array($comp['type'], $label, $hash));
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
         // Grab a colour from the array.
         if (isset($colours[$colcount])) {
             $colour = $colours[$colcount];
@@ -40,11 +40,11 @@ foreach ($components as $compid => $comp) {
             $colour = $colours[$colcount];
         }
 
-        $rrd_options .= " DEF:DS" . $count . "=" . $rrd_filename . ":pktsin:AVERAGE ";
-        $rrd_options .= " LINE1.25:DS" . $count . "#" . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
-        $rrd_options .= " GPRINT:DS" . $count . ":LAST:%6.2lf%s ";
-        $rrd_options .= " GPRINT:DS" . $count . ":AVERAGE:%6.2lf%s ";
-        $rrd_options .= " GPRINT:DS" . $count . ":MAX:%6.2lf%s\l ";
+        $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':pktsin:AVERAGE ';
+        $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
+        $rrd_options .= ' GPRINT:DS' . $count . ':LAST:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s ';
+        $rrd_options .= ' GPRINT:DS' . $count . ":MAX:%6.2lf%s\l ";
         $count++;
         $colcount++;
     }

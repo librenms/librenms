@@ -1,0 +1,190 @@
+-- =================================================================
+-- Copyright (C) 2008 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: description of Web Authentication
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2008-6-25, Created by dupengfei
+-- =================================================================
+HH3C-WEB-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    ifDescr
+        FROM RFC1213-MIB
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    MacAddress
+        FROM SNMPv2-TC;
+
+hh3cWebAuthentication MODULE-IDENTITY
+    LAST-UPDATED "200806250000Z"
+    ORGANIZATION "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The MIB module is used for web authentication to send traps."
+    REVISION "200806250000Z"
+    DESCRIPTION
+        "The initial version of hh3cWebAuthenticationMIB"
+    ::= { hh3cCommon 93 }
+
+
+hh3cWaTrapObjects OBJECT IDENTIFIER ::= { hh3cWebAuthentication 1 }
+
+--
+-- WEB AUTHENTICATION TRAPS OBJECT
+--
+hh3cWaVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Vlan ID associate with the port and the MAC address."
+    ::= { hh3cWaTrapObjects 1 }
+
+hh3cWaReasonCode OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+         globalNumberMax(1),
+         configNumberMax(2),
+         portNumberMax(3),
+         invalidUsername(4),
+         authFail(5),
+         setACLFail(6),
+         changeVlanFail(7),
+         other(8),
+         onlineOverTime(9),
+         noTransferData(10),
+         cutOperation(11),
+         portDisabled(12),
+         portDown(13),
+         userLogout(14),
+         vlanChanged(15),
+         vlanDelted(16)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The code indicates the reason for the action of this trap.
+         globalNumberMax:
+            The global number of connections is up to max.
+         configNumberMax:
+            The global number of connections is up to configured max value.
+         portNumberMax:
+            The interface number of connections is up to max.
+         invalidUsername:
+            The username or password is too long or username is empty.
+         authFail:
+            Wrong username or password.
+         setACLFail:
+            Failed to set ACL.
+         changeVlanFail:
+            Failed to set VLAN.
+         other:
+            Other reasons.
+         onlineOverTime:
+            The online time is over the max value.
+         noTransferData:
+            There was no data flow for the connection.
+         cutOperation:
+            There was a cut operation.
+         portDisabled:
+            Web authentication was disabled on interface.
+         portDown:
+            The interface turned down.
+         userLogout:
+            The client required to logout.
+         vlanChanged:
+            The interface VLAN value was changed.
+         vlanDelted:
+            The interface VLAN was deleted."
+    ::= { hh3cWaTrapObjects 2 }
+
+hh3cWaActionCode OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The code indicates the system action.
+         enabled:
+            Web authentication turns enabled.
+         disabled:
+            Web authentication turns disabled."
+    ::= { hh3cWaTrapObjects 3 }
+
+hh3cWaClientMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the client."
+    ::= { hh3cWaTrapObjects 4 }
+
+hh3cWaTrap OBJECT IDENTIFIER ::= { hh3cWebAuthentication 2 }
+
+hh3cWaTrapPrefix OBJECT IDENTIFIER ::= { hh3cWaTrap 0 }
+
+
+hh3cWaClientLogon NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWaClientMacAddr,
+            ifDescr,
+            hh3cWaVlanID
+        }
+    STATUS      current
+    DESCRIPTION
+        "It is generated when a client succeeded to logon."
+    ::= { hh3cWaTrapPrefix 1 }
+
+hh3cWaClientLogonFail NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWaClientMacAddr,
+            ifDescr,
+            hh3cWaVlanID,
+            hh3cWaReasonCode
+        }
+    STATUS      current
+    DESCRIPTION
+        "It is generated when a client failed to logon, the hh3cWaReasonCode
+         shows the failure reason."
+    ::= { hh3cWaTrapPrefix 2 }
+
+hh3cWaClientLogout NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWaClientMacAddr,
+            ifDescr,
+            hh3cWaVlanID,
+            hh3cWaReasonCode
+        }
+    STATUS      current
+    DESCRIPTION
+        "It is generated when a client logout, the hh3cWaReasonCode
+         shows the logout reason."
+    ::= { hh3cWaTrapPrefix 3 }
+
+hh3cWaSysAction NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWaActionCode
+        }
+    STATUS      current
+    DESCRIPTION
+        "It is generated when a system action was occurred, the hh3cWaActionCode
+         shows the action information."
+    ::= { hh3cWaTrapPrefix 4 }
+
+END

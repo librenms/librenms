@@ -1,0 +1,424 @@
+-- ===========================================================================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: EC(Encoder) Feature Configuration management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version 2007-09-05 created by zhoujianming
+--- ============================================================================================================
+HH3C-PU-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32,IpAddress, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString
+        FROM SNMPv2-TC
+    hh3cSurveillanceMIB
+        FROM HH3C-OID-MIB;
+
+
+hh3cPUMan MODULE-IDENTITY
+    LAST-UPDATED "200709050000Z"        -- September 5, 2007  GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The PU includes those device like EC(Encoder), DC(Decoder) and
+        ECR(Encoder Recorder). The PU will survey the remote video and
+        audio. This MIB is defined to manage the PU as our
+        private MIB node according to its specific capability."
+    ::= { hh3cSurveillanceMIB 2 }
+
+--
+-- EC and DC Common Node definitions
+--
+
+hh3cPUCommonMan OBJECT IDENTIFIER ::= { hh3cPUMan 1 }
+
+hh3cPUCommonManObjects OBJECT IDENTIFIER ::= { hh3cPUCommonMan 1 }
+
+hh3cPUisOnline        OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The PU online status indicates whether the PU is normally
+        registered into the VM. True indicates that the PU is
+        normally registered into the VM."
+    ::= { hh3cPUCommonManObjects 1 }
+
+hh3cPUCMSAddr        OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The IP address of the CMS.
+        All zero address indicates the CMS address is not configured."
+    ::= { hh3cPUCommonManObjects 2 }
+
+hh3cPUVersionServerAddr      OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The IP address of the version server.
+        All zero address indicates the version server is not configured
+        or does not support remote upgrade."
+    ::= { hh3cPUCommonManObjects 3 }
+
+hh3cPUCommonManTables OBJECT IDENTIFIER ::= { hh3cPUCommonMan 2 }
+
+hh3cPUExternalInputAlarmTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPUExternalInputAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "External input alarm table"
+    ::= { hh3cPUCommonManTables 1 }
+
+hh3cPUExternalInputAlarmEntry  OBJECT-TYPE
+    SYNTAX Hh3cPUExternalInputAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "External input alarm entry"
+    INDEX   { hh3cPUExternalInputAlarmChannelID }
+    ::= { hh3cPUExternalInputAlarmTable 1}
+
+Hh3cPUExternalInputAlarmEntry ::=
+    SEQUENCE {
+        hh3cPUExternalInputAlarmChannelID Unsigned32,
+        hh3cPUExternalInputAlarmStatus    TruthValue
+    }
+hh3cPUExternalInputAlarmChannelID  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID of the external input alarm channel."
+    ::= { hh3cPUExternalInputAlarmEntry 1 }
+
+hh3cPUExternalInputAlarmStatus  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "True indicates that the current channel has alarm."
+    ::= { hh3cPUExternalInputAlarmEntry 2 }
+
+hh3cPUExternalOutputAlarmTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPUExternalOutputAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "External output alarm table"
+    ::= { hh3cPUCommonManTables 2 }
+
+hh3cPUExternalOutputAlarmEntry  OBJECT-TYPE
+    SYNTAX Hh3cPUExternalOutputAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "External output alarm entry"
+    INDEX   { hh3cPUExternalOutputAlarmChannelID }
+    ::= { hh3cPUExternalOutputAlarmTable 1}
+
+Hh3cPUExternalOutputAlarmEntry ::=
+    SEQUENCE {
+        hh3cPUExternalOutputAlarmChannelID Unsigned32,
+        hh3cPUExternalOutputAlarmStatus    TruthValue
+    }
+hh3cPUExternalOutputAlarmChannelID  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID of the external output alarm channel"
+    ::= { hh3cPUExternalOutputAlarmEntry 1 }
+
+hh3cPUExternalOutputAlarmStatus  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "True indicates that the current channel has alarm."
+    ::= { hh3cPUExternalOutputAlarmEntry 2 }
+
+--
+-- EC Node definitions
+--
+hh3cPUECMan OBJECT IDENTIFIER ::= { hh3cPUMan 2 }
+
+hh3cPUECManObjects OBJECT IDENTIFIER ::= { hh3cPUECMan 1 }
+
+hh3cPUECCameraOnlines    OBJECT-TYPE
+    SYNTAX       Unsigned32 ( 0..100 )
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Number of online cameras connected to an EC."
+    ::= { hh3cPUECManObjects 1 }
+
+hh3cPUECCameraAvailRate    OBJECT-TYPE
+    SYNTAX       Unsigned32 ( 0..100 )
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Camera available rate. That is, the ratio of available cameras
+        to total cameras connected to an EC. It ranges from 0 to 100."
+    ::= { hh3cPUECManObjects 2 }
+
+hh3cPUECManTables OBJECT IDENTIFIER ::= { hh3cPUECMan 2 }
+
+hh3cPUECVideoChannelTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPUECVideoChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "Video channel table"
+    ::= { hh3cPUECManTables 1 }
+
+hh3cPUECVideoChannelEntry  OBJECT-TYPE
+    SYNTAX Hh3cPUECVideoChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Video channel entry"
+    INDEX   { hh3cPUECVideoChannelID }
+    ::= { hh3cPUECVideoChannelTable 1}
+
+Hh3cPUECVideoChannelEntry ::=
+    SEQUENCE {
+        hh3cPUECVideoChannelID            Unsigned32,
+        hh3cPUECVideoChannelName          DisplayString,
+        hh3cPUECVideoChannelServiceStatus BITS
+    }
+hh3cPUECVideoChannelID  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID of the video channel"
+    ::= { hh3cPUECVideoChannelEntry 1 }
+
+hh3cPUECVideoChannelName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the video channel.
+        It is suggested that the name includes the channel ID
+        information."
+    ::= { hh3cPUECVideoChannelEntry 2 }
+
+hh3cPUECVideoChannelServiceStatus  OBJECT-TYPE
+    SYNTAX  BITS
+    {
+        unknown   (0),
+        unused    (1),
+        kinescope (2),
+        snapshot  (3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The service status of the video channel.
+        0 the status is not known.
+        1 the video is not used or the channel has no signal.
+        2 the camera is kinescoping.
+        3 the camera is take snapshot. "
+    ::= { hh3cPUECVideoChannelEntry 3 }
+
+--
+-- DC Node definitions
+--
+hh3cPUDCMan OBJECT IDENTIFIER ::= { hh3cPUMan 3 }
+
+hh3cPUDCManObjects OBJECT IDENTIFIER ::= { hh3cPUDCMan 1 }
+
+hh3cPUDCRcvVideoPackets    OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of video packets which are received from
+        interfaces."
+    ::= { hh3cPUDCManObjects 1 }
+
+hh3cPUDCRcvVideoRefFrames    OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of video reference frames which are received
+        from interfaces."
+    ::= { hh3cPUDCManObjects 2 }
+
+hh3cPUDCVideoPacketsLoss    OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of lost video packets."
+    ::= { hh3cPUDCManObjects 3 }
+
+hh3cPUDCVideoRefFramesLoss    OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of lost video reference frames."
+    ::= { hh3cPUDCManObjects 4 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cPUECManMIBTrap OBJECT IDENTIFIER ::= { hh3cPUECMan 3 }
+
+-- All PU trap definitions should be placed under this object.
+hh3cPUECManTrapPrex OBJECT IDENTIFIER ::= { hh3cPUECManMIBTrap 0 }
+
+hh3cPUECManExternalSemaphoreTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUExternalInputAlarmChannelID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about external semaphore alarm."
+    ::= { hh3cPUECManTrapPrex 1 }
+
+hh3cPUECManVideoLossTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about video loss. Video loss is that no video
+        signal is inputted to the EC."
+    ::= { hh3cPUECManTrapPrex 2 }
+
+hh3cPUECManVideoRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about video recovery after loss."
+    ::= { hh3cPUECManTrapPrex 3 }
+
+hh3cPUECManMotionDetectTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUECVideoChannelName,
+        hh3cPUECRegionCoordinateX1,
+        hh3cPUECRegionCoordinateY1,
+        hh3cPUECRegionCoordinateX2,
+        hh3cPUECRegionCoordinateY2
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about motion detection."
+    ::= { hh3cPUECManTrapPrex 4 }
+
+hh3cPUECManOnLineFailureTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUCMSAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap when EC can not register the CMS."
+    ::= { hh3cPUECManTrapPrex 5 }
+
+hh3cPUECManConnectionCMSFailureTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUCMSAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap when the connection with the CMS breaks down."
+    ::= { hh3cPUECManTrapPrex 6 }
+
+hh3cPUECManConnectionVerSrvFailureTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUVersionServerAddr
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap when the connection with the version server breaks
+        down or can not create."
+    ::= { hh3cPUECManTrapPrex 7 }
+
+hh3cPUECManFlashFailureTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about flash failure."
+    ::= { hh3cPUECManTrapPrex 8 }
+
+hh3cPUECManCameraShelterTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPUECVideoChannelName,
+        hh3cPUECRegionCoordinateX1,
+        hh3cPUECRegionCoordinateY1,
+        hh3cPUECRegionCoordinateX2,
+        hh3cPUECRegionCoordinateY2
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap when a camera is sheltered."
+    ::= { hh3cPUECManTrapPrex 9 }
+
+-- All objects used for TRAP only are defined here.
+hh3cPUECManTrapObjects OBJECT IDENTIFIER ::= { hh3cPUECManMIBTrap 1 }
+
+hh3cPUECRegionCoordinateX1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of top left point of the motion
+        detection region."
+    ::= { hh3cPUECManTrapObjects 1 }
+
+hh3cPUECRegionCoordinateY1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The vertical coordinate of top left point of the motion
+        detection region."
+    ::= { hh3cPUECManTrapObjects 2 }
+
+hh3cPUECRegionCoordinateX2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of botton right point of the
+        motion detection region."
+    ::= { hh3cPUECManTrapObjects 3 }
+
+hh3cPUECRegionCoordinateY2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of botton right point of the
+        motion detection region."
+    ::= { hh3cPUECManTrapObjects 4 }
+
+END

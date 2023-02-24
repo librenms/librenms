@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -54,19 +54,19 @@ class AlertScheduleController extends TableController
             'recurring' => 'recurring',
             'start' => 'start',
             'end' => 'end',
-            'status' => DB::raw("end < '" . Carbon::now('UTC') ."'"), // only partition lapsed
+            'status' => DB::raw("end < '" . Carbon::now('UTC') . "'"), // only partition lapsed
         ];
     }
 
     /**
-     * @param AlertSchedule $schedule
+     * @param  AlertSchedule  $schedule
      * @return array
      */
     public function formatItem($schedule)
     {
         return [
-            'title' => $schedule->title,
-            'notes' => $schedule->notes,
+            'title' => htmlentities($schedule->title),
+            'notes' => htmlentities($schedule->notes),
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),
             'end' => $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes'),
@@ -75,7 +75,7 @@ class AlertScheduleController extends TableController
             'end_recurring_dt' => $schedule->recurring ? $schedule->end_recurring_dt : '',
             'end_recurring_hr' => $schedule->recurring ? $schedule->end_recurring_hr : '',
             'recurring' => $schedule->recurring ? __('Yes') : __('No'),
-            'recurring_day' => $schedule->recurring ? implode(',', $schedule->recurring_day) : '',
+            'recurring_day' => $schedule->recurring ? htmlentities(implode(',', $schedule->recurring_day)) : '',
             'status' => $schedule->status,
         ];
     }

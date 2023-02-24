@@ -1,299 +1,296 @@
 -- *******************************************************************
 -- CISCO-LWAPP-TC-MIB.my:  Cisco LWAPP MIBs Textual Conventions
 -- March 2006, Prasanna Viswakumar
---
--- Copyright (c) 2006,2007 by Cisco Systems, Inc.
+--   
+-- Copyright (c) 2006, 2007, 2010-2011 by Cisco Systems Inc.
 -- All rights reserved.
 -- *******************************************************************
 
 CISCO-LWAPP-TC-MIB DEFINITIONS ::= BEGIN
-IMPORTS
-        MODULE-IDENTITY,
-        Unsigned32,
-        Gauge32
-                FROM SNMPv2-SMI
-        TEXTUAL-CONVENTION
-                FROM SNMPv2-TC
-        ciscoMgmt
-                FROM CISCO-SMI;
 
---********************************************************************
---*  MODULE IDENTITY
---********************************************************************
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
 
 ciscoLwappTextualConventions MODULE-IDENTITY
-        LAST-UPDATED    "201109130000Z"
-        ORGANIZATION    "Cisco Systems, Inc."
-        CONTACT-INFO
-               "        Cisco Systems,
-                        Customer Service
+    LAST-UPDATED    "201906270000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
 
-                Postal: 170 West Tasman Drive
-                        San Jose, CA  95134
-                        USA
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
 
-                   Tel: +1 800 553-NETS
+            Tel: +1 800 553-NETS
 
-                 Email: cs-wnbu-snmp@cisco.com"
-        DESCRIPTION
-                "This module defines textual conventions used
-                throughout the Cisco enterprise MIBs
-                designed for implementation on Central 
-                Controllers that terminate the Light Weight
-                Access Point Protocol from LWAPP Access
-                Points. 
+            Email: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This module defines textual conventions used
+        throughout the Cisco enterprise MIBs
+        designed for implementation on Central 
+        Controllers that terminate the Light Weight
+        Access Point Protocol from LWAPP Access
+        Points. 
 
-                The relationship between CC and the LWAPP APs
-                can be depicted as follows:
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
 
         +......+     +......+     +......+           +......+
         +      +     +      +     +      +           +      +
         +  CC  +     +  CC  +     +  CC  +           +  CC  +
         +      +     +      +     +      +           +      +
         +......+     +......+     +......+           +......+
-          ..            .             .                 .
-          ..            .             .                 .
-         .  .            .             .                 .
+        ..            .             .                 .
+        ..            .             .                 .
+        .  .            .             .                 .
         .    .            .             .                 .
-       .      .            .             .                 .
-      .        .            .             .                 .
-   +......+ +......+     +......+      +......+          +......+
-   +      + +      +     +      +      +      +          +      +
-   +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
-   +      + +      +     +      +      +      +          +      +
-   +......+ +......+     +......+      +......+          +......+
-              .              .             .                 .
-            .  .              .             .                 .
-           .    .              .             .                 .
-          .      .              .             .                 .
-         .        .              .             .                 .
-      +......+ +......+     +......+      +......+          +......+
-      +      + +      +     +      +      +      +          +      +
-      +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
-      +      + +      +     +      +      +      +          +      +
-      +......+ +......+     +......+      +......+          +......+
+        .      .            .             .                 .
+        .        .            .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+        .              .             .                 .
+        .  .              .             .                 .
+        .    .              .             .                 .
+        .      .              .             .                 .
+        .        .              .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
 
 
-                The LWAPP tunnel exists between the controller and
-                the APs.  The MNs communicate with the APs through
-                the protocol defined by the 802.11 standard.
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
 
-                LWAPP APs, upon bootup, discover and join one of the
-                controllers and the controller pushes the configuration,
-                that includes the WLAN parameters, to the LWAPP APs.
-                The APs then encapsulate all the 802.11 frames from
-                wireless clients inside LWAPP frames and forward
-                the LWAPP frames to the controller.
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
 
-                                GLOSSARY
+                        GLOSSARY
 
-                Access Point ( AP )
+        Access Point ( AP )
 
-                An entity that contains an 802.11 medium access
-                control ( MAC ) and physical layer ( PHY ) interface
-                and provides access to the distribution services via
-                the wireless medium for associated clients.
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.
 
-                LWAPP APs encapsulate all the 802.11 frames in
-                LWAPP frames and sends it to the controller to which
-                it is logically connected.
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends it to the controller to which
+        it is logically connected.
 
-                Advanced Encryption Standard ( AES )
+        Advanced Encryption Standard ( AES )
 
-                In cryptography, the Advanced Encryption Standard
-                (AES), also known as Rijndael, is a block cipher
-                adopted as an encryption standard by the US
-                government. It is expected to be used worldwide
-                and analysed extensively, as was the case with its
-                predecessor, the Data Encryption Standard (DES).
-                AES was adopted by National Institute of Standards
-                and Technology (NIST) as US FIPS PUB 197 in
-                November 2001 after a 5-year standardisation
-                process.
-         
-                Central Controller ( CC )
+        In cryptography, the Advanced Encryption Standard
+        (AES), also known as Rijndael, is a block cipher
+        adopted as an encryption standard by the US
+        government. It is expected to be used worldwide
+        and analysed extensively, as was the case with its
+        predecessor, the Data Encryption Standard (DES).
+        AES was adopted by National Institute of Standards
+        and Technology (NIST) as US FIPS PUB 197 in
+        November 2001 after a 5-year standardisation
+        process.
 
-                The central entity that terminates the LWAPP protocol
-                tunnel from the LWAPP APs.  Throughout this MIB,
-                this entity is also referred to as 'controller'.
+        Central Controller ( CC )
 
-                Light Weight Access Point Protocol ( LWAPP )
+        The central entity that terminates the LWAPP protocol
+        tunnel from the LWAPP APs.  Throughout this MIB,
+        this entity is also referred to as 'controller'.
 
-                This is a generic protocol that defines the
-                communication between the Access Points and the
-                Central Controller. 
+        Light Weight Access Point Protocol ( LWAPP )
 
-                Management Frame Protection ( MFP )
+        This is a generic protocol that defines the
+        communication between the Access Points and the
+        Central Controller. 
 
-                A proprietary mechanism devised to integrity protect
-                the otherwise unprotected management frames of the
-                802.11 protocol specification.
+        Management Frame Protection ( MFP )
 
-                Message Integrity Check ( MIC )
+        A proprietary mechanism devised to integrity protect
+        the otherwise unprotected management frames of the
+        802.11 protocol specification.
 
-                A checksum computed on a sequence of bytes and made
-                known to the receiving party in a data communication,
-                to let the receiving party make sure the bytes
-                received were not compromised enroute.
+        Message Integrity Check ( MIC )
 
-                Mobile Node ( MN )
+        A checksum computed on a sequence of bytes and made
+        known to the receiving party in a data communication,
+        to let the receiving party make sure the bytes
+        received were not compromised enroute.
 
-                A roaming 802.11 wireless device in a wireless
-                network associated with an access point.
+        Mobile Node ( MN )
 
-                Temporal Key Integrity Protocol ( TKIP )
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point.
 
-                A security protocol defined to enhance the limitations
-                of WEP.  Message Integrity Check and per-packet keying
-                on all WEP-encrypted frames are two significant
-                enhancements provided by TKIP to WEP.
+        Temporal Key Integrity Protocol ( TKIP )
 
-                Wired Equivalent Privacy ( WEP )
+        A security protocol defined to enhance the limitations
+        of WEP.  Message Integrity Check and per-packet keying
+        on all WEP-encrypted frames are two significant
+        enhancements provided by TKIP to WEP.
 
-                A security method defined by 802.11. WEP uses a
-                symmetric key stream cipher called RC4 to encrypt the
-                data packets.
+        Wired Equivalent Privacy ( WEP )
 
-                802.11n
+        A security method defined by 802.11. WEP uses a
+        symmetric key stream cipher called RC4 to encrypt the
+        data packets.
 
-                802.11n builds upon previous 802.11 standards by 
-                adding MIMO (multiple-input multiple-output). MIMO 
-                uses multiple transmitter and receiver antennas to 
-                allow for increased data throughput through spatial 
-                multiplexing and increased range.
+        802.11n
 
-                Control/Extension Channel 
+        802.11n builds upon previous 802.11 standards by 
+        adding MIMO (multiple-input multiple-output). MIMO 
+        uses multiple transmitter and receiver antennas to 
+        allow for increased data throughput through spatial 
+        multiplexing and increased range.
 
-                A single 802.11 channel is 20 MHz wide.  802.11n allows 
-                the use of channels of width 40 MHz by combining two 
-                20 MHz channels.  The channels are known as the primary 
-                or control channel and secondary or extension channel. 
-                Both the channels are used for transmission 
-                and reception of data.
+        Control/Extension Channel 
 
-                REFERENCE
+        A single 802.11 channel is 20 MHz wide.  802.11n allows 
+        the use of channels of width 40 MHz by combining two 
+        20 MHz channels.  The channels are known as the primary 
+        or control channel and secondary or extension channel. 
+        Both the channels are used for transmission 
+        and reception of data.
 
-                [1] Part 11 Wireless LAN Medium Access Control ( MAC )
-                    and Physical Layer ( PHY ) Specifications.
+        REFERENCE
 
-                [2] Draft-obara-capwap-lwapp-00.txt, IETF Light
-                    Weight Access Point Protocol. 
-             
-                [3] Enhanced Wireless Consortium MAC Specification, 
-                    v1.24.
+        [1] Part 11 Wireless LAN Medium Access Control ( MAC )
+            and Physical Layer ( PHY ) Specifications.
 
-                [4] Enhanced Wireless Consortium PHY Specification,
-                    v1.27."
-        REVISION      "201109130000Z"
-        DESCRIPTION
-                "Added new textual conventions CcxServiceVersion." 
-        REVISION      "200710300000Z"
-        DESCRIPTION
-                "Added new textual conventions CLApEthernetIfStatus and
-                 CLApDot11RadioSubband."
+        [2] Draft-obara-capwap-lwapp-00.txt, IETF Light
+            Weight Access Point Protocol. 
 
-        REVISION      "200702050000Z"
-        DESCRIPTION
-                "Added new textual conventions CLDot11ChannelBandwidth,
-                 CLDot11Band and CLApAssocFailureReason."
+        [3] Enhanced Wireless Consortium MAC Specification, 
+            v1.24.
 
-        REVISION      "200610310000Z"
-        DESCRIPTION
-                "Added new textual conventions CLMfpEventSource, 
-                CLCdpAdvtVersionType and CLDot11ClientStatus."
+        [4] Enhanced Wireless Consortium PHY Specification,
+            v1.27."
+    REVISION        "201608230000Z"
+    DESCRIPTION
+        "Added new textual conventions CLApMode"        
+    REVISION        "201109130000Z"
+    DESCRIPTION
+        "Added new textual conventions CcxServiceVersion"
+    REVISION        "201002230000Z"
+    DESCRIPTION
+        "Added new textual conventions CLApDot11RadioRole,
+        CLClientPowerSaveMode,and CLApDot11RadioSubband."
+    REVISION        "200709110000Z"
+    DESCRIPTION
+        "Added new textual convention CLWebAuthType."
+    REVISION        "200702050000Z"
+    DESCRIPTION
+        "Added new textual conventions CLDot11ChannelBandwidth,
+        CLDot11Band and CLApAssocFailureReason."
+    REVISION        "200610310000Z"
+    DESCRIPTION
+        "Added new textual conventions CLMfpEventSource,
+        CLCdpAdvtVersionType and CLDot11ClientStatus."
+    REVISION        "200604130000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 514 }
 
-        REVISION      "200604130000Z"
-        DESCRIPTION
-                "Initial version of this MIB module. "
-        ::= { ciscoMgmt 514 }
+
 
 -- ********************************************************************
 -- TEXTUAL CONVENTION
 -- ********************************************************************
 
 CLApIfType ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the type of a
-                wireless interface.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the type of a
+        wireless interface.
 
-                The semantics are as follows:
+        The semantics are as follows:
 
-                dot11bg - This value indicates that the radio
-                interface follows 802.11b or 802.11g standard.
+        dot11bg - This value indicates that the radio
+        interface follows 802.11b or 802.11g standard.
 
-                dot11a  - This value indicates that the radio
-                interface follows 802.11a standard.
+        dot11a  - This value indicates that the radio
+        interface follows 802.11a standard.
 
-                dot11abgn  - This value indicates that the radio
-                interface is operating in XOR mode between 802.11a
-                and 802.11bg.
+        dot11abgn  - This value indicates that the radio
+        interface is operating in XOR mode between 802.11a
+        and 802.11bg.
 
-                dot11ac  - This value indicates that the radio
-                interface follows 802.11ac standard.
-
-                uwb - This value indicates that this is a Ultra
-                Wideband Interface. "
-        SYNTAX  INTEGER {
-                         dot11bg(1),
-                         dot11a(2),
-                         uwb(3),
-                         dot11abgn(4),
-                         dot11ac(5),
-                         dot11b(6),
-                         dot11g(7),
-                         dot11n24(8),
-                         dot11n5(9),
-                         unknown(10)
-
-                }
+        uwb - This value indicates that this is a Ultra
+        Wideband Interface."
+        
+    SYNTAX          INTEGER  {
+                        dot11bg(1),
+                        dot11a(2),
+                        uwb(3),
+                        dot11abgn(4),
+                        unknown(5)
+                    }
 
 CLDot11Channel ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the possible channel
-                numbers in an 802.11 communication channel.  The
-                802.11 radio interface of an Access Point operates
-                in one of the possible channels at any point of time
-                for wireless data communication with 802.11 based
-                wireless clients. "
-        SYNTAX  Unsigned32 ( 1..14 |
-                        34 | 36 | 38 | 40 | 42 | 44 | 46 | 48 |
-                        52 | 56 | 60 | 64 | 149 | 153 |
-                        157 | 161 | 165 | 169 | 173)
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the possible channel
+        numbers in an 802.11 communication channel.  The
+        802.11 radio interface of an Access Point operates
+        in one of the possible channels at any point of time
+        for wireless data communication with 802.11 based
+        wireless clients."
+    SYNTAX          Unsigned32 (1..14 | 34 | 36 | 38 | 40 | 42 | 44 | 46
+                                | 48 | 52 | 56 | 60 | 64 | 149 | 153
+                                | 157 | 161)
 
 CLDot11ClientStatus ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the states 
-                of an 802.11 client.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the states
+        of an 802.11 client.
 
-                The semantics are as follows:
+        The semantics are as follows:
 
-                idle(1) - client is in idle mode.
+        idle(1) - client is in idle mode.
 
-                aaaPending(2) - client's authentication is pending. 
-                Request has been sent to AAA server for authentication.
+        aaaPending(2) - client's authentication is pending. 
+        Request has been sent to AAA server for authentication.
 
-                authenticated(3) - client has been authenticated.
+        authenticated(3) - client has been authenticated.
 
-                associated(4) - client is associated, but not 
-                authenticated. 
+        associated(4) - client is associated, but not 
+        authenticated. 
 
-                powersave(5) - client is in powersave mode.
+        powersave(5) - client is in powersave mode.
 
-                disassociated(6) - client has dissociated and not in 
-                any of the 802.11 networks managed by the controller.
+        disassociated(6) - client has dissociated and not in 
+        any of the 802.11 networks managed by the controller.
 
-                tobedeleted(7) - client is marked for deletion.
+        tobedeleted(7) - client is marked for deletion.
 
-                probing(8) - state before association. The client 
-                will be removed if it does not associate. 
+        probing(8) - state before association. The client 
+        will be removed if it does not associate. 
 
-                excluded(9) - client has been marked as excluded after fixed 
-                number of authentication failures."
-
-        SYNTAX  INTEGER { 
+        excluded(9) - client has been marked as excluded after fixed 
+        number of authentication failures."
+    SYNTAX          INTEGER  {
                         idle(1),
                         aaaPending(2),
                         authenticated(3),
@@ -303,146 +300,146 @@ CLDot11ClientStatus ::= TEXTUAL-CONVENTION
                         tobedeleted(7),
                         probing(8),
                         excluded(9)
-                }
-
+                    }
 
 CLEventFrames ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the possible
-                802.11 management frame subtypes. 
-                 
-                cLAssocRequestFrm - 802.11 Association Request
-                frame
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the possible
+        802.11 management frame subtypes. 
 
-                cLAssocResponseFrm - 802.11 Association Response
-                frame
+        cLAssocRequestFrm - 802.11 Association Request
+        frame
 
-                cLReAssocRequestFrm - 802.11 Reassociation
-                Request frame
+        cLAssocResponseFrm - 802.11 Association Response
+        frame
 
-                cLReAssocResponseFrm - 802.11 Reassociation
-                Response frame
+        cLReAssocRequestFrm - 802.11 Reassociation
+        Request frame
 
-                cLProbeRequestFrm - 802.11 Probe Request frame
+        cLReAssocResponseFrm - 802.11 Reassociation
+        Response frame
 
-                cLProbeResponseFrm - 802.11 Probe Response 
-                frame
+        cLProbeRequestFrm - 802.11 Probe Request frame
 
-                cLReserved1 - Reserved for future use
+        cLProbeResponseFrm - 802.11 Probe Response 
+        frame
 
-                cLReserved2 - Reserved for future use
+        cLReserved1 - Reserved for future use
 
-                cLBeaconFrm - 802.11 Beacon frame
+        cLReserved2 - Reserved for future use
 
-                cLAtimFrm - 802.11 Adhoc Traffic Indication
-                Map frame
+        cLBeaconFrm - 802.11 Beacon frame
 
-                cLDissociationFrm - 802.11 Dissociation
-                frame
+        cLAtimFrm - 802.11 Adhoc Traffic Indication
+        Map frame
 
-                cLAuthenticationFrm - 802.11 Authentication
-                frame
+        cLDissociationFrm - 802.11 Dissociation
+        frame
 
-                cLDeAuthenticationFrm - 802.11 Deauthentication
-                frame "
-        REFERENCE
-                "Part 11 Wireless LAN Medium Access Control ( MAC )
-                and Physical Layer ( PHY ) Specifications,
-                Section 7.1.3.1.2 - Type and Subtype fields"
-        SYNTAX     BITS {
-                      cLAssocRequestFrm(0),
-                      cLAssocResponseFrm(1),
-                      cLReAssocRequestFrm(2),
-                      cLReAssocResponseFrm(3),
-                      cLProbeRequestFrm(4),
-                      cLProbeResponseFrm(5),
-                      cLReserved1(6),
-                      cLReserved2(7),
-                      cLBeaconFrm(8),
-                      cLAtimFrm(9),
-                      cLDissociationFrm(10),
-                      cLAuthenticationFrm(11),
-                      cLDeAuthenticationFrm(12)
-        }
+        cLAuthenticationFrm - 802.11 Authentication
+        frame
 
-CLMfpEventType ::= TEXTUAL-CONVENTION 
-        STATUS  current
-        DESCRIPTION
-                "The type of the MFP anomaly event. 
+        cLDeAuthenticationFrm - 802.11 Deauthentication
+        frame"
 
-                invalidMic - The MFP Validation has identified
-                that the MIC carried by a particular management
-                frame is invalid.
+    REFERENCE
+        "Part 11 Wireless LAN Medium Access Control ( MAC )
+        and Physical Layer ( PHY ) Specifications,
+        Section 7.1.3.1.2 - Type and Subtype fields"
+    SYNTAX          BITS {
+                        cLAssocRequestFrm(0),
+                        cLAssocResponseFrm(1),
+                        cLReAssocRequestFrm(2),
+                        cLReAssocResponseFrm(3),
+                        cLProbeRequestFrm(4),
+                        cLProbeResponseFrm(5),
+                        cLReserved1(6),
+                        cLReserved2(7),
+                        cLBeaconFrm(8),
+                        cLAtimFrm(9),
+                        cLDissociationFrm(10),
+                        cLAuthenticationFrm(11),
+                        cLDeAuthenticationFrm(12)
+                    }
 
-                invalidSeq - The MFP validation has identified 
-                that a particular management frame is carrying an
-                invalid sequence number.  Note that an invalid 
-                sequence number error can also be detected due to an
-                incorrect timestamp in the MFP information element.
-                The incorrect timestamp could possibly be due to the
-                fact that the detecting AP's time window is not in
-                synchronization with that of other APs in the
-                MFP framework.
+CLMfpEventType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The type of the MFP anomaly event.
 
-                noMic - The MFP validation has detected a management
-                frame without the MFP information element.
+        invalidMic - The MFP Validation has identified
+        that the MIC carried by a particular management
+        frame is invalid.
 
-                unexpectedMic - The MFP validation has detected a
-                management frame as carrying a MIC value when
-                protection is not enabled on the WLAN. 
+        invalidSeq - The MFP validation has identified 
+        that a particular management frame is carrying an
+        invalid sequence number.  Note that an invalid 
+        sequence number error can also be detected due to an
+        incorrect timestamp in the MFP information element.
+        The incorrect timestamp could possibly be due to the
+        fact that the detecting AP's time window is not in
+        synchronization with that of other APs in the
+        MFP framework.
 
-                ccmpDecryptError - An MFP frame that was apparently 
-                received from a client in an AES-CCMP encrypted 
-                session was rejected by the Access Point because it 
-                could not be decrypted.
+        noMic - The MFP validation has detected a management
+        frame without the MFP information element.
 
-                ccmpInvalidMhdrIe - An MFP frame that was apparently 
-                received from a client in an AES-CCMP encrypted 
-                session was rejected by the Access Point because it 
-                contained an invalid MHDR information element, or the 
-                MHDR information element was not present.
+        unexpectedMic - The MFP validation has detected a
+        management frame as carrying a MIC value when
+        protection is not enabled on the WLAN. 
 
-                ccmpInvalidReplayCtr - An MFP frame that was apparently 
-                received from a client in an AES-CCMP encrypted session 
-                was rejected by the Access Point because the replay 
-                counter was not valid.
+        ccmpDecryptError - An MFP frame that was apparently 
+        received from a client in an AES-CCMP encrypted 
+        session was rejected by the Access Point because it 
+        could not be decrypted.
 
-                tkipInvalidIcv - An MFP frame that was apparently 
-                received from a client in a TKIP encrypted session was 
-                rejected by the Access Point because it contained an 
-                invalid Integrity Check Value.
+        ccmpInvalidMhdrIe - An MFP frame that was apparently 
+        received from a client in an AES-CCMP encrypted 
+        session was rejected by the Access Point because it 
+        contained an invalid MHDR information element, or the 
+        MHDR information element was not present.
 
-                tkipInvalidMic - An MFP frame that was apparently 
-                received from a client in a TKIP encrypted session was 
-                rejected by the Access Point because the message 
-                integrity check failed.
+        ccmpInvalidReplayCtr - An MFP frame that was apparently 
+        received from a client in an AES-CCMP encrypted session 
+        was rejected by the Access Point because the replay 
+        counter was not valid.
 
-                tkipInvalidMhdrIe - An MFP frame that was apparently 
-                received from a client in a TKIP encrypted session was 
-                rejected by the Access Point because it contained an 
-                invalid MHDR information element, or the MHDR 
-                information element was not present.
+        tkipInvalidIcv - An MFP frame that was apparently 
+        received from a client in a TKIP encrypted session was 
+        rejected by the Access Point because it contained an 
+        invalid Integrity Check Value.
 
-                tkipInvalidReplayCtr - An MFP frame that was apparently 
-                received from a client in a TKIP encrypted session was 
-                rejected by the Access Point because it the replay 
-                counter was not valid.
+        tkipInvalidMic - An MFP frame that was apparently 
+        received from a client in a TKIP encrypted session was 
+        rejected by the Access Point because the message 
+        integrity check failed.
 
-                bcastDisassociationFrameRcvd - The Access Point detected 
-                a broadcast disassociation frame.  Broadcast 
-                disassociation frames are rejected by CCXv5 compliant 
-                devices.
+        tkipInvalidMhdrIe - An MFP frame that was apparently 
+        received from a client in a TKIP encrypted session was 
+        rejected by the Access Point because it contained an 
+        invalid MHDR information element, or the MHDR 
+        information element was not present.
 
-                bcastDeauthenticationFrameRcvd - The Access Point 
-                detected a broadcast deauthentication frame.  Broadcast 
-                deauthentication frames are rejected by CCXv5 compliant 
-                devices.
+        tkipInvalidReplayCtr - An MFP frame that was apparently 
+        received from a client in a TKIP encrypted session was 
+        rejected by the Access Point because it the replay 
+        counter was not valid.
 
-                bcastActionFrameRcvd - The Access Point detected a 
-                broadcast action frame.  Broadcast action frames are 
-                rejected by CCXv5 compliant devices.  "
-        SYNTAX  INTEGER {
+        bcastDisassociationFrameRcvd - The Access Point detected 
+        a broadcast disassociation frame.  Broadcast 
+        disassociation frames are rejected by CCXv5 compliant 
+        devices.
+
+        bcastDeauthenticationFrameRcvd - The Access Point 
+        detected a broadcast deauthentication frame.  Broadcast 
+        deauthentication frames are rejected by CCXv5 compliant 
+        devices.
+
+        bcastActionFrameRcvd - The Access Point detected a 
+        broadcast action frame.  Broadcast action frames are 
+        rejected by CCXv5 compliant devices."
+    SYNTAX          INTEGER  {
                         invalidMic(1),
                         invalidSeq(2),
                         noMic(3),
@@ -458,350 +455,340 @@ CLMfpEventType ::= TEXTUAL-CONVENTION
                         bcastDisassociationFrameRcvd(32),
                         bcastDeauthenticationFrameRcvd(33),
                         bcastActionFrameRcvd(34)
-                }
+                    }
 
-CLMfpEventSource ::= TEXTUAL-CONVENTION 
-        STATUS  current
-        DESCRIPTION
-                "The source of the MFP anomaly event. 
+CLMfpEventSource ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The source of the MFP anomaly event.
 
-                infrastructureMfp - The source of the MFP event is 
-                an infrastructure device that implements MFP.
+        infrastructureMfp - The source of the MFP event is 
+        an infrastructure device that implements MFP.
 
-                clientMfp - The source of the MFP event is a client 
-                device that implements MFP."
-        SYNTAX  INTEGER {
+        clientMfp - The source of the MFP event is a client 
+        device that implements MFP."
+    SYNTAX          INTEGER  {
                         infrastructureMfp(1),
                         clientMfp(2)
-                }
+                    }
 
 CLMfpVersion ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention lists the versions of
-                the MFP protocol. "
-        SYNTAX  INTEGER {
+    STATUS          current
+    DESCRIPTION
+        "This textual convention lists the versions of
+        the MFP protocol."
+    SYNTAX          INTEGER  {
                         mfpv1(1),
                         mfpv2(2)
-                }
+                    }
 
 CLTimeBaseStatus ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention is used to define the
-                time synchronization of entities with their
-                respective time bases.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention is used to define the
+        time synchronization of entities with their
+        respective time bases.
 
-                cTimeBaseInSync - This value indicates that the
-                respective entity is in synchronization with
-                its time base.
+        cTimeBaseInSync - This value indicates that the
+        respective entity is in synchronization with
+        its time base.
 
-                cTimeBaseNotInSync - This value indicates that
-                the respective entity is not in synchronization
-                with its time base. "
-        SYNTAX  INTEGER {
+        cTimeBaseNotInSync - This value indicates that
+        the respective entity is not in synchronization
+        with its time base."
+    SYNTAX          INTEGER  {
                         cTimeBaseInSync(1),
                         cTimeBaseNotInSync(2)
-                }
+                    }
 
 CLSecEncryptType ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the type of
-                encryption to be applied to a WLAN.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the type of
+        encryption to be applied to a WLAN.
 
-                The semantics are as follows:
+        The semantics are as follows:
 
-                tkip - This value indicates that TKIP encryption
-                is configured for data protection.
+        tkip - This value indicates that TKIP encryption
+        is configured for data protection.
 
-                aes  - This value indicates that AES encryption
-                is configured for data protection. "
-        SYNTAX   BITS {
+        aes  - This value indicates that AES encryption
+        is configured for data protection."
+    SYNTAX          BITS {
                         tkip(0),
                         aes(1)
-                 }
+                    }
 
 CLSecKeyFormat ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the type of
-                the key configured for encryption. "
-        SYNTAX  INTEGER {
-                    default(1),
-                    hex(2),
-                    ascii(3)
-                }
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the type of
+        the key configured for encryption."
+    SYNTAX          INTEGER  {
+                        default(1),
+                        hex(2),
+                        ascii(3)
+                    }
 
-CLDot11RfParamMode ::= TEXTUAL-CONVENTION 
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines how the RF
-                parameters used to manage roaming are chosen
-                by the controller.
+CLDot11RfParamMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines how the RF
+        parameters used to manage roaming are chosen
+        by the controller.
 
-                default - controller reverts back to the default
-                values specified for the RF parameters.
-                     
-                auto - controller determines the RF parameters
-                automatically without any input from the end user.
-   
-                custom - controller uses the RF parameters
-                configured by the end user.  User is allowed to
-                configure the parameters only if the mode is set
-                to 'custom'. "
-        SYNTAX  INTEGER {
+        default - controller reverts back to the default
+        values specified for the RF parameters.
+
+        auto - controller determines the RF parameters
+        automatically without any input from the end user.
+
+        custom - controller uses the RF parameters
+        configured by the end user.  User is allowed to
+        configure the parameters only if the mode is set
+        to 'custom'."
+    SYNTAX          INTEGER  {
                         default(1),
                         custom(2),
                         auto(3)
-                }
+                    }
 
 CLTsmDot11CurrentPackets ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "The number of packets received over a specified
-                period of time. "
-        SYNTAX  Gauge32
-
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received over a specified
+        period of time."
+    SYNTAX          Gauge32
 
 CLCdpAdvtVersionType ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
-            "This textual convention lists the versions of
-            the CDP protocol in use in LWAPP APs and Controllers."
-    SYNTAX          INTEGER 
-    {
-        cdpv1(1),
-        cdpv2(2)
-    }
+        "This textual convention lists the versions of
+        the CDP protocol in use in LWAPP APs and Controllers."
+    SYNTAX          INTEGER  {
+                        cdpv1(1),
+                        cdpv2(2)
+                    }
 
 CLDot11ChannelBandwidth ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the channel
-                bandwidth for 802.11n radio interfaces.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the channel
+        bandwidth for 802.11n radio interfaces.
 
-                The semantics are as follows:
+        The semantics are as follows:
 
-                five - This value indicates that the bandwidth
-                is 5 MHz.
+        five - This value indicates that the bandwidth
+        is 5 MHz.
 
-                ten - This value indicates that the bandwidth
-                is 10 MHz.
+        ten - This value indicates that the bandwidth
+        is 10 MHz.
 
-                twenty - This value indicates that the bandwidth
-                is 20 MHz.
+        twenty - This value indicates that the bandwidth
+        is 20 MHz.
 
-                aboveforty - This value indicates that the bandwidth
-                is 40 MHz with the extension channel above the control
-                channel.
+        aboveforty - This value indicates that the bandwidth
+        is 40 MHz with the extension channel above the control
+        channel.
 
-                belowforty - This value indicates that the bandwidth
-                is 40 MHz with the extension channel below the control
-                channel."
-
-        SYNTAX  INTEGER {
-                   five(1),
-                   ten(2),
-                   twenty(3),
-                   aboveforty(4),
-                   belowforty(5)
-                }
-
+        belowforty - This value indicates that the bandwidth
+        is 40 MHz with the extension channel below the control
+        channel."
+    SYNTAX          INTEGER  {
+                        five(1),
+                        ten(2),
+                        twenty(3),
+                        aboveforty(4),
+                        belowforty(5)
+                    }
 
 CLDot11Band ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the 802.11 frequency
-                band.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the 802.11 frequency
+        band.
 
-                The semantics are as follows:
+        The semantics are as follows:
 
-                band2dot4 - This value indicates that the 
-                2.4 GHz band is in use.
+        band2dot4 - This value indicates that the 
+        2.4 GHz band is in use.
 
-                band5 - This value indicates that the 
-                5 GHz band is in use."
-
-        SYNTAX  INTEGER {
-                   band2dot4(1),
-                   band5(2)
-                }
-
+        band5 - This value indicates that the 
+        5 GHz band is in use."
+    SYNTAX          INTEGER  {
+                        band2dot4(1),
+                        band5(2)
+                    }
 
 CLApAssocFailureReason ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This textual convention defines the possible reasons 
-                 for an AP's failure to get associated to a controller.
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the possible reasons
+        for an AP's failure to get associated to a controller.
 
-                 The semantics are as follows:  
+        The semantics are as follows:  
 
-                 unknown - The reason for the AP not being able to 
-                 associate is unknown.
+        unknown - The reason for the AP not being able to 
+        associate is unknown.
 
-                 notSupported - The AP is not supported for management
-                 by the controller." 
-
-        SYNTAX     INTEGER {
-                       unknown(1),
-                       notSupported(2)
-                   }
+        notSupported - The AP is not supported for management
+        by the controller."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        notSupported(2)
+                    }
 
 CLWebAuthType ::= TEXTUAL-CONVENTION
-    STATUS	   current
+    STATUS          current
     DESCRIPTION
-	    "Represents either one of the following web auth types
-		internalDefault(1) -
-			The default login page will be
-                presented to the client for authentication.
-	 
-		internalCustom(2)  -
-			The administrator has created and
-                uploaded a custom login page and it will be
-                presented to the clients for authentication.
+        "Represents either one of the following web auth types
+        internalDefault(1) -
+                The default login page will be
+        presented to the client for authentication.
 
-		external(3) -
-			This value indicates that the login page
-                will be served from the external web server.  Note
-                that cLWAWebAuthType can be successfully set to this
-                value when the cLWAExternalWebAuthURL object has been
-                set to string with non-zero length."
-	
-    SYNTAX      INTEGER {
-		    internalDefault(1),
-                    internalCustom(2),
-                    external(3)
-                   }
+        internalCustom(2)  -
+                The administrator has created and
+        uploaded a custom login page and it will be
+        presented to the clients for authentication.
 
+        external(3) -
+                This value indicates that the login page
+        will be served from the external web server.  Note
+        that cLWAWebAuthType can be successfully set to this
+        value when the cLWAExternalWebAuthURL object has been
+        set to string with non-zero length."
+    SYNTAX          INTEGER  {
+                        internalDefault(1),
+                        internalCustom(2),
+                        external(3)
+                    }
 
 CLClientPowerSaveMode ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This textual convention defines power management mode 
-                of this client.
-                The possible two modes are:
-                active(1)    - this client is not in power-save mode 
-                               and it is actively sending or receiving
-                               data.
-                powersave(2) - this client is in power-save mode and it
-                               wakes up once a while to check for 
-                               pending data." 
-
-        SYNTAX   INTEGER {
-                     active(1),
-                     powersave(2)
-                 }
-
-CLApEthernetIfStatus ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This textual convention defines the status of an
-                 Ethernet interface of an AP joined to a controller.
-
-                 up(1) - The interface is operational and ready to transmit
-                 packets.
-
-                 down(2) - The interface is not operational."
-        SYNTAX     INTEGER {
-                       up(1),
-                       down(2)
-                   }
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines power management mode
+        of this client.
+        The possible two modes are:
+        active(1)    - The client is not in power-save mode 
+                       and it is actively sending or receiving
+                       data.
+        powersave(2) - The client is in power-save mode and it
+                       wakes up once a while to check for 
+                       pending data."
+    SYNTAX          INTEGER  {
+                        active(1),
+                        powersave(2)
+                    }
 
 CLApDot11RadioSubband ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This textual convention defines the possible values 
-                 of subbands a radio can support.
-                 Currently, this information is applicable only to
-                 A radios.
-                 all(1) - This radio is a regular A radio that operates
-                          in the full A band spectrum in the frequency
-                          range 4940 Mhz - 5850 Mhz.
-                 sub49(2) - This is an A radio that operates only in the
-                            public safety (4.9 Ghz) sub band in the
-                            frequency range 4940 Mhz - 5100 Mhz.
-                 sub52(3) - This is an A radio that operates only in the
-                            5.2 Ghz sub band in the frequency range
-                            5250 Mhz - 5350 Mhz.
-                 sub54(4) - This is an A radio that operates only in the
-                            5.4 Ghz sub band in the frequency range
-                            5470 Mhz - 5725 Mhz.
-                 sub58(5) - This is an A radio that operates only in the
-                            5.8 Ghz sub band in the frequency range
-                            5725 Mhz - 5850 Mhz.
-                 "
-        SYNTAX     INTEGER {
-                       all(1),
-                       sub49(2),
-                       sub52(3),
-                       sub54(4),
-                       sub58(5)
-                   }
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the possible values
+        of subbands a radio can support.
+        Currently, this information is applicable to
+        A radios.
+        all(1) - This radio is a regular A radio that operates
+                 in the full A band spectrum in the frequency
+                 range 4940 Mhz - 5850 Mhz.
+        sub49(2) - This is an A radio that operates only in the
+                   public safety (4.9 Ghz) sub band in the
+                   frequency range 4940 Mhz - 5100 Mhz.
+        sub52(3) - This is an A radio that operates only in the
+                   5.2 Ghz sub band in the frequency range
+                   5250 Mhz - 5350 Mhz.
+        sub54(4) - This is an A radio that operates only in the
+                   5.4 Ghz sub band in the frequency range
+                   5470 Mhz - 5725 Mhz.
+        sub58(5) - This is an A radio that operates only in the
+                   5.8 Ghz sub band in the frequency range
+                   5725 Mhz - 5850 Mhz."
+    SYNTAX          INTEGER  {
+                        all(1),
+                        sub49(2),
+                        sub52(3),
+                        sub54(4),
+                        sub58(5)
+                    }
 
 CLApDot11RadioRole ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This textual convention defines the possible values
-                 of role a radio can support.
-                 shutdown(0)         - This role states that the radio is shut.
-                 updownlink(1)       - This radio will provide the both uplink and
-                                       downlink access.
-                 uplink(2)           - This role is applicable only for Ethernet ports.
-                                       Defined here to maintain the types of role.
-                 downlink(3)         - This radio will provide downlink access.
-                                       downlink radio allows child APs to join.
-                 access(4)           - This radio will provide the access to the clients.
-                 uplinkaccess(5)     - This radio role states that the radio will
-                                       provide the uplink access to the clients.
-                 downlinkaccess(6)   - This radio role states that the radio will
-                                       provide the downlink access to the clients.
-                 updownlinkaccess(7) - This radio role states that the radio will
-                                       provide both uplink and downlink access to the
-                                       clients.
-                 unknown(8)          - This radio does not have role.
-                 "
-        SYNTAX     INTEGER {
-                       shutdown(0),
-                       updownlink(1),
-                       uplink(2),
-                       downlink(3),
-                       access(4),
-                       uplinkaccess(5),
-                       downlinkaccess(6),
-                       updownlinkaccess(7),
-                       unknown(8)
-
-                   }
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the possible values
+        of role a radio can support.
+        shutdown(0)         - This role states that the radio is 
+                              shut down.
+        upDownlink(1)       - This radio provides both uplink
+                              and downlink access.
+        uplink(2)           - This role is applicable only for Ethernet 
+                              ports. This radio provides uplink access.
+        downlink(3)         - This radio provides downlink access.
+                              downlink radio allows child APs to join.
+        access(4)           - This radio provides the access to the
+                              clients.
+        uplinkAccess(5)     - This radio role states that the radio 
+                              provides the uplink access to the clients.
+        downlinkAccess(6)   - This radio role states that the radio
+                              provides the downlink access to
+                              the clients.
+        upDownlinkAccess(7) - This radio role states that the radio 
+                              provides both uplink and downlink access 
+                              to the clients.
+        unknown(8)          - This radio role is unknown."
+    SYNTAX          INTEGER  {
+                        shutdown(0),
+                        upDownlink(1),
+                        uplink(2),
+                        downlink(3),
+                        access(4),
+                        uplinkAccess(5),
+                        downlinkAccess(6),
+                        upDownlinkAccess(7),
+                        unknown(8)
+                    }
 
 CcxServiceVersion ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION
-                "This textual convention defines the service versions
-		 supported by a CCX Next client. The supported services
-		 include foundation, location, management and voice."
-
-        SYNTAX  INTEGER {
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines the service versions
+        supported by a CCX Next client. The supported services
+        include foundation, location, management and voice."
+    SYNTAX          INTEGER  {
                         none(1),
                         version1(2),
                         version2(3)
-                }
+                    }
 
 CLApMode ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
-                "This textual convention defines the working 
-                mode of the AP. "
+               "This textual convention defines the working 
+                mode of the AP. 
+                local(0) -        This mode enables the access points
+                                  to serve the clients.                
+                monitor(1) -      This mode enables the access points
+                                  to monitor all of its cycles scanning                   
+                                  the channels and looking for rogues.
+                remote(2) -       This mode indicates that AP is a remote 
+                                  edge lightweight access point. 
+                rogueDetector(3)- This mode enables the access points
+                                  to detect the rogue access points.
+                sniffer(4) -      This mode enables the access points
+                                  to sniff packets in a particular channel.
+                bridge(5) -       This mode indicates that a root access point.                        
+                                  is connected
+                seConnect(6) -    This mode enables the access points
+                                  to join Cisco spectrum expert and
+                                  perform spectrum intelligence."
 
         SYNTAX INTEGER  {
                         local(0),
                         monitor(1),
                         remote(2),
-                        roguedetector(3),
+                        rogueDetector(3),
                         sniffer(4),
                         bridge(5),
                         seConnect(6)
                     } 
 
-
 END
+

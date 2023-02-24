@@ -2,7 +2,7 @@
 <div class="form-group">
   <label for="bill_name" class="col-sm-4 control-label">Description</label>
   <div class="col-sm-8">
-    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo $bill_data['bill_name']; ?>">
+    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo htmlentities($bill_data['bill_name']); ?>">
   </div>
 </div>
 <div class="form-group">
@@ -12,7 +12,7 @@
       <input type="radio" name="bill_type" id="bill_type_cdr" value="cdr"
             <?php
             if ($bill_data['bill_type'] == 'cdr') {
-                echo "checked";
+                echo 'checked';
             }
             ?> onchange="javascript: billType();" /> CDR 95th
     </label>
@@ -20,7 +20,7 @@
       <input type="radio" name="bill_type" id="bill_type_quota" value="quota"
             <?php
             if ($bill_data['bill_type'] == 'quota') {
-                echo "checked";
+                echo 'checked';
             }
             ?> onchange="javascript: billType();" /> Quota
     </label>
@@ -45,7 +45,7 @@
        <input type="radio" name="dir_95th" id="dir_95th_inout" value="in"
             <?php
             if ($bill_data['dir_95th'] == 'in' || $bill_data['dir_95th'] == 'out') {
-                 echo "checked";
+                echo 'checked';
             }
             ?> /> Max In/Out
        </label>
@@ -53,7 +53,7 @@
        <input type="radio" name="dir_95th" id="dir_95th_agg" value="agg"
             <?php
             if ($bill_data['dir_95th'] == 'agg') {
-                 echo "checked";
+                echo 'checked';
             }
             ?> /> Aggregate
        </label>
@@ -79,7 +79,7 @@
     <select name="bill_day" class="form-control input-sm">
     <?php
     for ($x = 1; $x < 32; $x++) {
-        $sel = $bill_data['bill_day'] == $x ? "selected " : "";
+        $sel = $bill_data['bill_day'] == $x ? 'selected ' : '';
         echo "<option $sel value='$x'>$x</option>\n";
     }
     ?>
@@ -91,19 +91,19 @@
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_custid">Customer Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo $bill_data['bill_custid'] ?>">
+        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo htmlentities($bill_data['bill_custid']); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_ref">Billing Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo $bill_data['bill_ref']; ?>">
+        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo htmlentities($bill_data['bill_ref']); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_notes">Notes</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo $bill_data['bill_notes']; ?>">
+        <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo htmlentities($bill_data['bill_notes']); ?>">
       </div>
     </div>
 </fieldset>

@@ -1,0 +1,392 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition 
+  
+-- This file describes the ZyXEL Communications Corporation Enterprise MIB.
+-- It contains ZyXEL products OIDs, and common managed objects.
+
+-- ZYXEL-TRANSCEIVER-MIB.mib
+-- Revision 1.11  2013/12/06 
+
+ZYXEL-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE
+		FROM SNMPv2-SMI			-- RFC2578	
+		
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+
+	DisplayString                                          
+	  	FROM SNMPv2-TC
+	  	
+	dot1dBasePort
+     	FROM BRIDGE-MIB
+
+  ifIndex
+    	FROM IF-MIB					-- RFC2863
+  
+  NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+	esMgmt			
+		FROM ZYXEL-ES-SMI;
+
+	zyxelTransceiver MODULE-IDENTITY
+		LAST-UPDATED	"201207010000Z"    
+		ORGANIZATION "Enterprise Solution ZyXEL"     
+		CONTACT-INFO
+			""	   
+		DESCRIPTION
+			"The subtree for transceiver"
+		::= { esMgmt 84 }
+
+	zyxelTransceiverStatus     	OBJECT IDENTIFIER ::= { zyxelTransceiver 1 }
+	zyxelTransceiverTrapInfoObject	OBJECT IDENTIFIER ::= { zyxelTransceiver 2 }
+	zyxelTransceiverNotifications	OBJECT IDENTIFIER ::= { zyxelTransceiver 3 }
+	
+-- *******************************************************************
+-- *
+-- * zyxelTransceiverStatus
+-- *
+-- *******************************************************************
+
+-- zyxelTransceiverSerialTable	
+        zyxelTransceiverSerialTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelTransceiverSerialEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	"The table contains transceiver serial information."
+        ::= { zyxelTransceiverStatus 1 }
+        
+		zyxelTransceiverSerialEntry OBJECT-TYPE
+        SYNTAX	ZyxelTransceiverSerialEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+					"An entry contains transceiver serial information."
+        INDEX          	{ dot1dBasePort }
+        ::= { zyxelTransceiverSerialTable 1 }
+
+        ZyxelTransceiverSerialEntry ::=
+           SEQUENCE {
+        	zyTransceiverSerialModuleType		INTEGER,
+        	zyTransceiverSerialVendor			DisplayString,
+        	zyTransceiverSerialPartNumber		DisplayString,
+        	zyTransceiverSerialSerialNumber		DisplayString,
+        	zyTransceiverSerialRevision			DisplayString,
+        	zyTransceiverSerialDateCode			DisplayString,
+        	zyTransceiverSerialTransceiver		DisplayString
+           }
+       
+        zyTransceiverSerialModuleType OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		okWithDdm(1),
+        		okWithoutDdm(2),
+        		nonoperational(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module type."
+        ::= { zyxelTransceiverSerialEntry 1 }
+
+
+        zyTransceiverSerialVendor OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module vendor name."
+        ::= { zyxelTransceiverSerialEntry 2 }
+
+        zyTransceiverSerialPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Part number provided by transceiver module vendor."
+        ::= { zyxelTransceiverSerialEntry 3 }
+        
+        zyTransceiverSerialSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Serial number provided by transceiver module vendor."
+        ::= { zyxelTransceiverSerialEntry 4 }
+
+        zyTransceiverSerialRevision OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Revision level for part number provided by transceiver module vendor."
+        ::= { zyxelTransceiverSerialEntry 5 }
+
+        zyTransceiverSerialDateCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module vendor's manufacturing date code."
+        ::= { zyxelTransceiverSerialEntry 6 }
+        
+        zyTransceiverSerialTransceiver OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver module type names."
+        ::= { zyxelTransceiverSerialEntry 7 }
+
+-- zyxelTransceiverDdmiTable
+        zyxelTransceiverDdmiTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelTransceiverDdmiEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 	"The table contains transceiver DDMI information."
+        ::= { zyxelTransceiverStatus 2 }
+        
+		zyxelTransceiverDdmiEntry OBJECT-TYPE
+        SYNTAX	ZyxelTransceiverDdmiEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+					"An entry contains transceiver DDMI information."
+        INDEX          	{ dot1dBasePort, zyTransceiverDdmiType }
+        ::= { zyxelTransceiverDdmiTable 1 }
+
+        ZyxelTransceiverDdmiEntry ::=
+           SEQUENCE {
+        	zyTransceiverDdmiType			INTEGER,
+        	zyTransceiverDdmiAlarmMax		INTEGER,
+        	zyTransceiverDdmiAlarmMin		INTEGER,
+        	zyTransceiverDdmiWarnMax		INTEGER,
+        	zyTransceiverDdmiWarnMin		INTEGER,
+        	zyTransceiverDdmiCurrent		INTEGER,
+        	zyTransceiverDdmiDescription	DisplayString
+           }
+       
+        zyTransceiverDdmiType OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver DDMI information type."
+        ::= { zyxelTransceiverDdmiEntry 1 }
+
+
+        zyTransceiverDdmiAlarmMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver high alarm threshold. 
+						 The unit for temperature is 0.01C
+						 The unit for voltage is 0.01V
+						 The unit for TX bias is 0.01mA
+						 The unit for TX/RX power is 0.01dbm"
+        ::= { zyxelTransceiverDdmiEntry 2 }
+
+        zyTransceiverDdmiAlarmMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver low alarm threshold. 
+						 The unit for temperature is 0.01C
+						 The unit for voltage is 0.01V
+						 The unit for TX bias is 0.01mA
+						 The unit for TX/RX power is 0.01dbm"
+        ::= { zyxelTransceiverDdmiEntry 3 }
+        
+        zyTransceiverDdmiWarnMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver high warn threshold. 
+						 The unit for temperature is 0.01C
+						 The unit for voltage is 0.01V
+						 The unit for TX bias is 0.01mA
+						 The unit for TX/RX power is 0.01dbm"
+        ::= { zyxelTransceiverDdmiEntry 4 }
+
+        zyTransceiverDdmiWarnMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver low warn threshold. 
+						 The unit for temperature is 0.01C
+						 The unit for voltage is 0.01V
+						 The unit for TX bias is 0.01mA
+						 The unit for TX/RX power is 0.01dbm"
+        ::= { zyxelTransceiverDdmiEntry 5 }
+
+        zyTransceiverDdmiCurrent OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver current DDMI value. 
+						 The unit for temperature is 0.01C
+						 The unit for voltage is 0.01V
+						 The unit for TX bias is 0.01mA
+						 The unit for TX/RX power is 0.01dbm"
+        ::= { zyxelTransceiverDdmiEntry 6 }
+        
+        zyTransceiverDdmiDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                      	"Transceiver DDMI description. Show N/A if transceiver DDMI is not available."
+        ::= { zyxelTransceiverDdmiEntry 7 }   
+
+-- *******************************************************************
+-- *
+-- * zyxelTransceiverTrapInfoObject
+-- *
+-- *******************************************************************		
+		zyTransceiverTrapOutOfRangeType OBJECT-TYPE
+        SYNTAX  INTEGER { 
+			alarmHigh(0), 
+			warnHigh(1), 
+			alarmLow(2), 
+			warnLow(3)
+			}
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"There are the type of DDMI out of the normal operation range."  
+        ::= { zyxelTransceiverTrapInfoObject 1 }   
+		
+		zyTransceiverTrapOutOfRangeValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"There are the value of DDMI out of the normal operation range."  
+        ::= { zyxelTransceiverTrapInfoObject 2 } 		
+		
+-- *******************************************************************
+-- *
+-- * zyxelTransceiverNotifications
+-- *
+-- *******************************************************************
+
+-- zyxelTransceiverDdmiTemperatureOutOfRange
+		zyTransceiverDdmiTemperatureOutOfRange	NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI temperature is out of the normal operation range."
+		::= { zyxelTransceiverNotifications 1 }
+		
+-- zyxelTransceiverDdmiTxPowerOutOfRange
+		zyTransceiverDdmiTxPowerOutOfRange		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI TxPower is out of the normal operation range."
+		::= { zyxelTransceiverNotifications 2 }
+		
+-- zyxelTransceiverDdmiRxPowerOutOfRange
+		zyTransceiverDdmiRxPowerOutOfRange	NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI RxPower is out of the normal operation range."
+		::= { zyxelTransceiverNotifications 3 }
+		
+-- zyxelTransceiverDdmiVoltageOutOfRange
+		zyTransceiverDdmiVoltageOutOfRange		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI voltage is out of the normal operation range."
+		::= { zyxelTransceiverNotifications 4 }
+
+-- zyxelTransceiverDdmiTxBiasOutOfRange
+		zyTransceiverDdmiTxBiasOutOfRange		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI TX bias is out of the normal operation range."
+		::= { zyxelTransceiverNotifications 5 }		
+
+-- zyxelTransceiverDdmiTemperatureOutOfRangeRecovered
+		zyTransceiverDdmiTemperatureOutOfRangeRecovered	NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI temperature is recovered from out of the normal operation range."
+		::= { zyxelTransceiverNotifications 6 }
+		
+-- zyxelTransceiverDdmiTxPowerOutOfRangeRecovered
+		zyTransceiverDdmiTxPowerOutOfRangeRecovered		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI TxPower is recovered from out of the normal operation range."
+		::= { zyxelTransceiverNotifications 7 }
+		
+-- zyxelTransceiverDdmiRxPowerOutOfRangeRecovered
+		zyTransceiverDdmiRxPowerOutOfRangeRecovered	NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI RxPower is recovered from out of the normal operation range."
+		::= { zyxelTransceiverNotifications 8 }
+		
+-- zyxelTransceiverDdmiVoltageOutOfRangeRecovered
+		zyTransceiverDdmiVoltageOutOfRangeRecovered		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI voltage is recovered from out of the normal operation range."
+		::= { zyxelTransceiverNotifications 9 }
+
+-- zyxelTransceiverDdmiTxBiasOutOfRangeRecovered
+		zyTransceiverDdmiTxBiasOutOfRangeRecovered		NOTIFICATION-TYPE
+		OBJECTS {
+			ifIndex,
+			zyTransceiverTrapOutOfRangeType
+		}
+		STATUS  current
+		DESCRIPTION
+               "DDMI TX bias is recovered from out of the normal operation range."
+		::= { zyxelTransceiverNotifications 10 }		
+
+
+END

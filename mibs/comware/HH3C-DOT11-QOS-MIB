@@ -1,0 +1,573 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The file defines a MIB to provide WLAN QoS configuration.
+-- configuration information.
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2008-7-23 created by heziqi
+-- V1.1 2010-03-15 Modified by Wang Lu
+--      Add hh3cDot11RadioWmmEdcaCfg2Table
+-- V1.2 2013-02-17 Modified by Xiao min
+--      Change SYNTAX of hh3cDot11RadioCacUserNum
+-- =====================================================================
+HH3C-DOT11-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32
+    FROM SNMPv2-SMI
+        hh3cDot11,
+        Hh3cDot11QosAcType,
+        Hh3cDot11RadioElementIndex,
+        Hh3cDot11ObjectIDType,
+        Hh3cDot11RadioScopeType
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11QoS MODULE-IDENTITY
+    LAST-UPDATED "200807231200Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB provides information about WLAN QoS configuration.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        WMM
+        WMM is a wireless QoS protocol designed to preferentially
+        transmit packets with high priority, thus guaranteeing
+        better QoS services for voice and video applications in
+        a wireless network.
+
+        EDCA
+        Enhanced distributed channel access (EDCA) is a channel
+        contention mechanism designed by WMM to preferentially
+        transmit packets with high priority and allocate more
+        bandwidth to such packets.
+
+        AC
+        Access category (AC), is used for channel contention.
+        WMM defines four access categories; they are AC-VO (voice),
+        AC-VI (video), AC-BE (best-effort), and AC-BK (background)
+        in the descending order of priority.  When contending for a
+        channel, a high-priority AC preempts a low-priority AC.
+
+        CAC
+        Connection admission control (CAC) limits the number of
+        clients that are using high-priority ACs (AC-VO and AC-VI)
+        to guarantee sufficient bandwidth for existing high-priority
+        traffic.
+
+        U-APSD
+        Unscheduled automatic power-save delivery (U-APSD) is a new
+        power saving mechanism defined by WMM to enhance the power
+        saving capability of clients.
+
+        SVP
+        SpectraLink voice priority (SVP) is a voice priority protocol
+        designed by the Spectralink company to guarantee QoS for voice
+        traffic."
+
+    REVISION "200807231200Z"
+    DESCRIPTION
+            "The initial revision of this MIB module."
+    ::= { hh3cDot11 9 }
+
+-- ==================================================================
+-- Textual Conventions
+-- ==================================================================
+Hh3cDot11WMMSVPMapAC ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The AC level which SVP packets are assigned to.
+         acbk    : for background access category,
+         acbe    : for best-effort access category,
+         acvi    : for voice access category,
+         acvo    : for video access category,
+         disable : for disable SVP feature
+        "
+    SYNTAX      INTEGER
+        {
+            acbk(1),
+            acbe(2),
+            acvi(3),
+            acvo(4),
+            disable(5)
+        }
+
+Hh3cDot11WMMCACPolicy ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The policy of CAC.
+         channelUtilization : the channel utilization-based admission policy
+                                 for CAC,
+         userNumber         : the users-based admission policy for CAC"
+    SYNTAX      INTEGER
+        {
+            channelUtilization(1),
+            userNumber(2)
+        }
+
+
+
+-- ==================================================================
+-- Major sections
+-- ==================================================================
+hh3cDot11WmmCfgGroup OBJECT IDENTIFIER   ::= { hh3cDot11QoS 1 }
+--  Roaming Configuration Group has the following children:
+--  hh3cDot11RadioWmmCfgTable            ::= { hh3cDot11WmmCfgGroup 1 }
+--  hh3cDot11RadioWmmEdcaCfgTable        ::= { hh3cDot11WmmCfgGroup 2 }
+--  hh3cDot11StationWmmEdcaTable         ::= { hh3cDot11WmmCfgGroup 3 }
+--  hh3cDot11WmmResetGroup               ::= { hh3cDot11WmmCfgGroup 4 }
+
+-- ==================================================================
+-- hh3cDot11WmmCfgGroup Definition
+-- ==================================================================
+-- ==================================================================
+-- hh3cDot11RadioWmmCfgTable Definition
+-- ==================================================================
+hh3cDot11RadioWmmCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RadioWmmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the basic parameters for WMM configuration."
+    ::= { hh3cDot11WmmCfgGroup 1 }
+
+hh3cDot11RadioWmmCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioWmmCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains the basic information for WMM configuration."
+    INDEX
+        {
+            hh3cDot11WmmRadioIndex
+        }
+    ::= { hh3cDot11RadioWmmCfgTable 1 }
+
+Hh3cDot11RadioWmmCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11WmmRadioIndex           Hh3cDot11RadioElementIndex,
+        hh3cDot11RadioWmmEnabled         TruthValue,
+        hh3cDot11RadioSVPMapToAC         Hh3cDot11WMMSVPMapAC,
+        hh3cDot11RadioCacPolicy          Hh3cDot11WMMCACPolicy,
+        hh3cDot11RadioCacChlUtlValue     Integer32,
+        hh3cDot11RadioCacUserNum         Integer32
+    }
+
+hh3cDot11WmmRadioIndex OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioElementIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents index of the radio."
+    ::= { hh3cDot11RadioWmmCfgEntry 1 }
+
+hh3cDot11RadioWmmEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of WMM in radio.
+         'true' : The WMM function is enabled.
+         'false': The WMM function is disabled."
+    ::= { hh3cDot11RadioWmmCfgEntry 2 }
+
+hh3cDot11RadioSVPMapToAC OBJECT-TYPE
+    SYNTAX      Hh3cDot11WMMSVPMapAC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC level which SVP packets are assigned to.
+         'acbk'   : Specifies the AC-BK (background traffic) queue.
+         'acbe'   : Specifies the AC-BE (best-effort traffic) queue.
+         'acvi'   : Specifies the AC-VI (video traffic) queue.
+         'acvo'   : Specifies the AC-VO (voice traffic) queue.
+         'disable' : Disable SVP packet mapping."
+    ::= { hh3cDot11RadioWmmCfgEntry 3 }
+
+hh3cDot11RadioCacPolicy OBJECT-TYPE
+    SYNTAX      Hh3cDot11WMMCACPolicy
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the policy for CAC.
+         CAC requires that a client obtain permission of the AP before it can
+         use a high-priority AC for transmission, thus guaranteeing bandwidth
+         to the clients that have gained access.  CAC controls real time traffic
+         (AC-VO and AC-VI traffic) but not common data traffic (AC-BE and AC-BK
+         traffic)."
+    ::= { hh3cDot11RadioWmmCfgEntry 4 }
+
+hh3cDot11RadioCacChlUtlValue OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents Maximum channel utilization rate, that is, the medium
+         time of the accepted AC-VO traffic and AC-VI traffic to the valid
+         time during the unit time.
+         This object can be set only if the value of hh3cDot11RadioCacPolicy is
+         ChannelUtilization."
+    ::= { hh3cDot11RadioWmmCfgEntry 5 }
+
+hh3cDot11RadioCacUserNum OBJECT-TYPE
+    SYNTAX      Integer32(0..124)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the users-based admission policy for CAC.
+         This object can be set only if the value of hh3cDot11RadioCacPolicy is
+         userNumber."
+    ::= { hh3cDot11RadioWmmCfgEntry 6 }
+
+-- ==================================================================
+-- hh3cDot11RadioWmmEdcaCfgTable Definition
+-- ==================================================================
+hh3cDot11RadioWmmEdcaCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RadioWmmEdcaCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the basic parameters for EDCA configuration of
+         radio."
+    ::= { hh3cDot11WmmCfgGroup 2 }
+
+hh3cDot11RadioWmmEdcaCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioWmmEdcaCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains the basic information for EDCA configuration of
+         radio."
+    INDEX
+        {
+            hh3cDot11WmmRadioIndex,
+            hh3cDot11RadioWmmAC
+        }
+    ::= { hh3cDot11RadioWmmEdcaCfgTable 1 }
+
+Hh3cDot11RadioWmmEdcaCfgEntry ::= SEQUENCE
+    {
+        hh3cDot11RadioWmmAC          Hh3cDot11QosAcType,
+        hh3cDot11RadioWmmAifsn       Integer32,
+        hh3cDot11RadioWmmEcwMin      Integer32,
+        hh3cDot11RadioWmmEcwMax      Integer32,
+        hh3cDot11RadioWmmTxoplimit   Integer32,
+        hh3cDot11RadioWmmNoAck       TruthValue
+    }
+
+hh3cDot11RadioWmmAC OBJECT-TYPE
+    SYNTAX      Hh3cDot11QosAcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC level index of EDCA parameters of radio.
+         'acbk' : Specifies AC-BK (background traffic).
+         'acbe' : Specifies AC-BE (best-effort traffic).
+         'acvi' : Specifies AC-VI (video traffic).
+         'acvo' : Specifies AC-VO (voice traffic)."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 1 }
+
+hh3cDot11RadioWmmAifsn OBJECT-TYPE
+    SYNTAX      Integer32(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents AIFSN parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 2 }
+
+hh3cDot11RadioWmmEcwMin OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmin parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability.
+         ECWmin parameter of EDCA must be smaller than ECWmax parameter."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 3 }
+
+hh3cDot11RadioWmmEcwMax OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmax parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability.
+         ECWmin parameter of EDCA must be larger than ECWmax parameter."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 4 }
+
+hh3cDot11RadioWmmTxoplimit OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents TXOPLimit parameter of EDCA, the value must be
+         in the range of 0 to 65535 (in units of 32 microseconds).
+         The TXOP value of 0 indicates that only one MPDU can be
+         transmitted.  The range of this argument is limited by the
+         radio chip capability."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 5 }
+
+hh3cDot11RadioWmmNoAck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC to adopt the No ACK policy.  The protocol
+         defines two ACK policies: Normal ACK and No ACK."
+    ::= { hh3cDot11RadioWmmEdcaCfgEntry 6 }
+
+-- ==================================================================
+-- hh3cDot11StationWmmEdcaTable Definition
+-- ==================================================================
+hh3cDot11StationWmmEdcaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StationWmmEdcaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the basic parameters for EDCA configuration of
+         station."
+    ::= { hh3cDot11WmmCfgGroup 3 }
+
+hh3cDot11StationWmmEdcaEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StationWmmEdcaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains the basic information for EDCA configuration of
+         client.  If CAC is enabled for an AC, CAC is also enabled for ACs with
+         higher priority.  For example, if CAC is enabled for AC-VI, CAC
+         is also enabled for AC-VO.  However, enabling CAC for AC-VO does
+         not enable CAC for AC-VI."
+    INDEX
+        {
+            hh3cDot11WmmRadioIndex,
+            hh3cDot11StationWmmAC
+        }
+    ::= { hh3cDot11StationWmmEdcaTable 1 }
+
+Hh3cDot11StationWmmEdcaEntry ::= SEQUENCE
+    {
+        hh3cDot11StationWmmAC            Hh3cDot11QosAcType,
+        hh3cDot11StationWmmAifsn         Integer32,
+        hh3cDot11StationWmmEcwMin        Integer32,
+        hh3cDot11StationWmmEcwMax        Integer32,
+        hh3cDot11StationWmmTxoplimit     Integer32,
+        hh3cDot11StationWmmCacEnabled    TruthValue
+    }
+
+hh3cDot11StationWmmAC OBJECT-TYPE
+    SYNTAX      Hh3cDot11QosAcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC level index of EDCA parameters of client.
+         'acbk' : Specifies AC-BK (background traffic).
+         'acbe' : Specifies AC-BE (best-effort traffic).
+         'acvi' : Specifies AC-VI (video traffic).
+         'acvo' : Specifies AC-VO (voice traffic)."
+    ::= { hh3cDot11StationWmmEdcaEntry 1 }
+
+hh3cDot11StationWmmAifsn OBJECT-TYPE
+    SYNTAX      Integer32(2..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents AIFSN parameter of EDCA."
+    ::= { hh3cDot11StationWmmEdcaEntry 2 }
+
+hh3cDot11StationWmmEcwMin OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmin parameter of EDCA."
+    ::= { hh3cDot11StationWmmEdcaEntry 3 }
+
+hh3cDot11StationWmmEcwMax OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmax parameter of EDCA."
+    ::= { hh3cDot11StationWmmEdcaEntry 4 }
+
+hh3cDot11StationWmmTxoplimit OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents TXOPLimit parameter of EDCA, the value is in units of 32
+         microseconds.
+         The TXOP value of 0 indicates that only one MPDU can be
+         transmitted."
+    ::= { hh3cDot11StationWmmEdcaEntry 5 }
+
+hh3cDot11StationWmmCacEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC to adopt the No ACK policy.  The protocol
+         defines two ACK policies: Normal ACK and No ACK.  Only if
+         the value of hh3cDot11StationWmmAC is 'acvo' or 'acvi', Cac
+         can be set correctly here."
+    ::= { hh3cDot11StationWmmEdcaEntry 6 }
+
+-- ==================================================================
+-- end of hh3cDot11StationWmmEdcaTable Definition
+-- ==================================================================
+hh3cDot11WmmResetGroup OBJECT IDENTIFIER  ::= { hh3cDot11WmmCfgGroup 4 }
+
+hh3cDot11WmmResetRadioByAP OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the WMM statistics information of the radio of the
+         specified AP or all radios.
+         The meaning of this object is the same as hh3cDot11APElementIndex,
+         it represents the index of AP element.  If the value of this object
+         is set to 0xFFFFFFFF, WMM statistics information of all radios
+         will be cleared.
+         The value of this object is always 0 with the get operation."
+    ::= { hh3cDot11WmmResetGroup 1 }
+
+hh3cDot11WmmResetStationByAP OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the WMM statistics information of the clients associated
+         with the specified AP, or of all clients.
+         The meaning of this object is the same as hh3cDot11APElementIndex,
+         it represents the index of AP element.  If set with the
+         0xFFFFFFFF, it will clear the WMM statistics information of all
+         clients.
+         The value of this object is always 0 with the get operation."
+    ::= { hh3cDot11WmmResetGroup 2 }
+
+hh3cDot11RadioWmmEdcaCfg2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RadioWmmEdcaCfg2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the basic parameters for EDCA configuration of
+         radio."
+    ::= { hh3cDot11WmmCfgGroup 5 }
+
+hh3cDot11RadioWmmEdcaCfg2Entry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioWmmEdcaCfg2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains the basic information for EDCA configuration of
+         radio."
+    INDEX
+        {
+            hh3cDot11WMMAPSerialID,
+            hh3cDot11WMMRdId,
+            hh3cDot11RdWmmAC
+        }
+    ::= { hh3cDot11RadioWmmEdcaCfg2Table 1 }
+
+Hh3cDot11RadioWmmEdcaCfg2Entry ::= SEQUENCE
+    {
+        hh3cDot11WMMAPSerialID    Hh3cDot11ObjectIDType,
+        hh3cDot11WMMRdId          Hh3cDot11RadioScopeType,
+        hh3cDot11RdWmmAC          Hh3cDot11QosAcType,
+        hh3cDot11RdWmmAifsn       Integer32,
+        hh3cDot11RdWmmEcwMin      Integer32,
+        hh3cDot11RdWmmEcwMax      Integer32,
+        hh3cDot11RdWmmTxoplimit   Integer32
+    }
+
+hh3cDot11WMMAPSerialID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Serial ID of the AP."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 1 }
+
+hh3cDot11WMMRdId OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "radio ID of the radio."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 2 }
+
+
+hh3cDot11RdWmmAC OBJECT-TYPE
+    SYNTAX      Hh3cDot11QosAcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the AC level index of EDCA parameters of radio.
+         'acbk' : Specifies AC-BK (background traffic).
+         'acbe' : Specifies AC-BE (best-effort traffic).
+         'acvi' : Specifies AC-VI (video traffic).
+         'acvo' : Specifies AC-VO (voice traffic)."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 3 }
+
+hh3cDot11RdWmmAifsn OBJECT-TYPE
+    SYNTAX      Integer32(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents AIFSN parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 4 }
+
+hh3cDot11RdWmmEcwMin OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmin parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability.
+         ECWmin parameter of EDCA must be smaller than ECWmax parameter."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 5 }
+
+hh3cDot11RdWmmEcwMax OBJECT-TYPE
+    SYNTAX      Integer32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents ECWmax parameter of EDCA.  The value range of this
+         object is limited by the radio chip capability.
+         ECWmin parameter of EDCA must be larger than ECWmax parameter."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 6 }
+
+hh3cDot11RdWmmTxoplimit OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents TXOPLimit parameter of EDCA, the value must be
+         in the range of 0 to 65535 (in units of 32 microseconds).
+         The TXOP value of 0 indicates that only one MPDU can be
+         transmitted.  The range of this argument is limited by the
+         radio chip capability."
+    ::= { hh3cDot11RadioWmmEdcaCfg2Entry 7 }
+
+END

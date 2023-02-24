@@ -1,0 +1,614 @@
+-- ============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 Created by Zhouzhihua, 2004.11.12
+-- V1.1 Bug fixed by songhao, 2015.04.30
+-- ============================================================================
+HH3C-NS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        TimeTicks, IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC;
+
+    hh3cNS MODULE-IDENTITY
+        LAST-UPDATED "200411071353Z"        -- November 07, 2004 at 13:53 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB contains objects to manage the configuration and status
+            information of network traffic statistics.  It classifies the IP
+            packets by source IP address, source port, destination IP address,
+            destination port, protocol, ToS and input interface, counts the
+            octets and packets, and sends the statistic information to the
+            specific collector.
+            "
+        REVISION "200409211415Z"        -- September 21, 2004 at 14:15 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hh3cCommon 20 }
+
+    hh3cNSMibObjects OBJECT IDENTIFIER ::= { hh3cNS 1 }
+
+    hh3cNSMibScalarObjects OBJECT IDENTIFIER ::= { hh3cNSMibObjects 1 }
+
+    hh3cNSActiveTime OBJECT-TYPE
+        SYNTAX Integer32 (1..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The stream will be aged when the active time of this stream
+            exceeds this value.  This object is in minute."
+        DEFVAL { 30 }
+        ::= { hh3cNSMibScalarObjects 1 }
+
+    hh3cNSInactiveTime OBJECT-TYPE
+        SYNTAX Integer32 (1..600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The stream will be aged when the inactive time of this stream
+            exceeds this value.  This object is in second."
+        DEFVAL { 60 }
+        ::= { hh3cNSMibScalarObjects 2 }
+
+    hh3cNSVersion OBJECT-TYPE
+        SYNTAX Integer32 ( 5|9 )
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The version of the exported packet, which describes the format
+            of the exported packet.
+            It should export version 5 and version 8 when this object is 5,
+            but it should export version 9 only when the value of this object
+            is 9.
+            "
+        DEFVAL { 5 }
+        ::= { hh3cNSMibScalarObjects 3 }
+
+    hh3cNSAsType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            peerAs(1),
+            originAs(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of autonomous system (AS).
+            This object can be origin or peer."
+        DEFVAL { peerAs }
+        ::= { hh3cNSMibScalarObjects 4 }
+
+    hh3cNSTemplateRefreshRate OBJECT-TYPE
+        SYNTAX Integer32 (1..600 )
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+            "This object specifies the refresh rate in number of
+            exported packets."
+        DEFVAL { 20 }
+        ::= { hh3cNSMibScalarObjects 5 }
+
+    hh3cNSTemplateTimeout OBJECT-TYPE
+        SYNTAX Integer32 ( 1..3600 )
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object specifies the timeout rate in minutes."
+        DEFVAL { 30 }
+        ::= { hh3cNSMibScalarObjects 6 }
+
+    hh3cNSExportVlanOrIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            vlanId(1),
+            interfaceIndex(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object describes the interface index at the exported packet.
+             It can be interface index or vlan id according to the product."
+        DEFVAL { vlanId }
+        ::= { hh3cNSMibScalarObjects 7 }
+
+    hh3cNSProcessSlotTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HH3CNSProcessSlotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the board which can enable network traffic
+            statistics at the switch or router."
+        ::= { hh3cNSMibObjects 2 }
+
+    hh3cNSProcessSlotEntry OBJECT-TYPE
+        SYNTAX HH3CNSProcessSlotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cNSProcessSlotEntry."
+        INDEX { hh3cNSProcessSlot }
+        ::= { hh3cNSProcessSlotTable 1 }
+
+    HH3CNSProcessSlotEntry ::=
+        SEQUENCE {
+            hh3cNSProcessSlot
+                Integer32
+            }
+
+    hh3cNSProcessSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object describes all boards which can processes network
+            traffic statistics at the switch or router."
+        ::= { hh3cNSProcessSlotEntry 1 }
+
+    hh3cNSExportConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HH3CNSExportConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the configuration of the exported packets."
+        ::= { hh3cNSMibObjects 3 }
+
+    hh3cNSExportConfigEntry OBJECT-TYPE
+        SYNTAX HH3CNSExportConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cNSExportConfigTable."
+        INDEX { hh3cNSAggregationType }
+        ::= { hh3cNSExportConfigTable 1 }
+
+    HH3CNSExportConfigEntry ::=
+        SEQUENCE {
+            hh3cNSAggregationType
+                INTEGER,
+            hh3cNSHostIPAddr
+                IpAddress,
+            hh3cNSHostPort
+                Integer32,
+            hh3cNSSrcIpAddr
+                IpAddress,
+            hh3cNSState
+                INTEGER
+            }
+
+    hh3cNSAggregationType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            v5Statistics(1),
+            as(2),
+            destinationPrefix(3),
+            sourcePrefix(4),
+            protocolPort(5),
+            prefix(6),
+            tosAs(7),
+            tosDestinationPrefix(8),
+            tosSourcePrefix(9),
+            tosProtocolPort(10),
+            tosPrefix(11),
+            prefixPort(12)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The aggregation type.
+
+            v5Statistics type counts IP packets which have same source
+            IP address, destination IP address, source port, destination port,
+            protocol, ToS, input interface, output interface.
+
+            AS type counts IP packets which have same source AS, destination AS,
+            input interface and output interface.
+
+            destinationPrefix type counts IP packets which have same destination
+            AS, output interface, destination mask and destination prefix.
+
+            sourcePrefix type counts IP packets which have same source AS, input
+            interface, source mask and source prefix.
+
+            protocolPort type counts IP packets which have same protocol, source
+            port and destination port.
+
+            prefix type counts IP packets which have same source AS, destination
+            AS, input interface, output interface, source mask, source prefix,
+            destination mask, destination prefix.
+
+            tosAS type counts IP packets which have same tos, source AS, destination
+            AS, input interface and output interface.
+
+            tosDestinationPrefix type counts IP packets which have same tos,
+            destination AS, output interface, destination mask and destination prefix.
+
+            tosProtocolPort type counts IP packets which have same tos, protocol,
+            source port and destination port.
+
+            tosSourcePrefix type counts IP packets which have same tos, source AS,
+            input interface, source mask and source prefix.
+
+            tosPrefix type counts IP packets which have same tos, source AS,
+            destination AS, input interface, output interface, source mask, source
+            prefix, destination mask, destination prefix.
+
+            prefixPort type counts IP packets which have same tos, input interface,
+            output interface, source mask, source prefix, destination mask, destination
+            prefix, source port and destination port."
+        ::= { hh3cNSExportConfigEntry 1 }
+
+    hh3cNSHostIPAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The destination IP address of the exported packet.
+             This destination IP address is a NSC (NS Collector) address."
+        ::= { hh3cNSExportConfigEntry 2 }
+
+    hh3cNSHostPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The destination port of the exported packets.
+             This destination port is a NSC listening port."
+        ::= { hh3cNSExportConfigEntry 3 }
+
+    hh3cNSSrcIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The source IP address of the exported packets."
+        ::= { hh3cNSExportConfigEntry 4 }
+
+    hh3cNSState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of aggregation is enabled or disabled."
+        ::= { hh3cNSExportConfigEntry 5 }
+
+    hh3cNSExportInformationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HH3CNSExportInformationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the Information of the exported packets."
+        ::= { hh3cNSMibObjects 4 }
+
+    hh3cNSExportInformationEntry OBJECT-TYPE
+        SYNTAX HH3CNSExportInformationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cNSExportInformationTable."
+        INDEX { hh3cNSExportType,
+                hh3cNSExportSlot }
+        ::= { hh3cNSExportInformationTable 1 }
+
+        HH3CNSExportInformationEntry ::=
+            SEQUENCE {
+                hh3cNSExportType
+                    INTEGER,
+                hh3cNSExportSlot
+                    Integer32,
+                hh3cNSExportStream
+                    Counter32,
+                hh3cNSExportNum
+                    Counter32,
+                hh3cNSExportFail
+                    Counter32
+                }
+
+    hh3cNSExportType OBJECT-TYPE
+        SYNTAX INTEGER  ( 1..12 )
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object is equal to hh3cNSAggregationType."
+        ::= { hh3cNSExportInformationEntry 1 }
+
+    hh3cNSExportSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object is equal to hh3cNSProcessSlot."
+        ::= { hh3cNSExportInformationEntry 2 }
+
+    hh3cNSExportStream OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts the exported streams."
+        ::= { hh3cNSExportInformationEntry 3 }
+
+    hh3cNSExportNum OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts the exported packets."
+        ::= { hh3cNSExportInformationEntry 4 }
+
+    hh3cNSExportFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts the exported packets which failed to send.
+             The error may be unreachable destination IP address."
+        ::= { hh3cNSExportInformationEntry 5 }
+
+    hh3cNSConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HH3CNSConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes current configurations."
+        ::= { hh3cNSMibObjects 5 }
+
+    hh3cNSConfigEntry OBJECT-TYPE
+        SYNTAX HH3CNSConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cNSAggregationTable."
+        INDEX { hh3cNSSourceSlot,
+                hh3cNSSourceIfIndex,
+                hh3cNSDestSlot }
+        ::= { hh3cNSConfigTable 1 }
+
+    HH3CNSConfigEntry ::=
+        SEQUENCE {
+            hh3cNSSourceSlot
+                Integer32,
+            hh3cNSSourceIfIndex
+                Integer32,
+            hh3cNSDestSlot
+                Integer32,
+            hh3cNSDirect
+                INTEGER,
+            hh3cNSACLNumber
+                Integer32,
+            hh3cNSACLName
+                OCTET STRING,
+            hh3cNSACLRule
+                Integer32,
+            hh3cNSConfigRowStatus
+                RowStatus
+            }
+
+    hh3cNSSourceSlot OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP packet will be counted when it is passing through this slot."
+        ::= { hh3cNSConfigEntry 1 }
+
+    hh3cNSSourceIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP packet will be statistics when it through this interface.
+             This object is equal to ifIndex at ifTable."
+        ::= { hh3cNSConfigEntry 2 }
+
+    hh3cNSDestSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object is equal to hh3cNSProcessSlot."
+        ::= { hh3cNSConfigEntry 3 }
+
+    hh3cNSDirect OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            inbound(1),
+            outbound(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object describes which packets will be counted.
+             It may be inbound or outbound packets through this interface."
+        DEFVAL { inbound }
+        ::= { hh3cNSConfigEntry 4 }
+
+    hh3cNSACLNumber OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..3999)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The number of number-acl group."
+        ::= { hh3cNSConfigEntry 5 }
+
+    hh3cNSACLName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The name of name-acl group."
+        ::= { hh3cNSConfigEntry 6 }
+
+    hh3cNSACLRule OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The rule of acl group."
+        ::= { hh3cNSConfigEntry 7 }
+
+    hh3cNSConfigRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "SNMP Row Status Variable.
+             Writable objects in the table may be written in any RowStatus state."
+        ::= { hh3cNSConfigEntry 8 }
+
+    hh3cNSStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HH3CNSStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes current information of network traffic."
+        ::= { hh3cNSMibObjects 6 }
+
+    hh3cNSStatusEntry OBJECT-TYPE
+        SYNTAX HH3CNSStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cNSAggregationTable."
+        INDEX { hh3cNSSlot }
+        ::= { hh3cNSStatusTable 1 }
+
+    HH3CNSStatusEntry ::=
+        SEQUENCE {
+            hh3cNSSlot
+                Integer32,
+            hh3cNSActiveStreamNumber
+                Counter32,
+            hh3cNSTotalStreamNumber
+                Counter32,
+            hh3cNSTotalPacketNumber
+                Counter32,
+            hh3cNSTotalOctetNumber
+                Counter32,
+            hh3cNSMPLSActiveStreamNumber
+                Counter32,
+            hh3cNSMPLSTotalStreamNumber
+                Counter32,
+            hh3cNSMPLSTotalPacketNumber
+                Counter32,
+            hh3cNSMPLSTotalOctetNumber
+                Counter32,
+            hh3cNSResetFlag
+                INTEGER,
+            hh3cNSResetTime
+                TimeTicks
+            }
+
+    hh3cNSSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object is equal to hh3cNSProcessSlot."
+        ::= { hh3cNSStatusEntry 1 }
+
+    hh3cNSActiveStreamNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts current active streams."
+        ::= { hh3cNSStatusEntry 2 }
+
+    hh3cNSTotalStreamNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic streams."
+        ::= { hh3cNSStatusEntry 3 }
+
+    hh3cNSTotalPacketNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic packets."
+        ::= { hh3cNSStatusEntry 4 }
+
+    hh3cNSTotalOctetNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic octets."
+        ::= { hh3cNSStatusEntry 5 }
+
+    hh3cNSMPLSActiveStreamNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts current active MPLS streams."
+        ::= { hh3cNSStatusEntry 6 }
+
+    hh3cNSMPLSTotalStreamNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic MPLS streams."
+        ::= { hh3cNSStatusEntry 7 }
+
+    hh3cNSMPLSTotalPacketNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic MPLS packets."
+        ::= { hh3cNSStatusEntry 8 }
+
+    hh3cNSMPLSTotalOctetNumber OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object counts all statistic octets of MPLS packets."
+        ::= { hh3cNSStatusEntry 9 }
+
+    hh3cNSResetFlag OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Reset all streams.  The default value is disabled,
+             and set this value to enabled when resetting."
+        DEFVAL { disabled }
+        ::= { hh3cNSStatusEntry 10 }
+
+    hh3cNSResetTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The system up time when stream is reset."
+        ::= { hh3cNSStatusEntry 11 }
+
+END

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,7 +28,6 @@ namespace LibreNMS\Alerting;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
-use Symfony\Component\Yaml\Yaml;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
@@ -43,7 +42,8 @@ class QueryBuilderFilter implements \JsonSerializable
 
     /**
      * QueryBuilderFilter constructor.
-     * @param string $type alert|group
+     *
+     * @param  string  $type  alert|group
      */
     public function __construct($type = 'alert')
     {
@@ -92,11 +92,11 @@ class QueryBuilderFilter implements \JsonSerializable
         $db_schema = $this->schema->getSchema();
         $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
 
-        foreach ((array)$db_schema as $table => $data) {
+        foreach ((array) $db_schema as $table => $data) {
             $columns = array_column($data['Columns'], 'Type', 'Field');
 
             // only allow tables with a direct association to device_id
-            if (!in_array($table, $valid_tables)) {
+            if (! in_array($table, $valid_tables)) {
                 continue;
             }
 
@@ -143,7 +143,6 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-
     private function getColumnType($type)
     {
         if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
@@ -163,22 +162,27 @@ class QueryBuilderFilter implements \JsonSerializable
 
     /**
      * Specify data which should be serialized to JSON
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     *
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     *
      * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     *               which is a value of any type other than a resource.
+     *
      * @since 5.4.0
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $filter = $this->filter;
         asort($filter);
+
         return array_values($filter);
     }
 
     /**
      * Get the filter for a specific item
      *
-     * @param string $id
+     * @param  string  $id
      * @return array|null
      */
     public function getFilter($id)

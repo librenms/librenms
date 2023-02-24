@@ -1,0 +1,634 @@
+BTI8xx-TC-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, 
+        OBJECT-TYPE, 
+        IpAddress, 
+        Unsigned32,	
+        Integer32,	
+        Gauge32,
+		    TimeTicks,
+        Counter32               FROM SNMPv2-SMI
+		    TEXTUAL-CONVENTION,
+        DisplayString, 
+        MacAddress, 
+        TruthValue,
+        RowStatus               FROM SNMPv2-TC          -- [RFC2579]
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP            FROM SNMPv2-CONF
+        InterfaceIndex, 
+        ifIndex                 FROM IF-MIB             -- [RFC2863]
+        PerfCurrentCount,
+		    PerfIntervalCount,
+        PerfTotalCount          FROM PerfHist-TC-MIB    -- [RFC3593]
+        bti8xx                  FROM BTI8xx-MIB;
+
+privateManagement 	MODULE-IDENTITY
+
+	  LAST-UPDATED "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    ORGANIZATION "Actus Networks Ltd."
+    CONTACT-INFO "
+                  Support:  +82-2-26535666
+                  R&D:      +82-2-26535666
+                  Fax:      +82-2-26534662
+                  Email:    ymkim@actusnetworks.com
+
+                 "
+    DESCRIPTION  "This is a top-level MIB for bti whose purpose is to lay out
+                  the top-level objects in the OID hierarchy from which 
+                  BTI MIB OIDs descend."
+
+    REVISION     "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    DESCRIPTION  "
+        *1. Change the Syntax(for silver creek tool).
+          1.1. DisplayString -> OCTET STRING
+            fruBaseInfoLocation
+            fruBaseInfopackSWVersion
+            fruBaseInfopackShortName
+            fruBaseInfopackName
+            fruBaseInfoPECCode
+            fruBaseInfoCLEI
+            fruBaseInfoserialNumber
+            fruBaseInfomanufacturingDate
+            fruBaseInfomanufacturingLoc
+            fruBaseInfotestedDate
+            fruBaseInfotestedLoc
+            fruBaseInfobaseMacaddress
+            fruBaseInfoUSI
+
+          1.2. Delete syntax value rnage
+            errorInfoDesc
+        "
+
+    REVISION     "201502251500Z"  -- Wednesday, Feb 25, 15:00:00 KST 2015
+    DESCRIPTION  "
+        *1. Change the access to errorInfo
+          errorInfoCode
+           > R/W -> R/O
+          errorInfoDesc
+           > R/W -> R/O
+        "
+
+    REVISION     "201410291200Z"  -- Wednesday, Oct 29, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. Change the sytax size
+          DisplayString(SIZE(0..256)) -> DisplayString(SIZE(0..255))
+        "
+
+    REVISION     "201312271200Z"  -- Friday, Friday 27, 12:00:00 KST 2013
+    DESCRIPTION  "Initial version of MIB."
+	::= { bti8xx 100 }
+
+TcI1588ClkStratum  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+         "Indicates the clk stratum of grand master on i1588 "
+    SYNTAX   INTEGER {
+          none(0),   -- 20090904 : added none(0), re-arranged force(0) to force(1)
+          force(1),
+          stratum1(6), -- 20091026: primaryReference(6),
+          stratum2(7), -- 20091026: secondaryReference(7),
+          bestClockStratumthatcanbeSlave(128),
+          stratum3(248),
+          stratum4(254),
+          defaultStratum(255)
+    }
+
+    TcI1588ClkAccuracy  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+         "Indicates the clk accuracy of grand master on i1588 "
+    SYNTAX   INTEGER {
+          t25ns(32),
+          t100ns(33),
+          t250ns(34),
+          t1us(35),
+          t2dot5us(36),
+          t10us(37),
+          t25us(38),
+          t100us(39),
+          t250us(40),
+          t1ms(41),
+          t2dot5ms(42),
+          t10ms(43),
+          t25ms(44),
+          t100ms(45),
+          t250ms(46),
+          t1s(47),
+          t10s(48),
+          t10sExcess(49),
+          tUnknown(254)
+    }
+
+    TcI1588LogPeriod  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+         "Indicates the log period of Announce/Sync/delayReq on i1588 "
+    SYNTAX   INTEGER {
+         period0(1), period1(2), period2(4), period3(8),
+         period4(16), period5(32), period6(64)
+    }
+
+ EnableType    ::= TEXTUAL-CONVENTION
+ STATUS          current 
+ DESCRIPTION
+    "The direction of policy  on at interface."
+    SYNTAX      INTEGER
+    {
+        enabled(1),
+        disabled(2)
+    }
+                
+-- Sub Module: ACL
+
+
+-- Rule action value
+RuleAction    ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The value of rule's action.
+             permit: The packet matching the rule will be permitted to forward.
+             deny: The packet matching the rule will be denied.
+        "
+    SYNTAX          INTEGER
+        {
+            permit(1),
+            deny(2)
+        }
+
+-- CounterClear value
+    CounterClear    ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "cleared: Reset the value of the rule's counter.
+             nouse: 'nouse' will be returned when getting.
+        "
+    SYNTAX          INTEGER
+        {
+            cleared(1),
+            nouse(2)
+        }
+
+-- PortOp value
+    PortOp    ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The operation type of TCP and UDP.
+             lt : Less than given port number.
+             eq : Equal to given port number.
+             gt : Greater than given port number.
+             neq : Not equal to given port number.
+             range : Between two port numbers.
+        "
+    SYNTAX          INTEGER
+        {
+            eq(0),
+            neq(1),
+            gt(2),
+            lt(3),
+            range(4),
+            invalid(5)
+        }
+
+-- Precedence value
+    PrecedenceValue    ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The value of IP-packet's precedence.
+            <0-7>           Value of precedence
+            routine         Specify routine precedence(0)
+            priority        Specify priority precedence(1)
+            immediate       Specify immediate precedence(2)
+            flash           Specify flash precedence(3)
+            flash-override  Specify flash-override precedence(4)
+            critical        Specify critical precedence(5)
+            internet        Specify internetwork control precedence(6)
+            network         Specify network control precedence(7)        "
+    SYNTAX          Integer32 (0..7|255)
+
+-- DSCP value
+    DSCPValue    ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The value of DSCP.
+             <0-64>  Value of DSCP
+             af11    Specify Assured Forwarding 11 service(10)
+             af12    Specify Assured Forwarding 12 service(12)
+             af13    Specify Assured Forwarding 13 service(14)
+             af21    Specify Assured Forwarding 21 service(18)
+             af22    Specify Assured Forwarding 22 service(20)
+             af23    Specify Assured Forwarding 23 service(22)
+             af31    Specify Assured Forwarding 31 service(26)
+             af32    Specify Assured Forwarding 32 service(28)
+             af33    Specify Assured Forwarding 33 service(30)
+             af41    Specify Assured Forwarding 41 service(34)
+             af42    Specify Assured Forwarding 42 service(36)
+             af43    Specify Assured Forwarding 43 service(38)
+             be      Specify Best Effort service(0)
+             cs1     Specify Class Selector 1 service(8)
+             cs2     Specify Class Selector 2 service(16)
+             cs3     Specify Class Selector 3 service(24)
+             cs4     Specify Class Selector 4 service(32)
+             cs5     Specify Class Selector 5 service(40)
+             cs6     Specify Class Selector 6 service(48)
+             cs7     Specify Class Selector 7 service(56)
+             ef      Specify Expedited Forwarding service(46)
+             nouse   Do not use this filter(64)
+        "
+    SYNTAX          Integer32 (0..64)
+
+-- =====================================
+-- privateManagement Configuration          ==
+-- =====================================
+configManagement		          OBJECT IDENTIFIER ::= { privateManagement 1 }
+performanceManagement	        OBJECT IDENTIFIER ::= { privateManagement 3 }
+faultManagement 	            OBJECT IDENTIFIER ::= { privateManagement 4 }
+privateManagementConformance	OBJECT IDENTIFIER ::= { privateManagement 9 }
+privateManagementTC           OBJECT IDENTIFIER ::= { privateManagement 10 }
+
+----------------------------------------------------------------
+
+-- =======================================
+-- privateManagement:configManagement   ==
+-- =======================================
+systemInfo		OBJECT IDENTIFIER ::= { configManagement 1 }
+mainSystem		OBJECT IDENTIFIER ::= { configManagement 2 }
+fruInfo 			OBJECT IDENTIFIER ::= { systemInfo 1 }
+errorInfo			OBJECT IDENTIFIER ::= { systemInfo 2 }
+
+-- =======================================
+-- privateManagement:configManagement   ==
+-- =======================================
+--mainSystemPM        OBJECT IDENTIFIER ::= { performanceManagement 1}
+-- ===============================================================
+--   NOTIFICATION-TYPE Definitions (TRAP-TYPE in SNMPv1) ==
+-- ===============================================================
+
+privateManagementGroups				  OBJECT IDENTIFIER ::= { privateManagementConformance 1 }
+privateManagementCompliances    OBJECT IDENTIFIER ::= { privateManagementConformance 2 }
+
+-- ===============================================
+-- Management Naming Text Conventions           ==
+-- ===============================================
+
+  portIndex  OBJECT-TYPE
+    SYNTAX			Integer32 (1..84)
+	  MAX-ACCESS	not-accessible
+	  STATUS			current
+    DESCRIPTION
+		  "The index value that uniquely identifies uplink(NNI) port in Main,
+      TDM port in DS1E1 & OC3 crad and user traffic(UNI) port in FE card.
+      Main  : 1 ~ 4.
+      FE    : 1 ~ 8.
+      DS1E1 : 1 ~ 16.
+      OC3   : 1 ~ 84.
+				1[1-1-1-1] ~ 7[1-1-7-1], 8[1-1-1-2] ~ 28[1-1-7-4]
+				29[1-2-1-1] ~ 56[1-2-7-4], 57[1-3-1-1] ~ 84[1-3-7-4]"
+    ::= { privateManagementTC 1 }
+
+  ethPortIndex  OBJECT-TYPE
+    SYNTAX			Integer32 (1..8)
+	  MAX-ACCESS	not-accessible
+	  STATUS			current
+    DESCRIPTION
+		"The index value that uniquely identifies uplink(NNI) port in Main
+		and user traffic(UNI) port in FE card.
+		Main  : 1 ~ 4.
+		FE    : 1 ~ 8."
+    ::= { privateManagementTC 3 }
+
+    ethopIndex      OBJECT-TYPE
+    SYNTAX          Integer32 (1..64)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION 
+        "The index value that uniquely identifies ETHoP for 8FE Card."
+    ::= { privateManagementTC 4 }
+   
+    powerIndex				OBJECT-TYPE
+	SYNTAX					Integer32 (1..2)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of power card."         
+	::= { privateManagementTC 5 }
+
+    uniIndex				OBJECT-TYPE
+	SYNTAX					Integer32 (1..2147483647)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of Uni Index."         
+	::= { privateManagementTC 6 }
+
+    evcIndex				OBJECT-TYPE
+	SYNTAX					Unsigned32 (1..4294967295 )
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of Evc Index."         
+	::= { privateManagementTC 7 }
+
+    cosIndex				OBJECT-TYPE
+	SYNTAX					Integer32 (0..7)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of Cos Index."         
+	::= { privateManagementTC 8 }
+
+    bwCfgIndex				OBJECT-TYPE
+	SYNTAX					Integer32 (1..2)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of BW Profile Config Type Index.
+			1.Ingress
+			2.Egress
+		"         
+	::= { privateManagementTC 9 }
+
+    bwpDirection				OBJECT-TYPE
+	SYNTAX					INTEGER { ingress(1), egress(2) }
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+		"The index value of BW Profile Config Type Index.
+			1.Ingress
+			2.Egress
+		"         
+	::= { privateManagementTC 10 }
+
+    l2cpIndex				OBJECT-TYPE
+	SYNTAX					Integer32(1..16)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+        "Index value of mefL2CPProfileTable "
+	::= { privateManagementTC 11 }
+
+	mpIndex					OBJECT-TYPE
+	SYNTAX					Integer32(1..32)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+        "Index value of oamPM Table "
+	::= { privateManagementTC 12 }
+
+	sessionResponderEntryId	OBJECT-TYPE
+	SYNTAX					Integer32(1..10)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+        "Index value of oamPM Table "
+	::= { privateManagementTC 13 }
+
+	testSessionFarEndEntryId		OBJECT-TYPE
+	SYNTAX					Integer32(1..100)
+	MAX-ACCESS				not-accessible
+	STATUS					current
+	DESCRIPTION
+        "Index value of oamPM Table "
+	::= { privateManagementTC 14 }
+
+	-- 140424 robot303
+    sessionIndex            OBJECT-TYPE
+    SYNTAX                  Integer32(1..4)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Index value of RFC2544 Session Index"
+    ::= { privateManagementTC 15 }
+
+	--140425 robot303
+    fsIndex            OBJECT-TYPE
+    SYNTAX                  Integer32(1..6)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Index value of RFC2544 Frame Size Index"
+    ::= { privateManagementTC 16 }
+
+-- ==============================================================
+-- privateManagement:configManagement:fruInfo
+-- ==============================================================
+fruBaseInfo     OBJECT IDENTIFIER ::= { fruInfo 1 }
+
+-- ==============================================================
+-- privateManagement:configManagement:systemConfig:systemManagement:
+-- systemInfo:fruInfo:fruBaseInfo
+-- ==============================================================
+
+fruBaseInfoTable    OBJECT-TYPE
+    SYNTAX              SEQUENCE OF FruBaseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "   "
+    ::= { fruBaseInfo 1 }
+
+    fruBaseInfoEntry   OBJECT-TYPE
+    SYNTAX      FruBaseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            ""
+    INDEX   { fruBaseInfoIndex }
+    ::= { fruBaseInfoTable 1 }
+
+    FruBaseInfoEntry ::=
+    SEQUENCE    {
+        fruBaseInfoIndex                Integer32,
+        fruBaseInfoLocation             OCTET STRING,
+        fruBaseInfopackSWVersion        OCTET STRING,
+        fruBaseInfopackShortName        OCTET STRING,
+        fruBaseInfopackName             OCTET STRING,
+        fruBaseInfoPECCode              OCTET STRING,
+        fruBaseInfoCLEI                 OCTET STRING,
+        fruBaseInfoserialNumber         OCTET STRING,
+        fruBaseInforevision             Integer32,
+        fruBaseInfomanufacturingDate    OCTET STRING,
+        fruBaseInfomanufacturingLoc     OCTET STRING,
+        fruBaseInfotestedDate           OCTET STRING,
+        fruBaseInfotestedLoc            OCTET STRING,
+        fruBaseInfobaseMacaddress       OCTET STRING,
+        fruBaseInfonumberOfMacAddress   Integer32,
+		    fruBaseInfoUSI					        OCTET STRING,
+        fruBaseInfoIssuedNumber   		  Integer32
+    }
+
+    fruBaseInfoIndex    OBJECT-TYPE
+    SYNTAX              Integer32(1..5)
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the TableIndex of the Table"
+    ::= { fruBaseInfoEntry 1 }
+
+    fruBaseInfoLocation     OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(1..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the Description of the Device"
+    ::= { fruBaseInfoEntry 2 }
+
+ fruBaseInfopackSWVersion        OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the software version of the pack"
+    ::= { fruBaseInfoEntry 3 }
+
+    fruBaseInfopackShortName        OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..8))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the abbreviated name of a pack that is displayed to the customer."
+    ::= { fruBaseInfoEntry 4 }
+
+    fruBaseInfopackName         OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..64))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the full text name of a pack that is displayed to the customer."
+    ::= { fruBaseInfoEntry 5 }
+
+    fruBaseInfoPECCode              OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "
+        This field is the Product Engineering Code text of a pack.
+        This is used by the SCP SW to determine what type of pack is installed
+        "
+    ::= { fruBaseInfoEntry 6 }
+
+    fruBaseInfoCLEI             OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "
+        This filed is the alpha numeric CLEI (Common Language Equipment Identifier).
+        The CLEI is a unique alpha numeric string that is managed by Telcordia.
+        "
+    ::= { fruBaseInfoEntry 7 }
+
+    fruBaseInfoserialNumber     OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the Serial Number of the pack"
+    ::= { fruBaseInfoEntry 8 }
+
+ fruBaseInforevision         OBJECT-TYPE
+    SYNTAX              Integer32(0..1000)
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the numeric version number of the pack."
+    ::= { fruBaseInfoEntry 9 }
+
+    fruBaseInfomanufacturingDate    OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..16))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the string representation of the date the pack was manufactured"
+    ::= { fruBaseInfoEntry 10 }
+
+    fruBaseInfomanufacturingLoc OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the string representation of the location that the pack was manufactured."
+    ::= { fruBaseInfoEntry 11 }
+
+    fruBaseInfotestedDate           OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..16))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the string representation of the date the pack was tested."
+    ::= { fruBaseInfoEntry 12 }
+
+    fruBaseInfotestedLoc            OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..32))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the string representation of the location that the pack was tested."
+    ::= { fruBaseInfoEntry 13 }
+
+    fruBaseInfobaseMacaddress       OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..18))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "This field is the base MAC address."
+    ::= { fruBaseInfoEntry 14 }
+
+    fruBaseInfonumberOfMacAddress   OBJECT-TYPE
+    SYNTAX              Integer32(1..12)
+    MAX-ACCESS          read-only
+    STATUS              current
+
+  DESCRIPTION
+        "This field is the number of MAC address sequentially after the BASE_MACADDR."
+    ::= { fruBaseInfoEntry 15 }
+
+	fruBaseInfoUSI      OBJECT-TYPE
+    SYNTAX              OCTET STRING(SIZE(0..64))
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "Unique Serial Identifier(USI)."
+    ::= { fruBaseInfoEntry 16 }
+
+	fruBaseInfoIssuedNumber   OBJECT-TYPE
+    SYNTAX              Integer32(1..100)
+    MAX-ACCESS          read-only
+    STATUS              current
+
+  DESCRIPTION
+        "This field is the number of H/W Issue."
+    ::= { fruBaseInfoEntry 17 }
+
+
+-- ==============================================================
+-- privateManagement:configManagement:errorInfo
+-- ==============================================================
+	errorInfoCode OBJECT-TYPE
+	SYNTAX       Integer32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION  "The BTI-specific error code for the set request failure."
+	::= { errorInfo 1 }
+
+
+	errorInfoDesc OBJECT-TYPE
+	SYNTAX       DisplayString
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION  "A textual description string that explains the reason
+		for the failed set request."
+	::= { errorInfo 2 }
+
+	errorInfoClear OBJECT-TYPE
+	SYNTAX       INTEGER{ none(0), clear(1)}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION  "Error Info Description clear"
+	::= { errorInfo 3 }
+
+
+END

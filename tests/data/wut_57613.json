@@ -5,37 +5,20 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.5040.1.2.16",
-                    "sysDescr": null,
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "wut",
-                    "type": "environment",
-                    "serial": null,
-                    "icon": "wut.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.5040.1.2.16",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "wut",
                     "type": "environment",
                     "serial": null,
-                    "icon": "wut.svg",
-                    "location": "<private>"
+                    "icon": "wut.svg"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -165,8 +146,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -271,7 +250,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.5040.1.2.16.1.4.1.1.3",
                     "sensor_index": "wtWebGraphThermoBaroSensorNo.3",
                     "sensor_type": "wut",
-                    "sensor_descr": "Luftdruck",
+                    "sensor_descr": "Environment",
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -286,10 +265,10 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

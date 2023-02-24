@@ -144,6 +144,18 @@ return [
         'unit' => 'dBm',
         'unit_long' => 'Decibal-Milliwatts',
     ],
+    'tv_signal' => [
+        'short' => 'Signal',
+        'long' => 'TV signal',
+        'unit' => 'dBmV',
+        'unit_long' => 'Decibel-Millivolts',
+    ],
+    'bitrate' => [
+        'short' => 'Bitrate',
+        'long' => 'Bitrate',
+        'unit' => 'bps',
+        'unit_long' => 'bits per second',
+    ],
     'snr' => [
         'short' => 'SNR',
         'long' => 'Signal to Noise Ratio',
@@ -172,5 +184,11 @@ return [
         'long' => 'Water Flow',
         'unit' => 'l/m',
         'unit_long' => 'Liters Per Minute',
+    ],
+    'percent' => [
+        'short' => 'Percent',
+        'long' => 'Percent',
+        'unit' => '%',
+        'unit_long' => 'Percent',
     ],
 ];

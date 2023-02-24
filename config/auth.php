@@ -39,7 +39,7 @@ return [
     | users are actually retrieved out of your database or other storage
     | mechanisms used by this application to persist your user's data.
     |
-    | Supported: "session", "token"
+    | Supported: "session"
     |
     */
 
@@ -85,15 +85,15 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        'legacy' => [
+            'driver' => 'legacy',
+            'model' => App\Models\User::class,
+        ],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-
-         'legacy' => [
-             'driver' => 'legacy',
-             'model' => App\Models\User::class,
-         ],
     ],
 
     /*

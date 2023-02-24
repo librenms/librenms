@@ -1,5 +1,9 @@
 mib: Sentry4-MIB
 modules:
+    os:
+        hardware: Sentry4-MIB::st4UnitModel.1
+        serial: Sentry4-MIB::st4UnitProductSN.1
+        version: Sentry4-MIB::st4SystemFirmwareVersion.0
     sensors:
         pre-cache:
             data:
@@ -39,13 +43,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.3.{{ $index }}'
                     index: 'st4InputCord.{{ $index }}'
                     descr: Cord, {{ $st4InputCordName }}, Active Power
-                    divisor: 0
                 -
                     oid: st4PhaseActivePower
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.8.{{ $index }}'
                     index: 'st4PhaseActivePower.{{ $index }}'
                     descr: Phase, {{ $st4PhaseLabel }}, Active Power
-                    divisor: 0
         voltage:
             data:
                 -

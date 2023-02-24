@@ -1,0 +1,3994 @@
+-- ------------------------------------------------------------------
+-- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Descripton: Qos MIB
+--
+-- History V2.3
+--     V1.0 2002-11-18 created by qizhenglin
+--     V1.1 2004-05-09 add and modify hh3cPortWredTable by tangshun
+--     V1.2 2004-08-05 modify hh3cQueueScheduleMode(add hq_wrr(9)) by qizhenglin
+--     v1.3 2004-08-12 add hh3cFlowtempVlanId,hh3cFlowtempCos to hh3cFlowtempTable
+--     v1.4 2004-09-17 change value range of hh3cRateLimitTargetRateKbps from 200..100000
+--          to 64..1000000 by zhuangyu
+--     v1.5 2004-10-12 updated by gaolong
+--          Import Counter64.
+--          Remove some adjacent hyphens
+--          Rewrite value of hh3cQueueScheduleMode and hh3cRateLimitConformActionType.
+--          Change all underscore('_') characters to hyphen characters('-') because
+--          underscore character is not allowed in MIB module.
+--     v1.51 2004-10-27 changed by zhuangyu
+--          1 Add an enumeration in hh3cRateLimitConformActionType
+--          2 Add hh3cRateLimitConformCos and hh3cRateLimitConformDscp in hh3cRateLimitTable
+--          3 Import IpAddress
+--     v1.52 2004-12-13 updated by jinyi
+--          Fix syntax bugs and adjust format of the whole file.
+--     v1.53 2004-12-13 updated by zhuangyu
+--          Modify description of hh3cRateLimitExceedDscp,hh3cRateLimitConformDscp and hh3cPriorityDscp.
+--     v1.6 2004-12-1 changed by yangjianjun
+--          Add  hh3cMirroringGroupTable
+--               hh3cMirroringGroupMirrorTable
+--               hh3cMirroringGroupMonitorTable
+--               hh3cMirroringGroupReflectorTable
+--               hh3cMirroringGroupRprobeVlanTable
+--     v1.7 2005-4-6 changed by fanghailin
+--          Add hh3cRedirectToSlotNo hh3cRedirectRemarkedDSCP hh3cRedirectRemarkedPri hh3cRedirectRemarkedTos
+--          hh3cRedirectToNextHop3 hh3cRedirectTargetVlan hh3cRedirectMode
+--          in hh3cRedirectTable Notice:All the nodes are used only for L3plus funtion and speciality.
+--     v1.8 2005-5-18 updated by zhangyinxi
+--          Add  hh3cRedirectToNestedVlanID and hh3cRedirectToModifiedVlanID
+--     v1.9 2005-6-27
+--          1. Add hh3cMirroringGroupMirrorMacTable, hh3cMirroringGroupMirrorVlanTable,
+--             hh3cPortTrustTable, hh3cRemarkVlanIDTable, hh3cCosToDscpMapTable, hh3cDscpToLocalPreMapTable,
+--             hh3cDscpToDropPreMapTable, hh3cDscpToCosMapTable, hh3cDscpToDscpMapTable,
+--             hh3cRateLimitMeterStatByteCount, hh3cRateLimitMeterStatByteXCount,
+--             hh3cRateLimitMeterStatState by liyan and wangyingxia
+--          2. Modify the range of hh3cRateLimitTargetRateKbps by liyan and wangyingxia
+--          3. Add hh3cMirrorToGroup in hh3cMirrorTable by yubin
+--     v2.0 2005-10-25 updated by houli
+--          1. Remove value range of hh3cLineRateValue
+--          2. Remove value range of hh3cRateLimitTargetRateMbps
+--     V2.1 2005-11-07 update by wangyingxia
+--          1. Add Hh3cMirrorOrMonitorType and hh3cMirroringGroupMonitorType
+--          2. Modify the description of hh3cMirroringGroupMonitorIfIndex
+--          3. Change the value range of hh3cRedirectTargetVlan by lihaijun
+--     V2.2 2005-12-19 update by wangyingxia
+--          1. Add hh3cMirroringGroupMirrorInTypeList, hh3cMirroringGroupMirrorOutTypeList
+--             by wangyingxia
+--          2. change the description of hh3cMirroringGroupMirrorInboundIfIndexList  
+--             add hh3cMirroringGroupMirrorOutboundIfIndexList by wangyingxia
+--     v2.3 2006-01-16 updated by houli
+--          1. Remove value range of hh3cTrafficShapeMaxRate
+--          2. Remove value range of hh3cTrafficShapeBurstSize
+-- ------------------------------------------------------------------
+-- ------------------------------------------------------------------
+--
+-- Import and definition
+--
+-- ------------------------------------------------------------------
+HH3C-LswQos-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Integer32, MODULE-IDENTITY,OBJECT-TYPE,Counter32, Counter64,IpAddress
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+
+---------- Following is for Node£ºhh3cLswQosMib --------
+  hh3cLswQosAclMib MODULE-IDENTITY
+    LAST-UPDATED "200211190000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+      "Module node for qos and acl."
+    REVISION "200211190000Z"
+    DESCRIPTION
+      "Table of qos and acl."
+    ::= { hh3clswCommon  16 }
+
+  Hh3cMirrorOrMonitorType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+    "
+     Specify the mirror source or destination type.
+     port(1):
+        the mirror source or destination is port.
+     board(2):
+        the mirror source or destination is board.
+    "
+    SYNTAX INTEGER
+    {
+       port(1),
+       board(2)
+    }
+
+---------- Following is for Node£ºhh3cLswQosMibObject --------
+  hh3cLswQosMibObject OBJECT IDENTIFIER ::= {  hh3cLswQosAclMib 2  }
+
+  hh3cPriorityTrustMode OBJECT-TYPE
+    SYNTAX      INTEGER
+            {
+                default(0),
+                dscp(1),
+                ipprecedence(2),
+                cos(3),
+                localprecedence(4)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Priority type of inbound queue."
+    DEFVAL      { 0}
+    ::= { hh3cLswQosMibObject 1 }
+
+  hh3cPortMonitorBothIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The ifIndex of in/out monitor port."
+    DEFVAL      { 0}
+    ::= { hh3cLswQosMibObject 2 }
+
+
+ --TABLE: hh3cQueueTable
+
+  hh3cQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Queue table which contains queue entry."
+    ::= { hh3cLswQosMibObject 3 }
+
+  hh3cQueueEntry OBJECT-TYPE
+    SYNTAX      Hh3cQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The configuration information of queue."
+    INDEX {
+              hh3cQueueIfIndex
+          }
+    ::= { hh3cQueueTable 1 }
+
+  Hh3cQueueEntry ::=
+    SEQUENCE
+    {
+      hh3cQueueIfIndex    INTEGER,
+      hh3cQueueScheduleMode    INTEGER,
+      hh3cQueueWeight1    INTEGER,
+      hh3cQueueWeight2    INTEGER,
+      hh3cQueueWeight3    INTEGER,
+      hh3cQueueWeight4    INTEGER,
+      hh3cQueueMaxDelay    INTEGER,
+      hh3cQueueWeight5    INTEGER,
+      hh3cQueueWeight6    INTEGER,
+      hh3cQueueWeight7    INTEGER,
+      hh3cQueueWeight8    INTEGER
+    }
+
+
+  hh3cQueueIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cQueueEntry 1 }
+
+  hh3cQueueScheduleMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                        sp(1),
+                        wrr(2),
+                        wrr-max-delay(3),
+                        sc-0(4),
+                        sc-1(5),
+                        sc-2(6),
+                        rr(7),
+                        wfq(8),
+                        hq-wrr(9)
+                       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The mode of the queue schedule."
+    DEFVAL      { sp }
+    ::= { hh3cQueueEntry 2 }
+
+  hh3cQueueWeight1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight1 represent the bandwidth of queue 1.
+      If queue mode is wrr, then hh3cQueueWeight1 represent the weight of queue 1."
+    ::= { hh3cQueueEntry 3 }
+
+  hh3cQueueWeight2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight2 represent the bandwidth of queue 2.
+      If queue mode is wrr, then hh3cQueueWeight2 represent the weight of queue 2."
+    ::= { hh3cQueueEntry 4 }
+
+  hh3cQueueWeight3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight3 represent the bandwidth of queue 3.
+      If queue mode is wrr, then hh3cQueueWeight3 represent the weight of queue 3."
+    ::= { hh3cQueueEntry 5 }
+
+  hh3cQueueWeight4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight4 represent the bandwidth of queue 4.
+      If queue mode is wrr, then hh3cQueueWeight4 represent the weight of queue 4."
+    ::= { hh3cQueueEntry 6 }
+
+  hh3cQueueMaxDelay OBJECT-TYPE
+    SYNTAX      INTEGER(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      " "
+    ::= { hh3cQueueEntry 7 }
+
+  hh3cQueueWeight5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight5 represent the bandwidth of queue 5.
+      If queue mode is wrr, then hh3cQueueWeight5 represent the weight of queue 5."
+    ::= { hh3cQueueEntry 8 }
+
+  hh3cQueueWeight6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight6 represent the bandwidth of queue 6.
+      If queue mode is wrr, then hh3cQueueWeight6 represent the weight of queue 6."
+    ::= { hh3cQueueEntry 9 }
+
+  hh3cQueueWeight7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight7 represent the bandwidth of queue 7.
+      If queue mode is wrr, then hh3cQueueWeight7 represent the weight of queue 7."
+    ::= { hh3cQueueEntry 10 }
+
+  hh3cQueueWeight8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "If queue mode is wfq, then hh3cQueueWeight8 represent the bandwidth of queue 8.
+      If queue mode is wrr, then hh3cQueueWeight8 represent the weight of queue 8."
+    ::= { hh3cQueueEntry 11 }
+
+
+  -- TABLE: hh3cRateLimitTable ------
+  hh3cRateLimitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRateLimitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Rate limit table which contains limit entry. "
+    ::= { hh3cLswQosMibObject 4 }
+
+  hh3cRateLimitEntry OBJECT-TYPE
+    SYNTAX      Hh3cRateLimitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The configuration information of the rate-limited port."
+    INDEX {
+              hh3cRateLimitAclIndex,
+              hh3cRateLimitIfIndex,
+              hh3cRateLimitVlanID,
+              hh3cRateLimitDirection
+          }
+    ::= { hh3cRateLimitTable 1 }
+
+  Hh3cRateLimitEntry ::=
+    SEQUENCE
+    {
+      hh3cRateLimitAclIndex    INTEGER,
+      hh3cRateLimitIfIndex    INTEGER,
+      hh3cRateLimitVlanID    INTEGER,
+      hh3cRateLimitDirection    INTEGER,
+      hh3cRateLimitUserAclNum    INTEGER,
+      hh3cRateLimitUserAclRule    INTEGER,
+      hh3cRateLimitIpAclNum    INTEGER,
+      hh3cRateLimitIpAclRule    INTEGER,
+      hh3cRateLimitLinkAclNum    INTEGER,
+      hh3cRateLimitLinkAclRule    INTEGER,
+      hh3cRateLimitTargetRateMbps    INTEGER,
+      hh3cRateLimitTargetRateKbps    INTEGER,
+      hh3cRateLimitPeakRate    INTEGER,
+      hh3cRateLimitCIR    INTEGER,
+      hh3cRateLimitCBS    INTEGER,
+      hh3cRateLimitEBS    INTEGER,
+      hh3cRateLimitPIR    INTEGER,
+      hh3cRateLimitConformLocalPre    INTEGER,
+      hh3cRateLimitConformActionType    INTEGER,
+      hh3cRateLimitExceedActionType    INTEGER,
+      hh3cRateLimitExceedDscp    INTEGER,
+      hh3cRateLimitRuntime    TruthValue,
+      hh3cRateLimitRowStatus    RowStatus,
+      hh3cRateLimitExceedCos INTEGER,
+      hh3cRateLimitConformCos INTEGER,
+      hh3cRateLimitConformDscp INTEGER,
+      hh3cRateLimitMeterStatByteCount Counter64,
+      hh3cRateLimitMeterStatByteXCount Counter64,
+      hh3cRateLimitMeterStatState INTEGER
+    }
+
+  hh3cRateLimitAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cRateLimitEntry 1 }
+
+  hh3cRateLimitIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of the rate-limited port."
+    ::= { hh3cRateLimitEntry 2 }
+
+  hh3cRateLimitVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cRateLimitEntry 3 }
+
+  hh3cRateLimitDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), input(1), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of the rate-limited port."
+    ::= { hh3cRateLimitEntry 4 }
+
+  hh3cRateLimitUserAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of user acl."
+    ::= { hh3cRateLimitEntry 5 }
+
+  hh3cRateLimitUserAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of user acl-rule."
+    ::= { hh3cRateLimitEntry 6 }
+
+  hh3cRateLimitIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of Ip acl."
+    ::= { hh3cRateLimitEntry 7 }
+
+  hh3cRateLimitIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of Ip acl-rule."
+    ::= { hh3cRateLimitEntry 8 }
+
+  hh3cRateLimitLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of link acl."
+    ::= { hh3cRateLimitEntry 9 }
+
+  hh3cRateLimitLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of link acl-rule."
+    ::= { hh3cRateLimitEntry 10 }
+
+  hh3cRateLimitTargetRateMbps OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Target rate: Mbps."
+    ::= { hh3cRateLimitEntry 11 }
+
+  hh3cRateLimitTargetRateKbps OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Target rate: Kbps."
+    ::= { hh3cRateLimitEntry 12 }
+
+  hh3cRateLimitPeakRate OBJECT-TYPE
+    SYNTAX      INTEGER(0|64..8388608)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Peak rate of the rate-limited port."
+    ::= { hh3cRateLimitEntry 13 }
+
+  hh3cRateLimitCIR OBJECT-TYPE
+    SYNTAX      INTEGER(0..34120000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "CIR of the rate-limited port."
+    ::= { hh3cRateLimitEntry 14 }
+
+  hh3cRateLimitCBS OBJECT-TYPE
+    SYNTAX      INTEGER(0..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Burst traffic of the rate-limited port."
+    ::= { hh3cRateLimitEntry 15 }
+
+  hh3cRateLimitEBS OBJECT-TYPE
+    SYNTAX      INTEGER(0..268435455)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Excess burst traffic of the rate-limited port."
+    ::= { hh3cRateLimitEntry 16 }
+
+  hh3cRateLimitPIR OBJECT-TYPE
+    SYNTAX      INTEGER(0..34120000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "PIR of the rate-limited port."
+    ::= { hh3cRateLimitEntry 17 }
+
+  hh3cRateLimitConformLocalPre OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Conform local pre."
+    DEFVAL      { 1 }
+    ::= { hh3cRateLimitEntry 18 }
+
+  hh3cRateLimitConformActionType OBJECT-TYPE
+    SYNTAX      INTEGER{
+                       invalid(0),
+                       remark-cos(1),
+                       remark-drop-priority(2),
+                       remark-cos-drop-priority(3),
+                       remark-policed-service(4),
+                       remark-dscp(5)
+                       }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Conform action type."
+    DEFVAL      { 1 }
+    ::= { hh3cRateLimitEntry 19 }
+
+  hh3cRateLimitExceedActionType OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), forward(1), drop(2), remarkdscp(3), exceed-cos(4)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Exceed action type."
+    DEFVAL      { 1 }
+    ::= { hh3cRateLimitEntry 20 }
+
+  hh3cRateLimitExceedDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Exceed DSCP.
+      <0-63>  Value of DSCP
+      af11    Specify Assured Forwarding 11 service(10)
+      af12    Specify Assured Forwarding 12 service(12)
+      af13    Specify Assured Forwarding 13 service(14)
+      af21    Specify Assured Forwarding 21 service(18)
+      af22    Specify Assured Forwarding 22 service(20)
+      af23    Specify Assured Forwarding 23 service(22)
+      af31    Specify Assured Forwarding 31 service(26)
+      af32    Specify Assured Forwarding 32 service(28)
+      af33    Specify Assured Forwarding 33 service(30)
+      af41    Specify Assured Forwarding 41 service(34)
+      af42    Specify Assured Forwarding 42 service(36)
+      af43    Specify Assured Forwarding 43 service(38)
+      be      Specify Best Effort service(0)
+      cs1     Specify Class Selector 1 service(8)
+      cs2     Specify Class Selector 2 service(16)
+      cs3     Specify Class Selector 3 service(24)
+      cs4     Specify Class Selector 4 service(32)
+      cs5     Specify Class Selector 5 service(40)
+      cs6     Specify Class Selector 6 service(48)
+      cs7     Specify Class Selector 7 service(56)
+      ef      Specify Expedited Forwarding service(46)"
+    DEFVAL      { 255 }
+    ::= { hh3cRateLimitEntry 21 }
+
+  hh3cRateLimitRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Runtime."
+    ::= { hh3cRateLimitEntry 22 }
+
+  hh3cRateLimitRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cRateLimitEntry 23 }
+
+  hh3cRateLimitExceedCos OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Exceeding COS of rate-limited port."
+    DEFVAL      { 255 }
+    ::= { hh3cRateLimitEntry 24 }
+
+  hh3cRateLimitConformCos OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "If the user choose remark-cos value of the hh3cRateLimitConformActionType,
+      This object can be used to set the conform COS value.  There are a few
+      enumerations as follows:
+      background          Specify background priority(1)
+      best-effort         Specify best-effort priority(0)
+      controlled-load     Specify controlled-load priority(4)
+      excellent-effort    Specify excellent-effort priority(3)
+      network-management  Specify network-management priority(7)
+      spare               Specify spare priority(2)
+      video               Specify video priority(5)
+      voice               Specify voice priority(6)"
+    DEFVAL      { 255 }
+    ::= { hh3cRateLimitEntry 25 }
+
+  hh3cRateLimitConformDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "If the user choose remark-dscp value of the hh3cRateLimitConformActionType,
+      This object can be used to set the conform dscp value.  There are a few
+      enumerations as follows:
+      <0-63>  Value of DSCP
+      af11    Specify Assured Forwarding 11 service(10)
+      af12    Specify Assured Forwarding 12 service(12)
+      af13    Specify Assured Forwarding 13 service(14)
+      af21    Specify Assured Forwarding 21 service(18)
+      af22    Specify Assured Forwarding 22 service(20)
+      af23    Specify Assured Forwarding 23 service(22)
+      af31    Specify Assured Forwarding 31 service(26)
+      af32    Specify Assured Forwarding 32 service(28)
+      af33    Specify Assured Forwarding 33 service(30)
+      af41    Specify Assured Forwarding 41 service(34)
+      af42    Specify Assured Forwarding 42 service(36)
+      af43    Specify Assured Forwarding 43 service(38)
+      be      Specify Best Effort service(0)
+      cs1     Specify Class Selector 1 service(8)
+      cs2     Specify Class Selector 2 service(16)
+      cs3     Specify Class Selector 3 service(24)
+      cs4     Specify Class Selector 4 service(32)
+      cs5     Specify Class Selector 5 service(40)
+      cs6     Specify Class Selector 6 service(48)
+      cs7     Specify Class Selector 7 service(56)
+      ef      Specify Expedited Forwarding service(46)"
+    DEFVAL      { 255 }
+    ::= { hh3cRateLimitEntry 26 }
+
+  hh3cRateLimitMeterStatByteCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The counter of conform byte."
+    ::= { hh3cRateLimitEntry 27 }
+
+  hh3cRateLimitMeterStatByteXCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The counter of exceed byte."
+    ::= { hh3cRateLimitEntry 28 }
+
+  hh3cRateLimitMeterStatState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                       {
+                       set(1), --enable meter statistic
+                       unDo(2), --undo meter statistic
+                       reset(3), --reset meter statistic
+                       running(4), --status of meter statistic running
+                       notRunning(5) --status of meter statistic not running
+                       }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+               "The status of meter statistic."
+    ::= { hh3cRateLimitEntry 29 }
+
+  -- TABLE: hh3cPriorityTable ------
+  hh3cPriorityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The priority table which contains priority entry."
+    ::= { hh3cLswQosMibObject 5 }
+
+  hh3cPriorityEntry OBJECT-TYPE
+    SYNTAX      Hh3cPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The configuration information of priority."
+    INDEX {
+              hh3cPriorityAclIndex,
+              hh3cPriorityIfIndex,
+              hh3cPriorityVlanID,
+              hh3cPriorityDirection
+          }
+    ::= { hh3cPriorityTable 1 }
+
+  Hh3cPriorityEntry ::=
+    SEQUENCE
+    {
+      hh3cPriorityAclIndex    INTEGER,
+      hh3cPriorityIfIndex    INTEGER,
+      hh3cPriorityVlanID    INTEGER,
+      hh3cPriorityDirection    INTEGER,
+      hh3cPriorityUserAclNum    INTEGER,
+      hh3cPriorityUserAclRule    INTEGER,
+      hh3cPriorityIpAclNum    INTEGER,
+      hh3cPriorityIpAclRule    INTEGER,
+      hh3cPriorityLinkAclNum    INTEGER,
+      hh3cPriorityLinkAclRule    INTEGER,
+      hh3cPriorityDscp    INTEGER,
+      hh3cPriorityIpPre    INTEGER,
+      hh3cPriorityIpPreFromCos    TruthValue,
+      hh3cPriorityCos    INTEGER,
+      hh3cPriorityCosFromIpPre    TruthValue,
+      hh3cPriorityLocalPre    INTEGER,
+      hh3cPriorityPolicedServiceType    INTEGER,
+      hh3cPriorityPolicedServiceDscp    INTEGER,
+      hh3cPriorityPolicedServiceExp    INTEGER,
+      hh3cPriorityPolicedServiceCos    INTEGER,
+      hh3cPriorityPolicedServiceLoaclPre    INTEGER,
+      hh3cPriorityPolicedServiceDropPriority    INTEGER,
+      hh3cPriorityRuntime    TruthValue,
+      hh3cPriorityRowStatus    RowStatus
+    }
+
+  hh3cPriorityAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cPriorityEntry 1 }
+
+  hh3cPriorityIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of the port."
+    ::= { hh3cPriorityEntry 2 }
+
+  hh3cPriorityVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cPriorityEntry 3 }
+
+  hh3cPriorityDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), input(1), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cPriorityEntry 4 }
+
+  hh3cPriorityUserAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of user acl."
+    ::= { hh3cPriorityEntry 5 }
+
+  hh3cPriorityUserAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the user acl."
+    ::= { hh3cPriorityEntry 6 }
+
+  hh3cPriorityIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of Ip acl."
+    ::= { hh3cPriorityEntry 7 }
+
+  hh3cPriorityIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the IP acl."
+    ::= { hh3cPriorityEntry 8 }
+
+  hh3cPriorityLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of Link acl."
+    ::= { hh3cPriorityEntry 9 }
+
+  hh3cPriorityLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the link acl."
+    ::= { hh3cPriorityEntry 10 }
+
+  hh3cPriorityDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set DSCP Value.
+      <0-63>  Value of DSCP
+      af11    Specify Assured Forwarding 11 service(10)
+      af12    Specify Assured Forwarding 12 service(12)
+      af13    Specify Assured Forwarding 13 service(14)
+      af21    Specify Assured Forwarding 21 service(18)
+      af22    Specify Assured Forwarding 22 service(20)
+      af23    Specify Assured Forwarding 23 service(22)
+      af31    Specify Assured Forwarding 31 service(26)
+      af32    Specify Assured Forwarding 32 service(28)
+      af33    Specify Assured Forwarding 33 service(30)
+      af41    Specify Assured Forwarding 41 service(34)
+      af42    Specify Assured Forwarding 42 service(36)
+      af43    Specify Assured Forwarding 43 service(38)
+      be      Specify Best Effort service(0)
+      cs1     Specify Class Selector 1 service(8)
+      cs2     Specify Class Selector 2 service(16)
+      cs3     Specify Class Selector 3 service(24)
+      cs4     Specify Class Selector 4 service(32)
+      cs5     Specify Class Selector 5 service(40)
+      cs6     Specify Class Selector 6 service(48)
+      cs7     Specify Class Selector 7 service(56)
+      ef      Specify Expedited Forwarding service(46)"
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 11 }
+
+  hh3cPriorityIpPre OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set Ip precedence."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 12 }
+
+  hh3cPriorityIpPreFromCos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set Ip precedence according to vlan priority."
+    DEFVAL      { 2 }
+    ::= { hh3cPriorityEntry 13 }
+
+  hh3cPriorityCos OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set vlan priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 14 }
+
+  hh3cPriorityCosFromIpPre OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set vlan priority according to IP precedence."
+    DEFVAL      { 2 }
+    ::= { hh3cPriorityEntry 15 }
+
+  hh3cPriorityLocalPre OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Set local precedence."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 16 }
+
+  hh3cPriorityPolicedServiceType OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), auto(1), trust-dscp(2), new-dscp(3), untrusted(4)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service type of proliced Priority."
+    ::= { hh3cPriorityEntry 17 }
+
+  hh3cPriorityPolicedServiceDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service Dscp of proliced Priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 18 }
+
+  hh3cPriorityPolicedServiceExp OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service Exp of proliced Priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 19 }
+
+  hh3cPriorityPolicedServiceCos OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service COS of proliced Priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 20 }
+
+  hh3cPriorityPolicedServiceLoaclPre OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service local pre of proliced Priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 21 }
+
+  hh3cPriorityPolicedServiceDropPriority OBJECT-TYPE
+    SYNTAX      INTEGER(0..2|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The service drop priority of proliced Priority."
+    DEFVAL      { 255 }
+    ::= { hh3cPriorityEntry 22 }
+
+  hh3cPriorityRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cPriorityEntry 23 }
+
+  hh3cPriorityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cPriorityEntry 24 }
+
+  -- TABLE: hh3cRedirectTable ------
+  hh3cRedirectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRedirectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Redirect table which contains rediect entry."
+    ::= { hh3cLswQosMibObject 6 }
+
+  hh3cRedirectEntry OBJECT-TYPE
+    SYNTAX      Hh3cRedirectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of redirection."
+    INDEX {
+              hh3cRedirectAclIndex,
+              hh3cRedirectIfIndex,
+              hh3cRedirectVlanID,
+              hh3cRedirectDirection
+          }
+    ::= { hh3cRedirectTable 1 }
+
+  Hh3cRedirectEntry ::=
+    SEQUENCE
+    {
+      hh3cRedirectAclIndex    INTEGER,
+      hh3cRedirectIfIndex    INTEGER,
+      hh3cRedirectVlanID    INTEGER,
+      hh3cRedirectDirection    INTEGER,
+      hh3cRedirectUserAclNum    INTEGER,
+      hh3cRedirectUserAclRule    INTEGER,
+      hh3cRedirectIpAclNum    INTEGER,
+      hh3cRedirectIpAclRule    INTEGER,
+      hh3cRedirectLinkAclNum    INTEGER,
+      hh3cRedirectLinkAclRule    INTEGER,
+      hh3cRedirectToCpu    TruthValue,
+      hh3cRedirectToIfIndex    INTEGER,
+      hh3cRedirectToNextHop1    IpAddress,
+      hh3cRedirectToNextHop2    IpAddress,
+      hh3cRedirectRuntime    TruthValue,
+      hh3cRedirectRowStatus    RowStatus,
+      hh3cRedirectToSlotNo INTEGER,
+      hh3cRedirectRemarkedDSCP    INTEGER,
+      hh3cRedirectRemarkedPri  INTEGER,
+      hh3cRedirectRemarkedTos  INTEGER,
+      hh3cRedirectToNextHop3  IpAddress,
+      hh3cRedirectTargetVlanID INTEGER,
+      hh3cRedirectMode INTEGER,
+      hh3cRedirectToNestedVlanID Integer32,
+      hh3cRedirectToModifiedVlanID Integer32
+    }
+
+  hh3cRedirectAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cRedirectEntry 1 }
+
+  hh3cRedirectIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cRedirectEntry 2 }
+
+  hh3cRedirectVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cRedirectEntry 3 }
+
+  hh3cRedirectDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), input(1), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cRedirectEntry 4 }
+
+  hh3cRedirectUserAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the user acl."
+    ::= { hh3cRedirectEntry 5 }
+
+  hh3cRedirectUserAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the user acl."
+    ::= { hh3cRedirectEntry 6 }
+
+  hh3cRedirectIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The num of the IP acl."
+    ::= { hh3cRedirectEntry 7 }
+
+  hh3cRedirectIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the IP acl."
+    ::= { hh3cRedirectEntry 8 }
+
+  hh3cRedirectLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The num of the link acl."
+    ::= { hh3cRedirectEntry 9 }
+
+  hh3cRedirectLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the link acl."
+    ::= { hh3cRedirectEntry 10 }
+
+  hh3cRedirectToCpu OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Redirect to cpu."
+    DEFVAL      { 2 }
+    ::= { hh3cRedirectEntry 11 }
+
+  hh3cRedirectToIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The ifIndex of port to be redirect to."
+    ::= { hh3cRedirectEntry 12 }
+
+  hh3cRedirectToNextHop1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          " "
+    ::= { hh3cRedirectEntry 13 }
+
+  hh3cRedirectToNextHop2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          " "
+    ::= { hh3cRedirectEntry 14 }
+
+  hh3cRedirectRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cRedirectEntry 15 }
+
+  hh3cRedirectRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cRedirectEntry 16 }
+
+  hh3cRedirectToSlotNo OBJECT-TYPE
+    SYNTAX      INTEGER(1..16)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The slot number to process redirection. Default value is 15.
+      When L3plus function is not supported, the default value would be set.
+      For L3plus redirection function, it is necessary."
+    ::= { hh3cRedirectEntry 17 }
+
+  hh3cRedirectRemarkedDSCP OBJECT-TYPE
+    SYNTAX      INTEGER(0..63|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "DSCP of Policy-Based Routing. When L3plus function is not supported,
+      the default value would be set.
+      For L3plus redirection function, it is optional."
+    DEFVAL      { 255 }
+    ::= { hh3cRedirectEntry 18 }
+
+  hh3cRedirectRemarkedPri OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The priority of the redirect packet. When L3plus function is not supported,
+      the default value would be set.
+      For L3plus redirection function, it is optional."
+    DEFVAL      { 255 }
+    ::= { hh3cRedirectEntry 19 }
+
+  hh3cRedirectRemarkedTos OBJECT-TYPE
+    SYNTAX      INTEGER(0..15|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The TOS of the redirect packet.
+      When L3plus function is not supported, the default value would be set.
+      For L3plus redirection function, it is optional."
+    DEFVAL      { 255 }
+    ::= { hh3cRedirectEntry 20 }
+
+  hh3cRedirectToNextHop3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The third IP address for PBR. Default value is 0xffffffff.
+      When L3plus function is not supported, the default value would be set.
+      The data stream can be redirected to three nexthops at most or one
+      VLAN interface, one nexthop should be set at least if data packets
+      are not redirected to VLAN interface for L3plus redirection function."
+    ::= { hh3cRedirectEntry 21 }
+
+  hh3cRedirectTargetVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The destination vlan ID for PBR. Default value is 0.
+      When L3plus function is not supported, the default value would be set.
+      For L3plus redirection function, it is necessary when no nexthop is set. "
+    ::= { hh3cRedirectEntry 22 }
+
+  hh3cRedirectMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                                strict-priority(1),
+                                load-balance(2)
+                       }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The node denotes the strategy adopted by the PBR.
+      If strict-priority is configured, the most preferential IP address
+      is use as redirected nexthop.
+      If the mode is load-balance, any of the three IP addresses will be
+      the nexthop and the traffic distributes in the three direction.
+      Default value is strict-priority.
+      When L3plus function is not supported, the default value would be set.
+      It is optional. "
+    DEFVAL      { strict-priority }
+    ::= { hh3cRedirectEntry 23 }
+
+  hh3cRedirectToNestedVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The nested vlan ID inserted before the original vlan tag. Default value is 0.
+      When the function is not supported, the default value would be set.
+      It is optional."
+    DEFVAL      { 0 }
+    ::= { hh3cRedirectEntry 24 }
+
+  hh3cRedirectToModifiedVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The new vlan ID replaced the old one. Default value is 0.
+      When the function is not supported, the default value would be set.
+      It is optional."
+    DEFVAL      { 0 }
+    ::= { hh3cRedirectEntry 25 }
+
+  -- TABLE: hh3cStatisticTable ------
+  hh3cStatisticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cStatisticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Statistic table which contains statistic entry."
+    ::= { hh3cLswQosMibObject 7 }
+
+  hh3cStatisticEntry OBJECT-TYPE
+    SYNTAX      Hh3cStatisticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration about statistic information."
+    INDEX {
+              hh3cStatisticAclIndex,
+              hh3cStatisticIfIndex,
+              hh3cStatisticVlanID,
+              hh3cStatisticDirection
+          }
+    ::= { hh3cStatisticTable 1 }
+
+  Hh3cStatisticEntry ::=
+    SEQUENCE
+    {
+      hh3cStatisticAclIndex    INTEGER,
+      hh3cStatisticIfIndex    INTEGER,
+      hh3cStatisticVlanID    INTEGER,
+      hh3cStatisticDirection    INTEGER,
+      hh3cStatisticUserAclNum    INTEGER,
+      hh3cStatisticUserAclRule    INTEGER,
+      hh3cStatisticIpAclNum    INTEGER,
+      hh3cStatisticIpAclRule    INTEGER,
+      hh3cStatisticLinkAclNum    INTEGER,
+      hh3cStatisticLinkAclRule    INTEGER,
+      hh3cStatisticRuntime    TruthValue,
+      hh3cStatisticPacketCount    Counter64,
+      hh3cStatisticByteCount    Counter64,
+      hh3cStatisticCountClear    INTEGER,
+      hh3cStatisticRowStatus    RowStatus,
+      hh3cStatisticPacketXCount Counter64,
+      hh3cStatisticByteXCount Counter64
+    }
+
+  hh3cStatisticAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cStatisticEntry 1 }
+
+  hh3cStatisticIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cStatisticEntry 2 }
+
+  hh3cStatisticVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cStatisticEntry 3 }
+
+  hh3cStatisticDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), input(1), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cStatisticEntry 4 }
+
+  hh3cStatisticUserAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the user acl."
+    ::= { hh3cStatisticEntry 5 }
+
+  hh3cStatisticUserAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the user acl."
+    ::= { hh3cStatisticEntry 6 }
+
+  hh3cStatisticIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the IP acl."
+    ::= { hh3cStatisticEntry 7 }
+
+  hh3cStatisticIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the IP acl."
+    ::= { hh3cStatisticEntry 8 }
+
+  hh3cStatisticLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the link acl."
+    ::= { hh3cStatisticEntry 9 }
+
+  hh3cStatisticLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the link acl."
+    ::= { hh3cStatisticEntry 10 }
+
+  hh3cStatisticRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cStatisticEntry 11 }
+
+  hh3cStatisticPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The counter of the packets which is matched."
+    ::= { hh3cStatisticEntry 12 }
+
+  hh3cStatisticByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The counter of the byte which is matched."
+    ::= { hh3cStatisticEntry 13 }
+
+  hh3cStatisticCountClear OBJECT-TYPE
+    SYNTAX      INTEGER{cleared(1),nouse(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Clear the counter of the packets."
+    ::= { hh3cStatisticEntry 14 }
+
+  hh3cStatisticRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cStatisticEntry 15 }
+
+  hh3cStatisticPacketXCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The counter of the outprofile packets."
+    ::= { hh3cStatisticEntry 16 }
+
+  hh3cStatisticByteXCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The counter of the outprofile bytes."
+    ::= { hh3cStatisticEntry 17 }
+
+  -- TABLE: hh3cMirrorTable ------
+  hh3cMirrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Mirror table which contains mirror entry."
+    ::= { hh3cLswQosMibObject 8 }
+
+  hh3cMirrorEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information to be mirrored."
+    INDEX {
+              hh3cMirrorAclIndex,
+              hh3cMirrorIfIndex,
+              hh3cMirrorVlanID,
+              hh3cMirrorDirection
+          }
+    ::= { hh3cMirrorTable 1 }
+
+  Hh3cMirrorEntry ::=
+    SEQUENCE
+    {
+      hh3cMirrorAclIndex    INTEGER,
+      hh3cMirrorIfIndex    INTEGER,
+      hh3cMirrorVlanID    INTEGER,
+      hh3cMirrorDirection    INTEGER,
+      hh3cMirrorUserAclNum    INTEGER,
+      hh3cMirrorUserAclRule    INTEGER,
+      hh3cMirrorIpAclNum    INTEGER,
+      hh3cMirrorIpAclRule    INTEGER,
+      hh3cMirrorLinkAclNum    INTEGER,
+      hh3cMirrorLinkAclRule    INTEGER,
+      hh3cMirrorToIfIndex    INTEGER,
+      hh3cMirrorToCpu    TruthValue,
+      hh3cMirrorRuntime    TruthValue,
+      hh3cMirrorRowStatus    RowStatus,
+      hh3cMirrorToGroup       Integer32
+
+    }
+
+  hh3cMirrorAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cMirrorEntry 1 }
+
+  hh3cMirrorIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cMirrorEntry 2 }
+
+  hh3cMirrorVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cMirrorEntry 3 }
+
+  hh3cMirrorDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), input(1), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cMirrorEntry 4 }
+
+  hh3cMirrorUserAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the user acl."
+    ::= { hh3cMirrorEntry 5 }
+
+  hh3cMirrorUserAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the user acl."
+    ::= { hh3cMirrorEntry 6 }
+
+  hh3cMirrorIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the user acl."
+    ::= { hh3cMirrorEntry 7 }
+
+  hh3cMirrorIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the IP acl."
+    ::= { hh3cMirrorEntry 8 }
+
+  hh3cMirrorLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of the link acl."
+    ::= { hh3cMirrorEntry 9 }
+
+  hh3cMirrorLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of the link acl."
+    ::= { hh3cMirrorEntry 10 }
+
+  hh3cMirrorToIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The ifIndex of port that to be mirrored to."
+    ::= { hh3cMirrorEntry 11 }
+
+  hh3cMirrorToCpu OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Mirror to cpu."
+    ::= { hh3cMirrorEntry 12 }
+
+  hh3cMirrorRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cMirrorEntry 13 }
+
+  hh3cMirrorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy. "
+    ::= { hh3cMirrorEntry 14 }
+
+  hh3cMirrorToGroup OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The destination of stream-based mirroring is the mirroring group."
+    ::= { hh3cMirrorEntry 15 }
+
+
+  -- TABLE: hh3cPortMirrorTable ------
+  hh3cPortMirrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPortMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Port Mirror."
+    ::= { hh3cLswQosMibObject 9 }
+
+  hh3cPortMirrorEntry OBJECT-TYPE
+    SYNTAX      Hh3cPortMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of port mirroring."
+    INDEX {
+              hh3cPortMirrorIfIndex
+          }
+    ::= { hh3cPortMirrorTable 1 }
+
+  Hh3cPortMirrorEntry ::=
+    SEQUENCE
+    {
+      hh3cPortMirrorIfIndex    INTEGER,
+      hh3cPortMirrorDirection    INTEGER,
+      hh3cPortMirrorRowStatus    RowStatus
+    }
+
+  hh3cPortMirrorIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The ifIndex of mirror port."
+    ::= { hh3cPortMirrorEntry 1 }
+
+  hh3cPortMirrorDirection OBJECT-TYPE
+    SYNTAX      INTEGER{in(1),out(2),both(3)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The direction of mirror port."
+    ::= { hh3cPortMirrorEntry 2 }
+
+  hh3cPortMirrorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cPortMirrorEntry 3 }
+
+  -- TABLE: hh3cLineRateTable ------
+  hh3cLineRateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLineRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Line Rate."
+    ::= { hh3cLswQosMibObject 10 }
+
+  hh3cLineRateEntry OBJECT-TYPE
+    SYNTAX      Hh3cLineRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of line-rate port."
+    INDEX {
+              hh3cLineRateIfIndex,
+              hh3cLineRateDirection
+          }
+    ::= { hh3cLineRateTable 1 }
+
+  Hh3cLineRateEntry ::=
+    SEQUENCE
+    {
+      hh3cLineRateIfIndex    INTEGER,
+      hh3cLineRateDirection    INTEGER,
+      hh3cLineRateValue    INTEGER,
+      hh3cLineRateRowStatus    RowStatus
+    }
+
+  hh3cLineRateIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The ifIndex of port of line rate."
+    ::= { hh3cLineRateEntry 1 }
+
+  hh3cLineRateDirection OBJECT-TYPE
+    SYNTAX      INTEGER{in(1),out(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The direction of line rate."
+    ::= { hh3cLineRateEntry 2 }
+
+  hh3cLineRateValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The value of the line-rate."
+    ::= { hh3cLineRateEntry 3 }
+
+  hh3cLineRateRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cLineRateEntry 4 }
+
+  -- TABLE: hh3cBandwidthTable ------
+  hh3cBandwidthTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBandwidthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Bandwidth."
+    ::= { hh3cLswQosMibObject 11 }
+
+  hh3cBandwidthEntry OBJECT-TYPE
+    SYNTAX      Hh3cBandwidthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of bandwidth of port."
+    INDEX {
+              hh3cBandwidthAclIndex,
+              hh3cBandwidthIfIndex,
+              hh3cBandwidthVlanID,
+              hh3cBandwidthDirection
+          }
+    ::= { hh3cBandwidthTable 1 }
+
+  Hh3cBandwidthEntry ::=
+    SEQUENCE
+    {
+      hh3cBandwidthAclIndex    INTEGER,
+      hh3cBandwidthIfIndex    INTEGER,
+      hh3cBandwidthVlanID    INTEGER,
+      hh3cBandwidthDirection    INTEGER,
+      hh3cBandwidthIpAclNum    INTEGER,
+      hh3cBandwidthIpAclRule    INTEGER,
+      hh3cBandwidthLinkAclNum    INTEGER,
+      hh3cBandwidthLinkAclRule    INTEGER,
+      hh3cBandwidthMinGuaranteedWidth    INTEGER,
+      hh3cBandwidthMaxGuaranteedWidth    INTEGER,
+      hh3cBandwidthWeight    INTEGER,
+      hh3cBandwidthRuntime    TruthValue,
+      hh3cBandwidthRowStatus    RowStatus
+    }
+
+  hh3cBandwidthAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cBandwidthEntry 1 }
+
+  hh3cBandwidthIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cBandwidthEntry 2 }
+
+  hh3cBandwidthVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cBandwidthEntry 3 }
+
+  hh3cBandwidthDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cBandwidthEntry 4 }
+
+  hh3cBandwidthIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of Ip acl."
+    ::= { hh3cBandwidthEntry 5 }
+
+  hh3cBandwidthIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of ip acl."
+    ::= { hh3cBandwidthEntry 6 }
+
+  hh3cBandwidthLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of link acl."
+    ::= { hh3cBandwidthEntry 7 }
+
+  hh3cBandwidthLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of link acl."
+    ::= { hh3cBandwidthEntry 8 }
+
+  hh3cBandwidthMinGuaranteedWidth OBJECT-TYPE
+    SYNTAX      INTEGER(1..8388608)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The min width which is guaranteed."
+    ::= { hh3cBandwidthEntry 9 }
+
+  hh3cBandwidthMaxGuaranteedWidth OBJECT-TYPE
+    SYNTAX      INTEGER(1..8388608)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max width which is guaranteed."
+    ::= { hh3cBandwidthEntry 10 }
+
+  hh3cBandwidthWeight OBJECT-TYPE
+    SYNTAX      INTEGER(0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Weight of bandwidth."
+    ::= { hh3cBandwidthEntry 11 }
+
+  hh3cBandwidthRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cBandwidthEntry 12 }
+
+  hh3cBandwidthRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cBandwidthEntry 13 }
+
+-- TABLE: hh3cRedTable ------
+  hh3cRedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Red table which contains RED entry."
+    ::= { hh3cLswQosMibObject 12 }
+
+  hh3cRedEntry OBJECT-TYPE
+    SYNTAX      Hh3cRedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of RED."
+    INDEX {
+              hh3cRedAclIndex,
+              hh3cRedIfIndex,
+              hh3cRedVlanID,
+              hh3cRedDirection
+          }
+    ::= { hh3cRedTable 1 }
+
+  Hh3cRedEntry ::=
+    SEQUENCE
+    {
+      hh3cRedAclIndex    INTEGER,
+      hh3cRedIfIndex    INTEGER,
+      hh3cRedVlanID    INTEGER,
+      hh3cRedDirection    INTEGER,
+      hh3cRedIpAclNum    INTEGER,
+      hh3cRedIpAclRule    INTEGER,
+      hh3cRedLinkAclNum    INTEGER,
+      hh3cRedLinkAclRule    INTEGER,
+      hh3cRedStartQueueLen    INTEGER,
+      hh3cRedStopQueueLen    INTEGER,
+      hh3cRedProbability    INTEGER,
+      hh3cRedRuntime    TruthValue,
+      hh3cRedRowStatus    RowStatus
+    }
+
+  hh3cRedAclIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..2999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Index of acl rule."
+    ::= { hh3cRedEntry 1 }
+
+  hh3cRedIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cRedEntry 2 }
+
+  hh3cRedVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cRedEntry 3 }
+
+  hh3cRedDirection OBJECT-TYPE
+    SYNTAX      INTEGER{invalid(0), output(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream."
+    ::= { hh3cRedEntry 4 }
+
+  hh3cRedIpAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The num of Ip acl."
+    ::= { hh3cRedEntry 5 }
+
+  hh3cRedIpAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of Ip acl."
+    ::= { hh3cRedEntry 6 }
+
+  hh3cRedLinkAclNum OBJECT-TYPE
+    SYNTAX      INTEGER(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The number of link acl."
+    ::= { hh3cRedEntry 7 }
+
+  hh3cRedLinkAclRule OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The subitem of link acl."
+    ::= { hh3cRedEntry 8 }
+
+  hh3cRedStartQueueLen OBJECT-TYPE
+    SYNTAX      INTEGER(0..262128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The length of Starting queue."
+    ::= { hh3cRedEntry 9 }
+
+  hh3cRedStopQueueLen OBJECT-TYPE
+    SYNTAX      INTEGER(0..262128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The length of stopping queue."
+    ::= { hh3cRedEntry 10 }
+
+  hh3cRedProbability OBJECT-TYPE
+    SYNTAX      INTEGER(0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Probability."
+    ::= { hh3cRedEntry 11 }
+
+  hh3cRedRuntime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Is run or not."
+    ::= { hh3cRedEntry 12 }
+
+  hh3cRedRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cRedEntry 13 }
+
+  -- TABLE: hh3cMirrorGroupTable ------
+  hh3cMirrorGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirrorGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Mirror Group."
+    ::= { hh3cLswQosMibObject 13 }
+
+  hh3cMirrorGroupEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirrorGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of mirroring group."
+    INDEX {
+              hh3cMirrorGroupID
+          }
+    ::= { hh3cMirrorGroupTable 1 }
+
+  Hh3cMirrorGroupEntry ::=
+    SEQUENCE
+    {
+      hh3cMirrorGroupID    INTEGER,
+      hh3cMirrorGroupDirection    INTEGER,
+      hh3cMirrorGroupMirrorIfIndexList    OCTET STRING,
+      hh3cMirrorGroupMonitorIfIndex    INTEGER,
+      hh3cMirrorGroupRowStatus    RowStatus
+    }
+
+  hh3cMirrorGroupID OBJECT-TYPE
+    SYNTAX      INTEGER(1..20)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Group ID of mirroring group."
+    ::= { hh3cMirrorGroupEntry 1 }
+
+  hh3cMirrorGroupDirection OBJECT-TYPE
+    SYNTAX      INTEGER{input(1),output(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Direction of data stream which would be mirrored."
+    ::= { hh3cMirrorGroupEntry 2 }
+
+  hh3cMirrorGroupMirrorIfIndexList OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (1..257))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "ifIndex list of source port."
+    ::= { hh3cMirrorGroupEntry 3 }
+
+  hh3cMirrorGroupMonitorIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of destination port."
+    ::= { hh3cMirrorGroupEntry 4 }
+
+  hh3cMirrorGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirrorGroupEntry 5 }
+
+  -- TABLE: hh3cFlowtempTable ------
+  hh3cFlowtempTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cFlowtempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Flow-template table which contains flow-template entry."
+    ::= { hh3cLswQosMibObject 14 }
+
+  hh3cFlowtempEntry OBJECT-TYPE
+    SYNTAX      Hh3cFlowtempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of flow-template."
+    INDEX {
+              hh3cFlowtempIndex
+          }
+    ::= { hh3cFlowtempTable 1 }
+
+  Hh3cFlowtempEntry ::=
+    SEQUENCE
+    {
+      hh3cFlowtempIndex    INTEGER,
+      hh3cFlowtempIpProtocol    TruthValue,
+      hh3cFlowtempTcpFlag    TruthValue,
+      hh3cFlowtempSPort    TruthValue,
+      hh3cFlowtempDPort    TruthValue,
+      hh3cFlowtempIcmpType    TruthValue,
+      hh3cFlowtempIcmpCode    TruthValue,
+      hh3cFlowtempFragment    TruthValue,
+      hh3cFlowtempDscp    TruthValue,
+      hh3cFlowtempIpPre    TruthValue,
+      hh3cFlowtempTos    TruthValue,
+      hh3cFlowtempSIp          TruthValue,
+      hh3cFlowtempSIpMask    IpAddress,
+      hh3cFlowtempDIp          TruthValue,
+      hh3cFlowtempDIpMask    IpAddress,
+      hh3cFlowtempEthProtocol    TruthValue,
+      hh3cFlowtempSMac          TruthValue,
+      hh3cFlowtempSMacMask    MacAddress,
+      hh3cFlowtempDMac          TruthValue,
+      hh3cFlowtempDMacMask    MacAddress,
+      hh3cFlowtempVpn    TruthValue,
+      hh3cFlowtempRowStatus    RowStatus,
+      hh3cFlowtempVlanId    TruthValue,
+      hh3cFlowtempCos    TruthValue
+    }
+
+  hh3cFlowtempIndex OBJECT-TYPE
+    SYNTAX      INTEGER{default(1), user-defined(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of flow template."
+    ::= { hh3cFlowtempEntry 1 }
+
+  hh3cFlowtempIpProtocol OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "protocol-type of IP packet."
+    ::= { hh3cFlowtempEntry 2 }
+
+  hh3cFlowtempTcpFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The flag of Tcp paceket. "
+    ::= { hh3cFlowtempEntry 3 }
+
+  hh3cFlowtempSPort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The port of source."
+    ::= { hh3cFlowtempEntry 4 }
+
+  hh3cFlowtempDPort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The port of destination."
+    ::= { hh3cFlowtempEntry 5 }
+
+  hh3cFlowtempIcmpType OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The type of Icmp."
+    ::= { hh3cFlowtempEntry 6 }
+
+  hh3cFlowtempIcmpCode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The code of Icmp."
+    ::= { hh3cFlowtempEntry 7 }
+
+  hh3cFlowtempFragment OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The flag of Fragment. "
+    ::= { hh3cFlowtempEntry 8 }
+
+  hh3cFlowtempDscp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Dscp of IP packet."
+    ::= { hh3cFlowtempEntry 9 }
+
+  hh3cFlowtempIpPre OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The Precedence of Ip packet. "
+    ::= { hh3cFlowtempEntry 10 }
+
+  hh3cFlowtempTos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Tos of IP packet."
+    ::= { hh3cFlowtempEntry 11 }
+
+  hh3cFlowtempSIp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The Ip of source."
+    ::= { hh3cFlowtempEntry 12 }
+
+  hh3cFlowtempSIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The mask of source-Ip."
+    ::= { hh3cFlowtempEntry 13 }
+
+  hh3cFlowtempDIp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The Ip of destination."
+    ::= { hh3cFlowtempEntry 14 }
+
+  hh3cFlowtempDIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The mask of destination-Ip."
+    ::= { hh3cFlowtempEntry 15 }
+
+  hh3cFlowtempEthProtocol OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Protocol type of Ethernet."
+    ::= { hh3cFlowtempEntry 16 }
+
+  hh3cFlowtempSMac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The Mac of source."
+    ::= { hh3cFlowtempEntry 17 }
+
+  hh3cFlowtempSMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The mask of source-Mac."
+    ::= { hh3cFlowtempEntry 18 }
+
+  hh3cFlowtempDMac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The mac of destination."
+    ::= { hh3cFlowtempEntry 19 }
+
+  hh3cFlowtempDMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The mask of destination-Mac."
+    ::= { hh3cFlowtempEntry 20 }
+
+  hh3cFlowtempVpn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vpn"
+    ::= { hh3cFlowtempEntry 21 }
+
+  hh3cFlowtempRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cFlowtempEntry 22 }
+
+  hh3cFlowtempVlanId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Source VLAN ID."
+    ::= { hh3cFlowtempEntry 23 }
+
+  hh3cFlowtempCos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "802.1P priority."
+    ::= { hh3cFlowtempEntry 24 }
+
+  -- TABLE: hh3cFlowtempEnableTable ------
+  hh3cFlowtempEnableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cFlowtempEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The table of flow-template."
+    ::= { hh3cLswQosMibObject 15 }
+
+  hh3cFlowtempEnableEntry OBJECT-TYPE
+    SYNTAX      Hh3cFlowtempEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Enable entry of flow-template."
+    INDEX {
+              hh3cFlowtempEnableIfIndex,
+              hh3cFlowtempEnableVlanID
+          }
+    ::= { hh3cFlowtempEnableTable 1 }
+
+  Hh3cFlowtempEnableEntry ::=
+    SEQUENCE
+    {
+      hh3cFlowtempEnableIfIndex    INTEGER,
+      hh3cFlowtempEnableVlanID    INTEGER,
+      hh3cFlowtempEnableFlowtempIndex  INTEGER
+    }
+
+  hh3cFlowtempEnableIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cFlowtempEnableEntry 1 }
+
+  hh3cFlowtempEnableVlanID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Vlan ID."
+    ::= { hh3cFlowtempEnableEntry 2 }
+
+  hh3cFlowtempEnableFlowtempIndex OBJECT-TYPE
+    SYNTAX      INTEGER{default(1), user-defined(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The index of Flowtemp table."
+    ::= { hh3cFlowtempEnableEntry 3 }
+
+  -- TABLE: hh3cTrafficShapeTable ------
+  hh3cTrafficShapeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTrafficShapeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The traffic-shape table which contains traffic-shape entry."
+    ::= { hh3cLswQosMibObject 16 }
+
+  hh3cTrafficShapeEntry OBJECT-TYPE
+    SYNTAX      Hh3cTrafficShapeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of traffic-shape."
+    INDEX {
+              hh3cTrafficShapeIfIndex,
+              hh3cTrafficShapeQueueId
+          }
+    ::= { hh3cTrafficShapeTable 1 }
+
+  Hh3cTrafficShapeEntry ::=
+    SEQUENCE
+    {
+      hh3cTrafficShapeIfIndex    INTEGER,
+      hh3cTrafficShapeQueueId    INTEGER,
+      hh3cTrafficShapeMaxRate    INTEGER,
+      hh3cTrafficShapeBurstSize    INTEGER,
+      hh3cTrafficShapeBufferLimit    INTEGER,
+      hh3cTrafficShapeRowStatus    RowStatus
+    }
+
+  hh3cTrafficShapeIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "IfIdex of port."
+    ::= { hh3cTrafficShapeEntry 1 }
+
+  hh3cTrafficShapeQueueId OBJECT-TYPE
+    SYNTAX      INTEGER(0..7|255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "ID of queue which would be shaped."
+    ::= { hh3cTrafficShapeEntry 2 }
+
+  hh3cTrafficShapeMaxRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The max rate."
+    ::= { hh3cTrafficShapeEntry 3 }
+
+  hh3cTrafficShapeBurstSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The size of burst."
+    ::= { hh3cTrafficShapeEntry 4 }
+
+  hh3cTrafficShapeBufferLimit OBJECT-TYPE
+    SYNTAX      INTEGER(0|16..8000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "The limit of buffer."
+    ::= { hh3cTrafficShapeEntry 5 }
+
+  hh3cTrafficShapeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cTrafficShapeEntry 6 }
+
+  -- TABLE: hh3cPortQueueTable ------
+  hh3cPortQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPortQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The port-queue table which contains port-queue entry."
+    ::= { hh3cLswQosMibObject 17 }
+
+  hh3cPortQueueEntry OBJECT-TYPE
+    SYNTAX      Hh3cPortQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of port-queue."
+    INDEX {
+              hh3cPortQueueIfIndex,
+              hh3cPortQueueQueueID
+          }
+    ::= { hh3cPortQueueTable 1 }
+
+  Hh3cPortQueueEntry ::=
+    SEQUENCE
+    {
+      hh3cPortQueueIfIndex    INTEGER,
+      hh3cPortQueueQueueID    INTEGER,
+      hh3cPortQueueWrrPriority    INTEGER,
+      hh3cPortQueueWeight    INTEGER
+    }
+
+  hh3cPortQueueIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cPortQueueEntry 1 }
+
+  hh3cPortQueueQueueID OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "ID of port-queue."
+    ::= { hh3cPortQueueEntry 2 }
+
+  hh3cPortQueueWrrPriority OBJECT-TYPE
+    SYNTAX      INTEGER{sp(1),wrr-high-priority(2),wrr-low-priority(3)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The priority of Wrr."
+    ::= { hh3cPortQueueEntry 3 }
+
+  hh3cPortQueueWeight OBJECT-TYPE
+    SYNTAX      INTEGER(0|1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The weight of this queue."
+    ::= { hh3cPortQueueEntry 4 }
+
+  -- TABLE: hh3cDropModeTable ------
+  hh3cDropModeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDropModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The drop-mode table which contains drop-mode entry."
+    ::= { hh3cLswQosMibObject 18 }
+
+  hh3cDropModeEntry OBJECT-TYPE
+    SYNTAX      Hh3cDropModeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of the drop-mode."
+    INDEX {
+              hh3cDropModeIfIndex
+          }
+    ::= { hh3cDropModeTable 1 }
+
+  Hh3cDropModeEntry ::=
+    SEQUENCE
+    {
+      hh3cDropModeIfIndex    INTEGER,
+      hh3cDropModeMode    INTEGER,
+      hh3cDropModeWredIndex    INTEGER
+    }
+
+  hh3cDropModeIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "ifIndex of port."
+    ::= { hh3cDropModeEntry 1 }
+
+  hh3cDropModeMode OBJECT-TYPE
+    SYNTAX      INTEGER{random-detect(1),tail-drop(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Mode."
+    DEFVAL      { 2 }
+    ::= { hh3cDropModeEntry 2 }
+
+  hh3cDropModeWredIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The index of Wred table."
+    ::= { hh3cDropModeEntry 3 }
+
+  -- TABLE: hh3cWredTable ------
+  hh3cWredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The Wred table which contains wred Entry."
+    ::= { hh3cLswQosMibObject 19 }
+
+  hh3cWredEntry OBJECT-TYPE
+    SYNTAX      Hh3cWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of Wred."
+    INDEX {
+              hh3cWredIndex,
+              hh3cWredQueueId
+          }
+    ::= { hh3cWredTable 1 }
+
+  Hh3cWredEntry ::=
+    SEQUENCE
+    {
+      hh3cWredIndex    INTEGER,
+      hh3cWredQueueId    INTEGER,
+      hh3cWredGreenMinThreshold    INTEGER,
+      hh3cWredGreenMaxThreshold    INTEGER,
+      hh3cWredGreenMaxProb    INTEGER,
+      hh3cWredYellowMinThreshold    INTEGER,
+      hh3cWredYellowMaxThreshold    INTEGER,
+      hh3cWredYellowMaxProb    INTEGER,
+      hh3cWredRedMinThreshold    INTEGER,
+      hh3cWredRedMaxThreshold    INTEGER,
+      hh3cWredRedMaxProb    INTEGER,
+      hh3cWredExponent    INTEGER
+    }
+
+  hh3cWredIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of wred."
+    ::= { hh3cWredEntry 1 }
+
+  hh3cWredQueueId OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Queue ID."
+    ::= { hh3cWredEntry 2 }
+
+  hh3cWredGreenMinThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The min threshold of Green."
+    ::= { hh3cWredEntry 3 }
+
+  hh3cWredGreenMaxThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max threshold of Greem."
+    ::= { hh3cWredEntry 4 }
+
+  hh3cWredGreenMaxProb OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max prob of Green."
+    ::= { hh3cWredEntry 5 }
+
+  hh3cWredYellowMinThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The min threshold of Yellow."
+    ::= { hh3cWredEntry 6 }
+
+  hh3cWredYellowMaxThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max threshold of Yellow."
+    ::= { hh3cWredEntry 7 }
+
+  hh3cWredYellowMaxProb OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The Prob threshold of Yellow."
+    ::= { hh3cWredEntry 8 }
+
+  hh3cWredRedMinThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The min threshold of Red."
+    ::= { hh3cWredEntry 9 }
+
+  hh3cWredRedMaxThreshold OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max threshold of Red."
+    ::= { hh3cWredEntry 10 }
+
+  hh3cWredRedMaxProb OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The max prob of Red."
+    ::= { hh3cWredEntry 11 }
+
+  hh3cWredExponent OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Exponent."
+    DEFVAL      { 9 }
+    ::= { hh3cWredEntry 12 }
+
+  -- TABLE: hh3cCosToLocalPrecedenceMapTable ------
+  hh3cCosToLocalPrecedenceMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCosToLocalPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table of map of the COS to local-precedence."
+    ::= { hh3cLswQosMibObject 20 }
+
+  hh3cCosToLocalPrecedenceMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cCosToLocalPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of map of the COS to local precedence."
+    INDEX {
+              hh3cCosToLocalPrecedenceMapCosIndex
+          }
+    ::= { hh3cCosToLocalPrecedenceMapTable 1 }
+
+  Hh3cCosToLocalPrecedenceMapEntry ::=
+    SEQUENCE
+    {
+      hh3cCosToLocalPrecedenceMapCosIndex    INTEGER,
+      hh3cCosToLocalPrecedenceMapLocalPrecedenceValue       INTEGER
+    }
+
+  hh3cCosToLocalPrecedenceMapCosIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of the map."
+    ::= { hh3cCosToLocalPrecedenceMapEntry 1 }
+
+  hh3cCosToLocalPrecedenceMapLocalPrecedenceValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Value of local precedence."
+    ::= { hh3cCosToLocalPrecedenceMapEntry 2 }
+
+  -- TABLE: hh3cCosToDropPrecedenceMapTable ------
+  hh3cCosToDropPrecedenceMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCosToDropPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The table of map of COS to drop-precedence."
+    ::= { hh3cLswQosMibObject 21 }
+
+  hh3cCosToDropPrecedenceMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cCosToDropPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of the map of the COS to drop-precedence."
+    INDEX {
+              hh3cCosToDropPrecedenceMapCosIndex
+          }
+    ::= { hh3cCosToDropPrecedenceMapTable 1 }
+
+  Hh3cCosToDropPrecedenceMapEntry ::=
+    SEQUENCE
+    {
+      hh3cCosToDropPrecedenceMapCosIndex    INTEGER,
+      hh3cCosToDropPrecedenceMapDropPrecedenceValue       INTEGER
+    }
+
+  hh3cCosToDropPrecedenceMapCosIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of the map."
+    ::= { hh3cCosToDropPrecedenceMapEntry 1 }
+
+  hh3cCosToDropPrecedenceMapDropPrecedenceValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Value of drop-precedence."
+    ::= { hh3cCosToDropPrecedenceMapEntry 2 }
+
+  -- TABLE: hh3cDscpMapTable ------
+  hh3cDscpMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Table of dscp map."
+    ::= { hh3cLswQosMibObject 22 }
+
+  hh3cDscpMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of Dscp map."
+    INDEX {
+              hh3cDscpMapConformLevel,
+              hh3cDscpMapDscpIndex
+          }
+    ::= { hh3cDscpMapTable 1 }
+
+  Hh3cDscpMapEntry ::=
+    SEQUENCE
+    {
+      hh3cDscpMapConformLevel    INTEGER,
+      hh3cDscpMapDscpIndex    INTEGER,
+      hh3cDscpMapDscpValue    INTEGER,
+      hh3cDscpMapExpValue    INTEGER,
+      hh3cDscpMapCosValue    INTEGER,
+      hh3cDscpMapLocalPrecedence    INTEGER,
+      hh3cDscpMapDropPrecedence    INTEGER
+    }
+
+  hh3cDscpMapConformLevel OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Conformable level of Dscp-map."
+    ::= { hh3cDscpMapEntry 1 }
+
+  hh3cDscpMapDscpIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of dscp."
+    ::= { hh3cDscpMapEntry 2 }
+
+  hh3cDscpMapDscpValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Value of Dscp."
+    ::= { hh3cDscpMapEntry 3 }
+
+  hh3cDscpMapExpValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Exp value."
+    ::= { hh3cDscpMapEntry 4 }
+
+  hh3cDscpMapCosValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "COS value."
+    ::= { hh3cDscpMapEntry 5 }
+
+  hh3cDscpMapLocalPrecedence OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The precedence of local."
+    ::= { hh3cDscpMapEntry 6 }
+
+  hh3cDscpMapDropPrecedence OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The precedence of Drop."
+    ::= { hh3cDscpMapEntry 7 }
+
+  -- TABLE: hh3cExpMapTable ------
+  hh3cExpMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cExpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The table of Exp-map"
+    ::= { hh3cLswQosMibObject 23 }
+
+  hh3cExpMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cExpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of Exp-map."
+    INDEX {
+              hh3cExpMapConformLevel,
+              hh3cExpMapExpIndex
+          }
+    ::= { hh3cExpMapTable 1 }
+
+  Hh3cExpMapEntry ::=
+    SEQUENCE
+    {
+      hh3cExpMapConformLevel    INTEGER,
+      hh3cExpMapExpIndex     INTEGER,
+      hh3cExpMapDscpValue    INTEGER,
+      hh3cExpMapExpValue    INTEGER,
+      hh3cExpMapCosValue    INTEGER,
+      hh3cExpMapLocalPrecedence    INTEGER,
+      hh3cExpMapDropPrecedence    INTEGER
+    }
+
+  hh3cExpMapConformLevel OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Conformable level of Exp-map."
+    ::= { hh3cExpMapEntry 1 }
+
+  hh3cExpMapExpIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Index of Exp."
+    ::= { hh3cExpMapEntry 2 }
+
+  hh3cExpMapDscpValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Dscp value."
+    ::= { hh3cExpMapEntry 3 }
+
+  hh3cExpMapExpValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Exp value."
+    ::= { hh3cExpMapEntry 4 }
+
+  hh3cExpMapCosValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "COS Value."
+    ::= { hh3cExpMapEntry 5 }
+
+  hh3cExpMapLocalPrecedence OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The precedence of local."
+    ::= { hh3cExpMapEntry 6 }
+
+  hh3cExpMapDropPrecedence OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The precedence of Drop."
+    ::= { hh3cExpMapEntry 7 }
+
+  -- TABLE: hh3cLocalPrecedenceMapTable ------
+  hh3cLocalPrecedenceMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLocalPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The table of local-precedence map."
+    ::= { hh3cLswQosMibObject 24 }
+
+  hh3cLocalPrecedenceMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cLocalPrecedenceMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuraion information of local-precedence map."
+    INDEX {
+              hh3cLocalPrecedenceMapConformLevel,
+              hh3cLocalPrecedenceMapLocalPrecedenceIndex
+          }
+    ::= { hh3cLocalPrecedenceMapTable 1 }
+
+  Hh3cLocalPrecedenceMapEntry ::=
+    SEQUENCE
+    {
+      hh3cLocalPrecedenceMapConformLevel    INTEGER,
+      hh3cLocalPrecedenceMapLocalPrecedenceIndex    INTEGER,
+      hh3cLocalPrecedenceMapCosValue       INTEGER
+    }
+
+  hh3cLocalPrecedenceMapConformLevel OBJECT-TYPE
+    SYNTAX      INTEGER(0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Conformable level of local-precedence map."
+    ::= { hh3cLocalPrecedenceMapEntry 1 }
+
+  hh3cLocalPrecedenceMapLocalPrecedenceIndex OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Index of local-precedence."
+    ::= { hh3cLocalPrecedenceMapEntry 2 }
+
+  hh3cLocalPrecedenceMapCosValue OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "COS value."
+    ::= { hh3cLocalPrecedenceMapEntry 3 }
+--
+--
+--
+  -- TABLE: hh3cPortWredTable ---------
+  hh3cPortWredTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPortWredEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "The table of PortWred."
+    ::= { hh3cLswQosMibObject 25 }
+
+
+  hh3cPortWredEntry OBJECT-TYPE
+    SYNTAX Hh3cPortWredEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "Configuration information of port Wred."
+    INDEX {
+              hh3cPortWredIfIndex,
+              hh3cPortWredQueueID
+          }
+    ::= { hh3cPortWredTable 1 }
+
+
+    Hh3cPortWredEntry ::=
+    SEQUENCE
+    {
+        hh3cPortWredIfIndex INTEGER,
+        hh3cPortWredQueueID INTEGER,
+        hh3cPortWredQueueStartLength INTEGER,
+        hh3cPortWredQueueProbability INTEGER
+    }
+
+  hh3cPortWredIfIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ifIndex of port."
+    ::= { hh3cPortWredEntry 1 }
+
+
+  hh3cPortWredQueueID OBJECT-TYPE
+    SYNTAX  INTEGER(0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "ID of port-Wred queue."
+    ::= { hh3cPortWredEntry 2 }
+
+
+  hh3cPortWredQueueStartLength OBJECT-TYPE
+    SYNTAX  INTEGER(0..2047)
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+      "Queue length."
+    ::= { hh3cPortWredEntry 3 }
+
+
+  hh3cPortWredQueueProbability OBJECT-TYPE
+    SYNTAX  INTEGER(0..100)
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+      "Probability."
+    ::= { hh3cPortWredEntry 4 }
+
+-- TABLE: hh3cMirroringGroupTable ---------
+  hh3cMirroringGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The table of MirrorGroup."
+    ::= { hh3cLswQosMibObject 26 }
+
+  hh3cMirroringGroupEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Configuration information of MirrorGroup."
+    INDEX  {
+    	       hh3cMirroringGroupID
+    	   }
+    ::= { hh3cMirroringGroupTable 1 }
+
+  Hh3cMirroringGroupEntry ::=
+    SEQUENCE
+    {
+      hh3cMirroringGroupID    INTEGER,
+      hh3cMirroringGroupType    INTEGER,
+      hh3cMirroringGroupStatus    INTEGER,
+      hh3cMirroringGroupRowStatus    RowStatus
+    }
+
+   hh3cMirroringGroupID  OBJECT-TYPE
+    SYNTAX      INTEGER(1..20)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "GroupID."
+    ::= { hh3cMirroringGroupEntry 1 }
+
+    hh3cMirroringGroupType  OBJECT-TYPE
+    SYNTAX      INTEGER{local(1),remote-source(2),remote-destination(3)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "GroupType."
+    ::= { hh3cMirroringGroupEntry 2 }
+
+    hh3cMirroringGroupStatus  OBJECT-TYPE
+    SYNTAX      INTEGER{active(1),inactive(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup status."
+    ::= { hh3cMirroringGroupEntry 3 }
+
+    hh3cMirroringGroupRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, Now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirroringGroupEntry 4 }
+
+  -- TABLE: hh3cMirroringGroupMirrorTable ---------
+  hh3cMirroringGroupMirrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup mirroring-port information."
+    ::= { hh3cLswQosMibObject 27 }
+
+  hh3cMirroringGroupMirrorEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupMirrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup mirroring-port information."
+    INDEX {
+              hh3cMirroringGroupID
+          }
+    ::= { hh3cMirroringGroupMirrorTable 1 }
+
+  Hh3cMirroringGroupMirrorEntry ::=
+    SEQUENCE
+    {
+      hh3cMirroringGroupMirrorInboundIfIndexList    OCTET STRING,
+      hh3cMirroringGroupMirrorOutboundIfIndexList    OCTET STRING,
+      hh3cMirroringGroupMirrorRowStatus    RowStatus,
+      hh3cMirroringGroupMirrorInTypeList         OCTET STRING,
+      hh3cMirroringGroupMirrorOutTypeList         OCTET STRING
+    }
+
+    hh3cMirroringGroupMirrorInboundIfIndexList  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Inbound-Mirror ifIndex(for port) and slot number(for board) list.
+
+      Example A describes the relation between values of
+      hh3cMirroringGroupMirrorInboundIfIndexList and hh3cMirroringGroupMirrorInTypeList.
+
+      Example A:
+      hh3cMirroringGroupMirrorInboundIfIndexList: '00000002 0C000022 00000007'
+      hh3cMirroringGroupMirrorInTypeList:         '00000002 00000001 00000002'
+
+      Every four octets represent an integer value.
+      The first four octets of them should be same. Here the value '00000002'
+      indicates there are two inbound mirror sources.
+      The following every four octets of hh3cMirroringGroupMirrorInboundIfIndexList
+      indicate an ifIndex or a slot number of mirror source. For '0C000022' and
+      '00000007' in the value of hh3cMirroringGroupMirrorInboundIfIndexList above,
+      the corresponding value of hh3cMirroringGroupMirrorInTypeList is '00000001'
+      and '00000002'(00000001 means the mirror source is port, 00000002 means the 
+      mirror source is board, the meaning reference the object Hh3cMirrorOrMonitorType), 
+      then '0C000022' indicates an ifIndex value 201326626(decimal), and '00000007' 
+      indicates a slot with number 7(decimal).
+
+      Values with different types(port/board) should be set in separate set operations.
+      If one value with port type and one value with board type are set with same
+      hh3cMirroringGroupID separately, the result of get operation for that entry
+      will be like the example A above.
+      
+      If hh3cMirroringGroupMirrorInTypeList is not supported, the first four octets
+      of hh3cMirroringGroupMirrorInboundIfIndexList also indicates the number of mirror
+      source, but the following octets are values for ifIndex(port type).
+
+      hh3cMirroringGroupMirrorOutboundIfIndexList and hh3cMirroringGroupMirrorOutTypeList
+      are a pair and have the same relations like hh3cMirroringGroupMirrorInboundIfIndexList
+      and hh3cMirroringGroupMirrorInTypeList pair.
+      "
+    ::= { hh3cMirroringGroupMirrorEntry 1 }
+
+    hh3cMirroringGroupMirrorOutboundIfIndexList  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Outbound-Mirror ifIndex and slot number list.
+      Please refer to the description of hh3cMirroringGroupMirrorInboundIfIndexList."
+    ::= { hh3cMirroringGroupMirrorEntry 2 }
+
+    hh3cMirroringGroupMirrorRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirroringGroupMirrorEntry 3 }
+    
+    hh3cMirroringGroupMirrorInTypeList  OBJECT-TYPE
+    SYNTAX      OCTET STRING 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Inbound-Mirror type list.
+      Please refer to the description of hh3cMirroringGroupMirrorInboundIfIndexList."
+      
+    ::= { hh3cMirroringGroupMirrorEntry 4 }
+    
+    hh3cMirroringGroupMirrorOutTypeList  OBJECT-TYPE
+    SYNTAX      OCTET STRING    
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Outbound-Mirror type list.
+      Please refer to the description of hh3cMirroringGroupMirrorInboundIfIndexList."
+    ::= { hh3cMirroringGroupMirrorEntry 5 }
+
+  -- TABLE: hh3cMirroringGroupMonitorTable ---------
+  hh3cMirroringGroupMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup monitor-port information."
+    ::= { hh3cLswQosMibObject 28 }
+
+  hh3cMirroringGroupMonitorEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup monitor-port information."
+    INDEX {
+              hh3cMirroringGroupID
+          }
+    ::= { hh3cMirroringGroupMonitorTable 1 }
+
+  Hh3cMirroringGroupMonitorEntry ::=
+    SEQUENCE
+    {
+      hh3cMirroringGroupMonitorIfIndex    INTEGER,
+      hh3cMirroringGroupMonitorRowStatus    RowStatus,
+      hh3cMirroringGroupMonitorType Hh3cMirrorOrMonitorType
+    }
+
+    hh3cMirroringGroupMonitorIfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "If the monitor destination is port, the value means the ifIndex of this port.
+      If the monitor destination is board, the value means the slot number of the
+      board. Whether the value means ifIndex or slot number references the object
+      hh3cMirroringGroupMonitorType."
+    ::= { hh3cMirroringGroupMonitorEntry 1 }
+
+    hh3cMirroringGroupMonitorRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirroringGroupMonitorEntry 2 }
+
+    hh3cMirroringGroupMonitorType  OBJECT-TYPE
+    SYNTAX      Hh3cMirrorOrMonitorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Specify whether the monitor destination is port or board. If this object is
+      not supported, then the value of hh3cMirroringGroupMonitorIfIndex means ifIndex."
+    ::= { hh3cMirroringGroupMonitorEntry 3 }
+
+  -- TABLE: hh3cMirroringGroupReflectorTable ---------
+  hh3cMirroringGroupReflectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup reflector-port information."
+    ::= { hh3cLswQosMibObject 29 }
+
+  hh3cMirroringGroupReflectorEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupReflectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup reflector-port information."
+    INDEX {
+              hh3cMirroringGroupID
+          }
+    ::= { hh3cMirroringGroupReflectorTable 1 }
+
+  Hh3cMirroringGroupReflectorEntry ::=
+    SEQUENCE
+    {
+      hh3cMirroringGroupReflectorIfIndex    INTEGER,
+      hh3cMirroringGroupReflectorRowStatus    RowStatus
+    }
+
+  hh3cMirroringGroupReflectorIfIndex   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Only valid for remote-source MirroringGroup."
+    ::= { hh3cMirroringGroupReflectorEntry 1 }
+
+  hh3cMirroringGroupReflectorRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirroringGroupReflectorEntry 2 }
+
+  -- TABLE: hh3cMirroringGroupRprobeVlanTable ---------
+  hh3cMirroringGroupRprobeVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupRprobeVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup rprobe-vlan information."
+    ::= { hh3cLswQosMibObject 30 }
+
+  hh3cMirroringGroupRprobeVlanEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupRprobeVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MirroringGroup rprobe-vlan information."
+    INDEX {
+              hh3cMirroringGroupID
+          }
+    ::= { hh3cMirroringGroupRprobeVlanTable 1 }
+
+  Hh3cMirroringGroupRprobeVlanEntry ::=
+    SEQUENCE
+    {
+      hh3cMirroringGroupRprobeVlanID    INTEGER,
+      hh3cMirroringGroupRprobeVlanRowStatus    RowStatus
+    }
+
+  hh3cMirroringGroupRprobeVlanID   OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Remote-Probe vlanID.
+      0 is invalid value.
+      Only valid for remote-source and remote-destination MirroringGroup."
+    ::= { hh3cMirroringGroupRprobeVlanEntry 1 }
+
+  hh3cMirroringGroupRprobeVlanRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "RowStatus, now support three status: createAndGo, active, destroy."
+    ::= { hh3cMirroringGroupRprobeVlanEntry 2 }
+
+  hh3cMirroringGroupMirrorMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupMirrorMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MirroringGroup MAC information."
+    ::= { hh3cLswQosMibObject 31 }
+
+  hh3cMirroringGroupMirrorMacEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupMirrorMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MirroringGroup MAC information."
+    INDEX {
+           hh3cMirroringGroupID,
+           hh3cMirroringGroupMirrorMacSeq
+          }
+    ::= { hh3cMirroringGroupMirrorMacTable 1 }
+
+  Hh3cMirroringGroupMirrorMacEntry ::=
+    SEQUENCE
+    {
+       hh3cMirroringGroupMirrorMacSeq  Integer32,
+       hh3cMirroringGroupMirrorMac  MacAddress,
+       hh3cMirrorMacVlanID   Integer32,
+       hh3cMirroringGroupMirroMacStatus RowStatus
+    }
+
+  hh3cMirroringGroupMirrorMacSeq   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "The sequence MAC number of the same group."
+    ::= { hh3cMirroringGroupMirrorMacEntry 1 }
+
+  hh3cMirroringGroupMirrorMac   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The MAC address of the MirroringGroup."
+    ::= { hh3cMirroringGroupMirrorMacEntry 2 }
+
+  hh3cMirrorMacVlanID   OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The vlan ID of MAC address ."
+    ::= { hh3cMirroringGroupMirrorMacEntry 3 }
+
+  hh3cMirroringGroupMirroMacStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The status of this conceptual row."
+    ::= { hh3cMirroringGroupMirrorMacEntry 4 }
+
+  hh3cMirroringGroupMirrorVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirroringGroupMirrorVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "MirroringGroup Vlan Information."
+    ::= { hh3cLswQosMibObject 32 }
+
+  hh3cMirroringGroupMirrorVlanEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirroringGroupMirrorVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "MirroringGroup Vlan Information."
+    INDEX {
+           hh3cMirroringGroupID,
+           hh3cMirroringGroupMirrorVlanSeq
+           }
+    ::= { hh3cMirroringGroupMirrorVlanTable 1 }
+
+  Hh3cMirroringGroupMirrorVlanEntry ::=
+    SEQUENCE
+    {
+       hh3cMirroringGroupMirrorVlanSeq Integer32,
+       hh3cMirroringGroupMirrorVlanID Integer32,
+       hh3cMirroringGroupMirrorVlanDirection INTEGER,
+       hh3cMirroringGroupMirroVlanStatus RowStatus
+    }
+
+  hh3cMirroringGroupMirrorVlanSeq   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "The sequence vlan number of the same group."
+    ::= { hh3cMirroringGroupMirrorVlanEntry  1 }
+
+  hh3cMirroringGroupMirrorVlanID   OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The vlan ID of MirroringGroup."
+    ::= { hh3cMirroringGroupMirrorVlanEntry  2 }
+
+  hh3cMirroringGroupMirrorVlanDirection   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       inbound(1),
+       outbound(2),
+       both(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The vlan direction of MirroringGroup."
+    ::= { hh3cMirroringGroupMirrorVlanEntry  3 }
+
+  hh3cMirroringGroupMirroVlanStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The status of this conceptual row."
+    ::= { hh3cMirroringGroupMirrorVlanEntry  4 }
+
+  hh3cPortTrustTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPortTrustEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Port trust information."
+    ::= { hh3cLswQosMibObject 33 }
+
+  hh3cPortTrustEntry OBJECT-TYPE
+    SYNTAX      Hh3cPortTrustEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Port trust information."
+    INDEX  {
+             hh3cPortTrustIfIndex
+           }
+     ::= { hh3cPortTrustTable 1 }
+
+  Hh3cPortTrustEntry ::=
+    SEQUENCE
+    {
+       hh3cPortTrustIfIndex Integer32,
+       hh3cPortTrustTrustType INTEGER,
+       hh3cPortTrustOvercastType INTEGER,
+       hh3cPortTrustReset INTEGER
+    }
+
+  hh3cPortTrustIfIndex   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "ifIndex of the port which port trust is configured."
+    ::= { hh3cPortTrustEntry  1 }
+
+  hh3cPortTrustTrustType   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        port(1),  -- port untrust
+        cos(2),   -- port trust cos
+        dscp(3)   -- port trust dscp
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Trust type of port trust."
+    DEFVAL      { port }
+    ::= { hh3cPortTrustEntry  2 }
+
+  hh3cPortTrustOvercastType   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        noOvercast(1),
+        overcastDSCP(2),
+        overcastCOS(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Overcast type of port trust."
+    DEFVAL      { noOvercast }
+    ::= { hh3cPortTrustEntry  3 }
+
+    hh3cPortTrustReset   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset port trust to default value.
+          Read operation is meaningless."
+    ::= { hh3cPortTrustEntry  4 }
+
+  hh3cRemarkVlanIDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRemarkVlanIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Remark vlan ID information."
+    ::= { hh3cLswQosMibObject 34 }
+
+  hh3cRemarkVlanIDEntry OBJECT-TYPE
+    SYNTAX      Hh3cRemarkVlanIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Remark vlan ID information."
+    INDEX {
+              hh3cRemarkVlanIDAclIndex,
+              hh3cRemarkVlanIDIfIndex,
+              hh3cRemarkVlanIDVlanID,
+              hh3cRemarkVlanIDDirection
+          }
+    ::= { hh3cRemarkVlanIDTable 1 }
+
+    Hh3cRemarkVlanIDEntry ::=
+    SEQUENCE
+    {
+       hh3cRemarkVlanIDAclIndex         Integer32,
+       hh3cRemarkVlanIDIfIndex          Integer32,
+       hh3cRemarkVlanIDVlanID           Integer32,
+       hh3cRemarkVlanIDDirection        INTEGER,
+       hh3cRemarkVlanIDUserAclNum       Integer32,
+       hh3cRemarkVlanIDUserAclRule      Integer32,
+       hh3cRemarkVlanIDIpAclNum         Integer32,
+       hh3cRemarkVlanIDIpAclRule        Integer32,
+       hh3cRemarkVlanIDLinkAclNum       Integer32,
+       hh3cRemarkVlanIDLinkAclRule      Integer32,
+       hh3cRemarkVlanIDRemarkVlanID     Integer32,
+       hh3cRemarkVlanIDPacketType       INTEGER,
+       hh3cRemarkVlanIDRowStatus        RowStatus
+    }
+
+  hh3cRemarkVlanIDAclIndex   OBJECT-TYPE
+    SYNTAX      Integer32(0..2999)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Action identifier, acl index."
+    ::= { hh3cRemarkVlanIDEntry  1 }
+
+  hh3cRemarkVlanIDIfIndex   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Action identifier, ifIndex."
+    ::= { hh3cRemarkVlanIDEntry  2 }
+
+  hh3cRemarkVlanIDVlanID   OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Action identifier, vlan ID."
+    ::= { hh3cRemarkVlanIDEntry  3 }
+
+  hh3cRemarkVlanIDDirection   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       invalid(0),
+       input(1),
+       output(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Action identifier, direction of data stream."
+    ::= { hh3cRemarkVlanIDEntry  4 }
+
+  hh3cRemarkVlanIDUserAclNum   OBJECT-TYPE
+    SYNTAX      Integer32(0|5000..5999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The number of the user acl."
+    ::= { hh3cRemarkVlanIDEntry  5 }
+
+  hh3cRemarkVlanIDUserAclRule   OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The subitem of the user acl."
+    ::= { hh3cRemarkVlanIDEntry  6 }
+
+  hh3cRemarkVlanIDIpAclNum   OBJECT-TYPE
+    SYNTAX      Integer32(0|2000..3999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The num of the IP acl."
+    ::= { hh3cRemarkVlanIDEntry  7 }
+
+  hh3cRemarkVlanIDIpAclRule   OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The subitem of the IP acl."
+    ::= { hh3cRemarkVlanIDEntry  8 }
+
+  hh3cRemarkVlanIDLinkAclNum   OBJECT-TYPE
+    SYNTAX      Integer32(0|4000..4999|10000..12999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The num of the link acl."
+    ::= { hh3cRemarkVlanIDEntry  9 }
+
+  hh3cRemarkVlanIDLinkAclRule   OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The subitem of the link acl."
+    ::= { hh3cRemarkVlanIDEntry  10 }
+
+  hh3cRemarkVlanIDRemarkVlanID   OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "Remark vlan ID."
+    ::= { hh3cRemarkVlanIDEntry 11 }
+
+  hh3cRemarkVlanIDPacketType   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        all(1),
+        tagged(2),
+        untagged(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "Packet type of the remarked vlan ID."
+    ::= { hh3cRemarkVlanIDEntry 12 }
+
+  hh3cRemarkVlanIDRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+          "The status of this conceptual row. "
+    ::= { hh3cRemarkVlanIDEntry 13 }
+
+  hh3cCosToDscpMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCosToDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "COS to DSCP map information."
+    ::= { hh3cLswQosMibObject 35 }
+
+  hh3cCosToDscpMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cCosToDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "COS to DSCP map information."
+    INDEX {
+             hh3cCosToDscpMapCosIndex
+          }
+    ::= { hh3cCosToDscpMapTable 1 }
+
+  Hh3cCosToDscpMapEntry ::=
+    SEQUENCE
+    {
+      hh3cCosToDscpMapCosIndex     Integer32,
+      hh3cCosToDscpMapDscpValue    Integer32,
+      hh3cCosToDscpMapReSet        INTEGER
+    }
+
+  hh3cCosToDscpMapCosIndex   OBJECT-TYPE
+    SYNTAX    Integer32(0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "COS index of COS to DSCP map."
+    ::= { hh3cCosToDscpMapEntry 1 }
+
+  hh3cCosToDscpMapDscpValue   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "DSCP value of COS to DSCP map."
+    ::= { hh3cCosToDscpMapEntry 2 }
+
+  hh3cCosToDscpMapReSet   OBJECT-TYPE
+    SYNTAX    INTEGER
+    {
+        reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset COS to DSCP map to default value.
+          Read operation is meaningless."
+    ::= { hh3cCosToDscpMapEntry 3 }
+
+  hh3cDscpToLocalPreMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDscpToLocalPreMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to Local-precedence map information."
+    ::= { hh3cLswQosMibObject 36 }
+
+  hh3cDscpToLocalPreMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cDscpToLocalPreMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to Local-precedence map information."
+    INDEX {
+             hh3cDscpToLocalPreMapDscpIndex
+          }
+    ::= { hh3cDscpToLocalPreMapTable 1 }
+
+  Hh3cDscpToLocalPreMapEntry ::=
+    SEQUENCE
+    {
+      hh3cDscpToLocalPreMapDscpIndex     Integer32,
+      hh3cDscpToLocalPreMapLocalPreVal   Integer32,
+      hh3cDscpToLocalPreMapReset         INTEGER
+    }
+
+  hh3cDscpToLocalPreMapDscpIndex   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP Index of DSCP to Local-precedence map."
+    ::= { hh3cDscpToLocalPreMapEntry 1 }
+
+  hh3cDscpToLocalPreMapLocalPreVal   OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Local-precedence value of DSCP to Local-precedence map."
+    ::= { hh3cDscpToLocalPreMapEntry 2 }
+
+  hh3cDscpToLocalPreMapReset   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset DSCP to Local-precedence map to default value.
+           Read operation is meaningless."
+    ::= { hh3cDscpToLocalPreMapEntry 3 }
+
+  hh3cDscpToDropPreMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDscpToDropPreMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to Drop-precedence map information."
+    ::= { hh3cLswQosMibObject 37 }
+
+  hh3cDscpToDropPreMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cDscpToDropPreMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to Drop-precedence map information."
+    INDEX {
+             hh3cDscpToDropPreMapDscpIndex
+          }
+    ::= { hh3cDscpToDropPreMapTable 1 }
+
+  Hh3cDscpToDropPreMapEntry ::=
+    SEQUENCE
+    {
+      hh3cDscpToDropPreMapDscpIndex    Integer32,
+      hh3cDscpToDropPreMapDropPreVal   Integer32,
+      hh3cDscpToDropPreMapReset        INTEGER
+    }
+
+  hh3cDscpToDropPreMapDscpIndex   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP Index of DSCP to Drop-precedence map."
+    ::= { hh3cDscpToDropPreMapEntry 1 }
+
+  hh3cDscpToDropPreMapDropPreVal   OBJECT-TYPE
+    SYNTAX      Integer32(0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Drop-precedence value of DSCP to Drop-precedence map."
+    ::= { hh3cDscpToDropPreMapEntry 2 }
+
+  hh3cDscpToDropPreMapReset   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset DSCP to Drop-precedence map to default value.
+          Read operation is meaningless."
+    ::= { hh3cDscpToDropPreMapEntry 3 }
+
+  hh3cDscpToCosMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDscpToCosMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to COS map information."
+    ::= { hh3cLswQosMibObject 38 }
+
+  hh3cDscpToCosMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cDscpToCosMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to COS map information."
+    INDEX {
+             hh3cDscpToCosMapDscpIndex
+          }
+    ::= { hh3cDscpToCosMapTable 1 }
+
+  Hh3cDscpToCosMapEntry ::=
+    SEQUENCE
+    {
+      hh3cDscpToCosMapDscpIndex   Integer32,
+      hh3cDscpToCosMapCosValue    Integer32,
+      hh3cDscpToCosMapReset       INTEGER
+    }
+
+  hh3cDscpToCosMapDscpIndex   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP index of DSCP to COS map."
+    ::= { hh3cDscpToCosMapEntry 1 }
+
+  hh3cDscpToCosMapCosValue   OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "COS value of DSCP to COS map."
+    ::= { hh3cDscpToCosMapEntry 2 }
+
+  hh3cDscpToCosMapReset   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset DSCP to COS map to default value.
+          Read operation is meaningless."
+    ::= { hh3cDscpToCosMapEntry 3 }
+
+  hh3cDscpToDscpMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDscpToDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to DSCP map information."
+    ::= { hh3cLswQosMibObject 39 }
+
+    hh3cDscpToDscpMapEntry OBJECT-TYPE
+    SYNTAX      Hh3cDscpToDscpMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP to DSCP map information."
+    INDEX {
+             hh3cDscpToDscpMapDscpIndex
+          }
+    ::= { hh3cDscpToDscpMapTable 1 }
+
+  Hh3cDscpToDscpMapEntry ::=
+    SEQUENCE
+    {
+      hh3cDscpToDscpMapDscpIndex  Integer32,
+      hh3cDscpToDscpMapDscpValue  Integer32,
+      hh3cDscpToDscpMapReset    INTEGER
+    }
+
+  hh3cDscpToDscpMapDscpIndex   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "DSCP index of DSCP to DSCP map."
+    ::= { hh3cDscpToDscpMapEntry 1 }
+
+  hh3cDscpToDscpMapDscpValue   OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "DSCP value of DSCP to DSCP map."
+    ::= { hh3cDscpToDscpMapEntry 2 }
+
+  hh3cDscpToDscpMapReset    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+       reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to reset DSCP to DSCP map to default value.
+          Read operation is meaningless."
+    ::= { hh3cDscpToDscpMapEntry 3 }
+
+END

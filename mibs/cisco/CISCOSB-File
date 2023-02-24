@@ -17,7 +17,7 @@ IMPORTS
     OBJECT-TYPE                                 FROM SNMPv2-SMI;
 
 rlFile MODULE-IDENTITY
-      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      	LAST-UPDATED "201304010001Z"  -- April 1, 2013
 		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
@@ -34,6 +34,17 @@ rlFile MODULE-IDENTITY
       	DESCRIPTION
               "Added MODULE-IDENTITY"
         ::= { switch001 96 }
+FilePermission ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "File permission"
+    SYNTAX      BITS {
+            read(0),
+            write(1),
+            execute(2),
+            dir(3)
+    }
+
 
 rlFileMibVersion OBJECT-TYPE
     SYNTAX      INTEGER
@@ -63,7 +74,7 @@ rlFileEntry  OBJECT-TYPE
 
 RlFileEntry ::= SEQUENCE {
     rlFileName                          OCTET STRING,
-    rlFilePermission                    INTEGER,
+    rlFilePermission                    FilePermission,
     rlFileSize                          INTEGER,
     rlFileModificationDate              DisplayString,
     rlFileModificationTime              DisplayString,
@@ -73,7 +84,7 @@ RlFileEntry ::= SEQUENCE {
 }
 
 rlFileName OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(1..128))
+    SYNTAX      OCTET STRING(SIZE(1..160))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -81,16 +92,11 @@ rlFileName OBJECT-TYPE
     ::=  { rlFileEntry 1 }
 
 rlFilePermission OBJECT-TYPE
-    SYNTAX  INTEGER {
-        read(1),
-        write(2),
-        readWrite(3),
-        noReadNoWrite(4)
-    }
+    SYNTAX  FilePermission
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Specifies the permission level in which this file can be accessed. "
+        "permission level bitmap. "
     ::= { rlFileEntry 2 }
 
 rlFileSize OBJECT-TYPE
@@ -172,7 +178,7 @@ RlFileActionEntry ::= SEQUENCE {
 }
 
 rlFileActionName OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(1..128))
+    SYNTAX      OCTET STRING (SIZE(1..160))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -180,7 +186,7 @@ rlFileActionName OBJECT-TYPE
     ::=  { rlFileActionEntry 1 }
 
 rlFileActionNewName OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(1..128))
+    SYNTAX      OCTET STRING (SIZE(1..160))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -232,5 +238,21 @@ rlFileAuditingEnable  OBJECT-TYPE
          should be issued on file rename/delete events"
     DEFVAL { true }
     ::= { rlFile 6 }
+
+rlFileTotalSizeOfUSB OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the total size of the USB in bytes."
+    ::= {rlFile 7 }
+
+rlFileFreeSizeOfUSB OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of free bytes in the USB."
+    ::= {rlFile 8 }
 
 END

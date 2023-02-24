@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'sgos_average_requests');
+$rrd_filename = Rrd::name($device['hostname'], 'sgos_average_requests');
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -12,7 +12,6 @@ $colour_line = '0000cc';
 $colour_area_max = '9999cc';
 
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'Requests';
 

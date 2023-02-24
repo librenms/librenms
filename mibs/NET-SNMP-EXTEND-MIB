@@ -17,7 +17,7 @@ IMPORTS
 
 
 netSnmpExtendMIB MODULE-IDENTITY
-    LAST-UPDATED "200405080000Z"
+    LAST-UPDATED "201003170000Z"
     ORGANIZATION "www.net-snmp.org"
     CONTACT-INFO    
 	 "postal:   Wes Hardaker
@@ -27,6 +27,9 @@ netSnmpExtendMIB MODULE-IDENTITY
           email:    net-snmp-coders@lists.sourceforge.net"
     DESCRIPTION
 	 "Defines a framework for scripted extensions for the Net-SNMP agent."
+    REVISION     "201003170000Z"
+    DESCRIPTION
+         "Fixed inconsistencies in the definition of nsExtendConfigTable."
     REVISION     "200405080000Z"
     DESCRIPTION
 	"First revision."
@@ -211,8 +214,8 @@ nsExtendOutput1Entry     OBJECT-TYPE
 NsExtendOutput1Entry ::= SEQUENCE {
     nsExtendOutput1Line DisplayString,
     nsExtendOutputFull  DisplayString,
-    nsExtendOutNumLines INTEGER,
-    nsExtendResult      INTEGER
+    nsExtendOutNumLines Integer32,
+    nsExtendResult      Integer32
 }
 
 nsExtendOutput1Line OBJECT-TYPE

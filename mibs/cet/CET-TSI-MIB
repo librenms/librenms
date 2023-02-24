@@ -1,0 +1,1732 @@
+--****************************************
+--  CET MIB file definition for TSI 
+--
+--  Vs 1.1 written by Nicolas Marique  
+--****************************************
+
+CET-TSI-MIB DEFINITIONS ::= BEGIN
+    IMPORTS	
+			MODULE-IDENTITY,
+			OBJECT-TYPE, 		
+			NOTIFICATION-TYPE, 
+			Integer32
+				 FROM SNMPv2-SMI
+			cetMIB
+				 FROM CET-TSI-SMI
+			DisplayString, DateAndTime
+				 FROM SNMPv2-TC
+			MODULE-COMPLIANCE, 
+			OBJECT-GROUP,
+			NOTIFICATION-GROUP                  
+				 FROM SNMPv2-CONF;
+
+    
+    cetTSIMIB MODULE-IDENTITY		
+			LAST-UPDATED "200712051000Z" -- 05/12/2007 10:00 AM
+			ORGANIZATION "CE+T"
+			CONTACT-INFO "Construction Electronique + Telecommunication (CE+T)
+    
+										Postal: Rue du charbonnage, 12
+														B-4020 Wandre
+														BELGIUM
+				
+										Tel: ++3243456742
+				
+										E-mail: n.marique@cet.be"
+
+			DESCRIPTION "CET MIB file definition for TSI"	
+
+			REVISION    "200712051000Z" -- 05/12/2007 10:00 AM
+			DESCRIPTION "Update of MIB file content to match database
+									 that can be retrieved using T2S Modbus protocol Vs 2.00
+									 
+									 This include :
+									 
+									 - Addition of tsiRestrained and tsiEPC items in tsiModuleTable
+									 
+									 - Modification of some DESCRIPTION fields in tsiPhaseTable to
+									   clarify installed and available power notion
+									 
+									 - Addition of tsiACGroupACinFreq in tsiACGroupTable
+									 
+									 - Deprecation of tsiT2SSoftwareVersion in tsiT2SInfo
+									 
+									 - Addition of tsiT2SMainSoftwareVersion, tsiT2SSubSoftwareVersion,
+									   tsiT2SMaxKnownParameters and tsiT2SVersionTextError in tsiT2SInfo
+										 
+									 - Addition of tsiConfiguration node and associated subtree
+									 
+									 - Addition of Conformance clause and group for deprecated objects"
+
+			REVISION    "200708130900Z" -- 13/08/2007 09:00 AM
+			DESCRIPTION "First Release of the TSI MIB definition file"
+	    
+	    -- OID : 1.3.6.1.4.1.12551.4
+	    ::= { cetMIB 4 }		
+
+--==================
+--  TSI Subtree
+--==================
+    
+		-- OID : 1.3.6.1.4.1.12551.4.1
+    tsiObjects     OBJECT IDENTIFIER ::= { cetTSIMIB 1 }
+    
+    -- OID : 1.3.6.1.4.1.12551.4.2
+    tsiConformance OBJECT IDENTIFIER ::= { cetTSIMIB 2 }
+
+--================================================================================
+--                            TSI Objects  
+--================================================================================
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.1
+		tsiModules						OBJECT IDENTIFIER ::= { tsiObjects 1 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.2
+		tsiPhases							OBJECT IDENTIFIER ::= { tsiObjects 2 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.3
+		tsiACGroups						OBJECT IDENTIFIER	::= { tsiObjects 3 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.4
+		tsiDCGroups						OBJECT IDENTIFIER ::= { tsiObjects 4 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.5
+		tsiAlarms							OBJECT IDENTIFIER ::= { tsiObjects 5 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.6
+		tsiTraps							OBJECT IDENTIFIER ::= { tsiObjects 6 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.7
+		tsiEventDescription		OBJECT IDENTIFIER ::= { tsiObjects 7 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.8
+		tsiT2SInfo						OBJECT IDENTIFIER ::= { tsiObjects 8 }
+
+		-- OID : 1.3.6.1.4.1.12551.4.1.9
+		tsiConfiguration			OBJECT IDENTIFIER ::= { tsiObjects 9 }
+
+--=======================
+--	TSI Modules Subtree
+--=======================
+
+		--OID : 1.3.6.1.4.1.12551.4.1.1.1
+		tsiModuleTable OBJECT-TYPE
+       SYNTAX						SEQUENCE  OF  TsiModuleTableEntry
+       MAX-ACCESS				not-accessible
+       STATUS						current
+       DESCRIPTION			"Table describing the different values related to
+												 the TSI modules such as voltages, current, status, ..."
+	  ::=  { tsiModules  1 }
+       
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1
+		tsiModuleTableEntry OBJECT-TYPE
+       SYNTAX      TsiModuleTableEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+       INDEX    {  tsiModuleTableIndex  }
+	  ::=  { tsiModuleTable 1 }
+
+		TsiModuleTableEntry ::=  SEQUENCE {
+			tsiModuleTableIndex				Integer32,
+			tsiModuleSeen							INTEGER,
+			tsiModuleACOutState				INTEGER,
+			tsiModuleACInState				INTEGER,
+			tsiModuleDCInState				INTEGER,
+			tsiModuleAddress					Integer32,
+			tsiModuleInputRepartition Integer32,
+			tsiModuleLoadRatioW				Integer32,
+			tsiModuleLoadRatioVA			Integer32,
+			tsiModulePhaseNumber			Integer32,
+			tsiModuleACGroupNumber		Integer32,
+			tsiModuleDCGroupNumber		Integer32,
+			tsiModuleStatus						Integer32,
+			tsiModuleACInStatus				Integer32,
+			tsiModuleDCInStatus				Integer32,
+			tsiModuleVout							Integer32,
+			tsiModuleIout							Integer32,
+			tsiModulePoutW						Integer32,
+			tsiModulePoutVA						Integer32,
+			tsiModuleVinAC						Integer32,
+			tsiModuleIinAC						Integer32,
+			tsiModulePinACW						Integer32,
+			tsiModulePinACVA					Integer32,
+			tsiModuleACinFreq					Integer32,
+			tsiModuleVinDC						Integer32,
+			tsiModuleIinDC						Integer32,
+			tsiModulePinDC						Integer32,
+			tsiModuleTemperature			Integer32,
+			tsiModuleSoftwareVersion  Integer32,
+			tsiModuleSerialNumber			Integer32,
+			tsiModuleNominalPoutW			Integer32,
+			tsiModuleNominalPoutVA		Integer32,	
+			tsiModuleNominalVinAC			Integer32,
+			tsiModuleNominalVinDC			Integer32,
+			tsiModuleNominalFreqAC		Integer32,
+			tsiRestrained							INTEGER,
+			tsiEPC										INTEGER
+		}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.1
+		tsiModuleTableIndex OBJECT-TYPE 
+      SYNTAX         Integer32 (1..32)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "Inverter identifier"
+		::=  {  tsiModuleTableEntry  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.2
+		tsiModuleSeen			 OBJECT-TYPE 
+      SYNTAX						 INTEGER {
+													 no(0),
+													 yes(1)
+												 }
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Flag indicating if the module is seen 
+											 on the communication bus or not"
+		::=  {  tsiModuleTableEntry  2  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.3
+		tsiModuleACOutState OBJECT-TYPE 
+      SYNTAX						 INTEGER {
+													 sbr(0),
+													 sb(1),
+													 sbwe(2),
+													 sbwre(3),
+													 unknown(4)
+												 }
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Status of the module AC output stage"
+		::=  {  tsiModuleTableEntry  3  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.4
+		tsiModuleACInState OBJECT-TYPE 
+      SYNTAX					INTEGER {
+												ok(0),
+												safe(1),
+												notSync(2),
+												off(3),
+												unknown(4)
+											}
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Status of the module AC input stage"
+		::=  {  tsiModuleTableEntry  4  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.5
+		tsiModuleDCInState	OBJECT-TYPE 
+      SYNTAX						INTEGER {
+													ok(0),
+													fail(1),
+													unknown(2)
+												}
+      MAX-ACCESS				read-only
+      STATUS						current
+      DESCRIPTION				"Status of the module DC input stage"
+		::=  {  tsiModuleTableEntry  5  }
+	
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.6
+		tsiModuleAddress	OBJECT-TYPE 
+      SYNTAX						Integer32 (1..32) 
+      MAX-ACCESS				read-only
+      STATUS						current
+      DESCRIPTION				"Configured address of the module"
+		::=  {  tsiModuleTableEntry  6  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.7
+		tsiModuleInputRepartition	OBJECT-TYPE 
+      SYNTAX						Integer32 (0..100)
+			UNITS							"%"
+      MAX-ACCESS				read-only
+      STATUS						current
+      DESCRIPTION				"Load repartition ratio between AC and DC Inputs
+			                   (0% is AC and 100% is DC)"
+		::=  {  tsiModuleTableEntry  7  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.8
+		tsiModuleLoadRatioW	  OBJECT-TYPE 
+      SYNTAX							Integer32 (0..100)
+			UNITS               "%"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Loading ratio regarding power in watts"
+		::=  {  tsiModuleTableEntry  8  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.9
+		tsiModuleLoadRatioVA	OBJECT-TYPE 
+      SYNTAX							Integer32 (0..100)
+			UNITS								"%"
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Loading ratio regarding power in VA"
+		::=  {  tsiModuleTableEntry  9  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.10
+		tsiModulePhaseNumber	OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Label of the phase module is belonging to"
+		::=  {  tsiModuleTableEntry  10  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.11
+		tsiModuleACGroupNumber	OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Label of the AC group module is belonging to"
+		::=  {  tsiModuleTableEntry  11  }	
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.12
+		tsiModuleDCGroupNumber	OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Label of the DC group module is belonging to"
+		::=  {  tsiModuleTableEntry  12  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.13
+		tsiModuleStatus 	    OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Event number describing module output stage and
+													 internal status"
+		::=  {  tsiModuleTableEntry  13  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.14
+		tsiModuleACInStatus 	OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Event number describing AC input stage"
+		::=  {  tsiModuleTableEntry  14  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.15
+		tsiModuleDCInStatus 	OBJECT-TYPE 
+      SYNTAX							Integer32 
+			MAX-ACCESS					read-only
+			STATUS							current
+			DESCRIPTION					"Event number describing DC input stage"
+		::=  {  tsiModuleTableEntry  15  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.16
+		tsiModuleVout	        OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "0.1V"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Output voltage of the module"
+		::=  {  tsiModuleTableEntry  16  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.17
+		tsiModuleIout	        OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "0.1A"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Output current of the module"
+		::=  {  tsiModuleTableEntry  17  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.18
+		tsiModulePoutW	      OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "W"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Output power in watts of the module"
+		::=  {  tsiModuleTableEntry  18  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.19
+		tsiModulePoutVA	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "VA"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Output power in VA of the module"
+		::=  {  tsiModuleTableEntry  19  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.20
+		tsiModuleVinAC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1V"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"AC input voltage of the module"
+		::=  {  tsiModuleTableEntry  20  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.21
+		tsiModuleIinAC	      OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "0.1A"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"AC input current of the module"
+		::=  {  tsiModuleTableEntry  21  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.22
+		tsiModulePinACW	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "W"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Power in watts sourced from the AC input of the module"
+		::=  {  tsiModuleTableEntry  22  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.23
+		tsiModulePinACVA	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "VA"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Power in VA sourced from the AC input of the module"
+		::=  {  tsiModuleTableEntry  23  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.24
+		tsiModuleACinFreq	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1Hz"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Frequency of the AC input source of the module"
+		::=  {  tsiModuleTableEntry  24  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.25
+		tsiModuleVinDC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1V"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"DC input voltage of the module"
+		::=  {  tsiModuleTableEntry  25  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.26
+		tsiModuleIinDC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1A"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"DC input current of the module"
+		::=  {  tsiModuleTableEntry  26  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.27
+		tsiModulePinDC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "W"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Power in watts sourced from the DC input of the module"
+		::=  {  tsiModuleTableEntry  27  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.28
+		tsiModuleTemperature  OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "K"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Temperature of the module"
+		::=  {  tsiModuleTableEntry  28  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.29
+		tsiModuleSoftwareVersion  OBJECT-TYPE 
+      SYNTAX							    Integer32 
+      MAX-ACCESS					    read-only
+      STATUS							    current
+      DESCRIPTION					   "Software version number of the module"
+		::=  {  tsiModuleTableEntry  29  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.30
+		tsiModuleSerialNumber  OBJECT-TYPE 
+      SYNTAX						   Integer32 
+      MAX-ACCESS				   read-only
+      STATUS						   current
+      DESCRIPTION				  "Serial number of the module"
+		::=  {  tsiModuleTableEntry  30  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.31
+		tsiModuleNominalPoutW  OBJECT-TYPE 
+      SYNTAX							 Integer32
+			UNITS                "W"
+      MAX-ACCESS					 read-only
+      STATUS							 current
+      DESCRIPTION					 "Nominal output power in watts of the module"
+		::=  {  tsiModuleTableEntry  31  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.32
+		tsiModuleNominalPoutVA  OBJECT-TYPE 
+      SYNTAX							  Integer32
+			UNITS                 "VA"
+      MAX-ACCESS					  read-only
+      STATUS							  current
+      DESCRIPTION					  "Nominal output power in VA of the module"
+		::=  {  tsiModuleTableEntry  32  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.33
+		tsiModuleNominalVinAC  OBJECT-TYPE 
+      SYNTAX							  Integer32
+			UNITS                 "0.1V"
+      MAX-ACCESS					  read-only
+      STATUS							  current
+      DESCRIPTION					  "Nominal voltage of the AC input of the module"
+		::=  {  tsiModuleTableEntry  33  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.34
+		tsiModuleNominalVinDC  OBJECT-TYPE 
+      SYNTAX							  Integer32
+			UNITS                 "0.1V"
+      MAX-ACCESS					  read-only
+      STATUS							  current
+      DESCRIPTION					  "Nominal voltage of the DC input of the module"
+		::=  {  tsiModuleTableEntry  34  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.35
+		tsiModuleNominalFreqAC  OBJECT-TYPE 
+      SYNTAX							  Integer32
+			UNITS                 "0.1Hz"
+      MAX-ACCESS					  read-only
+      STATUS							  current
+      DESCRIPTION					  "Nominal AC frequency of the module"
+		::=  {  tsiModuleTableEntry  35  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.36
+		tsiRestrained			 OBJECT-TYPE 
+      SYNTAX						 INTEGER {
+													 no(0),
+													 yes(1)
+												 }
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Flag indicating if the module has limited features"
+		::=  {  tsiModuleTableEntry  36  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.1.1.1.37
+		tsiEPC						OBJECT-TYPE 
+      SYNTAX						 INTEGER {
+													 no(0),
+													 yes(1)
+												 }
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Flag indicating if the module has an EPC converter"
+		::=  {  tsiModuleTableEntry  37  }
+
+--======================
+--	TSI Phases Subtree
+--======================
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.1.0
+		tsiNbPhaseConfigured  OBJECT-TYPE 
+      SYNTAX							  Integer32 
+      MAX-ACCESS					  read-only
+      STATUS							  current
+      DESCRIPTION					  "Number of phases configured in the system"
+		::=  {  tsiPhases  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2
+		tsiPhaseTable OBJECT-TYPE
+       SYNTAX						SEQUENCE  OF  TsiPhaseTableEntry
+       MAX-ACCESS				not-accessible
+       STATUS						current
+       DESCRIPTION			"Table describing the different values related to
+												 the phases such as voltages, current, loading, ..."
+	  ::=  { tsiPhases  2 }
+       
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1
+		tsiPhaseTableEntry OBJECT-TYPE
+       SYNTAX      TsiPhaseTableEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+       INDEX    {  tsiPhaseTableIndex  }
+	  ::=  { tsiPhaseTable 1 }
+
+		TsiPhaseTableEntry ::=  SEQUENCE {
+			tsiPhaseTableIndex							Integer32,
+			tsiPhaseAvailablePowerRatioW		Integer32,
+			tsiPhaseAvailablePowerRatioVA		Integer32,
+			tsiPhaseInstalledPowerRatioW		Integer32,
+			tsiPhaseInstalledPowerRatioVA		Integer32,
+			tsiPhaseVout										Integer32,
+			tsiPhaseIout										Integer32,
+			tsiPhaseACOutFreq								Integer32,
+			tsiPhasePinDC										Integer32,
+			tsiPhasePinACW									Integer32,
+			tsiPhasePinACVA									Integer32,
+			tsiPhaseCurrentPowerInW					Integer32,
+			tsiPhaseCurrentPowerInVA				Integer32,
+			tsiPhaseInstalledPowerInW				Integer32,
+			tsiPhaseInstalledPowerInVA			Integer32,
+			tsiPhaseAvailablePowerInW				Integer32,
+			tsiPhaseAvailablePowerInVA			Integer32, 
+			tsiPhaseNbModConfigured					Integer32,
+			tsiPhaseRedundancy							Integer32,
+			tsiPhaseNbModSeen								Integer32,
+			tsiPhaseNbModOK									Integer32,
+			tsiPhaseNbModMO									Integer32,
+			tsiPhaseNbModKO									Integer32,
+			tsiPhaseNbModNT									Integer32	
+		}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.1
+		tsiPhaseTableIndex OBJECT-TYPE 
+      SYNTAX         Integer32 (1..8)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "Phase identifier"
+		::=  {  tsiPhaseTableEntry  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.2
+		tsiPhaseAvailablePowerRatioW  OBJECT-TYPE 
+      SYNTAX											Integer32 (0..100)
+			UNITS												"%"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Ratio between output load and available power in watts.
+
+																	 By available power, we mean the total power that could 
+																	 be delivered to load. That's to say, the number of valid 
+																	 modules multiplied by nominal power (no redundancy notion
+																	 here)"
+		::=  {  tsiPhaseTableEntry  2  }
+	
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.3
+		tsiPhaseAvailablePowerRatioVA  OBJECT-TYPE 
+      SYNTAX											Integer32 (0..100)
+			UNITS												"%"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Ratio between output load and available power in VA
+																	 
+																	 By available power, we mean the total power that could 
+																	 be delivered to load. That's to say, the number of valid 
+																	 modules multiplied by nominal power (no redundancy notion
+																	 here)"
+		::=  {  tsiPhaseTableEntry  3  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.4
+		tsiPhaseInstalledPowerRatioW  OBJECT-TYPE 
+      SYNTAX											Integer32 (0..100) 
+			UNITS												"%"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Ratio between output load and installed power in W
+																	
+																	 By installed power, we mean the total amount of power the
+																	 system was designed for. That's to say, the number of valid 
+																	 modules minus the number of redundant modules multiplied by 
+																	 nominal power"
+		::=  {  tsiPhaseTableEntry  4  }
+	
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.5
+		tsiPhaseInstalledPowerRatioVA OBJECT-TYPE 
+      SYNTAX											Integer32 (0..100)
+			UNITS												"%"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Ratio between output load and installed power in VA
+																	 
+																	 By installed power, we mean the total amount of power the
+																	 system was designed for. That's to say, the number of valid 
+																	 modules minus the number of redundant modules multiplied by 
+																	 nominal power"
+		::=  {  tsiPhaseTableEntry  5  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.6
+		tsiPhaseVout OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"0.1V"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Output voltage of the phase"
+		::=  {  tsiPhaseTableEntry  6  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.7
+		tsiPhaseIout OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"0.1V"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Output current of the phase"
+		::=  {  tsiPhaseTableEntry  7  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.8
+		tsiPhaseACOutFreq   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"0.1Hz"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Frequency of the output of the phase"
+		::=  {  tsiPhaseTableEntry  8  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.9
+		tsiPhasePinDC   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power sourced from the DC input of 
+																	 the module belonging to that phase"
+		::=  {  tsiPhaseTableEntry  9  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.10
+		tsiPhasePinACW   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in watts sourced from the AC input of 
+																	 the module belonging to that phase"
+		::=  {  tsiPhaseTableEntry  10  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.11
+		tsiPhasePinACVA   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"VA"
+      MAX-ACCESS									read-only
+      STATUS											current
+		  DESCRIPTION									"Total power in VA sourced from the AC input of 
+																	 the module belonging to that phase"
+		::=  {  tsiPhaseTableEntry  11  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.12
+		tsiPhaseCurrentPowerInW   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in watts delivered by  
+																	 the module belonging to that phase"
+		::=  {  tsiPhaseTableEntry  12  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.13
+		tsiPhaseCurrentPowerInVA   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"VA"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in VA delivered by  
+																	 the module belonging to that phase"
+		::=  {  tsiPhaseTableEntry  13  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.14
+		tsiPhaseInstalledPowerInW   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in W installed in that phase
+																		
+																	 By installed power, we mean the total amount of power the
+																	 system was designed for. That's to say, the number of valid 
+																	 modules minus the number of redundant modules multiplied by 
+																	 nominal power"
+		::=  {  tsiPhaseTableEntry  14  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.15
+		tsiPhaseInstalledPowerInVA   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"VA"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in VA installed in that phase
+																	
+																	 By installed power, we mean the total amount of power the
+																	 system was designed for. That's to say, the number of valid 
+																	 modules minus the number of redundant modules multiplied by 
+																	 nominal power"
+		::=  {  tsiPhaseTableEntry  15  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.16
+		tsiPhaseAvailablePowerInW   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total available power in watts in that phase
+												
+																	 By available power, we mean the total power that could 
+																	 be delivered to load. That's to say, the number of valid 
+																	 modules multiplied by nominal power (no redundancy notion
+																	 here)"
+		::=  {  tsiPhaseTableEntry  16  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.17
+		tsiPhaseAvailablePowerInVA   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"VA"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total available power in VA in that phase
+																	
+																	 By available power, we mean the total power that could 
+																	 be delivered to load. That's to say, the number of valid 
+																	 modules multiplied by nominal power (no redundancy notion
+																	 here)"
+		::=  {  tsiPhaseTableEntry  17  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.18
+		tsiPhaseNbModConfigured OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module configured in the phase"
+		::=  {  tsiPhaseTableEntry  18  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.19
+		tsiPhaseRedundancy OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of redundant module configured in the phase"
+		::=  {  tsiPhaseTableEntry  19 }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.20
+		tsiPhaseNbModSeen   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module seen in that phase"
+		::=  {  tsiPhaseTableEntry  20  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.21
+		tsiPhaseNbModOK   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module delivering output in that phase"
+		::=  {  tsiPhaseTableEntry  21  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.22
+		tsiPhaseNbModMO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module manually off in that phase"
+		::=  {  tsiPhaseTableEntry  22  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.23
+		tsiPhaseNbModKO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module not delivering output 
+																	 due to a failure in that phase"
+		::=  {  tsiPhaseTableEntry  23  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.2.2.1.24
+		tsiPhaseNbModNT   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module not seen in that phase (accordingly to
+																	 tsiPhaseNbModConfigured)"
+		::=  {  tsiPhaseTableEntry  24  }
+		
+		
+--========================
+--	TSI AC Group Subtree
+--========================
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.1.0
+		tsiNbACGroupConfigured  OBJECT-TYPE 
+      SYNTAX								Integer32
+      MAX-ACCESS						read-only
+      STATUS								current
+      DESCRIPTION						"Number of AC groups configured in the system"
+		::=  {  tsiACGroups  1}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2
+		tsiACGroupTable OBJECT-TYPE
+       SYNTAX						SEQUENCE  OF  TsiACGroupTableEntry
+       MAX-ACCESS				not-accessible
+       STATUS						current
+       DESCRIPTION			"Table describing the different values related to
+												 the AC groups such as voltages, currents, ..."
+	  ::=  { tsiACGroups  2 }
+       
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1
+		tsiACGroupTableEntry OBJECT-TYPE
+       SYNTAX      TsiACGroupTableEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+       INDEX    {  tsiACGroupTableIndex  }
+	  ::=  { tsiACGroupTable 1 }
+
+		TsiACGroupTableEntry ::=  SEQUENCE {
+			tsiACGroupTableIndex		Integer32,
+			tsiACGroupVinAC					Integer32,
+			tsiACGroupIinAC					Integer32,
+			tsiACGroupPinACW				Integer32,
+			tsiACGroupPinACVA				Integer32,
+			tsiACGroupNbModSeen			Integer32,
+			tsiACGroupNbModOK				Integer32,
+			tsiACGroupNbModMO				Integer32,
+			tsiACGroupNbModKO				Integer32,
+			tsiACGroupNbModACinOK		Integer32,
+			tsiACGroupACinFreq			Integer32
+		}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.1
+		tsiACGroupTableIndex OBJECT-TYPE 
+      SYNTAX         Integer32 (1..4)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "AC group number identifier"
+		::=  {  tsiACGroupTableEntry  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.2
+		tsiACGroupVinAC	      OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "0.1V"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"AC input voltage of the group"
+		::=  {  tsiACGroupTableEntry  2  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.3
+		tsiACGroupIinAC	      OBJECT-TYPE 
+      SYNTAX							Integer32 
+			UNITS               "0.1A"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Total current sourced from the AC input of 
+													 the module belonging to that group"
+		::=  {  tsiACGroupTableEntry  3  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.4
+		tsiACGroupPinACW   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in watts sourced from the AC input of 
+																	 the module belonging to that group"
+		::=  {  tsiACGroupTableEntry  4  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.5
+		tsiACGroupPinACVA   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"VA"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in VA sourced from the AC input of 
+																	 the module belonging to that group"
+		::=  {  tsiACGroupTableEntry  5  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.6
+		tsiACGroupNbModSeen   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module seen in that group"
+		::=  {  tsiACGroupTableEntry  6  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.7
+		tsiACGroupNbModOK   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module delivering output in that group"
+		::=  {  tsiACGroupTableEntry  7  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.8
+		tsiACGroupNbModMO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module manually off in that group"
+		::=  {  tsiACGroupTableEntry  8  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.9
+		tsiACGroupNbModKO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module not delivering output 
+																	 due to a failure in that group"
+		::=  {  tsiACGroupTableEntry  9  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.10
+		tsiACGroupNbModACinOK   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module stating that their AC input stage	
+																	 is fully functional"
+		::=  {  tsiACGroupTableEntry  10  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.3.2.1.11
+		tsiACGroupACinFreq   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"0.1Hz"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Frequency of the AC input of the group"
+		::=  {  tsiACGroupTableEntry  11  }
+
+--========================
+--	TSI DC Group Subtree
+--========================
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.1.0
+		tsiNbDCGroupConfigured  OBJECT-TYPE 
+      SYNTAX								Integer32
+      MAX-ACCESS						read-only
+      STATUS								current
+      DESCRIPTION						"Number of DC groups configured in the system"
+		::=  {  tsiDCGroups  1}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2
+		tsiDCGroupTable OBJECT-TYPE
+       SYNTAX						SEQUENCE  OF  TsiDCGroupTableEntry
+       MAX-ACCESS				not-accessible
+       STATUS						current
+       DESCRIPTION			"Table describing the different values related to
+												 the DC groups such as voltages, currents, ..."
+	  ::=  { tsiDCGroups  2 }
+       
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1
+		tsiDCGroupTableEntry OBJECT-TYPE
+       SYNTAX      TsiDCGroupTableEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+       INDEX    {  tsiDCGroupTableIndex  }
+	  ::=  { tsiDCGroupTable 1 }
+
+		TsiDCGroupTableEntry ::=  SEQUENCE {
+			tsiDCGroupTableIndex		Integer32,
+			tsiDCGroupVinDC					Integer32,
+			tsiDCGroupIinDC					Integer32,
+			tsiDCGroupPinDC				  Integer32,
+			tsiDCGroupNbModSeen			Integer32,
+			tsiDCGroupNbModOK				Integer32,
+			tsiDCGroupNbModMO				Integer32,
+			tsiDCGroupNbModKO				Integer32,
+			tsiDCGroupNbModDCinOK		Integer32
+		}
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.1
+		tsiDCGroupTableIndex OBJECT-TYPE 
+      SYNTAX         Integer32 (1..4)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "AC group number identifier"
+		::=  {  tsiDCGroupTableEntry  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.2
+		tsiDCGroupVinDC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1V"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"DC input voltage of the group"
+		::=  {  tsiDCGroupTableEntry  2  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.3
+		tsiDCGroupIinDC	      OBJECT-TYPE 
+      SYNTAX							Integer32
+			UNITS               "0.1A"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Total current sourced from the DC input of 
+													 the module belonging to that group"
+		::=  {  tsiDCGroupTableEntry  3  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.4
+		tsiDCGroupPinDC   OBJECT-TYPE 
+      SYNTAX											Integer32
+			UNITS												"W"
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Total power in watts sourced from the DC input of 
+																	 the module belonging to that group"
+		::=  {  tsiDCGroupTableEntry  4  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.5
+		tsiDCGroupNbModSeen   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module seen in that group"
+		::=  {  tsiDCGroupTableEntry  5  }
+
+		--OID : 1.3.6.1.4.1.12551.4.1.4.1.1.6
+		tsiDCGroupNbModOK   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module delivering output in that group"
+		::=  {  tsiDCGroupTableEntry  6  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.6
+		tsiDCGroupNbModMO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module manually off in that group"
+		::=  {  tsiDCGroupTableEntry  7  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.7
+		tsiDCGroupNbModKO   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module not delivering output 
+																	 due to a failure in that group"
+		::=  {  tsiDCGroupTableEntry  8  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.4.2.1.8
+		tsiDCGroupNbModDCinOK   OBJECT-TYPE 
+      SYNTAX											Integer32
+      MAX-ACCESS									read-only
+      STATUS											current
+      DESCRIPTION									"Number of module stating that their AC input stage	
+																	 is fully functional"
+		::=  {  tsiDCGroupTableEntry  9  }
+
+--=====================
+--	TSI Alarm Subtree
+--=====================
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.1.0
+		tsiNbMinorAlarm   OBJECT-TYPE 
+      SYNTAX			  	Integer32
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Number of minor alarms present in the system"
+		::=  {  tsiAlarms  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.2.0
+		tsiNbMajorAlarm   OBJECT-TYPE 
+      SYNTAX			  	Integer32
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION			"Number of major alarms present in the system"
+		::=  {  tsiAlarms  2  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.3.0
+		tsiTotalAlarmNumber   OBJECT-TYPE 
+      SYNTAX			  			Integer32
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Total number of alarms present in the system"
+		::=  {  tsiAlarms  3  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4
+		tsiAlarmTable  OBJECT-TYPE
+      SYNTAX       SEQUENCE  OF  TsiAlarmEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "Table containing the alarm present in the system"
+    ::=  { tsiAlarms  4 }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1
+		tsiAlarmEntry  OBJECT-TYPE
+      SYNTAX       TsiAlarmEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+      INDEX    {  tsiAlarmIndex  }
+    ::=  { tsiAlarmTable 1 }
+
+		TsiAlarmEntry  ::=  SEQUENCE {
+      tsiAlarmIndex					Integer32,
+			tsiAlarmID						Integer32,
+			tsiAlarmType					INTEGER,
+			tsiAlarmSource				INTEGER,
+			tsiAlarmDescription		DisplayString,
+      tsiAlarmTime					DateAndTime
+    }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.1
+		tsiAlarmIndex  OBJECT-TYPE 
+      SYNTAX         Integer32 (1..50)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "The alarm entry identifier"
+    ::=  {  tsiAlarmEntry  1  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.2
+		tsiAlarmID   OBJECT-TYPE 
+      SYNTAX        Integer32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION    "Unique identifier number of the alarm"
+    ::=  {  tsiAlarmEntry  2  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.3
+		tsiAlarmType   OBJECT-TYPE 
+      SYNTAX         INTEGER {
+												noAlarm(0),
+												minor(1),
+												major(2)
+										 }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION    "Severity level of the alarm"
+    ::=  {  tsiAlarmEntry  3  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.4
+		tsiAlarmSource   OBJECT-TYPE 
+      SYNTAX         INTEGER {
+												t2s(0),
+												module01(1),  module02(2),	module03(3),  module04(4),
+												module05(5),  module06(6),	module07(7),  module08(8),
+												module09(9),  module10(10),	module11(11), module12(12),
+												module13(13), module14(14),	module15(15), module16(16),
+												module17(17), module18(18),	module19(19), module20(20),
+												module21(21), module22(22),	module23(23), module24(24),
+												module25(25), module26(26),	module27(27), module28(28),
+												module29(29), module30(30),	module31(31), module32(32),
+												system(33)
+										 }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION    "Device responsible of the alarm"
+    ::=  {  tsiAlarmEntry  4  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.5
+		tsiAlarmDescription   OBJECT-TYPE 
+      SYNTAX         DisplayString
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION    "Description string of the alarm"
+    ::=  {  tsiAlarmEntry  5  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.5.4.1.6
+		tsiAlarmTime   OBJECT-TYPE 
+      SYNTAX         DateAndTime
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION    "Date and time of the occurence of the alarm"
+    ::=  {  tsiAlarmEntry  6  }
+	
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.5.0
+		tsiTempoMajorRelay   OBJECT-TYPE 
+      SYNTAX			  			Integer32
+			UNITS								"s"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Temporisation of the major alarm relay"
+		::=  {  tsiAlarms  5  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.6.0
+		tsiTempoMinorRelay   OBJECT-TYPE 
+      SYNTAX			  			Integer32
+			UNITS								"s"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Temporisation of the minor alarm relay"
+		::=  {  tsiAlarms  6  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.7.0
+		tsiACInputPresent   OBJECT-TYPE 
+      SYNTAX			  			INTEGER {
+														no(0),
+														yes(1)
+													}
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Flag that indicates if the AC input should 
+													 be considered as present or not"
+		::=  {  tsiAlarms  7  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.8.0
+		tsiSaturationThreshold   OBJECT-TYPE 
+      SYNTAX			  			Integer32 (0..100)
+			UNITS								"%"
+      MAX-ACCESS					read-only
+      STATUS							current
+      DESCRIPTION					"Ratio threshold over which the saturation
+													 alarm will be raised"
+		::=  {  tsiAlarms  8  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.5.9.0
+		tsiProgrammableRelay   OBJECT-TYPE 
+      SYNTAX			  			 Integer32 (0..100)
+			UNITS								 "%"
+      MAX-ACCESS					 read-only
+      STATUS							 current
+      DESCRIPTION					 "Event number on which the programmable alarm
+														relay will trigger"
+		::=  {  tsiAlarms  9  }
+
+--================
+--	Trap SubTree
+--================
+
+		--OID : .1.3.6.1.4.1.12551.4.1.6.0
+		tsiTrapsPrefix   OBJECT IDENTIFIER
+    ::=  {  tsiTraps  0  }
+   
+		--OID : .1.3.6.1.4.1.12551.4.1.6.0.1
+		tsiTrapMajorAlarmAdded    NOTIFICATION-TYPE
+      OBJECTS        { tsiAlarmID, tsiAlarmSource, tsiAlarmDescription, tsiAlarmTime }
+      STATUS         current
+      DESCRIPTION    "This trap is sent each time a new major
+											alarm is detected in the system"
+    ::=  {  tsiTrapsPrefix  1  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.6.0.2
+		tsiTrapMajorAlarmRemoved  NOTIFICATION-TYPE
+      OBJECTS        { tsiAlarmID, tsiAlarmSource, tsiAlarmDescription, tsiAlarmTime }
+      STATUS         current
+      DESCRIPTION    "This trap is sent each time a major alarm
+											that was present in the system disappear from it"
+		::=  {  tsiTrapsPrefix  2  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.6.0.3
+		tsiTrapMinorAlarmAdded NOTIFICATION-TYPE
+      OBJECTS        { tsiAlarmID, tsiAlarmSource, tsiAlarmDescription, tsiAlarmTime }
+      STATUS         current
+      DESCRIPTION     "This trap is sent each time a new minor
+											alarm is detected in the system"
+    ::=  {  tsiTrapsPrefix  3  }
+
+		--OID : .1.3.6.1.4.1.12551.4.1.6.0.4
+		tsiTrapMinorAlarmRemoved  NOTIFICATION-TYPE
+      OBJECTS        { tsiAlarmID, tsiAlarmSource, tsiAlarmDescription, tsiAlarmTime }
+      STATUS         current
+      DESCRIPTION    "This trap is sent each time a minor alarm
+											that was present in the system disappear from it"
+    ::=  {  tsiTrapsPrefix  4  }
+
+--=================================
+--	TSI Event Description Subtree
+--=================================
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.7.1
+		tsiEventDescriptionTable  OBJECT-TYPE
+      SYNTAX       SEQUENCE  OF  TsiEventDescriptionEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "Table containing the event description strings"
+    ::=  { tsiEventDescription  1 }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.7.1.1
+		tsiEventDescriptionEntry  OBJECT-TYPE
+      SYNTAX       TsiEventDescriptionEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+      INDEX    {  tsiEventDescriptionIndex  }
+    ::=  { tsiEventDescriptionTable 1 }
+
+		TsiEventDescriptionEntry  ::=  SEQUENCE {
+      tsiEventDescriptionIndex		Integer32,
+			tsiEventDescriptionString		DisplayString
+    }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.7.1.1.1
+		tsiEventDescriptionIndex  OBJECT-TYPE 
+      SYNTAX         Integer32 (1..300)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "The event identifier"
+    ::=  {  tsiEventDescriptionEntry  1  }
+
+		
+		-- OID : .1.3.6.1.4.1.12551.4.1.7.1.1.2
+		tsiEventDescriptionString   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Description string of the event"
+    ::=  {  tsiEventDescriptionEntry  2  }
+		
+--========================
+--	TSI T2S Info Subtree
+--========================
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.1.0
+		tsiT2SSoftwareVersion   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 deprecated
+      DESCRIPTION				 "Description string of the software version"
+    ::=  {  tsiT2SInfo  1  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.2.0
+		tsiT2SSerialNumber   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Description string of the event"
+    ::=  {  tsiT2SInfo  2  }
+
+	  -- OID : .1.3.6.1.4.1.12551.4.1.8.3.0
+		tsiT2SDateAndTime    OBJECT-TYPE 
+      SYNTAX						 DateAndTime
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Configured date and time of the T2S"
+    ::=  {  tsiT2SInfo  3  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.4.0
+		tsiT2SMainSoftwareVersion   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Major revision software number of the T2S"
+    ::=  {  tsiT2SInfo  4  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.5.0
+		tsiT2SSubSoftwareVersion   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Minor revision software number of the T2S"
+    ::=  {  tsiT2SInfo  5  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.6.0
+		tsiT2SMaxKnownParameters   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Version number of TSI modules configuration parameters"
+    ::=  {  tsiT2SInfo  6  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.8.7.0
+		tsiT2SVersionTextError   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Version number of TSI events description"
+    ::=  {  tsiT2SInfo  7  }
+
+
+--=============================
+--	TSI Configuration Subtree
+--=============================
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1
+		tsiConfigurationTable  OBJECT-TYPE
+      SYNTAX       SEQUENCE  OF  TsiConfigurationEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "Table containing the configurable parameters"
+    ::=  { tsiConfiguration  1 }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1
+		tsiConfigurationEntry  OBJECT-TYPE
+      SYNTAX       TsiConfigurationEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION "The conceptual row referencing the SEQUENCE definition"
+      INDEX    {  tsiConfigurationIndex  }
+    ::=  { tsiConfigurationTable 1 }
+
+		TsiConfigurationEntry  ::=  SEQUENCE {
+      tsiConfigurationIndex					Integer32,
+			tsiConfigurationID						Integer32,
+			tsiConfigurationValue					Integer32,
+			tsiConfigurationDescription		DisplayString,
+			tsiConfigurationUnits					Integer32,
+			tsiConfigurationValidity			DisplayString
+    }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.1
+		tsiConfigurationIndex  OBJECT-TYPE 
+      SYNTAX         Integer32 (1..500)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "The index of the table"
+    ::=  {  tsiConfigurationEntry  1  }
+
+		
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.2
+		tsiConfigurationID   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Unique identifier number associated to the parameter"
+    ::=  {  tsiConfigurationEntry  2  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.3
+		tsiConfigurationValue   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Configured value of the parameter"
+    ::=  {  tsiConfigurationEntry  3  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.4
+		tsiConfigurationDescription   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Textual description of the parameter"
+    ::=  {  tsiConfigurationEntry  4  }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.5
+		tsiConfigurationUnits   OBJECT-TYPE 
+      SYNTAX						 Integer32
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Value defining the conversion rule to apply to parameter value
+													to obtain real value in MKS units. 
+													
+													This value should be expressed in its hexidecimal form 0xYYWW
+													to understand it better
+													
+													 - The high byte YY represents the exponent of the power of 10 
+														 by wich the value should be divided
+													 - The low byte WW represents the unit in which the parameter is expressed 
+													 
+													    0  : No units 
+															1  : Volts
+															2  : Amperes
+															3  : Hertz
+															4  : Second
+															5  : Angle (in degrees)
+															6  : Watt
+															7  : VA
+															8  : Percent
+															9  : Degree
+															10 : Ohm"
+    ::=  {  tsiConfigurationEntry  5  }
+				
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.1.1.6
+		tsiConfigurationValidity   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Textual description regarding the validity status of the parameter"
+    ::=  {  tsiConfigurationEntry  6  }
+					
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.2.0
+		tsiDigInpLabel1   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Configured label associated to digital input 1"
+    ::=  { tsiConfiguration  2 }
+
+		-- OID : .1.3.6.1.4.1.12551.4.1.9.3.0
+		tsiDigInpLabel2   OBJECT-TYPE 
+      SYNTAX						 DisplayString
+      MAX-ACCESS				 read-only
+      STATUS						 current
+      DESCRIPTION				 "Configured label associated to digital input 2"
+    ::=  { tsiConfiguration  3 }
+
+--===============================================================================
+--                            Conformance Subtree  
+--===============================================================================
+
+		--OID : .1.3.6.1.4.1.12551.4.2.1
+		tsiMIBCompliances  OBJECT IDENTIFIER ::= { tsiConformance 1 }
+		--OID : .1.3.6.1.4.1.12551.4.2.2
+		tsiMIBGroups       OBJECT IDENTIFIER ::= { tsiConformance 2 }
+
+--=========================
+--  Compliance Statements
+--========================= 
+
+		--OID : .1.3.6.1.4.1.12551.4.2.1.1
+		tsiMIBCompliance MODULE-COMPLIANCE
+			 STATUS current
+			 DESCRIPTION
+					"The core compliance statements for TSI agent"
+			 MODULE -- this module
+			 
+				 GROUP tsiFunctionalGroup
+				 DESCRIPTION "The tsiFunctionalGroup contains the objects 
+											that are mandatory for a TSI agent to support"
+
+				 GROUP tsiNotificationGroup
+				 DESCRIPTION "The tsiNotificationGroup contains the notification type
+											that are mandatory for a TSI agent to support"
+						
+		::= { tsiMIBCompliances 1 }
+
+		--OID : .1.3.6.1.4.1.12551.4.2.1.2
+		tsiMIBDeprecated MODULE-COMPLIANCE
+			 STATUS deprecated
+			 DESCRIPTION
+					"The core compliance statements for TSI agent deprecated objects"
+			 MODULE -- this module
+			 
+				 GROUP tsiDeprecatedGroup
+				 DESCRIPTION "The tsiDeprecatedGroup contains the objets that
+											have been deprecated and that are hence not
+											mandatory anymore"
+		
+		::= { tsiMIBCompliances 2 }
+
+--======================
+--  Conformance Groups
+--======================
+  
+		--OID : .1.3.6.1.4.1.12551.4.2.2.1
+		tsiFunctionalGroup  OBJECT-GROUP
+			 OBJECTS  {
+
+				--	TSI Modules Subtree
+					
+						tsiModuleSeen,
+						tsiModuleACOutState,
+						tsiModuleACInState,
+						tsiModuleDCInState,
+						tsiModuleAddress,
+						tsiModuleInputRepartition,
+						tsiModuleLoadRatioW,
+						tsiModuleLoadRatioVA,
+						tsiModulePhaseNumber,
+						tsiModuleACGroupNumber,
+						tsiModuleDCGroupNumber,
+						tsiModuleStatus,
+						tsiModuleACInStatus,
+						tsiModuleDCInStatus,
+						tsiModuleVout,
+						tsiModuleIout,
+						tsiModulePoutW,
+						tsiModulePoutVA,
+						tsiModuleVinAC,
+						tsiModuleIinAC,
+						tsiModulePinACW,
+						tsiModulePinACVA,
+						tsiModuleACinFreq,
+						tsiModuleVinDC,
+						tsiModuleIinDC,
+						tsiModulePinDC,
+						tsiModuleTemperature,
+						tsiModuleSoftwareVersion,
+						tsiModuleSerialNumber,
+						tsiModuleNominalPoutW,
+						tsiModuleNominalPoutVA,	
+						tsiModuleNominalVinAC,
+						tsiModuleNominalVinDC,
+						tsiModuleNominalFreqAC,
+						tsiRestrained,
+						tsiEPC,
+		
+				--	TSI Phases Subtree
+
+						tsiNbPhaseConfigured,
+						tsiPhaseAvailablePowerRatioW,
+						tsiPhaseAvailablePowerRatioVA,
+						tsiPhaseInstalledPowerRatioW,
+						tsiPhaseInstalledPowerRatioVA,
+						tsiPhaseVout,
+						tsiPhaseIout,
+						tsiPhaseACOutFreq,
+						tsiPhasePinDC,
+						tsiPhasePinACW,
+						tsiPhasePinACVA,
+						tsiPhaseCurrentPowerInW,
+						tsiPhaseCurrentPowerInVA,
+						tsiPhaseInstalledPowerInW,
+						tsiPhaseInstalledPowerInVA,
+						tsiPhaseAvailablePowerInW,
+						tsiPhaseAvailablePowerInVA,
+						tsiPhaseNbModConfigured,
+						tsiPhaseRedundancy,
+						tsiPhaseNbModSeen,
+						tsiPhaseNbModOK,
+						tsiPhaseNbModMO,
+						tsiPhaseNbModKO,
+						tsiPhaseNbModNT,
+		
+				--	TSI AC Group Subtree
+
+						tsiNbACGroupConfigured,
+						tsiACGroupVinAC,
+						tsiACGroupIinAC,
+						tsiACGroupPinACW,
+						tsiACGroupPinACVA,
+						tsiACGroupNbModSeen,
+						tsiACGroupNbModOK,
+						tsiACGroupNbModMO,
+						tsiACGroupNbModKO,
+						tsiACGroupNbModACinOK,
+						tsiACGroupACinFreq,
+
+				--	TSI DC Group Subtree
+			
+						tsiNbDCGroupConfigured,
+						tsiDCGroupVinDC,
+						tsiDCGroupIinDC,
+						tsiDCGroupPinDC,
+						tsiDCGroupNbModSeen,
+						tsiDCGroupNbModOK,
+						tsiDCGroupNbModMO,
+						tsiDCGroupNbModKO,
+						tsiDCGroupNbModDCinOK,
+	
+				--	TSI Alarm Subtree
+
+						tsiNbMinorAlarm,
+						tsiNbMajorAlarm,
+						tsiTotalAlarmNumber,
+						tsiAlarmID,
+						tsiAlarmType,
+						tsiAlarmSource,
+						tsiAlarmDescription,
+						tsiAlarmTime,
+						tsiTempoMajorRelay,
+						tsiTempoMinorRelay,
+						tsiACInputPresent,
+						tsiSaturationThreshold,
+						tsiProgrammableRelay,
+
+				--	TSI Event Description Subtree
+			
+						tsiEventDescriptionString,
+
+				--	TSI T2S Info Subtree
+	
+						-- tsiT2SSoftwareVersion,  
+						tsiT2SSerialNumber,
+						tsiT2SDateAndTime,
+						tsiT2SMainSoftwareVersion,
+						tsiT2SSubSoftwareVersion,
+						tsiT2SMaxKnownParameters,
+						tsiT2SVersionTextError,
+
+				-- TSI Configuration subtree
+
+						tsiConfigurationID,
+						tsiConfigurationValue,
+						tsiConfigurationDescription,
+						tsiConfigurationUnits,
+						tsiConfigurationValidity,
+						tsiDigInpLabel1,
+						tsiDigInpLabel2
+
+			 }
+			 STATUS current
+			 DESCRIPTION
+					"Conformance group for TSI functional supervision."
+			 ::= { tsiMIBGroups 1 }
+
+		--OID : .1.3.6.1.4.1.12551.4.2.2.2
+		tsiNotificationGroup  NOTIFICATION-GROUP
+			 NOTIFICATIONS  {
+					tsiTrapMajorAlarmAdded,
+					tsiTrapMajorAlarmRemoved,
+					tsiTrapMinorAlarmAdded,
+					tsiTrapMinorAlarmRemoved
+					}
+			 STATUS current
+			 DESCRIPTION
+					"The TSI MIB notification group"
+			 ::= { tsiMIBGroups 2 }
+
+		--OID : .1.3.6.1.4.1.12551.4.2.2.3
+		tsiDeprecatedGroup  OBJECT-GROUP
+			 OBJECTS  {
+				--	TSI T2S Info Subtree
+						tsiT2SSoftwareVersion
+					}
+			 STATUS deprecated
+			 DESCRIPTION
+					"Conformance group for TSI deprecated objects"
+			 ::= { tsiMIBGroups 3 }
+		
+END

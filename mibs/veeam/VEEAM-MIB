@@ -1,0 +1,403 @@
+
+VEEAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises
+      FROM RFC1155-SMI
+   TRAP-TYPE 
+      FROM RFC-1215
+   OBJECT-TYPE 
+      FROM RFC-1212
+   DisplayString 
+      FROM RFC1213-MIB; 
+
+veeam         OBJECT IDENTIFIER ::= { enterprises 31023 }
+products      OBJECT IDENTIFIER ::= { veeam 1 }
+backup        OBJECT IDENTIFIER ::= { products 1 }
+traps         OBJECT IDENTIFIER ::= { backup 1 }
+
+onBackupJobCompleted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { backupJobId, backupJobName, backupJobResult, backupJobComment }
+   DESCRIPTION 
+      "This trap is sent on backup/replica job completed." 
+   ::= 1 
+
+onVmBackupCompleted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { backupJobName, vmName, sourceHostName, vmBackupResult, vmBackupComment }
+   DESCRIPTION 
+      "This trap is sent on vm backup/replica completed." 
+   ::= 2 
+
+onLinuxFLRMountStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { sessionId, initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime }
+   DESCRIPTION 
+      "This trap is sent when Multi-OS FLR helper appliance starts." 
+   ::= 3 
+
+onLinuxFLRCopyToStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { sessionId, initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, targetHost, targetDir }
+   DESCRIPTION 
+      "This trap is sent when Multi-OS FLR file recovery via Copy To operation is initiated." 
+   ::= 4 
+
+onLinuxFLRToOriginalStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { sessionId, initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime }
+   DESCRIPTION 
+      "This trap is sent when Multi-OS FLR file recovery via Restore operation is initiated." 
+   ::= 5 
+
+onLinuxFLRCopyToFinished TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { sessionId, initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, transferStatus, transferTime, transferFileList, notTransferFileList, targetHost, targetDir, csvReportFilePath }
+   DESCRIPTION 
+      "This trap is sent when Multi-OS FLR file recovery via Copy To operation is completed." 
+   ::= 6 
+
+onLinuxFLRToOriginalFinished TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { sessionId, initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, transferStatus, transferTime, transferFileList, notTransferFileList, csvReportFilePath }
+   DESCRIPTION 
+      "This trap is sent when Multi-OS FLR file recovery via Restore operation is completed." 
+   ::= 7 
+
+onWinFLRMountStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmName, vmRestorePointCreationTime, vmRestorePointId, mountServerName }
+   DESCRIPTION 
+      "This trap is sent when Windows FLR starts to mounts a backup." 
+   ::= 8
+
+onWinFLRToOriginalStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime }
+   DESCRIPTION 
+      "This trap is sent when Windows FLR file recovery via Restore operation is completed." 
+   ::= 9
+
+onWinFLRCopyToStarted TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, targetDir }
+   DESCRIPTION 
+      "This trap is sent when Windows FLR file recovery via Copy To operation is initiated." 
+   ::= 10
+
+onWinFLRToOriginalFinished TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, transferStatus, transferFileList, notTransferFileList, csvReportFilePath }
+   DESCRIPTION 
+      "This trap is sent when Windows FLR file recovery via Restore operation is completed." 
+   ::= 11
+
+onWinFLRCopyToFinished TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmName, vmRestorePointId, vmRestorePointCreationTime, transferStatus, transferFileList, notTransferFileList, targetDir, csvReportFilePath }
+   DESCRIPTION 
+      "This trap is sent when Windows FLR file recovery via Copy To operation is completed." 
+   ::= 12
+
+onWebDownloadStart TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmRestorePointId, vmName, vmRestorePointCreationTime }
+   DESCRIPTION 
+      "This trap is sent when 1-Click FLR file download operation is initiated in the Enterprise Manager." 
+   ::= 13
+
+onWebDownloadFinished TRAP-TYPE 
+   ENTERPRISE traps 
+   VARIABLES { initiatorName, initiatorSid, vmRestorePointId, vmName, vmRestorePointCreationTime, transferStatus, transferFileList, notTransferFileList }
+   DESCRIPTION 
+      "This trap is sent when 1-Click FLR file download operation is completed in the Enterprise Manager." 
+   ::= 14
+
+onSobrOffloadFinished TRAP-TYPE
+	ENTERPRISE traps
+	VARIABLES { repositoryId, repositoryName, repositoryStatus, extentStatusList }
+	DESCRIPTION
+		"This trap is sent when scale-out repository offload job is finished"
+	::= 15
+
+onCdpRpoReport TRAP-TYPE
+	ENTERPRISE traps
+	VARIABLES { cdpPolicyName, cdpRpoStatus, vmName, cdpSla, cdpRpoThreshold, cdpMaxDelay }
+	DESCRIPTION
+		"This trap is sent when CDP policy RPO status is changed"
+	::= 16
+
+backupJobId OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255))
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Backup job id"
+   ::= { backup 101 }
+
+backupJobName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Backup job name"
+   ::= { backup 102 }
+   
+backupJobResult OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Backup job result"
+   ::= { backup 103 }
+   
+backupJobComment OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Backup job comment"
+   ::= { backup 104 }
+
+vmName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "VM name."
+   ::= { backup 105 }
+
+sourceHostName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Source host name"
+   ::= { backup 106 }
+
+vmBackupResult OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "VM backup result"
+   ::= { backup 107 }
+
+vmBackupComment OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "VM backup comment"
+   ::= { backup 108 }
+
+sessionId OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restore session ID"
+   ::= { backup 109 }
+
+initiatorName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Initiated by"
+   ::= { backup 110 }
+
+initiatorSid OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Initiated by (SID)"
+   ::= { backup 111 }
+
+vmRestorePointId OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restore point ID"
+   ::= { backup 112 }
+
+vmRestorePointCreationTime OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restore point creation time"
+   ::= { backup 113 }
+
+targetHost OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Target host"
+   ::= { backup 114 }
+
+targetDir OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Target directory"
+   ::= { backup 115 }
+
+transferStatus OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restore result"
+   ::= { backup 116 }
+
+transferTime OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restore time"
+   ::= { backup 117 }
+
+transferFileList OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Restored files"
+   ::= { backup 118 }
+
+notTransferFileList OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Failed to restore"
+   ::= { backup 119 }
+   
+mountServerName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Mount server name"
+   ::= { backup 120 }
+
+repositoryId OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository ID"
+   ::= { backup 121 }
+
+repositoryName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository name"
+   ::= { backup 122 }
+
+repositoryStatus OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository status"
+   ::= { backup 123 }
+
+extentStatusList OBJECT-TYPE
+   SYNTAX     SEQUENCE OF ExtentStatusEntry
+   ACCESS     read-only
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository extent status list"
+   ::= { backup 124 }
+
+extentStatusEntry OBJECT-TYPE
+   SYNTAX     ExtentStatusEntry
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository extent status entry"
+   INDEX { extentName }
+   ::= { extentStatusList 1 }
+
+ExtentStatusEntry ::=
+	SEQUENCE {
+		extentName
+			DisplayString (SIZE (0..255)),
+		extentStatus
+			DisplayString (SIZE (0..255))
+	}
+
+extentName OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255))
+   ACCESS     read-only
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository extent name"
+   ::= { extentStatusEntry 1 }
+
+extentStatus OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255))
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Scale-out repository extent status"
+   ::= { extentStatusEntry 2 }
+
+csvReportFilePath OBJECT-TYPE
+   SYNTAX     DisplayString (SIZE (0..255)) 
+   ACCESS     read-only 
+   STATUS     mandatory
+   DESCRIPTION
+      "Path to CSV report file"
+   ::= { backup 125 }
+   
+cdpPolicyName OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE (0..255)) 
+      ACCESS     read-only 
+      STATUS     mandatory
+      DESCRIPTION
+         "CDP policy name"
+      ::= { backup 126 }
+
+cdpRpoStatus OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE (0..255)) 
+      ACCESS     read-only 
+      STATUS     mandatory
+      DESCRIPTION
+         "CDP RPO status"
+      ::= { backup 127 }
+
+cdpSla OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE (0..255)) 
+      ACCESS     read-only 
+      STATUS     mandatory
+      DESCRIPTION
+         "CDP SLA"
+      ::= { backup 128 }
+
+cdpRpoThreshold OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE (0..255)) 
+      ACCESS     read-only 
+      STATUS     mandatory
+      DESCRIPTION
+         "CDP RPO reporting threshold"
+      ::= { backup 129 }
+
+cdpMaxDelay OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE (0..255)) 
+      ACCESS     read-only 
+      STATUS     mandatory
+      DESCRIPTION
+         "CDP RPO max delay"
+      ::= { backup 130 }
+END

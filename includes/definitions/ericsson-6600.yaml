@@ -1,0 +1,11 @@
+os: ericsson-6600
+text: 'Ericsson 6600 series'
+type: wireless
+icon: ericsson
+discovery:
+    -
+        sysObjectID: 
+            - .1.3.6.1.4.1.193.81.1.1.3
+        sysDescr_except:
+            - 'MINI-LINK Traffic Node'
+mib_dir: ericsson

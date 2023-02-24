@@ -3,26 +3,27 @@
 use LibreNMS\Util\ObjectCache;
 
 if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
-    $colors = collect(['green', 'yellow', 'red']);
+    $colors = new \Illuminate\Support\Collection(['green', 'yellow', 'red']);
     $output = \App\Models\Service::query()
         ->where('device_id', $device['device_id'])
         ->orderBy('service_type')
-        ->get(['service_type', 'service_status', 'service_message'])
+        ->get(['service_type', 'service_status', 'service_message', 'service_name'])
         ->map(function ($service) use ($colors) {
             $message = str_replace(' ', '&nbsp;', $service->service_message);
             $color = $colors->get($service->service_status, 'grey');
             $type = strtolower($service->service_type);
+            $name = $service->service_name;
+            $name_type = ($name == '' || $name == $type) ? $type : $name . ' (' . $type . ')';
 
-            return "<span title='$message' class='$color'>$type</span>";
+            return "<span title='$message' class='$color'>$name_type</span>";
         })->implode(', ');
 
-    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
-    ?>
+    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']); ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                    <?php echo '<a href="device/device='.$device['device_id'].'/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
+                    <?php echo '<a href="device/device=' . $device['device_id'] . '/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
                     </div>
                     <table class="table table-hover table-condensed table-striped">
                         <tr>

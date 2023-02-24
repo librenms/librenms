@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -35,6 +35,7 @@ abstract class PaginatedAjaxController extends Controller
 {
     /**
      * Default sort, column => direction
+     *
      * @var array
      */
     protected $default_sort = [];
@@ -49,13 +50,13 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     abstract protected function baseQuery($request);
 
     /**
-     * @param Paginator $paginator
+     * @param  Paginator  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     abstract protected function formatResponse($paginator);
@@ -73,7 +74,7 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines search fields. They will be searched in order.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -85,7 +86,7 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines filter fields.  Request and table fields must match.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -97,7 +98,7 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -109,7 +110,7 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Format an item for display.  Default is pass-through
      *
-     * @param Model $model
+     * @param  Model  $model
      * @return array|Collection|Model
      */
     public function formatItem($model)
@@ -118,16 +119,15 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * @param string $search
-     * @param Builder $query
-     * @param array $fields
+     * @param  string  $search
+     * @param  Builder  $query
+     * @param  array  $fields
      * @return Builder
      */
     protected function search($search, $query, $fields)
     {
         if ($search) {
             $query->where(function ($query) use ($fields, $search) {
-                /** @var Builder $query */
                 foreach ($fields as $field) {
                     $query->orWhere($field, 'like', '%' . $search . '%');
                 }
@@ -138,15 +138,26 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Builder $query
-     * @param array $fields
+     * @param  Request  $request
+     * @param  Builder  $query
+     * @param  array  $fields
      * @return Builder
      */
     protected function filter($request, $query, $fields)
     {
         foreach ($fields as $target => $field) {
-            if ($value = $request->get($field)) {
+            $callable = is_callable($field);
+            $value = $request->get($callable ? $target : $field);
+
+            // unfiltered field
+            if ($value === null) {
+                continue;
+            }
+
+            // apply the filter
+            if ($callable) {
+                $field($query, $value);
+            } else {
                 $value = $this->adjustFilterValue($field, $value);
                 if (is_string($target)) {
                     $query->where($target, $value);
@@ -160,8 +171,8 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Builder $query
+     * @param  Request  $request
+     * @param  Builder  $query
      * @return Builder
      */
     protected function sort($request, $query)
@@ -183,25 +194,25 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  array $rules
-     * @param  array $messages
-     * @param  array $customAttributes
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $full_rules = array_replace($this->baseRules(), $rules);
 
-        parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $customAttributes);
     }
 
     /**
      * Sometimes filter values need to be modified to work
      * For example if the filter value is a string, when it needs to be an id
      *
-     * @param string $field The field being filtered
-     * @param mixed $value The current value
+     * @param  string  $field  The field being filtered
+     * @param  mixed  $value  The current value
      * @return mixed
      */
     protected function adjustFilterValue($field, $value)

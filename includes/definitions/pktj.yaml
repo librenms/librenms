@@ -3,6 +3,7 @@ type: network
 group: unix
 text: 'Gandi Packet Journey'
 icon: gandi
+mib_dir: gandi
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

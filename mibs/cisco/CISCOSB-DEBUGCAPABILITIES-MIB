@@ -1,50 +1,169 @@
 CISCOSB-DEBUGCAPABILITIES-MIB DEFINITIONS ::= BEGIN
 
--- Title:                CISCOSB ROS
---                       Private Debug Capabilities MIB
--- Version:              7.50
--- Date:                 5-Jan-2011
+-- Title:                CISCOSB
+--                       SNA MIB
+-- Version:              800
+-- Date:                 12-May-2015
 
 IMPORTS
-    switch001                                               FROM CISCOSB-MIB
-    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
-    DisplayString                                           FROM SNMPv2-TC;
+    switch001                                                           FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                                        FROM SNMPv2-SMI
+    InetAddressType, InetAddress                                        FROM INET-ADDRESS-MIB
+    TestAndIncr, TimeInterval, DisplayString, RowStatus, TruthValue     FROM SNMPv2-TC;
 
 
-rlDebugCapabilities MODULE-IDENTITY
+rlSna MODULE-IDENTITY
                 LAST-UPDATED "201101050000Z"
-                ORGANIZATION "Cisco Systems, Inc."
+      ORGANIZATION "Cisco Systems, Inc."
 
-                CONTACT-INFO
-                "Postal: 170 West Tasman Drive
-                San Jose , CA 95134-1706
-                USA
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
 
-                
-                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                 DESCRIPTION
-                      "This private MIB module is used for achieving extended
-                      debugging capablities for the device.
-                      For example: greater management capabilies for technical
-                      support users."
-                REVISION "201101050000Z"
+                      "This private MIB module is used for communication between 
+                      SNA client and SNA server."
+                REVISION "201505120000Z"
                 DESCRIPTION
                       "Initial revision."
-        ::= { switch001 206 }
+        ::= { switch001 229 }
+	
+	
+rlSnaNextFreeSessionId  OBJECT-TYPE
+    SYNTAX       TestAndIncr
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "The MIB allows several SNA clients operating at the same time to 
+	             receive different session ids. Get operation on this MIB will return 
+				 the next free session id number. An SNA client should then issue SET 
+				 operation with the value it received. The response will be one of the 
+                 following:
+                 - noError.
+                 - inconsistentValue in case another client has already used this session id.
+				 - resourceUnavailable in case the number of active sessions has already 
+				   reached the maximum. 
+				 In case of success, a new session events database is allocated for the session id."
+    ::= { rlSna 1 } 
+	
 
-rlDebugCapabilitiesPassword OBJECT-TYPE
-  SYNTAX DisplayString
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-           "A user intereseted to obtain extended debug capabilities should
-            SET this MIB to a well known secret value (it is intended to be
-            used only by authorized users).
-            Most often, this value will be based on the device MAC address.
-            Upon setting the correct value, the SET operation will return
-            noError. Otherwise, wrongValue will return to the caller.
-            GET operation on this MIB will reurn a value of length 0."
-    ::=  { rlDebugCapabilities 1 }
+rlSnaClientAgentPollingTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSnaClientAgentPollingEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table maintains remote agents and MIBs the SNA client wants to poll. The SNA client can add
+     an entry to this table, with an session-id of a currently connected client. Once an entry was added,
+     the SNA application will poll the requested MIB in the requested agent. This will be done one time
+     only or repeatadly (rlSnaClientAgentPollingEnable is set to TRUE). When the client diesconnects, all
+     entries relevant to this client session-id are automatically deleted from the table. "
+     ::= { rlSna 2 }
+
+rlSnaClientAgentPollingEntry  OBJECT-TYPE
+   SYNTAX RlSnaClientAgentPollingEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSnaClientAgentClientSessionId, rlSnaClientAgentAgentAddressType, rlSnaClientAgentAgentAddress, IMPLIED rlSnaClientAgentMibName }  
+   ::= { rlSnaClientAgentPollingTable 1 }  
+
+RlSnaClientAgentPollingEntry ::= SEQUENCE { 
+       rlSnaClientAgentClientSessionId    INTEGER,     
+       rlSnaClientAgentAgentAddressType   InetAddressType,
+       rlSnaClientAgentAgentAddress       InetAddress,
+       rlSnaClientAgentMibName            DisplayString,
+       rlSnaClientAgentMibFieldsMask      OCTET STRING,
+       rlSnaClientAgentSecondaryMibName   DisplayString,
+       rlSnaClientAgentPollingEnable      TruthValue,
+       rlSnaClientAgentPollingInterval    TimeInterval,
+       rlSnaClientAgentStatus             RowStatus
+}
+
+rlSnaClientAgentClientSessionId OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The session-id of a the client that requests the remote agent's MIB/s polling."
+     ::=  { rlSnaClientAgentPollingEntry 1 }
+
+rlSnaClientAgentAgentAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Type of Remote Agent IP address, from which the client wants to poll MIB/s."
+     ::=  { rlSnaClientAgentPollingEntry 2 }
+
+rlSnaClientAgentAgentAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "IP address of the remote agent, from which the client wants to poll MIB/s."
+     ::=  { rlSnaClientAgentPollingEntry 3 }
+
+rlSnaClientAgentMibName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..80))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The name of a MIB table/ MIB scalar the SNA client wants to poll its values."  
+     ::=  { rlSnaClientAgentPollingEntry 4 }
+
+rlSnaClientAgentMibFieldsMask OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE (0..32))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "A bit-mask indicating which fields are requeted to be polled. For each requested
+     field, the appropriate bit should be turned on. Empty mask means all entry fields
+     should be polled." 
+   DEFVAL  { "" }  
+     ::=  { rlSnaClientAgentPollingEntry 5 }
+
+rlSnaClientAgentSecondaryMibName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..80))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The name of a secondary MIB table/ MIB scalar to be polled together with the 
+     main MIB. In case the length of this value is 0, no MIB is being specified
+     to be polled." 
+   DEFVAL  { "" }     
+     ::=  { rlSnaClientAgentPollingEntry 6 }
+
+rlSnaClientAgentPollingEnable OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Indicates whether the specified MIB should be polled periodically 
+     on the remote agent, or one time only."
+   DEFVAL  { false }
+     ::=  { rlSnaClientAgentPollingEntry 7 }
+
+rlSnaClientAgentPollingInterval OBJECT-TYPE
+   SYNTAX TimeInterval  
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The time interval to wait until the next polling."
+   DEFVAL      { 12000 } 
+     ::=  { rlSnaClientAgentPollingEntry 8 }
+
+rlSnaClientAgentStatus OBJECT-TYPE
+   SYNTAX RowStatus  
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The status field of the row. The user may use only 'createAndGo'
+     and 'active' statuses."  
+     ::=  { rlSnaClientAgentPollingEntry 9 }
+
 
 END

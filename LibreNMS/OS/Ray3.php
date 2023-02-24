@@ -15,23 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @copyright  2020 Martin Kukal
  * @author     Martin Kukal <martin@kukal.cz>
  */
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class Ray3 extends OS implements
@@ -50,12 +48,12 @@ class Ray3 extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return array(
+        return [
             // RAY3-MIB::txFreq.0
             new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.4.0', 'racom3-tx', 1, 'TX Frequency', null, 1, 1000),
             // RAY3-MIB::rxFreq.0
             new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.3.0', 'racom3-rx', 1, 'RX Frequency', null, 1, 1000),
-        );
+        ];
     }
 
     /**
@@ -66,12 +64,12 @@ class Ray3 extends OS implements
      */
     public function discoverWirelessPower()
     {
-        return array(
+        return [
             // RAY3-MIB::rfPowerCurrent.0
             new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.17.0', 'racom3-pow-cur', 1, 'Tx Power Current'),
             //RAY3-MIB::rfPowerConfigured.0
             new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.12.0', 'racom3-pow-conf', 1, 'Tx Power Configured'),
-        );
+        ];
     }
 
     /**
@@ -83,9 +81,10 @@ class Ray3 extends OS implements
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.33555.4.3.2.1.0'; // RAY3-MIB::rss.0
-        return array(
+
+        return [
             new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom3', 1, 'RSSI', null, 1, 10),
-        );
+        ];
     }
 
     /**
@@ -97,10 +96,12 @@ class Ray3 extends OS implements
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.33555.4.3.2.2.0'; // RAY3-MIB::snr.0
-        return array(
+
+        return [
             new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom3', 1, 'CINR', null, 1, 10),
-        );
+        ];
     }
+
     /**
      * Discover wireless RATE.  This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -111,9 +112,10 @@ class Ray3 extends OS implements
     {
         $oid_bitrate = '.1.3.6.1.4.1.33555.4.2.1.13.0'; // RAY3-MIB::netBitrate.0
         $oid_maxbitrate = '.1.3.6.1.4.1.33555.4.2.1.14.0'; // RAY3-MIB::maxNetBitrate.0
-        return array(
+
+        return [
             new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom3-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
             new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom3-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
-        );
+        ];
     }
 }

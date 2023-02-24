@@ -1,0 +1,532 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: BRAS(Broadband Remote Access Server) access MIB File
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2020-11-10 created by wangzhenjun
+-- =================================================================
+HH3C-BRAS-ACCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+hh3cBrasAcc MODULE-IDENTITY
+    LAST-UPDATED
+        "202011100927Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB contains objects that manage the information
+        of BRAS access.
+        "
+    REVISION
+        "202011100927Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 200 }
+
+hh3cBrasAccTotalStat OBJECT IDENTIFIER ::= { hh3cBrasAcc 1 }
+
+hh3cBrasAccTotalUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of BRAS access users on the device."
+    ::= { hh3cBrasAccTotalStat 1 }
+
+hh3cBrasAccTotalPPPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of PPPoE users on the device."
+    ::= { hh3cBrasAccTotalStat 2 }
+
+hh3cBrasAccTotalIPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPoE users on the device."
+    ::= { hh3cBrasAccTotalStat 3 }
+
+hh3cBrasAccTotalLNSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LNS users on the device."
+    ::= { hh3cBrasAccTotalStat 4 }
+
+hh3cBrasAccTotalLACUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LAC users on the device."
+    ::= { hh3cBrasAccTotalStat 5 }
+
+hh3cBrasAccTotalIPv4UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv4 users on the device."
+    ::= { hh3cBrasAccTotalStat 6 }
+
+hh3cBrasAccTotalIPv6UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv6 users on the device."
+    ::= { hh3cBrasAccTotalStat 7 }
+
+hh3cBrasAccTotalDSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of dual-stack users on the device."
+    ::= { hh3cBrasAccTotalStat 8 }
+
+hh3cBrasAccUPStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBrasAccCUStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table for BRAS CU(C: control plane, U: user plane) 
+                 user statistics."
+    ::= { hh3cBrasAcc 2 }
+
+hh3cBrasAccUPStatEntry  OBJECT-TYPE
+    SYNTAX      Hh3cBrasAccCUStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry for BRAS CU user statistics."
+    INDEX
+    {
+            hh3cBrasAccUPID
+    }
+    ::= { hh3cBrasAccUPStatTable 1 }
+
+Hh3cBrasAccCUStatEntry ::=
+    SEQUENCE
+    {
+            hh3cBrasAccUPID                          Integer32,
+            hh3cBrasAccUPUserNum                     Integer32,
+            hh3cBrasAccUPPPPoEUserNum                Integer32,
+            hh3cBrasAccUPIPoEUserNum                 Integer32,
+            hh3cBrasAccUPLNSUserNum                  Integer32,
+            hh3cBrasAccUPLACUserNum                  Integer32,
+            hh3cBrasAccUPIPv4UserNum                 Integer32,
+            hh3cBrasAccUPIPv6UserNum                 Integer32,
+            hh3cBrasAccUPDSUserNum                   Integer32
+    }
+
+hh3cBrasAccUPID OBJECT-TYPE
+    SYNTAX      Integer32 (1024..2047)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value is UP (user plane) ID."
+    ::= { hh3cBrasAccUPStatEntry 1 }
+
+hh3cBrasAccUPUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of BRAS access users on the
+         specified UP."
+    ::= { hh3cBrasAccUPStatEntry 2 }
+
+hh3cBrasAccUPPPPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of PPPoE users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 3 }
+
+hh3cBrasAccUPIPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPoE users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 4 }
+
+hh3cBrasAccUPLNSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LNS users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 5 }
+
+hh3cBrasAccUPLACUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LAC users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 6 }
+
+hh3cBrasAccUPIPv4UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv4 users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 7 }
+
+hh3cBrasAccUPIPv6UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv6 users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 8 }
+
+hh3cBrasAccUPDSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of dual-stack users on the specified UP."
+    ::= { hh3cBrasAccUPStatEntry 9 }
+
+hh3cBrasAccUPSlotStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBrasAccUPSlotStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table for BRAS CU user statistics on the specific slot."
+    ::= { hh3cBrasAcc 3 }
+
+hh3cBrasAccUPSlotStatEntry  OBJECT-TYPE
+    SYNTAX      Hh3cBrasAccUPSlotStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry for BRAS CU user statistics."
+    INDEX
+    {
+            hh3cBrasAccUPSlotUPID,
+            hh3cBrasAccUPSlotID
+    }
+    ::= { hh3cBrasAccUPSlotStatTable 1 }
+
+Hh3cBrasAccUPSlotStatEntry ::=
+    SEQUENCE
+    {
+            hh3cBrasAccUPSlotUPID                        Integer32,
+            hh3cBrasAccUPSlotID                          Integer32,
+            hh3cBrasAccUPSlotUserNum                     Integer32,
+            hh3cBrasAccUPSlotPPPoEUserNum                Integer32,
+            hh3cBrasAccUPSlotIPoEUserNum                 Integer32,
+            hh3cBrasAccUPSlotLNSUserNum                  Integer32,
+            hh3cBrasAccUPSlotLACUserNum                  Integer32,
+            hh3cBrasAccUPSlotIPv4UserNum                 Integer32,
+            hh3cBrasAccUPSlotIPv6UserNum                 Integer32,
+            hh3cBrasAccUPSlotDSUserNum                   Integer32
+    }
+
+hh3cBrasAccUPSlotUPID OBJECT-TYPE
+    SYNTAX      Integer32 (1024..2047)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value is UP ID."
+    ::= { hh3cBrasAccUPSlotStatEntry 1 }
+
+hh3cBrasAccUPSlotID OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value is the slot ID of a UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 2 }
+
+hh3cBrasAccUPSlotUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of BRAS access users on the specified
+         slot of the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 3 }
+
+hh3cBrasAccUPSlotPPPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of PPPoE users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 4 }
+
+hh3cBrasAccUPSlotIPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPoE users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 5 }
+
+hh3cBrasAccUPSlotLNSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LNS users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 6 }
+
+hh3cBrasAccUPSlotLACUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LAC users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 7 }
+
+hh3cBrasAccUPSlotIPv4UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv4 users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 8 }
+
+hh3cBrasAccUPSlotIPv6UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv6 users on the specified slot of
+         the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 9 }
+
+hh3cBrasAccUPSlotDSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of dual-stack users on the specified
+         slot of the specified UP."
+    ::= { hh3cBrasAccUPSlotStatEntry 10 }
+
+hh3cBrasAccIfStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBrasAccIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table for BRAS CU user statistics on the specified
+                 interface."
+    ::= { hh3cBrasAcc 4 }
+
+hh3cBrasAccIfStatEntry  OBJECT-TYPE
+    SYNTAX      Hh3cBrasAccIfStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry for BRAS CU user statistics."
+    INDEX
+    {
+            hh3cBrasAccIfName
+    }
+    ::= { hh3cBrasAccIfStatTable 1 }
+
+Hh3cBrasAccIfStatEntry ::=
+    SEQUENCE
+    {
+            hh3cBrasAccIfName                        DisplayString,
+            hh3cBrasAccIfUserNum                     Integer32,
+            hh3cBrasAccIfPPPoEUserNum                Integer32,
+            hh3cBrasAccIfIPoEUserNum                 Integer32,
+            hh3cBrasAccIfLNSUserNum                  Integer32,
+            hh3cBrasAccIfLACUserNum                  Integer32,
+            hh3cBrasAccIfIPv4UserNum                 Integer32,
+            hh3cBrasAccIfIPv6UserNum                 Integer32,
+            hh3cBrasAccIfDSUserNum                   Integer32
+    }
+
+hh3cBrasAccIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is an interface name. The interface name must be valid
+         or not specified on the getnext operation."
+    ::= { hh3cBrasAccIfStatEntry 1 }
+
+hh3cBrasAccIfUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of BRAS access users on the specified
+         interface."
+    ::= { hh3cBrasAccIfStatEntry 2 }
+
+hh3cBrasAccIfPPPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of PPPoE users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 3 }
+
+hh3cBrasAccIfIPoEUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPoE users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 4 }
+
+hh3cBrasAccIfLNSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LNS users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 5 }
+
+hh3cBrasAccIfLACUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of LAC users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 6 }
+
+hh3cBrasAccIfIPv4UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv4 users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 7 }
+
+hh3cBrasAccIfIPv6UserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of IPv6 users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 8 }
+
+hh3cBrasAccIfDSUserNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value is the total number of dual-stack users on the
+         specified interface."
+    ::= { hh3cBrasAccIfStatEntry 9 }
+
+hh3cBrasAccCUMibTrapOid OBJECT IDENTIFIER ::= { hh3cBrasAcc 5 }
+
+hh3cBrasAccCUTrapUPID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved UP of trap information."
+    ::= { hh3cBrasAccCUMibTrapOid 1 }
+
+hh3cBrasAccCUTrapSlotID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved slot of trap information."
+    ::= { hh3cBrasAccCUMibTrapOid 2 }
+
+hh3cBrasAccCUTrapThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved threshold (percentage of online users) of
+         trap information."
+    ::= { hh3cBrasAccCUMibTrapOid 3 }
+
+hh3cBrasAccCUTrap OBJECT IDENTIFIER  ::= { hh3cBrasAcc 6 }
+
+hh3cBrasAccCUTrapPrefix OBJECT IDENTIFIER  ::= { hh3cBrasAccCUTrap 0 }
+
+hh3cBrasAccCUUPWarning NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccCUTrapUPID,
+        hh3cBrasAccCUTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the UP
+         reaches the maximum user threshold. Subsequent users are recommended
+         to access the device through another UP."
+    ::= { hh3cBrasAccCUTrapPrefix 1 }
+
+hh3cBrasAccCUUPWarningResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccCUTrapUPID,
+        hh3cBrasAccCUTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the UP
+         falls below the maximum user threshold."
+    ::= { hh3cBrasAccCUTrapPrefix 2 }
+
+hh3cBrasAccCUSlotWarning NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccCUTrapUPID,
+        hh3cBrasAccCUTrapSlotID,
+        hh3cBrasAccCUTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the slot of
+         the specified UP reaches the maximum user threshold. Subsequent users
+         are recommended to access the device through another slot of
+         the specified UP."
+    ::= { hh3cBrasAccCUTrapPrefix 3 }
+
+hh3cBrasAccCUSlotWarningResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccCUTrapUPID,
+        hh3cBrasAccCUTrapSlotID,
+        hh3cBrasAccCUTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the slot
+         of the specified UP falls below the maximum user threshold."
+    ::= { hh3cBrasAccCUTrapPrefix 4 }
+
+END

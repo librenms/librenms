@@ -1,0 +1,375 @@
+-- =============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The NVGRE(Network Virtualization using
+--                        Generic Routing Encapsulation) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2014-03-11 Initial version created by Neng Yan
+-- =============================================================================
+HH3C-NVGRE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        RowStatus, MacAddress
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32, Counter64
+    FROM SNMPv2-SMI
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cNvgre MODULE-IDENTITY
+    LAST-UPDATED
+        "201403110900Z"        -- Mar 11, 2014 at 09:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The NVGRE MIB."
+    REVISION
+        "201403110900Z"   -- Mar 11, 2014 at 09:00 GMT
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 156 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cNvgreObjects      OBJECT IDENTIFIER ::= { hh3cNvgre 1 }
+
+hh3cNvgreScalarGroup OBJECT IDENTIFIER ::= { hh3cNvgreObjects 1 }
+
+hh3cNvgreNextNvgreID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next available NVGRE ID(identifier), in the range of 4096 to 16777214.
+        The invalid value 4294967295 indicates that no ID can be set."
+    ::= { hh3cNvgreScalarGroup 1 }
+
+hh3cNvgreConfigured    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of currently configured NVGREs."
+    ::= { hh3cNvgreScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cNvgreTable Definition
+-- =============================================================================
+hh3cNvgreTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNvgreEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for NVGRE parameters."
+    ::= { hh3cNvgreObjects 2 }
+
+hh3cNvgreEntry  OBJECT-TYPE
+    SYNTAX      Hh3cNvgreEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the parameters of an NVGRE."
+    INDEX
+    {
+        hh3cNvgreID
+    }
+    ::= { hh3cNvgreTable 1 }
+
+Hh3cNvgreEntry ::=
+    SEQUENCE
+    {
+        hh3cNvgreID                 Unsigned32,
+        hh3cNvgreVsiIndex           Unsigned32,
+        hh3cNvgreRemoteMacCount     Unsigned32,
+        hh3cNvgreRowStatus          RowStatus
+    }
+
+hh3cNvgreID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The NVGRE ID, in the range of 4096 to 16777214."
+    ::= { hh3cNvgreEntry 1 }
+
+hh3cNvgreVsiIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VSI index.  A unique index for the conceptual row identifying
+         a VSI(Virtual Switch Instance) in the hh3cVsiTable."
+    ::= { hh3cNvgreEntry 2 }
+
+hh3cNvgreRemoteMacCount    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote MAC(Media Access Control) address count of this NVGRE."
+    ::= { hh3cNvgreEntry 3 }
+
+hh3cNvgreRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent."
+    ::= { hh3cNvgreEntry 4 }
+
+-- =============================================================================
+-- End of hh3cNvgreTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cNvgreTunnelTable Definition
+-- =============================================================================
+hh3cNvgreTunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNvgreTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for NVGRE tunnel parameters."
+    ::= { hh3cNvgreObjects 3 }
+
+hh3cNvgreTunnelEntry  OBJECT-TYPE
+    SYNTAX      Hh3cNvgreTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the parameters of an NVGRE tunnel."
+    INDEX
+    {
+        hh3cNvgreID,
+        hh3cNvgreTunnelID
+    }
+    ::= { hh3cNvgreTunnelTable 1 }
+
+Hh3cNvgreTunnelEntry ::=
+    SEQUENCE
+    {
+        hh3cNvgreTunnelID             Unsigned32,
+        hh3cNvgreTunnelRowStatus      RowStatus,
+        hh3cNvgreTunnelOctets         Counter64,
+        hh3cNvgreTunnelPackets        Counter64
+    }
+
+hh3cNvgreTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cNvgreTunnelEntry 1 }
+
+hh3cNvgreTunnelRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cNvgreTunnelEntry 2 }
+
+hh3cNvgreTunnelOctets   OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of octets that have been forwarded over the tunnel."
+    ::= { hh3cNvgreTunnelEntry 3 }
+
+hh3cNvgreTunnelPackets  OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of packets that have been forwarded over the tunnel."
+    ::= { hh3cNvgreTunnelEntry 4 }
+
+-- =============================================================================
+-- End of hh3cNvgreTunnelTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cNvgreTunnelBoundTable Definition
+-- =============================================================================
+hh3cNvgreTunnelBoundTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNvgreTunnelBoundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for the number of NVGREs to which the tunnel is bound."
+    ::= { hh3cNvgreObjects 4 }
+
+hh3cNvgreTunnelBoundEntry  OBJECT-TYPE
+    SYNTAX      Hh3cNvgreTunnelBoundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents the number of NVGREs to which a tunnel is bound."
+    INDEX
+    {
+        hh3cNvgreTunnelID
+    }
+    ::= { hh3cNvgreTunnelBoundTable 1 }
+
+Hh3cNvgreTunnelBoundEntry ::=
+    SEQUENCE
+    {
+        hh3cNvgreTunnelBoundNvgreNum  Unsigned32
+    }
+
+hh3cNvgreTunnelBoundNvgreNum    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of NVGREs to which this tunnel is bound."
+    ::= { hh3cNvgreTunnelBoundEntry 1 }
+
+-- =============================================================================
+-- End of hh3cNvgreTunnelBoundTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cNvgreMacTable Definition
+-- =============================================================================
+hh3cNvgreMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNvgreMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for NVGRE remote MAC addresses."
+    ::= { hh3cNvgreObjects 5 }
+
+hh3cNvgreMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cNvgreMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An NVGRE remote MAC address."
+    INDEX
+    {
+        hh3cNvgreVsiIndex,
+        hh3cNvgreMacAddr
+    }
+    ::= { hh3cNvgreMacTable 1 }
+
+Hh3cNvgreMacEntry ::=
+    SEQUENCE
+    {
+        hh3cNvgreMacAddr            MacAddress,
+        hh3cNvgreMacTunnelID        Unsigned32,
+        hh3cNvgreMacType            INTEGER
+    }
+
+hh3cNvgreMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC address."
+    ::= { hh3cNvgreMacEntry 1 }
+
+hh3cNvgreMacTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cNvgreMacEntry 2 }
+
+hh3cNvgreMacType    OBJECT-TYPE
+    SYNTAX      INTEGER{
+                 selfLearned (1),
+                 staticConfigured (2),
+                 protocolLearned (3)
+                 }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of an MAC address."
+    ::= { hh3cNvgreMacEntry 3 }
+
+-- =============================================================================
+-- End of hh3cNvgreMacTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cNvgreStaticMacTable Definition
+-- =============================================================================
+hh3cNvgreStaticMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNvgreStaticMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for NVGRE static remote MAC addresses."
+    ::= { hh3cNvgreObjects 6 }
+
+hh3cNvgreStaticMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cNvgreStaticMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An NVGRE static MAC address."
+    INDEX
+    {
+        hh3cNvgreVsiIndex,
+        hh3cNvgreStaticMacAddr
+    }
+    ::= { hh3cNvgreStaticMacTable 1 }
+
+Hh3cNvgreStaticMacEntry ::=
+    SEQUENCE
+    {
+        hh3cNvgreStaticMacAddr         MacAddress,
+        hh3cNvgreStaticMacTunnelID     Unsigned32,
+        hh3cNvgreStaticMacRowStatus    RowStatus
+    }
+
+hh3cNvgreStaticMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static MAC address."
+    ::= { hh3cNvgreStaticMacEntry 1 }
+
+hh3cNvgreStaticMacTunnelID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A unique index for tunnel."
+    ::= { hh3cNvgreStaticMacEntry 2 }
+
+hh3cNvgreStaticMacRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent."
+    ::= { hh3cNvgreStaticMacEntry 3 }
+
+-- =============================================================================
+-- End of hh3cNvgreStaticMacTable Definition
+-- =============================================================================
+
+END

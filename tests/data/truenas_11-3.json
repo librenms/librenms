@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.50536.3.1",
                     "sysDescr": "FreeNAS-11.3-U2.1 (6a6a2dfda7). Hardware: amd64 Intel(R) Core(TM) i5-7267U CPU @ 3.10GHz running at 3095. Software: FreeBSD 11.3-RELEASE-p7 (revision 199506)",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "truenas",
-                    "type": "storage",
-                    "serial": null,
-                    "icon": "truenas.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.50536.3.1",
-                    "sysDescr": "FreeNAS-11.3-U2.1 (6a6a2dfda7). Hardware: amd64 Intel(R) Core(TM) i5-7267U CPU @ 3.10GHz running at 3095. Software: FreeBSD 11.3-RELEASE-p7 (revision 199506)",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "truenas",
                     "type": "storage",
                     "serial": null,
-                    "icon": "truenas.png",
-                    "location": "<private>"
+                    "icon": "truenas.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -161,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -272,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 1000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -375,12 +352,10 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -510,98 +485,38 @@
                 {
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "2",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Real memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Virtual memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 4096,
                     "mempool_descr": "Physical memory",
                     "mempool_perc": 60,
+                    "mempool_perc_oid": null,
                     "mempool_used": 1897017344,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
                     "mempool_free": 1277497344,
+                    "mempool_free_oid": null,
                     "mempool_total": 3174514688,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 99
                 },
                 {
                     "mempool_index": "2",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 4096,
                     "mempool_descr": "Real memory",
                     "mempool_perc": 99,
+                    "mempool_perc_oid": null,
                     "mempool_used": 1098493952,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.2",
                     "mempool_free": 11534336,
+                    "mempool_free_oid": null,
                     "mempool_total": 1110028288,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -610,37 +525,66 @@
                 {
                     "mempool_index": "3",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "virtual",
                     "mempool_precision": 4096,
                     "mempool_descr": "Virtual memory",
                     "mempool_perc": 100,
+                    "mempool_perc_oid": null,
                     "mempool_used": 2200625545216,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
                     "mempool_free": 26001408,
+                    "mempool_free_oid": null,
                     "mempool_total": 2200651546624,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 95
                 },
                 {
-                    "mempool_index": "10",
+                    "mempool_index": "6",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_precision": 4096,
-                    "mempool_descr": "Swap space",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
                     "mempool_perc": 0,
+                    "mempool_perc_oid": null,
                     "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.6",
+                    "mempool_free": 3174514688,
+                    "mempool_free_oid": null,
+                    "mempool_total": 3174514688,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "7",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "cached",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 6,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 190910464,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.7",
+                    "mempool_free": 2983604224,
+                    "mempool_free_oid": null,
+                    "mempool_total": 3174514688,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -652,7 +596,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -667,6 +611,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -691,6 +636,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -698,7 +644,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -715,6 +661,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -739,6 +686,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -746,7 +694,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -763,6 +711,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -787,6 +736,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -796,7 +746,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -811,6 +761,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -835,6 +786,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -842,7 +794,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -859,6 +811,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -866,7 +819,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -883,6 +836,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -890,7 +844,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -907,6 +861,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -931,6 +886,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -938,7 +894,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -955,6 +911,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -979,6 +936,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1003,6 +961,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1027,6 +986,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1051,6 +1011,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 }
             ],
@@ -1108,7 +1069,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1123,6 +1084,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1147,6 +1109,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1154,7 +1117,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -1171,6 +1134,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1195,6 +1159,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1202,7 +1167,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -1219,6 +1184,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1243,6 +1209,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 14.574531946697,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1252,7 +1219,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1267,6 +1234,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1291,6 +1259,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1298,7 +1267,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -1315,6 +1284,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1322,7 +1292,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -1339,6 +1309,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1346,7 +1317,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -1363,6 +1334,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1387,6 +1359,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1394,7 +1367,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -1411,6 +1384,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -1435,6 +1409,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1459,6 +1434,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1483,6 +1459,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1507,6 +1484,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 }
             ],
@@ -1854,9 +1832,9 @@
                     "storage_index": "1",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system",
-                    "storage_size": 50415034368,
+                    "storage_size": 50416054272,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 1019904,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1893,9 +1871,9 @@
                     "storage_index": "2",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/configs-ee21f3733ab34d689aed5079e9ac663b",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415058944,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 24576,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1906,9 +1884,9 @@
                     "storage_index": "3",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/rrd-ee21f3733ab34d689aed5079e9ac663b",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415874048,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 839680,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2010,9 +1988,9 @@
                     "storage_index": "4",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/samba4",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415063040,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 28672,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2075,9 +2053,9 @@
                     "storage_index": "5",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/webui",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415058944,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 24576,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2088,9 +2066,9 @@
                     "storage_index": "6",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/cores",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415058944,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 24576,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2101,9 +2079,9 @@
                     "storage_index": "7",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/.system/syslog-ee21f3733ab34d689aed5079e9ac663b",
-                    "storage_size": 50415034368,
+                    "storage_size": 50415091712,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 57344,
                     "storage_free": 50415034368,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -2114,11 +2092,11 @@
                     "storage_index": "8",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/ROOT",
-                    "storage_size": 50415034368,
+                    "storage_size": 51487580160,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 1072545792,
                     "storage_free": 50415034368,
-                    "storage_perc": 0,
+                    "storage_perc": 2,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 },
@@ -2127,11 +2105,11 @@
                     "storage_index": "9",
                     "storage_type": "dataset",
                     "storage_descr": "freenas-boot/ROOT/default",
-                    "storage_size": 50415034368,
+                    "storage_size": 51487555584,
                     "storage_units": 4096,
-                    "storage_used": 0,
+                    "storage_used": 1072521216,
                     "storage_free": 50415034368,
-                    "storage_perc": 0,
+                    "storage_perc": 2,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 }

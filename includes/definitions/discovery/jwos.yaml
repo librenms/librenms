@@ -1,0 +1,9 @@
+modules:
+  os:
+    version: JUNIPER-WX-GLOBAL-REG::jnxWxSysSwVersion.0
+    serial: JUNIPER-WX-GLOBAL-REG::jnxWxSysSerialNumber.0
+    hardware:
+      - JUNIPER-WX-GLOBAL-REG::jnxWxChassisType.0
+      - JUNIPER-WX-GLOBAL-REG::jnxWxSysHwVersion.0
+    hardware_regex: '/(jnx)?(?<hardware>.*)/'
+    hardware_template: '/{{ JUNIPER-WX-GLOBAL-REG::jnxWxChassisType.0 }} {{ JUNIPER-WX-GLOBAL-REG::jnxWxSysHwVersion.0 }}/'

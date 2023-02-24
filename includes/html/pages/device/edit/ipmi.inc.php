@@ -2,14 +2,22 @@
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
-        $ipmi_hostname = mres($_POST['ipmi_hostname']);
-        $ipmi_username = mres($_POST['ipmi_username']);
-        $ipmi_password = mres($_POST['ipmi_password']);
+        $ipmi_hostname = $_POST['ipmi_hostname'];
+        $ipmi_port = (int) $_POST['ipmi_port'];
+        $ipmi_username = $_POST['ipmi_username'];
+        $ipmi_password = $_POST['ipmi_password'];
+        $ipmi_kg_key = $_POST['ipmi_kg_key'];
 
         if ($ipmi_hostname != '') {
             set_dev_attrib($device, 'ipmi_hostname', $ipmi_hostname);
         } else {
             del_dev_attrib($device, 'ipmi_hostname');
+        }
+
+        if ($ipmi_port != '') {
+            set_dev_attrib($device, 'ipmi_port', $ipmi_port);
+        } else {
+            set_dev_attrib($device, 'ipmi_port', '623'); // Default port
         }
 
         if ($ipmi_username != '') {
@@ -24,8 +32,14 @@ if ($_POST['editing']) {
             del_dev_attrib($device, 'ipmi_password');
         }
 
+        if ($ipmi_kg_key != '') {
+            set_dev_attrib($device, 'ipmi_kg_key', $ipmi_kg_key);
+        } else {
+            del_dev_attrib($device, 'ipmi_kg_key');
+        }
+
         $update_message = 'Device IPMI data updated.';
-        $updated        = 1;
+        $updated = 1;
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }//end if
@@ -39,8 +53,6 @@ if ($updated && $update_message) {
 
 ?>
 
-<h3>IPMI settings</h3>
-
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <?php echo csrf_field() ?>
 <input type="hidden" name="editing" value="yes">
@@ -48,6 +60,12 @@ if ($updated && $update_message) {
     <label for="ipmi_hostname" class="col-sm-2 control-label">IPMI/BMC Hostname</label>
     <div class="col-sm-6">
       <input id="ipmi_hostname" name="ipmi_hostname" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_hostname'); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ipmi_port" class="col-sm-2 control-label">IPMI/BMC Port</label>
+    <div class="col-sm-6">
+      <input id="ipmi_port" name="ipmi_port" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_port'); ?>" placeholder="623" />
     </div>
   </div>
   <div class="form-group">
@@ -60,6 +78,12 @@ if ($updated && $update_message) {
     <label for="impi_password" class="col-sm-2 control-label">IPMI/BMC Password</label>
     <div class="col-sm-6">
       <input id="ipmi_password" name="ipmi_password" type="password" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_password'); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ipmi_kg_key" class="col-sm-2 control-label">IPMIv2 Kg key</label>
+    <div class="col-sm-6">
+      <input id="ipmi_kg_key" name="ipmi_kg_key" type="password" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_kg_key'); ?>" placeholder="A0FE1A760B304... (Leave blank if none)" />
     </div>
   </div>
   <div class="row">

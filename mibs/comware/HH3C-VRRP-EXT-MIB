@@ -1,0 +1,120 @@
+-- =========================================================================
+-- Copyright (C) 2001,2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes various common MIB objects implemented 
+-- by both Routers and Switches.
+-- Reference: VRRP-MIB
+-- Version: V1.0
+-- History:
+--      V1.0 2004-12-09
+--        Initial version
+-- =========================================================================
+HH3C-VRRP-EXT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, Integer32                         
+         FROM SNMPv2-SMI
+
+     RowStatus       
+         FROM SNMPv2-TC
+
+     ifIndex               
+         FROM IF-MIB  
+
+     vrrpOperVrId                        
+         FROM VRRP-MIB     
+
+     hh3cCommon                          
+         FROM HH3C-OID-MIB;
+
+
+ hh3cVrrpExt MODULE-IDENTITY
+     LAST-UPDATED 
+         "200412090000Z"
+     ORGANIZATION
+         "New H3C Tech. Co., Ltd."
+     CONTACT-INFO
+         "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+         "
+     DESCRIPTION
+         "This MIB describes objects used for managing Virtual Router
+         Redundancy Protocol (VRRP) routers."
+     ::= { hh3cCommon 24 }
+
+
+-- ===================================================================
+--  Start of MIB objects
+-- ===================================================================
+
+ hh3cVrrpExtMibObject      OBJECT IDENTIFIER ::= { hh3cVrrpExt 1 }        
+
+-- ===================================================================
+--  VRRP EXT Table
+-- ===================================================================
+
+ hh3cVrrpExtTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF Hh3cVrrpExtEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table extends for a VRRP router which consists of a
+         sequence (i.e., one or more conceptual rows) of
+         hh3cVrrpExtEntry items."
+     ::= { hh3cVrrpExtMibObject 1 }
+
+ hh3cVrrpExtEntry OBJECT-TYPE
+     SYNTAX       Hh3cVrrpExtEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "An entry in the hh3cVrrpExtTable containing the status
+         values of a virtual router."
+     INDEX    { ifIndex, vrrpOperVrId, hh3cVrrpExtTrackInterface }
+     ::= { hh3cVrrpExtTable 1 }
+
+ Hh3cVrrpExtEntry ::=
+     SEQUENCE {
+         hh3cVrrpExtTrackInterface
+             INTEGER,
+         hh3cVrrpExtPriorityReduce
+             Integer32,
+         hh3cVrrpExtRowStatus
+             RowStatus
+ }
+
+ hh3cVrrpExtTrackInterface OBJECT-TYPE
+     SYNTAX INTEGER (0..2147483647)
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         "This value is the ifIndex that identifies which interface 
+         the virtual router tracked."
+     ::= { hh3cVrrpExtEntry 1 }
+
+ hh3cVrrpExtPriorityReduce  OBJECT-TYPE
+     SYNTAX       Integer32 (1..255)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "This value identifies how much priority of a virtual router
+         will be reduced/increased when the interface tracked is down/up."
+     DEFVAL { 10 }
+     ::= { hh3cVrrpExtEntry 2 }
+
+ hh3cVrrpExtRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION   
+         "The row status variable, used according to installation
+         and removal conventions for conceptual rows. Setting this
+         object to active(1) or createAndGo(4) results in the
+         addition of the ifIndex tracked by a virtual router.
+         Destroying the entry removes the tracked ifIndex from the 
+         virtual router. Other values is not supported now."
+     ::= { hh3cVrrpExtEntry 3 }
+
+END

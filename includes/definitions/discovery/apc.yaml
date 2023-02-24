@@ -240,6 +240,281 @@ modules:
                         - { value: 5, generic: 0, graph: 0, descr: outletOnWithDelay }
                         - { value: 6, generic: 3, graph: 0, descr: outletOffWithDelay }
                         - { value: 7, generic: 1, graph: 0, descr: outletRebootWithDelay }
+                -
+                    oid: airFMGroup
+                    value: airFMGroupSysStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.3.1.{{ $index }}'
+                    descr: 'airFM Group Status'
+                    index: 'airFMGroupSysStatus.{{ $index }}'
+                    state_name: airFMGroupSysStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: Online }
+                        - { value: 2, generic: 3, graph: 0, descr: Idle }
+                        - { value: 3, generic: 0, graph: 0, descr: LoadShare }
+                        - { value: 4, generic: 1, graph: 0, descr: Offline }
+                        - { value: 5, generic: 2, graph: 0, descr: Failed }
+                        - { value: 6, generic: 3, graph: 0, descr: Disabled }
+                        - { value: 7, generic: 1, graph: 0, descr: Undefined }
+                -
+                    oid: AirFMModCoolEntry
+                    value: airFMModComp1
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.2.{{ $index }}'
+                    descr: 'Compressor 1'
+                    index: 'airFMModComp1.{{ $index }}'
+                    state_name: airFMModComp1
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: On }
+                        - { value: 3, generic: 0, graph: 0, descr: Off }
+                -
+                    oid: AirFMModCoolEntry
+                    value: airFMModComp2
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.3.{{ $index }}'
+                    descr: 'Compressor 2'
+                    index: 'airFMModComp2.{{ $index }}'
+                    state_name: airFMModComp2
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: On }
+                        - { value: 3, generic: 0, graph: 0, descr: Off }
+                -
+                    oid: airFMSysCoolState
+                    value: airFMSysCoolState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.5.8.{{ $index }}'
+                    descr: 'Cooling'
+                    index: 'airFMSysCoolState.{{ $index }}'
+                    state_name: airFMSysCoolState
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                -
+                    oid: airFMSysHumState
+                    value: airFMSysHumState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.6.1.{{ $index }}'
+                    descr: 'Humidifier'
+                    index: 'airFMSysHumState.{{ $index }}'
+                    state_name: airFMSysHumState
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                -
+                    oid: airFMSysDehumState
+                    value: airFMSysDehumState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.7.1.{{ $index }}'
+                    descr: 'Dehumidifier'
+                    index: 'airFMSysDehumState.{{ $index }}'
+                    state_name: airFMSysDehumState
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                -
+                    oid: airFMSysReheatState
+                    value: airFMSysReheatState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.8.1.{{ $index }}'
+                    descr: 'Heating'
+                    index: 'airFMSysReheatState.{{ $index }}'
+                    state_name: airFMSysReheatState
+                    skip_values: 1
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                -
+                    oid: xATSSwitchStatusSelectedSource
+                    value: xATSSwitchStatusSelectedSource
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.1.{{ $index }}'
+                    descr: 'ATS Source'
+                    index: 'xATSSwitchStatusSelectedSource.{{ $index }}'
+                    state_name: xATSSwitchStatusSelectedSource
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: none }
+                        - { value: 2, generic: 0, graph: 0, descr: source1 }
+                        - { value: 3, generic: 1, graph: 0, descr: source2 }
+                        - { value: 4, generic: 2, graph: 0, descr: fault }
+                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSwitchStatusOperationalMode
+                    value: xATSSwitchStatusOperationalMode
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.2.{{ $index }}'
+                    descr: 'ATS Operation Mode'
+                    index: 'xATSSwitchStatusOperationalMode.{{ $index }}'
+                    state_name: xATSSwitchStatusOperationalMode
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: automatic }
+                        - { value: 2, generic: 2, graph: 0, descr: notInAutoAbnormal }
+                        - { value: 3, generic: 1, graph: 0, descr: notInAuto }
+                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSwitchStatusEngineStartSignal
+                    value: xATSSwitchStatusEngineStartSignal
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.4.{{ $index }}'
+                    descr: 'Engine Start Signal'
+                    index: 'xATSSwitchStatusEngineStartSignal.{{ $index }}'
+                    state_name: xATSSwitchStatusEngineStartSignal
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: run }
+                        - { value: 2, generic: 0, graph: 0, descr: stop }
+                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSource1Position
+                    value: xATSSource1Position
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.2.{{ $index }}'
+                    descr: 'Source1 Switch Position'
+                    index: 'xATSSource1Position.{{ $index }}'
+                    state_name: xATSSource1Position
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 2, generic: 0, graph: 0, descr: closed }
+                        - { value: 3, generic: 2, graph: 0, descr: tripped }
+                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSource2Position
+                    value: xATSSource2Position
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.2.{{ $index }}'
+                    descr: 'Source2 Switch Position'
+                    index: 'xATSSource2Position.{{ $index }}'
+                    state_name: xATSSource2Position
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 2, generic: 0, graph: 0, descr: closed }
+                        - { value: 3, generic: 2, graph: 0, descr: tripped }
+                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSource1Quality
+                    value: xATSSource1Quality
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.4.{{ $index }}'
+                    descr: 'Source1 Quality'
+                    index: 'xATSSource1Quality.{{ $index }}'
+                    state_name: xATSSource1Quality
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: sourceGood }
+                        - { value: 2, generic: 1, graph: 0, descr: lowVoltage }
+                        - { value: 3, generic: 1, graph: 0, descr: highVoltage }
+                        - { value: 4, generic: 1, graph: 0, descr: phaseImbalance }
+                        - { value: 5, generic: 1, graph: 0, descr: freqOutOfRange }
+                        - { value: 6, generic: 1, graph: 0, descr: badRotation }
+                        - { value: 7, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSSource2Quality
+                    value: xATSSource2Quality
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.4.{{ $index }}'
+                    descr: 'Source2 Quality'
+                    index: 'xATSSource2Quality.{{ $index }}'
+                    state_name: xATSSource2Quality
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: sourceGood }
+                        - { value: 2, generic: 1, graph: 0, descr: lowVoltage }
+                        - { value: 3, generic: 1, graph: 0, descr: highVoltage }
+                        - { value: 4, generic: 1, graph: 0, descr: phaseImbalance }
+                        - { value: 5, generic: 1, graph: 0, descr: freqOutOfRange }
+                        - { value: 6, generic: 1, graph: 0, descr: badRotation }
+                        - { value: 7, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSTestingStatusTestStatus
+                    value: xATSTestingStatusTestStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.5.1.2.{{ $index }}'
+                    descr: 'Test Status'
+                    index: 'xATSTestingStatusTestStatus.{{ $index }}'
+                    state_name: xATSTestingStatusTestStatus
+                    group: Test
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: noTestInProcess }
+                        - { value: 2, generic: 0, graph: 0, descr: testPending }
+                        - { value: 3, generic: 0, graph: 0, descr: startingEngine }
+                        - { value: 4, generic: 0, graph: 0, descr: engineWarmingUp }
+                        - { value: 5, generic: 0, graph: 0, descr: awaitingTransferToS2 }
+                        - { value: 6, generic: 0, graph: 0, descr: testingWithLoad }
+                        - { value: 7, generic: 0, graph: 0, descr: awaitingRetransferToS1 }
+                        - { value: 8, generic: 0, graph: 0, descr: testingWithoutLoad }
+                        - { value: 9, generic: 0, graph: 0, descr: stoppingEngine }
+                        - { value: 10, generic: 0, graph: 0, descr: holdingOnGenerator }
+                -
+                    oid: xATSTestingResultsLastResult
+                    value: xATSTestingResultsLastResult
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.5.2.2.{{ $index }}'
+                    descr: 'Last Test Result'
+                    index: 'xATSTestingResultsLastResult.{{ $index }}'
+                    state_name: xATSTestingResultsLastResult
+                    group: Test
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: noResultsAvailable }
+                        - { value: 2, generic: 0, graph: 0, descr: startTestPassed }
+                        - { value: 3, generic: 0, graph: 0, descr: loadTestPassed }
+                        - { value: 4, generic: 2, graph: 0, descr: startSignalFailure }
+                        - { value: 5, generic: 1, graph: 0, descr: failedGenNotInAuto }
+                        - { value: 6, generic: 2, graph: 0, descr: failedGenEmerStop }
+                        - { value: 7, generic: 2, graph: 0, descr: failedGenShutdown }
+                        - { value: 8, generic: 2, graph: 0, descr: failedGenDidNotStart }
+                        - { value: 9, generic: 2, graph: 0, descr: failedS2NeverGood }
+                        - { value: 10, generic: 2, graph: 0, descr: genFailedDuringWarmup }
+                        - { value: 11, generic: 2, graph: 0, descr: failureOnXferToS1 }
+                        - { value: 12, generic: 2, graph: 0, descr: genFailedLoaded }
+                        - { value: 13, generic: 2, graph: 0, descr: failureOnRexferToS2 }
+                        - { value: 14, generic: 1, graph: 0, descr: failedOnCooldown }
+                        - { value: 15, generic: 1, graph: 0, descr: genFailedToStop }
+                        - { value: 16, generic: 2, graph: 0, descr: failedAtsInternalFault }
+                        - { value: 17, generic: 1, graph: 0, descr: failedAtsNotInAuto }
+                        - { value: 18, generic: 3, graph: 0, descr: canceledManualTest }
+                        - { value: 19, generic: 3, graph: 0, descr: canceledScheduledTest }
+                -
+                    oid: xATSGeneratorStatusOperational
+                    value: xATSGeneratorStatusOperational
+                    num_oid: '.1.3.6.1.4.1.318.1.1.18.1.2.2.{{ $index }}'
+                    descr: 'Generator Status'
+                    index: 'xATSGeneratorStatusOperational.{{ $index }}'
+                    state_name: xATSGeneratorStatusOperational
+                    group: Generator
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: nocomm }
+                        - { value: 2, generic: 1, graph: 0, descr: off }
+                        - { value: 3, generic: 0, graph: 0, descr: ready }
+                        - { value: 4, generic: 0, graph: 0, descr: starting }
+                        - { value: 5, generic: 0, graph: 0, descr: idle }
+                        - { value: 6, generic: 0, graph: 0, descr: running }
+                        - { value: 7, generic: 0, graph: 0, descr: normalStop }
+                        - { value: 8, generic: 2, graph: 0, descr: emergencyStop }
+                        - { value: 9, generic: 1, graph: 0, descr: notInAuto }
+                        - { value: 10, generic: 1, graph: 0, descr: shutdown }
+                        - { value: 11, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSGeneratorStatusModeSwitchPosition
+                    value: xATSGeneratorStatusModeSwitchPosition
+                    num_oid: '.1.3.6.1.4.1.318.1.1.18.1.2.2.{{ $index }}'
+                    descr: 'Mode Switch'
+                    index: 'xATSGeneratorStatusModeSwitchPosition.{{ $index }}'
+                    state_name: xATSGeneratorStatusModeSwitchPosition
+                    group: Generator
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: off }
+                        - { value: 2, generic: 1, graph: 0, descr: manual }
+                        - { value: 3, generic: 0, graph: 0, descr: automatic }
+                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSGeneratorAdvStatusOilLevel
+                    value: xATSGeneratorAdvStatusOilLevel
+                    num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.5.{{ $index }}'
+                    descr: 'Oil Level'
+                    index: 'xATSGeneratorAdvStatusOilLevel.{{ $index }}'
+                    state_name: xATSGeneratorAdvStatusOilLevel
+                    group: Generator
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 1, graph: 0, descr: low }
+                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xATSGeneratorAdvStatusCoolantLevel
+                    value: xATSGeneratorAdvStatusCoolantLevel
+                    num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.5.{{ $index }}'
+                    descr: 'Coolant Level'
+                    index: 'xATSGeneratorAdvStatusCoolantLevel.{{ $index }}'
+                    state_name: xATSGeneratorAdvStatusCoolantLevel
+                    group: Generator
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 1, graph: 0, descr: low }
+                        - { value: 3, generic: 3, graph: 0, descr: unknown }
 
         temperature:
             data:
@@ -360,6 +635,34 @@ modules:
                             oid: rPDU2SensorTempHumidityStatusType
                             op: '='
                             value: 4
+                -
+                    oid: airFMModSupplyTempC
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.2.{{ $index }}'
+                    index: 'airFMModSupplyTempC.{{ $index }}'
+                    descr: 'Supply Air'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMModReturnTempC
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.5.{{ $index }}'
+                    index: 'airFMModReturnTempC.{{ $index }}'
+                    descr: 'Return Air'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysCoolSetpointC
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.5.10.{{ $index }}'
+                    index: 'airFMSysCoolSetpointC.{{ $index }}'
+                    descr: 'Cooling Setpoint'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysReheatSetpointC
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.8.3.{{ $index }}'
+                    index: 'airFMSysReheatSetpointC.{{ $index }}'
+                    descr: 'Heating Setpoint'
+                    divisor: 10
+                    skip_values: -2147483648
         humidity:
             data:
                 -
@@ -401,6 +704,34 @@ modules:
                             oid: rPDU2SensorTempHumidityStatusRelativeHumidity
                             op: '<'
                             value: 0
+                -
+                    oid: airFMModSupplyHum
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.4.{{ $index }}'
+                    index: 'airFMModSupplyHum.{{ $index }}'
+                    descr: 'Supply Air'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMModReturnHum
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.7.{{ $index }}'
+                    index: 'airFMModReturnHum.{{ $index }}'
+                    descr: 'Return Air'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysHumSetpoint
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.6.3.{{ $index }}'
+                    index: 'airFMSysHumSetpoint.{{ $index }}'
+                    descr: 'Humidifier Setpoint'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysDehumSetpoint
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.7.3.{{ $index }}'
+                    index: 'airFMSysDehumSetpoint.{{ $index }}'
+                    descr: 'Dehumidifier Setpoint'
+                    divisor: 10
+                    skip_values: -2147483648
         airflow:
             data:
                 -
@@ -434,6 +765,74 @@ modules:
                     index: 'airIRRP100UnitStatusCompressorDriveDCLinkVoltage.{{ $index }}'
                     descr: Compressor Drive DC Link
                     divisor: 10
+                -
+                    oid: airFMModBlwr1Vlt
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.10.{{ $index }}'
+                    index: 'airFMModBlwr1Vlt.{{ $index }}'
+                    descr: 'Blower 1 Voltage'
+                    divisor: 10
+                -
+                    oid: airFMModBlwr2Vlt
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.10.{{ $index }}'
+                    index: 'airFMModBlwr2Vlt.{{ $index }}'
+                    descr: 'Blower 2 Voltage'
+                    divisor: 10
+                -
+                    oid: xATSSource1VoltageLtoL
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.2.{{ $index }}'
+                    index: 'xATSSource1VoltageLtoL.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Source1 {{ $index }} L-L'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSSource1VoltageLtoN
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.3.{{ $index }}'
+                    index: 'xATSSource1VoltageLtoN.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Source1 {{ $index }} L-N'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSSource2VoltageLtoL
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.2.{{ $index }}'
+                    index: 'xATSSource2VoltageLtoL.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Source2 {{ $index }} L-L'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSSource2VoltageLtoN
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.3.{{ $index }}'
+                    index: 'xATSSource2VoltageLtoN.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Source2 {{ $index }} L-N'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSSystemOutputVoltageLtoL
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.2.{{ $index }}'
+                    index: 'xATSSystemOutputVoltageLtoL.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Output {{ $index }} L-L'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSSystemOutputVoltageLtoN
+                    num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.3.{{ $index }}'
+                    index: 'xATSSystemOutputVoltageLtoN.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Output {{ $index }} L-N'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xATSGeneratorAdvStatusBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.1.{{ $index }}'
+                    index: 'xATSGeneratorAdvStatusBatteryVoltage.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Generator Battery'
+                    divisor: 10
+                    skip_values: -1
         current:
             data:
                 -
@@ -454,6 +853,13 @@ modules:
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
+                -
+                    oid: airFMModElectrodeCurrent
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.5.2.1.3.{{ $index }}'
+                    index: 'airFMModElectrodeCurrent.{{ $index }}'
+                    descr: Humidifier
+                    divisor: 10
+                    skip_values: -2147483648
         fanspeed:
             data:
                 -
@@ -476,6 +882,34 @@ modules:
                     index: 'airIRRP100UnitStatusCompressorDriveSpeed.{{ $index }}'
                     descr: 'Drive Speed'
                     divisor: 10
+                -
+                    oid: airFMModBlwr1CmdFreq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.3.{{ $index }}'
+                    index: 'airFMModBlwr1CmdFreq.{{ $index }}'
+                    descr: 'Blower 1 Requested Frequency'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr1ActFreq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.4.{{ $index }}'
+                    index: 'airFMModBlwr1ActFreq.{{ $index }}'
+                    descr: 'Blower 1 Actual Frequency'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr2CmdFreq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.3.{{ $index }}'
+                    index: 'airFMModBlwr2CmdFreq.{{ $index }}'
+                    descr: 'Blower 2 Requested Frequency'
+                    divisor: 10
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr2ActFreq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.4.{{ $index }}'
+                    index: 'airFMModBlwr2ActFreq.{{ $index }}'
+                    descr: 'Blower 2 Actual Frequency'
+                    divisor: 10
+                    skip_values: -2147483648
         power:
             data:
                 -
@@ -527,6 +961,32 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.21.{{ $index }}'
                     index: 'airIRG2RDT2StatusDischargePressureMetric.{{ $index }}'
                     descr: Discharge Pressure
+                -
+                    oid: airFMModFilterDiffPresPa
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.8.{{ $index }}'
+                    index: 'airFMModFilterDiffPresPa.{{ $index }}'
+                    descr: 'Filter Air Pressure Differential'
+                    divisor: 1000
+                    skip_values: -2147483648
+                -
+                    oid: airFMModCoilDiffPresPa
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.10.{{ $index }}'
+                    index: 'airFMModCoilDiffPresPa.{{ $index }}'
+                    descr: 'Coil Air Pressure Differential'
+                    divisor: 1000
+                    skip_values: -2147483648
+                -
+                    oid: airFMModSuctPresKPa
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.4.{{ $index }}'
+                    index: 'airFMModSuctPresKPa.{{ $index }}'
+                    descr: 'Refrigerant Pressure - Inlet'
+                    skip_values: -2147483648
+                -
+                    oid: airFMModDischPresKPa
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.6.{{ $index }}'
+                    index: 'airFMModDischPresKPa.{{ $index }}'
+                    descr: 'Refrigerant Pressure - Discharge'
+                    skip_values: -2147483648
         cooling:
             data:
                 -
@@ -541,3 +1001,101 @@ modules:
                     index: 'airIRG2RDT2StatusCoolDemand.{{ $index }}'
                     descr: Demand
                     multiplier: 100
+        percent:
+            data:
+                -
+                    oid: airFMModHumActualOutput
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.5.2.1.4.{{ $index }}'
+                    index: 'airFMModHumActualOutput.{{ $index }}'
+                    descr: 'Humidifier Output'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysDXCoolingDmd
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.1.{{ $index }}'
+                    index: 'airFMSysDXCoolingDmd.{{ $index }}'
+                    descr: 'Cooling Demand'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysDXDehumDmd
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.2.{{ $index }}'
+                    index: 'airFMSysDXDehumDmd.{{ $index }}'
+                    descr: 'Dehumidification Demand'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysDXActualCoolDehum
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.3.{{ $index }}'
+                    index: 'airFMSysDXActualCoolDehum.{{ $index }}'
+                    descr: 'Cooling/Dehumidification Output'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysElectricReheatDmd
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.7.{{ $index }}'
+                    index: 'airFMSysElectricReheatDmd.{{ $index }}'
+                    descr: 'Heating Demand'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysActualElectricReheat
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.8.{{ $index }}'
+                    index: 'airFMSysActualElectricReheat.{{ $index }}'
+                    descr: 'Heating Output'
+                    skip_values: -2147483648
+                -
+                    oid: airFMSysSteamElectrodeHumDmd
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.11.{{ $index }}'
+                    index: 'airFMSysSteamElectrodeHumDmd.{{ $index }}'
+                    descr: 'Humidification Demand'
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr1ActTorq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.8.{{ $index }}'
+                    index: 'airFMModBlwr1ActTorq.{{ $index }}'
+                    descr: 'Blower 1 Torque'
+                    divisor: 100
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr1Current
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.9.{{ $index }}'
+                    index: 'airFMModBlwr1Current.{{ $index }}'
+                    descr: 'Blower 1 Current'
+                    divisor: 100
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr2ActTorq
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.8.{{ $index }}'
+                    index: 'airFMModBlwr2ActTorq.{{ $index }}'
+                    descr: 'Blower 2 Torque'
+                    divisor: 100
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr2Current
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.9.{{ $index }}'
+                    index: 'airFMModBlwr2Current.{{ $index }}'
+                    descr: 'Blower 2 Current'
+                    divisor: 100
+                    skip_values: -2147483648
+                -
+                    oid: airFMModBlwr1CapLife
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.14.{{ $index }}'
+                    index: 'airFMModBlwr1CapLife.{{ $index }}'
+                    descr: 'Blower 1 Capacitor Life Remaining'
+                    divisor: 10
+                    skip_values: -2147483648
+                    low_limit: 0
+                -
+                    oid: airFMModBlwr2CapLife
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.14.{{ $index }}'
+                    index: 'airFMModBlwr2CapLife.{{ $index }}'
+                    descr: 'Blower 2 Capacitor Life Remaining'
+                    divisor: 10
+                    skip_values: -2147483648
+                    low_limit: 0
+        count:
+            data:
+                -
+                    oid: airFMAlarmConditionsTableSize
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.1.6.3.{{ $index }}'
+                    index: 'airFMAlarmConditionsTableSize.{{ $index }}'
+                    descr: 'Active Alarms'
+                    warn_limit: 1
+                    high_limit: 3
+

@@ -13,7 +13,7 @@
 @endsection
 
 @push('styles')
-    <link href="{{ asset(mix('/css/app.css')) }}" rel="stylesheet">
+    <link href="{{ asset(mix('/css/vendor.css')) }}" rel="stylesheet">
 @endpush
 
 @section('javascript')

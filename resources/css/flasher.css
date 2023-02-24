@@ -1,0 +1,58 @@
+/*
+ * flasher.css
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2021 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+#flasher-container-top-right {
+    position: fixed;
+    z-index: 999999;
+    top: 55px;
+    right: 12px;
+}
+
+#flasher-container-top-right a {
+    font-weight: bold;
+}
+
+#flasher-container-top-right > div {
+    width: 304px;
+    min-height: 50px;
+    background-position: 10px center;
+    background-repeat: no-repeat;
+}
+
+.flasher-error {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMTYgMEExNiAxNiAwIDAgMCAwIDE2YTE2IDE2IDAgMCAwIDE2IDE2IDE2IDE2IDAgMCAwIDE2LTE2QTE2IDE2IDAgMCAwIDE2IDB6bS02IDlhMSAxIDAgMCAxIC43MDcuMjkzTDE2IDE0LjU4Nmw1LjI5My01LjI5M2ExIDEgMCAwIDEgMS40MTQgMCAxIDEgMCAwIDEgMCAxLjQxNEwxNy40MTQgMTZsNS4yOTMgNS4yOTNhMSAxIDAgMCAxIDAgMS40MTQgMSAxIDAgMCAxLTEuNDE0IDBMMTYgMTcuNDE0bC01LjI5MyA1LjI5M2ExIDEgMCAwIDEtMS40MTQgMCAxIDEgMCAwIDEgMC0xLjQxNEwxNC41ODYgMTZsLTUuMjkzLTUuMjkzYTEgMSAwIDAgMSAwLTEuNDE0QTEgMSAwIDAgMSAxMCA5eiIgZmlsbD0iI2RjMjYyNiIvPjwvc3ZnPg==");
+    background-size: 32px;
+}
+.flasher-info {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMTYgMEExNiAxNiAwIDAgMCAwIDE2YTE2IDE2IDAgMCAwIDE2IDE2IDE2IDE2IDAgMCAwIDE2LTE2QTE2IDE2IDAgMCAwIDE2IDB6bTAgNmM1LjUxMSAwIDEwIDQuNDg5IDEwIDEwcy00LjQ4OSAxMC0xMCAxMFM2IDIxLjUxMSA2IDE2IDEwLjQ4OSA2IDE2IDZ6bTAgMmMtNC40MyAwLTggMy41Ny04IDhzMy41NyA4IDggOCA4LTMuNTcgOC04LTMuNTctOC04LTh6bTAgM2ExIDEgMCAwIDEgMSAxdjRhMSAxIDAgMCAxLTEgMSAxIDEgMCAwIDEtMS0xdi00YTEgMSAwIDAgMSAxLTF6bTAgOGguMDFhMSAxIDAgMCAxIDEgMSAxIDEgMCAwIDEtMSAxSDE2YTEgMSAwIDAgMS0xLTEgMSAxIDAgMCAxIDEtMXoiIGZpbGw9IiMyNTYzZWIiIC8+PC9zdmc+");
+    background-size: 32px;
+}
+.flasher-success {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMTYgMEExNiAxNiAwIDAgMCAwIDE2YTE2IDE2IDAgMCAwIDE2IDE2IDE2IDE2IDAgMCAwIDE2LTE2QTE2IDE2IDAgMCAwIDE2IDB6bTcgMTBhMSAxIDAgMCAxIC43MDcuMjkzIDEgMSAwIDAgMSAwIDEuNDE0bC0xMCAxMGExIDEgMCAwIDEtMS40MTQgMGwtNC00YTEgMSAwIDAgMSAwLTEuNDE0IDEgMSAwIDAgMSAxLjQxNCAwTDEzIDE5LjU4Nmw5LjI5My05LjI5M0ExIDEgMCAwIDEgMjMgMTB6IiBmaWxsPSIjMDU5NjY5IiAvPjwvc3ZnPg==");
+    background-size: 32px;
+}
+.flasher-warning {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMTYgMEExNiAxNiAwIDAgMCAwIDE2YTE2IDE2IDAgMCAwIDE2IDE2IDE2IDE2IDAgMCAwIDE2LTE2QTE2IDE2IDAgMCAwIDE2IDB6bTAgNi4xNTZjMS4wMTYgMCAyLjAzMi40OSAyLjU5OCAxLjQ2OWw2LjkyNyAxMmMxLjEzMSAxLjk1OC0uMzM2IDQuNS0yLjU5NyA0LjVIOS4wNzJjLTIuMjYxIDAtMy43MjgtMi41NDItMi41OTctNC41bDYuOTI3LTEyYy41NjYtLjk3OSAxLjU4Mi0xLjQ2OSAyLjU5OC0xLjQ2OXptMCAxLjkzOGMtLjMzIDAtLjY2LjE3Ny0uODY1LjUzMWwtNi45MyAxMmMtLjQwOS43MDguMDQ5IDEuNS44NjcgMS41aDEzLjg1NmMuODE4IDAgMS4yNzYtLjc5Mi44NjctMS41bC02LjkzLTEyYy0uMjA0LS4zNTQtLjUzNC0uNTMxLS44NjUtLjUzMXptMCA0LjAzMWExIDEgMCAwIDEgMSAxdjJhMSAxIDAgMCAxLTEgMSAxIDEgMCAwIDEtMS0xdi0yYTEgMSAwIDAgMSAxLTF6bTAgNmguMDFhMSAxIDAgMCAxIDEgMSAxIDEgMCAwIDEtMSAxSDE2YTEgMSAwIDAgMS0xLTEgMSAxIDAgMCAxIDEtMXoiIGZpbGw9IiNkOTc3MDYiLz48L3N2Zz4=");
+    background-size: 32px;
+}

@@ -3,8 +3,7 @@ group: cisco
 text: 'Cisco IOS'
 type: network
 ifXmcbc: true
-mib_dir:
-    - cisco
+mib_dir: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -34,17 +33,19 @@ poller_modules:
     cisco-mac-accounting: true
     cisco-voice: true
     cisco-remote-access-monitor: true
-    cisco-sla: true
+    slas: true
     cisco-ipsec-flow-monitor: true
     cipsec-tunnels: true
     cisco-otv: true
     cisco-vpdn: true
     ipmi: false
+    xdsl: true
 discovery_modules:
     cisco-cef: true
-    cisco-sla: true
+    slas: true
     cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
+    xdsl: true

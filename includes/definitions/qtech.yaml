@@ -3,8 +3,7 @@ text: 'QTECH'
 type: network
 icon: qtech
 group: qtech
-mib_dir:
-    - qtech
+mib_dir: qtech
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

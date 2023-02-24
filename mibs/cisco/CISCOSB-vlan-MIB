@@ -32,6 +32,7 @@ CISCOSB-vlan-MIB DEFINITIONS ::= BEGIN
 -- 16-Oct-2008 (ShaharG) Added DIPO Asymmetric vlan MIB
 -- 13-Oct-2009 (GenadyB) Added trunk port mode vlan list  MIB
 -- 06-Sep-2010 (GenadyB) Added rldot1qPortVlanStaticTable MIB
+-- 08-Aug-2016 (OctaviaP) Added vlanMappingTunnelEdgePortTable MIB
 
 IMPORTS
     switch001                                   FROM CISCOSB-MIB
@@ -46,7 +47,7 @@ IMPORTS
     InetAddressType                             FROM INET-ADDRESS-MIB;
 
 vlan MODULE-IDENTITY
-              LAST-UPDATED "200602120000Z"
+              LAST-UPDATED "200602120001Z"
               ORGANIZATION "Cisco Systems, Inc."
 
               CONTACT-INFO
@@ -1819,7 +1820,9 @@ vlanPortModeContextValue   OBJECT-TYPE
                         7. Trunk
                         8. Customer
                         9. PV_promisc
-                        10. PV_host"
+                        10. PV_host
+						11. VM_tunnel
+						12. VM_one_to_one"
 
 
    ::= { vlanPortModeContextEntry  1 }
@@ -2074,7 +2077,8 @@ rldot1qVlanStaticListIndex  OBJECT-TYPE
       the type is static.
       If the vlan was created by GVRP/MVRP protocols then the type is dynamicGvrp.
       If the vlan was created by Radius server attribute assignment mechanism then
-      the type is dynamicRava."
+      the type is dynamicRava.
+      current includes all vlans which are exist in dot1qVlanCurrentTable."
    ::= { rldot1qVlanStaticListEntry 1}
 
 rldot1qVlanStaticList1to1024 OBJECT-TYPE
@@ -2242,7 +2246,384 @@ rldot1qVlanMembershipTypeBitmap  OBJECT-TYPE
      "
    ::= { rldot1qVlanMembershipTypeEntry 1}
 
--- next free ::= {vlan 73}
+   
+rlRspanRemoteVlan OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "1-4094 actual vlan (must exist in dot1qvlan static table)"
+    DEFVAL { 4094 }
+    ::= { vlan 73 }
+
+-- vlan mapping 
+	
+vlanMappingEthType OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Ethernet Type used for VLAN Mapping tunnel"
+    DEFVAL { 33024 }
+    ::= { vlan 74 }
+
+
+	
+--vlanMappingTunnel - definition
+
+vlanMappingTunnelEdgePortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanMappingTunnelEdgePortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains vlan mapping tunnel mode port configuration entries."
+    ::= { vlan 75}
+
+vlanMappingTunnelEdgePortConfigEntry  OBJECT-TYPE
+    SYNTAX VlanMappingTunnelEdgePortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port ifIndex, ethernet type value and L2protocol behavior for Edge port."
+    INDEX { ifIndex }
+    ::= { vlanMappingTunnelEdgePortConfigTable 1 }
+
+VlanMappingTunnelEdgePortConfigEntry::=SEQUENCE{
+   vlanMappingTunnelEdgePortConfigVlanId      		VlanIndex,
+   vlanMappingTunnelEdgePortConfigCos   			INTEGER,
+   vlanMappingTunnelEdgePortConfigDropThreshold		INTEGER,
+   vlanMappingTunnelEdgePortConfigShutdownThreshold INTEGER,
+   vlanMappingTunnelEdgePortConfigForwardCDP  		TruthValue, 
+   vlanMappingTunnelEdgePortConfigForwardLLDP	  	TruthValue,
+   vlanMappingTunnelEdgePortConfigForwardSTP  		TruthValue,
+   vlanMappingTunnelEdgePortConfigForwardVTP  		TruthValue
+}
+	
+vlanMappingTunnelEdgePortConfigVlanId	OBJECT-TYPE
+   SYNTAX  VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies S-VLAN-ID used to encapsulate of forwarded untagged Layer 2 frames."
+   ::= { vlanMappingTunnelEdgePortConfigEntry 1 }
+	
+vlanMappingTunnelEdgePortConfigCos	OBJECT-TYPE
+   SYNTAX      INTEGER (0..8)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Specify class of service (CoS) value into S-VLAN tag of forwarded Layer 2 frames."
+   DEFVAL { 8 }
+   ::= { vlanMappingTunnelEdgePortConfigEntry 2 }
+
+vlanMappingTunnelEdgePortConfigDropThreshold	OBJECT-TYPE
+   SYNTAX      INTEGER (0..256)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Set a drop threshold for received forwarded L2 protocol frames in kbps resolution."
+   DEFVAL { 32 }	
+   ::= { vlanMappingTunnelEdgePortConfigEntry 3 }
+
+vlanMappingTunnelEdgePortConfigShutdownThreshold	OBJECT-TYPE
+   SYNTAX      INTEGER (0..1024)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Set a shutdown threshold for received forwarded L2 protocol frames in packets-per-second resolution."
+   ::= { vlanMappingTunnelEdgePortConfigEntry 4 }
+
+vlanMappingTunnelEdgePortConfigForwardCDP	OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Configure CDP forward over the Provider network untagged Layer 2 frames received."
+   DEFVAL { false }
+   ::= { vlanMappingTunnelEdgePortConfigEntry 5 }
+
+vlanMappingTunnelEdgePortConfigForwardLLDP	OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Configure LLDP forward over the Provider network untagged Layer 2 frames received."
+   DEFVAL { false }
+   ::= { vlanMappingTunnelEdgePortConfigEntry 6 }
+
+vlanMappingTunnelEdgePortConfigForwardSTP	OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Configure STP forward over the Provider network untagged Layer 2 frames received."
+   DEFVAL { false }
+   ::= { vlanMappingTunnelEdgePortConfigEntry 7 }
+
+vlanMappingTunnelEdgePortConfigForwardVTP	OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "Configure VTP forward over the Provider network untagged Layer 2 frames received."
+   DEFVAL { false }
+   ::= { vlanMappingTunnelEdgePortConfigEntry 8 }
+   			
+
+   
+--vlanMappingTunnelNniPortConfigTable
+
+vlanMappingTunnelNniPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanMappingTunnelNniPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains vlan mapping tunnel mode port configuration entries."
+    ::= { vlan 76}
+
+vlanMappingTunnelNniPortConfigEntry  OBJECT-TYPE
+    SYNTAX VlanMappingTunnelNniPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains port ifIndex, ethernet type value for NNI port."
+    INDEX { ifIndex }
+    ::= { vlanMappingTunnelNniPortConfigTable 1 }
+
+VlanMappingTunnelNniPortConfigEntry::=SEQUENCE{
+   vlanMappingTunnelNniPortConfigEthTypeValue      	INTEGER,
+   vlanMappingTunnelNniPortConfigRowStatus   		RowStatus    
+}
+
+vlanMappingTunnelNniPortConfigEthTypeValue	OBJECT-TYPE
+   SYNTAX  INTEGER
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicated ethernet type. Default is 0x8100. "
+   DEFVAL { 8100 }
+   ::= { vlanMappingTunnelNniPortConfigEntry 1 }
+	
+vlanMappingTunnelNniPortConfigRowStatus	OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "The row status variable, used according to
+       row installation and removal conventions."
+   ::= { vlanMappingTunnelNniPortConfigEntry 2 }
+
+
+
+VlanMappingTunnelPortType  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "VLAN mapping port type:
+                    1 - edge
+                    2 - NNI."
+    SYNTAX INTEGER {
+        edge(1),
+        nni(2)
+}
+
+VlanMappingTunnelPortMode  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "VLAN mapping port mode:
+                    1 - QinQ
+                    2 - selective QinQ."
+    SYNTAX INTEGER {
+        qinq(1),
+        selqinq(2)
+}
+
+VlanMappingDefaultConfigMode  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "VLAN mapping default VLAN configuration:
+                    1 - set
+                    2 - unset."
+    SYNTAX INTEGER {
+        set(1),
+        unset(2)
+}
+
+VlanMappingActionConfigMode  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "VLAN mapping action for S-VLAN configuration:
+                    1 - forward
+                    2 - drop."
+    SYNTAX INTEGER {
+        forward(1),
+        drop(2)
+}
+
+
+-- vlanMappingTunnelEdgePortTable
+
+vlanMappingTunnelEdgePortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanMappingTunnelEdgePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains vlan mapping tunnel mode port."
+    ::= { vlan 77}
+
+vlanMappingTunnelEdgePortEntry  OBJECT-TYPE
+    SYNTAX VlanMappingTunnelEdgePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains VLAN mapping configuration for edge port, C-VLAN and S-VLAN."
+    INDEX { ifIndex, 
+            vlanMappingTunnelEdgePortCVlanTag}
+    ::= { vlanMappingTunnelEdgePortTable 1 }
+
+VlanMappingTunnelEdgePortEntry::=SEQUENCE{
+   vlanMappingTunnelEdgePortCVlanTag				VlanIndex,
+   vlanMappingTunnelEdgePortSVlanTag				VlanIndex,
+   vlanMappingTunnelEdgePortDefaultConfig  			VlanMappingDefaultConfigMode,
+   vlanMappingTunnelEdgePortActionConfig			VlanMappingActionConfigMode,
+   vlanMappingTunnelEdgePortIsActiveEdge   			VlanMappingTunnelPortType,
+   vlanMappingTunnelEdgePortMapMode				VlanMappingTunnelPortMode,
+   vlanMappingTunnelEdgePortRowStatus  				RowStatus
+}
+	
+
+vlanMappingTunnelEdgePortCVlanTag	OBJECT-TYPE
+   SYNTAX      VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "C-VLAN value to be encapsulated."
+   ::= { vlanMappingTunnelEdgePortEntry 1 }
+
+vlanMappingTunnelEdgePortSVlanTag	OBJECT-TYPE
+   SYNTAX      VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "S-VLAN value."
+   ::= { vlanMappingTunnelEdgePortEntry 2 }
+  
+vlanMappingTunnelEdgePortDefaultConfig	OBJECT-TYPE
+   SYNTAX      VlanMappingDefaultConfigMode
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "VLAN mapping default VLAN configuration exists."
+   DEFVAL { 2 }
+   ::= { vlanMappingTunnelEdgePortEntry 3 }
+
+vlanMappingTunnelEdgePortActionConfig	OBJECT-TYPE
+   SYNTAX      VlanMappingActionConfigMode
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "VLAN mapping action defined."
+   DEFVAL { 1 }
+   ::= { vlanMappingTunnelEdgePortEntry 4 }
+
+vlanMappingTunnelEdgePortIsActiveEdge	OBJECT-TYPE
+   SYNTAX      VlanMappingTunnelPortType
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "VLAN mapping port type - edge or NNI."
+   DEFVAL { 2 }
+   ::= { vlanMappingTunnelEdgePortEntry 5 }
+
+vlanMappingTunnelEdgePortMapMode	OBJECT-TYPE
+   SYNTAX      VlanMappingTunnelPortMode
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "VLAN mapping port mode - QinQ or selective QinQ."
+   DEFVAL { 2 }
+   ::= { vlanMappingTunnelEdgePortEntry 6 }
+   
+vlanMappingTunnelEdgePortRowStatus	OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "he row status variable, used according to
+       row installation and removal conventions."
+   ::= { vlanMappingTunnelEdgePortEntry 7 }
+
+
+-- vlanMappingOneToOneEdgePortTable
+
+vlanMappingOneToOneEdgePortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VlanMappingOneToOneEdgePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains vlan mapping tunnel mode port."
+    ::= { vlan 78}
+
+vlanMappingOneToOneEdgePortEntry  OBJECT-TYPE
+    SYNTAX VlanMappingOneToOneEdgePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The entry contains VLAN mapping configuration for Nni port, C-VLAN and S-VLAN."
+    INDEX { ifIndex, 
+            vlanMappingOneToOneEdgePortCVlanTag }
+    ::= { vlanMappingOneToOneEdgePortTable 1 }
+
+VlanMappingOneToOneEdgePortEntry::=SEQUENCE{
+   vlanMappingOneToOneEdgePortCVlanTag				VlanIndex,
+   vlanMappingOneToOneEdgePortSVlanTag				VlanIndex,
+   vlanMappingOneToOneEdgePortIsActiveEdge   		VlanMappingTunnelPortType,
+   vlanMappingOneToOneEdgePortRowStatus  			RowStatus   
+}
+	
+
+vlanMappingOneToOneEdgePortCVlanTag	OBJECT-TYPE
+   SYNTAX      VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "C-VLAN value to be encapsulated."
+   ::= { vlanMappingOneToOneEdgePortEntry 1 }
+
+vlanMappingOneToOneEdgePortSVlanTag	OBJECT-TYPE
+   SYNTAX      VlanIndex
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "S-VLAN value."
+   ::= { vlanMappingOneToOneEdgePortEntry 2 }
+
+vlanMappingOneToOneEdgePortIsActiveEdge	OBJECT-TYPE
+   SYNTAX      VlanMappingTunnelPortType
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "VLAN mapping port type - edge or NNI."
+   DEFVAL { 2 }
+   ::= { vlanMappingOneToOneEdgePortEntry 3 }
+
+vlanMappingOneToOneEdgePortRowStatus	OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+     "he row status variable, used according to
+       row installation and removal conventions."
+   ::= { vlanMappingOneToOneEdgePortEntry 4 }
+
+   
+  
+   
+vlanMappingCosValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Class of service (CoS) value globally into S-VLAN tag of forwarded Layer 2 frames."
+    DEFVAL { 5 }
+    ::= { vlan 79 }
+   
+-- next free ::= {vlan 80}
 
 
 END

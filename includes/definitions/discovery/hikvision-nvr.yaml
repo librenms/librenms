@@ -1,0 +1,11 @@
+modules:
+    mempools:
+        data:
+            -
+                total: HIKVISION-MIB::hikMemoryCapability
+                percent_used: HIKVISION-MIB::hikMemoryUsage
+                precision: 1048576
+    os:
+        hardware: HIKVISION-MIB::hikEntityType.0
+        serial: HIKVISION-MIB::hikEntityIndex.0
+        version: HIKVISION-MIB::hikEntity.101.0

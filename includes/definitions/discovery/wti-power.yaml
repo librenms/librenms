@@ -1,0 +1,189 @@
+mib: WTI-POWER-MIB
+modules:
+    os:
+        hardware:
+            - WTI-POWER-MIB::environmentUnitName.1
+    sensors:
+        state:
+            data:
+                -
+                    oid: plugTable
+                    value: plugStatus
+                    num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.3.{{ $index }}'
+                    index: 'plugStatus.{{ $index }}'
+                    descr: '{{ $plugName }} State'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
+                        - { value: 2, generic: 1, graph: 0, descr: outletReboot }
+                        - { value: 4, generic: 2, graph: 0, descr: outletUnknown }
+        temperature:
+            data:
+                -
+                    oid: environmentUnitTemperature
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.3.{{ $index }}'
+                    index: 'environmentUnitTemperature.{{ $index }}'
+                    descr: 'Unit temperature'
+        voltage:
+            data:
+                -
+                    oid: environmentUnitVoltageA
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.5.{{ $index }}'
+                    index: 'environmentUnitVoltageA.{{ $index }}'
+                    descr: 'Branch A Voltage'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageA.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentUnitVoltageB
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.8.{{ $index }}'
+                    index: 'environmentUnitVoltageB.{{ $index }}'
+                    descr: 'Branch B Voltage'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageB.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentUnitVoltageC
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.11.{{ $index }}'
+                    index: 'environmentUnitVoltageC.{{ $index }}'
+                    descr: 'Branch C Voltage'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageC.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentUnitVoltageD
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.14.{{ $index }}'
+                    index: 'environmentUnitVoltageD.{{ $index }}'
+                    descr: 'Branch D Voltage'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageD.1
+                      op: '=='
+                      value: "0"
+        current:
+            data:
+                -
+                    oid: plugTable
+                    value: plugCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.7.{{ $index }}'
+                    index: 'plugCurrent.{{ $index }}'
+                    descr: '{{ $plugName }} Current'
+                    divisor: 10
+                -
+                    oid: environmentTables
+                    value: environmentSystemTotalCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.60.{{ $index }}'
+                    index: 'environmentSystemTotalCurrent.{{ $index }}'
+                    descr: 'Total Unit Current'
+                    divisor: 10
+                -
+                    oid: environmentTables
+                    value: environmentBranchATotalCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.20.{{ $index }}'
+                    index: 'environmentBranchATotalCurrent.{{ $index }}'
+                    descr: 'Branch A Current'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageA.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchBTotalCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.40.{{ $index }}'
+                    index: 'environmentBranchBTotalCurrent.{{ $index }}'
+                    descr: 'Branch B Current'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageB.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchCTotalCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.51.{{ $index }}'
+                    index: 'environmentBranchCTotalCurrent.{{ $index }}'
+                    descr: 'Branch C Current'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageC.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchDTotalCurrent
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.53.{{ $index }}'
+                    index: 'environmentBranchDTotalCurrent.{{ $index }}'
+                    descr: 'Branch D Current'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageD.1
+                      op: '=='
+                      value: "0"
+        power:
+            data:
+                -
+                    oid: plugTable
+                    value: plugPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.8.{{ $index }}'
+                    index: 'plugPower.{{ $index }}'
+                    descr: '{{ $plugName }} Power'
+                -
+                    oid: environmentSystemTotalPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.70.{{ $index }}'
+                    index: 'environmentSystemTotalPower.{{ $index }}'
+                    descr: 'Total Unit Power'
+                -
+                    oid: environmentTables
+                    value: environmentBranchATotalPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.30.{{ $index }}'
+                    index: 'environmentBranchATotalPower.{{ $index }}'
+                    descr: 'Branch A Power'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageA.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchBTotalPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.50.{{ $index }}'
+                    index: 'environmentBranchBTotalPower.{{ $index }}'
+                    descr: 'Branch B Power'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageB.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchCTotalPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.52.{{ $index }}'
+                    index: 'environmentBranchCTotalPower.{{ $index }}'
+                    descr: 'Branch C Power'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageC.1
+                      op: '=='
+                      value: "0"
+                -
+                    oid: environmentTables
+                    value: environmentBranchDTotalPower
+                    num_oid: '.1.3.6.1.4.1.2634.3.200.54.{{ $index }}'
+                    index: 'environmentBranchDTotalPower.{{ $index }}'
+                    descr: 'Branch D Power'
+                    skip_values:
+                    -
+                      oid: environmentUnitVoltageD.1
+                      op: '=='
+                      value: "0"

@@ -1,65 +1,46 @@
-source: Alerting/index.md
-path: blob/master/doc/
+# Introduction
 
-# About
+To get started, you first need some alert rules which will react to
+changes with your devices before raising an alert.
 
-LibreNMS includes a highly customizable alerting system.
-The system requires a set of user-defined rules to evaluate the
-situation of each device, port, service or any other entity.
+[Creating alert rules](Rules.md)
 
-> You can configure all options for alerting and transports via the
-> WebUI, config options in this document are crossed out but left for reference.
+After that you also need to tell LibreNMS how to notify you when an
+alert is raised, this is done using `Alert Transports`.
 
-Table of Content:
+[Configuring alert transports](Transports.md)
 
-- [Introduction](Introduction.md)
-- [Rules](Rules.md)
-  - [Syntax](Rules.md#syntax)
-  - [Options](Rules.md#options)
-  - [Examples](Rules.md#examples)
-  - [Procedure](Rules.md#procedure)
-- [Templates](Templates.md)
-  - [Syntax](Templates.md#syntax)
-  - [Testing](Templates.md#testing)
-  - [Examples](Templates.md#examples)
-  - [Included](Templates.md#included)
-- [Transports](Transports.md)
-  - [E-Mail](Transports.md#e-mail)
-  - [API](Transports.md#api)
-  - [Nagios-Compatible](Transports.md#nagios-compatible)
-  - [IRC](Transports.md#irc)
-  - [Slack](Transports.md#slack)
-  - [Rocket.chat](Transports.md#rocketchat)
-  - [HipChat](Transports.md#hipchat)
-  - [PagerDuty](Transports.md#pagerduty)
-  - [Pushover](Transports.md#pushover)
-  - [Boxcar](Transports.md#boxcar)
-  - [Telegram](Transports.md#telegram)
-  - [Pushbullet](Transports.md#pushbullet)
-  - [Clickatell](Transports.md#clickatell)
-  - [PlaySMS](Transports.md#playsms)
-  - [VictorOps](Transports.md#victorops)
-  - [Canopsis](Transports.md#canopsis)
-  - [osTicket](Transports.md#osticket)
-  - [Microsoft Teams](Transports.md#microsoftteams)
-  - [Cisco Spark](Transports.md#ciscospark)
-  - [SMSEagle](Transports.md#smseagle)
-  - [Syslog](Transports.md#syslog)
-  - [Elasticsearch](Transports.md#elasticsearch)
-  - [Jira](Transports.md#jira)
-- [Entities](Entities.md)
-  - [Devices](Entities.md#devices)
-  - [BGP Peers](Entities.md#bgppeers)
-  - [IPSec Tunnels](Entities.md#ipsec)
-  - [Memory Pools](Entities.md#entity-mempools)
-  - [Ports](Entities.md#entity-ports)
-  - [Processors](Entities.md#entity-processors)
-  - [Storage](Entities.md#entity-storage)
-  - [Sensors](Entities.md#entity-sensors)
-- [Macros](Macros.md)
-  - [Device](Macros.md#macros-device)
-  - [Port](Macros.md#macros-port)
-  - [Time](Macros.md#macros-time)
-  - [Sensors](Macros.md#macros-sensors)
-  - [Misc](Macros.md#macros-misc)
-- [Device Dependencies](Device-Dependencies.md)
+The next step is not strictly required but most people find it
+useful. Creating custom alert templates will help you get the benefit
+out of the alert system in general. Whilst we include a default
+template, it is limited in the data that you will receive in the alerts.
+
+[Configuring alert templates](Templates.md)
+
+## Managing alerts
+
+When an alert has triggered you will see these in the Alerts ->
+Notifications page within the Web UI.
+
+This list has a couple of options available to it and we'll explain
+what these are here.
+
+### ACK
+
+This column provides you visibility on the status of the alert:
+
+![ack alert](img/ack.png) This alert is currently active and sending
+alerts. Click this icon to acknowledge the alert.
+
+![unack alert](img/unack.png) This alert is currently acknowledged
+until the alert clears. Click this icon to un-acknowledge the alert.
+
+![unack alert until fault worsens](img/nunack.png) This alert is
+currently acknowledged until the alert worsens or gets
+better, at which stage it will be automatically unacknowledged and
+alerts will resume. Click this icon to un-acknowledge the alert.
+
+### Notes
+
+![alert notes](img/notes.png) This column will allow you access to the
+acknowledge/unacknowledge notes for this alert.

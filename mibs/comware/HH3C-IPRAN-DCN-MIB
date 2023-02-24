@@ -1,0 +1,272 @@
+-- =================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Description: Ipran Data Communication Network(DCN) MIB.
+-- Reference:
+-- Version:     V1.1
+-- V1.0  2011-09-30 The initial version, created by Longgang
+--       2014-03-10 updated by wangguanglun
+--       Changed the format
+-- V1.1  2015-01-27 updated by fengxiaodong
+--       Added hh3cIpRanDcnMAC and hh3cIpRanDcnVendor nodes to hh3cIpRanDcnInfoObject
+--       Added hh3cIpRanDcnNeInfoMAC and hh3cIpRanDcnNeInfoVendor nodes to hh3cIpRanDcnNeInfoTable
+-- ==================================================================
+HH3C-IPRAN-DCN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    TEXTUAL-CONVENTION,  DisplayString, MacAddress
+        FROM SNMPv2-TC;
+
+hh3cIpRanDcn MODULE-IDENTITY
+    LAST-UPDATED "201501300000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB provides mechanisms to monitor all network elements(NE)
+        in Ipran Data Communication Network."
+    REVISION "201501300000Z"
+    DESCRIPTION
+        "Add nodes to hh3cIpRanDcnInfoObject and hh3cIpRanDcnNeInfoTable."
+    REVISION "201307240000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 152 }
+
+Hh3cIpRanNeId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS current
+    DESCRIPTION
+        "Uniquely identifies the network entity ID.
+        The first 8 bits are 0 and the total number of valid bits is 24.
+        The high 8 bits represent the subnet number and the low 16 bits represent the base ID.
+        The IpRanNeId will be shown as 0.x.x.x."
+    SYNTAX OCTET STRING (SIZE (4))
+
+hh3cIpRanDcnMIB OBJECT IDENTIFIER ::= { hh3cIpRanDcn 1 }
+
+hh3cIpRanDcnObjects OBJECT IDENTIFIER ::= { hh3cIpRanDcnMIB 1 }
+
+hh3cIpRanDcnInfoObject OBJECT IDENTIFIER ::= { hh3cIpRanDcnObjects 1 }
+hh3cIpRanDcnNeId OBJECT-TYPE
+    SYNTAX      Hh3cIpRanNeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ID of the local network element."
+    ::= { hh3cIpRanDcnInfoObject 1 }
+
+hh3cIpRanDcnNeIpType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address type of the local network element."
+    ::= { hh3cIpRanDcnInfoObject 2 }
+
+hh3cIpRanDcnNeIp OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address of the local network element."
+    ::= { hh3cIpRanDcnInfoObject 3 }
+
+hh3cIpRanDcnMask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address mask of the local network element."
+::= { hh3cIpRanDcnInfoObject 4 }
+
+hh3cIpRanDcnMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge MAC address of the network element."
+    ::= { hh3cIpRanDcnInfoObject 5 }
+
+hh3cIpRanDcnVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Company name."
+::= { hh3cIpRanDcnInfoObject 6 }
+
+hh3cIpRanDcnNeInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cIpRanDcnNeInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information about all network elements online."
+    ::= { hh3cIpRanDcnObjects 2 }
+
+hh3cIpRanDcnNeInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cIpRanDcnNeInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A single network element information entry."
+    INDEX { hh3cIpRanDcnNeInfoNeId }
+    ::= { hh3cIpRanDcnNeInfoTable 1 }
+
+Hh3cIpRanDcnNeInfoEntry ::=
+    SEQUENCE
+        {
+            hh3cIpRanDcnNeInfoNeId         Hh3cIpRanNeId,
+            hh3cIpRanDcnNeInfoNeIpType     InetAddressType,
+            hh3cIpRanDcnNeInfoNeIp         InetAddress,
+            hh3cIpRanDcnNeInfoMetric       Integer32,
+            hh3cIpRanDcnNeInfoDeviceType   DisplayString,
+            hh3cIpRanDcnNeInfoMAC          MacAddress,
+            hh3cIpRanDcnNeInfoVendor       DisplayString
+        }
+
+hh3cIpRanDcnNeInfoNeId OBJECT-TYPE
+    SYNTAX      Hh3cIpRanNeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the network element ID uniquely identifying
+        one network element in the routing domain."
+    ::= { hh3cIpRanDcnNeInfoEntry 1 }
+
+hh3cIpRanDcnNeInfoNeIpType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address type of the network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 2 }
+
+hh3cIpRanDcnNeInfoNeIp OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the IP address of the network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 3 }
+
+hh3cIpRanDcnNeInfoMetric OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The metric from the local network element to the remote
+        network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 4 }
+
+hh3cIpRanDcnNeInfoDeviceType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the device type of the network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 5 }
+
+hh3cIpRanDcnNeInfoMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge MAC address of the network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 6 }
+
+hh3cIpRanDcnNeInfoVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Company name."
+    ::= { hh3cIpRanDcnNeInfoEntry 7 }
+
+hh3cIpRanDcnTrapObjects OBJECT IDENTIFIER ::= { hh3cIpRanDcnMIB 2 }
+
+hh3cIpRanDcnNeNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The overall number of network elements online."
+    ::= { hh3cIpRanDcnTrapObjects 1 }
+
+hh3cIpRanDcnNeChangeMode OBJECT-TYPE
+    SYNTAX  INTEGER
+        {
+            online (1),
+            offline (2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The change mode of the last trap."
+    ::= { hh3cIpRanDcnTrapObjects 2 }
+
+hh3cIpRanDcnCompanyName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Company name."
+    ::= { hh3cIpRanDcnTrapObjects 3 }
+
+hh3cIpRanDcnDeviceType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device type."
+    ::= { hh3cIpRanDcnTrapObjects 4 }
+
+hh3cIpRanDcnDeviceMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The bridge MAC address of the network element."
+    ::= { hh3cIpRanDcnTrapObjects 5 }
+
+hh3cIpRanDcnTraps OBJECT IDENTIFIER ::= { hh3cIpRanDcnMIB 3 }
+hh3cIpRanDcnTrapsPrefix OBJECT IDENTIFIER ::= { hh3cIpRanDcnTraps 0 }
+
+hh3cIpRanDcnNeOnline NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeId,
+            hh3cIpRanDcnNeInfoNeIpType,
+            hh3cIpRanDcnNeInfoNeIp,
+            hh3cIpRanDcnCompanyName,
+            hh3cIpRanDcnDeviceType,
+            hh3cIpRanDcnDeviceMac
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when a new network element is online."
+    ::= { hh3cIpRanDcnTrapsPrefix 1 }
+
+hh3cIpRanDcnNeOffline NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeId,
+            hh3cIpRanDcnNeInfoNeIpType,
+            hh3cIpRanDcnNeInfoNeIp
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when a network element is offline."
+    ::= { hh3cIpRanDcnTrapsPrefix 2 }
+
+END

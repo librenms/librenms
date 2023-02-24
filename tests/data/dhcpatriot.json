@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux patriot-1 3.19.0-FNGi-ModularOS-2.0.0 #1 SMP Thu Aug 9 14:02:24 UTC 2018 x86_64",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "dhcpatriot",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "dhcpatriot.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux patriot-1 3.19.0-FNGi-ModularOS-2.0.0 #1 SMP Thu Aug 9 14:02:24 UTC 2018 x86_64",
                     "sysContact": "<private>",
                     "version": "6.4.0",
                     "hardware": "MODELNUMBER",
                     "features": "Non-Expiry License",
+                    "location": "<private>",
                     "os": "dhcpatriot",
                     "type": "server",
                     "serial": "SERIALNUMBER",
-                    "icon": "dhcpatriot.png",
-                    "location": "<private>"
+                    "icon": "dhcpatriot.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -161,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -268,8 +247,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -375,8 +352,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -486,8 +461,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -589,12 +562,10 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -700,8 +671,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 1000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -807,8 +776,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 1000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -960,105 +927,126 @@
                 {
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Physical memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Virtual memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                },
-                {
-                    "mempool_index": "10",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 97,
-                    "mempool_used": 4014157824,
-                    "mempool_free": 137547776,
+                    "mempool_perc": 13,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 520826880,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "mempool_free": 3630878720,
+                    "mempool_free_oid": null,
                     "mempool_total": 4151705600,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 99
                 },
                 {
                     "mempool_index": "3",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "virtual",
                     "mempool_precision": 1024,
                     "mempool_descr": "Virtual memory",
                     "mempool_perc": 32,
+                    "mempool_perc_oid": null,
                     "mempool_used": 4122005504,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
                     "mempool_free": 8625111040,
+                    "mempool_free_oid": null,
                     "mempool_total": 12747116544,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 95
+                },
+                {
+                    "mempool_index": "6",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 4,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 182665216,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.6",
+                    "mempool_free": 3969040384,
+                    "mempool_free_oid": null,
+                    "mempool_total": 4151705600,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "7",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 80,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 3310665728,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.7",
+                    "mempool_free": 841039872,
+                    "mempool_free_oid": null,
+                    "mempool_total": 4151705600,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
+                },
+                {
+                    "mempool_index": "8",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_class": "shared",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Shared memory",
+                    "mempool_perc": 0,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 1163264,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.8",
+                    "mempool_free": 4150542336,
+                    "mempool_free_oid": null,
+                    "mempool_total": 4151705600,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 0
                 },
                 {
                     "mempool_index": "10",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "swap",
                     "mempool_precision": 1024,
                     "mempool_descr": "Swap space",
                     "mempool_perc": 1,
+                    "mempool_perc_oid": null,
                     "mempool_used": 107847680,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.10",
                     "mempool_free": 8487563264,
+                    "mempool_free_oid": null,
                     "mempool_total": 8595410944,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
+                    "mempool_perc_warn": 10
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -1085,6 +1073,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1109,6 +1098,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1133,6 +1123,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1157,6 +1148,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1181,6 +1173,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1205,6 +1198,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1229,6 +1223,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1253,6 +1248,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1277,6 +1273,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1301,6 +1298,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1325,6 +1323,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1349,6 +1348,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1373,6 +1373,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1397,6 +1398,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1421,6 +1423,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1445,6 +1448,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1469,6 +1473,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1493,6 +1498,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1517,6 +1523,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1541,6 +1548,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1565,6 +1573,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1589,6 +1598,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1613,6 +1623,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1637,6 +1648,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1661,6 +1673,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1685,6 +1698,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1709,6 +1723,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1733,6 +1748,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1757,6 +1773,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1781,6 +1798,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -1805,6 +1823,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -1856,6 +1875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1880,6 +1900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1904,6 +1925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1928,6 +1950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 88.914170142839,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1952,6 +1975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 34.989429175476,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1976,6 +2000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 62.60162601626,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2000,6 +2025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 9.7560975609756,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2024,6 +2050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 4.8780487804878,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2048,6 +2075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 7.3170731707317,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2072,6 +2100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 8.130081300813,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2096,6 +2125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 4.7808764940239,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2120,6 +2150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 8.130081300813,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2144,6 +2175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 3.2520325203252,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2168,6 +2200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2192,6 +2225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0.8130081300813,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2216,6 +2250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2240,6 +2275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2264,6 +2300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 92.03187250996,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2288,6 +2325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2312,6 +2350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2336,6 +2375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2360,6 +2400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2384,6 +2425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2408,6 +2450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2432,6 +2475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2456,6 +2500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2480,6 +2525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2504,6 +2550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2528,6 +2575,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2552,6 +2600,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "dhcpatriotServiceStatus"
                 },
                 {
@@ -2576,6 +2625,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

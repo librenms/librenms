@@ -1,5 +1,9 @@
 mib: BCN-HA-MIB:BCN-DHCPV4-MIB:BCN-DNS-MIB:BCN-NTP-MIB
 modules:
+    os:
+        version: BCN-SYSTEM-MIB::bcnSysIdOSRelease.0
+        hardware: BCN-SYSTEM-MIB::bcnSysIdPlatform.0
+        serial: BCN-SYSTEM-MIB::bcnSysIdSerial.0
     sensors:
         state:
             data:

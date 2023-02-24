@@ -1,0 +1,153 @@
+Axos-Ont-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32,
+    Counter64,
+    IpAddress,
+    mib-2
+                    FROM SNMPv2-SMI
+    RowStatus,
+    DisplayString,
+    MacAddress
+                    FROM SNMPv2-TC
+    InterfaceIndex,
+    ifIndex         FROM IF-MIB
+
+    axosModules
+        FROM CALIX-PRODUCT-MIB;
+		
+    axosOntModule MODULE-IDENTITY
+        LAST-UPDATED "202010230000Z"
+        ORGANIZATION "Calix"
+        CONTACT-INFO
+            "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+	            Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: mib-info@calix.com"
+        DESCRIPTION
+            "Describes ont table for Calix Axos
+             based products"
+        REVISION "202010230000Z"
+        DESCRIPTION
+            "Initial revision"
+    ::= { axosModules 6 }
+
+-- ONT data
+
+axosOntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxosOntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains ONT entries"
+    ::= { axosOntModule 1 }
+
+axosOntEntry OBJECT-TYPE
+    SYNTAX      AxosOntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to ONT"
+    INDEX { axosOntIndex }
+    ::= { axosOntTable 1 }
+
+AxosOntEntry ::= SEQUENCE {
+        axosOntIndex                   Integer32,
+        axosOntID                      OCTET STRING,
+        axosOntAdminStatus             INTEGER,
+        axosOntOperStatus              INTEGER,
+        axosOntDyingGasp               INTEGER,
+        axosOntRxOpticalLevel          Integer32,
+        axosOntTxOpticalLevel          Integer32,
+        axosOntFarEndRxOpticalLevel    Integer32,
+        axosOntSoftwareVersion         OCTET STRING,
+        axosOntCleiCode                OCTET STRING
+    }
+
+axosOntIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Unit identifier "
+    ::= { axosOntEntry 1 }
+
+axosOntID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT ID "
+    ::= { axosOntEntry 2 }
+
+axosOntAdminStatus OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    unknown(0),
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { axosOntEntry 3 }
+
+axosOntOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    enabled(1),
+                    degraded(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational status"
+    ::= { axosOntEntry 4 }
+
+axosOntDyingGasp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(-1),
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ont dying gasp status "
+    ::= { axosOntEntry 5 }
+
+axosOntRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Rx signal level ((value / 10000) = mW)"
+    ::= { axosOntEntry 6 }
+
+axosOntTxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Tx signal level ((value / 10000) = mW)"
+    ::= { axosOntEntry 7 }
+
+axosOntFarEndRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OLT Rx signal level ((value / 10000) = mW)"
+    ::= { axosOntEntry 8 }
+
+axosOntSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Running software version, dotted string notation"
+    ::= { axosOntEntry 9 }
+
+axosOntCleiCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware CLEI code "
+    ::= { axosOntEntry 10 }
+
+END

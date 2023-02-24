@@ -13,8 +13,6 @@
  */
 
 ?>
-<h3>Routing settings</h3>
-
 <div class="table-responsive">
     <table id="routing" class="table table-hover table-condensed routing">
         <thead>
@@ -49,7 +47,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".routing").blur(function(event) {
+        grid.find(".routing").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var routing_id = $(this).data("routing_id");

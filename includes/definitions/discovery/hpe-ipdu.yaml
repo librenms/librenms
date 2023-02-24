@@ -1,5 +1,9 @@
 mib: CPQPOWER-MIB
 modules:
+    os:
+        hardware: CPQPOWER-MIB::mpduModel.1
+        serial: CPQPOWER-MIB::mpduSerialNumber.1
+        version: CPQPOWER-MIB::mpduSerialNumber.1
     sensors:
         current:
             data:

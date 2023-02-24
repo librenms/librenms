@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux localhost.localdomain 2.6.37.6-lsp-3.2.5_stm24_0012-spear3xx #105 Mon Dec 24 14:49:28 CST 2018 armv5tejl",
-                    "sysContact": null,
-                    "version": null,
+                    "sysContact": "<private>",
+                    "version": "7.20",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "netvision-rfc",
                     "type": "power",
                     "serial": null,
-                    "icon": "netvision.png",
-                    "location": null
+                    "icon": "netvision.png"
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux localhost.localdomain 2.6.37.6-lsp-3.2.5_stm24_0012-spear3xx #105 Mon Dec 24 14:49:28 CST 2018 armv5tejl",
-                    "sysContact": "<private>",
-                    "version": "7 v7.20",
-                    "hardware": null,
-                    "features": null,
-                    "os": "netvision-rfc",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "netvision.png",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -161,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -268,8 +247,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -375,8 +352,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -486,8 +461,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -593,8 +566,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 100,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -696,12 +667,10 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -803,12 +772,10 @@
                     "ifName": "ip6tnl0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -946,6 +913,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -970,6 +938,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -994,6 +963,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1018,6 +988,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1042,6 +1013,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1066,6 +1038,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1090,6 +1063,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1114,6 +1088,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1138,6 +1113,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1162,6 +1138,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1186,6 +1163,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1210,6 +1188,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1234,6 +1213,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1258,6 +1238,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1282,6 +1263,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "upsBatteryStatusState"
                 },
                 {
@@ -1306,6 +1288,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "upsOutputSourceState"
                 },
                 {
@@ -1330,6 +1313,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1354,6 +1338,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1378,6 +1363,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1402,6 +1388,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1426,6 +1413,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -1510,5 +1498,135 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 57,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 71933952,
+                    "mempool_used_oid": null,
+                    "mempool_free": 54140928,
+                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 99,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 125366272,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
+                    "mempool_free": 708608,
+                    "mempool_free_oid": null,
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 85,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 107032576,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
+                    "mempool_free": 19042304,
+                    "mempool_free_oid": null,
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 57,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 71933952,
+                    "mempool_used_oid": null,
+                    "mempool_free": 54140928,
+                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 1,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 708608,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
+                    "mempool_free": 125366272,
+                    "mempool_free_oid": null,
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 15,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 19042304,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
+                    "mempool_free": 107032576,
+                    "mempool_free_oid": null,
+                    "mempool_total": 126074880,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                }
+            ]
+        }
     }
 }

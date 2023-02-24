@@ -1,0 +1,1299 @@
+-- =============================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V1.6
+-- History:
+--   V1.0 2009-04-30 Initial Version by jinyi
+--   V1.1 2009-12-30 Added hh3cAccessMediaChanged by jinyi
+--   V1.2 2011-07-22 Added hh3cWirelessCardInterfaceIndex,
+--                   hh3cWirelessCardModemStatus in hh3cWirelessCardTable.
+--                   Added hh3c3GCdma1xRttTable, hh3c3GCdmaEvDoTable, hh3c3GGsmInfoTable
+--                   hh3c3GCurrentService, hh3c3GCurrentRssiBind, hh3c3GImsiBind,
+--                   hh3c3GRssiStrongSignalTrap, hh3c3GRssiMediumSignalTrap and
+--                   hh3c3GRssiWeakSignalTrap.
+--                   Changed MAX-ACCESS of hh3cWirelessCardIndex by songhao.
+--   V1.3 2012-08-02 Added hh3cWirelessCardModemMode, hh3cWirelessCardCurNetConn in
+--                   hh3cWirelessCardEntry.
+--                   Added hh3cSmsGroup and hh3cWirelessCardOnlineTable under hh3cWirelessCard.
+--                   Added hh3c3GGsmMcc, hh3c3GGsmMnc in hh3c3GGsmInfoEntry
+--                   Added hh3cLte under hh3c3GModemObjects
+--                   Added hh3cSmsSrcNumberBind, hh3cSmsTimeBind, hh3cSmsEncodeBind,
+--                   hh3cSmsContentBind, hh3cSmsTxNotifation, hh3cSmsRxNotifation by songhao.
+--   V1.4 2013-08-13 Added hh3cLteCurrentRssi,hh3cLteRssiMediumThreshold and
+--                   hh3cLteRssiWeakThreshold in Hh3cLteInfoEntry.
+--                   Added lte(5) in hh3c3GCurrentService by zuowenzhong.
+--   V1.5 2014-09-04 Added hh3c3GCdma1xRttBID, hh3c3GCdma1xRttSID and
+--                   hh3c3GCdma1xRttNID in hh3c3GCdma1xRttTable.
+--                   Added hh3c3GCdmaEvDoSubNetID in hh3c3GCdmaEvDoTable by lijuan.
+--   V1.6 2015-12-01 Modified description and added lte(5) in
+--                   hh3cWirelessCardModemMode by maqianli.
+-- =============================================================
+HH3C-3GMODEM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3c3GModem MODULE-IDENTITY
+    LAST-UPDATED    "201512011200Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The information about the wireless card and the UIM
+         (User Identification Module)."
+    REVISION        "201512011200Z"
+    DESCRIPTION
+        "Modified description and added lte(5) in hh3cWirelessCardModemMode."
+    REVISION        "201409091200Z"
+    DESCRIPTION
+        "Added hh3c3GCdma1xRttTable and hh3c3GCdmaEvDoTable."
+    REVISION        "200904301200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 98 }
+
+Hh3cUIMStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The status of the UIM."
+    SYNTAX      INTEGER
+        {
+            absent(1),      -- the UIM is absent
+            initial(2),     -- the UIM is initial
+            fault(3),       -- something wrong in UIM
+            unprotected(4), -- the UIM is not protected with PIN
+                            -- (Personal Identification Number) and can be
+                            -- used normally
+            protected(5),   -- the UIM is protected with PIN and can be
+                            -- used normally
+            pinLocked(6),   -- the UIM is locked, and need be unlocked with PIN
+            pukLocked(7),   -- the UIM is locked, and need be unlocked with PUK
+                            -- (PIN Unblocking Key)
+            selfDestruct(8) -- the UIM is destruct by itself
+        }
+
+Hh3cSmsEncodeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The encode type of Sms (short message service)."
+    SYNTAX      INTEGER
+        {
+            ascii(1),
+            ucs2(2)
+        }
+
+
+hh3c3GModemObjects     OBJECT IDENTIFIER ::= { hh3c3GModem 1 }
+
+hh3cWirelessCard OBJECT IDENTIFIER ::= { hh3c3GModemObjects 1 }
+hh3cUIM OBJECT IDENTIFIER ::= { hh3c3GModemObjects 2 }
+hh3c3GCdma OBJECT IDENTIFIER ::= { hh3c3GModemObjects 3 }
+hh3c3GGsm OBJECT IDENTIFIER ::= { hh3c3GModemObjects 4 }
+hh3cLte OBJECT IDENTIFIER ::= { hh3c3GModemObjects 5 }
+
+
+-- The wireless card table
+hh3cWirelessCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWirelessCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row per wireless card."
+    ::= { hh3cWirelessCard 1 }
+
+hh3cWirelessCardEntry OBJECT-TYPE
+    SYNTAX      Hh3cWirelessCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular wireless card."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3cWirelessCardTable 1 }
+
+Hh3cWirelessCardEntry ::= SEQUENCE
+    {
+        hh3cWirelessCardIndex                Integer32,
+        hh3cWirelessCardModelName            SnmpAdminString,
+        hh3cWirelessCardMfgName              SnmpAdminString,
+        hh3cWirelessCardDescription          SnmpAdminString,
+        hh3cWirelessCardSerialNumber         SnmpAdminString,
+        hh3cWirelessCardCMIIID               SnmpAdminString,
+        hh3cWirelessCardHardwareVersion      SnmpAdminString,
+        hh3cWirelessCardFirmwareVersion      SnmpAdminString,
+        hh3cWirelessCardPRLVersion           SnmpAdminString,
+        hh3cWirelessCardInterfaceIndex       InterfaceIndex,
+        hh3cWirelessCardModemStatus          INTEGER,
+        hh3cWirelessCardModemMode            INTEGER,
+        hh3cWirelessCardCurNetConn           INTEGER
+    }
+
+hh3cWirelessCardIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index for this entry."
+    ::= { hh3cWirelessCardEntry 1 }
+
+hh3cWirelessCardModelName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The model name of this card."
+    ::= { hh3cWirelessCardEntry 2 }
+
+hh3cWirelessCardMfgName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the manufacturer of this card."
+    ::= { hh3cWirelessCardEntry 3 }
+
+hh3cWirelessCardDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual description of this card."
+    ::= { hh3cWirelessCardEntry 4 }
+
+hh3cWirelessCardSerialNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor-specific serial number string for this card."
+    ::= { hh3cWirelessCardEntry 5 }
+
+hh3cWirelessCardCMIIID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The card ID of CMII (Ministry of Information Industry of China)."
+    ::= { hh3cWirelessCardEntry 6 }
+
+hh3cWirelessCardHardwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor-specific hardware version string for this card."
+    ::= { hh3cWirelessCardEntry 7 }
+
+hh3cWirelessCardFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendor-specific firmware version string for this card."
+    ::= { hh3cWirelessCardEntry 8 }
+
+hh3cWirelessCardPRLVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The preferred roaming list version for this card."
+    ::= { hh3cWirelessCardEntry 9 }
+
+hh3cWirelessCardInterfaceIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface index in IF-MIB of this card."
+    ::= { hh3cWirelessCardEntry 10 }
+
+hh3cWirelessCardModemStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        onLine(2),
+                        offLine(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of modem."
+    ::= { hh3cWirelessCardEntry 11 }
+
+hh3cWirelessCardModemMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        tdscdma(2),
+                        wcdma(3),
+                        cdma(4),
+                        lte(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mode of the 3G and 4G Modem."
+    ::= { hh3cWirelessCardEntry 12 }
+
+hh3cWirelessCardCurNetConn OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        noService(2),
+                        gsm(3),
+                        gprs(4),
+                        edge(5),
+                        hsdpa(6),
+                        hsupa(7),
+                        hsupaAndhsdpa(8),
+                        hspaPlus(9),
+                        umts(10),
+                        dchspaPlus(11),
+                        lte(12),
+                        onexrtt(13),
+                        evdo(14),
+                        onexrttAndevdo(15),
+                        tdscdma(16)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current network connection."
+    ::= { hh3cWirelessCardEntry 13 }
+
+
+-- SMS group
+hh3cSmsGroup OBJECT IDENTIFIER ::= { hh3cWirelessCard 2 }
+
+-- SMS scalar objects
+hh3cSmsScalarObjects OBJECT IDENTIFIER ::= { hh3cSmsGroup 1 }
+
+hh3cSmsRxNotifSwitch OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The switch of notification when a short message received."
+    ::= { hh3cSmsScalarObjects 1 }
+
+
+-- SMS operation table
+hh3cSmsOperationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSmsOperationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row per short message."
+    ::= { hh3cSmsGroup 2 }
+
+hh3cSmsOperationEntry OBJECT-TYPE
+    SYNTAX      Hh3cSmsOperationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The information about the short message."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3cSmsOperationTable 1 }
+
+Hh3cSmsOperationEntry ::= SEQUENCE
+    {
+        hh3cSmsDestNumber        SnmpAdminString,
+        hh3cSmsEncode            Hh3cSmsEncodeType,
+        hh3cSmsContent           OCTET STRING,
+        hh3cSmsSendStatus        INTEGER
+    }
+
+
+hh3cSmsDestNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination number of the short message."
+    ::= { hh3cSmsOperationEntry 1 }
+
+hh3cSmsEncode OBJECT-TYPE
+    SYNTAX      Hh3cSmsEncodeType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The encoded type of the short message."
+    DEFVAL      { 1 }
+    ::= { hh3cSmsOperationEntry 2 }
+
+hh3cSmsContent OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Content of the short message."
+    ::= { hh3cSmsOperationEntry 3 }
+
+hh3cSmsSendStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            set2Send(1),
+            ready2Send(2),
+            sending(3),
+            sentAlready(4),
+            telnumberInvalid(5),
+            paramInvalid(6),
+            contentTooLong(7),
+            codeError(8),
+            unknown(9),
+            busy(10),
+            notPresent(11),
+            notSupport(12),
+            initializing(13),
+            noCenterNum(14),
+            noSim(15),
+            simNotReady(16),
+            sendAtFailed(17),
+            sendDisable(18)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Status of the short message sent."
+    ::= { hh3cSmsOperationEntry 4 }
+
+-- Wireless card online table
+hh3cWirelessCardOnlineTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWirelessCardOnlineEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row per wireless card."
+    ::= { hh3cWirelessCard 3 }
+
+hh3cWirelessCardOnlineEntry OBJECT-TYPE
+    SYNTAX      Hh3cWirelessCardOnlineEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about online time of a wireless card."
+    INDEX { hh3cWirelessCardIndex, hh3cWirelessCardOnlineTime }
+    ::= { hh3cWirelessCardOnlineTable 1 }
+
+Hh3cWirelessCardOnlineEntry ::= SEQUENCE
+    {
+        hh3cWirelessCardOnlineTime       Unsigned32,
+        hh3cWirelessCardOnlineType       INTEGER
+    }
+
+hh3cWirelessCardOnlineTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index for this entry."
+    ::= { hh3cWirelessCardOnlineEntry 1 }
+
+hh3cWirelessCardOnlineType OBJECT-TYPE
+    SYNTAX    INTEGER
+        {
+            up(1),
+            down(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The online type of this wireless card."
+    ::= { hh3cWirelessCardOnlineEntry 2 }
+
+
+-- The UIM information table
+hh3cUIMInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUIMInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row per UIM."
+    ::= { hh3cUIM 1 }
+
+hh3cUIMInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cUIMInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The information about the UIM."
+    INDEX { hh3cWirelessCardIndex, hh3cUIMIndex }
+    ::= { hh3cUIMInfoTable 1 }
+
+Hh3cUIMInfoEntry ::= SEQUENCE
+    {
+        hh3cUIMIndex          Integer32,
+        hh3cUIMStatus         Hh3cUIMStatusType,
+        hh3cUIMImsi           SnmpAdminString,
+        hh3cUIMPin            SnmpAdminString,
+        hh3cUIMVoltage        Unsigned32,
+        hh3cUIMProvider       SnmpAdminString,
+        hh3cUIMSignal         Integer32,
+        hh3cUIMTryPinPukTimes Unsigned32,
+        hh3cUIMOldPin         SnmpAdminString
+    }
+
+hh3cUIMIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index for this entry."
+    ::= { hh3cUIMInfoEntry 1 }
+
+hh3cUIMStatus OBJECT-TYPE
+    SYNTAX      Hh3cUIMStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status about this UIM."
+    ::= { hh3cUIMInfoEntry 2 }
+
+hh3cUIMImsi OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IMSI (International Mobile Subscriber Identification Number) about
+        this UIM.  If this information is unknown to the agent, then this object
+        will be returned a zero-length string."
+    ::= { hh3cUIMInfoEntry 3 }
+
+hh3cUIMPin OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..9))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The PIN about this UIM.  If this information is unknown to the agent,
+        then this object will be returned a zero-length string."
+    ::= { hh3cUIMInfoEntry 4 }
+
+hh3cUIMVoltage OBJECT-TYPE
+    SYNTAX      Unsigned32(0..4294967295)
+    UNITS       "milli-volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The voltage about this UIM.  If this information is unknown to the
+        agent, then this object will be returned 4294967295."
+    ::= { hh3cUIMInfoEntry 5 }
+
+hh3cUIMProvider OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The provider of mobile network.  If this information is unknown to the
+        agent, then this object will be returned a zero-length string."
+    ::= { hh3cUIMInfoEntry 6 }
+
+hh3cUIMSignal OBJECT-TYPE
+    SYNTAX      Integer32(0..31 | 99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The intensity of the signal about this UIM.
+        A value of '99' means no signal."
+    ::= { hh3cUIMInfoEntry 7 }
+
+hh3cUIMTryPinPukTimes OBJECT-TYPE
+    SYNTAX      Unsigned32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of remaining times for unlocking PIN or PUK.
+        The value is associated the same instance of hh3cUIMStatus.  If this
+        information is unknown to the agent, then this object will be
+        returned 4294967295."
+    ::= { hh3cUIMInfoEntry 8 }
+
+hh3cUIMOldPin OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..9))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The old PIN for this UIM."
+    ::= { hh3cUIMInfoEntry 9 }
+
+
+-- The CDMA information table of 1xRTT
+hh3c3GCdma1xRttTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3c3GCdma1xRttEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "CDMA 1xRTT table."
+    ::= { hh3c3GCdma 1 }
+
+hh3c3GCdma1xRttEntry OBJECT-TYPE
+    SYNTAX      Hh3c3GCdma1xRttEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of hh3c3GCdma1xRttTable."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3c3GCdma1xRttTable 1 }
+
+Hh3c3GCdma1xRttEntry ::= SEQUENCE
+    {
+        hh3c3GCdma1xRttCurrentRssi           Integer32,
+        hh3c3GCdma1xRttRssiMediumThreshold   Integer32,
+        hh3c3GCdma1xRttRssiWeakThreshold     Integer32,
+        hh3c3GCdma1xRttCurServiceStatus      INTEGER,
+        hh3c3GCdma1xRttCurRoamingStatus      INTEGER,
+        hh3c3GCdma1xRttBID                   Unsigned32,
+        hh3c3GCdma1xRttSID                   Unsigned32,
+        hh3c3GCdma1xRttNID                   Unsigned32
+    }
+
+hh3c3GCdma1xRttCurrentRssi OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Received Signal Strength Indicator(RSSI) of CDMA 1xRTT."
+    ::= { hh3c3GCdma1xRttEntry 1 }
+
+hh3c3GCdma1xRttRssiMediumThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The medium signal threshold of CMDA 1xRTT RSSI.  The absolute
+        value of hh3c3GCdma1xRttRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GCdma1xRttRssiWeakThreshold
+        (|hh3c3GCdma1xRttRssiMediumThreshold| <= |hh3c3GCdma1xRttRssiWeakThreshold|)."
+    DEFVAL      { 0 }
+    ::= { hh3c3GCdma1xRttEntry 2 }
+
+hh3c3GCdma1xRttRssiWeakThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weak signal threshold of CMDA 1xRTT RSSI.  The absolute
+        value of hh3c3GCdma1xRttRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GCdma1xRttRssiWeakThreshold
+        (|hh3c3GCdma1xRttRssiMediumThreshold| <= |hh3c3GCdma1xRttRssiWeakThreshold|)."
+    DEFVAL      { -150 }
+    ::= { hh3c3GCdma1xRttEntry 3 }
+
+hh3c3GCdma1xRttCurServiceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        available(2),
+                        emergency(3),
+                        lowPower(4),
+                        noService(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of service."
+    ::= { hh3c3GCdma1xRttEntry 4 }
+
+hh3c3GCdma1xRttCurRoamingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        roaming(2),
+                        home(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of roaming."
+    ::= { hh3c3GCdma1xRttEntry 5 }
+
+hh3c3GCdma1xRttBID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base Station ID(BID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 6 }
+
+hh3c3GCdma1xRttSID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The System ID(SID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 7 }
+
+hh3c3GCdma1xRttNID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Network ID(NID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 8 }
+
+-- The CDMA information table of EvDo
+hh3c3GCdmaEvDoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3c3GCdmaEvDoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "CDMA EvDo table."
+    ::= { hh3c3GCdma 2 }
+
+hh3c3GCdmaEvDoEntry OBJECT-TYPE
+    SYNTAX      Hh3c3GCdmaEvDoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of hh3c3GCdmaEvDoTable."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3c3GCdmaEvDoTable 1 }
+
+Hh3c3GCdmaEvDoEntry ::= SEQUENCE
+    {
+        hh3c3GCdmaEvDoCurrentRssi           Integer32,
+        hh3c3GCdmaEvDoRssiMediumThreshold   Integer32,
+        hh3c3GCdmaEvDoRssiWeakThreshold     Integer32,
+        hh3c3GCdmaEvDoCurServiceStatus      INTEGER,
+        hh3c3GCdmaEvDoCurRoamingStatus      INTEGER,
+        hh3c3GCdmaEvDoSubNetID              SnmpAdminString
+    }
+
+hh3c3GCdmaEvDoCurrentRssi OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Received Signal Strength Indicator(RSSI) of CDMA EvDo."
+    ::= { hh3c3GCdmaEvDoEntry 1 }
+
+hh3c3GCdmaEvDoRssiMediumThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The medium signal threshold of CMDA EvDo RSSI.  The absolute
+        value of hh3c3GCdmaEvDoRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GCdmaEvDoRssiWeakThreshold
+        (|hh3c3GCdmaEvDoRssiMediumThreshold| <= |hh3c3GCdmaEvDoRssiWeakThreshold|)."
+    DEFVAL      { 0 }
+    ::= { hh3c3GCdmaEvDoEntry 2 }
+
+hh3c3GCdmaEvDoRssiWeakThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weak signal threshold of CMDA EvDo RSSI.  The absolute
+        value of hh3c3GCdmaEvDoRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GCdmaEvDoRssiWeakThreshold
+        (|hh3c3GCdmaEvDoRssiMediumThreshold| <= |hh3c3GCdmaEvDoRssiWeakThreshold|)."
+    DEFVAL      { -150 }
+    ::= { hh3c3GCdmaEvDoEntry 3 }
+
+hh3c3GCdmaEvDoCurServiceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        available(2),
+                        emergency(3),
+                        lowPower(4),
+                        noService(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of service."
+    ::= { hh3c3GCdmaEvDoEntry 4 }
+
+hh3c3GCdmaEvDoCurRoamingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        roaming(2),
+                        home(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of roaming."
+    ::= { hh3c3GCdmaEvDoEntry 5 }
+
+hh3c3GCdmaEvDoSubNetID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Sub Net ID of CDMA EvDo.
+        The invalid value is a zero-length string."
+    ::= { hh3c3GCdmaEvDoEntry 6 }
+
+-- The GSM information table
+hh3c3GGsmInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3c3GGsmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "GSM information table."
+    ::= { hh3c3GGsm 1 }
+
+hh3c3GGsmInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3c3GGsmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of hh3c3GGsmInfoTable."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3c3GGsmInfoTable 1 }
+
+Hh3c3GGsmInfoEntry ::= SEQUENCE
+    {
+        hh3c3GGsmCurrentRssi             Integer32,
+        hh3c3GGsmRssiMediumThreshold     Integer32,
+        hh3c3GGsmRssiWeakThreshold       Integer32,
+        hh3c3GGsmImsi                    SnmpAdminString,
+        hh3c3GGsmImei                    SnmpAdminString,
+        hh3c3GGsmApn                     SnmpAdminString,
+        hh3c3GGsmPacketSessionStatus     INTEGER,
+        hh3c3GGsmNetworkSelectionMode    INTEGER,
+        hh3c3GGsmMobileNetworkName       SnmpAdminString,
+        hh3c3GGsmLac                     SnmpAdminString,
+        hh3c3GGsmCellId                  SnmpAdminString,
+        hh3c3GGsmSimStatus               INTEGER,
+        hh3c3GGsmCurServiceStatus        INTEGER,
+        hh3c3GGsmCurRoamingStatus        INTEGER,
+        hh3c3GGsmMcc                     SnmpAdminString,
+        hh3c3GGsmMnc                     SnmpAdminString
+    }
+
+hh3c3GGsmCurrentRssi OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Received Signal Strength Indicator(RSSI) of GSM."
+    ::= { hh3c3GGsmInfoEntry 1 }
+
+hh3c3GGsmRssiMediumThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The medium signal threshold of GSM RSSI.  The absolute
+        value of hh3c3GGsmRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GGsmRssiWeakThreshold
+        (|hh3c3GGsmRssiMediumThreshold| <= |hh3c3GGsmRssiWeakThreshold|)."
+    DEFVAL      { 0 }
+    ::= { hh3c3GGsmInfoEntry 2 }
+
+hh3c3GGsmRssiWeakThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weak signal threshold of GSM RSSI.  The absolute
+        value of hh3c3GGsmRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3c3GGsmRssiWeakThreshold
+        (|hh3c3GGsmRssiMediumThreshold| <= |hh3c3GGsmRssiWeakThreshold|)."
+    DEFVAL      { -150 }
+    ::= { hh3c3GGsmInfoEntry 3 }
+
+hh3c3GGsmImsi OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The International Mobile Subscriber Identity(IMSI) of GSM."
+    ::= { hh3c3GGsmInfoEntry 4 }
+
+hh3c3GGsmImei OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The International Mobile Equipment Identity(IMEI) of GSM."
+    ::= { hh3c3GGsmInfoEntry 5 }
+
+hh3c3GGsmApn OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..100))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Access Point Name(APN) of GSM."
+    ::= { hh3c3GGsmInfoEntry 6 }
+
+hh3c3GGsmPacketSessionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        active(2),
+                        inactive(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The packet session status of GSM."
+    ::= { hh3c3GGsmInfoEntry 7 }
+
+hh3c3GGsmNetworkSelectionMode    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        automatic(2),
+                        manual(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The network selection mode of GSM."
+    ::= { hh3c3GGsmInfoEntry 8 }
+
+hh3c3GGsmMobileNetworkName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mobile network name of GSM."
+    ::= { hh3c3GGsmInfoEntry 9 }
+
+hh3c3GGsmLac OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Location Area Code(LAC) of GSM."
+    ::= { hh3c3GGsmInfoEntry 10 }
+
+hh3c3GGsmCellId OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID of cell."
+    ::= { hh3c3GGsmInfoEntry 11 }
+
+hh3c3GGsmSimStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        ok(2),
+                        notInsert(3),
+                        networkReject(4),
+                        blocked(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of SIM."
+    ::= { hh3c3GGsmInfoEntry 12 }
+
+hh3c3GGsmCurServiceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        available(2),
+                        emergency(3),
+                        lowPower(4),
+                        noService(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of service."
+    ::= { hh3c3GGsmInfoEntry 13 }
+
+hh3c3GGsmCurRoamingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        roaming(2),
+                        home(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of roaming."
+    ::= { hh3c3GGsmInfoEntry 14 }
+
+hh3c3GGsmMcc OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mobile Country Code(MCC) of GSM."
+    ::= { hh3c3GGsmInfoEntry 15 }
+
+hh3c3GGsmMnc OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mobile Network Code of GSM."
+    ::= { hh3c3GGsmInfoEntry 16 }
+
+
+-- The LTE infomation table
+hh3cLteInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLteInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The quality of signal table."
+    ::= { hh3cLte 1 }
+
+hh3cLteInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cLteInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The quality about the signal."
+    INDEX { hh3cWirelessCardIndex }
+    ::= { hh3cLteInfoTable 1 }
+
+Hh3cLteInfoEntry ::= SEQUENCE
+    {
+        hh3cLteCurrentRsrp     Integer32,
+        hh3cLteCurrentRsrq     Integer32,
+        hh3cLteCurrentSinr     Integer32,
+        hh3cLteTxPower         Integer32,
+        hh3cLteCurrentRssi           Integer32,
+        hh3cLteRssiMediumThreshold   Integer32,
+        hh3cLteRssiWeakThreshold     Integer32
+    }
+
+hh3cLteCurrentRsrp OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reference signal receiving power."
+    ::= { hh3cLteInfoEntry 1 }
+
+hh3cLteCurrentRsrq OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reference signal receiving quality."
+    ::= { hh3cLteInfoEntry 2 }
+
+hh3cLteCurrentSinr OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal to interface plus noise ratio."
+    ::= { hh3cLteInfoEntry 3 }
+
+hh3cLteTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit power, 0x8000 means invalid."
+    ::= { hh3cLteInfoEntry 4 }
+
+hh3cLteCurrentRssi OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Received Signal Strength Indicator(RSSI) of LTE."
+    ::= { hh3cLteInfoEntry 5 }
+
+hh3cLteRssiMediumThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The medium signal threshold of LTE RSSI.  The absolute
+        value of hh3cLteRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3cLteRssiWeakThreshold
+        (|hh3cLteRssiMediumThreshold| <= |hh3cLteRssiWeakThreshold|)."
+    DEFVAL      { 0 }
+    ::= { hh3cLteInfoEntry 6 }
+
+hh3cLteRssiWeakThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weak signal threshold of LTE RSSI.  The absolute
+        value of hh3cLteRssiMediumThreshold should be less than
+        or equal to the absolute value of hh3cLteRssiWeakThreshold
+        (|hh3cLteRssiMediumThreshold| <= |hh3cLteRssiWeakThreshold|)."
+    DEFVAL      { -150 }
+    ::= { hh3cLteInfoEntry 7 }
+
+
+-- MIB trap definitions
+hh3c3GModemTrap       OBJECT IDENTIFIER ::= { hh3c3GModem 2 }
+hh3c3GModemTraps       OBJECT IDENTIFIER ::= { hh3c3GModem 3 }
+hh3c3GModemTrapPrefix  OBJECT IDENTIFIER ::= { hh3c3GModemTraps 0 }
+
+hh3cDevSerialNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The serial number of the current device."
+    ::= { hh3c3GModemTrap 1 }
+
+hh3cDeviceOUI OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The OUI (Organizational Unique Identifier) of the current device."
+    ::= { hh3c3GModemTrap 2 }
+
+hh3cAccessMedia OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            unknown(1),
+            air(2),
+            cable(3)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The current access media."
+    ::= { hh3c3GModemTrap 3 }
+
+hh3c3GCurrentService OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            unknown(1),
+            oneXRtt(2),
+            evDo(3),
+            gsm(4),
+            lte(5)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The current service type that is bound in the notifications."
+    ::= { hh3c3GModemTrap 4 }
+
+hh3c3GCurrentRssiBind OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The current RSSI that is bound in the notifications."
+    ::= { hh3c3GModemTrap 5 }
+
+hh3c3GImsiBind OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The IMSI that is bound in the notifications."
+    ::= { hh3c3GModemTrap 6 }
+
+hh3cSmsSrcNumberBind OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..20))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The source number that is bound in the notifications."
+    ::= { hh3c3GModemTrap 7 }
+
+hh3cSmsTimeBind OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The sending time that is bound in the notifications."
+    ::= { hh3c3GModemTrap 8 }
+
+hh3cSmsEncodeBind OBJECT-TYPE
+    SYNTAX      Hh3cSmsEncodeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The encoded type that is bound in the notifications."
+    ::= { hh3c3GModemTrap 9 }
+
+hh3cSmsContentBind OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..512))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The content of short message that is bound in the notifications."
+    ::= { hh3c3GModemTrap 10 }
+
+
+hh3cWirelessCardInserted NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3cUIMImsi
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cWirelessCardInserted notification is generated when a wireless
+        card is inserted."
+   ::= { hh3c3GModemTrapPrefix 1 }
+
+hh3cWirelessCardPulledOut NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3cUIMImsi
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cWirelessCardPulledOut notification is generated when a wireless
+        card is pulled out."
+   ::= { hh3c3GModemTrapPrefix 2 }
+
+hh3cUIMPinInvalid NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3cUIMImsi
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cUIMPinInvalid notification is generated when UIM PIN is invalid."
+   ::= { hh3c3GModemTrapPrefix 3 }
+
+hh3cUIMPinChanged NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3cUIMImsi,
+            hh3cUIMOldPin,
+            hh3cUIMPin
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cUIMPinInvalid notification is generated when UIM PIN is changed."
+   ::= { hh3c3GModemTrapPrefix 4 }
+
+hh3cAccessMediaChanged NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3cUIMImsi,
+            hh3cAccessMedia
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cAccessMediaChanged notification is generated when access media
+         is changed."
+   ::= { hh3c3GModemTrapPrefix 5 }
+
+hh3c3GRssiStrongSignalTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWirelessCardIndex,
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3c3GCurrentService,
+            hh3c3GCurrentRssiBind,
+            hh3c3GImsiBind
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3c3GRssiStrongSignalTrap notification is generated when current RSSI
+        exceeds the medium signal threshold."
+   ::= { hh3c3GModemTrapPrefix 6 }
+
+hh3c3GRssiMediumSignalTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWirelessCardIndex,
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3c3GCurrentService,
+            hh3c3GCurrentRssiBind,
+            hh3c3GImsiBind
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3c3GRssiMediumSignalTrap notification is generated when the current RSSI
+        falls or rises to a value between the medium and weak signal thresholds."
+   ::= { hh3c3GModemTrapPrefix 7 }
+
+
+hh3c3GRssiWeakSignalTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWirelessCardIndex,
+            hh3cDeviceOUI,
+            hh3cDevSerialNumber,
+            hh3cWirelessCardSerialNumber,
+            hh3c3GCurrentService,
+            hh3c3GCurrentRssiBind,
+            hh3c3GImsiBind
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3c3GRssiWeakSignalTrap notification is generated when current RSSI
+        falls below the weak signal threshold."
+   ::= { hh3c3GModemTrapPrefix 8 }
+
+hh3cSmsTxNotification NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWirelessCardIndex,
+            hh3cSmsSendStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "A hh3cSmsTxNotification notification is generated
+        when a short message is sent."
+    ::= { hh3c3GModemTrapPrefix 9 }
+
+hh3cSmsRxNotification NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWirelessCardIndex,
+            hh3cSmsSrcNumberBind,
+            hh3cSmsTimeBind,
+            hh3cSmsEncodeBind,
+            hh3cSmsContentBind
+        }
+    STATUS  current
+    DESCRIPTION
+        "A hh3cSmsRxNotification notification is generated
+        when a short message is received."
+    ::= { hh3c3GModemTrapPrefix 10 }
+
+END

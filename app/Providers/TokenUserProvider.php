@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,8 +34,8 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
-     * @param  mixed $identifier
-     * @param  string $token
+     * @param  mixed  $identifier
+     * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByToken($identifier, $token)
@@ -46,34 +46,34 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param  string $token
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  string  $token
      * @return void
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return;
     }
 
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param  array $credentials
+     * @param  array  $credentials
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (!ApiToken::isValid($credentials['api_token'])) {
+        if (! ApiToken::isValid($credentials['api_token'])) {
             return null;
         }
 
         $user = ApiToken::userFromToken($credentials['api_token']);
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return $user;
         }
 
         // missing user for existing token, create it assuming legacy auth_id
         $api_token = ApiToken::where('token_hash', $credentials['api_token'])->first();
+        /** @var \App\Models\User|null */
         $user = $this->retrieveByLegacyId($api_token->user_id);
 
         // update token user_id
@@ -88,12 +88,13 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
     /**
      * Validate a user against the given credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param  array $credentials
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  array  $credentials
      * @return bool
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
+        /** @var \App\Models\User $user */
         return ApiToken::isValid($credentials['api_token'], $user->user_id);
     }
 }

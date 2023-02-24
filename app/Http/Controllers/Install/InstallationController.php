@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -43,6 +43,7 @@ class InstallationController extends Controller
     public function redirectToFirst()
     {
         $step = collect($this->filterActiveSteps())->keys()->first(null, 'checks');
+
         return redirect()->route("install.$step");
     }
 
@@ -50,7 +51,7 @@ class InstallationController extends Controller
     {
         foreach ($this->filterActiveSteps() as $step => $controller) {
             /** @var InstallerStep $controller */
-            if (!$controller->complete()) {
+            if (! $controller->complete()) {
                 return redirect()->route("install.$step");
             }
         }
@@ -83,7 +84,7 @@ class InstallationController extends Controller
                 return true;
             }
 
-            if (!$status['complete']) {
+            if (! $status['complete']) {
                 return false;
             }
         }
@@ -93,7 +94,7 @@ class InstallationController extends Controller
 
     final protected function markStepComplete()
     {
-        if (!$this->stepCompleted($this->step)) {
+        if (! $this->stepCompleted($this->step)) {
             session(["install.$this->step" => true]);
             session()->save();
         }
@@ -101,20 +102,21 @@ class InstallationController extends Controller
 
     final protected function stepCompleted(string $step)
     {
-        return (bool)session("install.$step");
+        return (bool) session("install.$step");
     }
 
     final protected function formatData($data = [])
     {
         $data['steps'] = $this->hydrateControllers();
         $data['step'] = $this->step;
+
         return $data;
     }
 
     protected function configureDatabase()
     {
         $db = session('db');
-        if (!empty($db)) {
+        if (! empty($db)) {
             Eloquent::setConnection(
                 $this->connection,
                 $db['host'] ?? 'localhost',
@@ -149,6 +151,7 @@ class InstallationController extends Controller
     private function stepStatus()
     {
         $this->hydrateControllers();
+
         return array_map(function (InstallerStep $controller) {
             return [
                 'enabled' => $controller->enabled(),

@@ -1,0 +1,5 @@
+modules:
+  os:
+    hardware: STORMSHIELD-PROPERTY-MIB::snsModel.0
+    version: STORMSHIELD-PROPERTY-MIB::snsVersion.0
+    serial: STORMSHIELD-PROPERTY-MIB::snsSerialNumber.0

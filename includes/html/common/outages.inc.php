@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -38,7 +38,7 @@ var outages_grid = $("#outages").bootgrid({
     post: function ()
     {
         return {
-            device: "' . (int)($vars['device']) . '",
+            device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
             to: "' . addcslashes($vars['to'], '"') . '",
             from: "' . addcslashes($vars['from'], '"') . '",
         };

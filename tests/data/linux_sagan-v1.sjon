@@ -1,0 +1,228 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "sagan",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "sagan",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": ".total_after",
+                    "value": 423,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_alert",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_bytes",
+                    "value": 260930,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_bytes_ignored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_drop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_drop_percent",
+                    "value": "0.00000",
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_eps",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_f_drop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_f_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_f_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_ignore",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_match",
+                    "value": 677,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_max_bytes_log_line",
+                    "value": 1202,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_threshold",
+                    "value": 425,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_total",
+                    "value": 1424,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": ".total_uptime",
+                    "value": 3939964,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_after",
+                    "value": 423,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_alertString",
+                    "value": "",
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_bytes",
+                    "value": 260930,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_bytes_ignored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_drop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_drop_percent",
+                    "value": "0.00000",
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_eps",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_f_drop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_f_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_f_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_ignore",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_match",
+                    "value": 677,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_max_bytes_log_line",
+                    "value": 1202,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_threshold",
+                    "value": 425,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_total",
+                    "value": 1424,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                },
+                {
+                    "metric": "ids_uptime",
+                    "value": 3939964,
+                    "value_prev": null,
+                    "app_type": "sagan"
+                }
+            ]
+        }
+    }
+}

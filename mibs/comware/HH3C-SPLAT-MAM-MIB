@@ -1,0 +1,288 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: MAC management MIB
+-- Reference:
+-- Version: V2.3
+-- History:
+--(1) Created by Zhangshilin, 2001.06.29
+-- V2.0 2004-10-12 updated by gaolong
+--      Import TEXTUAL-CONVENTION and MODULE-IDENTITY.
+--      Add hh3cLswMacPort MODULE-IDENTITY clause.
+--      Change ACCESS to MAX-ACCESS.
+--      Change MAX-ACCESS clause value from write-only to read-write.
+-- V2.1 2005-03-16 by gaolong
+--      Change import clause of hh3cdot1qVlanIndex
+-- V2.2 2005-07-28 by huna kf0518
+--      Add hh3cdot1qTpFdbGroupSetTable
+-- V2.3 2005-02-25 by wangyupeng
+--      Add blackhole and security for hh3cdot1qTpFdbSetStatus
+-- ==================================================================
+
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-LswMAM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    OBJECT-TYPE,Integer32, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+
+    hh3clswCommon
+        FROM HH3C-OID-MIB
+
+    hh3cdot1qVlanIndex
+        FROM HH3C-LswVLAN-MIB;
+
+    hh3cLswMacPort MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            " "
+            REVISION "200106290000Z"
+            DESCRIPTION
+            " "
+            ::= { hh3clswCommon 3 }
+
+    InterfaceIndex ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "A unique value, greater than zero, for each interface
+               or interface sub-layer in the managed system.  It is
+               recommended that values are assigned contiguously
+               starting from 1.  The value for each interface sub-
+               layer must remain constant at least from one re-
+               initialization of the entity's network management
+               system to the next re-initialization."
+       SYNTAX       Integer32
+
+    PortList ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            ports, with the first octet specifying ports 1 through
+            8, the second octet specifying ports 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the lowest numbered port, and the least significant bit
+            represents the highest numbered port.  Thus, each port
+            of the bridge is represented by a single bit within the
+            value of this object.  If that bit has a value of '1'
+            then that port is included in the set of ports; the port
+            is not included if its bit has a value of '0'."
+        SYNTAX      OCTET STRING
+
+
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+
+
+    hh3cdot1qMacSearchTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDot1qMacSearchEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Information table for searching port with mac address   "
+        ::= { hh3cLswMacPort  1 }
+
+    hh3cdot1qMacSearchEntry   OBJECT-TYPE
+        SYNTAX  Hh3cDot1qMacSearchEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                " Information table for searching port with mac address entry  "
+        INDEX   { hh3cdot1qMacSearchAddress, hh3cdot1qMacSearchVlanID }
+        ::= { hh3cdot1qMacSearchTable  1 }
+
+    Hh3cDot1qMacSearchEntry ::=
+       SEQUENCE {
+                hh3cdot1qMacSearchAddress MacAddress ,
+                hh3cdot1qMacSearchVlanID  INTEGER ,
+                hh3cdot1qMacSearchPort    InterfaceIndex ,
+                hh3cdot1qMacSearchAgeTime INTEGER
+                }
+
+    hh3cdot1qMacSearchAddress   OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "MAC address"
+        ::= { hh3cdot1qMacSearchEntry  1 }
+
+    hh3cdot1qMacSearchVlanID OBJECT-TYPE
+        SYNTAX  INTEGER (-1 | 1..4096)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+               " VLANID of the native VLAN of the MAC address to be searched for "
+        ::= { hh3cdot1qMacSearchEntry  2 }
+
+    hh3cdot1qMacSearchPort OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+               "Interface index corresponding to the MAC address"
+        ::= { hh3cdot1qMacSearchEntry  3 }
+
+    hh3cdot1qMacSearchAgeTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+               " Address aging time"
+        ::= { hh3cdot1qMacSearchEntry  4 }
+
+
+    hh3cdot1qTpFdbSetTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDot1qTpFdbSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Unicast address setting table  "
+        ::= { hh3cLswMacPort  2 }
+
+    hh3cdot1qTpFdbSetEntry   OBJECT-TYPE
+        SYNTAX  Hh3cDot1qTpFdbSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                " Unicast address setting table entry "
+        INDEX   { hh3cdot1qVlanIndex, hh3cdot1qTpFdbSetAddress }
+        ::= { hh3cdot1qTpFdbSetTable  1 }
+
+    Hh3cDot1qTpFdbSetEntry ::=
+       SEQUENCE {
+                hh3cdot1qTpFdbSetAddress  MacAddress ,
+                hh3cdot1qTpFdbSetPort     InterfaceIndex ,
+                hh3cdot1qTpFdbSetStatus   INTEGER,
+                hh3cdot1qTpFdbSetOperate  INTEGER
+                }
+
+    hh3cdot1qTpFdbSetAddress   OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Unicast MAC address "
+        ::= { hh3cdot1qTpFdbSetEntry  1 }
+
+
+    hh3cdot1qTpFdbSetPort OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+               "Interface index corresponding to the MAC address "
+        ::= { hh3cdot1qTpFdbSetEntry  2 }
+
+    hh3cdot1qTpFdbSetStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            learned(3),
+            static(6),
+            dynamic(7),
+            blackhole(9),
+            security(11)
+                }
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION
+               "State corresponding to the MAC address"
+        ::= { hh3cdot1qTpFdbSetEntry 3 }
+
+    hh3cdot1qTpFdbSetOperate OBJECT-TYPE
+        SYNTAX  INTEGER {
+            add(1),
+            delete(2)
+            }
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION
+        "Add or delete an MAC address.  Read operation not supported."
+        ::= { hh3cdot1qTpFdbSetEntry 4 }
+
+
+    hh3cdot1qTpFdbGroupSetTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDot1qTpFdbGroupSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Multistcast address setting table, whose maximal row number
+                 is dynamically changed by the influence of IGSP.  When
+                 reaching the upper limit of the table, no more row could be
+                 added, then an error will be returned."
+        ::= { hh3cLswMacPort  3 }
+
+    hh3cdot1qTpFdbGroupSetEntry   OBJECT-TYPE
+        SYNTAX  Hh3cDot1qTpFdbGroupSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Multicast address setting table entry."
+        INDEX   { hh3cdot1qVlanIndex, hh3cdot1qTpFdbGroupSetAddress }
+        ::= { hh3cdot1qTpFdbGroupSetTable  1 }
+
+    Hh3cDot1qTpFdbGroupSetEntry ::=
+       SEQUENCE {
+                hh3cdot1qTpFdbGroupSetAddress  MacAddress,
+                hh3cdot1qTpFdbGroupSetPort     PortList,
+                hh3cdot1qTpFdbGroupSetOperate  INTEGER
+                }
+
+    hh3cdot1qTpFdbGroupSetAddress   OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Multicast MAC address."
+        ::= { hh3cdot1qTpFdbGroupSetEntry  1 }
+
+    hh3cdot1qTpFdbGroupSetPort OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The complete set of ports, in this VLAN, to which
+                 frames destined to this Multicast MAC address are currently
+                 being explicitly forwarded.  This does not include ports
+                 for which this address is only implicitly forwarded."
+        ::= { hh3cdot1qTpFdbGroupSetEntry  2 }
+
+    hh3cdot1qTpFdbGroupSetOperate OBJECT-TYPE
+        SYNTAX  INTEGER {
+            add(1),
+            delete(2)
+            }
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION
+                "Add or delete a Multicast MAC address.  Read operation is
+                 meaningless.  When adding a Multicast MAC address, it is
+                 required to provide MacAddress, VLAN and PortList all.  For
+                 deleting operation, MacAddress and VLAN must be provided,
+                 but hh3cdot1qTpFdbGroupSetPort is optional."
+        ::= { hh3cdot1qTpFdbGroupSetEntry 3 }
+
+
+END

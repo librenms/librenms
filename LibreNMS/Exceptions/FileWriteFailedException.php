@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,24 +29,24 @@ use Throwable;
 
 class FileWriteFailedException extends \Exception
 {
-    protected $file;
+    /** @var string */
+    protected $file_path;
 
     public function __construct($file, $code = 0, Throwable $previous = null)
     {
-        $this->file = $file;
+        $this->file_path = $file;
         parent::__construct("Failed to write file: $file", $code, $previous);
     }
 
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function render(\Illuminate\Http\Request $request)
     {
         $title = trans('exceptions.file_write_failed.title');
-        $message = trans('exceptions.file_write_failed.message', ['file' => $this->file]);
+        $message = trans('exceptions.file_write_failed.message', ['file' => $this->file_path]);
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',

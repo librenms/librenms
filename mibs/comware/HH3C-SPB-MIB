@@ -1,0 +1,248 @@
+-- =========================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  SPB MIB
+-- Reference:  Enterprise MIB
+-- Version:V1.00
+-- History:
+--     initial version 2003-03-06
+--     V1.0 6th Nov 2012
+-- =========================================================================
+HH3C-SPB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MacAddress
+        FROM SNMPv2-TC
+    VlanIdOrNone
+        FROM Q-BRIDGE-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    IEEE8021SpbmSPsourceId
+        FROM IEEE8021-SPB-MIB;
+
+hh3cSpb MODULE-IDENTITY
+    LAST-UPDATED "201211220000Z"        -- November 22, 2012 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION  "802.1 SPB MIB"
+    REVISION  "201211220000Z"        -- November 22, 2012 at 00:00 GMT
+    DESCRIPTION
+        "This MIB describes objects used for managing Shortest Path Bridging
+        (SPB)."
+    ::= { hh3cCommon 128 }
+
+
+hh3cSpbObjects OBJECT IDENTIFIER ::= { hh3cSpb 1 }
+
+hh3cSpbSysObjects OBJECT IDENTIFIER
+    ::= { hh3cSpbObjects 1 }
+
+hh3cSpbSysStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To descript the status of Shortest Path Bridging MAC Mode(SPBM) is
+        Enabled or Disabled."
+    DEFVAL { disabled }
+    ::= { hh3cSpbSysObjects 1 }
+
+hh3cSpbMulticastBVlanStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To descript the status of SPBM multicast bvlan is Enabled or
+        Disabled."
+    DEFVAL { disabled }
+    ::= { hh3cSpbSysObjects 2 }
+
+hh3cSpbConfig OBJECT IDENTIFIER
+    ::= { hh3cSpbObjects 2 }
+
+hh3cSpbIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSpbIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the interface status of SPBM is Enabled or
+        Disabled."
+    ::= { hh3cSpbConfig 1 }
+
+hh3cSpbIfEntry OBJECT-TYPE
+    SYNTAX Hh3cSpbIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cSpbIfEntry."
+    INDEX { ifIndex }
+    ::= { hh3cSpbIfTable 1 }
+
+Hh3cSpbIfEntry ::=
+    SEQUENCE
+    {
+        hh3cSpbIfStatus         INTEGER
+    }
+
+hh3cSpbIfStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To descript the interface status of SPBM is Enabled or Disabled."
+    DEFVAL { disabled }
+    ::= { hh3cSpbIfEntry 1 }
+
+hh3cSpbSrvTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSpbSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table descript the Base VlanID(VID) associated with the service
+        and the service multicast duplicate mode."
+    ::= { hh3cSpbConfig 2 }
+
+
+hh3cSpbSrvEntry OBJECT-TYPE
+    SYNTAX Hh3cSpbSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cSpbSrvEntry."
+    INDEX { hh3cSpbSrvTableEntryTopIx,
+            hh3cSpbSrvTableEntryIsid }
+    ::= { hh3cSpbSrvTable 1 }
+
+Hh3cSpbSrvEntry ::=
+    SEQUENCE {
+        hh3cSpbSrvTableEntryTopIx   Unsigned32,
+        hh3cSpbSrvTableEntryIsid    Unsigned32,
+        hh3cSpbSrvTableEntryBaseVid VlanIdOrNone,
+        hh3cSpbSrvTableEntryMode    INTEGER
+        }
+
+hh3cSpbSrvTableEntryTopIx OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Unique identifier of this SPB topology
+         This is index is allocated for this ISIS/MT instance.
+         It is used as an index to most other SPB tables below and to
+         select the exact ISIS instance and which MT instance together."
+    ::= { hh3cSpbSrvEntry 1 }
+
+hh3cSpbSrvTableEntryIsid OBJECT-TYPE
+    SYNTAX    Unsigned32 (255..16777215)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An ISID (service) originating/terminating on this bridge."
+    ::= { hh3cSpbSrvEntry 2 }
+
+hh3cSpbSrvTableEntryBaseVid OBJECT-TYPE
+    SYNTAX    VlanIdOrNone
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Base VID associated with this service.  The Base VID determines
+         the ECT Algorithm that is associated with this service.  Otherwise
+         no Base VID associated with the service, should be set = 0."
+    ::= { hh3cSpbSrvEntry 3 }
+
+hh3cSpbSrvTableEntryMode OBJECT-TYPE
+    SYNTAX    INTEGER
+        {
+            headEnd(1),
+            tandem(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indication of supporting multicast replicate mode
+         head-end/tandem."
+    DEFVAL { headEnd }
+    ::= { hh3cSpbSrvEntry 4 }
+
+-- ==================================================================
+--
+-- ======================= trap definition begin ====================
+--
+-- ==================================================================
+hh3cSpbTrap OBJECT IDENTIFIER ::= {  hh3cSpbObjects 3  }
+
+hh3cSpbTraps OBJECT IDENTIFIER ::= { hh3cSpbTrap 0 }
+
+hh3cSpbTrapsObjects OBJECT IDENTIFIER ::= { hh3cSpbTrap 1 }
+
+hh3cSpbSPSourceConflictTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSpbConflictSysID,
+            hh3cSpbConflictSPSourceID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification will be generated when the SPSourceID is conflict
+        with another bridge."
+    ::= { hh3cSpbTraps 1 }
+
+hh3cSpbBMacConflictTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSpbConflictSysID,
+            hh3cSpbConflictBMac
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification will be generated when the BMAC is conflict
+        with another bridge."
+    ::= { hh3cSpbTraps 2 }
+
+hh3cSpbConflictSysID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The bridge's SPSourceID is conflict with this bridge."
+    ::= { hh3cSpbTrapsObjects 1 }
+
+hh3cSpbConflictSPSourceID OBJECT-TYPE
+    SYNTAX IEEE8021SpbmSPsourceId
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The Shortest Path Source Identifier which is conflict."
+    ::= { hh3cSpbTrapsObjects 2 }
+
+hh3cSpbConflictBMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The BMAC which is conflict."
+    ::= { hh3cSpbTrapsObjects 3 }
+
+END

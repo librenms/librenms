@@ -1,0 +1,160 @@
+-- ===========================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- The information of EPON fiber backup.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 created by zhaodan.
+-- Initial version for hh3cEponFBMibObjects of hh3cEpon.
+-- ===========================================================
+HH3C-EPON-FB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cEpon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY
+    FROM SNMPv2-SMI
+        RowStatus
+    FROM SNMPv2-TC;
+
+
+hh3cEponFBMibObjects MODULE-IDENTITY
+    LAST-UPDATED "200711271008Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "
+        The objects in this MIB module are used to manage and
+        display current configuration of fiber backup groups
+        based on EPON OLT port.
+        "
+    ::= { hh3cEpon 6 }
+
+hh3cEponFBMIB OBJECT IDENTIFIER ::= { hh3cEponFBMibObjects 1 }
+--
+-- hh3cEponFBMIBTable
+--
+
+hh3cEponFBMIBTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEponFBMIBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines several optical fiber-backup system parameters."
+    ::= { hh3cEponFBMIB  1 }
+
+hh3cEponFBMIBEntry OBJECT-TYPE
+    SYNTAX      Hh3cEponFBMIBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cEponFBMIBTable."
+    INDEX
+        {
+            hh3cEponFBGroupIndex
+        }
+    ::= { hh3cEponFBMIBTable 1}
+
+
+Hh3cEponFBMIBEntry ::= SEQUENCE
+    {
+        hh3cEponFBGroupIndex          Integer32,
+        hh3cEponFBGroupRowStatus      RowStatus,
+        hh3cEponFBMasterPort          Integer32,
+        hh3cEponFBSlavePort           Integer32,
+        hh3cEponFBMasterPortStatus    INTEGER,
+        hh3cEponFBSlavePortStatus     INTEGER,
+        hh3cEponFBSwitchover          INTEGER
+    }
+
+hh3cEponFBGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPON fiber-backup group ID."
+    ::= { hh3cEponFBMIBEntry 1 }
+
+hh3cEponFBGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entry to be created and deleted
+        from the hh3cEponFBMIBTable."
+    ::= { hh3cEponFBMIBEntry 2 }
+
+hh3cEponFBMasterPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "OLT port ifindex of the fiber-backup group.
+        Use it to set or get the group master port."
+    ::= { hh3cEponFBMIBEntry 3 }
+
+hh3cEponFBSlavePort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "OLT port ifindex of the fiber-backup group.
+        Use it to set or get the group slave port.
+        hh3cEponFBSlavePort must be set after hh3cEponFBMasterPort.
+        "
+    ::= { hh3cEponFBMIBEntry 4 }
+
+hh3cEponFBMasterPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(1),
+            down(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The master port status of the fiber-backup group.
+        The active state indicates that the port's role is master, the olt chip is right
+        and the optical module is inserted.
+        The down state indicates others conditions."
+    ::= { hh3cEponFBMIBEntry 5 }
+
+hh3cEponFBSlavePortStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            ready(1),
+            down(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slave port status of the fiber-backup group.
+        The ready state indicates that the port's role is slave, the olt chip is right
+        and optical module is inserted.
+        The down state indicates others conditions."
+    ::= { hh3cEponFBMIBEntry 6 }
+
+hh3cEponFBSwitchover OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            false(1),
+            true(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Switch the fiber backup group's two port manually.
+        The group must has two ports
+        and the value of hh3cEponFBSlavePortStatus must be ready before Switchover.
+        after Switchover the port's role will be changed.
+        The value true is for switch-over.  The default value is false."
+    ::= { hh3cEponFBMIBEntry 7 }
+
+END

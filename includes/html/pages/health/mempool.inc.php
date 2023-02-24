@@ -10,12 +10,14 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = "Health :: Memory";
+$pagetitle[] = 'Health :: Memory';
+$graph_view = $vars['view'] == 'graphs';
+
 ?>
 
 <div class="panel panel-default panel-condensed">
@@ -35,10 +37,10 @@ $pagetitle[] = "Health :: Memory";
             <thead>
                 <tr>
                     <th data-column-id="hostname">Device</th>
-                    <th data-column-id="mempool_descr">Memory</th>
+                    <th data-column-id="mempool_descr"><?php echo $graph_view ? '' : 'Memory' ?></th>
                     <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
-                    <th data-column-id="mempool_used" data-searchable="false">Used</th>
-                    <th data-column-id="mempool_perc" data-searchable="false">Usage</th>
+                    <th data-column-id="mempool_used" data-searchable="false"><?php echo $graph_view ? '' : 'Used' ?></th>
+                    <th data-column-id="mempool_perc" data-searchable="false"><?php echo $graph_view ? '' : 'Usage' ?></th>
                 </tr>
             </thead>
         </table>
@@ -51,10 +53,9 @@ $pagetitle[] = "Health :: Memory";
         post: function ()
         {
             return {
-                id: "mempool",
                 view: '<?php echo $vars['view']; ?>'
             };
         },
-        url: "ajax_table.php"
+        url: "<?php echo url('/ajax/table/mempools'); ?>"
     });
 </script>

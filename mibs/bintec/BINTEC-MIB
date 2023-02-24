@@ -1,0 +1,118 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2004-2014 bintec elmeg GmbH
+-- $RCSfile: mib-standards,v $
+-- $Revision: 1.19 $
+-- $Date: 2017-03-10 16:15:21 $
+---------------------------------------------------------------------------
+
+-- INFO for importing MIB files into SNMP manager
+-- 
+-- if MIBcompiler dont like multiple modules or redefinitions of standard MIBs
+-- listed in this file, remove everything with except of last BINTEC-MIB:
+--   keep only lines from:
+--     from : BINTEC-MIB DEFINITIONS ::= BEGIN
+--     to   : END
+
+BINTEC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS enterprises FROM SNMPv2-SMI;
+
+    bintec	OBJECT IDENTIFIER ::= { enterprises 272 }
+    bibo	OBJECT IDENTIFIER ::= { bintec 4 }
+
+    isdn	OBJECT IDENTIFIER 
+	::= { bibo 2 }
+
+    biboip	OBJECT IDENTIFIER
+	::= { bibo 5 }
+
+    atm		OBJECT IDENTIFIER
+	::= { bibo 16 }
+
+    sys		OBJECT IDENTIFIER
+	::= { bibo 17 }
+
+    admin-2	OBJECT IDENTIFIER
+	::= { bibo 22 }
+
+    vpn		OBJECT IDENTIFIER
+	::= { bibo 23 }
+
+    ipsec	OBJECT IDENTIFIER
+	::= { bibo 26 }
+
+    qos		OBJECT IDENTIFIER
+	::= { bibo 27 }
+
+    adsl	OBJECT IDENTIFIER
+	::= { bibo 30 }
+
+    voip	OBJECT IDENTIFIER
+	::= { bibo 33 }
+
+    security	OBJECT IDENTIFIER
+	::= { bibo 38 }
+
+    vif		OBJECT IDENTIFIER 
+	::= { bibo 39 }
+
+    tty		OBJECT IDENTIFIER
+        ::= { bibo 41 }
+
+    ssh		OBJECT IDENTIFIER
+        ::= { bibo 44 }
+
+    phy		OBJECT IDENTIFIER
+	::= { bibo 45 }
+
+    wlan	OBJECT IDENTIFIER 
+	::= { bibo 46 }
+
+    ima		OBJECT IDENTIFIER
+	::= { bibo 54 }
+
+    usb		OBJECT IDENTIFIER
+	::= { bibo 55 }
+
+    resource	OBJECT IDENTIFIER
+        ::= { sys 4 }
+
+    gui	OBJECT IDENTIFIER
+        ::= { bibo 69 }
+
+    PhysAddress ::=
+	OCTET STRING (SIZE(6))
+
+    DisplayString ::=
+	OCTET STRING (SIZE(0..255))
+
+    MacAddress ::=
+	OCTET STRING (SIZE(6))
+
+    BridgeId ::= 
+	OCTET STRING (SIZE(8))
+
+    Timeout ::= 
+	INTEGER (0..4294967295)
+
+    Date ::=
+	INTEGER (0..4294967295)
+
+    HexValue ::=
+	INTEGER (0..4294967295)
+
+    BitValue ::=
+	INTEGER (0..4294967295)
+
+    -- dont use, only for internal signaling, use standard BITS
+    BitField ::=	-- alias type to distinguish BITS from OCTET STR
+	BITS
+
+    InetAddressV6 ::=	-- alias type to output in IPv6 ::-format
+	OCTET STRING (SIZE(0..16))
+
+
+END

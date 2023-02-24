@@ -3,7 +3,7 @@
 $no_refresh = true;
 
 if ($_POST['addbill'] == 'yes') {
-    if (!Auth::user()->hasGlobalAdmin()) {
+    if (! Auth::user()->hasGlobalAdmin()) {
         include 'includes/html/error-no-perm.inc.php';
         exit;
     }
@@ -26,7 +26,7 @@ if ($_POST['addbill'] == 'yes') {
                 }
 
                 $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \LibreNMS\Config::get('billing.base') * $multiplier : 0);
-                $bill_cdr   = 0;
+                $bill_cdr = 0;
             }
         }
 
@@ -44,13 +44,13 @@ if ($_POST['addbill'] == 'yes') {
                     $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
                 }
 
-                $bill_cdr   = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);
+                $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);
                 $bill_quota = 0;
             }
         }
     }//end if
 
-    $insert = array(
+    $insert = [
         'bill_name'   => $_POST['bill_name'],
         'bill_type'   => $_POST['bill_type'],
         'bill_cdr'    => $bill_cdr,
@@ -69,17 +69,17 @@ if ($_POST['addbill'] == 'yes') {
         'rate_average'      => 0,
         'rate_average_in'   => 0,
         'rate_average_out'  => 0,
-        'bill_last_calc'    => array('NOW()'),
+        'bill_last_calc'    => ['NOW()'],
         'bill_autoadded'    => 0,
-    );
+    ];
 
     $bill_id = dbInsert($insert, 'bills');
 
     if (is_numeric($bill_id) && is_numeric($_POST['port_id'])) {
-        dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port_id']), 'bill_ports');
+        dbInsert(['bill_id' => $bill_id, 'port_id' => $_POST['port_id']], 'bill_ports');
     }
 
-    header('Location: ' . generate_url(array('page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit')));
+    header('Location: ' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));
     exit();
 }
 
@@ -187,11 +187,11 @@ include 'includes/html/modal/new_bill.inc.php';
 
 <?php
 if ($vars['view'] == 'add') {
-    ?>
+                                ?>
 $(function() {
     $('#create-bill').modal('show');
 });
     <?php
-}
+                            }
 ?>
 </script>

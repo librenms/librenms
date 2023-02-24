@@ -1,14 +1,16 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
-foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device['device_id'])) as $storage) {
+$storage_cache = $storage_cache ?? [];
+foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['device_id']]) as $storage) {
     $descr = $storage['storage_descr'];
     $mib = $storage['storage_mib'];
 
-    echo 'Storage '. $descr .': ' . $mib . "\n\n\n\n";
+    echo 'Storage ' . $descr . ': ' . $mib . "\n\n\n\n";
 
-    $rrd_name = array('storage', $mib, $descr);
+    $rrd_name = ['storage', $mib, $descr];
     $rrd_def = RrdDefinition::make()
         ->addDataset('used', 'GAUGE', 0)
         ->addDataset('free', 'GAUGE', 0);
@@ -20,26 +22,21 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
 
     d_echo($storage);
 
-    if ($storage['size']) {
-        $percent = round(($storage['used'] / $storage['size'] * 100));
-    } else {
-        $percent = 0;
-    }
+    $percent = Number::calculatePercent($storage['used'], $storage['size'], 0);
+    echo $percent . '% ';
 
-    echo $percent.'% ';
-
-    $fields = array(
+    $fields = [
         'used'   => $storage['used'],
         'free'   => $storage['free'],
-    );
+    ];
 
     $tags = compact('mib', 'descr', 'rrd_name', 'rrd_def');
     data_update($device, 'storage', $tags, $fields);
 
     // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-    $update = dbUpdate(array('storage_used' => (string)$storage['used'], 'storage_free' => (string)$storage['free'], 'storage_size' => (string)$storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent), 'storage', '`storage_id` = ?', array($storage['storage_id']));
+    $update = dbUpdate(['storage_used' => (string) $storage['used'], 'storage_free' => (string) $storage['free'], 'storage_size' => (string) $storage['size'], 'storage_units' => (int) $storage['units'], 'storage_perc' => (int) $percent], 'storage', '`storage_id` = ?', [$storage['storage_id']]);
 
     echo "\n";
 }//end foreach
 
-unset($storage);
+unset($storage, $storage_cache);

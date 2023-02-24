@@ -1,0 +1,2294 @@
+-- ===========================================================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: System Management MIB
+-- Reference:
+-- Version: V2.8
+-- History:
+--  revision 1.0 2002-12-20 created by xuqingwei
+--  revision 1.1 2004-4-16  added the support for XRN  by xuqingwei
+--  revision 1.2 2004-4-16  added 'hh3cSysImageType' in hh3cSysImageTable for dual image  by changxiangqing
+--  revision 1.3 2004-5-14  convert MIB object name from hh3cXXX to hh3c, etc.
+--  revision 1.31 2004-7-16 1. modified 'hh3cSysImageSize' in hh3cSysImageTable by zhaolina
+--                      2.modified SYNTAX of 'hh3cSysReloadImage','hh3cSysImageIndex','hh3cSysCFGFileIndex'
+--                           from (1..2147483647) to (0..2147483647) by zhaolina
+--  revision 1.5 2004-8-1  1. added 'secure' attribute for hh3cSysImageType in hh3cSysImageTable by zhaolina
+--                         2.modified 'MAX-ACCESS' of hh3cSysReloadTag from 'read-create' to 'read-write' by zhaolina
+--                         3.modified DESCRIPTION of hh3cSysReloadNotification by zhaolina
+--                         4.modified DESCRIPTION of hh3cSysImageType,hh3cSysImageIndex,hh3cSysImageTable and hh3cSysReloadImage by zhaolina
+--  revision 1.6 2004-9-8  1.modified DESCRIPTION of hh3cSysImageType by wangyingxia
+--                         2.added the trap object hh3cSysStartUpNotification by wangyingxia
+--                         3.added hh3cSysStartUpNotification into the NOTIFICATION OF hh3cSystemManMIBNotifications
+--  revision 1.7 2004-10-12 updated by gaolong
+--               Change all underscore('_') characters to hyphen characters('-') because underscore character is not allowed in MIB module.
+--               Remove hh3cSysCurEntPhysicalIndex from hh3cSysCurGroup because this object is not accessible.
+--  revision 1.8 2004-11-08 Change the description of hh3cSysReloadScheduleIndex by gaolong
+--  revision 1.9 2005-04-08 updated by songjie.
+--               1. added the support of summer time.
+--               2. correct word errors and adjust file format.
+--  revision 2.0 2005-12-26 updated by jinyi
+--               added hh3cSysCurBtmFileName, hh3cSysCurUpdateBtmFileName,
+--               hh3cSysBtmLoadMaxNumber, and hh3cSysBtmLoadTable.
+--  revision 2.1 2006-04-03 updated by shuaixiaojuan
+--               modified descriptions of some objects.
+--  revision 2.2 2009-06-07 Change the MAX-ACCESS of hh3cSysLocalClock.
+--          V2.3 2010-03-17 add hh3cSysLocalClockString by jinyi
+--  revision V2.4 2011-08-30 add  hh3cSysPackage, hh3cSysIpePackage by z02031
+--  revision V2.5 2013-10-18 add hh3cSysPackageLoadAttribute, hh3cSysPackageModel, hh3cSysIpeFileModel,
+--                hh3cSysIpePackageModel and hh3cSysSetBootImage by z03030 and z08715
+--  revision V2.6 2015-07-07 add hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
+--                and hh3cSysClockProtocolSrcContext by l09650
+--  revision V2.7 2017-05-27 add hh3cSysLocalClockString2 by h12133
+--                2018-01-10 added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup by t16382
+--  revision V2.8 2020-02-21 added 'gnss' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup by d04404
+-- ============================================================================================================
+HH3C-SYS-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, TimeTicks, Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    SnmpTagList, SnmpTagValue
+        FROM SNMP-TARGET-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+
+hh3cSystemMan MODULE-IDENTITY
+    LAST-UPDATED "202002210000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB contains objects to manage the system.
+         It focuses on the display of current configure file and image
+         file,and the definition of reloading image.
+         Add the support for XRN."
+    REVISION     "202002210000Z"
+    DESCRIPTION  "added 'gnss' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
+    REVISION     "201801100000Z"
+    DESCRIPTION  "added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
+    REVISION     "201706120000Z"
+    DESCRIPTION  "Add hh3cSysLocalClockString2."
+    REVISION     "201507270000Z"
+    DESCRIPTION  "Add hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
+--                and hh3cSysClockProtocolSrcContext."
+    REVISION "200404081345Z"        -- April 08, 2004 at 13:45 GMT
+    DESCRIPTION
+        " "
+    ::= { hh3cCommon 3 }
+
+
+-- XRN brief introduction:
+--    Expandable resilient networking (XRN) is a technology to construct expandable
+--    resilient networks. With XRN feature, you can connect several devices into a
+--    combined device and treat them as a single one. The combined device is called
+--    Fabric, while the member devices are units.
+
+
+
+
+--
+-- Node definitions
+--
+
+hh3cSystemManMIBObjects OBJECT IDENTIFIER ::= { hh3cSystemMan 1 }
+
+
+hh3cSysClock OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 1 }
+
+hh3cSysLocalClock OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node gives the current local time of the system.
+        The unit of it is DateAndTime.
+        "
+    ::= { hh3cSysClock 1 }
+
+hh3cSysSummerTime OBJECT IDENTIFIER ::= { hh3cSysClock 2 }
+
+hh3cSysSummerTimeEnable OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This node indicates the status of summer time.
+        If the value of this node is enable, means that summer time is
+        enabled.
+        If the value is disable, means that summer time is disabled.
+        "
+    ::= { hh3cSysSummerTime 1 }
+
+hh3cSysSummerTimeZone OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node describes the name of time zone in summer.
+        The string is only used to display in local time when summer
+        time is running.
+        That the value of hh3cSysLocalClock has the time zone information
+        means that summer time is running.
+        "
+    ::= { hh3cSysSummerTime 2 }
+
+hh3cSysSummerTimeMethod OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        oneOff(1),
+        repeating(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node provides the execute method of summer time.
+        oneOff(1):   means that summer time only takes effect at specified time.
+        repeating(2): means that summer time takes effect in specified month/day
+                      once a year.
+        "
+    ::= { hh3cSysSummerTime 3 }
+
+hh3cSysSummerTimeStart OBJECT-TYPE
+    SYNTAX DateAndTime (SIZE(8))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node provides the start time of summer time.
+        "
+    ::= { hh3cSysSummerTime 4 }
+
+hh3cSysSummerTimeEnd OBJECT-TYPE
+    SYNTAX DateAndTime (SIZE(8))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node provides the end time of summer time.
+        The end time must be more than start time one day and less
+        than start time one year.
+        "
+    ::= { hh3cSysSummerTime 5 }
+
+hh3cSysSummerTimeOffset OBJECT-TYPE
+    SYNTAX Integer32 (0..86399)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        This node provides the offset time of summer time.
+        The offset time(in seconds) means that how much time need to be
+        appended to the local time.
+        "
+    ::= { hh3cSysSummerTime 6 }
+
+hh3cSysLocalClockString OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (16..24))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This node gives the current local time of the system.
+        For example, Tuesday May 26, 2002 at 1:30:15 would be
+        displayed as: 2002-5-26T13:30:15.0Z"
+    ::= { hh3cSysClock 3 }
+
+hh3cSysClockProtocolGroup OBJECT IDENTIFIER ::= { hh3cSysClock 4 }
+
+hh3cSysLocalClockString2 OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (14..19))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This node gives the current local time of the system.
+        For example, 1:30:15 on Tuesday, May 26th, 2002 will be
+        displayed as: 2002/05/26/01/30/15.
+        2002/5/26/1/30/15 or 2002/05/26/01/30/15 will be applied in a write operation."
+    ::= { hh3cSysClock 5 }
+
+hh3cSysClockProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        ntp(2),
+        ptp(3),
+        interface(4),
+        gnss(5)
+         }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing none(1) to this object indicates to use the local system time.
+        When the value is set to none(1), hh3cSysClockProtocolSrcMdc and
+        hh3cSysClockProtocolSrcContext cannot be written and the value will be
+        set to invalid.  Change system time will be performed through the node
+        of hh3cSysLocalClock and hh3cSysSummerTime.
+        Writing ntp(2) to this object indicates to use NTP time source.
+        NTP means Network Time Protocol.  To get the system time through NTP,
+        NTP must be configured successfully.  NTP time source can be obtained
+        from non-default MDC and non-default context.
+        When ntp(2) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing ptp(3) to this object indicates to use PTP time source.
+        PTP means Precision Time Protocol.  To get clock time through PTP, PTP
+        must be configured successfully.  PTP time source can be obtained from
+        non-default MDC but cannot be obtained from non-default context.
+        When ptp(3) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing interface(4) to this object indicates to get time source from interface.
+        To get clock time through interface, interface must be configured successfully.
+        When interface(4) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing gnss(5) to this object indicates to get time source from Global
+        Natvigtion Satelite System(GNSS).GNSS time source can be obtained from
+        non-default MDC and non-default context. When gnss(5) is set, the system time
+        can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        All MDCs on the device share the same time source and use the same system time.
+        The shared time source can be one of the following items:
+        Local system time - the time signal that is generated by the local
+        crystal oscillator
+        Remote time source - the time signal that is obtained by the specified MDC
+        from another device on the network."
+    ::= { hh3cSysClockProtocolGroup 1 }
+
+hh3cSysClockProtocolSrcMdc OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The MDC ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If MDC is not supported on this system, this node is invalid.
+        If the device supports MDC, the system time will be obtained
+        from NTP or PTP on the specified MDC.
+        If the device supports context and MDC, the most recent configuration of
+        hh3cSysClockProtocolSrcContext and hh3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+     DEFVAL { 1 }
+    ::= { hh3cSysClockProtocolGroup 2 }
+
+hh3cSysClockProtocolSrcContext OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The context ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If context is not supported on this system, this node is invalid.
+        If the system supports context, the system time will be obtained from
+        NTP or PTP on the specified context.
+        If the device supports context and MDC, the most recent configuration of
+        hh3cSysClockProtocolSrcContext and hh3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+    DEFVAL { 1 }
+    ::= { hh3cSysClockProtocolGroup 3 }
+
+hh3cSysCurrent OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 2 }
+
+hh3cSysCurTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysCurEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The current status of system. A configuration file, an image
+        file and bootrom information are used to describe the current status.
+        "
+    ::= { hh3cSysCurrent 1 }
+
+hh3cSysCurEntry OBJECT-TYPE
+    SYNTAX Hh3cSysCurEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An entry of hh3cSysCurTable.
+        "
+    INDEX { hh3cSysCurEntPhysicalIndex }
+    ::= { hh3cSysCurTable 1 }
+
+Hh3cSysCurEntry ::=
+    SEQUENCE {
+        hh3cSysCurEntPhysicalIndex       Integer32,
+        hh3cSysCurCFGFileIndex           Integer32,
+        hh3cSysCurImageIndex             Integer32,
+        hh3cSysCurBtmFileName            OCTET STRING,
+        hh3cSysCurUpdateBtmFileName      OCTET STRING
+     }
+
+hh3cSysCurEntPhysicalIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The value of this object is the entity index
+         which depends on the implementation of ENTITY-MIB.
+         If ENTITY-MIB is not supported, the value for this object is the unit ID for XRN devices ,
+         0 for non-XRN device which has only one mainboard,
+         the board number for non-XRN device which have several mainboards.
+        "
+    ::= { hh3cSysCurEntry 1 }
+
+hh3cSysCurCFGFileIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The startup configuration file currently used by the specified entity.
+        If the value of it is zero, no configuration file is used. It will be
+        the value of corresponding hh3cSysCFGFileIndex in hh3cSysCFGFileTable.
+        "
+    ::= { hh3cSysCurEntry 2 }
+
+hh3cSysCurImageIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The image file currently used by the specified entity.
+        It will be the value of corresponding hh3cSysImageIndex
+        in hh3cSysImageTable."
+    ::= { hh3cSysCurEntry 3 }
+
+hh3cSysCurBtmFileName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bootrom file currently used by the specified entity."
+    ::= { hh3cSysCurEntry 4 }
+
+hh3cSysCurUpdateBtmFileName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The default value of this object is the same as the value of
+        hh3cSysCurBtmFileName. The value will be changed after updating
+        the bootrom successfully. This bootrom will take effect on next
+        startup.
+        "
+    ::= { hh3cSysCurEntry 5 }
+
+-- Begin define reload group
+hh3cSysReload OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 3 }
+
+hh3cSysReloadSchedule OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        The object points one row in hh3cSysReloadScheduleTable.
+        Its value is equal to the value of hh3cSysReloadScheduleIndex.
+        When a reload action is finished, the value of it
+        would be zero which means no any reload schedule is selected.
+        "
+    ::= { hh3cSysReload 1 }
+
+hh3cSysReloadAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        reloadUnavailable(1),
+        reloadOnSchedule(2),
+        reloadAtOnce(3),
+        reloadCancel(4)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        Writing reloadOnSchedule(2) to this object performs the reload operation on schedule.
+        If hh3cSysReloadScheduleTime is not set, the value of hh3cSysReloadAction can't be set to
+        'reloadOnSchedule(2)'.
+
+        Writing reloadAtOnce(3)to this object performs the reload operation at once,
+        regardless of the hh3cSysReloadScheduleTime.
+
+        When reloadCancel(4)is set, the scheduled reload action will be cancelled and the value of
+        hh3cSysReloadAction will be 'reloadUnavailable(1)',the value of hh3cSysReloadSchedule will be
+        0, hh3cSysReloadTag will be given a value of zero length, but the content of
+        hh3cSysReloadScheduleTable will remain.
+
+
+        The hh3cSysReloadSchedule and hh3cSysReloadTag  determine the reload entity(ies) in mutually
+        exclusive way. And the hh3cSysReloadSchedule will be handled at first. If the value of
+        hh3cSysReloadSchedule is invalid, then the hh3cSysReloadTag will be handled.
+
+        If the value of hh3cSysReloadSchedule is valid, the value of hh3cSysReloadTag is ignored and a
+        reload action will be implemented to the entity specified by hh3cSysReloadEntity in the entry
+        pointed by hh3cSysReloadSchedule.
+
+        If hh3cSysReloadSchedule is valid, but the entry hh3cSysReloadSchedule pointing to is not active,
+        the reload action will be ignored , and an inconsistent value will be returned.
+
+
+        If multiple entities are required to be reloaded at the same time, the value of hh3cSysReloadTag
+        must be specified to select the reload parameters in the hh3cSysReloadSceduelTable, and
+        hh3cSysReloadSchedule must have the value of '0'.
+
+        If the whole fabric is to be reloaded in an XRN device, all the units in the fabric must
+        have at least one entry in the hh3cSysReloadSceduelTable with the same tag in hh3cSysReloadSceduelTagList.
+
+        When a reload action is done, or there is no reload action, the value
+        should be reloadUnavailable(1).
+        "
+    ::= { hh3cSysReload 2 }
+
+hh3cSysReloadScheduleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysReloadScheduleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        A reload parameters set table.
+
+        The table is exclusively used for reloading.
+
+        When reloading action finished, the value of the table may be empty or still exist.
+        If the mainboard in non-XRN device or all the units of the fabric in XRN device are
+        reloaded,then the table will be refreshed.
+        "
+    ::= { hh3cSysReload 3 }
+
+hh3cSysReloadScheduleEntry OBJECT-TYPE
+    SYNTAX Hh3cSysReloadScheduleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of hh3cSysReloadScheduleTable."
+    INDEX { hh3cSysReloadScheduleIndex }
+    ::= { hh3cSysReloadScheduleTable 1 }
+
+Hh3cSysReloadScheduleEntry ::=
+    SEQUENCE {
+        hh3cSysReloadScheduleIndex           Integer32,
+        hh3cSysReloadEntity                  Integer32,
+        hh3cSysReloadCfgFile                 Integer32,
+        hh3cSysReloadImage                   Integer32,
+        hh3cSysReloadReason                  DisplayString,
+        hh3cSysReloadScheduleTime            DateAndTime,
+        hh3cSysReloadRowStatus               RowStatus,
+        hh3cSysReloadScheduleTagList         SnmpTagList
+     }
+
+hh3cSysReloadScheduleIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of hh3cSysReloadScheduleTable. There are two parts
+        for this index depicted as follows:
+
+        31                  15                  0
+        +++++++++++++++++++++++++++++++++++++++++
+        + physical index     +     random index +
+        ( bit 16..31 )              ( bit 0..15 )
+        +++++++++++++++++++++++++++++++++++++++++
+        From bit0 to bit15 (two bytes), if the row is automatic created,
+        the value is zero, and if the row is created by users, then the
+        value is determined by the users.
+
+        From bit16 to bit31 (two bytes) is the physical index the same as the
+        entPhysicalIndex specified in ENTITY-MIB. For XRN devices,
+        physical index is the value of a chassis entPhysicalIndex. 0 for non-XRN
+        device which has only one main board, the board number for non-XRN device
+        which have multiple main boards."
+    ::= { hh3cSysReloadScheduleEntry 1 }
+
+hh3cSysReloadEntity OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        The value of hh3cSysReloadEntity indicates an entry in entPhysicalTable,
+        which is the physical entity to be reloaded.
+
+        If ENTITY-MIB is not supported,the value for this object is the unit ID for XRN devices ,
+        0 for non-XRN device which has only one mainboard,
+        the board number for non-XRN device which have several mainboards.
+
+        Each entity has only one row in hh3cSysReloadScheduleTable.
+        "
+    ::= { hh3cSysReloadScheduleEntry 2 }
+
+hh3cSysReloadCfgFile OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        The value indicates an entry in hh3cSysCFGFileTable.
+        It defines a configuration file for reload action.
+        It is the value of corresponding hh3cSysCFGFileIndex in hh3cSysCFGFileTable.
+        The zero value means no configuration file has been set for this entry, and
+        no configuration file is used during system reloading.
+        "
+    ::= { hh3cSysReloadScheduleEntry 3 }
+
+hh3cSysReloadImage OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        The value indicates an entry in hh3cSysImageTable.
+        It defines an image file for reload action.
+        It is the value of corresponding hh3cSysImageIndex in hh3cSysImageTable.
+
+        If dual image is supported, the main image attribute can be
+        set through this object or by hh3cSysImageType of hh3cSysImageTable
+        of the entity. It is strongly suggested to set this attribute by
+        the latter.
+
+        If main image attribute is set here, the hh3cSysImageType in hh3cSysImageTable
+        of the corresponding entity will be updated, and vice versa.
+
+        Before reboot, the device will check the validation of the entry. If the file does
+        not exist, the device will not reboot and a trap will be send to NMS.
+        "
+    ::= { hh3cSysReloadScheduleEntry 4 }
+
+hh3cSysReloadReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        The reason of system's reloading.
+        It is a zero length octet string when not set.
+        "
+    ::= { hh3cSysReloadScheduleEntry 5 }
+
+hh3cSysReloadScheduleTime OBJECT-TYPE
+    SYNTAX DateAndTime (SIZE(8))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specify the local time at which the reload action will
+        occur. we will only take octet strings
+        with length 8 for this object which indicates the
+        local time of the switch. The maximum scheduled
+        interval between the specified time and the current
+        system clock time is 24 days .
+
+            field  octets  contents                  range
+            -----  ------  --------                  -----
+              1      1-2   year                      0..65536
+              2       3    month                     1..12
+              3       4    day                       1..31
+              4       5    hour                      0..23
+              5       6    minutes                   0..59
+              6       7    seconds                   0..60
+
+         For example, Tuesday May 26, 1992 at 1:30:15 PM would be
+         displayed as:
+
+                    1992-5-26,13:30:15
+
+        If the set value is less than the value of hh3cSysLocalClock
+        or beyond the maximum scheduled time limit, a bad value error
+        occurred.
+        The value of all-zero octet strings indicates system reload
+        at once if the reload action is reloadOnSchedule(2).
+        "
+    ::= { hh3cSysReloadScheduleEntry 6 }
+
+hh3cSysReloadRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        If one of the value of hh3cSysReloadEntity,hh3cSysReloadImage
+        is invalid, the value of hh3cSysReloadRowStatus can not be set to the value
+        of ACTIVE.
+
+        A valid entry means the specified element is available in current system.
+        "
+    ::= { hh3cSysReloadScheduleEntry 7 }
+
+hh3cSysReloadScheduleTagList OBJECT-TYPE
+    SYNTAX SnmpTagList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "
+    It specifies a tag list for the entry.
+    "
+    ::= { hh3cSysReloadScheduleEntry 8 }
+
+hh3cSysReloadTag OBJECT-TYPE
+    SYNTAX SnmpTagValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains a single tag value which is used
+        to select entries in the hh3cSysReloadScheduleTable.
+
+        In the hh3cSysReloadScheduleTable,any entry that contains
+        a tag value which is equal to the value of this object is
+        selected.
+
+        For example, the value of hh3cSysReloadTag is 'TOM',and the
+        hh3cSysReloadScheduleTagList of each hh3cSysReloadScheduleTable
+        entry are as follows:
+        1)'TOM,ROBERT,MARY'
+        2)'TOM,DAVE'
+        3)'DAVE,MARY'
+        Since there are 'TOM' in 1) and 2),so 1) and 2) are selected.
+
+
+        If this object contains a value of zero length, no entries
+        are selected.
+        "
+    ::= { hh3cSysReload 4 }
+-- End define reload group
+hh3cSysImage OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 4 }
+
+hh3cSysImageNum OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The number of system images. It indicates the
+        total entries of hh3cSysImageTable.
+        "
+    ::= { hh3cSysImage 1 }
+
+hh3cSysImageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysImageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The system image management table.
+
+
+        When 'copy srcfile destfile' is executed via the CLI, if destfile is not existed,
+        then hh3cSysImageType of the new file will be 'none'; otherwise hh3cSysImageType keeps its current value.
+        When 'move srcfile destfile' is executed via the CLI, hh3cSysImageType and hh3cSysImageIndex
+         remain the same while hh3cSysImageLocation changes.
+        When 'rename srcfile' is executed via the CLI,hh3cSysImageType and hh3cSysImageIndex remain the same
+        while hh3cSysImageName changes.
+        When 'delete srcfile' is executed via the CLI, the file is deleted from hh3cSysImageTable
+        while index of the file keeps and will not be allocated.
+        "
+    ::= { hh3cSysImage 2 }
+
+hh3cSysImageEntry OBJECT-TYPE
+    SYNTAX Hh3cSysImageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An entity image entry. Each entry consists of information of an entity image.
+        The hh3cSysImageIndex exclusively defines an image file.
+        "
+    INDEX { hh3cSysImageIndex }
+    ::= { hh3cSysImageTable 1 }
+
+Hh3cSysImageEntry ::=
+    SEQUENCE {
+        hh3cSysImageIndex            Integer32,
+        hh3cSysImageName             DisplayString,
+        hh3cSysImageSize             Integer32,
+        hh3cSysImageLocation         DisplayString,
+        hh3cSysImageType             INTEGER
+     }
+
+hh3cSysImageIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "There are two parts for the index depicted as follows:
+
+        31                15             0
+        +++++++++++++++++++++++++++++++++++
+        + physical index   +  image index +
+        +++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes) is the image index;Image file Index
+        is a monotonically increasing integer for the sole purpose of indexing
+        events.  When it reaches the maximum value, an extremely unlikely event,
+        the agent wraps the value back to 1 and may flush existing entries.
+
+        From bit16 to bit31 (two bytes) is the physical index the same as the
+        entPhysicalIndex specified in ENTITY-MIB.
+        If ENTITY-MIB is not supported,the value for this object is the unit ID for XRN
+        devices ,0 for non-XRN device which has only one main board,the board number for
+        non-XRN device which have several main boards.
+
+
+        Any index beyond the above range will not be supported.
+
+        If a file is added in, its hh3cSysImageIndex will be the maximum image index plus one.
+                        If the image file is removed, renamed, or moved from one place to another,
+                        its hh3cSysImageIndex is not reallocated.
+                        If the image file's content is replaced, its hh3cSysImageIndex will not change.
+
+        "
+    ::= { hh3cSysImageEntry 1 }
+
+hh3cSysImageName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The file name of the image. It MUST NOT contain the path of the file."
+    ::= { hh3cSysImageEntry 2 }
+
+hh3cSysImageSize OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Size of the file in bytes.
+        "
+    ::= { hh3cSysImageEntry 3 }
+
+hh3cSysImageLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The directory path of the image.
+        Its form should be the same as what defined in file system.
+        Currently it is defined as follows:
+        For mainboard:   flash:/
+        For slave mainboard and subboards: slotN#flash:/
+        For XRN devices: unitN>slotN#flash:/
+        "
+    ::= { hh3cSysImageEntry 4 }
+
+hh3cSysImageType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        main(1),
+        backup(2),
+        none(3),
+        secure(4),
+        main-backup(5),
+        main-secure(6),
+        backup-secure(7),
+        main-backup-secure(8)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        It indicates the reloading sequence attribute of the image.
+
+        For devices which support dual image:
+
+        If the value is 'main(1)',the image will be the first image
+        in the next reloading procedure. If the value is 'backup(2)',
+        the image will be used if the main image fails. If the value
+        is 'secure(4)', the image will be used if the main image and
+        backup image both fail. If the value is 'none(3)',the image will
+        not be used in the next reloading procedure.
+
+        At the same time,you also can specify the main image by
+        hh3cSysReloadImage in hh3cSysReloadScheduleTable. If the
+        image is different from previous main image, the previous main image
+        will not be main image again. And the image table will update with
+        this variation. Vice versa, if you have defined the reload schedule,
+        and then you define a new main image through hh3cSysImageType when you
+        are waiting the reload schedule to be executed, the real main image
+        will be the latest one.
+
+
+        It is strongly suggested to define the main image here, not by hh3cSysReloadImage
+        in hh3cSysReloadScheduleTable.
+
+        There are some rules for setting the value of hh3cSysImageType:
+
+        a)When a new image file is defined as 'main' or 'backup' file,the hh3cSysImageType
+          of old 'main' or 'backup' file will automatically be 'none'.
+        b)It is forbidden to set 'none' attribute manually.
+        c)It is forbidden to set 'secure' attribute manually.
+        d)If 'main' image is set to 'backup', the file keeps 'main'. And vice versa.
+          At this time, the file has 'main-backup' property.
+        e)If the secure image is set to 'main' or 'backup', the file has 'main-secure' or 'backup-secure'property.
+        f)If the secure image is set to 'main' and 'backup', the file has the 'main-backup-secure' property.
+        g)If the none image is set to 'main' or 'backup', the file has the 'main' or 'backup' property.
+
+        The following table describes whether it is ok to set to another state
+        directly from original state.
+
+                        +--------------+-----------+-------------+-------------+
+                        |   set to     | set to    |  set to     |   set to    |
+                        |              |           |             |             |
+             original   |    'main'    | 'backup'  |  'none'     |  'secure'   |
+             state      |              |           |             |             |
+          --------------+--------------+-----------+-------------+-------------+
+                        |              |           |             |             |
+             main       |     ---      |   yes     |   no        |   no        |
+                        |              |           |             |             |
+                        |              |           |             |             |
+          --------------+--------------+-----------+-------------|-------------+
+                        |              |           |             |             |
+             backup     |     yes      |   ---     |   no        |   no        |
+                        |              |           |             |             |
+          --------------+--------------+-----------+-------------|-------------+
+                        |              |           |             |             |
+                        |              |           |             |             |
+              none      |     yes      |   yes     |   ---       |   no        |
+                        |              |           |             |             |
+          --------------+--------------+-----------+-------------+-------------+
+                        |              |           |             |             |
+              secure    |     yes      |   yes     |   no        |   ---       |
+                        |              |           |             |             |
+                        |              |           |             |             |
+          --------------+--------------+-----------+-------------+-------------+
+
+        If there is one main image in the system, one row of Hh3cSysReloadScheduleEntry
+        whose  hh3cSysReloadImage is equal to the main image's hh3cSysImageIndex will be
+        created automatically. But if any row is deleted, it will not be created
+        automatically in hh3cSysReloadScheduleTable.
+
+
+
+
+        For the device which doesn't support dual image(main/backup):
+
+        Only 'main' and 'none' is supported and it only can be set from none to main.
+        When a new image file is defined as 'main' file,the hh3cSysImageType of old 'main'
+        file will automatically be 'none'.
+        "
+    ::= { hh3cSysImageEntry 5 }
+
+-- End define sysImage group
+
+hh3cSysCFGFile OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 5 }
+
+hh3cSysCFGFileNum OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The number of the configuration files in the system. It indicates the
+        total entries of hh3cSysCFGFileTable.
+        "
+    ::= { hh3cSysCFGFile 1 }
+
+hh3cSysCFGFileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysCFGFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of configuration files in this system.
+         At present, the system doesn't support dual configure file,
+         it should act as 'dual image' if dual configure file is
+         supported.
+        "
+    ::= { hh3cSysCFGFile 2 }
+
+hh3cSysCFGFileEntry OBJECT-TYPE
+    SYNTAX Hh3cSysCFGFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        A configuration file entry. Each entry consists of information of
+        a configuration file.
+        hh3cSysCFGFileIndex exclusively decides a configuration file.
+        "
+    INDEX { hh3cSysCFGFileIndex }
+    ::= { hh3cSysCFGFileTable 1 }
+
+Hh3cSysCFGFileEntry ::=
+    SEQUENCE {
+        hh3cSysCFGFileIndex          Integer32,
+        hh3cSysCFGFileName           DisplayString,
+        hh3cSysCFGFileSize           Integer32,
+        hh3cSysCFGFileLocation       DisplayString
+     }
+
+hh3cSysCFGFileIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "There are two parts for the index depicted as follows:
+
+        31                15             0
+        +++++++++++++++++++++++++++++++++++
+        + physical index  + cfgFile index +
+        +++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes) is the configuration file index; the
+        configuration file index is a monotonically increasing integer for
+        the sole purpose of indexing events. When it reaches the maximum
+        value, an extremely unlikely event, the agent wraps the value back
+        to 1 and may flush existing entries.
+
+        From bit16 to bit31 (two bytes) is the physical index the same
+        as the entPhysicalIndex specified in ENTITY-MIB.
+        If ENTITY-MIB is not supported, the value for this object is the unit ID for XRN
+        devices ,0 for non-XRN device which has only one slot,the board number for
+        non-XRN device which have several slots.
+
+        Any index beyond the above range will not be supported.
+        "
+    ::= { hh3cSysCFGFileEntry 1 }
+
+hh3cSysCFGFileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Configuration file name. The name should not include the colon (:)
+        character as it is a special separator character used
+        to delineate the device name, partition name and the
+        file name.
+        "
+    ::= { hh3cSysCFGFileEntry 2 }
+
+hh3cSysCFGFileSize OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Size of the file in bytes. Note that it does
+        not include the size of the filesystem file header.
+        File size will always be non-zero.
+        "
+    ::= { hh3cSysCFGFileEntry 3 }
+
+hh3cSysCFGFileLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The directory path of the image.
+        Its form should be the same as what defined in filesystem.
+        Currently it is defined as follows:
+        For mainboard:   flash:/
+        For slave mainboard and subboards: slotN#flash:/
+        For XRN devices: unitN>slotN#flash:/
+        "
+    ::= { hh3cSysCFGFileEntry 4 }
+-- End define CFGFile group
+
+-- Begin define bootrom group
+hh3cSysBtmFile OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 6 }
+
+hh3cSysBtmFileLoad OBJECT IDENTIFIER ::= { hh3cSysBtmFile 1 }
+
+hh3cSysBtmLoadMaxNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        This object shows the maximum number of hh3cSysBtmLoadEntry in
+        each device/unit.
+        "
+    ::= { hh3cSysBtmFileLoad 1 }
+
+hh3cSysBtmLoadTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysBtmLoadEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        This table is used to update the bootrom and show the results of
+        the update operation.
+        The bootrom files are listed at the hh3cFlhFileTable.  These files
+        are used to update bootrom.
+        "
+    ::= { hh3cSysBtmFile 2 }
+
+hh3cSysBtmLoadEntry OBJECT-TYPE
+    SYNTAX Hh3cSysBtmLoadEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        Entries in the hh3cSysBtmLoadTable are created and deleted using
+        the hh3cSysBtmRowStatus object.
+
+        When a new row is being created and the number of entries is
+        hh3cSysBtmLoadMaxNumber, the row with minimal value of
+        hh3cSysBtmLoadTime and the value of hh3cSysBtmFileType is none(2),
+        should be destroyed automatically.
+        "
+    INDEX { hh3cSysBtmLoadIndex }
+    ::= { hh3cSysBtmLoadTable 1 }
+
+Hh3cSysBtmLoadEntry ::=
+    SEQUENCE {
+        hh3cSysBtmLoadIndex          Integer32,
+        hh3cSysBtmFileName           OCTET STRING,
+        hh3cSysBtmFileType           INTEGER,
+        hh3cSysBtmRowStatus          RowStatus,
+        hh3cSysBtmErrorStatus        INTEGER,
+        hh3cSysBtmLoadTime           TimeTicks
+     }
+
+hh3cSysBtmLoadIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The index of hh3cSysBtmLoadTable. There are two parts for this
+        index depicted as follows:
+
+        31                  15                  0
+        +++++++++++++++++++++++++++++++++++++++++
+        + physical index     +     random index +
+        ( bit 16..31 )              ( bit 0..15 )
+        +++++++++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes), if the row is created by command
+        line, the value is determined by system, and if the row is created
+        by SNMP, the value is determined by users.
+
+        From bit16 to bit31 (two bytes) is the physical index the same as
+        the entPhysicalIndex specified in ENTITY-MIB.
+
+        If ENTITY-MIB is not supported, the value of this object is the
+        unit ID for XRN devices, 0 for non-XRN device which has only one
+        main board, the board number for non-XRN device which has multiple
+        main boards.
+       "
+    ::= { hh3cSysBtmLoadEntry 1 }
+
+hh3cSysBtmFileName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (1..64))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        The bootrom file name is determined by the users.  The file must
+        exist in corresponding entity.
+
+        The validity of the bootrom file will be identified by system.
+        If the file is invalid, the bootrom should fail to be updated,
+        and the value of hh3cSysBtmErrorStatus should be failed(4).
+        "
+    ::= { hh3cSysBtmLoadEntry 2 }
+
+hh3cSysBtmFileType OBJECT-TYPE
+    SYNTAX INTEGER
+       {
+       main(1),
+       none(2)
+       }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        main(1) - The effective bootrom file.
+        none(2) - The noneffective file.
+
+        When bootrom is being updated, this object must be set to main(1).
+
+        When bootrom is updated successfully, this object should be
+        main(1), and the former object with the same physical index should
+        be none(2).
+
+        When bootrom failed to be updated, this object should be none(2).
+        "
+    ::= { hh3cSysBtmLoadEntry 3 }
+
+hh3cSysBtmRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Only support active(1), createAndGo(4), destroy(6).  When a row
+        is created successfully, the value of this object should be active(1),
+        the value of hh3cSysBtmFileName and hh3cSysBtmFileType can not be
+        modified by users.
+
+        When bootrom is being updated, the value of hh3cSysBtmErrorStatus
+        is inProgress(2).
+
+        When bootrom failed to be updated, the value of hh3cSysBtmErrorStatus
+        should be failed(4).
+
+        When bootrom is updated successfully, the value of hh3cSysBtmErrorStatus
+        should be success(3).  The value of hh3cSysCurUpdateBtmFileName
+        should change to the new bootrom file name.
+
+        When another row is created successfully with the same physical
+        index, and the update is successful, then the value of former
+        hh3cSysBtmFileType should be none(2) automatically.
+
+        If a row is destroyed, hh3cSysCurUpdateBtmFileName should not change.
+
+        If a device/unit reboots, hh3cSysBtmLoadTable should be empty.
+        "
+    ::= { hh3cSysBtmLoadEntry 4 }
+
+hh3cSysBtmErrorStatus OBJECT-TYPE
+    SYNTAX INTEGER
+       {
+       invalidFile(1),
+       inProgress(2),
+       success(3),
+       failed(4)
+       }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        This object shows the status of the specified operation after
+        creating a row.
+        invalidFile(1) - file is invalid.
+        inProgress(2)  - the operation is in progress.
+        success(3)     - the operation was done successfully.
+        failed(4)      - the operation failed.
+        "
+    ::= { hh3cSysBtmLoadEntry 5 }
+
+hh3cSysBtmLoadTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        This object indicates operation time.
+        "
+    ::= { hh3cSysBtmLoadEntry 6 }
+
+-- End define Bootrom group
+
+hh3cSysPackage OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 7 }
+
+hh3cSysPackageNum OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The number of software packages.  It indicates the
+        total entries of hh3cSysPackageTable.
+        "
+    ::= { hh3cSysPackage 1 }
+
+hh3cSysPackageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The system package management table.
+        "
+    ::= { hh3cSysPackage 2 }
+
+hh3cSysPackageEntry OBJECT-TYPE
+    SYNTAX Hh3cSysPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An software package entry.  Each entry consists of information of
+        an software package.
+        "
+    INDEX { hh3cSysPackageIndex }
+    ::= { hh3cSysPackageTable 1 }
+
+Hh3cSysPackageEntry ::=
+    SEQUENCE {
+        hh3cSysPackageIndex            Integer32,
+        hh3cSysPackageName             DisplayString,
+        hh3cSysPackageSize             Unsigned32,
+        hh3cSysPackageLocation         DisplayString,
+        hh3cSysPackageType             INTEGER,
+        hh3cSysPackageAttribute        INTEGER,
+        hh3cSysPackageStatus           INTEGER,
+        hh3cSysPackageDescription      DisplayString,
+        hh3cSysPackageFeature          DisplayString,
+        hh3cSysPackageVersion          DisplayString,
+        hh3cSysPackageLoadAttribute    INTEGER,
+        hh3cSysPackageModel            DisplayString
+    }
+
+hh3cSysPackageIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "There are two parts for the index depicted as follows:
+
+        31                15             0
+        +++++++++++++++++++++++++++++++++++
+        + physical index   +  package index +
+        +++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes) is the Package index; Package file Index
+        is a monotonically increasing integer for the sole purpose of indexing
+        events.  When it reaches the maximum value, an extremely unlikely
+        event, the agent wraps the value back to 1 and may flush existing
+        entries.
+
+        From bit16 to bit31 (two bytes) is the physical index the same as the
+        entPhysicalIndex specified in ENTITY-MIB.
+
+        Any index beyond the above range will not be supported.
+
+        If a file is added in, its hh3cSysPackageIndex will be the maximum
+        image index plus one.
+        If the package file is removed, renamed, or moved from one place to
+        another, its hh3cSysPackageIndex is not reallocated.
+        If the package file's content is replaced, its hh3cSysPackageIndex will
+        not change.
+        "
+    ::= { hh3cSysPackageEntry 1 }
+
+hh3cSysPackageName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The file name of the package.  It MUST NOT contain the path
+        of the file.
+        "
+    ::= { hh3cSysPackageEntry 2 }
+
+hh3cSysPackageSize OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Size of the file in bytes.
+        "
+    ::= { hh3cSysPackageEntry 3 }
+
+hh3cSysPackageLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The directory path of the package.
+        Its form should be the same as what defined in file system.
+        Currently it is defined as follows:
+        For mainboard:   flash:/
+        For slave mainboard and subboards: slotN#flash:/
+        "
+    ::= { hh3cSysPackageEntry 4 }
+
+hh3cSysPackageType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        boot(1),
+        system(2),
+        feature(3),
+        patch(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        It indicates the type of the package file.
+        boot    :  kernel, file system, memory management and other
+                   core components.
+        system  :  interface management, configuration management and other
+                   basic system package.
+        feature :  feature packages, providing different services.
+        patch   :  patch file contains fixes for a specific defect.
+        "
+    ::= { hh3cSysPackageEntry 5 }
+
+hh3cSysPackageAttribute OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        primary(2),
+        secondary(3),
+        primarySecondary(4)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        It indicates the attribute of the package file.
+        If the value is 'primary', the package will be the first package
+        in the next reloading procedure.  If the value is 'secondary',
+        the package will be used if the primary package fails.
+        If the value is 'none', it will not be used in the next reloading
+        procedure.
+        "
+    ::= { hh3cSysPackageEntry 6 }
+
+hh3cSysPackageStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        active(1),
+        inactive(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    It indicates the status of the package file.  If this file is used in the
+    current system, its status is 'active'.
+    "
+    ::= { hh3cSysPackageEntry 7 }
+
+hh3cSysPackageDescription OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    It is the description of the package.
+    "
+    ::= { hh3cSysPackageEntry 8 }
+
+hh3cSysPackageFeature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    Indicate the feature of the package.  Different package files
+    could be the same feature.
+    "
+    ::= { hh3cSysPackageEntry 9 }
+
+hh3cSysPackageVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    Indicate the version of the package.
+    "
+    ::= { hh3cSysPackageEntry 10 }
+
+hh3cSysPackageLoadAttribute OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        none(1),
+        primary(2),
+        secondary(3),
+        primarySecondary(4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "File attribute of the startup image for an extended device to load from
+    the parent device.  Examples of extended devices include PEXs and firewall
+    modules.  The none attribute is returned if the image is not for extended
+    devices, or if the load attribute is not specified."
+    ::= { hh3cSysPackageEntry 11 }
+
+hh3cSysPackageModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates whether the image file is for an extended device or the parent
+    device.  Examples of extended devices include PEXs and firewall modules."
+    ::= { hh3cSysPackageEntry 12 }
+
+-- begin package operate table
+hh3cSysPackageOperateEntryLimit OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        The maximum number of the entries in hh3cSysPackageOperateTable.
+        "
+    ::= { hh3cSysPackage 3 }
+
+hh3cSysPackageOperateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysPackageOperateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of package file operate."
+   ::= { hh3cSysPackage 4 }
+
+hh3cSysPackageOperateEntry OBJECT-TYPE
+    SYNTAX Hh3cSysPackageOperateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An operate request entry.
+        "
+    INDEX { hh3cSysPackageOperateIndex }
+    ::= { hh3cSysPackageOperateTable 1 }
+
+Hh3cSysPackageOperateEntry ::=
+    SEQUENCE {
+        hh3cSysPackageOperateIndex                   Integer32,
+        hh3cSysPackageOperatePackIndex               Integer32,
+        hh3cSysPackageOperateStatus                  INTEGER,
+        hh3cSysPackageOperateRowStatus               RowStatus,
+        hh3cSysPackageOperateResult                  INTEGER
+     }
+
+hh3cSysPackageOperateIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The unique index value of a row in this table.
+        "
+    ::= { hh3cSysPackageOperateEntry 1 }
+
+hh3cSysPackageOperatePackIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS   read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specify the package file in the hh3cSysPackageTable.
+        "
+    ::= { hh3cSysPackageOperateEntry 2 }
+
+hh3cSysPackageOperateStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        active(1),
+        inactive(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        activate or deactivate a package in the hh3cSysPackageTable.
+        "
+    ::= { hh3cSysPackageOperateEntry 3 }
+
+hh3cSysPackageOperateRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        the status of this table entry.
+        When the status is active all the
+        object's value in the entry is not
+        allowed to modified.
+        "
+    ::= { hh3cSysPackageOperateEntry 4 }
+
+hh3cSysPackageOperateResult OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+        opInProgress(1),
+        opSuccess(2),
+        opUnknownFailure(3),
+        opInvalidFile(4),
+        opNotSupport(5)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        the result of the operation.
+        "
+    ::= { hh3cSysPackageOperateEntry 5 }
+-- End define sysPackage group
+
+-- Begin define sysIpe group
+hh3cSysIpeFile OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 8 }
+
+hh3cSysIpeFileNum OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The number of software IPE(Image Package Envelop) files.
+        It indicates the total entries of hh3cSysIpeFileTable.
+        "
+    ::= { hh3cSysIpeFile 1 }
+
+hh3cSysIpeFileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysIpeFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The system IPE file manage table.
+        "
+    ::= { hh3cSysIpeFile 2 }
+
+hh3cSysIpeFileEntry OBJECT-TYPE
+    SYNTAX Hh3cSysIpeFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An IPE package file entry.  Each entry consists of information of
+        an IPE package file.
+        hh3cSysIpeFileIndex exclusively decides an IPE file.
+        "
+    INDEX { hh3cSysIpeFileIndex }
+    ::= { hh3cSysIpeFileTable 1 }
+
+Hh3cSysIpeFileEntry ::=
+    SEQUENCE {
+        hh3cSysIpeFileIndex            Integer32,
+        hh3cSysIpeFileName             DisplayString,
+        hh3cSysIpeFileSize             Unsigned32,
+        hh3cSysIpeFileLocation         DisplayString,
+        hh3cSysIpeFileModel            SnmpTagList
+     }
+
+hh3cSysIpeFileIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "There are two parts for the index depicted as follows:
+
+        31                15             0
+        +++++++++++++++++++++++++++++++++++
+        + physical index   +  IPE   index +
+        +++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes) is the IPE file index; IPE file Index
+        is a monotonically increasing integer for the sole purpose of indexing
+        events.  When it reaches the maximum value, an extremely unlikely
+        event, the agent wraps the value back to 1 and may flush existing
+        entries.
+
+        From bit16 to bit31 (two bytes) is the physical index the same as the
+        entPhysicalIndex specified in ENTITY-MIB.
+
+        Any index beyond the above range will not be supported.
+
+        If a file is added in, its hh3cSysIpeFileIndex will be the maximum image
+        ndex plus one.
+        If the IPE file is removed, renamed, or moved from one place to
+        another, its hh3cSysIpeFileIndex is not reallocated.
+        If the IPE file's content is replaced, its hh3cSysIpeFileIndex will not
+        change.
+        "
+    ::= { hh3cSysIpeFileEntry 1 }
+
+hh3cSysIpeFileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The file name of the IPE file.  It MUST NOT contain the path of
+        the file.
+        "
+    ::= { hh3cSysIpeFileEntry 2 }
+
+hh3cSysIpeFileSize OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Size of the file in bytes.
+        "
+    ::= { hh3cSysIpeFileEntry 3 }
+
+hh3cSysIpeFileLocation OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The directory path of the IPE file.
+        Its form should be the same as what defined in file system.
+        Currently it is defined as follows:
+        For mainboard:   flash:/
+        For slave mainboard and subboards: slotN#flash:/
+        "
+    ::= { hh3cSysIpeFileEntry 4 }
+
+hh3cSysIpeFileModel OBJECT-TYPE
+    SYNTAX SnmpTagList
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device models for which the IPE file contains software images.  For
+        the ease of software upgrade, an IPE file might contain software images
+        for a parent device and extended devices.  Examples of extended devices
+        include PEXs and firewall modules."
+    ::= { hh3cSysIpeFileEntry 5 }
+
+-- Begin define Ipe-package
+hh3cSysIpePackageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysIpePackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The IPE package file table.  It shows the package files in
+        the IPE file.
+        "
+    ::= { hh3cSysIpeFile 3 }
+
+hh3cSysIpePackageEntry OBJECT-TYPE
+    SYNTAX Hh3cSysIpePackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An entry of the hh3cIpePackageTable.  Indexed by
+        hh3cSysIpeFileIndex and hh3cSysIpePackageIndex.
+        "
+    INDEX { hh3cSysIpeFileIndex, hh3cSysIpePackageIndex }
+    ::= { hh3cSysIpePackageTable 1 }
+
+Hh3cSysIpePackageEntry ::=
+    SEQUENCE {
+        hh3cSysIpePackageIndex            Integer32,
+        hh3cSysIpePackageName             DisplayString,
+        hh3cSysIpePackageSize             Unsigned32,
+        hh3cSysIpePackageType             INTEGER,
+        hh3cSysIpePackageDescription      DisplayString,
+        hh3cSysIpePackageFeature          DisplayString,
+        hh3cSysIpePackageVersion          DisplayString,
+        hh3cSysIpePackageModel            DisplayString
+     }
+
+hh3cSysIpePackageIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        It is the IPE package index; IPE Package Index
+        is a monotonically increasing integer for the sole purpose of indexing
+        events.  When it reaches the maximum value, an extremely unlikely
+        event, the agent wraps the value back to 1 and may flush existing
+        entries.
+
+        Any index beyond the above range will not be supported.
+        "
+    ::= { hh3cSysIpePackageEntry 1 }
+
+hh3cSysIpePackageName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The file name of the package file."
+    ::= { hh3cSysIpePackageEntry 2 }
+
+hh3cSysIpePackageSize OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Size of the package file in bytes.
+        "
+    ::= { hh3cSysIpePackageEntry 3 }
+
+hh3cSysIpePackageType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        boot(1),
+        system(2),
+        feature(3),
+        patch(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        It indicates the type of the package file.
+        boot    : kernel, file system, memory management and
+                  other core components.
+        system  : interface management, configuration management and
+                  other basic system package.
+        feature : feature packages, providing different services.
+        patch   : patch file contains fixes for a specific defect.
+        "
+    ::= { hh3cSysIpePackageEntry 4 }
+
+hh3cSysIpePackageDescription OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    It is the description of the package.
+    "
+    ::= { hh3cSysIpePackageEntry 5 }
+
+hh3cSysIpePackageFeature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    Indicate the feature of the package.
+    "
+    ::= { hh3cSysIpePackageEntry 6 }
+
+hh3cSysIpePackageVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "
+    The version of the package.
+    "
+    ::= { hh3cSysIpePackageEntry 7 }
+
+hh3cSysIpePackageModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates whether the image package file is for an extended device, the
+    parent device, or both.  Examples of extended devices include PEXs and
+    firewall modules."
+    ::= { hh3cSysIpePackageEntry 8 }
+-- End define Ipe-package
+
+-- Begin define Ipe File operate table
+hh3cSysIpeFileOperateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysIpeFileOperateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of IPE file operate."
+   ::= { hh3cSysIpeFile 4 }
+
+hh3cSysIpeFileOperateEntry OBJECT-TYPE
+    SYNTAX Hh3cSysIpeFileOperateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An operate request entry.
+        "
+    INDEX { hh3cSysIpeFileOperateIndex }
+    ::= { hh3cSysIpeFileOperateTable 1 }
+
+Hh3cSysIpeFileOperateEntry ::=
+    SEQUENCE {
+        hh3cSysIpeFileOperateIndex                   Integer32,
+        hh3cSysIpeFileOperateFileIndex               Integer32,
+        hh3cSysIpeFileOperateAttribute               INTEGER,
+        hh3cSysIpeFileOperateRowStatus               RowStatus,
+        hh3cSysIpeFileOperateResult                  INTEGER
+     }
+
+hh3cSysIpeFileOperateIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The unique index value of a row in this table.
+        "
+    ::= { hh3cSysIpeFileOperateEntry 1 }
+
+hh3cSysIpeFileOperateFileIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS   read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specify the IPE file in the hh3cSysIpeFileTable.  This IPE file
+        will be unpacked to package files.
+        "
+    ::= { hh3cSysIpeFileOperateEntry 2 }
+
+hh3cSysIpeFileOperateAttribute OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        primary(2),
+        secondary(3),
+        primarySecondary(4)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        It indicates the attribute of the IPE file when it is used in the reloading.
+        If the value is 'primary', the packages in the IPE file will be the
+        first packages in the next reloading procedure.
+        If the value is 'secondary', the package in the IPE file will be used
+        if the primary packages fails.
+        If the value is 'none', the IPE file is only unpacked,
+        will not be used in the reloading procedure.
+        "
+    ::= { hh3cSysIpeFileOperateEntry 3 }
+
+hh3cSysIpeFileOperateRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        the status of this table entry.
+        When the status is active all the
+        object's value in the entry is not
+        allowed to modified.
+        "
+    ::= { hh3cSysIpeFileOperateEntry 4 }
+
+hh3cSysIpeFileOperateResult OBJECT-TYPE
+    SYNTAX  INTEGER
+      {
+        opInProgress(1),
+        opSuccess(2),
+        opUnknownFailure(3),
+        opInvalidFile(4),
+        opDeviceFull(5),
+        opFileOpenError(6)
+      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        the result of the operation.
+        "
+    ::= { hh3cSysIpeFileOperateEntry 5 }
+-- End define IpePackage operate table
+
+hh3cSysSetBootImage OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 9 }
+
+hh3cSysSetBootImageOp OBJECT IDENTIFIER ::= { hh3cSysSetBootImage 1 }
+
+hh3cSysSetBootImageAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        done(2),
+        bootLoadPrimary(3),
+        bootLoadSecondary(4),
+        bootLoadPrimarySecondary(5),
+        bootPrimary(6),
+        bootSecondary(7),
+        bootPrimarySecondary(8),
+        loadPrimary(9),
+        loadSecondary(10),
+        loadPrimarySecondary(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets images as primary startup images, secondary startup images, or
+        both.  Primary startup images are also called 'main' startup images.
+        For extended devices, startup images saved on their local media are
+        called 'local startup images,' and images saved on the parent device
+        are called 'remote startup images.'
+        none: Returns a success without setting image attributes.
+        done: Clears data for the previous startup image operation.  This
+        object must be set 'done' before each startup image operation.
+
+        -------------------------+-----------------------+---------------------------------------------------
+            Action               |   Parent devices      |                  Extended devices
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadPrimary          | Sets images as the    | Sets images as the primary startup images
+                                 | primary startup       |
+                                 | images                | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadSecondary        | Sets images as the    | Sets images as the backup startup images
+                                 | backup startup images |
+                                 |                       | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadPrimarySecondary | Sets images as both   | Sets images as both the primary and backup startup
+                                 | the primary and       | images
+                                 | backup startup images | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootPrimary              | Sets images as the    | Sets images as the primary startup images
+                                 | primary startup       |
+                                 | images                | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        bootSecondary            | Sets images as the    | Sets images as the backup startup images
+                                 | backup startup images |
+                                 |                       | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        bootPrimarySecondary     | Sets images as both   | Sets images as both the primary and backup startup
+                                 | the primary and       | images
+                                 | backup startup images | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        loadPrimary              | N/A                   | Sets images as the remote primary startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        loadSecondary            | N/A                   | Sets images as the remote backup startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        loadPrimarySecondary     | N/A                   | Sets images as both the remote primary and
+                                 |                       | backup startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        "
+    ::= { hh3cSysSetBootImageOp 1 }
+
+hh3cSysSetBootImageFileOverWrite OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines whether to overwrite the existing image file with the same
+        name as the downloaded image file. "
+    DEFVAL { false }
+    ::= { hh3cSysSetBootImageOp 2 }
+
+hh3cSysSetBootImageRemoveIpeFile OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines whether the IPE file will be removed when the startup
+        images are set successfully.  If this object is set to TRUE,
+        the IPE file will be removed."
+    DEFVAL { false }
+    ::= { hh3cSysSetBootImageOp 3 }
+
+hh3cSysSetBootImageStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        doing(2),
+        success(3),
+        failed(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the startup image set operation."
+    ::= { hh3cSysSetBootImageOp 4 }
+
+hh3cSysSetBootImageFailedReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Startup image operation failure reason.  The field is empty if the
+        operation was successful."
+    ::= { hh3cSysSetBootImageOp 5 }
+
+hh3cSysBootPackageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysBootPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of images to be set as startup images.  It should be used when
+         hh3cSysBootIpeTable is empty."
+    ::= { hh3cSysSetBootImage 2 }
+
+hh3cSysBootPackageEntry OBJECT-TYPE
+    SYNTAX Hh3cSysBootPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of the image table."
+    INDEX { hh3cSysBootPackageIndex }
+    ::= { hh3cSysBootPackageTable 1 }
+
+Hh3cSysBootPackageEntry ::=
+    SEQUENCE {
+        hh3cSysBootPackageIndex
+            Integer32,
+        hh3cSysBootPackageRowStatus
+            RowStatus
+     }
+
+hh3cSysBootPackageIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the software images.  The index must be included
+        in hh3cSysPackageTable."
+    ::= { hh3cSysBootPackageEntry 1 }
+
+hh3cSysBootPackageRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status of the image entry."
+    ::= { hh3cSysBootPackageEntry 2 }
+
+hh3cSysBootIpeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysBootIpeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of the IPE files to be set for startup.  It should be used when
+        hh3cSysBootPackageTable is empty."
+    ::= { hh3cSysSetBootImage 3 }
+
+hh3cSysBootIpeEntry OBJECT-TYPE
+    SYNTAX Hh3cSysBootIpeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in the IPE file table."
+    INDEX { hh3cSysBootIpeIndex }
+    ::= { hh3cSysBootIpeTable 1 }
+
+Hh3cSysBootIpeEntry ::=
+    SEQUENCE
+        {
+        hh3cSysBootIpeIndex
+            Integer32,
+        hh3cSysBootIpeRowStatus
+            RowStatus
+        }
+
+hh3cSysBootIpeIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPE file index.  The index must be included in hh3cSysIpeFileTable."
+    ::= { hh3cSysBootIpeEntry 1 }
+
+hh3cSysBootIpeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status of the IPE file table entry."
+    ::= { hh3cSysBootIpeEntry 2 }
+
+hh3cSysSetBootImageResultTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSysSetBootImageResultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of startup image operation results.  This table shows the
+        result for each card."
+    ::= { hh3cSysSetBootImage 4 }
+
+hh3cSysSetBootImageResultEntry OBJECT-TYPE
+    SYNTAX Hh3cSysSetBootImageResultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in the startup image operation result table."
+    INDEX { hh3cSysSetBootImageResultIndex }
+    ::= { hh3cSysSetBootImageResultTable 1 }
+
+Hh3cSysSetBootImageResultEntry ::=
+    SEQUENCE {
+        hh3cSysSetBootImageResultIndex
+            Integer32,
+        hh3cSysSetBootImageResultStatusOfEachCard
+            INTEGER,
+        hh3cSysSetBootImageFailedReasonOfEachCard
+            DisplayString
+     }
+
+hh3cSysSetBootImageResultIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of a startup image operation result.  It is identical to the
+        entity index of each card."
+    ::= { hh3cSysSetBootImageResultEntry 1 }
+
+hh3cSysSetBootImageResultStatusOfEachCard OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        doing(2),
+        success(3),
+        failed(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the startup image set operation."
+    ::= { hh3cSysSetBootImageResultEntry 2 }
+
+hh3cSysSetBootImageFailedReasonOfEachCard OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reason of the startup image set failure for a card.  It is empty if
+        the operation was successful."
+    ::= { hh3cSysSetBootImageResultEntry 3 }
+-- End define Boot/Load image table
+
+hh3cSystemManMIBNotifications OBJECT IDENTIFIER ::= { hh3cSystemMan 2 }
+
+
+hh3cSysClockChangedNotification NOTIFICATION-TYPE
+    OBJECTS { hh3cSysLocalClock }
+    STATUS current
+    DESCRIPTION
+        "
+        A clock changed notification is generated when the current
+        local date and time for the system has been manually changed.
+        The value of hh3cSysLocalClock reflects new date and time.
+        "
+    ::= { hh3cSystemManMIBNotifications 1 }
+
+
+hh3cSysReloadNotification NOTIFICATION-TYPE
+    OBJECTS { hh3cSysReloadImage, hh3cSysReloadCfgFile, hh3cSysReloadReason, hh3cSysReloadScheduleTime, hh3cSysReloadAction
+         }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cSysReloadNotification will be sent before the corresponding entity is
+                        rebooted. It will also be sent if the entity fails to reboot because the clock
+                        has changed.
+        "
+    ::= { hh3cSystemManMIBNotifications 2 }
+
+
+    hh3cSysStartUpNotification NOTIFICATION-TYPE
+            OBJECTS { hh3cSysImageType }
+            STATUS current
+            DESCRIPTION
+            "
+            a hh3cSysStartUpNotification trap will be sent when the system starts up with 'main' image file failed,
+            a trap will be sent to indicate which type the current image file (I.e backup or secure)is.
+            "
+            ::={ hh3cSystemManMIBNotifications 3}
+
+
+-- conformance and Compliance define
+hh3cSystemManMIBConformance OBJECT IDENTIFIER ::= { hh3cSystemMan 3 }
+
+
+hh3cSystemManMIBCompliances OBJECT IDENTIFIER ::= { hh3cSystemManMIBConformance 1 }
+
+
+hh3cSystemManMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "
+        The compliance statement for entities which implement
+        the system management MIB.
+        "
+    MODULE -- this module
+        MANDATORY-GROUPS { hh3cSysClockGroup, hh3cSysReloadGroup, hh3cSysImageGroup,
+                           hh3cSysCFGFileGroup, hh3cSystemManNotificationGroup,
+                           hh3cSysCurGroup
+             }
+        GROUP hh3cSystemBtmLoadGroup
+        DESCRIPTION
+        "
+        The hh3cSystemBtmLoadGroup is optional for system.
+        "
+    ::= { hh3cSystemManMIBCompliances 1 }
+
+
+hh3cSystemManMIBGroups OBJECT IDENTIFIER ::= { hh3cSystemManMIBConformance 2 }
+
+
+hh3cSysClockGroup OBJECT-GROUP
+    OBJECTS { hh3cSysLocalClock, hh3cSysSummerTimeEnable, hh3cSysSummerTimeZone, hh3cSysSummerTimeMethod,
+        hh3cSysSummerTimeStart, hh3cSysSummerTimeEnd, hh3cSysSummerTimeOffset }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing mandatory system clock information."
+    ::= { hh3cSystemManMIBGroups 1 }
+
+
+-- A collection of objects providing mandatory system image
+-- information.
+hh3cSysReloadGroup OBJECT-GROUP
+    OBJECTS { hh3cSysReloadSchedule, hh3cSysReloadAction, hh3cSysReloadImage, hh3cSysReloadCfgFile, hh3cSysReloadReason,
+        hh3cSysReloadScheduleTagList,hh3cSysReloadTag,hh3cSysReloadScheduleTime, hh3cSysReloadEntity, hh3cSysReloadRowStatus }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing mandatory system reload."
+    ::= { hh3cSystemManMIBGroups 2 }
+
+
+hh3cSysImageGroup OBJECT-GROUP
+    OBJECTS { hh3cSysImageNum, hh3cSysImageName, hh3cSysImageSize, hh3cSysImageLocation,
+              hh3cSysImageType }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing mandatory system image information."
+    ::= { hh3cSystemManMIBGroups 3 }
+
+
+hh3cSysCFGFileGroup OBJECT-GROUP
+    OBJECTS { hh3cSysCFGFileNum, hh3cSysCFGFileName, hh3cSysCFGFileSize, hh3cSysCFGFileLocation }
+    STATUS current
+    DESCRIPTION
+        "
+        A collection of objects providing mandatory system
+        configuration file information.
+        "
+    ::= { hh3cSystemManMIBGroups 4 }
+
+
+hh3cSysCurGroup OBJECT-GROUP
+    OBJECTS { hh3cSysCurCFGFileIndex, hh3cSysCurImageIndex }
+    STATUS current
+    DESCRIPTION
+        "A collection of system current status."
+    ::= { hh3cSystemManMIBGroups 5 }
+
+
+hh3cSystemManNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hh3cSysClockChangedNotification, hh3cSysReloadNotification,
+                    hh3cSysStartUpNotification }
+    STATUS current
+    DESCRIPTION
+        "A collection of notifications."
+    ::= { hh3cSystemManMIBGroups 6 }
+
+
+hh3cSystemBtmLoadGroup OBJECT-GROUP
+    OBJECTS { hh3cSysCurBtmFileName, hh3cSysCurUpdateBtmFileName,
+                    hh3cSysBtmLoadMaxNumber, hh3cSysBtmFileName,
+                    hh3cSysBtmFileType, hh3cSysBtmRowStatus,
+                    hh3cSysBtmErrorStatus, hh3cSysBtmLoadTime }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing system update bootrom information."
+    ::= { hh3cSystemManMIBGroups 7 }
+
+END

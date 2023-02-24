@@ -30,7 +30,7 @@ IMPORTS
     DisplayString                                           FROM SNMPv2-TC;
 
 swInterfaces MODULE-IDENTITY
-      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      	LAST-UPDATED "202105190000Z"  -- April 1, 2013
 		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
@@ -43,7 +43,7 @@ swInterfaces MODULE-IDENTITY
 
         DESCRIPTION
              "The private MIB module definition for Switch Interfaces."
-      	REVISION     "201304010000Z"  -- April 1, 2013
+      	REVISION     "202105190000Z"  -- April 1, 2013
       	DESCRIPTION
               "Added MODULE-IDENTITY"
         ::= { switch001 43 }
@@ -67,7 +67,13 @@ AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
         fastFull(5),
         gigaHalf(6),
         gigaFull(7),
-        tenGigaFull(8)
+        tenGigaFull(8),
+        fiveGigaFull(9),
+        twoPointFiveGigaFull(10),
+	twentyFiveGigaFull(11),
+	fortyGigaFull(12),
+	fiftyGigaFull(13),
+	oneHundredGigaFull(14)
     }
 
 --
@@ -137,8 +143,9 @@ SwIfEntry ::= SEQUENCE {
         swIfSpeedDuplexNegotiationRemoteCapabilities            AutoNegCapabilitiesBits,
         swIfAdminComboMode                                      INTEGER,
         swIfOperComboMode                                       INTEGER,
-        swIfAutoNegotiationMasterSlavePreference                INTEGER
-    }
+        swIfAutoNegotiationMasterSlavePreference                INTEGER,
+        swIfPortCapabilities                                    AutoNegCapabilitiesBits
+        }
 
 
 swIfIndex OBJECT-TYPE
@@ -279,11 +286,15 @@ swIfType  OBJECT-TYPE
         eth10M(1),
         eth100M(2),
         eth1000M(3),
-        eth10G(4),
-        eth20G(5),
-        eth40G(6),
-        eth100G(7),
-        unknown(8)
+        eth2500M(4),
+        eth5G(5),
+        eth10G(6),
+        eth20G(7),
+        eth40G(8),
+        eth100G(9),
+        eth25G(10),	
+        eth50G(11),	
+        unknown(12)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -758,7 +769,13 @@ swIfAutoNegotiationMasterSlavePreference OBJECT-TYPE
 --    DEFVAL - according to MTSC parameter
     ::= {  swIfEntry 45 }
 
-
+swIfPortCapabilities OBJECT-TYPE
+    SYNTAX AutoNegCapabilitiesBits
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Returns the port capabilities."
+    ::= { swIfEntry 46 }
 
 --
 -- swIfMibVersion
@@ -1309,8 +1326,65 @@ rlFlowControlMode OBJECT-TYPE
        control pause frames."
 
     ::= { rlIfInterfaces 32 }
+rlIfPortsNegotationTuning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "indicates if to apply link negotiation tuning WA globally for all ports with PHY 3140."    
+    ::= { rlIfInterfaces 33 } 
+    
+rlFlowControlPerSystem OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "define if flow control is enabled on all regular ports and trunk in the system or not."
+    ::= { rlIfInterfaces 34 }
 
+rlMacOperationTable    OBJECT-TYPE
+   SYNTAX  SEQUENCE  OF MacOperationEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "pefrom mac operation on given ifindex"
+   ::=  { swInterfaces 8 }
 
+macOperationEntry OBJECT-TYPE
+   SYNTAX  MacOperationEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "Defines mac operation "
+   INDEX   { macOpifIndex }
+   ::=  { rlMacOperationTable 1 }
+
+MacOperationEntry ::= SEQUENCE {
+        macOpifIndex                        INTEGER,
+		macOpType                           INTEGER
+	}
+
+macOpifIndex OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to the rlMacOperationTable. The interface defined by a
+         particular value of this index is the same interface as
+         identified by the same value of ifIndex (MIB II)."
+    ::= {  macOperationEntry 1  }
+	
+macOpType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        securePortDynamicToStatic(1),
+		securePortClearStatic(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " This variable indicates what operation should be performed on the MAC
+          of the given interface."
+    ::= {  macOperationEntry 2  }	
 
 END
 

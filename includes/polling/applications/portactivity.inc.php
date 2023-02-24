@@ -1,22 +1,20 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
-$app_id = $app['app_id'];
-
-echo $name;
 
 try {
-    $returned=json_app_get($device, 'portactivity', 1);
+    $returned = json_app_get($device, 'portactivity', 1);
 } catch (JsonAppException $e) { // Only doing the generic one as this has no non-JSON return
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$ports=$returned['data'];
+$ports = $returned['data'];
 
 $ports_rrd_def = RrdDefinition::make()
     ->addDataset('total_conns', 'GAUGE', 0)
@@ -66,11 +64,11 @@ $ports_rrd_def = RrdDefinition::make()
 // update the RRD files for each port
 //
 
-$ports_keys=array_keys($ports);
-$ports_keys_int=0;
+$ports_keys = array_keys($ports);
+$ports_keys_int = 0;
 while (isset($ports[$ports_keys[$ports_keys_int]])) {
-    $rrd_name = array('app', $name, $app_id, $ports_keys[$ports_keys_int]);
-    $fields = array(
+    $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
+    $fields = [
         'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'],
         'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'],
         'total_from' => $ports[$ports_keys[$ports_keys_int]]['total_from'],
@@ -113,50 +111,25 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
         'fromTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['TIME_WAIT'],
         'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'],
         'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
-    );
-    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name);
+    ];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $ports_keys_int++;
 }
 
-//
-// component processing for portsactivity
-//
-$device_id=$device['device_id'];
-$options=array(
-    'filter' => array(
-        'device_id' => array('=', $device_id),
-        'type' => array('=', 'portsactivity'),
-     ),
-);
+// check for added or removed instances
+$old_ports = $app->data['ports'] ?? [];
+$added_ports = array_diff($ports_keys, $old_ports);
+$removed_ports = array_diff($old_ports, $ports_keys);
 
-$component=new LibreNMS\Component();
-$components=$component->getComponents($device_id, $options);
-
-//delete portsactivity component if nothing is found
-if (empty($ports_keys)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-                 $component->deleteComponent($component_id);
-        }
-    }
-//add portsactivity component if found
-} else {
-    if (isset($components[$device_id])) {
-        $portsc = $components[$device_id];
-    } else {
-        $portsc = $component->createComponent($device_id, 'portsactivity');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($ports_keys);
-
-    $id = $component->getFirstComponentID($portsc);
-    $portsc[$id]['label'] = 'Portsactivity';
-    $portsc[$id]['ports'] = json_encode($ports_keys);
-
-    $component->setComponentPrefs($device_id, $portsc);
+// if we have any source instances, save and log
+if (count($added_ports) > 0 || count($removed_ports) > 0) {
+    $app->data = ['ports' => $ports_keys];
+    $log_message = 'Portactivity Port Change:';
+    $log_message .= count($added_ports) > 0 ? ' Added ' . implode(',', $added_ports) : '';
+    $log_message .= count($removed_ports) > 0 ? ' Removed ' . implode(',', $added_ports) : '';
+    log_event($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', data_flatten($ports));

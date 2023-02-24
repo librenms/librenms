@@ -15,16 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Data\Store;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
@@ -35,8 +36,8 @@ class Datastore
     /**
      * Initialize and create the Datastore(s)
      *
-     * @param array $options
-     * @return DatastoreContract
+     * @param  array  $options
+     * @return Datastore
      */
     public static function init($options = [])
     {
@@ -62,7 +63,8 @@ class Datastore
 
     /**
      * Datastore constructor.
-     * @param array $datastores Implement DatastoreInterface
+     *
+     * @param  array  $datastores  Implement DatastoreInterface
      */
     public function __construct($datastores)
     {
@@ -72,7 +74,7 @@ class Datastore
     /**
      * Disable a datastore for the rest of this run
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function disable($name)
     {
@@ -95,11 +97,11 @@ class Datastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param array $device
-     * @param string $measurement Name of this measurement
-     * @param array $tags tags for the data (or to control rrdtool)
-     * @param array|mixed $fields The data to update in an associative array, the order must be consistent with rrd_def,
-     *                            single values are allowed and will be paired with $measurement
+     * @param  array  $device
+     * @param  string  $measurement  Name of this measurement
+     * @param  array  $tags  tags for the data (or to control rrdtool)
+     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
+     *                               single values are allowed and will be paired with $measurement
      */
     public function put($device, $measurement, $tags, $fields)
     {
@@ -107,7 +109,7 @@ class Datastore
         // data_update($device, 'mymeasurement', $tags, 1234);
         //     AND
         // data_update($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
-        if (!is_array($fields)) {
+        if (! is_array($fields)) {
             $fields = [$measurement => $fields];
         }
 
@@ -124,7 +126,7 @@ class Datastore
     /**
      * Filter all elements with keys that start with 'rrd_'
      *
-     * @param array $arr input array
+     * @param  array  $arr  input array
      * @return array Copy of $arr with all keys beginning with 'rrd_' removed.
      */
     private function rrdTagFilter($arr)
@@ -136,6 +138,7 @@ class Datastore
             }
             $result[$k] = $v;
         }
+
         return $result;
     }
 
@@ -149,11 +152,15 @@ class Datastore
         return $this->stores;
     }
 
-    public function getStats()
+    /**
+     * Get the measurements for all datastores, keyed by datastore name
+     *
+     * @return \Illuminate\Support\Collection<\App\Polling\Measure\MeasurementCollection>
+     */
+    public function getStats(): Collection
     {
-        return array_reduce($this->stores, function ($result, DatastoreContract $store) {
-            $result[$store->getName()] = $store->getStats();
-            return $result;
-        }, []);
+        return collect($this->stores)->mapWithKeys(function (DatastoreContract $store) {
+            return [$store->getName() => $store->getStats()];
+        });
     }
 }

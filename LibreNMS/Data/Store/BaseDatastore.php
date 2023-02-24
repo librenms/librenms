@@ -15,18 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Data\Store;
 
-use LibreNMS\Data\Measure\Measurement;
-use LibreNMS\Data\Measure\MeasurementCollection;
+use App\Polling\Measure\Measurement;
+use App\Polling\Measure\MeasurementCollection;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
@@ -41,7 +41,7 @@ abstract class BaseDatastore implements DatastoreContract
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {
@@ -50,7 +50,8 @@ abstract class BaseDatastore implements DatastoreContract
 
     /**
      * Record statistics for operation
-     * @param Measurement $stat
+     *
+     * @param  Measurement  $stat
      */
     protected function recordStatistic(Measurement $stat)
     {

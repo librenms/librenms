@@ -27,32 +27,74 @@ IMPORTS
              FROM LLDP-V2-MIB;
 
 cmSystemMIB MODULE-IDENTITY
-    LAST-UPDATED    "201711270000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202101270000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the System MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201711270000Z"
+             Copyright (C) ADVA."
+    REVISION        "202101270000Z"
     DESCRIPTION
-        " Notes from release 201803130000Z
+        "
+          Notes from release 201910080000Z
+          a)Added the literals ntp-server-and-peering(4) and ntp-peering(5)
+            to CmNtpMode 
+ 
+          Notes from release 201908260000Z
+          a)Added the literal ntpclock(5)
+            to TimeOfDayType 
+	    
+	      Notes from release 201912010000Z
+          (1) Added fileServicesCsrName
+
+          Notes from release 201901230000Z
+          a) added softwarePeerCondition object
+          b) added PeerUpgradeStatus object
+
+          Notes from release 201901100000Z,
+          (1)Added the following scalars
+             f3ApplicationsBootCompleted
+             f3ApplicationsUpTime.
+
+          Notes from release 201810290000Z
+          a) added softwareAffectedEntity object
+          b) added fileServicesAffectedEntity object
+          c) added AffectedEntity textual convention
+         
+          Notes from release 201805140000Z   
+          a) added sysLogFacilityCode scalar variable
+
+          Notes from release 201803130000Z
            a) added usbPortEnabled scalar variable
 
-        Notes from release 201801170000Z
+          Notes from release 201801170000Z
            a) added fileServicesDbFileName variable
-        
-        Notes from release 201711270000Z
+
+          Notes from release 201802020000Z
+           a) added f3SysAuthKeyTable
+           
+          Notes from release 201801030000Z   
+           a) added sysLogTimestampFormat scalar variable
+
+          Notes from release 201711270000Z
            a) added sysLogTimestampFormat scalar variable
            b) added SysLogFormatType textual convention
-        
-        Notes from release 201601150000Z
+
+          Notes from release 201706210000Z
+           a) Modified aclTable index:
+              -New range for aclEntryIndex
+
+          Notes from release 201601150000Z
            a) added  f3SnmpLongIfAlias scalar variable
 
           Notes from release 201307310000Z 
@@ -111,7 +153,8 @@ cmSystemMIB MODULE-IDENTITY
             serialPortDisconnectAutoLogOff, httpsEnabled, sftpEnabled
 
          Notes from release 200803030000Z,
-          (1)MIB version ready for release FSP150CM 3.1." 
+          (1)MIB version ready for release FSP150CM 3.1."
+
     ::= {fsp150cm 2}    
 
 -- 
@@ -144,6 +187,10 @@ snmpIPv6UDPDomain                      OBJECT IDENTIFIER ::= {cmSystemObjects 18
 f3RawDataObjects                       OBJECT IDENTIFIER ::= {cmSystemObjects 19}
 f3LldpV2RemoteSystemsData              OBJECT IDENTIFIER ::= {cmSystemObjects 20}
 f3SimpleLtpObjects                     OBJECT IDENTIFIER ::= {cmSystemObjects 21}
+f3SysAuthenKeyObjects                  OBJECT IDENTIFIER ::= {cmSystemObjects 22}
+f3CallhomeServerObjects                OBJECT IDENTIFIER ::= {cmSystemObjects 23}
+f3SystemInfoObjects                    OBJECT IDENTIFIER ::= {cmSystemObjects 24}
+f3ZtpObjects                           OBJECT IDENTIFIER ::= {cmSystemObjects 25}
 
 
 -- 
@@ -190,11 +237,15 @@ CmNtpMode ::= TEXTUAL-CONVENTION
         "Enumerations for NTP Types 
             client,
             server,
-            both."
+            both,
+            ntp-server-and-peering,
+            ntp-peering ."
     SYNTAX       INTEGER {
                    client (1),
                    server (2),
-                   both (3)
+                   both (3),
+                   ntp-server-and-peering(4),
+                   ntp-peering(5)
                  }
 
 CmNtpServerType ::= TEXTUAL-CONVENTION
@@ -313,6 +364,12 @@ CmFileServicesMode ::= TEXTUAL-CONVENTION
              configfiledownload     - Configuration file download in progress. 
              defaultvalsfiledownload- Default Values file download in progress. 
              satresultupload        - SAT test result file upload in progress.
+             sslcertificatedownload     - SSL Certificate file download in progress.
+             sslprivatekeydownload      - SSL Private Key file download in progress.
+             sslencprivatekeydownload   - SSL Encrypted Private Key file download in progress.
+             sslkeypairdownload         - SSL Key Pair file download in progress. 
+             csrUpload                  - CSR Upload 
+             rfc2544testreportupload   - Rfc2544 Test Report Upload
              "
     SYNTAX     INTEGER {
                  idle(1),
@@ -338,7 +395,13 @@ CmFileServicesMode ::= TEXTUAL-CONVENTION
                  configfileupload(21),
                  configfiledownload(22),
                  defaultvalsfiledownload(23),
-                 satresultupload(24)
+                 satresultupload(24),
+                 sslcertificatedownload(25),
+                 sslprivatekeydownload(26),
+                 sslencprivatekeydownload(27),
+                 sslkeypairdownload(28),
+                 csrUpload(29),
+                 rfc2544testreportupload(30)
                }
 
 CmRestartCauseType ::= TEXTUAL-CONVENTION
@@ -397,7 +460,7 @@ F3ConfigFileStatus ::= TEXTUAL-CONVENTION
     DESCRIPTION
             "Defines the status of configuration file actions.
              initial            - Initial status 
-             in-progress	- Configuration File Operation is in progress 
+             in-progress    - Configuration File Operation is in progress 
              completed          - Configuration File Operation completed 
              failed             - Configuration File Operation failed "
     SYNTAX     INTEGER {
@@ -415,22 +478,24 @@ TimeOfDayType ::= TEXTUAL-CONVENTION
              local - System time driven by local clock
              ntp   - System time driven by NTP client
              ptp   - System time driven by PTP Telecom Slave
-             timeclock - Sytem time driven by time clock"
+             timeclock - System time driven by time clock
+             ntpclock - System time driven by NTP server or peers"
              
     SYNTAX     INTEGER {
                  local(1),
                  ntp(2),
                  ptp(3),
-                 timeclock(4)
+                 timeclock(4),
+                 ntpclock(5)
                }
 
 LldpV2ConfigurationADVAExtMaxNeighborsAction ::= TEXTUAL-CONVENTION
     STATUS     current
     DESCRIPTION
             "Discard: information selected to be discarded is the 
-	    information in the current LLDPDU.
+        information in the current LLDPDU.
             Deleteentry:information selected to be discarded is 
-	    currently in the LLDP remote systems MIB."
+        currently in the LLDP remote systems MIB."
              
     SYNTAX     INTEGER {
                  delete-entry(1),
@@ -486,6 +551,83 @@ SysLogFormatType ::= TEXTUAL-CONVENTION
     SYNTAX     INTEGER {
                  adva (1),
                  rfc3164 (2)
+               }
+
+SysAuthKeyType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the System Authentication Key Type."
+             
+    SYNTAX     INTEGER {
+                 notApplicable (0),
+                 md5 (1)
+               }
+
+AffectedEntity ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the affected Entity."
+             
+    SYNTAX     INTEGER {
+                 notApplicable (0),
+                 none (1),
+                 shelf (2),
+                 card1 (3),
+                 card2 (4)
+               }
+--
+-- Enumeration Type : PeerUpgradeReadyCondition
+--
+PeerUpgradeReadyCondition ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the Peer Upgrade Ready Condition Entity."
+    SYNTAX     INTEGER {
+                        notApplicable   (1),
+                        ignorealarms    (2),
+                        nocriticalalarms(3),
+                        nomjandcrialarms(4),
+                        noalarms        (5)
+                       }
+
+
+
+--
+--    Enumeration Type : PeerUpgradeStatus
+--
+
+PeerUpgradeStatus ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the Peer Upgrade Status Entity."
+    SYNTAX     INTEGER {
+                        inprogress   (1),
+                        ready        (2)
+                       }
+
+CallhomeState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Describes States available for CallHome"
+    SYNTAX     INTEGER {
+                 completed (1),
+                 failed (2),
+                 inProgress (3),
+                 notStarted (4)
+               }
+
+F3TargetAddressLifetime ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Lifetime of target address."
+    SYNTAX     INTEGER {
+                 notApplicable (0),
+                 duration1hour (1),
+                 duration1day (2),
+                 duration3days (3),
+                 duration1week (4),
+                 duration1month (5),
+                 unlimited (6)
                }
 
 --
@@ -832,6 +974,14 @@ sysLogTimestampFormat OBJECT-TYPE
             "This object describes the syslog server timestamp format type."
     ::= { cmSysModeObjects 7 }
 
+sysLogFacilityCode OBJECT-TYPE
+    SYNTAX      Integer32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describes the syslog server facility code."
+    ::= { cmSysModeObjects 8 }
+
 --
 -- File Services functionality
 --
@@ -850,7 +1000,13 @@ fileServicesAction OBJECT-TYPE
                  put-auditlog-file(10),
                  get-config-file(11),
                  put-config-file(12),
-                 put-sat-result(13)
+                 put-sat-result(13),
+                 get-ssl-certificate(14),
+                 get-ssl-private-key(15),
+                 get-ssl-encrypt-private-Key(16),
+                 get-ssl-key-pair(17),
+                 put-csr(18),
+                 put-rfc2544-test-report(19)
                }
     MAX-ACCESS read-write
     STATUS     current
@@ -884,7 +1040,13 @@ fileServicesAction OBJECT-TYPE
                                     file to a remote server.
              get-config-file(11)  - Transfer the Configuration File from a remote server. 
              put-config-file(12)  - Transfer the Configuration File to a remote server. 
-             put-sat-result(13)   - Transfer the SAT test result file to a remote server." 
+             put-sat-result(13)   - Transfer the SAT test result file to a remote server.
+             get-ssl-certificate(14)   - Transfer the SSL Certificate file to the system.
+             get-ssl-private-key(15)   - Transfer the SSL Private Key file to the system.
+             get-ssl-encrypt-private-Key(16)   - Transfer the SSL Encrypted Private Key file to the system.
+             get-ssl-key-pair(17) - Transfer the SSL Key Pair file to the system.
+             put-csr(18)                    - Transfer the CSR file to the system.
+             put-rfc2544-test-report(19)   - Transfer the Rfc2544 test report to the system." 
     ::= { cmFileServicesObjects 1 }
 
 fileServicesMethod OBJECT-TYPE
@@ -985,6 +1147,37 @@ fileServicesDbFileName OBJECT-TYPE
             "Name of the upload unique database file."
     ::= { cmFileServicesObjects 12 }
 
+fileServicesAffectedEntity OBJECT-TYPE
+    SYNTAX     AffectedEntity 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Affected Entity."
+    ::= { cmFileServicesObjects 13 }
+
+fileServicesSslKeyPairName OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This is a unique name for the SSL key pair."
+    ::= { cmFileServicesObjects 14 }
+
+fileServicesDecryptionPassword OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This is the decryption password for the SSL file."
+    ::= { cmFileServicesObjects 15 }
+
+fileServicesCsrName OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This is a unique name for the CSR."
+    ::= { cmFileServicesObjects 16 }
 
 --
 --Database Objects
@@ -1079,7 +1272,15 @@ databaseVersion OBJECT-TYPE
     DESCRIPTION
         "The database version string."
     ::= { databaseEntry 3 }
-
+    
+databaseActionPassphrase OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Pass-phrase used to generate key for encrypting private keys."
+    ::= { cmDatabaseObjects 4 }
+    
 --
 -- Software Upgrade
 --
@@ -1148,7 +1349,7 @@ softwareTable OBJECT-TYPE
     DESCRIPTION
         "This table lists information about the software installed
          in the active and standby partitions."
-    ::= { cmSoftwareObjects 4 }
+    ::= { cmSoftwareObjects 4 }    
 
 softwareEntry OBJECT-TYPE
     SYNTAX     SoftwareEntry
@@ -1190,6 +1391,29 @@ softwareVersion OBJECT-TYPE
         "The software version string."
     ::= { softwareEntry 3 }
 
+softwareAffectedEntity OBJECT-TYPE
+    SYNTAX     AffectedEntity 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Affected Entity."
+    ::= { cmSoftwareObjects 5 }
+
+softwarePeerCondition OBJECT-TYPE
+    SYNTAX     PeerUpgradeReadyCondition 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Peer Upgrade Ready Condition Entity."
+    ::= { cmSoftwareObjects 6 }
+
+peerUpgradeStatus OBJECT-TYPE
+    SYNTAX     PeerUpgradeStatus 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Peer Upgrade Status Entity."
+    ::= { cmSoftwareObjects 7 }
 
 --
 --Logging
@@ -1565,7 +1789,8 @@ F3SnmpTargetAddrExtEntry ::= SEQUENCE {
         f3SnmpTargetAddrExtDyingGaspPort      VariablePointer,
         f3SnmpTargetAddrExtDyingGaspEnabled   TruthValue,
         f3SnmpTargetAddrExtDyingGaspActive    TruthValue,
-        f3SnmpTargetAddrExtBulkTrapsEnabled   TruthValue
+        f3SnmpTargetAddrExtBulkTrapsEnabled   TruthValue,
+        f3SnmpTargetAddrExtLifetime           F3TargetAddressLifetime
     }
 
 f3SnmpTargetAddrExtDyingGaspPort OBJECT-TYPE
@@ -1607,6 +1832,17 @@ f3SnmpTargetAddrExtBulkTrapsEnabled OBJECT-TYPE
             "Provides ability to enable/disable the Snmp Bulk Traps on
              the Target Address."
     ::= { f3SnmpTargetAddrExtEntry 4 }
+    
+f3SnmpTargetAddrExtLifetime OBJECT-TYPE
+    SYNTAX      F3TargetAddressLifetime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Provides a time after which target address
+             entry will automatically be deleted. 
+             SNMP packet received from snmpTargetAddrTAddress 
+             resets timer to its original value."
+    ::= { f3SnmpTargetAddrExtEntry 5 }
 
 f3SnmpEngineID     OBJECT-TYPE
     SYNTAX       SnmpEngineID
@@ -1819,6 +2055,14 @@ f3ConfigFilePercentComplete OBJECT-TYPE
             "This object provides configure file percent complete."
     ::= { f3ConfigFileObjects 6 }
 
+f3ConfigFilePassphrase OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Pass-phrase used to generate key for encrypting private keys."
+    ::= { f3ConfigFileObjects 7 }
+    
 --
 --Feature Management Objects
 --
@@ -2339,6 +2583,142 @@ f3SimpleLtpSoftwareFileName OBJECT-TYPE
          " The software file name."
     ::= { f3SimpleLtpObjects 7 }
 
+--
+-- Sys Authentication Key Table
+--
+f3SysAuthKeyTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SysAuthKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "."
+    ::= { f3SysAuthenKeyObjects 1 }
+
+f3SysAuthKeyEntry OBJECT-TYPE
+    SYNTAX     F3SysAuthKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "."
+    INDEX { f3SysAuthKeyIndex }
+    ::= { f3SysAuthKeyTable 1 }
+
+F3SysAuthKeyEntry ::= SEQUENCE {
+    f3SysAuthKeyIndex        Unsigned32,
+    f3SysAuthKeyId           Unsigned32,
+    f3SysAuthKeyType         SysAuthKeyType,
+    f3SysAuthKey             DisplayString,
+    f3SysAuthKeyStorageType  StorageType,
+    f3SysAuthKeyRowStatus    RowStatus
+}
+
+f3SysAuthKeyIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "."
+    ::= { f3SysAuthKeyEntry 1 }
+
+f3SysAuthKeyId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "."
+    ::= { f3SysAuthKeyEntry 2 }
+
+f3SysAuthKeyType  OBJECT-TYPE
+    SYNTAX      SysAuthKeyType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Authentication type."
+    ::= { f3SysAuthKeyEntry 3 }
+
+f3SysAuthKey  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Password for this key."
+    ::= { f3SysAuthKeyEntry 4 }
+
+f3SysAuthKeyStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3SysAuthKeyEntry 5 }
+
+f3SysAuthKeyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3SysAuthKeyRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3SysAuthKeyRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3SysAuthKeyRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3SysAuthKeyEntry 6 }
+
+-- 
+-- Callhome Server Objects 
+--
+f3CallhomeClientIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION
+         "Callhome client IP address."
+    ::= { f3CallhomeServerObjects 1 }
+
+f3CallhomeState  OBJECT-TYPE
+    SYNTAX      CallhomeState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Callhome state."
+    ::= { f3CallhomeServerObjects 2 }
+
+--
+-- System Information Objects
+--
+f3ApplicationsBootCompleted OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "This is a flag informing that system completed booting of its applications."
+   ::= { f3SystemInfoObjects 1 }
+
+f3ApplicationsUpTime OBJECT-TYPE
+   SYNTAX TimeTicks
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The time (in hundredths of second) since the applications of the system were last initialized."
+   ::= { f3SystemInfoObjects 2 }
+   
+f3EnsembleZtpEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION
+         "This provides ability to enable/disable Ensemble ZTP on the system."
+    ::= { f3ZtpObjects 1 }
+    
 ---
 ---Notifications
 ---
@@ -2434,20 +2814,30 @@ cmSystemObjectGroup OBJECT-GROUP
         telnetEnabled, sshEnabled, ftpEnabled, scpEnabled, serialPortEnabled,
         httpEnabled, httpsEnabled, sftpEnabled, tftpEnabled, netconfOverSSHEnabled, usbPortEnabled,
         ntpMode, autoProvMode, sysTimeOfDayType, ntpServerConfigType,
-        sysLogServerConfigType, sysLogTimestampFormat,
+        sysLogServerConfigType, sysLogTimestampFormat, sysLogFacilityCode,
         fileServicesAction, 
         fileServicesMethod, fileServicesServerIp, 
         fileServicesUserId, fileServicesPassword, fileServicesRemoteFile, fileServicesDbFileName,
         fileServicesStatus, fileServicesPercentComplete,
-        fileServicesMode,
+        fileServicesMode, fileServicesServerType,
+        fileServicesServerIpv6Addr, fileServicesAffectedEntity, 
+        fileServicesSslKeyPairName, fileServicesDecryptionPassword,
+        sysLogIpVersion, sysLogIpv6Addr, fileServicesCsrName,
+        ntpPrimaryServerIpVersion, ntpPrimaryServerIpv6Addr,
+        ntpBackupServerIpVersion, ntpBackupServerIpv6Addr,
+        ntpPrimaryServerAuthKey, ntpBackupServerAuthKey,
 
         databaseAction, databaseLastSaveTime,
-        databaseIndex, databaseType, databaseVersion, 
+        databaseIndex, databaseType, databaseVersion, databaseActionPassphrase,
 
         softwareAction, 
         softwareUpgradeTime, softwareValidationTimer, 
         softwareIndex, softwareType, softwareVersion,
-
+        
+        softwareAffectedEntity, 
+        softwarePeerCondition,
+        peerUpgradeStatus,
+        
         sysLogServerIndex, sysLogIpAddress,
         sysLogPort, secLog2sysLogEnabled, 
         auditLog2sysLogEnabled, auditLog2fileEnabled, 
@@ -2460,19 +2850,28 @@ cmSystemObjectGroup OBJECT-GROUP
 
         f3SnmpTargetAddrExtDyingGaspPort, f3SnmpTargetAddrExtDyingGaspEnabled,
         f3SnmpTargetAddrExtDyingGaspActive, f3SnmpTargetAddrExtBulkTrapsEnabled,
+        f3SnmpTargetAddrExtLifetime,
 
         f3SysLastResetType,
         f3SysLastResetCauseType,
         f3SysLastAbnormalResetTimestamp1,
         f3SysLastAbnormalResetTimestamp2,
         f3SysLastAbnormalResetTimestamp3,
+        f3SysResetButtonControl,
+        f3SimpleLtpControl,
+        f3SimpleLtpTransferProtocol,
+        f3SimpleLtpServerIpv4Addr,
+        f3SimpleLtpUserName,
+        f3SimpleLtpPasswd,
+        f3SimpleLtpConfigFileName,
+        f3SimpleLtpSoftwareFileName,
 
         f3DatabaseSyncTrapObject,
 
         f3ConfigFileActionFileName, f3ConfigFileAction,
         f3ConfigFileStatus, f3ConfigFileErrorInformation,
-        f3ConfigFileIndex, f3ConfigFileName, 
-        f3ConfigFileDescription,f3ConfigFilePercentComplete,
+        f3ConfigFileIndex, f3ConfigFileName,
+        f3ConfigFileDescription,f3ConfigFilePercentComplete, f3ConfigFilePassphrase,
 
         f3SystemFeatureIndex, f3SystemFeatureName, f3SystemFeatureEnabled,
         f3SystemLldpV2DestAddressADVAExtIndex, f3SystemLldpV2ADVAExtDestMacAddress,
@@ -2494,7 +2893,29 @@ cmSystemObjectGroup OBJECT-GROUP
         f3RawDataServerFtProtocol, f3RawDataServerFtServerName,
         f3RawDataServerFtUserId, f3RawDataServerFtPasswd,
 
-        f3LldpV2RemTTL
+        f3LldpV2RemTTL,
+        
+        f3NtpAuthKeyId,
+        f3NtpAuthKeyNumber,
+        f3NtpAuthKeyType,
+        f3NtpAuthKey,
+        f3NtpAuthKeyStorageType,
+        f3NtpAuthKeyRowStatus,
+        
+        f3SysAuthKeyIndex,
+        f3SysAuthKeyId,
+        f3SysAuthKeyType,
+        f3SysAuthKey,
+        f3SysAuthKeyStorageType,
+        f3SysAuthKeyRowStatus,
+        
+        f3CallhomeClientIpAddress,
+        f3CallhomeState,
+
+        f3ApplicationsBootCompleted,
+        f3ApplicationsUpTime,
+        
+        f3EnsembleZtpEnabled
     }
     STATUS  current
     DESCRIPTION
@@ -2577,7 +2998,14 @@ cmSystemObjectGroupCmHub OBJECT-GROUP
         f3SimpleLtpConfigFileName,
         f3SimpleLtpSoftwareFileName,
 
-        f3DatabaseSyncTrapObject
+        f3DatabaseSyncTrapObject,
+        
+        f3SysAuthKeyIndex,
+        f3SysAuthKeyId,
+        f3SysAuthKeyType,
+        f3SysAuthKey,
+        f3SysAuthKeyStorageType,
+        f3SysAuthKeyRowStatus
     }
     STATUS  current
     DESCRIPTION

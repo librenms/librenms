@@ -12,7 +12,7 @@ IMPORTS
     TruthValue, DisplayString, RowStatus         FROM SNMPv2-TC;
 
 rlCli MODULE-IDENTITY
-                LAST-UPDATED "201005250000Z"
+                LAST-UPDATED "201005250001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
@@ -84,7 +84,8 @@ rlCLIremoteCLIcommand OBJECT-TYPE
                      applySentCLI(3),
                      deleteCommandsCLI(4),
                      setEchoModeCLI(5),
-                     unsetEchoModeCLI(6)
+                     unsetEchoModeCLI(6),
+		     applySentDebugCommands(7)
                    }
 
    MAX-ACCESS read-write
@@ -128,7 +129,8 @@ rlCLIremoteCLIexecutionState OBJECT-TYPE
                                        and remote CLI is waiting for the manager
                                        to retrieve the output.
             done: All the commands in rlCLIremoteCLIcommandsTable
-                  have been executed."
+                  have been executed, but there still may be unretrieved output from the commands
+			"
 
     ::= { rlCLIremoteCLIsupport 2 }
 
@@ -150,7 +152,7 @@ rlCLIremoteCLImode OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "Operation mode of remote CLI:
-            deleteCLIOutputOnGet: output row will be deleted after GET.
+            deleteCLIOutputOnGet: all parts of an output row will be deleted after GET of last part of the row.
                                   Recommended for reliable management channels.
             keepCLIOutputOnGet:   output row will be kept after GET,
                                   will be deleted only explicitly by remote
@@ -159,8 +161,7 @@ rlCLIremoteCLImode OBJECT-TYPE
                                   management channels."
     DEFVAL  {deleteCLIOutputOnGet}
     ::= { rlCLIremoteCLIsupport 4 }
-
-
+	
 --- Remote CLI Tables
 
 ---  rlCLIremoteCLIcommandsTable
@@ -310,5 +311,13 @@ rlCLIremoteCLIinstance OBJECT-TYPE
          corresponding to the client was found."
     ::= { rlCLIremoteCLIsupport 7 }
 
+rlCLIremoteCLIoutputEmpty OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the rlCLIremoteCLIoutputsTable is empty or not"    
+    ::= { rlCLIremoteCLIsupport 8 }	
+	
 
 END

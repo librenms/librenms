@@ -12,43 +12,43 @@
  */
 
 $component = new LibreNMS\Component();
-$options['filter']['type'] = array('=','Cisco-OTV');
+$options['filter']['type'] = ['=', 'Cisco-OTV'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/html/graphs/common.inc.php";
-$rrd_options .= " -l 0 -E ";
+include 'includes/html/graphs/common.inc.php';
+$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'VLANs               Now     Min    Max\\n'";
-$rrd_additions = "";
+$rrd_additions = '';
 
 $count = 0;
 foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'overlay') {
-        $rrd_filename = rrd_name($device['hostname'], array('cisco', 'otv', $array['label'], 'vlan'));
+        $rrd_filename = Rrd::name($device['hostname'], ['cisco', 'otv', $array['label'], 'vlan']);
 
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
+        if (Rrd::checkRrdExists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
-            $stack = "";
+            $stack = '';
             if ($count != 0) {
-                $stack = ":STACK ";
+                $stack = ':STACK ';
             }
 
             // Grab a color from the array.
             $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
 
-            $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":count:AVERAGE ";
-            $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
-            $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%4.0lf%s ";
-            $rrd_additions .= " GPRINT:DS" . $count . ":MIN:%4.0lf%s ";
-            $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%4.0lf%s\\\l ";
+            $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':count:AVERAGE ';
+            $rrd_additions .= ' AREA:DS' . $count . '#' . $color . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
+            $rrd_additions .= ' GPRINT:DS' . $count . ':LAST:%4.0lf%s ';
+            $rrd_additions .= ' GPRINT:DS' . $count . ':MIN:%4.0lf%s ';
+            $rrd_additions .= ' GPRINT:DS' . $count . ":MAX:%4.0lf%s\\\l ";
             $count++;
         }
     }
 }
 
-if ($rrd_additions == "") {
+if ($rrd_additions == '') {
     // We didn't add any data points.
 } else {
     $rrd_options .= $rrd_additions;

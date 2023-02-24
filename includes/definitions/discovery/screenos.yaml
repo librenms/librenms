@@ -1,5 +1,12 @@
 mib: NETSCREEN-RESOURCE-MIB
 modules:
+    mempools:
+        data:
+            -
+                used: NETSCREEN-RESOURCE-MIB::nsResMemAllocate
+                free: NETSCREEN-RESOURCE-MIB::nsResMemLeft
+    os:
+        sysDescr_regex: '/(?<hardware>.+) version (?<version>.+) \(SN: (?<serial>[^,]+), (?<features>.+)\)/'
     processors:
         data:
             -

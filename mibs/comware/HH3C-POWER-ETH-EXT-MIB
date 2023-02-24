@@ -1,0 +1,1610 @@
+-- =================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Power over ethernet extend MIB
+-- Reference: POWER-ETHERNET-MIB
+-- Version: V1.7
+-- History:
+--   V1.0 2004-07-24 Created by Gaolong
+--   V1.1 2004-09-08 Update file by Gaolong for some syntax errors.
+--   V1.2 2004-11-19 Update file by liuhongxu for poe need.
+--                   add hh3cMainPsePriorityMode¡¢hh3cPsePowerMaxValue¡¢
+--                   hh3cpsePDChangNotification adjust the objects' sequence of
+--                   hh3cPsePortTable and hh3cMainPseTable add the description
+--                   of MANDATORY-GROUPS in hh3cPseCompliance.
+--   V1.3 2004-12-16 Update file by liuhongxu for poe profile
+--                   add hh3cPsePortProfile, hh3cPseProfilesTable
+--                   change the name of hh3cPseProfileIndex add
+--                   hh3cPseProfileApplyNum.  adjust the format of this mib.
+--   V1.4 2005-03-29 Update file by Wangzhaoyan for poe pow need.
+--                   add hh3cPOEPowerObjects, hh3cPOEThresholdLimitObjs,
+--                   hh3cPOESupModuleInfoObjs, hh3cPOEDCOutStateObjects,
+--                   hh3cPOEDCDCOutInfoObjects, hh3cPOEACSwitchStateModuleObjs,
+--                   hh3cPOEInCurStateObjects, hh3cPOEAlarmStateObjects and the
+--                   sub-nodes.  add 17 traps change the node name from
+--                   hh3cpsePDChangNotification to hh3cpsePDChangeNotification
+--                   change some detail as the suggestion from Wangyingxia and
+--                   Yangyang.  adjust the format of this mib.
+--   V1.5 2005-11-21 Update file by Liweizhen for controling the power-management
+--                   policy of PSE or PD.  Add hh3cPsePolicyMode, hh3cPDPolicyMode,
+--                   hh3cMainPsePowerPriority.
+--                   Delete some description of hh3cPsePortProfileIndex node.
+--                   Change the description of hh3cPseProfilePowerMode node.
+--                   Change SYNTAX OCTET STRING range for the following nodes:
+--                   hh3cPOEPowerType, hh3cPOESupervisionModuleName,
+--                   hh3cPOESMFactorName, hh3cPOEModuleHardVerInfo.
+--                   Adjust the format of this mib.
+--   V1.6 2015-07-21 Update file by Fangliwen for profile power limit.
+--                   Change the syntax of hh3cPseProfilePowerLimit node.
+--   V1.7 2019-5-23  Update file for PoE-AI. Add the following nodes:
+--                   hh3cPsePDDisableNotification,hh3cPsePortGroupIndex,
+--                   hh3cPsePortIndex and hh3cPsePortDisableInfo.
+-- =================================================================
+HH3C-POWER-ETH-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      hh3cCommon
+              FROM HH3C-OID-MIB
+      pethPsePortGroupIndex, pethPsePortIndex,
+      pethMainPseGroupIndex, pethPsePortDetectionStatus
+              FROM POWER-ETHERNET-MIB
+      OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+              FROM SNMPv2-CONF
+      Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+              FROM SNMPv2-SMI
+      DisplayString, RowStatus, TEXTUAL-CONVENTION
+              FROM SNMPv2-TC;
+
+
+hh3cPowerEthernetExt MODULE-IDENTITY
+      LAST-UPDATED "201905230000Z"      -- May 23, 2019 at 00:00 GMT
+
+      ORGANIZATION
+          "New H3C Tech. Co., Ltd."
+      CONTACT-INFO
+          "Platform Team New H3C Tech. Co., Ltd.
+          Hai-Dian District Beijing P.R. China
+          http://www.h3c.com
+          Zip:100085
+          "
+      DESCRIPTION
+              "Description."
+      REVISION "201905230000Z"
+      DESCRIPTION
+          "Add the following nodes:
+          hh3cPsePDDisableNotification,hh3cPsePortGroupIndex,
+          hh3cPsePortIndex and hh3cPsePortDisableInfo."
+      REVISION      "201507250000Z"
+      DESCRIPTION
+          "The initial version of this MIB module."
+          ::= { hh3cCommon 14 }
+
+
+--
+-- Node definitions
+--
+
+hh3cPsePortTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPsePortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The indexing scheme is taken form that used by
+             the IETF Power MIB.  The same indexing scheme is
+             used to give continuity in behaviour between
+             that standard and this extensions definitioin."
+      ::= { hh3cPowerEthernetExt 1 }
+
+
+hh3cPsePortEntry OBJECT-TYPE
+      SYNTAX Hh3cPsePortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The pethPsePortGroupIndex is imported from the IETF Power MIB
+             and uniquely identifies the group containing the port to which
+             power ethernet PSE is connected.  Group means (box in the stack,
+             module in a rack).
+
+             The pethPsePortPowerIndex is imported from the IETF Power MIB
+             and uniquely identifies the power ethernet PSE port within group
+             pethPseGroupIndex to which the power Ethernet PSE entry is
+             connected.  This value will match the local port number on a
+             switch."
+      INDEX { pethPsePortGroupIndex, pethPsePortIndex }
+      ::= { hh3cPsePortTable 1 }
+
+
+Hh3cPsePortEntry ::=
+      SEQUENCE {
+              hh3cPsePortFaultDescription
+                      DisplayString,
+              hh3cPsePortPeakPower
+                      Integer32,
+              hh3cPsePortAveragePower
+                      Integer32,
+              hh3cPsePortCurrentPower
+                      Integer32,
+              hh3cPsePortPowerLimit
+                      Integer32,
+              hh3cPsePortProfileIndex
+                      Integer32
+      }
+
+hh3cPsePortFaultDescription OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object supports the fault category of the IETF Power MIB [1]
+             pethPsePortDetectionStatus object.  A textual description
+             containing more information about the nature of this fault is
+             provided by this object.  Typically this will detail the precise
+             PoE hardware state which is causing the pethPsePortDetectionStatus
+             object to be in the 'fault' state.
+             It is a DisplayString of up to 255 characters."
+      ::= { hh3cPsePortEntry 2 }
+
+
+hh3cPsePortPeakPower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the peak power which has been consumed by
+             the port.  It is defined as the highest measured value of power
+             in milliWatts that has been consumed by the port.  Its value
+             is only reset when link is lost, the port is PoE disabled or
+             when it is manually reset by the user asspecified below.
+             It is a read/write integer value with units of milliWatts.
+             Writing a value of zero to this object resets its value
+             to zero.  Writing any other value to this object has no
+             effect on its value and an error is returned."
+      ::= { hh3cPsePortEntry 3 }
+
+
+hh3cPsePortAveragePower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the average power which has been consumed
+             by the port.  This object is a read/write integer value with
+             units of milliWatts.  Writing a value of zero to this object
+             resets its value to zero.  Writing any other value to this
+             object has no effect on its value and an error is returned."
+      ::= { hh3cPsePortEntry 4 }
+
+
+hh3cPsePortCurrentPower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+              "The object specifies the power currently being consumed by the port.
+              It is a read only integer value with units of milliWatts."
+      ::= { hh3cPsePortEntry 5 }
+
+
+hh3cPsePortPowerLimit OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "The object specifies the power limit set for this port.
+              The PSE will not supply more than this level of power to the
+              specified port.
+              It is a read/write integer value with units of milliWatts."
+      ::= { hh3cPsePortEntry 6 }
+
+hh3cPsePortProfileIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..100)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Indicates the power profile which is currently associated
+             with this port.  This object references the corresponding
+             hh3cPseProfileIndex object in the power profiles table.  A
+             value of zero is a special case and indicates that no
+             power profile is currently associated with this port.  When
+             hh3cPseProfileIndex is set to an index of existent profile,
+             pethPsePortPowerPairs, pethPsePortPowerPriority,
+             pethPsePortAdminEnable and hh3cPsePortPowerLimit will be
+             set to the same as corresponding value.  PethPsePortPowerPairs,
+             pethPsePortPowerPriority and pethPsePortAdminEnable are objects
+             of rfc3621-Power-Ethernet.mib."
+      ::= { hh3cPsePortEntry 7 }
+
+
+hh3cMainPseTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cMainPseEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+              "Description."
+      ::= { hh3cPowerEthernetExt 2 }
+
+
+hh3cMainPseEntry OBJECT-TYPE
+      SYNTAX Hh3cMainPseEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The pethMainPseGroupIndex is imported from the IETF Power MIB
+             and uniquely identifies the group containing the port to which
+             power ethernet PSE is connected.  Group means (box in the stack,
+             module in a rack) and the value 1 MUST be used for non-modular
+             devices."
+      INDEX { pethMainPseGroupIndex }
+      ::= { hh3cMainPseTable 1 }
+
+
+Hh3cMainPseEntry ::=
+      SEQUENCE {
+              hh3cMainPsePowerLimit
+                         Integer32,
+              hh3cMainPseAveragePower
+                         Integer32,
+              hh3cMainPsePeakPower
+                         Integer32,
+              hh3cMainGuaranteedPowerRemaining
+                         Integer32,
+              hh3cMainPsePriorityMode
+                         INTEGER,
+              hh3cMainPseLegacy
+                         INTEGER,
+              hh3cMainPsePowerPriority
+                         INTEGER
+              }
+
+hh3cMainPsePowerLimit OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the power limit set for the unit as a whole.
+             The PoE unit will already have a nominal power defined by the
+             IETF Power MIB [1] pethMainPsePower object.  This OPTIONAL object
+             specifies a further limit to this nominal power value.  This may
+             be useful to control the thermals of the unit, or for internal
+             testing purposes.  One possible use for this object may be to lower
+             the power consumption of the unit if one or more of the internal
+             fans have broken.  It is a read/write integer value with units of
+             Watts (note - Watts is chosen instead of milliWatts here since
+             the IETF Power MIB [1] measures unit based parameters, such as
+             the pethMainPsePower object, in units of Watts)."
+      ::= { hh3cMainPseEntry 1 }
+
+
+hh3cMainPseAveragePower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the average power which has been consumed
+             by the port.  It is a read/write integer value with units of
+             Watts (note - Watts is chosen instead of milliWatts here since
+             the IETF Power MIB [1] measures unit based parameters, such as
+             the pethMainPsePower object, in units of Watts).  Writing a value
+             of zero to this object resets its value to zero.  Writing any
+             other value to this object has no effect on its value and an error
+             is returned."
+      ::= { hh3cMainPseEntry 2 }
+
+
+hh3cMainPsePeakPower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the peak power which has been consumed for PoE.
+             It is defined as the highest measured value of power in milliWatts
+             that has been consumed at any one point in time by the sum of the PoE
+             ports.  Its value is only reset when the unit is powered on or when
+             it is manually reset by the user as specifiedbelow.  It is a read/write
+             integer value with units of Watts (note - Watts is chosen instead of
+             milliWatts here since the IETF Power MIB [1] measures unit based
+             parameters, such as the pethMainPsePower object, in units of Watts).
+             Writing a value of zero to this object resets its value to zero.
+             Writing any other value to this object has noeffect on its value
+             and an error is returned."
+      ::= { hh3cMainPseEntry 3 }
+
+
+hh3cMainGuaranteedPowerRemaining OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the amount of power remaining in the guaranteed
+             power pool.  Each time a port is placed into guaranteed mode it
+             reserves a set amount of power out of the total guaranteed power
+             pool for the system.  This intention of this object is to give the
+             client of this MIB (whether that be the CLI or the Web interface or
+             the end user) an indication of how many ports can still be placed
+             into guaranteed mode.  It is a read only integer value with units of
+             Watts(note - Watts is chosen instead of milliWatts here since the
+             IETF Power MIB [1] measures unit based parameters,such as the
+             pethMainPsePower object, in units of Watts)."
+      ::= { hh3cMainPseEntry 4 }
+
+
+hh3cMainPsePriorityMode OBJECT-TYPE
+      SYNTAX INTEGER   {
+              disconnection(0),
+              non-disconnection(1)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Describes or controls the priority mode on slot which must be
+             enabled firstly.  When a new board is inserted, and the power is
+             over-load, a value of disconnection(0) means that the power will
+             stop supply to the low priority slot ; A value of non-disconnection(1)
+             means that the slot still supply when a new board is inserted, and
+             the power is over-load too."
+      ::= { hh3cMainPseEntry 5 }
+
+hh3cMainPseLegacy OBJECT-TYPE
+      SYNTAX INTEGER   {
+             enable(0),
+             disable(1)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Describes or controls the legacy mode on slot which must be enabled
+             firstly.  Legacy mode: standard or nonstandard PD detection mode."
+      ::= { hh3cMainPseEntry 6 }
+
+hh3cMainPsePowerPriority OBJECT-TYPE
+      SYNTAX INTEGER   {
+             critical(1),
+             high(2),
+             low(3)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Describes or controls the priority of the PSE.  The priority
+             will be used by the PSE policy to prevent from power overloading.
+             If the priority of PSE is set to critical, the PSE will turn into
+             guaranteed mode.  The priority could be used by a control mechanism
+             that prevents power overloading by disconnecting PSEs with lower
+             power priority.  PSEs that connect devices critical to the
+             application should be set to higher priority."
+      ::= { hh3cMainPseEntry 7 }
+
+-- Power Profile PSE table
+hh3cPseProfilesTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPseProfilesEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "A table of objects representing a set of power profiles.
+             Power profiles can be applied to PoE ports, which have the
+             effect of automatically setting the priority, power limit
+             and PoE enable MIB objects to the values specified in the
+             power profile."
+      ::= { hh3cPowerEthernetExt 7 }
+
+hh3cPseProfilesEntry OBJECT-TYPE
+      SYNTAX Hh3cPseProfilesEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "A set of objects that display and control the Main power of a PSE."
+      INDEX    { hh3cPseProfileIndex }
+      ::= { hh3cPseProfilesTable 1 }
+
+Hh3cPseProfilesEntry ::= SEQUENCE {
+             hh3cPseProfileIndex     Integer32,
+             hh3cPseProfileName      DisplayString,
+             hh3cPseProfilePowerMode      INTEGER,
+             hh3cPseProfilePowerLimit     Integer32,
+             hh3cPseProfilePriority       INTEGER,
+             hh3cPseProfilePairs          INTEGER,
+             hh3cPseProfileApplyNum       Integer32,
+             hh3cPseProfileRowStatus      RowStatus
+                }
+
+hh3cPseProfileIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..100)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The index of the profile.  This uniquely allow the profile to be
+             identified."
+      ::= { hh3cPseProfilesEntry 1 }
+
+hh3cPseProfileName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(1..15))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+            "Assigns the profile a name with which the settings
+            can be assiciated with.  For example, 'NBX Phone'."
+      ::= { hh3cPseProfilesEntry 2 }
+
+hh3cPseProfilePowerMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                powerDisabled (1),
+                powerEnabled (2)
+               }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+             "The power mode associated with this power profile.  There
+             are two possible power modes as follows: powerDisabled,
+             powerEnabled.  When a power profile is applied to a PSE port,
+             this value dictates the settings of the ports pethPsePortPowerPriority
+             and pethPsePortAdminEnable objects."
+      ::= { hh3cPseProfilesEntry 3 }
+
+hh3cPseProfilePowerLimit OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+             "The power limit to be applied to the ports hh3cPsePortPowerLimit
+              object when the profile is applied to the PSE port.  Expressed in
+              milliWatts."
+      ::= { hh3cPseProfilesEntry 4 }
+
+hh3cPseProfilePriority OBJECT-TYPE
+      SYNTAX INTEGER   {
+                critical(1),
+                high(2),
+                low(3)
+               }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+             "This object controls the priority of the port from the point of
+             view of a power management algorithm.  The priority that is set
+             by this variable could be used by a control mechanism that
+             prevents over current situations by disconnecting first ports
+             with lower power priority.  Ports that connect devices critical
+             to the operation of the network - like the E911 telephones
+             ports - should be set to higher priority."
+      ::= { hh3cPseProfilesEntry 5 }
+
+hh3cPseProfilePairs OBJECT-TYPE
+      SYNTAX INTEGER   {
+                signal(1),
+                spare(2)
+                }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+             "Describes or controls the pairs in use.  If the value of
+             pethPsePortPowerPairsControl is true, this object is writable.
+             A value of signal(1) means that the signal pairs only are in use.
+             A value of spare(2) means that the spare pairs only are in use."
+      REFERENCE
+             "IEEE Std 802.3af Section 30.9.1.1.4 aPSEPowerPairs"
+      ::= { hh3cPseProfilesEntry 6 }
+
+hh3cPseProfileApplyNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of this profile which has been applied.
+             If hh3cPseProfileApplyNum is not zero, user can't
+             change the current line."
+      ::= { hh3cPseProfilesEntry 7 }
+
+hh3cPseProfileRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+             "The status of this classifier.
+             If hh3cPseProfileApplyNum is not zero, user can't
+             delete the current line."
+      ::= { hh3cPseProfilesEntry 8 }
+
+hh3cPseAutoDetectActive OBJECT-TYPE
+      SYNTAX INTEGER
+                {
+                notSupported(1),
+                disabled(2),
+                enabled(3)
+                }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies whether the device auto-detection feature is
+             active.  If this object is set to Active, and a known powered device
+             is detected, then the port will automatically switch to Auto-Guaranteed
+             mode.  This is a stackwide object (ie. it is not referenced by
+             group index)."
+      ::= { hh3cPowerEthernetExt 3 }
+
+hh3cPsePowerMaxValue OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object specifies the max poe power for lanswitch.
+             The value should between the power currently and the max power."
+      ::= { hh3cPowerEthernetExt 5 }
+
+hh3cPsePolicyMode OBJECT-TYPE
+      SYNTAX INTEGER
+              {
+              disabled(1),
+              priority(2)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The PSE policy only applies to the situation that when a new
+             board (PSE) is inserted, and the power is overload.
+             A value of priority(2) means that the power will stop supplying
+             to the low priority PSE.  About PSE priority, please refer to
+             hh3cMainPsePowerPriority.  A value of disabled(1) means that the
+             power will stop supplying to the new inserted PSE.  The default
+             value of this object is disabled(1)."
+      ::= { hh3cPowerEthernetExt 9 }
+
+hh3cPDPolicyMode OBJECT-TYPE
+      SYNTAX INTEGER
+              {
+              disabled(1),
+              priority(2)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The PD policy only applies to the situation that when a new
+             PD is inserted, and the power of PSE is overload.
+             A value of priority(2) means that the power will stop supplying
+             to the low priority port PD.  About port priority, please refer
+             to pethPsePortPowerPriority.  A value of disabled(1) means that
+             the slot stop supplying to the new inserted PD.  The default
+             value of this object is disabled(1)."
+      ::= { hh3cPowerEthernetExt 10 }
+
+hh3cpseportNotification  OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 6 }
+
+-- Notification  Control  Objects
+
+hh3cpsePDChangeNotification NOTIFICATION-TYPE
+      OBJECTS { pethPsePortDetectionStatus }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates if PD has been inserted or pulled out."
+      ::= { hh3cpseportNotification 1 }
+
+hh3cPOEDisconnectNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleDisconnect }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module does not disconnect."
+      ::= { hh3cpseportNotification 2 }
+
+hh3cPOEInputErrorNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleInputError }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module input error."
+      ::= { hh3cpseportNotification 3 }
+
+hh3cPOEOutputErrorNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleOutputError }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module output error."
+      ::= { hh3cpseportNotification 4 }
+
+hh3cPOEOverVoltageNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleOverVoltage }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module overruns the
+             voltage limit."
+      ::= { hh3cpseportNotification 5 }
+
+hh3cPOEOverTempNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleOverTemp }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module overruns the
+             temperature limit."
+      ::= { hh3cpseportNotification 6 }
+
+hh3cPOEFanErrorNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleFanError }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module fan error."
+      ::= { hh3cpseportNotification 7 }
+
+hh3cPOEModuleShutdownNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleShutdown }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module is closed."
+      ::= { hh3cpseportNotification 8 }
+
+hh3cPOECurRestrictedNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEAlarmModuleInfoIndex, hh3cPOEModuleCurRestricted }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the POE power module current is restricted."
+      ::= { hh3cpseportNotification 9 }
+
+hh3cPOEACSwitchNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEACSwitchStateIndex, hh3cPOEACSwitchState }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input switch alarm of this POE power."
+      ::= { hh3cpseportNotification 10 }
+
+hh3cPOEACInCurANotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEInCurAState }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input current A alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 11 }
+
+hh3cPOEACInCurBNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEInCurBState }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input current B alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 12 }
+
+hh3cPOEACInCurCNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEInCurCState }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input current C alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 13 }
+
+hh3cPOEACSwitchVolABNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOESwitchStateVolExIndex, hh3cPOESwitchStateInVolAB}
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input voltage AB alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 14 }
+
+hh3cPOEACSwitchVolBCNotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOESwitchStateVolExIndex, hh3cPOESwitchStateInVolBC}
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input voltage BC alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 15 }
+
+hh3cPOEACSwitchVolCANotification  NOTIFICATION-TYPE
+      OBJECTS { hh3cPOESwitchStateVolExIndex, hh3cPOESwitchStateInVolCA }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the AC input voltage CA alarm state of
+             this POE power."
+      ::= { hh3cpseportNotification 16 }
+
+hh3cPOEDCOutVolNotification NOTIFICATION-TYPE
+      OBJECTS { hh3cPOEDCOutStateIndex, hh3cPOEDCOutDCVolAlarm }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the DC output alarm of this POE power."
+      ::= { hh3cpseportNotification 17 }
+
+hh3cPOEShutdownNotification NOTIFICATION-TYPE
+      STATUS current
+      DESCRIPTION
+             "This notification indicates the whole POE power has been shutdown."
+      ::= { hh3cpseportNotification 18 }
+hh3cPseComformance OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 4 }
+
+hh3cPseCompliances OBJECT IDENTIFIER ::= { hh3cPseComformance 1 }
+
+hh3cPseCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+             "Description."
+      MODULE  -- this module
+      MANDATORY-GROUPS {    hh3cPsePortGroup,
+                            hh3cMainPseGroup,
+                            hh3cPseScalarGroup,
+                            hh3cPsePDNotificationGroup
+                       }
+      GROUP hh3cPseProfilesGroup
+      DESCRIPTION
+             "This group is mandatory only for executing POE commands as a batch."
+      ::= { hh3cPseCompliances 1 }
+
+hh3cPseGroup OBJECT IDENTIFIER ::= { hh3cPseComformance 2 }
+
+hh3cPsePortGroup OBJECT-GROUP
+      OBJECTS { hh3cPsePortProfileIndex, hh3cPsePortPowerLimit, hh3cPsePortCurrentPower,
+                hh3cPsePortAveragePower, hh3cPsePortPeakPower, hh3cPsePortFaultDescription,
+                hh3cMainPsePriorityMode
+              }
+      STATUS current
+      DESCRIPTION
+             "A collection of objects should be supported at the same time."
+      ::= { hh3cPseGroup 1 }
+
+hh3cMainPseGroup OBJECT-GROUP
+      OBJECTS { hh3cMainPsePowerLimit, hh3cMainPseAveragePower, hh3cMainPsePeakPower,
+                hh3cMainGuaranteedPowerRemaining }
+      STATUS current
+      DESCRIPTION
+             "A collection of objects should be supported at the same time."
+      ::= { hh3cPseGroup 2 }
+
+hh3cPseScalarGroup OBJECT-GROUP
+      OBJECTS { hh3cPseAutoDetectActive, hh3cPsePowerMaxValue, hh3cPsePolicyMode ,
+                hh3cPDPolicyMode }
+      STATUS current
+      DESCRIPTION
+             "A collection of scalar objects supported."
+      ::= { hh3cPseGroup 3 }
+
+hh3cPsePDNotificationGroup NOTIFICATION-GROUP
+      NOTIFICATIONS { hh3cpsePDChangeNotification }
+      STATUS current
+      DESCRIPTION
+             "PD Change Notification."
+      ::= { hh3cPseGroup 4 }
+
+hh3cPseProfilesGroup OBJECT-GROUP
+      OBJECTS { hh3cPseProfileName, hh3cPseProfilePowerMode,
+                hh3cPseProfilePowerLimit, hh3cPseProfilePriority,
+                hh3cPseProfilePairs, hh3cPseProfileApplyNum, hh3cPseProfileRowStatus}
+      STATUS current
+      DESCRIPTION
+             "A collection of objects should be supported at the same time."
+      ::= { hh3cPseGroup 5 }
+
+hh3cPOEPowerThresholdLimitGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEThresholdACMimimum, hh3cPOEThresholdACMaximum,
+                hh3cPOEThresholdDCMinimum, hh3cPOEThresholdDCMaximum }
+      STATUS current
+      DESCRIPTION
+             "Power threshold limits group."
+      ::= { hh3cPseGroup 6 }
+
+hh3cPOEPowerSupInfoGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEPowerType, hh3cPOEPowerModuleNum, hh3cPOESupervisionModuleName,
+                hh3cPOESMMajorVersion, hh3cPOESMMinorVersion, hh3cPOESMFactorName}
+      STATUS current
+      DESCRIPTION
+             "The basic Power information group."
+      ::= { hh3cPseGroup 7 }
+
+hh3cPOEPowerDCOutStateGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEDCOutStateModuleNum }
+      STATUS current
+      DESCRIPTION
+             "The DC out power state group."
+      ::= { hh3cPseGroup 8 }
+
+hh3cPOEPowerDCOutInfoGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEDCOutCurNum }
+      STATUS current
+      DESCRIPTION
+             "The power AC input switch information group"
+      ::= { hh3cPseGroup 9 }
+
+hh3cPOEPowerACSwitchStateModuleGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEACSwitchStateModuleNum}
+      STATUS current
+      DESCRIPTION
+             "PD Change Notification."
+      ::= { hh3cPseGroup 10 }
+
+hh3cPOEPowerInCurStateGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEInCurStateModuleNum, hh3cPOEInCurAState, hh3cPOEInCurBState,
+                hh3cPOEInCurCState}
+      STATUS current
+      DESCRIPTION
+             "PD Change Notification."
+      ::= { hh3cPseGroup 11 }
+
+hh3cPOEPowerAlarmStateGroup OBJECT-GROUP
+      OBJECTS { hh3cPOEAlarmStateModuleNum }
+      STATUS current
+      DESCRIPTION
+              "PD Change Notification."
+      ::= { hh3cPseGroup 12 }
+
+ACAlarmState ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+           "AC Alarm State."
+      SYNTAX INTEGER{
+                normal     (1),
+                underLimit (2),
+                aboveLimit (3),
+                lackPhrase (4),
+                fuseBroken (5),
+                switchOff  (6),
+                otherError (7)
+                   }
+
+DCAlarmState ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+         "DC Alarm State."
+     SYNTAX INTEGER{
+                normal     (1),
+                underLimit (2),
+                aboveLimit (3),
+                fuseBroken (4),
+                switchOff  (5),
+                otherError (6)
+                   }
+
+SwitchState ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+        "Switch State."
+SYNTAX INTEGER   {
+               on            (1),
+               off           (2),
+               highVoltInput (3),
+               lowVoltInput  (4)
+                  }
+
+ModuleAlarmState ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "Module Alarm State."
+   SYNTAX INTEGER   {
+                    normal (1),
+                    alarm  (2)
+                      }
+
+hh3cPOEPowerObjects OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 8 }
+
+hh3cPOEThresholdLimitObjs OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 1 }
+
+hh3cPOEThresholdACMimimum OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Input threshold AC minimum.
+             It is a read-write node.
+             The value of this node is 'OCTET STRING',
+             it is used to describe a float value.
+             So this string should fit the following rule:
+             1. This string should be terminated by '\0';
+             2. Every characters should be number or radix point;
+             3. The radix point should occur only once, and it should not
+             be the first or the last character of the string.
+             The value of this node should be smaller than 264.0V and larger than 90.0V.
+             And it should be smaller than the hh3cPOEThresholdACMaximum."
+      ::= { hh3cPOEThresholdLimitObjs 1 }
+
+hh3cPOEThresholdACMaximum OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Input threshold AC maximum.
+             It is a read-write node.
+             The value of this node is 'OCTET STRING',
+             it is used to describe a float value.
+             So this string should fit the following rule:
+             1. This string should be terminated by '\0';
+             2. Every characters should be number or radix point;
+             3. The radix point should occur only once, and it should not
+             be the first or the last character of the string.
+             It should be smaller than 264.0V and larger than 90.0V.
+             And it should be larger than the hh3cPOEThresholdACMinimum."
+      ::= { hh3cPOEThresholdLimitObjs 2 }
+
+hh3cPOEThresholdDCMinimum OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Input threshold DC minimum.
+             It is a read-write node.
+             The value of this node is 'OCTET STRING',
+             it is used to describe a float value.
+             So this string should fit the following rule:
+             1. This string should be terminated by '\0';
+             2. Every characters should be number or radix point;
+             3. The radix point should occur only once, and it should not
+             be the first or the last character of the string.
+             It should be smaller than 47.0V and larger than 45.0V."
+      ::= { hh3cPOEThresholdLimitObjs 3 }
+
+hh3cPOEThresholdDCMaximum OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Input threshold DC maximum.
+             It is a read-write node.
+             The value of this node is 'OCTET STRING',
+             it is used to describe a float value.
+             So this string should fit the following rule:
+             1. This string should be terminated by '\0';
+             2. Every characters should be number or radix point;
+             3. The radix point should occur only once, and it should not
+             be the first or the last character of the string.
+             It should be smaller than 57.0V and larger than 55.0V."
+      ::= { hh3cPOEThresholdLimitObjs 4 }
+
+hh3cPOESupModuleInfoObjs OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 2 }
+
+hh3cPOEPowerType OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The type of the power."
+      ::= { hh3cPOESupModuleInfoObjs 1 }
+
+hh3cPOEPowerModuleNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of the power modules."
+      ::= { hh3cPOESupModuleInfoObjs 2 }
+
+hh3cPOESupervisionModuleName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the Supervision Module name on this POE power."
+      ::= { hh3cPOESupModuleInfoObjs 3 }
+
+hh3cPOESMMajorVersion OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the high byte of the monitor module version."
+      ::= { hh3cPOESupModuleInfoObjs 4 }
+
+hh3cPOESMMinorVersion OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the low byte of the monitor module version."
+      ::= { hh3cPOESupModuleInfoObjs 5 }
+
+hh3cPOESMFactorName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the name of the manufactor."
+      ::= { hh3cPOESupModuleInfoObjs 6 }
+
+hh3cPOEModuleInfoTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOEModuleInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The table of the module information on this POE power."
+      ::= { hh3cPOESupModuleInfoObjs 7 }
+
+hh3cPOEModuleInfoEntry OBJECT-TYPE
+      SYNTAX Hh3cPOEModuleInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The entry of the module information on this POE power."
+      INDEX { hh3cPOEModuleIndex }
+      ::= { hh3cPOEModuleInfoTable 1 }
+
+Hh3cPOEModuleInfoEntry ::=
+      SEQUENCE {
+                 hh3cPOEModuleIndex
+                         Integer32,
+                 hh3cPOEModuleID
+                         Integer32,
+                 hh3cPOEModuleInfoPower
+                         Integer32,
+                 hh3cPOEModuleHardVerInfo
+                         OCTET STRING
+                }
+
+hh3cPOEModuleIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The index of the current module on this POE power.
+             It is also the index of hh3cPOEModuleInfoTable.
+             The range of this node is from 1 to hh3cPOEPowerModuleNum."
+      ::= { hh3cPOEModuleInfoEntry 1 }
+
+hh3cPOEModuleID OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The ID of the current module on this POE power."
+      ::= { hh3cPOEModuleInfoEntry 2 }
+
+hh3cPOEModuleInfoPower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The power of the current module on this POE power."
+      ::= { hh3cPOEModuleInfoEntry 3 }
+
+hh3cPOEModuleHardVerInfo OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The hardware version information of the current module on this POE power."
+      ::= { hh3cPOEModuleInfoEntry 4 }
+
+hh3cPOEDCOutStateObjects OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 3 }
+
+hh3cPOEDCOutStateModuleNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The module number on this POE power.
+             It is the maximum of the hh3cPOEDCOutStateIndex."
+      ::= { hh3cPOEDCOutStateObjects 1 }
+
+hh3cPOEDCOutStateTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOEDCOutStateEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The table of DC output power state on this POE power."
+      ::= { hh3cPOEDCOutStateObjects 2 }
+
+hh3cPOEDCOutStateEntry OBJECT-TYPE
+      SYNTAX Hh3cPOEDCOutStateEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The entry of the DC output power state on this POE power."
+      INDEX { hh3cPOEDCOutStateIndex }
+      ::= { hh3cPOEDCOutStateTable 1 }
+
+      Hh3cPOEDCOutStateEntry ::=
+              SEQUENCE {
+                       hh3cPOEDCOutStateIndex
+                               Integer32,
+                       hh3cPOEDCOutDCVolAlarm
+                               DCAlarmState
+                    }
+
+hh3cPOEDCOutStateIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The index of the DC output power state on this POE power.
+             The range of this node is from 1 to hh3cPOEDCOutStateModuleNum."
+      ::= { hh3cPOEDCOutStateEntry 1 }
+
+hh3cPOEDCOutDCVolAlarm OBJECT-TYPE
+      SYNTAX DCAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The DC output alarm of the DC output power state on this POE power.
+             The value of this node will be the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 fuseBroken (4),
+                                 switchOff  (5),
+                                 otherError (6)."
+      ::= { hh3cPOEDCOutStateEntry 2 }
+
+hh3cPOEDCOutInfoObjects OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 4 }
+
+hh3cPOEDCOutCurNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of DC output current on this POE power.
+             It is the maximum of hh3cPOEDCOutInfoIndex."
+      ::= { hh3cPOEDCOutInfoObjects 1 }
+
+hh3cPOEDCOutInfoTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOEDCOutInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The table of the DC output information on this POE power."
+      ::= { hh3cPOEDCOutInfoObjects 2 }
+
+hh3cPOEDCOutInfoEntry OBJECT-TYPE
+      SYNTAX Hh3cPOEDCOutInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The entry of the DC output information on this POE power."
+      INDEX { hh3cPOEDCOutInfoIndex }
+      ::= { hh3cPOEDCOutInfoTable 1 }
+
+Hh3cPOEDCOutInfoEntry ::=
+      SEQUENCE {
+                hh3cPOEDCOutInfoIndex
+                        Integer32,
+                hh3cPOEDCOutVol
+                        OCTET STRING,
+                hh3cPOEDCOutInfoLoadCur
+                        OCTET STRING
+              }
+
+hh3cPOEDCOutInfoIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The index of the DC output information on this POE POWER.
+             The range of this node is from 1 to hh3cPOEDCOutCurNum."
+      ::= { hh3cPOEDCOutInfoEntry 1 }
+
+hh3cPOEDCOutVol OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The DC output voltage of the current DC output on this POE power."
+      ::= { hh3cPOEDCOutInfoEntry 2 }
+
+hh3cPOEDCOutInfoLoadCur OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..10))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The total load current of the current DC output on this POE power."
+      ::= { hh3cPOEDCOutInfoEntry 3 }
+
+hh3cPOEACSwitchStateModuleObjs OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 5 }
+
+hh3cPOEACSwitchStateModuleNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The number of the AC swtich state module on this POE power.
+             It is the maximum of hh3cPOEACSwitchStateIndex."
+      ::= { hh3cPOEACSwitchStateModuleObjs 1 }
+
+hh3cPOEACSwitchStateTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOEACSwitchStateEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The table of the AC switch state on this POE power."
+      ::= { hh3cPOEACSwitchStateModuleObjs 2 }
+
+hh3cPOEACSwitchStateEntry OBJECT-TYPE
+      SYNTAX Hh3cPOEACSwitchStateEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The entry of the AC switch state on this POE power."
+      INDEX { hh3cPOEACSwitchStateIndex }
+      ::= { hh3cPOEACSwitchStateTable 1 }
+
+Hh3cPOEACSwitchStateEntry ::=
+      SEQUENCE {
+                hh3cPOEACSwitchStateIndex
+                        Integer32,
+                hh3cPOEACSwitchState
+                        SwitchState
+               }
+
+hh3cPOEACSwitchStateIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The index of the AC switch state on this POE power.
+             The range of this node is from 1 to hh3cPOEACSwitchStateModuleNum."
+      ::= { hh3cPOEACSwitchStateEntry 1 }
+
+hh3cPOEACSwitchState OBJECT-TYPE
+      SYNTAX SwitchState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The AC switch state on this POE power.
+             The value of this node will be one of the following values:
+                                 on             (1),
+                                 off            (2),
+                                 highVoltInput  (3),
+                                 lowVoltInput   (4)"
+      ::= { hh3cPOEACSwitchStateEntry 2 }
+
+hh3cPOEInCurStateObjects OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 6 }
+
+hh3cPOEInCurStateModuleNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The DC input current state of the module on this POE power.
+             It is the maximum of the hh3cPOESwitchStateVolExIndex."
+      ::= { hh3cPOEInCurStateObjects 1 }
+
+hh3cPOEInCurAState OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The current A state in the DC input on this POE power.
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOEInCurStateObjects 2 }
+
+hh3cPOEInCurBState OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The current B state in the DC input on this POE power.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOEInCurStateObjects 3 }
+
+hh3cPOEInCurCState OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The current C state in the DC input on this POE power.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOEInCurStateObjects 4 }
+
+hh3cPOESwitchStateVolExTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOESwitchStateVolExEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "All alarm status of the VOL status.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOEInCurStateObjects 5 }
+
+hh3cPOESwitchStateVolExEntry OBJECT-TYPE
+      SYNTAX Hh3cPOESwitchStateVolExEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The hh3cPOESwitchStateVolExIndex will match the number of the VOL status."
+      INDEX { hh3cPOESwitchStateVolExIndex }
+      ::= { hh3cPOESwitchStateVolExTable 1 }
+
+Hh3cPOESwitchStateVolExEntry ::=
+      SEQUENCE {
+               hh3cPOESwitchStateVolExIndex
+                       Integer32,
+               hh3cPOESwitchStateInVolAB
+                       ACAlarmState,
+               hh3cPOESwitchStateInVolBC
+                       ACAlarmState,
+               hh3cPOESwitchStateInVolCA
+                       ACAlarmState
+               }
+
+hh3cPOESwitchStateVolExIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The object species the index of the VOL status.
+             The range of this node is from 1 to hh3cPOEInCurStateModuleNum."
+      ::= { hh3cPOESwitchStateVolExEntry 1 }
+
+hh3cPOESwitchStateInVolAB OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the VOL AB alarm in each VOL status.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOESwitchStateVolExEntry 2 }
+
+hh3cPOESwitchStateInVolBC OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the VOL BC alarm in each VOL status.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOESwitchStateVolExEntry 3 }
+
+hh3cPOESwitchStateInVolCA OBJECT-TYPE
+      SYNTAX ACAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the VOL CA alarm in each VOL status.
+             The value of this node will be one of the following values:
+                                 normal     (1),
+                                 underLimit (2),
+                                 aboveLimit (3),
+                                 lackPhrase (4),
+                                 fuseBroken (5),
+                                 switchOff  (6),
+                                 otherError (7)."
+      ::= { hh3cPOESwitchStateVolExEntry 4 }
+
+hh3cPOEAlarmStateObjects OBJECT IDENTIFIER ::= { hh3cPOEPowerObjects 7 }
+
+hh3cPOEAlarmStateModuleNum OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The object specifies the number of the power modules in alarm state."
+      ::= { hh3cPOEAlarmStateObjects 1 }
+
+hh3cPOEAlarmStateInfoTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF Hh3cPOEAlarmStateInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "All alarm states in the POE power modules."
+      ::= { hh3cPOEAlarmStateObjects 2 }
+
+hh3cPOEAlarmStateInfoEntry OBJECT-TYPE
+      SYNTAX Hh3cPOEAlarmStateInfoEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "The hh3cPOEAlarmModuleInfoIndex will match the number
+             of the power module."
+INDEX { hh3cPOEAlarmModuleInfoIndex }
+      ::= { hh3cPOEAlarmStateInfoTable 1 }
+
+Hh3cPOEAlarmStateInfoEntry ::=
+      SEQUENCE {
+               hh3cPOEAlarmModuleInfoIndex
+                       Integer32,
+               hh3cPOEModuleDisconnect
+                       ModuleAlarmState,
+               hh3cPOEModuleInputError
+                       ModuleAlarmState,
+               hh3cPOEModuleOutputError
+                       ModuleAlarmState,
+               hh3cPOEModuleOverVoltage
+                       ModuleAlarmState,
+               hh3cPOEModuleOverTemp
+                       ModuleAlarmState,
+               hh3cPOEModuleFanError
+                       ModuleAlarmState,
+               hh3cPOEModuleShutdown
+                       ModuleAlarmState,
+               hh3cPOEModuleCurRestricted
+                       ModuleAlarmState
+               }
+
+hh3cPOEAlarmModuleInfoIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "The index specifies the index of the Hh3cPOEAlarmStateInfoEntry table.
+             The range of this node is from 1 to hh3cPOEAlarmStateModuleNum."
+      ::= { hh3cPOEAlarmStateInfoEntry 1 }
+
+hh3cPOEModuleDisconnect OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+             The module does not link.
+             The value of this node is one of the following values:
+                              normal (1),
+                              alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 2 }
+
+hh3cPOEModuleInputError OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 Input error.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 3 }
+
+hh3cPOEModuleOutputError OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 Output error.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 4 }
+
+hh3cPOEModuleOverVoltage OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 The voltage is too high.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 5 }
+
+hh3cPOEModuleOverTemp OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 The temperature is too high.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 6 }
+
+hh3cPOEModuleFanError OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 The fan error.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 7 }
+
+hh3cPOEModuleShutdown OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 The module is shutdown.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 8 }
+
+hh3cPOEModuleCurRestricted OBJECT-TYPE
+      SYNTAX ModuleAlarmState
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The node specifies the alarm state:
+                                 The module limit the current.
+             The value of this node is one of the following values:
+                                 normal (1),
+                                 alarm  (2)."
+      ::= { hh3cPOEAlarmStateInfoEntry 9 }
+
+Hh3cPDDisableState ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+           "PD disabled State."
+      SYNTAX INTEGER{
+             unknown(0),
+             overInrush(1),
+             lessMPSCurrent(2),
+             peakPower(3),
+             overVoltage(4),
+             underVoltage(5),
+             overTemperature(6),
+             shortCircuit(7)
+                   }
+
+hh3cPseNotification  OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 11 }
+hh3cPseNotificationPrefix OBJECT IDENTIFIER ::= { hh3cPseNotification 0 }
+
+    hh3cPsePDDisableNotification NOTIFICATION-TYPE
+      OBJECTS{ hh3cPsePortGroupIndex, hh3cPsePortIndex, hh3cPsePortDisableInfo }
+      STATUS current
+      DESCRIPTION
+            "The PD has been powered off."
+      ::= { hh3cPseNotificationPrefix 1 }
+
+hh3cPseNotificationObjects OBJECT IDENTIFIER ::= { hh3cPseNotification 1 }
+
+       hh3cPsePortGroupIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group
+            containing the port to which a power Ethernet PSE is
+            connected."
+       ::= { hh3cPseNotificationObjects 1 }
+
+     hh3cPsePortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the power Ethernet PSE
+            port within group pethPsePortGroupIndex to which the
+            power Ethernet PSE entry is connected."
+       ::= { hh3cPseNotificationObjects 2 }
+
+     hh3cPsePortDisableInfo OBJECT-TYPE
+      SYNTAX Hh3cPDDisableState
+          MAX-ACCESS  accessible-for-notify
+          STATUS      current
+          DESCRIPTION
+              "
+              Reason that caused PSE port power failure.
+              The calue of this node is one of the following values:
+              unknown(0),
+              overInrush(1),
+              lessMPSCurrent(2),
+              peakPower(3),
+              overVoltage(4),
+              underVoltage(5),
+              overTemperature(6),
+              shortCircuit(7).
+              "
+          ::= { hh3cPseNotificationObjects 3 }
+
+END
+

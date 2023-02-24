@@ -1,6 +1,3 @@
-source: API/Logs.md
-path: blob/master/doc/
-
 All the `list_*logs` calls are aliased to `list_logs`.
 
 Retrieve all logs or logs for a specific device.
@@ -11,8 +8,8 @@ Input:
 
 - start: The page number to request.
 - limit: The limit of results to be returned.
-- from: The date and time to search from.
-- to: The data and time to search to.
+- from: The date and time or the event id to search from.
+- to: The data and time or the event id to search to.
 
 ### `list_eventlog`
 
@@ -36,6 +33,7 @@ Example:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/syslog/:hostname?limit=20
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?limit=20&start=5&from=2017-07-22%2023:00:00
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?sortorder=DESC
 ```
 
 Output:

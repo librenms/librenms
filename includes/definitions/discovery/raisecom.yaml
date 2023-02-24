@@ -1,5 +1,15 @@
 mib: RAISECOM-COMMON-MANAGEMENT-MIB:RAISECOM-FANMONITOR-MIB:RAISECOM-POWERMONITOR-MIB:RAISECOM-SYSTEM-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: RAISECOM-SYSTEM-MIB::raisecomMemoryTotal
+                free: RAISECOM-SYSTEM-MIB::raisecomMemoryAvailable
+    os:
+        sysDescr_regex: '/^ROAP  Version (?<version>[^,]+)/'
+        hardware: .1.3.6.1.4.1.8886.6.1.1.1.2.0
+        serial: .1.3.6.1.4.1.8886.6.1.1.1.14.0
+        version: .1.3.6.1.4.1.8886.6.1.1.1.1.0
     processors:
         data:
             -

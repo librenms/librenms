@@ -1,66 +1,80 @@
 -- *****************************************************************
--- CISCO-CDP-MIB.my:  CDP MIB file
+-- CISCO-CDP-MIB.mib:  CDP MIB file
 --
 -- Oct 1994, Arun Sastry
 -- November 2001, Edward Pham
---
--- Copyright (c) 1994-1998, 1999, 2001 by cisco Systems, Inc.
+-- July 2004, Arvind Parthasarathy
+-- March 2005, Praveen k Arora
+-- March 2005, Karthikeyan Veerapandian
+-- Copyright (c) 1994-1998, 1999, 2001, 2004, 2005 by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
 --
 CISCO-CDP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE,
-        Integer32
-		FROM SNMPv2-SMI
-	MODULE-COMPLIANCE, OBJECT-GROUP
-		FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
         TruthValue, DisplayString, TimeStamp
-		FROM SNMPv2-TC
-	ciscoMgmt
-		FROM CISCO-SMI
-	CiscoNetworkProtocol, CiscoNetworkAddress, Unsigned32
-                FROM CISCO-TC 
+                FROM SNMPv2-TC
+        ciscoMgmt
+                FROM CISCO-SMI
+        CiscoNetworkProtocol, CiscoNetworkAddress
+                FROM CISCO-TC
+--        VlanIndex
+--              FROM CISCO-VTP-MIB
+-- 19-Nov-08 Changed by RevitalR: to allow vlanid of range 1-4095 as in Pirouette project.
         VlanIndex
-                FROM CISCO-VTP-MIB
+                FROM Q-BRIDGE-MIB
         ifIndex
                 FROM IF-MIB
         ;
 
 ciscoCdpMIB   MODULE-IDENTITY
-	LAST-UPDATED	"200111230000Z"
-	ORGANIZATION	"Cisco System Inc."
-	CONTACT-INFO
-		"	Cisco Systems
-			Customer Service
+        LAST-UPDATED    "200503210000Z"
+		ORGANIZATION "Cisco Systems, Inc."
 
-		Postal: 170 West Tasman Drive,
-			San Jose CA 95134-1706.
-			USA
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
 
-		   Tel: +1 800 553-NETS
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
-		E-mail: cs-snmp@cisco.com"
-	DESCRIPTION
-		"The MIB module for management of the Cisco Discovery
-		Protocol in Cisco devices."
+        DESCRIPTION
+                "The MIB module for management of the Cisco Discovery
+                Protocol in Cisco devices."
+        REVISION        "200503210000Z"
+        DESCRIPTION
+                "Added the following object:
+                 cdpInterfaceName."
+        REVISION        "200503140000Z"
+        DESCRIPTION
+                "Added cdpCtAddressTable which contains the following
+                 objects:
+                 cdpCtAddressIndex,
+                 cdpCtAddressType,
+                 cdpCtAddress."
         REVISION        "200111230000Z"
         DESCRIPTION
                 "Added cdpInterfaceExtTable which contains the following
                  objects:
-                 cdpInterfaceExtendedTrust, 
-                 cdpInterfaceCosForUntrustedPort." 
+                 cdpInterfaceExtendedTrust,
+                 cdpInterfaceCosForUntrustedPort."
         REVISION        "200104230000Z"
         DESCRIPTION
                 "Added the following objects:
-                 cdpGlobalDeviceIdFormatCpb, 
-                 cdpGlobalDeviceIdFormat." 
+                 cdpGlobalDeviceIdFormatCpb,
+                 cdpGlobalDeviceIdFormat."
         REVISION        "200011220000Z"
         DESCRIPTION
-                "Added the following objects: 
+                "Added the following objects:
                  cdpCacheApplianceID,
-                 cdpCacheVlanID, 
+                 cdpCacheVlanID,
                  cdpCachePowerConsumption,
                  cdpCacheMTU,
                  cdpCachePrimaryMgmtAddrType,
@@ -69,7 +83,7 @@ ciscoCdpMIB   MODULE-IDENTITY
                  cdpCacheSecondaryMgmtAddr,
                  cdpCacheLastChange,
                  cdpCachePhysLocation,
-                 cdpCacheSysName, 
+                 cdpCacheSysName,
                  cdpCacheSysObjectID,
                  cdpGlobalLastChange"
         REVISION        "9812100000Z"
@@ -77,26 +91,26 @@ ciscoCdpMIB   MODULE-IDENTITY
                 "Added cdpGlobalDeviceId object."
         REVISION        "9809160000Z"
         DESCRIPTION
-                "added these objects to cdpCacheTable:  
-                cdpCacheVTPMgmtDomain, 
-                cdpCacheNativeVLAN, 
+                "added these objects to cdpCacheTable:
+                cdpCacheVTPMgmtDomain,
+                cdpCacheNativeVLAN,
                 cdpCacheDuplex.
                 "
-	REVISION        "9607080000Z"
-	DESCRIPTION
-		"Obsolete cdpInterfaceMessageInterval and newly
-		define cdpGlobal object."
-	REVISION        "9508150000Z"
-	DESCRIPTION
-		"Specify a correct (non-negative) range for several
-		index objects."
-	REVISION        "9507270000Z"
-	DESCRIPTION
-		"Correct range of cdpInterfaceMessageInterval."
-	REVISION        "9501250000Z"
-	DESCRIPTION
-		"Move from ciscoExperiment to ciscoMgmt oid subtree."
-	::= { ciscoMgmt 23 }
+        REVISION        "9607080000Z"
+        DESCRIPTION
+                "Obsolete cdpInterfaceMessageInterval and newly
+                define cdpGlobal object."
+        REVISION        "9508150000Z"
+        DESCRIPTION
+                "Specify a correct (non-negative) range for several
+                index objects."
+        REVISION        "9507270000Z"
+        DESCRIPTION
+                "Correct range of cdpInterfaceMessageInterval."
+        REVISION        "9501250000Z"
+        DESCRIPTION
+                "Move from ciscoExperiment to ciscoMgmt oid subtree."
+        ::= { ciscoMgmt 23 }
 
 
 ciscoCdpMIBObjects OBJECT IDENTIFIER ::= { ciscoCdpMIB 1 }
@@ -128,11 +142,12 @@ cdpInterfaceEntry OBJECT-TYPE
     ::= { cdpInterfaceTable 1 }
 
 CdpInterfaceEntry ::= SEQUENCE {
-    cdpInterfaceIfIndex           Integer32, 
+    cdpInterfaceIfIndex           Integer32,
     cdpInterfaceEnable            TruthValue,
     cdpInterfaceMessageInterval   INTEGER,
     cdpInterfaceGroup             Integer32,
-    cdpInterfacePort              Integer32
+    cdpInterfacePort              Integer32,
+    cdpInterfaceName              DisplayString
 }
 
 cdpInterfaceIfIndex OBJECT-TYPE
@@ -196,6 +211,15 @@ cdpInterfacePort OBJECT-TYPE
             port which corresponds to this interface."
     ::= { cdpInterfaceEntry 5 }
 
+cdpInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The name of the local interface as advertised by
+             CDP in the Port-ID TLV"
+    ::= { cdpInterfaceEntry 6 }
+
 cdpInterfaceExtTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF CdpInterfaceExtEntry
     MAX-ACCESS not-accessible
@@ -219,13 +243,13 @@ cdpInterfaceExtEntry OBJECT-TYPE
 
 CdpInterfaceExtEntry ::= SEQUENCE {
     cdpInterfaceExtendedTrust        INTEGER,
-    cdpInterfaceCosForUntrustedPort  Unsigned32 
+    cdpInterfaceCosForUntrustedPort  Unsigned32
 }
 
 cdpInterfaceExtendedTrust OBJECT-TYPE
     SYNTAX     INTEGER {
                    trusted(1),
-                   noTrust(2) 
+                   noTrust(2)
                }
     MAX-ACCESS read-write
     STATUS     current
@@ -244,13 +268,13 @@ cdpInterfaceExtendedTrust OBJECT-TYPE
 cdpInterfaceCosForUntrustedPort OBJECT-TYPE
     SYNTAX     Unsigned32 (0..7)
     MAX-ACCESS read-write
-    STATUS     current 
+    STATUS     current
     DESCRIPTION
         "Indicates the value to be sent by COS for Untrusted Ports TLV."
     ::= { cdpInterfaceExtEntry 2 }
 
 --
--- The CDP Address Cache Group
+-- The CDP Cache Group
 --
 
 cdpCacheTable OBJECT-TYPE
@@ -285,9 +309,9 @@ CdpCacheEntry ::= SEQUENCE {
     cdpCacheDeviceId                DisplayString,
     cdpCacheDevicePort              DisplayString,
     cdpCachePlatform                DisplayString,
-    cdpCacheCapabilities            OCTET STRING, 
+    cdpCacheCapabilities            OCTET STRING,
     cdpCacheVTPMgmtDomain           DisplayString,
-    cdpCacheNativeVLAN              VlanIndex, 
+    cdpCacheNativeVLAN              VlanIndex,
     cdpCacheDuplex                  INTEGER,
     cdpCacheApplianceID             Unsigned32,
     cdpCacheVlanID                  Unsigned32,
@@ -340,11 +364,15 @@ cdpCacheAddress OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The (first) network-layer address of the device's
-        SNMP-agent as reported in the Address TLV of the most recently
-        received CDP message.  For example, if the corresponding
-        instance of cacheAddressType had the value 'ip(1)', then
-        this object would be an IP-address."
+          "The (first) network-layer address of the device
+          as reported in the Address TLV of the most recently received
+          CDP message.  For example, if the corresponding instance of
+          cacheAddressType had the value 'ip(1)', then this object
+          would be an IPv4-address.  If the neighbor device is
+          SNMP-manageable, it is supposed to generate its CDP messages
+          such that this address is one at which it will receive SNMP
+          messages. Use cdpCtAddressTable to extract the remaining
+          addresses from the Address TLV received most recently."
     ::= { cdpCacheEntry 4 }
 
 cdpCacheVersion OBJECT-TYPE
@@ -406,30 +434,30 @@ cdpCacheCapabilities OBJECT-TYPE
 
     ::= { cdpCacheEntry 9 }
 
-cdpCacheVTPMgmtDomain   OBJECT-TYPE	
+cdpCacheVTPMgmtDomain   OBJECT-TYPE
     SYNTAX    DisplayString (SIZE (0..32))
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The VTP Management Domain for the remote device's interface, 
+        "The VTP Management Domain for the remote device's interface,
         as reported in the most recently received CDP message.
         This object is not instantiated if no VTP Management Domain field
         (TLV) was reported in the most recently received CDP message."
     REFERENCE "managementDomainName in CISCO-VTP-MIB"
     ::= { cdpCacheEntry 10 }
- 
+
 cdpCacheNativeVLAN OBJECT-TYPE
     SYNTAX    VlanIndex
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The remote device's interface's native VLAN, as reported in the 
+        "The remote device's interface's native VLAN, as reported in the
         most recent CDP message.  The value 0 indicates
         no native VLAN field (TLV) was reported in the most
         recent CDP message."
     ::= { cdpCacheEntry 11 }
 
-cdpCacheDuplex OBJECT-TYPE	
+cdpCacheDuplex OBJECT-TYPE
     SYNTAX    INTEGER {
                   unknown(1),
                   halfduplex(2),
@@ -438,35 +466,35 @@ cdpCacheDuplex OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The remote device's interface's duplex mode, as reported in the 
+        "The remote device's interface's duplex mode, as reported in the
         most recent CDP message.  The value unknown(1) indicates
         no duplex mode field (TLV) was reported in the most
         recent CDP message."
     ::= { cdpCacheEntry 12 }
 
-cdpCacheApplianceID OBJECT-TYPE	
+cdpCacheApplianceID OBJECT-TYPE
     SYNTAX     Unsigned32 (0..255)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The remote device's Appliance ID, as reported in the 
+        "The remote device's Appliance ID, as reported in the
         most recent CDP message. This object is not instantiated if
         no Appliance VLAN-ID field (TLV) was reported in the most
         recently received CDP message."
     ::= { cdpCacheEntry 13 }
 
-cdpCacheVlanID OBJECT-TYPE	
+cdpCacheVlanID OBJECT-TYPE
     SYNTAX     Unsigned32 (0..4095)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The remote device's VoIP VLAN ID, as reported in the 
+        "The remote device's VoIP VLAN ID, as reported in the
         most recent CDP message. This object is not instantiated if
         no Appliance VLAN-ID field (TLV) was reported in the most
         recently received CDP message."
     ::= { cdpCacheEntry 14 }
 
-cdpCachePowerConsumption OBJECT-TYPE	
+cdpCachePowerConsumption OBJECT-TYPE
     SYNTAX     Unsigned32
     UNITS      "milliwatts"
     MAX-ACCESS read-only
@@ -478,7 +506,7 @@ cdpCachePowerConsumption OBJECT-TYPE
         recently received CDP message."
     ::= { cdpCacheEntry 15 }
 
-cdpCacheMTU OBJECT-TYPE	
+cdpCacheMTU OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
     STATUS     current
@@ -489,7 +517,7 @@ cdpCacheMTU OBJECT-TYPE
         (TLV) was reported in the most recently received CDP message."
     ::= { cdpCacheEntry 16 }
 
-cdpCacheSysName OBJECT-TYPE	
+cdpCacheSysName OBJECT-TYPE
     SYNTAX     DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS     current
@@ -500,7 +528,7 @@ cdpCacheSysName OBJECT-TYPE
         reported in the most recently received CDP message."
     ::= { cdpCacheEntry 17 }
 
-cdpCacheSysObjectID OBJECT-TYPE	
+cdpCacheSysObjectID OBJECT-TYPE
     SYNTAX     OBJECT IDENTIFIER
     MAX-ACCESS read-only
     STATUS     current
@@ -519,21 +547,24 @@ cdpCachePrimaryMgmtAddrType OBJECT-TYPE
             corresponding instance of cdpCachePrimaryMgmtAddress."
     ::= { cdpCacheEntry 19 }
 
-cdpCachePrimaryMgmtAddr OBJECT-TYPE	
-    SYNTAX     CiscoNetworkAddress 
+cdpCachePrimaryMgmtAddr OBJECT-TYPE
+    SYNTAX     CiscoNetworkAddress
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "This object indicates the (first) network layer address at
-        which the device will accept SNMP messages as reported in the
-        most recently received CDP message. If the corresponding
-        instance of cdpCachePrimaryMgmtAddrType has the value 'ip(1)',
-        then this object would be an IP-address. If the remote device
-        is not currently manageable via any network protocol, this
-        object has the special value of the IPv4 address 0.0.0.0.
-        If the most recently received CDP message did not contain any
-        primary address at which the device prefers to receive
-        SNMP messages, then this object is not instanstiated."
+            "This object indicates the (first) network layer
+            address at which the device will accept SNMP messages
+            as reported in the first address in the
+            Management-Address TLV of the most recently received
+            CDP message.  If the corresponding instance of
+            cdpCachePrimaryMgmtAddrType has the value 'ip(1)',
+            then this object would be an IP-address. If the
+            remote device is not currently manageable via any
+            network protocol, then it reports the special value
+            of the IPv4 address 0.0.0.0, and that address is
+            recorded in this object.  If the most recently received
+            CDP message did not contain the Management-Address
+            TLV, then this object is not instanstiated."
     ::= { cdpCacheEntry 20 }
 
 cdpCacheSecondaryMgmtAddrType OBJECT-TYPE
@@ -545,22 +576,27 @@ cdpCacheSecondaryMgmtAddrType OBJECT-TYPE
             corresponding instance of cdpCacheSecondaryMgmtAddress."
     ::= { cdpCacheEntry 21 }
 
-cdpCacheSecondaryMgmtAddr OBJECT-TYPE	
-    SYNTAX     CiscoNetworkAddress 
+cdpCacheSecondaryMgmtAddr OBJECT-TYPE
+    SYNTAX     CiscoNetworkAddress
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "This object indicates the alternate network layer address
-        (other than the one indicated by cdpCachePrimaryMgmtAddr) at
-        which the device will accept SNMP messages as reported in the
-        most recently received CDP message. If the corresponding
-        instance of cdpCacheSecondaryMgmtAddrType has the value 'ip(1)',
-        then this object would be an IP-address. If the most recently
-        received CDP message did not contain such an alternate network
-        layer address, then this object is not instanstiated."
+            "This object indicates the alternate network layer
+            address at which the device will accept SNMP messages
+            as reported in the second address in the
+            Management-Address TLV of the most recently received
+            CDP message.  If the corresponding instance of
+            cdpCacheSecondaryMgmtAddrType has the value 'ip(1)',
+            then this object would be an IP-address. If the
+            remote device reports the special value of the
+            IPv4 address 0.0.0.0, that address is recorded in
+            this object.  If the most recently received CDP
+            message did not contain the Management-Address
+            TLV, or if that TLV contained only one address, then
+            this object is not instanstiated."
     ::= { cdpCacheEntry 22 }
 
-cdpCachePhysLocation OBJECT-TYPE	
+cdpCachePhysLocation OBJECT-TYPE
     SYNTAX     DisplayString
     MAX-ACCESS read-only
     STATUS     current
@@ -570,10 +606,10 @@ cdpCachePhysLocation OBJECT-TYPE
         to, the remote device's interface over which the CDP packet is
         sent. This object is not instantiated if no Physical Location
         field (TLV) was reported by the most recently received CDP
-        message." 
+        message."
     ::= { cdpCacheEntry 23 }
 
-cdpCacheLastChange OBJECT-TYPE	
+cdpCacheLastChange OBJECT-TYPE
     SYNTAX     TimeStamp
     MAX-ACCESS read-only
     STATUS     current
@@ -584,6 +620,79 @@ cdpCacheLastChange OBJECT-TYPE
         of any (other) object instance in the corresponding row is
         modified."
     ::= { cdpCacheEntry 24 }
+
+cdpCtAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CdpCtAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing the list of
+            network-layer addresses of a neighbor interface,
+            as reported in the Address TLV of the most recently
+            received CDP message. The first address included in
+            the Address TLV is saved in cdpCacheAddress.  This
+            table contains the remainder of the addresses in the
+            Address TLV."
+    ::= { cdpCache 2 }
+
+cdpCtAddressEntry OBJECT-TYPE
+    SYNTAX     CdpCtAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cdpCtAddressTable,
+            containing the information on one address received via CDP
+            on one interface from one device.  Entries appear
+            when a CDP advertisement is received from a neighbor
+            device, with an Address TLV.  Entries disappear when
+            CDP is disabled on the interface, or globally. An entry
+            or entries would also disappear if the most recently
+            received CDP packet contain fewer address entries in the
+            Address TLV, than are currently present in the CDP cache."
+    INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex,
+                 cdpCtAddressIndex }
+    ::= { cdpCtAddressTable 1 }
+
+CdpCtAddressEntry ::= SEQUENCE {
+    cdpCtAddressIndex       Integer32,
+    cdpCtAddressType        CiscoNetworkProtocol,
+    cdpCtAddress            CiscoNetworkAddress
+}
+
+cdpCtAddressIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of the address entry for a given
+            cdpCacheIfIndex,cdpCacheDeviceIndex pair. It
+            has the value N-1 for the N-th address in the
+            Address TLV"
+    ::= { cdpCtAddressEntry 3 }
+
+cdpCtAddressType OBJECT-TYPE
+    SYNTAX     CiscoNetworkProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "An indication of the type of address contained in the
+            corresponding instance of cdpCtAddress."
+    ::= { cdpCtAddressEntry 4 }
+
+cdpCtAddress OBJECT-TYPE
+    SYNTAX     CiscoNetworkAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The N-th network-layer address of the device as reported
+            in the most recent CDP message's Address TLV, where N-1 is
+            given by the value of cdpCtAddressIndex. For example, if
+            the the corresponding instance of cdpCtAddressType had the
+            value 'ip(1)', then this object would be an IPv4-address.
+            NOTE - The 1st address received in the Address TLV is
+                   available using cdpCacheAddress"
+    ::= { cdpCtAddressEntry 5 }
+
 
 --
 -- The CDP Global Group
@@ -628,7 +737,7 @@ cdpGlobalDeviceId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The device ID advertised by this device. The format of this
-         device id is characterized by the value of 
+         device id is characterized by the value of
          cdpGlobalDeviceIdFormat object."
     ::= { cdpGlobal 4 }
 
@@ -643,11 +752,11 @@ cdpGlobalLastChange  OBJECT-TYPE
     ::= { cdpGlobal 5 }
 
 cdpGlobalDeviceIdFormatCpb  OBJECT-TYPE
-    SYNTAX     BITS { 
-                 serialNumber(0), 
+    SYNTAX     BITS {
+                 serialNumber(0),
                  macAddress(1),
-                 other (2) 
-               } 
+                 other (2)
+               }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -664,11 +773,11 @@ cdpGlobalDeviceIdFormatCpb  OBJECT-TYPE
     ::= { cdpGlobal 6 }
 
 cdpGlobalDeviceIdFormat  OBJECT-TYPE
-    SYNTAX     INTEGER { 
-                 serialNumber(1), 
+    SYNTAX     INTEGER {
+                 serialNumber(1),
                  macAddress(2),
-                 other(3) 
-               } 
+                 other(3)
+               }
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -676,18 +785,18 @@ cdpGlobalDeviceIdFormat  OBJECT-TYPE
         corresponding instance of cdpGlobalDeviceId. User can only
         specify the formats that the device is capable of as
         denoted in cdpGlobalDeviceIdFormatCpb object.
-        
-        serialNumber(1) indicates that the value of cdpGlobalDeviceId 
+
+        serialNumber(1) indicates that the value of cdpGlobalDeviceId
         object is in the form of an ASCII string contain the device
-        serial number. 
-        
-        macAddress(2) indicates that the value of cdpGlobalDeviceId 
+        serial number.
+
+        macAddress(2) indicates that the value of cdpGlobalDeviceId
         object is in the form of Layer 2 MAC address.
 
         other(3) indicates that the value of cdpGlobalDeviceId object
         is in the form of a platform specific ASCII string contain
         info that identifies the device. For example: ASCII string
-        contains serialNumber appended/prepened with system name." 
+        contains serialNumber appended/prepened with system name."
     ::= { cdpGlobal 7 }
 
 -- conformance information
@@ -730,13 +839,42 @@ ciscoCdpMIBComplianceV11R02 MODULE-COMPLIANCE
     ::= { ciscoCdpMIBCompliances 3 }
 
 ciscoCdpMIBComplianceV12R02 MODULE-COMPLIANCE
-    STATUS  current 
+    STATUS  obsolete -- superseded by ciscoCdpMIBCompliance5
     DESCRIPTION
             "The compliance statement for the CDP MIB."
     MODULE  -- this module
         MANDATORY-GROUPS { ciscoCdpMIBGroupV12R02 }
- 
+
     ::= { ciscoCdpMIBCompliances 4 }
+
+ciscoCdpMIBCompliance5 MODULE-COMPLIANCE
+    STATUS  deprecated -- superseded by ciscoCdpMIBComplianceV12R03
+    DESCRIPTION
+            "The compliance statement for the CDP MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { ciscoCdpMIBGroupV12R02 }
+
+    ::= { ciscoCdpMIBCompliances 5 }
+
+ciscoCdpMIBComplianceV12R03 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for the CDP MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { ciscoCdpMIBGroupV12R03,
+                           ciscoCdpCtAddressGroup
+                         }
+
+    GROUP ciscoCdpV2MIBGroup
+    DESCRIPTION
+        "This group is mandatory for agents implementing CDP version 2"
+
+    GROUP ciscoCdpV2IfExtGroup
+    DESCRIPTION
+        "This group is mandatory for agents implementing Extended Trust
+         TLV and COS for Untrusted Port TLV of CDP version 2."
+
+   ::= { ciscoCdpMIBCompliances 6 }
 
 -- units of conformance
 
@@ -789,14 +927,14 @@ ciscoCdpMIBGroupV12R02 OBJECT-GROUP
               cdpGlobalRun, cdpGlobalMessageInterval, cdpGlobalHoldTime,
               cdpGlobalDeviceId
             }
-    STATUS  current
+    STATUS  deprecated -- superseded by ciscoCdpMIBGroupV12R03
     DESCRIPTION
             "A collection of objects for use with the Cisco
             Discovery Protocol."
     ::= { ciscoCdpMIBGroups 5 }
 
 ciscoCdpV2MIBGroup OBJECT-GROUP
-    OBJECTS { 
+    OBJECTS {
               cdpCacheApplianceID, cdpCacheVlanID,
               cdpCachePowerConsumption, cdpCacheMTU,
               cdpCacheSysName, cdpCacheSysObjectID,
@@ -815,7 +953,7 @@ ciscoCdpV2MIBGroup OBJECT-GROUP
     ::= { ciscoCdpMIBGroups 6 }
 
 ciscoCdpV2IfExtGroup OBJECT-GROUP
-    OBJECTS { 
+    OBJECTS {
               cdpInterfaceExtendedTrust,
               cdpInterfaceCosForUntrustedPort
             }
@@ -825,4 +963,34 @@ ciscoCdpV2IfExtGroup OBJECT-GROUP
             Discovery Protocol version 2 to configure the value
             for Extended Trust TLV and COS for Untrusted Port TLV."
     ::= { ciscoCdpMIBGroups 7 }
+
+ciscoCdpCtAddressGroup OBJECT-GROUP
+    OBJECTS {
+              cdpCtAddressType,
+              cdpCtAddress
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects for use with the Cisco
+            Discovery Protocol to obtain the addresses from
+            the Address TLV of a received CDP packet."
+    ::= { ciscoCdpMIBGroups 8 }
+
+ciscoCdpMIBGroupV12R03 OBJECT-GROUP
+    OBJECTS { cdpInterfaceEnable,
+              cdpInterfaceGroup, cdpInterfacePort, cdpInterfaceName,
+              cdpCacheAddressType, cdpCacheAddress, cdpCacheVersion,
+              cdpCacheDeviceId, cdpCacheDevicePort,
+              cdpCacheCapabilities, cdpCachePlatform,
+              cdpCacheVTPMgmtDomain, cdpCacheNativeVLAN, cdpCacheDuplex,
+              cdpGlobalRun, cdpGlobalMessageInterval, cdpGlobalHoldTime,
+              cdpGlobalDeviceId
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects for use with the Cisco
+            Discovery Protocol."
+    ::= { ciscoCdpMIBGroups 9 }
+
 END
+

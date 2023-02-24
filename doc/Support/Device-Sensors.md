@@ -1,6 +1,3 @@
-source: Support/Device-Sensors.md
-path: blob/master/doc/
-
 # Device Sensors
 
 LibreNMS has a standard for device sensors they are split into

@@ -1,5 +1,8 @@
 mib: FCMGMT-MIB
 modules:
+    os:
+        hardware: CPQSINFO-MIB::cpqSiProductName.0
+        serial: CPQSINFO-MIB::cpqSiSysSerialNum.0
     sensors:
         state:
             data:

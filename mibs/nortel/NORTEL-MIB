@@ -1,0 +1,25 @@
+NORTEL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, enterprises
+           FROM SNMPv2-SMI;
+
+nortel MODULE-IDENTITY
+	LAST-UPDATED "200305010000Z"
+	ORGANIZATION "Northern Telecom Ltd."
+   CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+   DESCRIPTION
+	      "The Nortel Networks top-level MIB definition."
+	::= { enterprises 562 }
+
+nortelGenericMIBs OBJECT IDENTIFIER ::= {nortel 29}
+opterametro       OBJECT IDENTIFIER ::= {nortel 68}
+
+END

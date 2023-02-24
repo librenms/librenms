@@ -16,36 +16,36 @@
     </table>
     <input type='hidden' name='component' value='yes'>
     <input type='hidden' name='type' value='component'>
-    <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
+    <input type='hidden' name='device' value='<?php echo $device['device_id']; ?>'>
 </form>
 <script>
     // Waiting for the document to be ready.
     $(document).ready(function() {
 
-        $('form#components').submit(function (event) {
+        $('form#components').on("submit", function (event) {
 
-            $('#disable-toggle').click(function (event) {
+            $('#disable-toggle').on("click", function (event) {
                 // invert selection on all disable buttons
                 event.preventDefault();
                 $('input[name^="dis_"]').trigger('click');
             });
 
-            $('#disable-select').click(function (event) {
+            $('#disable-select').on("click", function (event) {
                 // select all disable buttons
                 event.preventDefault();
                 $('.disable-check').prop('checked', true);
             });
-            $('#ignore-toggle').click(function (event) {
+            $('#ignore-toggle').on("click", function (event) {
                 // invert selection on all ignore buttons
                 event.preventDefault();
                 $('input[name^="ign_"]').trigger('click');
             });
-            $('#ignore-select').click(function (event) {
+            $('#ignore-select').on("click", function (event) {
                 // select all ignore buttons
                 event.preventDefault();
                 $('.ignore-check').prop('checked', true);
             });
-            $('#warning-select').click(function (event) {
+            $('#warning-select').on("click", function (event) {
                 // select ignore button for all components that are in a warning state.
                 event.preventDefault();
                 $('[name^="status_"]').each(function () {
@@ -59,7 +59,7 @@
                     }
                 });
             });
-            $('#critical-select').click(function (event) {
+            $('#critical-select').on("click", function (event) {
                 // select ignore button for all components that are in a critical state.
                 event.preventDefault();
                 $('[name^="status_"]').each(function () {
@@ -73,12 +73,12 @@
                     }
                 });
             });
-            $('#form-reset').click(function (event) {
+            $('#form-reset').on("click", function (event) {
                 // reset objects in the form to the value when the page was loaded
                 event.preventDefault();
                 $('#components')[0].reset();
             });
-            $('#save-form').click(function (event) {
+            $('#save-form').on("click", function (event) {
                 event.preventDefault();
                 $.ajax({
                     type: "POST",

@@ -10,14 +10,13 @@ IMPORTS
     InterfaceIndex                              FROM IF-MIB;
 
 rlTimeSynchronization MODULE-IDENTITY
-      LAST-UPDATED "200408030024Z"
+      LAST-UPDATED "202105170000Z"
       ORGANIZATION "Cisco Systems, Inc."
 
       CONTACT-INFO
       "Postal: 170 West Tasman Drive
       San Jose , CA 95134-1706
       USA
-
       
       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
@@ -442,13 +441,14 @@ rlClockStatus OBJECT-TYPE
         SYNTAX      INTEGER {
                        invalid(1),
                        manuallySet(2),
-                       synchronizedBySntp(3)
+                       synchronizedBySntp(3),
+		       setByRtc(4)
                     }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "Current status of the clock. The value 'invalid' means time is meaninglesss,
-                     since it has neither been manually configured nor achieved as a result
-                     of SNTP synchronization."
+                     since it has not been manually configured, or achieved as a result
+                     of SNTP synchronization or set by RTC."
         ::=  {rlTimeSyncMethodMode 16 }
 
 rlDhcpTimezoneOptionEnabled OBJECT-TYPE
@@ -1340,7 +1340,8 @@ RlSntpBroadcastInetEntry ::=
            rlSntpBroadcastInetStatus        INTEGER,
            rlSntpBroadcastInetOffset        NTPTimeStamp,
            rlSntpBroadcastInetDelay         NTPSignedTimeValue,
-           rlSntpBroadcastInetRowStatus     RowStatus
+           rlSntpBroadcastInetRowStatus     RowStatus,
+           rlSntpBroadcastInetLastReq       NTPTimeStamp
         }
 
 rlSntpBroadcastInetIfIndex OBJECT-TYPE
@@ -1478,6 +1479,13 @@ rlSntpBroadcastInetRowStatus OBJECT-TYPE
                      information."
         ::= { rlSntpBroadcastInetEntry 12 }
 
+rlSntpBroadcastInetLastReq OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Broadcast Last Request Time"
+        ::= { rlSntpBroadcastInetEntry 13 }
+
 -- ----------------------------------------------------------------------
 -- IPv6: Table for configuring Interfaces (Anycast)
 -- ----------------------------------------------------------------------
@@ -1509,7 +1517,8 @@ RlSntpAnycastInetEntry ::=
            rlSntpAnycastInetStatus           INTEGER,
            rlSntpAnycastInetOffset           NTPTimeStamp,
            rlSntpAnycastInetDelay            NTPSignedTimeValue,
-           rlSntpAnycastInetRowStatus        RowStatus
+           rlSntpAnycastInetRowStatus        RowStatus,
+           rlSntpAnycastInetLastReq          NTPTimeStamp
         }
 
 rlSntpAnycastInetIfIndex OBJECT-TYPE
@@ -1598,6 +1607,13 @@ rlSntpAnycastInetRowStatus OBJECT-TYPE
                      information."
         ::= { rlSntpAnycastInetEntry 9 }
 
+rlSntpAnycastInetLastReq OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Anycast Last Request Time"
+        ::= { rlSntpAnycastInetEntry 10 }
+
 -- ----------------------------------------------------------------------
 -- IPv6: Table for configuring Servers (Unicast)
 -- ----------------------------------------------------------------------
@@ -1630,7 +1646,8 @@ RlSntpServerInetEntry ::=
            rlSntpServerInetOffset           NTPTimeStamp,
            rlSntpServerInetDelay            NTPSignedTimeValue,
            rlSntpServerInetKeyIdentifier    Unsigned32,
-           rlSntpServerInetRowStatus        RowStatus
+           rlSntpServerInetRowStatus        RowStatus,
+           rlSntpServerInetLastReq          NTPTimeStamp
         }
 
 rlSntpServerInetAddressType OBJECT-TYPE
@@ -1728,6 +1745,13 @@ rlSntpServerInetRowStatus OBJECT-TYPE
         DESCRIPTION "The Status of this SNTP server information."
         ::= { rlSntpServerInetEntry 10 }
 
+rlSntpServerInetLastReq OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Request Time"
+        ::= { rlSntpServerInetEntry 11 }
+
 
 rlSntpAllServerInetTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF RlSntpAllServerInetEntry
@@ -1765,13 +1789,15 @@ RlSntpAllServerInetEntry ::=
            rlSntpAllServerInetStatus          INTEGER,
            rlSntpAllServerInetOffset          NTPTimeStamp,
            rlSntpAllServerInetDelay           NTPSignedTimeValue,
-           rlSntpAllServerInetKeyIdentifier   Unsigned32
+           rlSntpAllServerInetKeyIdentifier   Unsigned32,
+           rlSntpAllServerInetLastReq         NTPTimeStamp
         }
 
 rlSntpAllServerSource OBJECT-TYPE
         SYNTAX INTEGER {
          static(1),
-         dhcpv6(2)
+         dhcpv6(2),
+		 dhcpv4(3)
         }
         MAX-ACCESS  not-accessible
         STATUS      current
@@ -1885,6 +1911,28 @@ rlSntpAllServerInetKeyIdentifier OBJECT-TYPE
                      Value zero, means no authentication is being done."
         ::= { rlSntpAllServerInetEntry 12 }
 
+rlSntpAllServerInetLastReq OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Request Time"
+        ::= { rlSntpAllServerInetEntry 13 }
 
+rlSntpRestoreDefaultServers OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this scalar to true restores sntp default unicast servers.
+                     Meaning: all manually configured servers are deleted, and the
+                     default SNTP servers are recreated with their default values.
+                     This is an 'action' scalar."
+        ::= { rlSntpConfig 19 }
+
+rlSntpTimeSinceLastSync OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP time in seconds since last sync."        
+        ::= { rlSntpConfig 20 }
 
 END

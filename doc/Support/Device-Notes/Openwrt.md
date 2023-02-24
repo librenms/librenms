@@ -1,6 +1,3 @@
-source: doc/Support/Device-Notes/Openwrt.md
-path: blob/master/doc/
-
 To use Wireless Sensors on Openwrt, an agent of sorts is required. The
 purpose of the agent is to execute on the client (Openwrt) side, to ensure
 that the needed Wireless Sensor information is returned for SNMP queries (from LibreNMS).

@@ -1,37 +1,4 @@
-source: Support/SNMP-Configuration-Examples.md
-path: blob/master/doc/
-
 # SNMP configuration examples
-
-Table of Content:
-
-- [Devices](#devices)
-  - [Cisco](#cisco)
-    - [Adaptive Security Appliance (ASA)](#adaptive-security-appliance-asa)
-    - [IOS / IOS XE](#ios--ios-xe)
-    - [NX-OS](#nx-os)
-    - [Wireless LAN Controller (WLC)](#wireless-lan-controller-wlc)
-  - [HPE 3PAR](#hpe3par)
-  - [Inform OS 3.2.x](#inform-os-32x)
-  - [Infoblox](#infoblox)
-    - [NIOS 7.x+](#nios-7x)
-  - [Juniper](#juniper)
-    - [Junos OS](#junos-os)
-  - [Mikrotik](#mikrotik)
-    - [RouterOS 6.x](#routeros-6x)
-  - [Palo Alto](#palo-alto)
-    - [PANOS 6.x/7.x](#panos-6x7x)
-  - [Ubiquiti](#ubiquiti)
-    - [EdgeOs](#edgeos)
-  - [VMware](#vmware)
-    - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
-    - [VCenter 6.x](#vcenter-6x)
-- [Operating systems](#operating-systems)
-  - [Linux (snmpd v2)](#linux-snmpd)
-  - [Linux (snmpd v3)](#linux-snmpd-v3)
-  - [Windows Server 2008 R2](#windows-server-2008-r2)
-  - [Windows Server 2012 R2 and 2016](#windows-server-2012-r2-and-2016)
-  - [Mac OSX](#Mac-OSX)
 
 ## Devices
 
@@ -83,7 +50,7 @@ snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 1
 snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
 
-# Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
+# Note: The following is also required if using SNMPv3 and you want to populate the FDB table, STP info and others.
 
 snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 ```
@@ -120,11 +87,40 @@ snmp-server location <YOUR-LOCATION>
 #### Network Card-MS
 
 1. Connect to the Web UI of the device
-1. Upgrade to the lastest available manufacturer firmware which applies to your hardware revision. Refer to the releasenotes.   For devices which can use the Lx releases, *do* install LD.
+1. Upgrade to the latest available manufacturer firmware which applies to your hardware revision. Refer to the release notes.   For devices which can use the Lx releases, *do* install LD.
 1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
 1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
 
-### HPE 3PAR
+### HPE / 3PAR
+
+#### Comware
+
+SNMPv2c
+
+```
+snmp-agent community read <YOUR-COMMUNITY>
+snmp-agent sys-info contact <YOUR-CONTACT>
+snmp-agent sys-info location <YOUR-LOCATION>
+snmp-agent sys-info version all
+snmp-agent packet max-size 6000
+```
+
+> `packet max-size` is required for some walks to complete, but the path must support fragmentation.
+
+SNMPv3
+
+```
+snmp-agent mib-view excluded ExcludeAll snmp
+snmp-agent group v3 V3ROGroup privacy read-view ViewDefault write-view ExcludeAll
+snmp-agent usm-user v3 <USER> V3ROGroup simple authentication-mode sha <AuthKey> privacy-mode aes128 <PrivacyKey>
+snmp-agent sys-info contact <YOUR-CONTACT>
+snmp-agent sys-info location <YOUR-LOCATION>
+snmp-agent sys-info version v3
+undo snmp-agent sys-info version v1 v2c
+snmp-agent packet max-size 6000
+```
+
+> `packet max-size` is required for some walks to complete, but the path must support fragmentation.
 
 #### Inform OS 3.2.x
 
@@ -203,8 +199,8 @@ Notes:
 
 CLI SNMP v3 Configuration for *authPriv*
 ```
-/snmp community 
-add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>" 
+/snmp community
+add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>"
 set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
 set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
 set "<COMMUNITY>" read-access=yes write-access=no security=private
@@ -314,7 +310,7 @@ esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
 ```
 
->Note: In case of snmp timouts, disable the firewall with `esxcli
+>Note: In case of snmp timeouts, disable the firewall with `esxcli
 >network firewall set --enabled false` If snmp timeouts still occur
 >with firewall disabled, migrate VMs if needed and reboot ESXi host.
 
@@ -367,12 +363,11 @@ syslocation Rack, Room, Building, City, Country [GPSX,Y]
 syscontact Your Name <your@email.address>
 
 #Distro Detection
-extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
-
+extend distro /usr/bin/distro
 #Hardware Detection (uncomment to enable)
-#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
-#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
-#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+#extend hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
 ```
 
 **NOTE**: On some systems the snmpd is running as its own user, which
@@ -380,6 +375,13 @@ means it can't read `/sys/devices/virtual/dmi/id/product_serial` which
 is mode 0400. One solution is to include `@reboot chmod 444
 /sys/devices/virtual/dmi/id/product_serial` in the crontab for root or
 equivalent.
+
+Non-x86 or SMBIOS-based systems, such as ARM-based Raspberry Pi units should
+query device tree locations for this metadata, for example:
+```
+extend hardware '/bin/cat /sys/firmware/devicetree/base/model'
+extend serial '/bin/cat /sys/firmware/devicetree/base/serial-number'
+```
 
 The LibreNMS server include a copy of this example here:
 
@@ -403,14 +405,14 @@ line to create SNMPV3 User (replace username and passwords with your
 own):
 
 ```
-createUser authPrivUser MD5 "authPassword" DES "privPassword"
+createUser authPrivUser SHA "authPassword" AES "privPassword"
 ```
 
 Make sure the agent listens to all interfaces by adding the following
 line inside snmpd.conf:
 
 ```
-agentAddress udp:161,udp6:[::1]:161
+agentAddress udp:161,udp6:161
 ```
 
 This line simply means listen to connections across all interfaces
@@ -473,9 +475,10 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
-### Windows Server 2012 R2 and 2016
+### Windows Server 2012 R2 and newer
 
-1. Log in to your Windows Server 2012 R2
+#### GUI
+1. Log in to your Windows Server 2012 R2 or newer
 1. Start "Server Manager" under "Administrative Tools"
 1. Click "Manage" and then "Add Roles and Features"
 1. Continue by pressing "Next" to the "Features" menu
@@ -487,6 +490,17 @@ service snmpd restart
 1. In "Accept SNMP packets from these hosts" click "Add" and add your
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
+
+#### PowerShell
+The following example will install SNMP, set the Librenms IP and set a read only community string.  
+Replace `$IP` and `$communitystring` with your values.
+
+```Powershell
+Install-WindowsFeature -Name 'SNMP-Service','RSAT-SNMP'
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\PermittedManagers"  -Name 2 -Value $IP
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\services\SNMP\Parameters\ValidCommunities"  -Name $communitystring -Value 4
+
+```
 
 >Note: SNMPv3 can be supported on Windows platforms with the use of Net-SNMP.
 

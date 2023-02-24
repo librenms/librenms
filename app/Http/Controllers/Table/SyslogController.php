@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
-use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
 {
@@ -39,6 +39,7 @@ class SyslogController extends TableController
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+            'level' => 'nullable|string',
         ];
     }
 
@@ -64,25 +65,35 @@ class SyslogController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
     {
-        /** @var Builder $query */
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query) use ($request) {
-                $query->inDeviceGroup($request->device_group);
+            ->when($request->device_group, function ($query, $group) {
+                $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query) use ($request) {
-                $query->where('timestamp', '>=', $request->from);
+            ->when($request->from, function ($query, $from) {
+                $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query) use ($request) {
-                $query->where('timestamp', '<=', $request->to);
+            ->when($request->to, function ($query, $to) {
+                $query->where('timestamp', '<=', $to);
+            })
+            ->when($request->level, function ($query, $level) {
+                if ($level >= 7) {
+                    return;  // include everything
+                }
+
+                $levels = array_slice(SyslogSeverity::LEVELS, 0, $level + 1);
+                $query->whereIn('level', $levels);
             });
     }
 
+    /**
+     * @param  Syslog  $syslog
+     */
     public function formatItem($syslog)
     {
         $device = $syslog->device;
@@ -103,34 +114,38 @@ class SyslogController extends TableController
         $output = "<span class='alert-status ";
         $output .= $this->priorityLabel($syslog->priority);
         $output .= "'>";
-        $output .= "</span>";
+        $output .= '</span>';
 
         return $output;
     }
 
     /**
-     * @param int $syslog_priority
-     * @return string $syslog_priority_icon
+     * @param  int  $syslog_priority
+     * @return string
      */
     private function priorityLabel($syslog_priority)
     {
         switch ($syslog_priority) {
-            case "debug":
-                return "label-default"; //Debug
-            case "info":
-                return "label-info"; //Informational
-            case "notice":
-                return "label-primary"; //Notice
-            case "warning":
-                return "label-warning"; //Warning
-            case "err":
-                return "label-danger"; //Error
-            case "crit":
-                return "label-danger"; //Critical
-            case "alert":
-                return "label-danger"; //Alert
-            case "emerg":
-                return "label-danger"; //Emergency
+            case 'debug':
+                return 'label-default'; //Debug
+            case 'info':
+                return 'label-info'; //Informational
+            case 'notice':
+                return 'label-primary'; //Notice
+            case 'warning':
+                return 'label-warning'; //Warning
+            case 'err':
+                return 'label-danger'; //Error
+            case 'crit':
+                return 'label-danger'; //Critical
+            case 'alert':
+                return 'label-danger'; //Alert
+            case 'emerg':
+                return 'label-danger'; //Emergency
+            default:
+                return '';
         }
-    } // end syslog_priority
+    }
+
+    // end syslog_priority
 }

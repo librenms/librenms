@@ -1,11 +1,11 @@
 <?php
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $response = array(
+if (! Auth::user()->hasGlobalAdmin()) {
+    $response = [
         'status'  => 'error',
         'message' => 'Need to be admin',
-    );
-    echo _json_encode($response);
+    ];
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 $customoid_id = $_POST['customoid_id'];
@@ -20,10 +20,10 @@ if (is_numeric($customoid_id) && $customoid_id > 0) {
     }
     if ($oid['customoid_passed'] == 1) {
         $cpassed = true;
-        $passed  = 'on';
+        $passed = 'on';
     } else {
         $cpassed = false;
-        $passed  = '';
+        $passed = '';
     }
 
     header('Content-type: application/json');

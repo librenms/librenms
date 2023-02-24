@@ -1,6 +1,3 @@
-source: API/Services.md
-path: blob/master/doc/
-
 ### `list_services`
 
 Retrieve all services

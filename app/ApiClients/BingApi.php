@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +26,7 @@
 namespace App\ApiClients;
 
 use Exception;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
@@ -33,16 +34,13 @@ class BingApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'http://dev.virtualearth.net';
-    protected $geocoding_uri = '/REST/v1/Locations';
+    protected string $base_uri = 'http://dev.virtualearth.net';
+    protected string $geocoding_uri = '/REST/v1/Locations';
 
     /**
      * Get latitude and longitude from geocode response
-     *
-     * @param array $data
-     * @return array
      */
-    protected function parseLatLng($data)
+    protected function parseLatLng(array $data): array
     {
         return [
             'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : 0,
@@ -53,34 +51,28 @@ class BingApi extends BaseApi implements Geocoder
     /**
      * Build Guzzle request option array
      *
-     * @param string $address
-     * @return array
      * @throws \Exception you may throw an Exception if validation fails
      */
-    protected function buildGeocodingOptions($address)
+    protected function buildGeocodingOptions(string $address): array
     {
         $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
-            throw new Exception("Bing API key missing, set geoloc.api_key");
+        if (! $api_key) {
+            throw new Exception('Bing API key missing, set geoloc.api_key');
         }
 
         return [
             'query' => [
                 'key' => $api_key,
                 'addressLine' => $address,
-            ]
+            ],
         ];
     }
 
     /**
      * Checks if the request was a success
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param array $data decoded response data
-     * @return bool
      */
-    protected function checkResponse($response, $data)
+    protected function checkResponse(Response $response, array $data): bool
     {
-        return $response->getStatusCode() == 200 && !empty($data['resourceSets'][0]['resources']);
+        return $response->successful() && ! empty($data['resourceSets'][0]['resources']);
     }
 }

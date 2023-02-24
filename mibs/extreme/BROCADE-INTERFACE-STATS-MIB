@@ -1,0 +1,304 @@
+-- MIB File: BROCADE-INTERFACE-STATS-MIB.mib
+-- *********************************************************************
+-- BROCADE-INTERFACE-STATS-MIB.mib: Extreme Interface Stats MIB
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+BROCADE-INTERFACE-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Integer32, Unsigned32, Gauge32, Counter64
+        FROM SNMPv2-SMI
+    DateAndTime
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    ifIndex
+        FROM IF-MIB
+    bcsiModules
+        FROM Brocade-REG-MIB;
+    
+brocadeInterfaceStatsMIB  MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+      "This MIB module supports additional interface stats as compared to ifTable and ifXTable.
+       Specifically, it supports interface utilization statistics and 
+	   interface watermark statistics."
+    REVISION	    "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201609300000Z"    -- 30 September 2016
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 11 }
+
+bcsiIfStatsNotifications  OBJECT IDENTIFIER
+    ::=  { brocadeInterfaceStatsMIB 0 }
+bcsiIfStatsObjects OBJECT IDENTIFIER
+    ::=  { brocadeInterfaceStatsMIB 1 }
+bcsiIfStatsConformance OBJECT IDENTIFIER
+    ::=  { brocadeInterfaceStatsMIB 2 }
+    
+    
+bcsiIfStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BcsiIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " This table consists of ingress and egress interface 
+        statistics value, ingress and egress interface utilization value. "
+    ::= { bcsiIfStatsObjects 1 }
+
+bcsiIfStatsEntry OBJECT-TYPE
+    SYNTAX  BcsiIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry in the bcsiIfStats table indicates the
+         stats and utilization on an interface."
+    INDEX   { ifIndex }
+    ::= { bcsiIfStatsTable 1 }
+
+BcsiIfStatsEntry ::= SEQUENCE {
+    bcsiIfStatsInBitsPerSec
+        CounterBasedGauge64,
+    bcsiIfStatsOutBitsPerSec
+        CounterBasedGauge64,
+    bcsiIfStatsInPktsPerSec
+        Gauge32,
+    bcsiIfStatsOutPktsPerSec
+        Gauge32,
+    bcsiIfStatsInUtilization
+        Unsigned32 ,
+    bcsiIfStatsOutUtilization
+        Unsigned32 ,
+    bcsiIfStatsInJumboFrames
+        Counter64
+    }
+
+bcsiIfStatsInBitsPerSec OBJECT-TYPE
+    SYNTAX  CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits per second received on the interface."
+    ::= { bcsiIfStatsEntry 1 }
+
+bcsiIfStatsOutBitsPerSec OBJECT-TYPE
+    SYNTAX  CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bits per second transmitted out of the interface."
+    ::= { bcsiIfStatsEntry 2 }
+
+bcsiIfStatsInPktsPerSec OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets per second received on the interface."
+    ::= { bcsiIfStatsEntry 3 }
+
+bcsiIfStatsOutPktsPerSec OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets per second transmitted out of the interface."
+    ::= { bcsiIfStatsEntry 4 }
+
+bcsiIfStatsInUtilization OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The input network utilization in hundredths of a percent.
+        For example, a value of 200 indicates 2 percent utilization."
+    ::= { bcsiIfStatsEntry 5 }
+
+bcsiIfStatsOutUtilization OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The output network utilization in hundredths of a percent.
+        For example, a value of 200 indicates 2 percent utilization."
+    ::= { bcsiIfStatsEntry 6 }
+
+bcsiIfStatsInJumboFrames OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total number of jumbo packets received on the interface."
+    ::= { bcsiIfStatsEntry 7 }
+    
+-- Extreme interface stats watermark table
+
+bcsiIfWatermarkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BcsiIfWatermarkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "Table to display the highest/lowest Tx/Rx BitRate and PktRate 
+            of a port for the current and previous 1 hour/24 hour window."
+    ::= { bcsiIfStatsObjects 2 }
+
+bcsiIfWatermarkEntry OBJECT-TYPE
+    SYNTAX      BcsiIfWatermarkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the bcsiIfWatermarkTable containing the 
+             highest/lowest Tx/Rx BitRate and PktRate of a port 
+             for the current and previous 1 hour/24 hour window."
+    INDEX   { ifIndex, bcsiIfWatermarkWindowType, bcsiIfWatermarkTrafficDirection, bcsiIfWatermarkType }
+    ::= { bcsiIfWatermarkTable 1 }
+
+BcsiIfWatermarkEntry ::= SEQUENCE {
+    bcsiIfWatermarkWindowType         INTEGER,
+    bcsiIfWatermarkTrafficDirection INTEGER,
+    bcsiIfWatermarkType             INTEGER,
+    bcsiIfWatermarkBitRate             CounterBasedGauge64,
+    bcsiIfWatermarkPktRate             Gauge32,
+    bcsiIfWatermarkUpdateTime         DateAndTime,
+    bcsiIfWatermarkWindowStartTime     DateAndTime
+    }
+
+bcsiIfWatermarkWindowType OBJECT-TYPE
+    SYNTAX   INTEGER {
+             bcsiIfWatermarkCurrent1Hr(1),
+             bcsiIfWatermarkLast1Hr(2),
+             bcsiIfWatermarkCurrent24Hr(3),
+             bcsiIfWatermarkLast24Hr(4)
+             }
+    MAX-ACCESS not-accessible
+    STATUS    current
+    DESCRIPTION
+        "Interface Watermark window during which the mornitoring is done."
+    ::= { bcsiIfWatermarkEntry 1 }
+
+bcsiIfWatermarkTrafficDirection OBJECT-TYPE
+    SYNTAX   INTEGER {
+             bcsiIfWatermarkTrafficDirIn(1),     -- Traffic direction Ingress
+             bcsiIfWatermarkTrafficDirOut(2)     -- Traffic direction Egress
+             }
+    MAX-ACCESS not-accessible
+    STATUS    current
+    DESCRIPTION
+        "Traffic direction of the mornitored data for Interface Watermarking."
+    ::= { bcsiIfWatermarkEntry 2 }
+
+bcsiIfWatermarkType OBJECT-TYPE
+    SYNTAX   INTEGER {
+             bcsiIfWatermarkTypeLow(1),     -- Low utilization watermark
+             bcsiIfWatermarkTypeHigh(2)     -- High utilization watermark
+             }
+    MAX-ACCESS not-accessible
+    STATUS    current
+    DESCRIPTION
+        "Interface Watermark type."
+    ::= { bcsiIfWatermarkEntry 3 }
+
+bcsiIfWatermarkBitRate OBJECT-TYPE
+    SYNTAX   CounterBasedGauge64
+    UNITS    "BitsPerSec"
+    MAX-ACCESS read-only
+    STATUS    current
+    DESCRIPTION
+        "Bit rate when the Lowest/Highest bit rate was recorded on the interface, 
+        inside the specified window for the specified traffic direction."
+    ::= { bcsiIfWatermarkEntry 4 }
+
+bcsiIfWatermarkPktRate OBJECT-TYPE
+    SYNTAX   Gauge32
+    UNITS    "PktsPerSec"
+    MAX-ACCESS read-only
+    STATUS    current
+    DESCRIPTION
+        "Packet rate when the Lowest/Highest packet rate was recorded on the interface,
+        inside the specified window for the specified traffic direction."
+    ::= { bcsiIfWatermarkEntry 5 }
+
+bcsiIfWatermarkUpdateTime OBJECT-TYPE
+    SYNTAX   DateAndTime
+    MAX-ACCESS read-only
+    STATUS    current
+    DESCRIPTION
+        "Time at which the port Bit/Pkt rate hit its lowest/highest mark,
+        inside the specified window for the specified traffic direction."
+    ::= { bcsiIfWatermarkEntry 6 }
+
+bcsiIfWatermarkWindowStartTime OBJECT-TYPE
+    SYNTAX   DateAndTime
+    MAX-ACCESS read-only
+    STATUS    current
+    DESCRIPTION
+        "Time at which the specified window (Curr1Hr/Last1Hr/Curr24Hr/Last24Hr) started."
+    ::= { bcsiIfWatermarkEntry 7 }
+
+--
+-- Conformance
+--
+
+bcsiIfStatsCompliances OBJECT IDENTIFIER
+                             ::= { bcsiIfStatsConformance 1 }
+bcsiIfStatsGroups       OBJECT IDENTIFIER
+                             ::= { bcsiIfStatsConformance 2 }
+
+bcsiIfStatsCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-INTERFACE-STATS-MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS { bcsiIfStatsGroup, 
+                           bcsiIfWatermarkGroup 
+                         }
+    ::= { bcsiIfStatsCompliances 1 }
+
+--
+-- Units of Conformance
+--
+
+bcsiIfStatsGroup  OBJECT-GROUP
+    OBJECTS {
+    bcsiIfStatsInBitsPerSec,
+    bcsiIfStatsOutBitsPerSec,
+    bcsiIfStatsInPktsPerSec,
+    bcsiIfStatsOutPktsPerSec,
+    bcsiIfStatsInUtilization,
+    bcsiIfStatsOutUtilization,
+    bcsiIfStatsInJumboFrames
+    }
+    STATUS         current
+    DESCRIPTION
+        "A collection of objects for ingress and egress interface stats and interface utilization."
+    ::= { bcsiIfStatsGroups 1 }
+
+bcsiIfWatermarkGroup  OBJECT-GROUP
+    OBJECTS {
+    bcsiIfWatermarkBitRate,
+    bcsiIfWatermarkPktRate,
+    bcsiIfWatermarkUpdateTime,
+    bcsiIfWatermarkWindowStartTime
+    }
+    STATUS         current
+    DESCRIPTION
+        "A collection of objects for interface traffic water marking."
+    ::= { bcsiIfStatsGroups 2 }
+
+END
+
+

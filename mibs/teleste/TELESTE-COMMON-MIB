@@ -65,7 +65,7 @@
 -- 1.2  05.11.2001  Rainer Salminen
 -- - added repairIndex and changed indexing of repairLogTable.
 -- 
--- 1.1  2.11.2001  Pasi PÃ¶ri
+-- 1.1  2.11.2001  Pasi Pöri
 -- - trapEnryId added to elementTrapReceiverTable as index 
 --   in order to enable multiple null IP addresses (0.0.0.0). 
 --   Thus no table row manipulation is needed.

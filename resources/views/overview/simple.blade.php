@@ -20,7 +20,7 @@
         <div class="front-box device-down">
             {!! \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) !!}
             <br />
-            <span class=list-device-down>@lang('Device Down')</span>
+            <span class=list-device-down>{{ __('Device Down') }}</span>
             <br />
             <span class=body-date-1>{{ \LibreNMS\Util\StringHelpers::shortenText($device->location, 20) }}</span>
         </div>
@@ -30,7 +30,7 @@
         <div class="front-box alert alert-danger">
             {!! \LibreNMS\Util\Url::deviceLink($port->device, $port->device->shortDisplayName()) !!}
             <br />
-            <span class="interface-updown">@lang('Port Down')</span>
+            <span class="interface-updown">{{ __('Port Down') }}</span>
             <br />
             {!! \LibreNMS\Util\Url::PortLink($port) !!}
             @if($port->ifAlias)
@@ -43,7 +43,7 @@
     @foreach ($services_down as $service)
         <div class="front-box service-down">
             {!! \LibreNMS\Util\Url::deviceLink($service->device, $service->device->shortDisplayName()) !!}
-            <span class=service-down>@lang('Service Down')</span>
+            <span class=service-down>{{ __('Service Down') }}</span>
             {{ $service->service_type }}
         </div>
     @endforeach
@@ -51,7 +51,7 @@
     @foreach ($bgp_down as $bgp)
         <div class="front-box bgp-down">
             {!! \LibreNMS\Util\Url::deviceLink($bgp->device, $bgp->device->shortDisplayName()) !!}
-            <span class="bgp-down">@lang('BGP Down')</span>
+            <span class="bgp-down">{{ __('BGP Down') }}</span>
             <span class="{{ (strstr($bgp->bgpPeerIdentifier, ':') ? 'front-page-bgp-small' : 'front-page-bgp-normal') }}">
                 {{ $bgp->bgpPeerIdentifier }}
             </span>
@@ -63,7 +63,7 @@
     @foreach ($devices_uptime as $device)
         <div class="front-box device-rebooted">
             {!! \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) !!}
-            <span class="device-rebooted">@lang('Device Rebooted')</span>
+            <span class="device-rebooted">{{ __('Device Rebooted') }}</span>
             <br />
             <span class="body-date-1">{{ $device->formatDownUptime(true) }}</span>
         </div>

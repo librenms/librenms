@@ -12,24 +12,25 @@ poller_modules:
     cisco-mac-accounting: true
     cisco-voice: true
     cisco-remote-access-monitor: true
-    cisco-sla: true
+    slas: true
     cisco-ipsec-flow-monitor: true
     cipsec-tunnels: true
     cisco-otv: true
 discovery_modules:
     cisco-cef: true
-    cisco-sla: true
+    slas: true
     cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.9.1.1348
+            - .1.3.6.1.4.1.9.12.3.1.3.1062
     -
         sysDescr:
             - 'Software:UCOS'
+            - 'Cisco NX-OS(tm) ucs'

@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
    AI-AP-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -32,16 +32,17 @@
                         FROM ARUBA-MIB;
 
    aiMIB MODULE-IDENTITY 
-       LAST-UPDATED "0804160206Z"
-       ORGANIZATION "Aruba Wireless Networks"
+       LAST-UPDATED "202008141745Z"
+       ORGANIZATION "Aruba, a Hewlett Packard Enterprise company"
        CONTACT-INFO
-            "Postal:    1322 Crossman Avenue
-                        Sunnyvale, CA 94089     
-            E-mail:     dl-support@arubanetworks.com
-            Phone:      +1 408 227 4500"
+            "Postal:    3333 Scott Blvd,
+                        Santa Clara, CA 95054
+            E-mail:     aruba-ext-eng-reg@hpe.com
+            Phone:      408 227 4500
+            Fax:        408 752 0626"
        DESCRIPTION
            "This MIB is for managing Aruba Instant WLAN"
-       REVISION        "0804160206Z"
+       REVISION        "202008141745Z"
        DESCRIPTION
            "The initial revision."
        ::= { aiEnterpriseMibModules 1 }
@@ -93,7 +94,17 @@ ArubaHTMode ::= TEXTUAL-CONVENTION
 	SYNTAX       INTEGER {
 		 				none(1),
 						ht20(2),
-						ht40(3)
+						ht40(3),
+                        vht20(4),
+                        vht40(5),
+                        vht80(6),
+                        vht160(7),
+                        vht80plus80(8),
+                        he20(9),
+                        he40(10),
+                        he80(11),
+                        he160(12),
+                        he80plus80(13)
 					  }
         
 ArubaHTExtChannel ::= TEXTUAL-CONVENTION
@@ -1202,7 +1213,7 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
       ::= { aiAccessPointEntry 1 }
 
    aiAPName OBJECT-TYPE
-       SYNTAX      DisplayString (SIZE(0..64))
+       SYNTAX      DisplayString (SIZE(0..255))
        MAX-ACCESS  read-only
        STATUS      current
        DESCRIPTION
@@ -1291,7 +1302,9 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
                         rsdb5g(2),
                         rsdb2g(3),
                         dual5gon(4),
-                        dual5goff(5)
+                        dual5goff(5),
+                        split5goff(6),
+                        split5gon(7)
 
                     }
         MAX-ACCESS  read-only
@@ -1694,7 +1707,9 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
         aiClientRxDataBytes     Counter32,
         aiClientRxRetries       Counter32,
         aiClientRxRate          Integer32,
-        aiClientUptime          TimeTicks
+        aiClientUptime          TimeTicks,
+        aiClientPhyType         ArubaPhyType,
+        aiClientHtMode          ArubaHTMode
    }
 
    aiClientMACAddress OBJECT-TYPE
@@ -1827,6 +1842,21 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
             0 and uptime gets reset to 0."
        ::= { aiClientEntry 16 }
 
+    aiClientPhyType OBJECT-TYPE
+       SYNTAX      ArubaPhyType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The wireless PHY type to which the client is associated, or 'wired'"
+       ::= { aiClientEntry 17 }
+
+    aiClientHtMode OBJECT-TYPE
+       SYNTAX      ArubaHTMode
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The HT mode of this Client"
+       ::= { aiClientEntry 18 }
 
 --- Begining of voice client location entry       
 
@@ -2193,7 +2223,7 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
 	::= {aiTrapObjectsGroup 16 }
 
 	wlsxTrapAPLocation OBJECT-TYPE
-		SYNTAX		DisplayString(SIZE(0..64))
+		SYNTAX		DisplayString(SIZE(0..255))
 		MAX-ACCESS	accessible-for-notify
 		STATUS		current
 		DESCRIPTION
@@ -2982,7 +3012,7 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
 	::= {aiTrapObjectsGroup 93 }
 
 	wlsxTrapAPName OBJECT-TYPE
-		SYNTAX		DisplayString(SIZE(0..64))
+		SYNTAX		DisplayString(SIZE(0..255))
 		MAX-ACCESS	accessible-for-notify
 		STATUS		current
 		DESCRIPTION
@@ -3235,6 +3265,36 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
             type of Blacklist reason.
                                 "
     ::= {aiTrapObjectsGroup 144 }
+
+	wlsxTrapAPUSBStatus OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..32))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                    "                       
+            This object represents plug in or plug out status of an USB device.
+                                "
+    ::= {aiTrapObjectsGroup 147 }
+
+	wlsxTrapUSBVendorProductID OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..32))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                    "                       
+            This object represents vendor ID or product ID of an USB device.
+                                "
+    ::= {aiTrapObjectsGroup 148 }
+
+     wlsxTrapAuthFailureReason OBJECT-TYPE
+         SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                 "           
+                 This object represents the reason for the authentication failure.
+                         "
+    ::= {aiTrapObjectsGroup 155 }
 
 -- Definition of traps
 
@@ -5125,5 +5185,36 @@ ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
             This trap indicates that clearpass server is not valid when using the CA to verity the server for download-role.
         	"
 	::= {aiTrapDefinitionsGroup 1274 }
+
+	wlsxAPUSBPLUGALARM NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPName,wlsxTrapUSBVendorProductID,wlsxTrapUSBVendorProductID,wlsxTrapAPUSBStatus}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that an USB device is plugged in or out to an AP.
+        	"
+	::= {aiTrapDefinitionsGroup 1277 }
+
+    wlsxClientRejectedByMaxClientCount NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapUserPhyAddress,wlsxTrapAPBSSID,
+                wlsxTrapAPMacAddress,wlsxTrapAPName,
+                wlsxTrapEssid}
+        STATUS      current
+        DESCRIPTION
+            "           
+            This trap indicates the client is rejected by the max client count.
+            "
+    ::= {aiTrapDefinitionsGroup 1284 }
+  
+    wlsxClientPskAuthenticationFailed NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapUserPhyAddress,wlsxTrapAuthFailureReason,
+                wlsxTrapAPBSSID,wlsxTrapAPMacAddress,wlsxTrapAPName,
+                wlsxTrapEssid}
+        STATUS      current
+        DESCRIPTION
+            "           
+            This trap indicates the client PSK Authentication Failed.
+            "
+    ::= {aiTrapDefinitionsGroup 1285 }
 
 END

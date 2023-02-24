@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -35,7 +35,7 @@ class LayoutComposer
     /**
      * Bind data to the view.
      *
-     * @param  View $view
+     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
@@ -53,7 +53,7 @@ class LayoutComposer
         Checks::postAuth();
 
         $show_menu = auth()->check();
-        if ($show_menu && Config::get('twofactor') && !session('twofactor')) {
+        if ($show_menu && Config::get('twofactor') && ! session('twofactor')) {
             $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
         }
 

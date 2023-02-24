@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -17,17 +17,19 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$length = '10';
+$length = 10;
+$percentile = $percentile ?? false;
+$print_total = $print_total ?? false;
 
-if (!isset($percentile)) {
-    $length += '2';
+if (! isset($percentile)) {
+    $length += 2;
 }
 
-if (!isset($out_text)) {
+if (! isset($out_text)) {
     $out_text = 'Out';
 }
 
-if (!isset($in_text)) {
+if (! isset($in_text)) {
     $in_text = 'In';
 }
 
@@ -54,12 +56,12 @@ if ($percentile) {
     $rrd_options .= ' VDEF:dpercentile_out=dout,' . $percentile . ',PERCENT';
 }
 
-if ($graph_max) {
+if (! empty($graph_max)) {
     $rrd_options .= ' AREA:in_max#' . $colour_area_in_max . $stacked['transparency'] . ':';
     $rrd_options .= ' AREA:dout_max#' . $colour_area_out_max . $stacked['transparency'] . ':';
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' DEF:' . $out . 'X=' . $rrd_filename . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $in . 'X=' . $rrd_filename . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $out . '_maxX=' . $rrd_filename . ':' . $ds_out . ':MAX:start=' . $prev_from . ':end=' . $from;
@@ -99,31 +101,31 @@ if ($percentile) {
 
 $rrd_options .= "\\n'";
 $rrd_options .= ' LINE1.25:in#' . $colour_line_in . ":'" . $in_text . "'";
-$rrd_options .= ' GPRINT:in:LAST:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:in:AVERAGE:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:in_max:MAX:%6.'.$float_precision.'lf%s';
+$rrd_options .= ' GPRINT:in:LAST:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:in:AVERAGE:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:in_max:MAX:%6.' . $float_precision . 'lf%s';
 
 if ($percentile) {
-    $rrd_options .= ' GPRINT:percentile_in:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s';
 }
 
-$rrd_options .= " COMMENT:\\n";
+$rrd_options .= ' COMMENT:\\n';
 $rrd_options .= ' AREA:dout#' . $colour_area_out . $stacked['transparency'] . ':';
 $rrd_options .= ' LINE1.25:dout#' . $colour_line_out . ":'" . $out_text . "'";
-$rrd_options .= ' GPRINT:out:LAST:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:out:AVERAGE:%6.'.$float_precision.'lf%s';
-$rrd_options .= ' GPRINT:out_max:MAX:%6.'.$float_precision.'lf%s';
+$rrd_options .= ' GPRINT:out:LAST:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:out:AVERAGE:%6.' . $float_precision . 'lf%s';
+$rrd_options .= ' GPRINT:out_max:MAX:%6.' . $float_precision . 'lf%s';
 
 if ($percentile) {
-    $rrd_options .= ' GPRINT:percentile_out:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s';
 }
 
-$rrd_options .= " COMMENT:\\n";
+$rrd_options .= ' COMMENT:\\n';
 
 if ($print_total) {
-    $rrd_options .= " GPRINT:tot:'Total %6.".$float_precision."lf%s'";
-    $rrd_options .= " GPRINT:totin:'(In %6.".$float_precision."lf%s'";
-    $rrd_options .= " GPRINT:totout:'Out %6.".$float_precision."lf%s)\l'";
+    $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%s'";
+    $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%s'";
+    $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%s)\l'";
 }
 
 if ($percentile) {
@@ -131,7 +133,7 @@ if ($percentile) {
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
     $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#666666:'Prev Out'";

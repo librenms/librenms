@@ -1,0 +1,152 @@
+--
+-- Eltex MES Ethernet Switches  MIBs
+--
+-- Copyright (c) 2015, Eltex Ltd
+-- All rights reserved.
+--
+
+ELTEX-MES DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    eltexLtd, elHardware
+        FROM ELTEX-SMI-ACTUAL;
+
+eltMes MODULE-IDENTITY
+    LAST-UPDATED "201511170000Z"
+    ORGANIZATION "Eltex Co"
+    CONTACT-INFO "eltex.nsk.ru"
+    DESCRIPTION  "Mib for Eltex MES ethernet switches."
+    REVISION "201511170000Z"
+    DESCRIPTION
+        "Initial revision."
+    ::= { elHardware 23 }
+
+    Percents ::= INTEGER (0..100)
+    NetNumber ::=  OCTET STRING (SIZE(4))
+    VlanPriority ::= INTEGER (0..7)
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to Elt MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+--   Objects in this MIB are arranged into groups:
+--01 eltMesMng             - Management/Action
+--02 ...
+
+-- At the end of the MIB there is a definition of all Eltex-specific traps.
+
+eltMesNotifications OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION " All the Eltex notifications will reside under this branch
+                         as specified in
+                         RFC2578 'Structure of Management Information Version 2 (SMIv2)' 8.5"
+           ::= { eltMes 0 }
+
+-- eltMesMng group contains Management Variables for Eltex devices
+
+eltMesMng   OBJECT IDENTIFIER ::= { eltMes 1  }
+-- see eltMng.mib
+
+eltMesDevParams OBJECT IDENTIFIER ::= { eltMes  2}
+-- see eltDevParams.mib
+
+eltMesCopy   OBJECT IDENTIFIER ::= { eltMes 3  }
+-- see eltCopy.mib
+
+eltMesIpOspfMtu   OBJECT IDENTIFIER ::= { eltMes 4  }
+-- see eltIpOspfMtu.mib
+
+eltMesIpBfd   OBJECT IDENTIFIER ::= { eltMes 6  }
+-- see eltIpBfd.mib
+
+eltMesIpUnnumbered   OBJECT IDENTIFIER ::= { eltMes 7  }
+-- see eltIpUnnumbered.mib
+
+eltMesDhcp   OBJECT IDENTIFIER ::= { eltMes 8  }
+-- see eltDhcp.mib
+
+eltMesLinkAgg   OBJECT IDENTIFIER ::= { eltMes 9  }
+-- see eltLinkAgg.mib
+
+-- eltMesSyslog OBJECT IDENTIFIER ::= { eltMes 10  }
+-- see eltSyslog.mib
+
+--eltMesEnv OBJECT IDENTIFIER ::= { eltMes 11  }
+-- see eltEnv.mib
+
+eltMesQosTailDropMib   OBJECT IDENTIFIER ::= { eltMes 12  }
+-- see eltQosTailDropMib.mib
+
+--eltMesL2TunnelConfig ::= { eltMes 13 }
+-- see ELTEX-L2-TUNNEL-CONFIG-MIB.mib
+
+eltMesHardwareMib   OBJECT IDENTIFIER ::= { eltMes 14  }
+-- see eltHardware.mib
+
+eltMesSsh OBJECT IDENTIFIER ::= { eltMes 15  }
+-- see ELTEX-MES-SSH-MIB.mib
+
+eltMesSecuritySuiteMIB OBJECT IDENTIFIER ::= { eltMes 19  } 
+-- see ELTEX-MES-SECURITY-SUITE-MIB.mib
+
+eltMesTuning   OBJECT IDENTIFIER ::= { eltMes 29  }
+-- see eltTuning.mib
+
+eltMesSwInterfaces OBJECT IDENTIFIER ::= { eltMes 43  }
+-- see eltInterfaces.mib
+
+eltMesIpMulticast OBJECT IDENTIFIER ::= { eltMes 46 }
+--see eltBrgMulticast.mib
+
+eltMesPhdTransceiver OBJECT IDENTIFIER ::= { eltMes 53 }
+--see ELTEX-PHYSICAL-DESCRIPTION-MIB.mib
+
+eltMesMacMulticast OBJECT IDENTIFIER ::= { eltMes 55 }
+--see eltBrgMulticast.mib
+
+eltMesStormCtrl OBJECT IDENTIFIER ::= { eltMes 77 }
+--see elteltStormCtrl.mib
+
+eltMesAAA  OBJECT IDENTIFIER ::= { eltMes 79 }
+--see eltAAA.mib
+
+eltMesRadius  OBJECT IDENTIFIER ::= { eltMes 80 }
+--see eltAAA.mib
+
+eltMesTacacs  OBJECT IDENTIFIER ::= { eltMes 81 }
+--see eltAAA.mib
+
+eltMesSmon  OBJECT IDENTIFIER ::= { eltMes 84 }
+--see eltSmon.mib
+
+eltMesQosCliMib OBJECT IDENTIFIER ::= { eltMes 88 }
+--see eltQosclimib.mib
+
+eltMesPhy OBJECT IDENTIFIER ::= { eltMes 90 }
+-- see eltPhy.mib
+
+eltMesIpSpec OBJECT IDENTIFIER ::= { eltMes 91 }
+-- see eltip.mib
+
+eltMesDot1x OBJECT IDENTIFIER ::= { eltMes 95 }
+-- see eltdot1x.mib
+
+eltMesBridgeSecurity OBJECT IDENTIFIER ::= { eltMes  112}
+--see eltBridgeSecurity.mib
+
+eltMesEndOfMibGroup   OBJECT IDENTIFIER ::= { eltMes 1000  }
+-- see ELTEX-ENDOFMIB-MIB.MIB
+
+
+
+END
+

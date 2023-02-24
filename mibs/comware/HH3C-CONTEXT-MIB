@@ -1,0 +1,112 @@
+-- ===========================================================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: context MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- revision 1.0 2014-3-18 created by c08124
+--
+-- ============================================================================================================
+HH3C-CONTEXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+hh3cContext MODULE-IDENTITY
+    LAST-UPDATED "201403180000Z"
+    ORGANIZATION
+        "New H3C Technologies. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies. Co., Ltd.
+        Haidian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB contains objects for managing context operations."
+
+    REVISION "201403180000Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { hh3cCommon 154 }
+
+hh3cContextTables OBJECT IDENTIFIER ::= { hh3cContext 1 }
+
+hh3cContextControl OBJECT IDENTIFIER ::= { hh3cContextTables 1 }
+
+
+hh3cContextControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cContextControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to configure contexts for a device and
+         show context status info."
+    ::= { hh3cContextControl 1 }
+
+
+hh3cContextControlEntry OBJECT-TYPE
+    SYNTAX Hh3cContextControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cContextControlTable.
+         Each entry corresponds to one context."
+    INDEX { hh3cContextIndex }
+    ::= { hh3cContextControlTable 1 }
+
+Hh3cContextControlEntry ::=
+    SEQUENCE
+        {
+            hh3cContextIndex
+                Integer32,
+            hh3cContextName
+                DisplayString
+        }
+
+hh3cContextIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value range of Context ID depends on the device model."
+    ::= { hh3cContextControlEntry 1 }
+
+
+hh3cContextName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the context name,
+         a case-sensitive string of 1 to 15 characters.
+         The context name cannot be modified once created."
+    ::= { hh3cContextControlEntry 2 }
+
+
+hh3cContextNotification OBJECT IDENTIFIER ::= { hh3cContext 8 }
+
+hh3cContextNotificationObjects OBJECT IDENTIFIER ::= { hh3cContextNotification 0 }
+
+hh3cContextStateChangeToActive NOTIFICATION-TYPE
+    OBJECTS {hh3cContextIndex, hh3cContextName}
+    STATUS current
+    DESCRIPTION
+        "The hh3cContextStateChangeToActive trap indicates
+         that the context status has changed to active."
+    ::= { hh3cContextNotificationObjects 1 }
+
+hh3cContextStateChangeToInactive NOTIFICATION-TYPE
+    OBJECTS {hh3cContextIndex, hh3cContextName}
+    STATUS current
+    DESCRIPTION
+        "The hh3cContextStateChangeToInactive trap indicates
+         that the context status has changed to inactive."
+    ::= { hh3cContextNotificationObjects 2 }
+
+END

@@ -11,7 +11,7 @@ IMPORTS
     TruthValue, DisplayString, PhysAddress                  FROM SNMPv2-TC;
 
 rndDeviceParams MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "200701020001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
@@ -636,17 +636,19 @@ rndImageInfoEntry  OBJECT-TYPE
     ::= {rndImageInfoTable  1 }
 
 RndImageInfoEntry ::= SEQUENCE {
-    rndStackUnitNumber                 INTEGER,
-    rndImage1Name                      DisplayString,
-    rndImage2Name                      DisplayString,
-    rndImage1Version                   DisplayString,
-    rndImage2Version                   DisplayString,
-    rndImage1Date                      DisplayString,
-    rndImage2Date                      DisplayString,
-    rndImage1Time                      DisplayString,
-    rndImage2Time                      DisplayString,
-    rndImage1Description               DisplayString,
-    rndImage2Description               DisplayString
+    rndStackUnitNumber                 	INTEGER,
+    rndImage1Name                      	DisplayString,
+    rndImage2Name                      	DisplayString,
+    rndImage1Version                   	DisplayString,
+    rndImage2Version                   	DisplayString,	
+    rndImage1Date                      	DisplayString,
+    rndImage2Date                      	DisplayString,
+    rndImage1Time                      	DisplayString,
+    rndImage2Time                      	DisplayString,
+    rndImage1Description               	DisplayString,
+    rndImage2Description               	DisplayString,
+    rndImage1InternalVersion		DisplayString,
+    rndImage2InternalVersion		DisplayString	
 }
 
 rndStackUnitNumber OBJECT-TYPE
@@ -738,6 +740,26 @@ rndImage2Description OBJECT-TYPE
         "Indicates the description of image-2 in the system."
     ::= {rndImageInfoEntry 11 }
 
+rndImage1InternalVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "In case customer (external) version exists, this field is indicates image-1 internal version"
+    ::= {rndImageInfoEntry 12 }
+	
+rndImage2InternalVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "In case customer (external) version exists, this field is indicates image-2 internal version"
+    ::= {rndImageInfoEntry 13 }
+	
+	
+	
+	
+	
 rlComponentsInfoTable OBJECT-TYPE
     SYNTAX SEQUENCE OF RlComponentsInfoEntry
     MAX-ACCESS not-accessible

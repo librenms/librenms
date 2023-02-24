@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateMacAccountingTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

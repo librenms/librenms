@@ -1,0 +1,6 @@
+modules:
+  os:
+    hardware: LANTRONIX-SLC-MIB::slcSystemModel.0
+    version: LANTRONIX-SLC-MIB::slcSystemFWRev.0
+    features: LANTRONIX-SLC-MIB::slcSystemModelString.0
+    serial: LANTRONIX-SLC-MIB::slcSystemSerialNo.0

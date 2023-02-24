@@ -7,11 +7,11 @@
     <div class="row">
         <form action="{{ route('users.store') }}" method="POST" role="form"
               class="form-horizontal col-md-8 col-md-offset-2">
-            <legend>@lang('Create User')</legend>
+            <legend>{{ __('Create User') }}</legend>
             @csrf
 
             <div class="form-group @if($errors->has('username')) has-error @endif">
-                <label for="realname" class="control-label col-sm-3">@lang('Username')</label>
+                <label for="realname" class="control-label col-sm-3">{{ __('Username') }}</label>
                 <div class="col-sm-9">
                     <input type="text" class="form-control" id="username" name="username"
                            value="{{ old('username', $user->username) }}">
@@ -23,8 +23,8 @@
 
             <div class="form-group">
                 <div class="col-sm-9 col-sm-offset-3">
-                    <button type="submit" class="btn btn-primary">@lang('Save')</button>
-                    <a type="button" class="btn btn-danger" href="{{ route('users.index') }}">@lang('Cancel')</a>
+                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    <a type="button" class="btn btn-danger" href="{{ route('users.index') }}">{{ __('Cancel') }}</a>
                 </div>
             </div>
         </form>

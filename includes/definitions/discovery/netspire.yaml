@@ -1,5 +1,13 @@
 mib: OACOMMON-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: OACOMMON-MIB::netSpireDeviceStorageUsed
+                descr: 'Storage'
+    os:
+        hardware: OACOMMON-MIB::netspireDeviceModelName.0
+        serial: OACOMMON-MIB::netSpireDeviceDeviceSerialNo.0
     processors:
         data:
             -

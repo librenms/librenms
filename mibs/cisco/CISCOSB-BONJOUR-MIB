@@ -12,7 +12,7 @@ IMPORTS
 
 
 rlBonjour MODULE-IDENTITY
-          LAST-UPDATED "200909210000Z"
+          LAST-UPDATED "200909210001Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -166,6 +166,9 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
        "This variable identifies the service state on IP interface of the device."
     ::= { rlBonjourStatusEntry 4 }
 
+-- -------------------------------------------------------------
+-- rlBonjourStateTable
+-- -------------------------------------------------------------
 
  rlBonjourStateTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlBonjourStateEntry
@@ -191,13 +194,13 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
                               AND rlBonjourL2Mode is disable
                     Not-Include - rlBonjourL2Table is empty
                                   AND rlBonjourL2Mode is enable
-                    service disabled - service was removed ue to specific request from L1 manager
+                    service disabled - service was removed due to specific request from L1 manager
                     No IP address    - the L2 interfaces is listed in the table rlBonjourL2EnableTable
                                        BUT don't have an IP on it
                     Not-present      - the L2 interfaces is listed in the table rlBonjourL2EnableTable
-                                       BUT no yet defined (like vlan not created or port in an unconnected salve)
+                                       BUT not yet defined (like vlan not created or port in an unconnected member)
                     Bonjour disabled - rlBonjourPublish scalar is off
-        Using this MIB user can monitor actual state of a service on an IP interface"
+        Using this MIB user can monitor actual state of a service on an L2 interface"
     ::= {rlBonjour 3 }
 
     rlBonjourStateEntry  OBJECT-TYPE
@@ -210,10 +213,12 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
     ::= {rlBonjourStateTable  1 }
 
     RlBonjourStateEntry ::= SEQUENCE {
-    rlBonjourStateServiceName      DisplayString ,
-    rlBonjourStateL2Interface      InterfaceIndex,
-    rlBonjourStateOperationMode    RlBonjourOperationState,
-    rlBonjourStateOperationReason  RlBonjourOperationReason
+    rlBonjourStateServiceName          DisplayString ,
+    rlBonjourStateL2Interface          InterfaceIndex,
+    rlBonjourStateOperationMode        RlBonjourOperationState,
+    rlBonjourStateOperationReason      RlBonjourOperationReason,
+    rlBonjourStateIPv6OperationMode    RlBonjourOperationState,
+    rlBonjourStateIPv6OperationReason  RlBonjourOperationReason
     }
 
 
@@ -241,7 +246,7 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-       "This variable indicates wether Bonjour is operational on the pair (service + L2 interface)."
+       "This variable indicates whether Bonjour over IPv4 is operational on the pair (service + L2 interface)."
     ::= { rlBonjourStateEntry 3 }
 
     rlBonjourStateOperationReason OBJECT-TYPE
@@ -249,8 +254,28 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-       "This variable specifies the reason of the previous field: rlBonjourStateOperationMode."
+       "This variable specifies the reason for the value of rlBonjourStateOperationMode."
     ::= { rlBonjourStateEntry 4 }
+
+    rlBonjourStateIPv6OperationMode OBJECT-TYPE
+    SYNTAX      RlBonjourOperationState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates whether Bonjour over IPv4 is operational on the pair (service + L2 interface)."
+    ::= { rlBonjourStateEntry 5 }
+
+    rlBonjourStateIPv6OperationReason OBJECT-TYPE
+    SYNTAX      RlBonjourOperationReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable specifies the reason for the value of rlBonjourStateIPv6OperationMode"
+    ::= { rlBonjourStateEntry 6 }
+
+-- -------------------------------------------------------------
+-- rlBonjourL2Table
+-- -------------------------------------------------------------
 
  rlBonjourL2Table  OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlBonjourL2Entry
@@ -306,6 +331,10 @@ RlBonjourOperationReason ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "This variable identifies the L2 interface status manager."
     ::= { rlBonjourL2Entry 2 }
+
+-- -------------------------------------------------------------
+-- Scalars
+-- -------------------------------------------------------------
 
  rlBonjourL2Mode OBJECT-TYPE
     SYNTAX      INTEGER {

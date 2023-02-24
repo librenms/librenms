@@ -1,5 +1,7 @@
 mib: STE2-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.+?)( (?<version>[\d.]+))?/'
     sensors:
         temperature:
             data:

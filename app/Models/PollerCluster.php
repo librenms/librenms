@@ -15,17 +15,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
 {
@@ -33,25 +36,69 @@ class PollerCluster extends Model
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
+    protected $casts = [
+        'last_report' => 'datetime',
+    ];
 
     // ---- Accessors/Mutators ----
 
-    public function setPollerGroupsAttribute($groups)
+    /**
+     * @param  array|string  $groups
+     * @return void
+     */
+    public function setPollerGroupsAttribute($groups): void
     {
         $this->attributes['poller_groups'] = is_array($groups) ? implode(',', $groups) : $groups;
+    }
+
+    // ---- Scopes ----
+
+    public function scopeIsActive(Builder $query): Builder
+    {
+        $default = (int) \LibreNMS\Config::get('service_poller_frequency');
+
+        return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
+    }
+
+    public function scopeIsInactive(Builder $query): Builder
+    {
+        $default = (int) \LibreNMS\Config::get('service_poller_frequency');
+
+        return $query->where('last_report', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
     // ---- Helpers ----
 
     /**
+     * Get the value of a setting (falls back to the global value if not set on this node)
+     *
+     * @param  string  $name
+     * @return mixed
+     *
+     * @throws \LibreNMS\Exceptions\InvalidNameException
+     */
+    public function getSettingValue(string $name)
+    {
+        $definition = $this->configDefinition(false);
+
+        foreach ($definition as $entry) {
+            if ($entry['name'] == $name) {
+                return $entry['value'];
+            }
+        }
+
+        throw new InvalidNameException("Poller group setting named \"$name\" is invalid");
+    }
+
+    /**
      * Get the frontend config definition for this poller
      *
-     * @param \Illuminate\Support\Collection $groups optionally supply full list of poller groups to avoid fetching multiple times
+     * @param  \Illuminate\Support\Collection|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
     public function configDefinition($groups = null)
     {
-        if (empty($groups)) {
+        if ($groups === null || $groups === true) {
             $groups = PollerGroup::list();
         }
 
@@ -66,7 +113,7 @@ class PollerCluster extends Model
             [
                 'name' => 'poller_enabled',
                 'default' => \LibreNMS\Config::get('service_poller_enabled'),
-                'value' => (bool)($this->poller_enabled ?? \LibreNMS\Config::get('service_poller_enabled')),
+                'value' => (bool) ($this->poller_enabled ?? \LibreNMS\Config::get('service_poller_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -79,7 +126,7 @@ class PollerCluster extends Model
             [
                 'name' => 'poller_frequency',
                 'default' => \LibreNMS\Config::get('service_poller_frequency'),
-                'value' => $this->poller_workers ?? \LibreNMS\Config::get('service_poller_frequency'),
+                'value' => $this->poller_frequency ?? \LibreNMS\Config::get('service_poller_frequency'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,
@@ -94,7 +141,7 @@ class PollerCluster extends Model
             [
                 'name' => 'discovery_enabled',
                 'default' => \LibreNMS\Config::get('service_discovery_enabled'),
-                'value' => (bool)($this->discovery_enabled ?? \LibreNMS\Config::get('service_discovery_enabled')),
+                'value' => (bool) ($this->discovery_enabled ?? \LibreNMS\Config::get('service_discovery_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -115,7 +162,7 @@ class PollerCluster extends Model
             [
                 'name' => 'services_enabled',
                 'default' => \LibreNMS\Config::get('service_services_enabled'),
-                'value' => (bool)($this->services_enabled ?? \LibreNMS\Config::get('service_services_enabled')),
+                'value' => (bool) ($this->services_enabled ?? \LibreNMS\Config::get('service_services_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -136,7 +183,7 @@ class PollerCluster extends Model
             [
                 'name' => 'billing_enabled',
                 'default' => \LibreNMS\Config::get('service_billing_enabled'),
-                'value' => (bool)($this->billing_enabled ?? \LibreNMS\Config::get('service_billing_enabled')),
+                'value' => (bool) ($this->billing_enabled ?? \LibreNMS\Config::get('service_billing_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -158,7 +205,7 @@ class PollerCluster extends Model
             [
                 'name' => 'alerting_enabled',
                 'default' => \LibreNMS\Config::get('service_alerting_enabled'),
-                'value' => (bool)($this->alerting_enabled ?? \LibreNMS\Config::get('service_alerting_enabled')),
+                'value' => (bool) ($this->alerting_enabled ?? \LibreNMS\Config::get('service_alerting_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -172,7 +219,7 @@ class PollerCluster extends Model
             [
                 'name' => 'ping_enabled',
                 'default' => \LibreNMS\Config::get('service_ping_enabled'),
-                'value' => (bool)($this->ping_enabled ?? \LibreNMS\Config::get('service_ping_enabled')),
+                'value' => (bool) ($this->ping_enabled ?? \LibreNMS\Config::get('service_ping_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -186,7 +233,7 @@ class PollerCluster extends Model
             [
                 'name' => 'update_enabled',
                 'default' => \LibreNMS\Config::get('service_update_enabled'),
-                'value' => (bool)($this->update_enabled ?? \LibreNMS\Config::get('service_update_enabled')),
+                'value' => (bool) ($this->update_enabled ?? \LibreNMS\Config::get('service_update_enabled')),
                 'type' => 'boolean',
                 'advanced' => true,
             ],
@@ -208,13 +255,13 @@ class PollerCluster extends Model
                     'INFO' => 'INFO',
                     'WARNING' => 'WARNING',
                     'ERROR' => 'ERROR',
-                    'CRITICAL' => 'CRITICAL'
+                    'CRITICAL' => 'CRITICAL',
                 ],
             ],
             [
                 'name' => 'watchdog_enabled',
                 'default' => \LibreNMS\Config::get('service_watchdog_enabled'),
-                'value' => (bool)($this->watchdog_enabled ?? \LibreNMS\Config::get('service_watchdog_enabled')),
+                'value' => (bool) ($this->watchdog_enabled ?? \LibreNMS\Config::get('service_watchdog_enabled')),
                 'type' => 'boolean',
             ],
             [
@@ -229,7 +276,7 @@ class PollerCluster extends Model
 
     // ---- Relationships ----
 
-    public function stats()
+    public function stats(): HasMany
     {
         return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');
     }

@@ -1,0 +1,325 @@
+-- ============================================================================
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description:  This MIB is used for configuration of ATM-DXI.
+--               include :1.ATM-DXI PVC
+--                        2.ATM-DXI MAP
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2005/04/14 created by Liguanmin
+-- ============================================================================
+HH3C-ATM-DXI-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+                hh3cCommon
+                    FROM HH3C-OID-MIB
+                ifIndex
+                    FROM RFC1213-MIB
+                OBJECT-GROUP,MODULE-COMPLIANCE
+                    FROM SNMPv2-CONF
+                Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                    FROM SNMPv2-SMI
+                InetAddressType,InetAddress
+                    FROM INET-ADDRESS-MIB
+                RowStatus
+                    FROM SNMPv2-TC;
+
+      hh3cAtmDxi MODULE-IDENTITY
+                LAST-UPDATED "200504141518Z"            -- 14 April, 2005 at 15:18 GMT
+                ORGANIZATION
+                    "New H3C Tech. Co., Ltd."
+                CONTACT-INFO
+                    "Platform Team New H3C Tech. Co., Ltd.
+                    Hai-Dian District Beijing P.R. China
+                    http://www.h3c.com
+                    Zip:100085
+                    "
+                DESCRIPTION
+                        "This MIB contains objects to manage configuration of ATM-DXI.
+                         There are no constraints on this MIB."
+                REVISION "200504141518Z"                -- 14 April, 2005 at 15:18 GMT
+                DESCRIPTION
+                        "The initial revision of this MIB module."
+                ::= { hh3cCommon 49 }
+
+--
+-- Node definitions
+--
+        hh3cAtmDxiScalarGroup OBJECT IDENTIFIER ::= { hh3cAtmDxi 1 }
+
+        hh3cAtmDxiConfMode OBJECT-TYPE
+                SYNTAX INTEGER
+                        {
+                        mode1a(1),
+                        mode1b(2),
+                        mode2(3)
+                        }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This node identifies the ATM-DXI mode being
+                        used at the ATM-DXI port."
+                ::= { hh3cAtmDxiScalarGroup 1 }
+
+
+        hh3cAtmDxiIfObjects OBJECT IDENTIFIER ::= { hh3cAtmDxi 2 }
+
+
+        hh3cAtmDxiPvcTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3cAtmDxiPvcEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table describes information of PVC in ATM-DXI interface."
+                ::= { hh3cAtmDxiIfObjects 1 }
+
+
+        hh3cAtmDxiPvcEntry OBJECT-TYPE
+                SYNTAX Hh3cAtmDxiPvcEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The entry of hh3cAtmDxiPvcTable."
+                INDEX { ifIndex, hh3cAtmDxiPvcVpi, hh3cAtmDxiPvcVci }
+                ::= { hh3cAtmDxiPvcTable 1 }
+
+
+        Hh3cAtmDxiPvcEntry ::=
+                SEQUENCE {
+                        hh3cAtmDxiPvcVpi
+                                Integer32,
+                        hh3cAtmDxiPvcVci
+                                Integer32,
+                        hh3cAtmDxiPvcDFA
+                                Integer32,
+                        hh3cAtmDxiPvcEncType
+                                INTEGER,
+                        hh3cAtmDxiPvcMapCount
+                                Integer32,
+                        hh3cAtmDxiPvcRowStatus
+                                RowStatus
+                 }
+
+
+        hh3cAtmDxiPvcVpi OBJECT-TYPE
+                SYNTAX Integer32 (0..15)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The value of VPI.  It can't be 0 if hh3cAtmDxiPvcVci is 0."
+                ::= { hh3cAtmDxiPvcEntry 1 }
+
+
+        hh3cAtmDxiPvcVci OBJECT-TYPE
+                SYNTAX Integer32 (0..63)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The value of VCI.  It can't be 0 if hh3cAtmDxiPvcVpi is 0."
+                ::= { hh3cAtmDxiPvcEntry 2 }
+
+
+        hh3cAtmDxiPvcDFA OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The index of PVC.  It is equal with vci and VPI.  And this node value
+                        is correlate with hh3cAtmDxiPvcVpi and hh3cAtmDxiPvcVci. "
+                ::= { hh3cAtmDxiPvcEntry 3 }
+
+
+        hh3cAtmDxiPvcEncType OBJECT-TYPE
+                SYNTAX INTEGER
+                        {
+                        snap(1),
+                        nlpid(2),
+                        mux(3)
+                        }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "Encapsulation type of the frame."
+                DEFVAL { snap }
+                ::= { hh3cAtmDxiPvcEntry 4 }
+
+
+        hh3cAtmDxiPvcMapCount OBJECT-TYPE
+                SYNTAX Integer32 (0..32)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The number of map.  One map can only associate with one PVC, but
+                        one PVC can associate with 32 maps.  This node is the map count
+                        which one PVC associated with."
+                ::= { hh3cAtmDxiPvcEntry 5 }
+
+
+        hh3cAtmDxiPvcRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "Only support 'destroy' 'createAndGo' and 'active'."
+                ::= { hh3cAtmDxiPvcEntry 6 }
+
+
+        hh3cAtmDxiMapTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3cAtmDxiMapEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table describes PVC map information."
+                ::= { hh3cAtmDxiIfObjects 2 }
+
+
+        hh3cAtmDxiMapEntry OBJECT-TYPE
+                SYNTAX Hh3cAtmDxiMapEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The entry of hh3cAtmDxiMapTable."
+                INDEX { ifIndex,
+                        hh3cAtmDxiMapPeerIpType,
+                        hh3cAtmDxiMapPeerIp,
+                        hh3cAtmDxiMapPvcVpi,
+                        hh3cAtmDxiMapPvcVci,
+                        hh3cAtmDxiMapType
+                      }
+                ::= { hh3cAtmDxiMapTable 1 }
+
+
+        Hh3cAtmDxiMapEntry ::=
+                SEQUENCE {
+                        hh3cAtmDxiMapPeerIpType
+                                InetAddressType,
+                        hh3cAtmDxiMapPeerIp
+                                InetAddress,
+                        hh3cAtmDxiMapPvcVpi
+                                Integer32,
+                        hh3cAtmDxiMapPvcVci
+                                Integer32,
+                        hh3cAtmDxiMapType
+                                INTEGER,
+                        hh3cAtmDxiMapInarpTime
+                                Integer32,
+                        hh3cAtmDxiMapBroEnable
+                                INTEGER,
+                        hh3cAtmDxiMapRowStatus
+                                RowStatus
+                 }
+
+        hh3cAtmDxiMapPeerIpType OBJECT-TYPE
+                SYNTAX InetAddressType
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The type of ip address: IPv4 or IPv6."
+                ::= { hh3cAtmDxiMapEntry 1 }
+
+        hh3cAtmDxiMapPeerIp OBJECT-TYPE
+                SYNTAX InetAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The peer ip address.  This ip address is the peer ip
+                        address which the frame will arrive."
+                ::= { hh3cAtmDxiMapEntry 2 }
+
+        hh3cAtmDxiMapPvcVpi OBJECT-TYPE
+                SYNTAX Integer32 (0..15)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VPI of PVC.  It can't be 0 if hh3cAtmDxiMapPvcVci is 0."
+                ::= { hh3cAtmDxiMapEntry 3 }
+
+        hh3cAtmDxiMapPvcVci OBJECT-TYPE
+                SYNTAX Integer32 (0..63)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The VCI of PVC.  It can't be 0 if hh3cAtmDxiMapPvcVpi is 0."
+                ::= { hh3cAtmDxiMapEntry 4 }
+
+        hh3cAtmDxiMapType OBJECT-TYPE
+                SYNTAX INTEGER
+                        {
+                        address(1),
+                        inarp(2),
+                        default(3)
+                        }
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Pvc map type."
+                ::= { hh3cAtmDxiMapEntry 5 }
+
+        hh3cAtmDxiMapInarpTime OBJECT-TYPE
+                SYNTAX Integer32 (0 | 5..10)
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "The interval time of inarp request.  This node describes
+                        the interval time inarp request frame sent.  If the hh3cAtmDxiMapType
+                        isn't inarp, this value is 0.  Its unit is minute."
+                DEFVAL { 10 }
+                ::= { hh3cAtmDxiMapEntry 6 }
+
+        hh3cAtmDxiMapBroEnable OBJECT-TYPE
+                SYNTAX INTEGER
+                        {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "Whether ATM-DXI map enable broadcast or not."
+                DEFVAL { 2 }
+                ::= { hh3cAtmDxiMapEntry 7 }
+
+        hh3cAtmDxiMapRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                        "Only support 'destroy', 'createAndGo' and 'active'."
+                ::= { hh3cAtmDxiMapEntry 8 }
+
+
+        hh3cAtmDxiConformance OBJECT IDENTIFIER ::= { hh3cAtmDxi 3 }
+
+        hh3cAtmDxiCompliances OBJECT IDENTIFIER ::= { hh3cAtmDxiConformance 1 }
+
+        hh3cAtmDxiCompliance MODULE-COMPLIANCE
+               STATUS current
+               DESCRIPTION
+                       "The compliance statement."
+               MODULE
+               MANDATORY-GROUPS { hh3cPVCMAPGroup }
+               GROUP hh3cAtmDxiGeneralGroup
+               DESCRIPTION
+                       "If ATM-DXI protocol supports other ATM-DXI modes,
+                       this group must be supported."
+               ::= { hh3cAtmDxiCompliances 1 }
+
+        hh3cAtmDxiGroup OBJECT IDENTIFIER ::= { hh3cAtmDxiConformance 2 }
+
+        hh3cPVCMAPGroup OBJECT-GROUP
+                OBJECTS { hh3cAtmDxiPvcDFA, hh3cAtmDxiPvcEncType, hh3cAtmDxiPvcMapCount,
+                          hh3cAtmDxiPvcRowStatus, hh3cAtmDxiMapBroEnable, hh3cAtmDxiMapInarpTime,
+                          hh3cAtmDxiMapRowStatus }
+                STATUS current
+                DESCRIPTION
+                        "This group includes nodes which are associated with interface."
+                ::= { hh3cAtmDxiGroup 1 }
+
+        hh3cAtmDxiGeneralGroup OBJECT-GROUP
+                OBJECTS { hh3cAtmDxiConfMode }
+                STATUS current
+                DESCRIPTION
+                        "This group includes the general nodes about ATM-DXI."
+                ::= { hh3cAtmDxiGroup 2 }
+
+END

@@ -11,6 +11,6 @@ discovery:
             - 'RICOH Aficio'
             - 'RICOH Network Printer'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use App\Models\Port;
 use App\Models\Vminfo;
-use Auth;
 use Carbon\Carbon;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
@@ -51,7 +52,6 @@ class DeviceController extends Controller
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
-        'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
         'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
@@ -59,13 +59,14 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
-        DeviceCache::setPrimary($device_id);
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
+
+        DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
@@ -79,7 +80,7 @@ class DeviceController extends Controller
         }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
-        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');
+        $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
         $tabs = array_map(function ($class) {
@@ -89,9 +90,9 @@ class DeviceController extends Controller
         $data = $tabs[$current_tab]->data($device);
 
         // Device Link Menu, select the primary link
-        $device_links = $this->deviceLinkMenu($device);
+        $device_links = $this->deviceLinkMenu($device, $current_tab);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (!isset($device_links[$primary_device_link_name])) {
+        if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
@@ -102,6 +103,7 @@ class DeviceController extends Controller
         }
 
         $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+
         return view('device.tabs.legacy', get_defined_vars());
     }
 
@@ -109,7 +111,8 @@ class DeviceController extends Controller
     {
         ob_start();
         $device = $device->toArray();
-        set_debug(false);
+        $device['os_group'] = Config::get("os.{$device['os']}.group");
+        Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
@@ -147,15 +150,33 @@ class DeviceController extends Controller
         return $graphs;
     }
 
-    private function deviceLinkMenu(Device $device)
+    private function deviceLinkMenu(Device $device, string $current_tab): array
     {
         $device_links = [];
 
         if (Gate::allows('update', $device)) {
+            $suffix = 'edit';
+            $title = __('Edit');
+
+            // check if metric has more specific edit page
+            if (preg_match('#health/metric=(\w+)#', \Request::path(), $matches)) {
+                if ($this->editTabExists($matches[1])) {
+                    $current_tab = $matches[1];
+                } elseif ($this->editTabExists($matches[1] . 's')) {
+                    $current_tab = $matches[1] . 's';
+                }
+            }
+
+            // check if edit page exists
+            if ($this->editTabExists($current_tab)) {
+                $suffix .= "/section=$current_tab";
+                $title .= ' ' . ucfirst($current_tab);
+            }
+
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
-                'url' => route('device', [$device->device_id, 'edit']),
-                'title' => __('Edit'),
+                'url' => route('device', [$device->device_id, $suffix]),
+                'title' => $title,
                 'external' => false,
             ];
         }
@@ -164,7 +185,7 @@ class DeviceController extends Controller
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
             $device_links['custom' . ($index + 1)] = [
                 'icon' => $link['icon'] ?? 'fa-external-link',
-                'url' => view(['template' => $link['url']], ['device' => $device])->__toString(),
+                'url' => Blade::render($link['url'], ['device' => $device]),
                 'title' => $link['title'],
                 'external' => $link['external'] ?? true,
             ];
@@ -208,5 +229,10 @@ class DeviceController extends Controller
         }
 
         return $device_links;
+    }
+
+    private function editTabExists(string $tab): bool
+    {
+        return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
     }
 }

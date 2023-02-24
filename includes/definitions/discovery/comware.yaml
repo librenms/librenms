@@ -1,5 +1,7 @@
 mib: HH3C-LswDEVM-MIB:HH3C-ENTITY-EXT-MIB
 modules:
+    os:
+        sysDescr_regex: '/Version (?<version>[0-9.]+).*(Release|ESS) (?<features>[R0-9P]+).*[\n ](HPE |HPE FF |HP |H3C )(?<hardware>.*)[\r ][\n ]/'
     sensors:
         pre-cache:
             data:

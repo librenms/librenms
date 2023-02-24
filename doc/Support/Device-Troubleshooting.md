@@ -1,6 +1,3 @@
-source: Support/Device-Troubleshooting.md
-path: blob/master/doc/
-
 # Capture Debug Information
 
 You can use this feature to run Debug on Discovery, Poller, SNMP,
@@ -14,7 +11,7 @@ far right and selecting Capture.
 
 ## Discovery
 
-Discovery will run and output debug infomation.
+Discovery will run and output debug information.
 
 ## Poller
 

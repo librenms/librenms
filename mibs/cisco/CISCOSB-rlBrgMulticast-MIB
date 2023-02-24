@@ -6,1484 +6,675 @@ CISCOSB-rlBrgMulticast-MIB DEFINITIONS ::= BEGIN
 --
 
 IMPORTS
-    TruthValue,TEXTUAL-CONVENTION,
-    RowStatus                                            FROM SNMPv2-TC
+    TEXTUAL-CONVENTION, RowStatus                        FROM SNMPv2-TC
     VlanIndex,PortList                                   FROM Q-BRIDGE-MIB
-    Unsigned32, IpAddress, NOTIFICATION-TYPE,
-    OBJECT-TYPE                                          FROM SNMPv2-SMI
-    rndErrorDesc, rndErrorSeverity                       FROM CISCOSB-DEVICEPARAMS-MIB
-    switch001, rlMacMulticast, rndNotifications                FROM CISCOSB-MIB
-    InetAddressType, InetAddress, InetVersion            FROM INET-ADDRESS-MIB;
+    Unsigned32, IpAddress, OBJECT-TYPE,
+    MODULE-IDENTITY                                      FROM SNMPv2-SMI
+    switch001                                            FROM CISCOSB-MIB
+    InetAddressType, InetAddress                         FROM INET-ADDRESS-MIB;
 
--- IGMP Snooping and mac multicast moved here from appolo ,
--- under mac multicast because of historic reasons
 
-rlMacMulticastEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
+rlBrgMulticast MODULE-IDENTITY
+      LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      ORGANIZATION "Cisco Systems, Inc."
+
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
+
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+      DESCRIPTION
+              "The MIB module describes the private MIB for Multicast Bridge 
+               supported by CISCOSB's software and products."   
+      REVISION     "201304010000Z"  -- April 1, 2013
+      DESCRIPTION
+              "Added MODULE-IDENTITY"
+      ::= { switch001 116  }
+
+
+--  rlBrgMulticastMibVersion
+
+rlBrgMulticastMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Enable/Disable MAC Multicast bridging in the device."
-    ::= { rlMacMulticast 1 }
+        "MIB's version, the current version is 4.
+         Snooping supports IGMPv1/v2/v3 and MLDv1/v2."
+::= { rlBrgMulticast 1 }
 
-rlIgmpSnoop  OBJECT IDENTIFIER ::= { rlMacMulticast 2 }
+-- rlBrgStaticIpMulticastTable   (replaced by rlBrgStaticInetMulticastTable)
 
---
--- rlIgmpSnooping
---
-
- rlIgmpSnoopMibVersion OBJECT-TYPE
-     SYNTAX      INTEGER
-     MAX-ACCESS  read-only
-     STATUS      current
-     DESCRIPTION
-         "MIB's version, the current version is 3.
-          IGMP Snooping supports IGMPv3."
-     ::= { rlIgmpSnoop 1 }
-
-rlIgmpSnoopEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
+rlBrgStaticIpMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgStaticIpMulticastEntry
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Enable/Disable IGMP Snooping in the switch."
-    ::= { rlIgmpSnoop 2 }
+        "A table containing filtering information for IP Multicast
+         addresses for each VLAN."
+    ::= { rlBrgMulticast 3}
 
-rlIgmpSnoopHostAgingTime OBJECT-TYPE
-    SYNTAX      INTEGER (0 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
+rlBrgStaticIpMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgStaticIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
     DESCRIPTION
-        "The amount of time that should pass before aging out
-         an entry in the rlIgmpSnoopGroupTable will be aged out."
-    DEFVAL  {260}
-    ::= { rlIgmpSnoop 3 }
+        "Filtering information configured into the device.
+         The set of ports to which frames containing this IP
+         Multicast destination address and IP source address
+         are allowed to be forwarded."
+    INDEX { rlBrgStaticIpMulticastVlanTag,
+            rlBrgStaticIpMulticastGroupAddress,
+            rlBrgStaticIpMulticastSourceAddress }
+    ::= { rlBrgStaticIpMulticastTable 1 }
 
-rlIgmpSnoopRouterAgingTime OBJECT-TYPE
-    SYNTAX      INTEGER (1 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-    "The amount of time that should pass before aging out
-     an entry in the rlIgmpSnoopInterfaceTable will be aged out."
-    DEFVAL  {300}
-    ::= { rlIgmpSnoop 4 }
---   IgmpSnoopGroupTable - DEPRICATED
-
--- rlIgmpSnoopGroupTable OBJECT-TYPE
---     SYNTAX      SEQUENCE OF RlIgmpSnoopGroupEntry
---  MAX-ACCESS  not-accessible
---     STATUS      current
---     DESCRIPTION
---         "The (conceptual) table listing the IP multicast groups
---          for which there are members on a particular interface."
---     ::= { rlIgmpSnoop 5 }
---
--- rlIgmpSnoopGroupEntry OBJECT-TYPE
---     SYNTAX      RlIgmpSnoopGroupEntry
---     MAX-ACCESS  not-accessible
---     STATUS      current
---     DESCRIPTION
---         "An entry (conceptual row) in the rlIgmpSnoopGroupTable."
---     INDEX  { rlIgmpSnoopGroupTag, rlIgmpSnoopGroupAddress,
---              rlIgmpSnoopGroupPort}
---     ::= { rlIgmpSnoopGroupTable 1 }
---
--- RlIgmpSnoopGroupEntry ::= SEQUENCE {
---     rlIgmpSnoopGroupTag         INTEGER,
---     rlIgmpSnoopGroupAddress     MacAddress,
---     rlIgmpSnoopGroupPort        INTEGER,
---     rlIgmpSnoopGroupExpiryTime  INTEGER
--- }
---
--- rlIgmpSnoopGroupTag OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The VLAN tag for which this entry contains
---          information for an IP multicast group address."
---     ::= { rlIgmpSnoopGroupEntry 1 }
---
--- rlIgmpSnoopGroupAddress OBJECT-TYPE
---     SYNTAX      MacAddress
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---     "The MAC multicast group address for which this entry
---      contains information."
---     ::= { rlIgmpSnoopGroupEntry 2 }
---
--- rlIgmpSnoopGroupPort OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The ifIndex value of the port for which this entry contains
---          information for an IP multicast group address."
---     ::= { rlIgmpSnoopGroupEntry 3 }
---
--- rlIgmpSnoopGroupExpiryTime OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The minimum amount of time remaining before this entry will aged out."
---     ::= { rlIgmpSnoopGroupEntry 4 }
-
---   rlIgmpSnoopRouterTable - DEPRICATED
--- rlIgmpSnoopRouterTable OBJECT-TYPE
---     SYNTAX      SEQUENCE OF RlIgmpSnoopRouterEntry
---     MAX-ACCESS  not-accessible
---     STATUS      current
---     DESCRIPTION
---         "The (conceptual) table listing the ports for which there are
---          IP Multicast Routers."
---     ::= { rlIgmpSnoop 6 }
---
--- rlIgmpSnoopRouterEntry OBJECT-TYPE
---     SYNTAX      RlIgmpSnoopRouterEntry
---     MAX-ACCESS  not-accessible
---     STATUS      current
---     DESCRIPTION
---         "An entry (conceptual row) in the rlIgmpSnoopRouterTable."
---     INDEX  { rlIgmpSnoopRouterTag, rlIgmpSnoopRouterPort }
---     ::= { rlIgmpSnoopRouterTable 1 }
---
--- RlIgmpSnoopRouterEntry ::= SEQUENCE {
---     rlIgmpSnoopRouterTag        INTEGER,
---     rlIgmpSnoopRouterPort       INTEGER,
---     rlIgmpSnoopRouterExpiryTime INTEGER
--- }
---
--- rlIgmpSnoopRouterTag OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The tag of the VLAN for which this entry contains
---          information for an IP Multicast Router."
---     ::= { rlIgmpSnoopRouterEntry 1 }
---
--- rlIgmpSnoopRouterPort OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The interface for which this entry contains information for
---          an IP multicast Router."
---     ::= { rlIgmpSnoopRouterEntry 2 }
---
--- rlIgmpSnoopRouterExpiryTime OBJECT-TYPE
---     SYNTAX      INTEGER
---     MAX-ACCESS  read-only
---     STATUS      current
---     DESCRIPTION
---         "The minimum amount of time remaining before this entry will aged out."
---     ::= { rlIgmpSnoopRouterEntry 3 }
-
-IgmpVersion ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
-        "IGMP version."
-    SYNTAX  INTEGER {
-        none(0),
-        v1(1),
-        v2(2),
-        v3(3)
+RlBrgStaticIpMulticastEntry ::= SEQUENCE {
+        rlBrgStaticIpMulticastVlanTag           VlanIndex,
+        rlBrgStaticIpMulticastGroupAddress      IpAddress,
+        rlBrgStaticIpMulticastSourceAddress     IpAddress,
+        rlBrgStaticIpMulticastFrwPorts          PortList,
+        rlBrgStaticIpMulticastForbiddenPorts    PortList,
+        rlBrgStaticIpMulticastStatus            RowStatus
 }
 
+rlBrgStaticIpMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The VLAN tag for which this entry is configured."
+    ::= { rlBrgStaticIpMulticastEntry 1}
 
--- rlIgmpSnoopVlanTable  changed to Inet type (November 2007)  DEPRICATED (See rlIgmpMldSnoopVlanTable)
+rlBrgStaticIpMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The multicast group address for which the filtering information applies "
+    ::= { rlBrgStaticIpMulticastEntry 2}
 
- rlIgmpSnoopVlanTable OBJECT-TYPE
-     SYNTAX      SEQUENCE OF RlIgmpSnoopVlanEntry
-     MAX-ACCESS  not-accessible
-     STATUS      obsolete
-     DESCRIPTION
-         "The table listing the per vlan parameters : enable/disable ,
-         aging-out timers , filter ports and permanent ports."
-     ::= { rlIgmpSnoop 7 }
+rlBrgStaticIpMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The unicast group address for which the filtering information applies."
+    ::= { rlBrgStaticIpMulticastEntry 3}
 
- rlIgmpSnoopVlanEntry OBJECT-TYPE
-     SYNTAX      RlIgmpSnoopVlanEntry
-     MAX-ACCESS  not-accessible
-     STATUS      obsolete
-     DESCRIPTION
-         "An entry (conceptual row) in the rlIgmpSnoopVlanTable."
-     INDEX  { rlIgmpSnoopVlanTag }
-     ::= { rlIgmpSnoopVlanTable 1 }
+rlBrgStaticIpMulticastFrwPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports the data should be forwarded to "
+    ::= { rlBrgStaticIpMulticastEntry 4}
 
-RlIgmpSnoopVlanEntry ::= SEQUENCE {
-     rlIgmpSnoopVlanTag                  INTEGER,
-     rlIgmpSnoopVlanEnable               TruthValue,
-     rlIgmpSnoopVlanRouterLearn          TruthValue,
-     rlIgmpSnoopVlanHostTimeOut          INTEGER,
-     rlIgmpSnoopVlanQuerierTimeOut       INTEGER,
-     rlIgmpSnoopVlanRouterTimeOut        INTEGER,
-     rlIgmpSnoopVlanLeaveTimeOut         INTEGER,
-     rlIgmpSnoopVlanIgmpVersion          IgmpVersion,
-     rlIgmpSnoopVlanRouterPortlist       PortList
- }
+rlBrgStaticIpMulticastForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports that overrides dynamic configuration and
+          prevents multicast data forwarding for the group or
+          group and source to these ports."
+    ::= { rlBrgStaticIpMulticastEntry 5}
 
- rlIgmpSnoopVlanTag OBJECT-TYPE
-     SYNTAX      INTEGER
-     MAX-ACCESS  read-only
-     STATUS      obsolete
-     DESCRIPTION
-         "The tag of the VLAN for which this entry contains
-          information for an IP Multicast Router."
-     ::= { rlIgmpSnoopVlanEntry 1 }
+rlBrgStaticIpMulticastStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of the table entry. It's used to add/delete an entry"
+    ::= { rlBrgStaticIpMulticastEntry  6}
+
+-- bridge ip multicast FDB
+-- rlBrgIpMulticastTable  (See rlBrgInetMulticastTable)
+
+rlBrgIpMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all filtering information for IP
+         Multicast addresses for each VLAN "
+    ::= { rlBrgMulticast 4}
+
+rlBrgIpMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgIpMulticastTable
+         contains IP Multicast FDB data "
+    INDEX { rlBrgIpMulticastVlanTag,
+            rlBrgIpMulticastGroupAddress,
+            rlBrgIpMulticastSourceAddress }
+::= { rlBrgIpMulticastTable 1 }
+
+RlBrgIpMulticastEntry ::= SEQUENCE {
+    rlBrgIpMulticastVlanTag         VlanIndex,
+    rlBrgIpMulticastGroupAddress    IpAddress,
+    rlBrgIpMulticastSourceAddress   IpAddress,
+    rlBrgIpMulticastEgressPorts     PortList,
+    rlBrgIpMulticastLearntPorts     PortList
+}
+
+rlBrgIpMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgIpMulticastEntry 1}
+
+rlBrgIpMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpMulticastEntry 2}
+
+rlBrgIpMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpMulticastEntry 3}
+
+rlBrgIpMulticastEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which frames
+         destined for this Group IP address or Group and Source
+         address are currently being explicitly forwarded.  This
+         does not include ports for which this address is only implicitly
+         forwarded, in the dot1qForwardAllPorts list."
+    ::= { rlBrgIpMulticastEntry 4}
+
+rlBrgIpMulticastLearntPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in rlBrgIpMulticastEgressPorts which
+         were learnt by IGMP or some other dynamic mechanism,
+         in this Filtering database.."
+    ::= { rlBrgIpMulticastEntry 5}
+
+-- static ipm inet bridge configuration
+--  rlBrgStaticInetMulticastTable  IPM FDB
+
+rlBrgStaticInetMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgStaticInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for INET (Pv4 and IPv6)
+        Multicast addresses for each VLAN."
+    ::= { rlBrgMulticast 5}
+
+rlBrgStaticInetMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgStaticInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device.
+         The set of ports to which frames containing this IP
+         Multicast destination address and IP source address
+         are allowed to be forwarded."
+    INDEX { rlBrgStaticInetMulticastVlanTag,
+            rlBrgStaticInetMulticastGroupAddressType, rlBrgStaticInetMulticastGroupAddress,
+            rlBrgStaticInetMulticastSourceAddressType, rlBrgStaticInetMulticastSourceAddress }
+    ::= { rlBrgStaticInetMulticastTable 1 }
+
+RlBrgStaticInetMulticastEntry ::= SEQUENCE {
+        rlBrgStaticInetMulticastVlanTag           VlanIndex,
+        rlBrgStaticInetMulticastGroupAddressType  InetAddressType,
+        rlBrgStaticInetMulticastGroupAddress      InetAddress,
+        rlBrgStaticInetMulticastSourceAddressType InetAddressType,
+        rlBrgStaticInetMulticastSourceAddress     InetAddress,
+        rlBrgStaticInetMulticastFrwPorts          PortList,
+        rlBrgStaticInetMulticastForbiddenPorts    PortList,
+        rlBrgStaticInetMulticastStatus            RowStatus
+}
+
+rlBrgStaticInetMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The VLAN tag for which this entry is configured."
+    ::= { rlBrgStaticInetMulticastEntry 1}
+
+rlBrgStaticInetMulticastGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type ipv6/ipv4."
+    ::= { rlBrgStaticInetMulticastEntry 2}
+
+rlBrgStaticInetMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The multicast group address for which the filtering information applies "
+    ::= { rlBrgStaticInetMulticastEntry 3}
+
+rlBrgStaticInetMulticastSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type ipv6/ipv4."
+    ::= { rlBrgStaticInetMulticastEntry 4}
+
+rlBrgStaticInetMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The unicast group address for which the filtering information applies."
+    ::= { rlBrgStaticInetMulticastEntry 5}
+
+rlBrgStaticInetMulticastFrwPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports the data should be forwarded to "
+    ::= { rlBrgStaticInetMulticastEntry 6}
+
+rlBrgStaticInetMulticastForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports that overrides dynamic configuration and
+          prevents multicast data forwarding for the group or
+          group and source to these ports."
+    ::= { rlBrgStaticInetMulticastEntry 7}
+
+rlBrgStaticInetMulticastStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of the table entry. It's used to add/delete an entry"
+    ::= { rlBrgStaticInetMulticastEntry  8}
+
+-- rlBrgInetMulticastTable  IPM FDB
+
+rlBrgInetMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all filtering information for IP
+         Multicast addresses for each VLAN "
+    ::= { rlBrgMulticast 6}
+
+rlBrgInetMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgInetMulticastTable
+         contains IP Multicast FDB data "
+    INDEX { rlBrgInetMulticastVlanTag,
+            rlBrgInetMulticastGroupAddressType, rlBrgInetMulticastGroupAddress,
+            rlBrgInetMulticastSourceAddressType, rlBrgInetMulticastSourceAddress }
+::= { rlBrgInetMulticastTable 1 }
+
+RlBrgInetMulticastEntry ::= SEQUENCE {
+    rlBrgInetMulticastVlanTag           VlanIndex,
+    rlBrgInetMulticastGroupAddressType  InetAddressType,
+    rlBrgInetMulticastGroupAddress      InetAddress,
+    rlBrgInetMulticastSourceAddressType InetAddressType,
+    rlBrgInetMulticastSourceAddress     InetAddress,
+    rlBrgInetMulticastEgressPorts       PortList,
+    rlBrgInetMulticastLearntPorts       PortList
+}
+
+rlBrgInetMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgInetMulticastEntry 1}
+
+rlBrgInetMulticastGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv4/IPv6."
+    ::= { rlBrgInetMulticastEntry 2}
+
+rlBrgInetMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgInetMulticastEntry 3}
+
+rlBrgInetMulticastSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv4/IPv6."
+    ::= { rlBrgInetMulticastEntry 4}
+
+rlBrgInetMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgInetMulticastEntry 5}
+
+rlBrgInetMulticastEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which frames
+         destined for this Group IP address or Group and Source
+         address are currently being explicitly forwarded.  This
+         does not include ports for which this address is only implicitly
+         forwarded, in the dot1qForwardAllPorts list."
+    ::= { rlBrgInetMulticastEntry 6}
+
+rlBrgInetMulticastLearntPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in rlBrgIpMulticastEgressPorts which
+         were learnt by IGMP or some other dynamic mechanism,
+         in this Filtering database.."
+    ::= { rlBrgInetMulticastEntry 7}
 
 
- rlIgmpSnoopVlanEnable OBJECT-TYPE
-     SYNTAX      TruthValue
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "Enable/Disable IGMP Snooping in the vlan."
-     ::= { rlIgmpSnoopVlanEntry 2 }
+-- IPM FDB overlapping Reference Table
 
- rlIgmpSnoopVlanRouterLearn OBJECT-TYPE
-     SYNTAX      TruthValue
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "Enable/Disable of Learning of routers in the vlan."
-     ::= { rlIgmpSnoopVlanEntry 3 }
+rlBrgIpmFdbRefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgIpmFdbRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all information stored in
+         IPM FDB overlapping Reference Table "
+    ::= { rlBrgMulticast 7}
 
- rlIgmpSnoopVlanHostTimeOut OBJECT-TYPE
-     SYNTAX      INTEGER (0 .. 2147483647 )
-    UNITS   "seconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan."
-     DEFVAL  {260}
-     ::= { rlIgmpSnoopVlanEntry 4 }
+rlBrgIpmFdbRefEntry OBJECT-TYPE
+    SYNTAX      RlBrgIpmFdbRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgIpmFdbRefTable
+         contains overlapping Reference Table FDB data "
+    INDEX { rlBrgIpmFdbRefVlanTag,
+            rlBrgIpmFdbRefGroupAddressType, rlBrgIpmFdbRefGroupAddress,
+            rlBrgIpmFdbRefSourceAddressType, rlBrgIpmFdbRefSourceAddress }
+::= { rlBrgIpmFdbRefTable 1 }
 
- rlIgmpSnoopVlanQuerierTimeOut OBJECT-TYPE
-     SYNTAX      INTEGER (1 .. 2147483647 )
-    UNITS   "seconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time where no query is heard until
-          querier is activated"
-     DEFVAL  {260}
-     ::= { rlIgmpSnoopVlanEntry 5 }
+RlBrgIpmFdbRefEntry ::= SEQUENCE {
+    rlBrgIpmFdbRefVlanTag           VlanIndex,
+    rlBrgIpmFdbRefGroupAddressType  InetAddressType,
+    rlBrgIpmFdbRefGroupAddress      InetAddress,
+    rlBrgIpmFdbRefSourceAddressType InetAddressType,
+    rlBrgIpmFdbRefSourceAddress     InetAddress,
+    rlBrgIpmFdbRefPorts             PortList
+}
 
- rlIgmpSnoopVlanRouterTimeOut OBJECT-TYPE
-     SYNTAX      INTEGER (1 .. 2147483647 )
-     UNITS   "seconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          a port in the router ports dynamically learnt for
-          this vlan."
-     DEFVAL  {300}
-     ::= { rlIgmpSnoopVlanEntry 6 }
+rlBrgIpmFdbRefVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgIpmFdbRefEntry 1}
 
- rlIgmpSnoopVlanLeaveTimeOut OBJECT-TYPE
-     SYNTAX      INTEGER (0 .. 2147483647 )
-     UNITS   "seconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan,
-          after  recieving a leave/exclude message from the port of
-          the entry."
-     DEFVAL  {10}
-     ::= { rlIgmpSnoopVlanEntry 7 }
+rlBrgIpmFdbRefGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpmFdbRefEntry 2}
 
-rlIgmpSnoopVlanIgmpVersion OBJECT-TYPE
-     SYNTAX      IgmpVersion
-     MAX-ACCESS  read-only
-     STATUS      obsolete
-     DESCRIPTION
-         "The current IGMP protocol version running on the VLAN."
-     ::= { rlIgmpSnoopVlanEntry 8 }
+rlBrgIpmFdbRefGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpmFdbRefEntry 3}
 
- rlIgmpSnoopVlanRouterPortlist OBJECT-TYPE
-     SYNTAX      PortList
-     MAX-ACCESS  read-only
-     STATUS      obsolete
-     DESCRIPTION
-         "List of router ports learned dynamically on this VLAN
-          from PIM, DVMRP, MRDISC and IGMP Query messages "
-     ::= { rlIgmpSnoopVlanEntry 9}
+rlBrgIpmFdbRefSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpmFdbRefEntry 4}
 
--- rlIgmpSnoopIGMP224ReportsHandle
+rlBrgIpmFdbRefSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpmFdbRefEntry 5}
 
-rlIgmpSnoopIGMP224ReportsHandle OBJECT-TYPE
-   SYNTAX  INTEGER {
-        allow(1),
-        ignore (2)
-    }
-    MAX-ACCESS   read-write
+rlBrgIpmFdbRefPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of ports represented in IPM FDB overlapping
+            Reference Table"
+    ::= { rlBrgIpmFdbRefEntry 6}
+
+
+-- IPM FDB Dynamic command MIB
+DynamicCmdType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of Dynamic IPM FDB command:
+         Create Entry, Delete Entry, Set ports Pset."
+    SYNTAX  INTEGER {
+        createEntry(0),
+        deleteEntry(1),
+        addPorts(2),
+        deletePorts(3)
+}
+
+rlBrgDynamicCmdTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlBrgDynamicCmdEntry
+    MAX-ACCESS   not-accessible
     STATUS   current
     DESCRIPTION
-       "This varaiable indicates whether to allow IGMP reports for groups in the
-        224.0.0.X range when the group address is already manually configured or to ignore."
-    ::= {  rlIgmpSnoop 8 }
+       "The (conceptual) table for Dynamic IPM FDB command. For debugging purposes
+        only. This MIB is prohibited to be used with working IGMP/MLD snooping"
+    ::= {  rlBrgMulticast 8 }
 
--- rlIgmpSnoopMrouterEnabled - DEPRICATED
--- rlIgmpSnoopMrouterEnabled OBJECT-TYPE
---     SYNTAX  TruthValue
---     MAX-ACCESS  read-only
---     STATUS  current
---     DESCRIPTION
---         "Indicates whether the device functions as a multicast router."
---     ::= {  rlIgmpSnoop 9 }
-
---  rlIgmpSnoopMulticastTvTable  converted to Inet  (See rlIgmpMldSnoopMulticastTvTable)
-
-rlIgmpSnoopMulticastTvTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpSnoopMulticastTvEntry
+rlBrgDynamicCmdEntry OBJECT-TYPE
+    SYNTAX      RlBrgDynamicCmdEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        " multicast vlan used for this port"
-    ::= { rlIgmpSnoop 10 }
+        "An entry (conceptual row) in the rlBrgDynamicCmdTable."
+    INDEX  { rlBrgDynamicCmdKey }
+    ::= { rlBrgDynamicCmdTable 1 }
 
-rlIgmpSnoopMulticastTvEntry OBJECT-TYPE
-   SYNTAX      RlIgmpSnoopMulticastTvEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        " entry of multicast ip"
-    INDEX   { rlIgmpSnoopMulticastTvVID, rlIgmpSnoopMulticastTvGroup }
-    ::= { rlIgmpSnoopMulticastTvTable 1 }
-
-RlIgmpSnoopMulticastTvEntry ::= SEQUENCE {
-        rlIgmpSnoopMulticastTvVID           VlanIndex,
-        rlIgmpSnoopMulticastTvGroup         IpAddress,
-        rlIgmpSnoopMulticastTvStatus        RowStatus
-    }
-
-rlIgmpSnoopMulticastTvVID OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-         "Specify the multicast ip to be used."
-    ::= { rlIgmpSnoopMulticastTvEntry  1 }
-
-rlIgmpSnoopMulticastTvGroup OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-         "Specify the multicast ip to be used."
-    ::= { rlIgmpSnoopMulticastTvEntry  2 }
-
-rlIgmpSnoopMulticastTvStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-       "The row status variable, used according to
-        row installation and removal conventions."
-    ::= { rlIgmpSnoopMulticastTvEntry 3 }
-
---  rlIgmpSnoopMembershipTable  changed to Inet type (November 2007)   (See rlIgmpMldSnoopMembershipTable)
-
-rlIgmpSnoopMembershipTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpSnoopMembershipEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table listing the IP multicast memberships."
-    ::= { rlIgmpSnoop 11 }
-
-rlIgmpSnoopMembershipEntry OBJECT-TYPE
-    SYNTAX      RlIgmpSnoopMembershipEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpSnoopMembershipTable."
-    INDEX  { rlIgmpSnoopMembershipVlanTag, rlIgmpSnoopMembershipGroupIpAddress, rlIgmpSnoopMembershipSourceIpAddress }
-    ::= { rlIgmpSnoopMembershipTable 1 }
-
-RlIgmpSnoopMembershipEntry ::= SEQUENCE {
-    rlIgmpSnoopMembershipVlanTag            VlanIndex,
-    rlIgmpSnoopMembershipGroupIpAddress     IpAddress,
-    rlIgmpSnoopMembershipSourceIpAddress    IpAddress,
-    rlIgmpSnoopMembershipIncPortlist        PortList,
-    rlIgmpSnoopMembershipExcPortlist        PortList,
-    rlIgmpSnoopMembershipExpiryTime         INTEGER,
-    rlIgmpSnoopMembershipCompatibilityMode  IgmpVersion
+RlBrgDynamicCmdEntry ::= SEQUENCE {
+    rlBrgDynamicCmdKey               INTEGER,
+    rlBrgDynamicCmdVlanTag           VlanIndex,
+    rlBrgDynamicCmdGroupAddressType  InetAddressType,
+    rlBrgDynamicCmdGroupAddress      InetAddress,
+    rlBrgDynamicCmdSourceAddressType InetAddressType,
+    rlBrgDynamicCmdSourceAddress     InetAddress,
+    rlBrgDynamicCmdPorts             PortList,
+    rlBrgDynamicCmdType              DynamicCmdType
 }
 
-rlIgmpSnoopMembershipVlanTag OBJECT-TYPE
+rlBrgDynamicCmdKey OBJECT-TYPE
+    SYNTAX      INTEGER (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Key of the rlBrgDynamicCmdTable table"
+    ::= { rlBrgDynamicCmdEntry 1 }
+
+rlBrgDynamicCmdVlanTag OBJECT-TYPE
     SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry contains multicast membership information."
-    ::= { rlIgmpSnoopMembershipEntry 1}
-
-rlIgmpSnoopMembershipGroupIpAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The multicast group address."
-    ::= { rlIgmpSnoopMembershipEntry 2}
-
-rlIgmpSnoopMembershipSourceIpAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The unicast source address."
-    ::= { rlIgmpSnoopMembershipEntry 3}
-
-rlIgmpSnoopMembershipIncPortlist OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Included ports, where a report message was heard for the group
-         (IGMP version 2|1) or group and source address (IGMP version 3)."
-    ::= { rlIgmpSnoopMembershipEntry 4}
-
-rlIgmpSnoopMembershipExcPortlist OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Excluded ports where an exclude report message
-         was heard for the group and source address (IGMP version 3). "
-    ::= { rlIgmpSnoopMembershipEntry 5}
-
-rlIgmpSnoopMembershipExpiryTime OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "Time till entry will expire."
-    ::= { rlIgmpSnoopMembershipEntry 6}
-
-rlIgmpSnoopMembershipCompatibilityMode OBJECT-TYPE
-    SYNTAX      IgmpVersion
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "IGMP group compatibility mode."
-    ::= { rlIgmpSnoopMembershipEntry 7 }
-
-
--- rlIgmpSnoopQuerierVlanTable  changed to Inet type (November 2007)  See rlIgmpMldSnoopQuerierVlanTable
-
-rlIgmpSnoopQuerierVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpSnoopQuerierVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-       "A table that contains IGMP Snooping Querier information about
-        every vlan. This is indexed by vlan tag."
-    ::= { rlIgmpSnoop 12 }
-
-rlIgmpSnoopQuerierVlanEntry OBJECT-TYPE
-    SYNTAX      RlIgmpSnoopQuerierVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpSnoopQuerierVlanTable."
-    INDEX  { rlIgmpSnoopQuerierVlanTag }
-    ::= { rlIgmpSnoopQuerierVlanTable 1 }
-
-RlIgmpSnoopQuerierVlanEntry ::= SEQUENCE {
-    rlIgmpSnoopQuerierVlanTag                       VlanIndex,
-    rlIgmpSnoopQuerierAdminEnable                   TruthValue,
-    rlIgmpSnoopQuerierOperEnable                    TruthValue,
-    rlIgmpSnoopQuerierAdminAddr                     IpAddress,
-    rlIgmpSnoopQuerierOperAddr                      IpAddress,
-    rlIgmpSnoopQuerierAdminVersionNumber            IgmpVersion,
-    rlIgmpSnoopQuerierOperVersionNumber             IgmpVersion,
-    rlIgmpSnoopQuerierElectionEnable                TruthValue
-}
-
-rlIgmpSnoopQuerierVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "An IGMP Snoop Querier entry vlan tag."
-    ::= { rlIgmpSnoopQuerierVlanEntry 1 }
-
-rlIgmpSnoopQuerierAdminEnable OBJECT-TYPE
-    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The desired administrative state of IGMP Snoop Querier on the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 2 }
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgDynamicCmdEntry 2}
 
-rlIgmpSnoopQuerierOperEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current operational state of IGMP Snoop Querier on the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 3 }
-
-rlIgmpSnoopQuerierAdminAddr OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The desired IP address is being used in IGMP Snoop Querier messages on the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 4 }
-
-rlIgmpSnoopQuerierOperAddr OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current operational IP address is being used in IGMP Snoop Querier messages on the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 5 }
-
-rlIgmpSnoopQuerierAdminVersionNumber OBJECT-TYPE
-    SYNTAX      IgmpVersion
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The highest version number of IGMP Snoop Querier for the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 6 }
-
-rlIgmpSnoopQuerierOperVersionNumber OBJECT-TYPE
-    SYNTAX      IgmpVersion
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current operational version number of IGMP Snoop Querier for the vlan."
-    ::= { rlIgmpSnoopQuerierVlanEntry 7 }
-
-rlIgmpSnoopQuerierElectionEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Whether or not to participate in querier election.
-         When true, the snooping querier participates in querier election.
-         When false, the snooping querier is the elected querier until a general
-         query is heard from another router on the vlan (always lose)."
-    ::= { rlIgmpSnoopQuerierVlanEntry 8 }
-
-
-rlIgmpSnoopQuerierEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Globally enable/disable IGMP Snooping Querier in the switch."
-    ::= { rlIgmpSnoop 13 }
-
---
---
---   rlMacMulticastMaxEntriesNum
-
-rlMacMulticastMaxEntriesNum OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The maximum number of Mac Multicast entries the device supports."
-    ::= { rlMacMulticast 3 }
-
-rlMacMulticastFilter  OBJECT IDENTIFIER ::= { rlMacMulticast 4 }
-
--- rlMacMulticastUnregFilterEnable
-rlMacMulticastUnregFilterEnable OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Each bit represent a port whether Unregistered Multicast Filtering enable "
- ::= { rlMacMulticastFilter  1 }
-
-
--- mld
-rlMldSnoop  OBJECT IDENTIFIER ::= { rlMacMulticast 5 }
---
-
-rlMldSnoopEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Enable/Disable Mld Snooping in the switch."
-    ::= { rlMldSnoop 1 }
-
-rlMldSnoopHostAgingTime OBJECT-TYPE
-    SYNTAX      INTEGER (60 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The amount of time that should pass before aging out
-         an entry in the rlMldSnoopGroupTable will be aged out."
-    DEFVAL  {260}
-    ::= { rlMldSnoop 2 }
-
-rlMldSnoopRouterAgingTime OBJECT-TYPE
-    SYNTAX      INTEGER (1 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-    "The amount of time that should pass before aging out
-     an entry in the rlMldSnoopInterfaceTable will be aged out."
-    DEFVAL  {300}
-    ::= { rlMldSnoop 3 }
-
---rlIgmpMldSnoopMembershipTable (replaces rlIgmpSnoopMembershipTable)
-
-rlIgmpMldSnoopMembershipTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpMldSnoopMembershipEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table listing the IP multicast memberships."
-    ::= { rlMldSnoop 4 }
-
-rlIgmpMldSnoopMembershipEntry OBJECT-TYPE
-    SYNTAX      RlIgmpMldSnoopMembershipEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpMldSnoopMembershipTable."
-    INDEX  { rlIgmpMldSnoopMembershipVlanTag,
-             rlIgmpMldSnoopMembershipGroupIpAddressType,
-             rlIgmpMldSnoopMembershipGroupIpAddress,
-             rlIgmpMldSnoopMembershipSourceIpAddressType,
-             rlIgmpMldSnoopMembershipSourceIpAddress }
-    ::= { rlIgmpMldSnoopMembershipTable 1 }
-
-RlIgmpMldSnoopMembershipEntry ::= SEQUENCE {
-    rlIgmpMldSnoopMembershipVlanTag             VlanIndex,
-    rlIgmpMldSnoopMembershipGroupIpAddressType  InetAddressType,
-    rlIgmpMldSnoopMembershipGroupIpAddress      InetAddress,
-    rlIgmpMldSnoopMembershipSourceIpAddressType InetAddressType,
-    rlIgmpMldSnoopMembershipSourceIpAddress     InetAddress,
-    rlIgmpMldSnoopMembershipIncPortlist         PortList,
-    rlIgmpMldSnoopMembershipExcPortlist         PortList,
-    rlIgmpMldSnoopMembershipExpiryTime          INTEGER,
-    rlIgmpMldSnoopMembershipCompatibilityMode   IgmpVersion
-}
-
-rlIgmpMldSnoopMembershipVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The VLAN tag for which this entry contains multicast membership information."
-    ::= { rlIgmpMldSnoopMembershipEntry 1}
-
-rlIgmpMldSnoopMembershipGroupIpAddressType OBJECT-TYPE
+rlBrgDynamicCmdGroupAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Inet type IPv4/IPv6."
-    ::= { rlIgmpMldSnoopMembershipEntry 2}
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgDynamicCmdEntry 3}
 
-rlIgmpMldSnoopMembershipGroupIpAddress OBJECT-TYPE
+rlBrgDynamicCmdGroupAddress OBJECT-TYPE
     SYNTAX      InetAddress
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The multicast group address."
-    ::= { rlIgmpMldSnoopMembershipEntry 3}
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgDynamicCmdEntry 4}
 
-rlIgmpMldSnoopMembershipSourceIpAddressType OBJECT-TYPE
+rlBrgDynamicCmdSourceAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Inet type IPv4/IPv6."
-    ::= { rlIgmpMldSnoopMembershipEntry 4}
+        "Unicast source address of data frames."
+    ::= { rlBrgDynamicCmdEntry 5}
 
-rlIgmpMldSnoopMembershipSourceIpAddress OBJECT-TYPE
+rlBrgDynamicCmdSourceAddress OBJECT-TYPE
     SYNTAX      InetAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The unicast source address."
-    ::= { rlIgmpMldSnoopMembershipEntry 5}
-
-rlIgmpMldSnoopMembershipIncPortlist OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Included ports, where a report message was heard for the group
-         (IGMPv2/V1 or MLDv1) or group and source address (IGMPv3/MLDv2)."
-    ::= { rlIgmpMldSnoopMembershipEntry 6}
-
-rlIgmpMldSnoopMembershipExcPortlist OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "list of excluded ports to which an exclude report message
-         was heard for the group and source address (IGMPv3/MLDv2 ). "
-    ::= { rlIgmpMldSnoopMembershipEntry 7}
-
-rlIgmpMldSnoopMembershipExpiryTime OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "Time till entry will expire."
-    ::= { rlIgmpMldSnoopMembershipEntry 8}
-
-rlIgmpMldSnoopMembershipCompatibilityMode OBJECT-TYPE
-    SYNTAX      IgmpVersion
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "IGMP/MLD group compatibility mode."
-    ::= { rlIgmpMldSnoopMembershipEntry 9 }
-
--- rlIgmpMldSnoopVlanTable (replaces rlIgmpSnoopVlanTable)
-
-rlIgmpMldSnoopVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpMldSnoopVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The table lists the per vlan parameters : enable/disable ,
-        aging-out timers , filter ports and permanent ports."
-    ::= { rlMldSnoop 5 }
-
-rlIgmpMldSnoopVlanEntry OBJECT-TYPE
-    SYNTAX      RlIgmpMldSnoopVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpSnoopVlanTable."
-    INDEX  { rlIgmpMldSnoopVlanInetAddressType, rlIgmpMldSnoopVlanTag }
-    ::= { rlIgmpMldSnoopVlanTable 1 }
-
-RlIgmpMldSnoopVlanEntry ::= SEQUENCE {
-    rlIgmpMldSnoopVlanInetAddressType               InetAddressType,
-    rlIgmpMldSnoopVlanTag                           INTEGER,
-    rlIgmpMldSnoopVlanEnable                        TruthValue,
-    rlIgmpMldSnoopVlanRouterLearn                   TruthValue,
-    rlIgmpMldSnoopVlanHostTimeOut                   INTEGER,
-    rlIgmpMldSnoopVlanQuerierTimeOut                INTEGER,
-    rlIgmpMldSnoopVlanRouterTimeOut                 INTEGER,
-    rlIgmpMldSnoopVlanLeaveTimeOut                  INTEGER,
-    rlIgmpMldSnoopVlanIgmpVersion                   IgmpVersion,
-    rlIgmpMldSnoopVlanRouterPortlist                PortList,
-    rlIgmpMldSnoopVlanRouterStaticPortlist          PortList,
-    rlIgmpMldSnoopVlanRouterForbiddenPortlist       PortList,
-    rlIgmpMldSnoopVlanQueryOverride                 TruthValue,
-    rlIgmpMldSnoopVlanOperRobustness                Unsigned32,
-    rlIgmpMldSnoopVlanOperQueryInterval             Unsigned32,
-    rlIgmpMldSnoopVlanOperQueryMaxResponseTime      Unsigned32,
-    rlIgmpMldSnoopVlanOperLastMemberQueryInterval   Unsigned32,
-    rlIgmpMldSnoopVlanOperLastMemberQueryCount      Unsigned32,
-    rlIgmpMldSnoopVlanOperStartupQueryInterval      Unsigned32,
-    rlIgmpMldSnoopVlanOperStartupQueryCount         Unsigned32,
-    rlIgmpMldSnoopVlanOperHostTimeOut               Unsigned32,
-    rlIgmpMldSnoopVlanOperRouterTimeOut             Unsigned32,
-    rlIgmpMldSnoopVlanOperLeaveTimeOut              Unsigned32,
-    rlIgmpMldSnoopVlanAdminRobustness               Unsigned32,
-    rlIgmpMldSnoopVlanAdminQueryInterval            Unsigned32,
-    rlIgmpMldSnoopVlanAdminQueryMaxResponseTime     Unsigned32,
-    rlIgmpMldSnoopVlanAdminLastMemberQueryInterval  Unsigned32,
-    rlIgmpMldSnoopVlanAdminLastMemberQueryCount     Unsigned32,
-    rlIgmpMldSnoopVlanAdminStartupQueryInterval     Unsigned32,
-    rlIgmpMldSnoopVlanAdminStartupQueryCount        Unsigned32,
-    rlIgmpMldSnoopVlanAdminHostTimeOut              Unsigned32,
-    rlIgmpMldSnoopVlanAdminRouterTimeOut            Unsigned32,
-    rlIgmpMldSnoopVlanAdminLeaveTimeOut             Unsigned32,
-    rlIgmpMldSnoopVlanIsImmediateLeave              TruthValue
-}
-
-rlIgmpMldSnoopVlanInetAddressType OBJECT-TYPE
-     SYNTAX     InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type ipv6/ipv4."
-    ::= { rlIgmpMldSnoopVlanEntry 1}
-
-rlIgmpMldSnoopVlanTag OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The tag of the VLAN for which this entry contains
-         information for an IP Multicast Router."
-    ::= { rlIgmpMldSnoopVlanEntry 2 }
-
-
-rlIgmpMldSnoopVlanEnable OBJECT-TYPE
-    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Enable/Disable IGMP Snooping in the vlan."
-    ::= { rlIgmpMldSnoopVlanEntry 3 }
+        "Unicast source address of data frames."
+    ::= { rlBrgDynamicCmdEntry 6}
 
-rlIgmpMldSnoopVlanRouterLearn OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Enable/Disable of Learning of routers in the vlan."
-    ::= { rlIgmpMldSnoopVlanEntry 4 }
-
-rlIgmpMldSnoopVlanHostTimeOut OBJECT-TYPE
-    SYNTAX      INTEGER (60 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The amount of time that should pass before aging out
-         an entry in the rlIgmpSnoopMembershipTable for this vlan."
-    DEFVAL  {260}
-    ::= { rlIgmpMldSnoopVlanEntry 5 }
-
-rlIgmpMldSnoopVlanQuerierTimeOut OBJECT-TYPE
-    SYNTAX      INTEGER (1 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The amount of time where no query is heard until
-         querier is activated"
-    DEFVAL  {260}
-    ::= { rlIgmpMldSnoopVlanEntry 6 }
-
-rlIgmpMldSnoopVlanRouterTimeOut OBJECT-TYPE
-    SYNTAX      INTEGER (1 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The amount of time that should pass before aging out
-         a port in the router ports dynamically learnt for
-         this vlan."
-    DEFVAL  {300}
-    ::= { rlIgmpMldSnoopVlanEntry 7 }
-
-rlIgmpMldSnoopVlanLeaveTimeOut OBJECT-TYPE
-    SYNTAX      INTEGER (0 .. 2147483647 )
-    UNITS   "seconds"
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The amount of time that should pass before aging out
-         an entry in the rlIgmpSnoopMembershipTable for this vlan,
-         after  recieving a leave/exclude message from the port of
-         the entry."
-    DEFVAL  {10}
-    ::= { rlIgmpMldSnoopVlanEntry 8 }
-
-
-rlIgmpMldSnoopVlanIgmpVersion OBJECT-TYPE
-    SYNTAX      IgmpVersion
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current IGMP protocol version running on the VLAN."
-    ::= { rlIgmpMldSnoopVlanEntry 9 }
-
-rlIgmpMldSnoopVlanRouterPortlist OBJECT-TYPE
-    SYNTAX      PortList
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "List of router ports learned dynamically
-         from PIM, DVMRP, MRDISC, MOSPF and IGMP/MLD Query messages on this VLAN "
-    ::= { rlIgmpMldSnoopVlanEntry 10}
-
-rlIgmpMldSnoopVlanRouterStaticPortlist OBJECT-TYPE
+rlBrgDynamicCmdPorts OBJECT-TYPE
     SYNTAX      PortList
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "List of router ports configured statically on this VLAN."
-    ::= { rlIgmpMldSnoopVlanEntry 11}
+        "The list of ports for them the command is issued"
+    ::= { rlBrgDynamicCmdEntry 7}
 
-rlIgmpMldSnoopVlanRouterForbiddenPortlist OBJECT-TYPE
-    SYNTAX      PortList
+rlBrgDynamicCmdType OBJECT-TYPE
+    SYNTAX      DynamicCmdType
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "List of ports statically configured to NOT
-         be router ports on this VLAN"
-    ::= { rlIgmpMldSnoopVlanEntry 12}
+        "Current type of command"
+    ::= { rlBrgDynamicCmdEntry 8 }
 
 
-rlIgmpMldSnoopVlanQueryOverride OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Enable/Disable overriding of Query values"
-    ::= { rlIgmpMldSnoopVlanEntry 13 }
+-------------------------------------------------------------------
+--rlUserAssignedVidx
+-------------------------------------------------------------------
 
-rlIgmpMldSnoopVlanOperRobustness OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..255)
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "The Robustness Variable allows tuning for the expected
-            packet loss on a subnet.  If a subnet is expected to be
-            lossy, the Robustness Variable may be increased.  IGMP and
-            MLD are robust to (Robustness Variable-1) packet losses."
-    DEFVAL     { 2 }
-    ::= { rlIgmpMldSnoopVlanEntry 14 }
+rlUserAssignedVidx  OBJECT IDENTIFIER ::= { rlBrgMulticast 9 }
 
-rlIgmpMldSnoopVlanOperQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32 (1000..31744000)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "The frequency at which IGMP or MLD Host-Query packets are
-            transmitted on this interface. This variable must be a
-            non-zero value."
-    DEFVAL     { 125000 }
-    ::= { rlIgmpMldSnoopVlanEntry 15 }
-
-rlIgmpMldSnoopVlanOperQueryMaxResponseTime OBJECT-TYPE
-    SYNTAX     Unsigned32  (0..8387584)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "The maximum query response interval advertised in MGMDv2
-            or v3 queries on this interface."
-    REFERENCE "RFC 3810 section 9.3"
-    DEFVAL     { 10000 }
-    ::= { rlIgmpMldSnoopVlanEntry 16 }
-
-rlIgmpMldSnoopVlanOperLastMemberQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32  (0..8387584)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "The Last Member Query Interval is the Max Query Response
-            Interval inserted into group-specific queries sent in
-            response to leave group messages, and is also the amount
-            of time between group-specific query messages.  This value
-            may be tuned to modify the leave latency of the network. A
-            reduced value results in reduced time to detect the loss of
-            the last member of a group.  The value of this object is
-            irrelevant if mgmdRouterInterfaceVersion is 1."
-    DEFVAL     { 1000 }
-    ::= { rlIgmpMldSnoopVlanEntry 17 }
-
-rlIgmpMldSnoopVlanOperLastMemberQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..255)
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "Represents the number of group-specific and
-            group-and-source-specific queries sent by the router before
-            it assumes there are no local members."
-    DEFVAL  { 2 }
-    ::= { rlIgmpMldSnoopVlanEntry 18 }
-
-rlIgmpMldSnoopVlanOperStartupQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32 (0..31744000)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "This variable represents the interval between General
-            Queries sent by a Querier on startup."
-    DEFVAL {0}
-    ::= { rlIgmpMldSnoopVlanEntry 19 }
-
-rlIgmpMldSnoopVlanOperStartupQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..255)
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-            "Represents the number of Queries sent out on startup
-            separated by the Startup Query Interval."
-    DEFVAL {1}
-    ::= { rlIgmpMldSnoopVlanEntry 20 }
-
-
-rlIgmpMldSnoopVlanOperHostTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-    UNITS   "milliseconds"
-     MAX-ACCESS  read-only
-     STATUS      current
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan.
-          DEFVAL  { rlIgmpMldSnoopVlanOperRobustness *
-                    rlIgmpMldSnoopVlanOperQueryInterval +
-                    rlIgmpMldSnoopVlanOperQueryMaxResponseTime }"
-     ::= { rlIgmpMldSnoopVlanEntry 21 }
-
-rlIgmpMldSnoopVlanOperRouterTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-     UNITS   "milliseconds"
-     MAX-ACCESS  read-only
-     STATUS      current
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          a port in the router ports dynamically learnt for
-          this vlan.
-          DEFVAL  { rlIgmpMldSnoopVlanOperRobustness *
-                    rlIgmpMldSnoopVlanOperQueryInterval }"
-     ::= { rlIgmpMldSnoopVlanEntry 22 }
-
-rlIgmpMldSnoopVlanOperLeaveTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-     UNITS   "milliseconds"
-     MAX-ACCESS  read-only
-     STATUS      current
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan,
-          after  recieving a leave/exclude message from the port of
-          the entry.
-          DEFVAL  { rlIgmpMldSnoopVlanOperLastMemberQueryCount *
-                    rlIgmpMldSnoopVlanOperLastMemberQueryInterval }"
-     ::= { rlIgmpMldSnoopVlanEntry 23 }
-
-
-rlIgmpMldSnoopVlanAdminRobustness OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..7)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "The Robustness Variable allows tuning for the expected
-            packet loss on a subnet.  If a subnet is expected to be
-            lossy, the Robustness Variable may be increased.  IGMP and
-            MLD are robust to (Robustness Variable-1) packet losses."
-    DEFVAL     { 2 }
-    ::= { rlIgmpMldSnoopVlanEntry 24 }
-
-rlIgmpMldSnoopVlanAdminQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32 (1000..18000000)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "The frequency at which IGMP or MLD Host-Query packets are
-            transmitted on this interface. This variable must be a
-            non-zero value."
-    DEFVAL     { 125000 }
-    ::= { rlIgmpMldSnoopVlanEntry 25 }
-
-rlIgmpMldSnoopVlanAdminQueryMaxResponseTime OBJECT-TYPE
-    SYNTAX     Unsigned32  (1000..20000)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "The maximum query response interval advertised in MGMDv2
-            or v3 queries on this interface."
-    REFERENCE "RFC 3810 section 9.3"
-    DEFVAL     { 10000 }
-    ::= { rlIgmpMldSnoopVlanEntry 26 }
-
-rlIgmpMldSnoopVlanAdminLastMemberQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32  (100..25500)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "The Last Member Query Interval is the Max Query Response
-            Interval inserted into group-specific queries sent in
-            response to leave group messages, and is also the amount
-            of time between group-specific query messages.  This value
-            may be tuned to modify the leave latency of the network. A
-            reduced value results in reduced time to detect the loss of
-            the last member of a group.  The value of this object is
-            irrelevant if mgmdRouterInterfaceVersion is 1."
-    DEFVAL     { 1000 }
-    ::= { rlIgmpMldSnoopVlanEntry 27 }
-
-rlIgmpMldSnoopVlanAdminLastMemberQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (0..7)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "Represents the number of group-specific and
-            group-and-source-specific queries sent by the router before
-            it assumes there are no local members. Value 0 is used to indicate 
-             usage of default value. DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness }"
-    ::= { rlIgmpMldSnoopVlanEntry 28 }
-
-rlIgmpMldSnoopVlanAdminStartupQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32 (0..4500000)
-    UNITS      "milliseconds"
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "This variable represents the interval between General
-            Queries sent by a Querier on startup."
-    DEFVAL {0}
-    ::= { rlIgmpMldSnoopVlanEntry 29 }
-
-rlIgmpMldSnoopVlanAdminStartupQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..255)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-            "Represents the number of Queries sent out on startup
-            separated by the Startup Query Interval."
-    DEFVAL {0}
-    ::= { rlIgmpMldSnoopVlanEntry 30 }
-
-rlIgmpMldSnoopVlanAdminHostTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-     UNITS   "milliseconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan.
-          DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness *
-                    rlIgmpMldSnoopVlanAdminQueryInterval +
-                    rlIgmpMldSnoopVlanAdminQueryMaxResponseTime }"
-     ::= { rlIgmpMldSnoopVlanEntry 31 }
-
-rlIgmpMldSnoopVlanAdminRouterTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-     UNITS   "milliseconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          a port in the router ports dynamically learnt for
-          this vlan.
-          DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness *
-                    rlIgmpMldSnoopVlanAdminQueryInterval }"
-     ::= { rlIgmpMldSnoopVlanEntry 32 }
-
-rlIgmpMldSnoopVlanAdminLeaveTimeOut OBJECT-TYPE
-     SYNTAX      Unsigned32 (0 .. 2147483647 )
-     UNITS   "milliseconds"
-     MAX-ACCESS  read-write
-     STATUS      obsolete
-     DESCRIPTION
-         "The amount of time that should pass before aging out
-          an entry in the rlIgmpSnoopMembershipTable for this vlan,
-          after  recieving a leave/exclude message from the port of
-          the entry.
-          DEFVAL  { rlIgmpMldSnoopVlanAdminLastMemberQueryCount *
-                    rlIgmpMldSnoopVlanAdminLastMemberQueryInterval }"
-     ::= { rlIgmpMldSnoopVlanEntry 33 }
-
-rlIgmpMldSnoopVlanIsImmediateLeave OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        " Enable/Disable immediate leave on this Vlan"
-    DEFVAL {false}
-    ::= { rlIgmpMldSnoopVlanEntry 34 }
-
-
--- rlIgmpMldSnoopMulticastTvTable (replaces rlIgmpSnoopMulticastTvTable)
-
-rlIgmpMldSnoopMulticastTvTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpMldSnoopMulticastTvEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        " multicast vlan used for this port"
-    ::= { rlMldSnoop  6 }
-
-rlIgmpMldSnoopMulticastTvEntry OBJECT-TYPE
-    SYNTAX      RlIgmpMldSnoopMulticastTvEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        " entry of multicast ip"
-    INDEX   { rlIgmpMldSnoopMulticastTvInetAddressType, rlIgmpMldSnoopMulticastTvVID, rlIgmpMldSnoopMulticastTvGroupAddressType, rlIgmpMldSnoopMulticastTvGroup }
-    ::= { rlIgmpMldSnoopMulticastTvTable 1 }
-
-RlIgmpMldSnoopMulticastTvEntry ::= SEQUENCE {
-        rlIgmpMldSnoopMulticastTvInetAddressType   InetAddressType,
-        rlIgmpMldSnoopMulticastTvVID               VlanIndex,
-        rlIgmpMldSnoopMulticastTvGroupAddressType  InetAddressType,
-        rlIgmpMldSnoopMulticastTvGroup             InetAddress,
-        rlIgmpMldSnoopMulticastTvStatus            RowStatus
-    }
-
-rlIgmpMldSnoopMulticastTvInetAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type ipv6/ipv4."
-    ::= { rlIgmpMldSnoopMulticastTvEntry 1}
-
-rlIgmpMldSnoopMulticastTvVID OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-         "Specify the multicast ip to be used."
-    ::= { rlIgmpMldSnoopMulticastTvEntry  2 }
-
-rlIgmpMldSnoopMulticastTvGroupAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type ipv6/ipv4."
-    ::= { rlIgmpMldSnoopMulticastTvEntry 3}
-
-rlIgmpMldSnoopMulticastTvGroup OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-         "Specify the multicast ip to be used."
-    ::= { rlIgmpMldSnoopMulticastTvEntry  4 }
-
-rlIgmpMldSnoopMulticastTvStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-       "The row status variable, used according to
-        row installation and removal conventions."
-    ::= { rlIgmpMldSnoopMulticastTvEntry 5 }
-
-
-
-MldVersion ::= TEXTUAL-CONVENTION
+VidxIndex ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
-        "MLD version."
-    SYNTAX  INTEGER {
-        none(0),
-        v1(1),
-        v2(2)
+        "Values of Vidx. 0 means no free Vidx."
+    SYNTAX  Unsigned32 (0|4096..32767)
+
+
+--rlUserAssignedVidxTable
+
+rlUserAssignedVidxConfigTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlUserAssignedVidxConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing entries of User Assigned Vidx configuration information"
+    ::= { rlUserAssignedVidx 1 }
+
+rlUserAssignedVidxConfigEntry       OBJECT-TYPE
+    SYNTAX      RlUserAssignedVidxConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry of User Assigned Vidx information table"
+    INDEX   { rlUserAssignedVidxConfigIndex }
+    ::= { rlUserAssignedVidxConfigTable 1 }
+
+RlUserAssignedVidxConfigEntry::= SEQUENCE {
+        rlUserAssignedVidxConfigIndex       VidxIndex,
+        rlUserAssignedVidxConfigPorts       PortList,
+        rlUserAssignedVidxConfigRowStatus   RowStatus
 }
 
-
-
--- rlMldSnoopQuerierVlanTable
-
-rlMldSnoopQuerierVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlMldSnoopQuerierVlanEntry
+rlUserAssignedVidxConfigIndex       OBJECT-TYPE
+    SYNTAX      VidxIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-       "A table that contains MLD Snooping Querier information about
-        every vlan. This is indexed by vlan tag."
-    ::= { rlMldSnoop 7 }
+            "Vidx index. Values from 4K to 32K"
+    ::= { rlUserAssignedVidxConfigEntry 1 }
 
-rlMldSnoopQuerierVlanEntry OBJECT-TYPE
-    SYNTAX      RlMldSnoopQuerierVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlMldSnoopQuerierVlanTable."
-    INDEX  { rlMldSnoopQuerierVlanTag }
-    ::= { rlMldSnoopQuerierVlanTable 1 }
-
-RlMldSnoopQuerierVlanEntry ::= SEQUENCE {
-    rlMldSnoopQuerierVlanTag                       VlanIndex,
-    rlMldSnoopQuerierAdminEnable                   TruthValue,
-    rlMldSnoopQuerierOperEnable                    TruthValue,
-    rlMldSnoopQuerierAdminAddrInetAddressType      InetAddressType,
-    rlMldSnoopQuerierAdminAddr                     InetAddress,
-    rlMldSnoopQuerierOperAddrInetAddressType       InetAddressType,
-    rlMldSnoopQuerierOperAddr                      InetAddress,
-    rlMldSnoopQuerierAdminVersionNumber            MldVersion,
-    rlMldSnoopQuerierOperVersionNumber             MldVersion,
-        rlMldSnoopQuerierElectionEnable                TruthValue
-}
-
-rlMldSnoopQuerierVlanTag OBJECT-TYPE
-    SYNTAX      VlanIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "An MLD Snoop Querier entry vlan tag."
-    ::= { rlMldSnoopQuerierVlanEntry 1 }
-
-rlMldSnoopQuerierAdminEnable OBJECT-TYPE
-    SYNTAX      TruthValue
+rlUserAssignedVidxConfigPorts       OBJECT-TYPE
+    SYNTAX PortList
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The desired administrative state of MLD Snoop Querier on the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 2 }
+        "List of ports that belong to the Vidx"
+    ::= { rlUserAssignedVidxConfigEntry 2 }
 
-rlMldSnoopQuerierOperEnable OBJECT-TYPE
-    SYNTAX      TruthValue
+rlUserAssignedVidxConfigRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlUserAssignedVidxConfigEntry 3 }
+
+--rlUserAssignedVidxGetFreeIndex
+
+rlUserAssignedVidxGetNextFreeIndex OBJECT-TYPE
+    SYNTAX           VidxIndex
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Returns the next free Vidx index. Values from 4K to 32K"
+    ::= { rlUserAssignedVidx 2 }
+
+rlBrgMulticastCurrentNumberOfEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current operational state of MLD Snoop Querier on the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 3 }
-
-rlMldSnoopQuerierAdminAddrInetAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type IPv6/IPv4."
-    ::= { rlMldSnoopQuerierVlanEntry 4}
-
-rlMldSnoopQuerierAdminAddr OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The desired IP address is being used in MLD Snoop Querier messages on the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 5 }
-
-rlMldSnoopQuerierOperAddrInetAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type IPv6/IPv4."
-    ::= { rlMldSnoopQuerierVlanEntry 6}
-
-rlMldSnoopQuerierOperAddr OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current operational IP address is being used in MLD Snoop Querier messages on the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 7 }
-
-rlMldSnoopQuerierAdminVersionNumber OBJECT-TYPE
-    SYNTAX      MldVersion
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The highest version number of MLD Snoop Querier for the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 8 }
-
-rlMldSnoopQuerierOperVersionNumber OBJECT-TYPE
-    SYNTAX      MldVersion
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The current operational version number of MLD Snoop Querier for the vlan."
-    ::= { rlMldSnoopQuerierVlanEntry 9 }
-
-rlMldSnoopQuerierElectionEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Whether or not to participate in querier election.
-         When true, the snooping querier participates in querier election.
-         When false, the snooping querier is the elected querier until a general
-         query is heard from another router on the vlan (always lose)."
-    ::= { rlMldSnoopQuerierVlanEntry 10 }
----
-
-rlMldSnoopQuerierEnable OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Globally enable/disable MLD Snooping Querier in the switch."
-    ::= { rlMldSnoop 8 }
-
-
-rlIgmpMldSnoopQuerierGlobalAddressTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlIgmpMldSnoopQuerierGlobalAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-       "A table that contains IGMP/MLD Snooping Querier global address."
-    ::= { rlMldSnoop 9 }
-
-
-rlIgmpMldSnoopQuerierGlobalAddressEntry OBJECT-TYPE
-    SYNTAX      RlIgmpMldSnoopQuerierGlobalAddressEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "An entry (conceptual row) in the rlIgmpMldSnoopQuerierGlobalAddressTable."
-    INDEX  { rlIgmpMldSnoopQuerierGlobalAddressIPVersion }
-    ::= { rlIgmpMldSnoopQuerierGlobalAddressTable 1 }
-
-RlIgmpMldSnoopQuerierGlobalAddressEntry ::= SEQUENCE {
-    rlIgmpMldSnoopQuerierGlobalAddressIPVersion InetVersion,
-    rlIgmpMldSnoopQuerierGlobalAddressType      InetAddressType,
-    rlIgmpMldSnoopQuerierGlobalAddress          InetAddress
-}
-
-rlIgmpMldSnoopQuerierGlobalAddressIPVersion OBJECT-TYPE
-    SYNTAX     InetVersion
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-            "The IP version of this PIM interface.  A physical interface
-            may be configured in multiple modes concurrently, e.g., IPv4
-            and IPv6; however, the traffic is considered to be logically
-            separate."
-    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 1 }
-
-rlIgmpMldSnoopQuerierGlobalAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Inet type IPv6/IPv4."
-    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 2}
-
-rlIgmpMldSnoopQuerierGlobalAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The desired address to used in IGMP/MLD Snoop Querier messages if
-         such an address is not configured on the vlan."
-    ::= { rlIgmpMldSnoopQuerierGlobalAddressEntry 3 }
-
-
----
---- TRAPS
----
-
-rlMacMulticastUnregFilterFailed TRAP-TYPE
-    ENTERPRISE  switch001
-    VARIABLES   { rndErrorDesc, rndErrorSeverity }
-    DESCRIPTION
-        "Warning trap indicating - Setting Mac Unregistered Filtering on port is failed. The bound variable rndErrorDesc provides the interface number. "
-    ::= 1
-
-rlIgmpMldSnoopTriplePlayPort NOTIFICATION-TYPE
-    OBJECTS   { rndErrorDesc, rndErrorSeverity }
-    STATUS  current
-    DESCRIPTION
-        "Informational trap indicating that a query was recieved on a triple play port."
-    ::= { rndNotifications 208 }
-
-
-rlbrgIgmpSnoopQrrDuplicateIP  NOTIFICATION-TYPE
-    OBJECTS   { rndErrorDesc, rndErrorSeverity }
-    STATUS  current
-    DESCRIPTION
-        "Warning trap indicating that duplicate ip\ipv6 address 
-         occured between two queries"
-    ::= { rndNotifications 227 }
+        "Current number of multicast entries."
+::= { rlBrgMulticast 10 }
 
 
 END

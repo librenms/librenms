@@ -1,10 +1,7 @@
-source: Alerting/Templates.md
-path: blob/master/doc/
-
 # Templates
 
 > This page is for installs running version 1.42 or later. You can
-> find the older docs [here](Old_Templates.md)
+> find the older docs [here](https://github.com/librenms/librenms/blob/773411359489e0ffcc3ba763f1f138403343591a/doc/Alerting/Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can
 contain any kind of text. There is also a default template which is
@@ -20,7 +17,7 @@ button. You might hold down the CTRL key to select multiple rules at once.
 
 The templating engine in use is Laravel Blade. We will cover some of
 the basics here, however the official Laravel docs will have more
-information [here](https://laravel.com/docs/5.7/blade)
+information [here](https://laravel.com/docs/blade)
 
 ## Syntax
 
@@ -28,8 +25,7 @@ Controls:
 
 - if-else (Else can be omitted): `@if ($alert->placeholder  ==
   'value') Some Text @else Other Text @endif`
-- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key
-  </br> alue: $value @endforeach`
+- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key Value: $value @endforeach`
 
 Placeholders:
 
@@ -47,6 +43,7 @@ been up for 30344 seconds`.
 - Hostname of the Device: `$alert->hostname`
 - sysName of the Device: `$alert->sysName`
 - sysDescr of the Device: `$alert->sysDescr`
+- display name of the Device: `$alert->display`
 - sysContact of the Device: `$alert->sysContact`
 - OS of the Device: `$alert->os`
 - Type of Device: `$alert->type`
@@ -67,9 +64,11 @@ been up for 30344 seconds`.
 - ping min (if icmp enabled): `$alert->ping_min`
 - ping max (if icmp enabled): `$alert->ping_max`
 - ping avg (if icmp enabled): `$alert->ping_avg`
-- debug (array) If `$config['debug']['run_trace] = true;` is set then this will contain:
-  - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
-  - output (if the traceroute fails this will contain why): `$alert->debug['output']`
+- debug (array) 
+  - poller_name - name of poller (for distributed setups)
+  - If `$config['debug']['run_trace] = true;` is set then this will contain:
+   - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
+   - traceroute_output (if the traceroute fails this will contain why): `$alert->debug['output']`
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
@@ -139,11 +138,11 @@ In your alert template just use
 @endsection
 ```
 
-More info: [https://laravel.com/docs/5.7/blade#extending-a-layout](https://laravel.com/docs/5.7/blade#extending-a-layout)
+More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.com/docs/blade#extending-a-layout)
 
 ## Examples
 
-#### Default Template
+### Default Template
 
 ```text
 {{ $alert->title }}
@@ -194,7 +193,6 @@ Timestamp: {{ $alert->timestamp }}
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
 Server: {{ $alert->sysName }}
@@ -204,7 +202,7 @@ Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-#### Temperature Sensors
+#### Value Sensors (Temperature, Humidity, Fanspeed, ...)
 
 ```text
 {{ $alert->title }}
@@ -213,47 +211,26 @@ Device Name: {{ $alert->hostname }}
 Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
-Location: {{ $alert->location }}
-Description: {{ $alert->description }}
-Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
-Notes: {{ $alert->notes }}
-
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
-@foreach ($faults as $key => $value)
-#{{ $key }}: Temperature: {{ $value['sensor_current'] }} °C
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp°C over limit
-Previous Measurement: {{ $value['sensor_prev'] }} °C
-High Temperature Limit: {{ $value['sensor_limit'] }} °C
-@endforeach
+@if ($alert->state == 0)
+Time elapsed: {{ $alert->elapsed }}
 @endif
-```
-
-#### Value Sensors
-
-```text
-{{ $alert->title }}
-
-Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }}
-Timestamp: {{ $alert->timestamp }}
-Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
+Rule: {{ $alert->name ?? $alert->rule }}
+@if ($alert->faults)
+Faults:
 @foreach ($alert->faults as $key => $value)
-#{{ $key }}: Sensor {{ $value['sensor_current'] }}
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp over limit
-Previous Measurement: {{ $value['sensor_prev'] }}
-Limit: {{ $value['sensor_limit'] }}
+@php($unit = __("sensors.${value["sensor_class"]}.unit"))
+#{{ $key }}: {{ $value['sensor_descr'] ?? 'Sensor' }}
+
+Current: {{ $value['sensor_current'].$unit }}
+Previous: {{ $value['sensor_prev'].$unit }}
+Limit: {{ $value['sensor_limit'].$unit }}
+Over Limit: {{ round($value['sensor_current']-$value['sensor_limit'], 2).$unit }}
+
 @endforeach
 @endif
 ```
@@ -297,7 +274,7 @@ email or just the hostname in any other transport:
 
 ```text
 @if ($alert->status == 0)
-    @if ($alert->status == icmp)
+    @if ($alert->status_reason == 'icmp')
         {{ $alert->debug['traceroute'] }}
     @endif
 @endif
@@ -309,15 +286,95 @@ Note: To use HTML emails you must set HTML email to Yes in the WebUI
 under Global Settings > Alerting Settings > Email transport > Use HTML
 emails
 
-Note: To include Graphs you must enable unauthorized graphs in
-config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+## Graphs
+
+There are two helpers for graphs that will use a signed url to allow secure external
+access.  Anyone using the signed url will be able to view the graph.
+
+ - Your LibreNMS web must be accessible from the location where the graph is viewed.
+   Some alert transports require publicly accessible urls.
+ - APP_URL must be set in .env to use signed graphs.
+ - Changing APP_KEY will invalidate all previously issued singed urls.
+
+You may specify the graph one of two ways, a php array of parameters, or
+a direct url to a graph.
+
+Note that to and from can be specified either as timestamps with `time()`
+or as relative time `-3d` or `-36h`.  When using relative time, the graph
+will show based on when the user views the graph, not when the event happened.
+Sharing a graph image with a relative time will always give the recipient access
+to current data, where a specific timestamp will only allow access to that timeframe.
+
+### @signedGraphTag
+
+This will insert a specially formatted html img tag linking to the graph.
+Some transports may search the template for this tag to attach images properly
+for that transport.
 
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
-$config['allow_unauth_graphs'] = true;
+@signedGraphTag([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+    'width' => 700, 
+    'height' => 250
+])
 ```
 
-#### Service Alert
+Output:
+```html
+<img class="librenms-graph" src="https://librenms.org/graph?from=1662176216&amp;height=250&amp;id=20425&amp;to=1662219416&amp;type=port_bits&amp;width=700&amp;signature=f6e516e8fd893c772eeaba165d027cb400e15a515254de561a05b63bc6f360a4">
+```
+
+Specific graph using url input:
+
+```
+@signedGraphTag('https://librenms.org/graph.php?type=device_processor&from=-2d&device=2&legend=no&height=400&width=1200')
+```
+
+### @signedGraphUrl
+
+This is used when you need the url directly. One example is using the
+API Transport, you may want to include the url only instead of a html tag.
+
+```
+@signedGraphUrl([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+])
+```
+
+## Using models for optional data
+
+If some value does not exist within the `$faults[]`-array, you may
+query fields from the database using Laravel models. You may use
+models to query additional values and use them on the template by
+placing the model and the value to search for within the braces. For
+example, ISIS-alerts do have a `port_id` value associated with the
+alert but `ifName` is not directly accessible from the
+`$faults[]`-array. If the name of the port was needed, it's value
+could be queried using a template such as:
+
+```
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  Local interface: {{ \App\Models\Port::find($value['port_id'])->ifName }}
+  Adjacent IP: {{ $value['isisISAdjIPAddrAddress'] }}
+  Adjacent state: {{ $value['isisISAdjState'] }}
+
+@endforeach
+@endif
+```
+
+### Service Alert
 
 ```
 <div style="font-family:Helvetica;">
@@ -353,7 +410,8 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 {{ $key }}: {{ $value['string'] }}<br>
 @endforeach
 @if ($alert->faults) <b>Faults:</b><br>
-@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
+@foreach ($alert->faults as $key => $value)
+@signedGraphTag(['device_id' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach
 Template: CPU alert <br>
@@ -376,29 +434,29 @@ The included templates apart from the default template are:
 
 ## Other Examples
 
-#### Microsoft Teams - Markdown
+### Microsoft Teams - Markdown
 
 ```
-[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-**Device name:** {{ $alert->sysName }}  
-**Severity:** {{ $alert->severity }}  
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)
+**Device name:** {{ $alert->sysName }}
+**Severity:** {{ $alert->severity }}
 @if ($alert->state == 0)
-**Time elapsed:** {{ $alert->elapsed }}  
+**Time elapsed:** {{ $alert->elapsed }}
 @endif
-**Timestamp:** {{ $alert->timestamp }}  
-**Unique-ID:** {{ $alert->uid }}  
+**Timestamp:** {{ $alert->timestamp }}
+**Unique-ID:** {{ $alert->uid }}
 @if ($alert->name)
-**Rule:** {{ $alert->name }}  
+**Rule:** {{ $alert->name }}
 @else
-**Rule:** {{ $alert->rule }}  
+**Rule:** {{ $alert->rule }}
 @endif
 @if ($alert->faults)
-**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}
 @endforeach
 @endif
 ```
 
-#### Microsoft Teams - JSON
+### Microsoft Teams - JSON
 
 ```
 {

@@ -1,9 +1,12 @@
 -- *****************************************************************
 -- CISCO-POWER-ETHERNET-EXT-MIB
 --   
+-- Ported from flo_dsbu7
+--   
+-- Nov 2011, ovld-sw-platform-dev
 -- March 2004, Seth Wang
 --   
--- Copyright (c) 2004-2007 by Cisco Systems, Inc.
+-- Copyright (c) 2004-2007, 2010-2013, 2017-2018 by Cisco Systems, Inc.
 --   
 -- All rights reserved.
 -- ****************************************************************
@@ -20,10 +23,13 @@ IMPORTS
     OBJECT-GROUP,
     NOTIFICATION-GROUP
         FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
     TruthValue
         FROM SNMPv2-TC
     pethPsePortEntry,
-    pethMainPseGroupIndex
+    pethMainPseGroupIndex,
+    pethPsePortGroupIndex,
+    pethPsePortIndex
         FROM POWER-ETHERNET-MIB
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
@@ -34,7 +40,7 @@ IMPORTS
 
 
 ciscoPowerEthernetExtMIB MODULE-IDENTITY
-    LAST-UPDATED    "200704120000Z"
+    LAST-UPDATED    "201801190000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -66,6 +72,32 @@ ciscoPowerEthernetExtMIB MODULE-IDENTITY
             supply from Power Sourcing Equipment. They are, for
             example, IP telephones and wireless access points
             or bridges."
+    REVISION        "201801190000Z"
+    DESCRIPTION
+        "Added following OBJECT-GROUP
+        - cpeExtPseInfoPwrGroup
+        Added new compliance
+        - cpeExtMIBCompliance6."
+    REVISION        "201307100000Z"
+    DESCRIPTION
+        "Added following TEXTUAL-CONVENTION
+        - CpeExtLldpPwrClassOrZero
+        Added following OBJECT-GROUP
+        - cpeExtPsePortLldpPowerGroup
+        Added new compliance
+        - cpeExtMIBCompliance5."
+    REVISION        "201107180000Z"
+    DESCRIPTION
+        "Added cpeExtPowerPriorityGroup, cpeExtPsePortLldpGroup
+        and cpeExtPsePortCapabilitiesGroup.
+
+        Added a new enumeration 'class4' in cpeExtPdStatsClass.
+
+        Added TEXTUAL-CONVENTION CpeExtLldpPwrType,
+        CpeExtLldpPwrSrc, and CpeExtPwrPriority."
+    REVISION        "200912040000Z"
+    DESCRIPTION
+        "Updated the DESCRIPTION of cpeExtPolicingNotif."
     REVISION        "200704120000Z"
     DESCRIPTION
         "Added 'overdrawLog' value to cpeExtPsePortAdditionalStatus.
@@ -99,6 +131,106 @@ cpeExtMIBObjects  OBJECT IDENTIFIER
 cpeExtMIBConformance  OBJECT IDENTIFIER
     ::= { ciscoPowerEthernetExtMIB 2 }
 
+
+CpeExtLldpPwrType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The requested Data Terminal Equipment (DTE) Power via
+        Media Dependent Interface (MDI) type based on Data Link Layer
+        (DLL) power classification.
+
+        In Data Link Layer power classification, the PSE and PD perform 
+        power negotiation using the Link Layer Discovery Protocol (LLDP)
+        as soon as the data link is established. It has finer power
+        resolution than the Physical Layer power classification and has
+        the ability for the PSE and PD to participate in dynamic power
+        allocation wherein allocated power to the PD may change one or
+        more times during PD operation.
+
+        'type1Pd'  - A PD that advertises a power draw less than or 
+                     equal to 12.95 W (at the PD).
+        'type1Pse' - A PSE that is designed to support a Type 1 PD.
+        'type2Pd'  - A PD that advertises a power draw greater than
+                     12.95 W (at the PD).
+        'type2Pse  - A PSE that is designed to support either a Type 1
+                     or a Type 2 PD."
+    SYNTAX          INTEGER  {
+                        type1Pd(1),
+                        type1Pse(2),
+                        type2Pd(3),
+                        type2Pse(4)
+                    }
+
+CpeExtLldpPwrSrc ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The power source of the PD or PSE port which implements the
+        LLDP based Data Link Layer power classification.
+
+        'pseAndLocal'   - A PD powered both locally and by a PSE.
+        'local'         - A PD powered locally only.
+        'pse'           - A PD powered by a PSE only.
+        'backupSrc'     - A PSE powered by a backup power source.
+        'primarySrc'    - A PSE powered by its primary power source.
+        'unknown'       - A PD or PSE where the power source is
+                          unknown."
+    SYNTAX          INTEGER  {
+                        pseAndLocal(1),
+                        local(2),
+                        pse(3),
+                        backupSrc(4),
+                        primarySrc(5),
+                        unknown(6)
+                    }
+
+CpeExtPwrPriority ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The power priority for the PD on the PSE port which implements
+        the LLDP based Data Link Layer power classification.
+
+        'critical' - power priority is at critical level.
+        'high'     - power priority is at high level.
+        'low'      - power priority is at low level.
+        'unknown'  - power priority level is unknown."
+    SYNTAX          INTEGER  {
+                        critical(1),
+                        high(2),
+                        low(3),
+                        unknown(4)
+                    }
+
+CpeExtLldpPwrClassOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The power class of the PD or PSE port that implements
+        the LLDP based Data Link Layer power classification
+
+        'unknown' - power classification of the powered devices is
+                    unknown.
+
+        'class0'  - power classification of the powered devices is
+                    class 0 in IEEE specifications.
+
+        'class1'  - power classification of the powered devices is
+                    class 1 in IEEE specifications.
+
+        'class2'  - power classification of the powered devices is
+                    class 2 in IEEE specifications.
+
+        'class3'  - power classification of the powered devices is
+                    class 3 in IEEE specifications.
+
+        'class4'  - power classification of the powered devices is
+                    class 4 in IEEE specifications."
+    SYNTAX          INTEGER  {
+                        unknown(0),
+                        class0(1),
+                        class1(2),
+                        class2(3),
+                        class3(4),
+                        class4(5)
+                    }
 
 cpeExtDefaultAllocation OBJECT-TYPE
     SYNTAX          Unsigned32
@@ -137,12 +269,11 @@ cpeExtPsePortEntry OBJECT-TYPE
         controls more characteristics of a power Ethernet
         port on a PSE device."
     AUGMENTS           { pethPsePortEntry  } 
- 
     ::= { cpeExtPsePortTable 1 }
 
 CpeExtPsePortEntry ::= SEQUENCE {
-        cpeExtPsePortEnable           INTEGER ,
-        cpeExtPsePortDiscoverMode     INTEGER ,
+        cpeExtPsePortEnable           INTEGER,
+        cpeExtPsePortDiscoverMode     INTEGER,
         cpeExtPsePortDeviceDetected   TruthValue,
         cpeExtPsePortIeeePd           TruthValue,
         cpeExtPsePortAdditionalStatus BITS,
@@ -153,9 +284,10 @@ CpeExtPsePortEntry ::= SEQUENCE {
         cpeExtPsePortMaxPwrDrawn      Unsigned32,
         cpeExtPsePortEntPhyIndex      EntPhysicalIndexOrZero,
         cpeExtPsePortPolicingCapable  TruthValue,
-        cpeExtPsePortPolicingEnable   INTEGER ,
-        cpeExtPsePortPolicingAction   INTEGER ,
-        cpeExtPsePortPwrManAlloc      Unsigned32
+        cpeExtPsePortPolicingEnable   INTEGER,
+        cpeExtPsePortPolicingAction   INTEGER,
+        cpeExtPsePortPwrManAlloc      Unsigned32,
+        cpeExtPsePortCapabilities     BITS
 }
 
 cpeExtPsePortEnable OBJECT-TYPE
@@ -428,9 +560,28 @@ cpeExtPsePortPwrManAlloc OBJECT-TYPE
         power allocation. 
 
         Warning: Misconfiguring this manual power allocation may 
-        cause demage to the system and void the warranty. Take 
+        cause damage to the system and void the warranty. Take 
         precautions not to oversubscribe the power supply." 
     ::= { cpeExtPsePortEntry 15 }
+
+cpeExtPsePortCapabilities OBJECT-TYPE
+    SYNTAX          BITS {
+                        policing(0),
+                        poePlus(1)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the PSE functionality that
+        this port supports.
+
+        If the 'policing' BIT is set, then this PSE port is
+        capable of policing the port for proper power consumption
+        based on the allocated value.
+
+        If the 'poePlus' BIT is set, then this PSE port supports
+        PoE Plus functions." 
+    ::= { cpeExtPsePortEntry 16 }
  
 
 
@@ -462,7 +613,9 @@ cpeExtMainPseEntry OBJECT-TYPE
 CpeExtMainPseEntry ::= SEQUENCE {
         cpeExtMainPseEntPhyIndex       EntPhysicalIndexOrZero,
         cpeExtMainPseDescr             SnmpAdminString,
-        cpeExtMainPsePwrMonitorCapable TruthValue
+        cpeExtMainPsePwrMonitorCapable TruthValue,
+        cpeExtMainPseUsedPower         Unsigned32,
+        cpeExtMainPseRemainingPower    Unsigned32
 }
 
 cpeExtMainPseEntPhyIndex OBJECT-TYPE
@@ -498,6 +651,26 @@ cpeExtMainPsePwrMonitorCapable OBJECT-TYPE
         group is capable. The value 'false' means that the group
         in not capable." 
     ::= { cpeExtMainPseEntry 3 }
+
+cpeExtMainPseUsedPower OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "miliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates used power expressed in miliwatts." 
+    ::= { cpeExtMainPseEntry 4 }
+
+cpeExtMainPseRemainingPower OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "miliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates remaining power expressed in
+        miliwatts, this parameter is calculated as pethMainPsePower
+        minus cpeExtMainPseUsedPower." 
+    ::= { cpeExtMainPseEntry 5 }
  
 
 cpeExtPdStatistics  OBJECT IDENTIFIER
@@ -548,7 +721,7 @@ cpeExtPdStatsEntry OBJECT-TYPE
     ::= { cpeExtPdStatsTable 1 }
 
 CpeExtPdStatsEntry ::= SEQUENCE {
-        cpeExtPdStatsClass       INTEGER ,
+        cpeExtPdStatsClass       INTEGER,
         cpeExtPdStatsDeviceCount Unsigned32
 }
 
@@ -558,7 +731,8 @@ cpeExtPdStatsClass OBJECT-TYPE
                         class0(2),
                         class1(3),
                         class2(4),
-                        class3(5)
+                        class3(5),
+                        class4(6)
                     }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -585,7 +759,11 @@ cpeExtPdStatsClass OBJECT-TYPE
 
         A value of 'class3' indicates that the power
         classification of the powered devices falls into
-        class 3 in IEEE specifications."
+        class 3 in IEEE specifications.
+
+        A value of 'class4' indicates that the power
+        classification of the powered devices falls into
+        class 4 in IEEE specifications."
     REFERENCE
         "IEEE Std 802.3af Section 30.9.1.1.6
                aPSEPowerClassification" 
@@ -612,6 +790,224 @@ cpeExtPolicingNotifEnable OBJECT-TYPE
         the cpeExtPolicingNotif notification." 
     ::= { cpeExtMIBObjects 5 }
 
+cpeExtPowerPriorityEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is the global control of the power priority
+        feature on the device. 'true' indicates that the power priority
+        feature is globally enabled. 'false' indicates that the power
+        priority feature is globally disabled." 
+    ::= { cpeExtMIBObjects 6 }
+
+cpeExtPsePortLldpTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpeExtPsePortLldpEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table provides the Link Layer Discovery Protocol (LLDP)
+        based Data Link Layer (DLL) power classification
+        characteristics of PSE ports and PDs attached to them."
+    ::= { cpeExtMIBObjects 7 }
+
+cpeExtPsePortLldpEntry OBJECT-TYPE
+    SYNTAX          CpeExtPsePortLldpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A cpeExtPsePortLldpEntry entry contains the LLDP
+        based 802.3at DLL power classification characteristics for
+        a particular PSE and the PD attached to it. 
+
+        A PSE has its entry here when all of the following conditions
+        are satisfied:
+        - The LLDP power classification is globally enabled.
+        - It has a PD attached.
+        - LLDP is the operational power negotiation protocol between
+          the PSE and the PD attached."
+    INDEX           {
+                        pethPsePortGroupIndex,
+                        pethPsePortIndex
+                    } 
+    ::= { cpeExtPsePortLldpTable 1 }
+
+CpeExtPsePortLldpEntry ::= SEQUENCE {
+        cpeExtPsePortLldpPwrType          CpeExtLldpPwrType,
+        cpeExtPsePortLldpPdPwrType        CpeExtLldpPwrType,
+        cpeExtPsePortLldpPwrSrc           CpeExtLldpPwrSrc,
+        cpeExtPsePortLldpPdPwrSrc         CpeExtLldpPwrSrc,
+        cpeExtPsePortLldpPwrPriority      CpeExtPwrPriority,
+        cpeExtPsePortLldpPdPwrPriority    CpeExtPwrPriority,
+        cpeExtPsePortLldpPwrReq           Unsigned32,
+        cpeExtPsePortLldpPdPwrReq         Unsigned32,
+        cpeExtPsePortLldpPwrAlloc         Unsigned32,
+        cpeExtPsePortLldpPdPwrAlloc       Unsigned32,
+        cpeExtPsePortLldpPwrClass         CpeExtLldpPwrClassOrZero,
+        cpeExtPsePortLldpPdPwrClass       CpeExtLldpPwrClassOrZero,
+        cpeExtPsePortLldpPdPwrSupport     BITS,
+        cpeExtPsePortLldpPdPwrPairsOrZero INTEGER
+}
+
+cpeExtPsePortLldpPwrType OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The DTE Power via MDI type of the local system (PSE)." 
+    ::= { cpeExtPsePortLldpEntry 1 }
+
+cpeExtPsePortLldpPdPwrType OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The DTE Power via MDI type of the remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 2 }
+
+cpeExtPsePortLldpPwrSrc OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrSrc
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The power source of the local system (PSE)." 
+    ::= { cpeExtPsePortLldpEntry 3 }
+
+cpeExtPsePortLldpPdPwrSrc OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrSrc
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The power source of the remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 4 }
+
+cpeExtPsePortLldpPwrPriority OBJECT-TYPE
+    SYNTAX          CpeExtPwrPriority
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The power priority of the local system (PSE)." 
+    ::= { cpeExtPsePortLldpEntry 5 }
+
+cpeExtPsePortLldpPdPwrPriority OBJECT-TYPE
+    SYNTAX          CpeExtPwrPriority
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The power priority of the remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 6 }
+
+cpeExtPsePortLldpPwrReq OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The requested PD power value that the local
+        system (PSE) mirrors back to the remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 7 }
+
+cpeExtPsePortLldpPdPwrReq OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The PD requested power value received from
+        the remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 8 }
+
+cpeExtPsePortLldpPwrAlloc OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The PSE allocated power value for the remote
+        system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 9 }
+
+cpeExtPsePortLldpPdPwrAlloc OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliwatts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The PSE allocated power value received from the
+        remote system (PD)." 
+    ::= { cpeExtPsePortLldpEntry 10 }
+
+cpeExtPsePortLldpPwrClass OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrClassOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The PSE power classification sent to the remote PD via MDI TLV
+        in LLDP Protocol."
+    REFERENCE
+        "IEEE Std 802.3af Section 30.9.1.1.6
+        aPSEPowerClassification" 
+    ::= { cpeExtPsePortLldpEntry 11 }
+
+cpeExtPsePortLldpPdPwrClass OBJECT-TYPE
+    SYNTAX          CpeExtLldpPwrClassOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This power classification received from the remote
+        system (PD)."
+    REFERENCE
+        "IEEE Std 802.3af Section 30.9.1.1.6
+        aPSEPowerClassification" 
+    ::= { cpeExtPsePortLldpEntry 12 }
+
+cpeExtPsePortLldpPdPwrSupport OBJECT-TYPE
+    SYNTAX          BITS {
+                        portClass(0),
+                        pseMdiPwrSupport(1),
+                        pseMdiPwrState(2),
+                        psePairCtrlAbility(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the power support mode received
+        from the remote PD via MDI TLV in LLDP protocol.
+
+        'portClass'          - This bit is set if the port is
+                               operating as PSE.  Otherwise, it is
+                               operating as PD.
+
+        'pseMdiPwrSupport'   - This bit is set if power is supported in
+                               MDI TLV.
+
+        'pseMdiPwrState'     - This bit is set if power is enabled.
+
+        'psePairCtrlAbility' - This bit is set if pair selection can
+                               be controlled." 
+    ::= { cpeExtPsePortLldpEntry 13 }
+
+cpeExtPsePortLldpPdPwrPairsOrZero OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(0),
+                        signal(1),
+                        spare(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the pinout pairs in use received
+        from the remote PD via MDI TLV in LLDP Protocol.
+
+        'unknown' - information is not available
+
+        'signal'  - the signal pairs are in use.
+
+        'spare'   - the spare pairs are in use." 
+    ::= { cpeExtPsePortLldpEntry 14 }
+ 
+
+
 -- Notifications
 
 cpeExtPolicingNotif NOTIFICATION-TYPE
@@ -623,8 +1019,9 @@ cpeExtPolicingNotif NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "This notification is generated when the value of
-        cpeExtPsePortAdditionalStatus changes."
+        "This notification is generated when the 'overdraw' or
+        'overdrawLog' bit in value of cpeExtPsePortAdditionalStatus
+        is set or cleared."
    ::= { cpeExtMIBNotifs 1 }
 -- Conformance
 
@@ -677,7 +1074,7 @@ cpeExtMIBCompliance2 MODULE-COMPLIANCE
     ::= { cpeExtMIBCompliances 2 }
 
 cpeExtMIBCompliance3 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for the
         CISCO-POWER-ETHERNET-EXT-MIB."
@@ -749,6 +1146,396 @@ cpeExtMIBCompliance3 MODULE-COMPLIANCE
         status for the PSE ports."
     ::= { cpeExtMIBCompliances 3 }
 
+cpeExtMIBCompliance4 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+
+    GROUP           cpeExtPsePortPwrMonitorGroup
+    DESCRIPTION
+        "The cpeExtPsePortPwrMonitorGroup is mandatory for agents
+        that provide power monitoring on PD's connected to the
+        PSE interfaces."
+
+    GROUP           cpeExtMainPseGroup2
+    DESCRIPTION
+        "The cpeExtMainPseGroup2 is mandatory for agents
+        that need additional information to identify the PSE 
+        group."
+
+    GROUP           cpeExtPseGrpPwrGroup
+    DESCRIPTION
+        "The cpeExtPseGrpPwrGroup is mandatory for agents
+        that support the power consumption monitoring for
+        PSE groups."
+
+    GROUP           cpeExtPortEntityIndexGroup
+    DESCRIPTION
+        "The cpeExtPortEntityIndexGroup is mandatory for agents
+        that needs additional info to identify the interfaces 
+        of the PSE port."
+
+    GROUP           cpeExtPortPolicingGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingGroup is mandatory for agents
+        that provide power consumption policing for the PSE 
+        ports."
+
+    GROUP           cpeExtPdStatsGroup
+    DESCRIPTION
+        "The cpeExtPdStatsGroup is mandatory for agents
+        that provide the statistics information for powered 
+        devices."
+
+    GROUP           cpeExtPortPolicingActionGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide control of the power policing
+        action."
+
+    GROUP           cpeExtPortPwrManAllocGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide manual power allocation."
+
+    GROUP           cpeExtPolicingNotifEnableGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifEnableGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPolicingNotifGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPowerPriorityGroup
+    DESCRIPTION
+        "The cpeExtPowerPriorityGroup is mandatory for agents
+        that support global control of the power priority
+        feature."
+
+    GROUP           cpeExtPsePortLldpGroup
+    DESCRIPTION
+        "The cpeExtPsePortLldpGroup is mandatory for agents
+        that support the LLDP based Data Link Layer
+        power classification."
+
+    GROUP           cpeExtPsePortCapabilitiesGroup
+    DESCRIPTION
+        "The cpeExtPsePortCapabilitiesGroup is mandatory for agents
+        that support PSE port capabilities."
+
+    OBJECT          cpeExtPsePortEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrMax
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingAction
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrManAlloc
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPolicingNotifEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPowerPriorityEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { cpeExtMIBCompliances 4 }
+
+cpeExtMIBCompliance5 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+
+    GROUP           cpeExtPsePortPwrMonitorGroup
+    DESCRIPTION
+        "The cpeExtPsePortPwrMonitorGroup is mandatory for agents
+        that provide power monitoring on PD's connected to the
+        PSE interfaces."
+
+    GROUP           cpeExtMainPseGroup2
+    DESCRIPTION
+        "The cpeExtMainPseGroup2 is mandatory for agents
+        that need additional information to identify the PSE 
+        group."
+
+    GROUP           cpeExtPseGrpPwrGroup
+    DESCRIPTION
+        "The cpeExtPseGrpPwrGroup is mandatory for agents
+        that support the power consumption monitoring for
+        PSE groups."
+
+    GROUP           cpeExtPortEntityIndexGroup
+    DESCRIPTION
+        "The cpeExtPortEntityIndexGroup is mandatory for agents
+        that needs additional info to identify the interfaces 
+        of the PSE port."
+
+    GROUP           cpeExtPortPolicingGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingGroup is mandatory for agents
+        that provide power consumption policing for the PSE 
+        ports."
+
+    GROUP           cpeExtPdStatsGroup
+    DESCRIPTION
+        "The cpeExtPdStatsGroup is mandatory for agents
+        that provide the statistics information for powered 
+        devices."
+
+    GROUP           cpeExtPortPolicingActionGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide control of the power policing
+        action."
+
+    GROUP           cpeExtPortPwrManAllocGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide manual power allocation."
+
+    GROUP           cpeExtPolicingNotifEnableGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifEnableGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPolicingNotifGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPowerPriorityGroup
+    DESCRIPTION
+        "The cpeExtPowerPriorityGroup is mandatory for agents
+        that support global control of the power priority
+        feature."
+
+    GROUP           cpeExtPsePortLldpGroup
+    DESCRIPTION
+        "The cpeExtPsePortLldpGroup is mandatory for agents
+        that support the LLDP based Data Link Layer
+        power classification."
+
+    GROUP           cpeExtPsePortCapabilitiesGroup
+    DESCRIPTION
+        "The cpeExtPsePortCapabilitiesGroup is mandatory for agents
+        that support PSE port capabilities."
+
+    GROUP           cpeExtPsePortLldpPowerGroup
+    DESCRIPTION
+        "The cpeExtPsePortLldpPowerGroup is mandatory for agents
+        that support Power via MDI TLV in LLDP protocol."
+
+    OBJECT          cpeExtPsePortEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrMax
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingAction
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrManAlloc
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPolicingNotifEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPowerPriorityEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { cpeExtMIBCompliances 5 }
+
+cpeExtMIBCompliance6 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-POWER-ETHERNET-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpeExtPsePortGroup }
+
+    GROUP           cpeExtPsePortGlobalConfigGroup
+    DESCRIPTION
+        "The cpeExtPsePortGlobalConfigGroup is mandatory for agents
+        that support global configurations on the PSE interfaces."
+
+    GROUP           cpeExtPsePortPwrMonitorGroup
+    DESCRIPTION
+        "The cpeExtPsePortPwrMonitorGroup is mandatory for agents
+        that provide power monitoring on PD's connected to the
+        PSE interfaces."
+
+    GROUP           cpeExtMainPseGroup2
+    DESCRIPTION
+        "The cpeExtMainPseGroup2 is mandatory for agents
+        that need additional information to identify the PSE 
+        group."
+
+    GROUP           cpeExtPseGrpPwrGroup
+    DESCRIPTION
+        "The cpeExtPseGrpPwrGroup is mandatory for agents
+        that support the power consumption monitoring for
+        PSE groups."
+
+    GROUP           cpeExtPortEntityIndexGroup
+    DESCRIPTION
+        "The cpeExtPortEntityIndexGroup is mandatory for agents
+        that needs additional info to identify the interfaces 
+        of the PSE port."
+
+    GROUP           cpeExtPortPolicingGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingGroup is mandatory for agents
+        that provide power consumption policing for the PSE 
+        ports."
+
+    GROUP           cpeExtPdStatsGroup
+    DESCRIPTION
+        "The cpeExtPdStatsGroup is mandatory for agents
+        that provide the statistics information for powered 
+        devices."
+
+    GROUP           cpeExtPortPolicingActionGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide control of the power policing
+        action."
+
+    GROUP           cpeExtPortPwrManAllocGroup
+    DESCRIPTION
+        "The cpeExtPortPolicingActionGroup is mandatory
+        for agents that provide manual power allocation."
+
+    GROUP           cpeExtPolicingNotifEnableGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifEnableGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPolicingNotifGroup
+    DESCRIPTION
+        "The cpeExtPolicingNotifGroup is mandatory for agents
+        that provide notifications of power consumption policing
+        status for the PSE ports."
+
+    GROUP           cpeExtPowerPriorityGroup
+    DESCRIPTION
+        "The cpeExtPowerPriorityGroup is mandatory for agents
+        that support global control of the power priority
+        feature."
+
+    GROUP           cpeExtPsePortLldpGroup
+    DESCRIPTION
+        "The cpeExtPsePortLldpGroup is mandatory for agents
+        that support the LLDP based Data Link Layer
+        power classification."
+
+    GROUP           cpeExtPsePortCapabilitiesGroup
+    DESCRIPTION
+        "The cpeExtPsePortCapabilitiesGroup is mandatory for agents
+        that support PSE port capabilities."
+
+    GROUP           cpeExtPsePortLldpPowerGroup
+    DESCRIPTION
+        "The cpeExtPsePortLldpPowerGroup is mandatory for agents
+        that support Power via MDI TLV in LLDP protocol."
+
+    GROUP           cpeExtPseInfoPwrGroup
+    DESCRIPTION
+        "The cpeExtPseInfoPwrGroup is mandatory for agents
+        that support used and remaining power info for PSE groups."
+
+    OBJECT          cpeExtPsePortEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrMax
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPolicingAction
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPsePortPwrManAlloc
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPolicingNotifEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cpeExtPowerPriorityEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { cpeExtMIBCompliances 6 }
+
 -- Units of Conformance
 
 cpeExtPsePortGroup OBJECT-GROUP
@@ -795,7 +1582,9 @@ cpeExtMainPseGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "This is a collection of objects which provide
-        additional information for the PSE group."
+        additional information for the PSE group.
+        cpeExtMainPseGroup object is superseded by cpeExtMainPseGroup2,
+        and cpeExtPseGrpPwrGroup."
     ::= { cpeExtMIBGroups 4 }
 
 cpeExtPortEntityIndexGroup OBJECT-GROUP
@@ -880,8 +1669,67 @@ cpeExtPolicingNotifGroup NOTIFICATION-GROUP
         power consumption policing information for PSE ports."
     ::= { cpeExtMIBGroups 13 }
 
+cpeExtPowerPriorityGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPowerPriorityEnable }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which provides global
+        control of power priority feature."
+    ::= { cpeExtMIBGroups 14 }
+
+cpeExtPsePortLldpGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtPsePortLldpPwrType,
+                        cpeExtPsePortLldpPdPwrType,
+                        cpeExtPsePortLldpPwrSrc,
+                        cpeExtPsePortLldpPdPwrSrc,
+                        cpeExtPsePortLldpPwrPriority,
+                        cpeExtPsePortLldpPdPwrPriority,
+                        cpeExtPsePortLldpPwrReq,
+                        cpeExtPsePortLldpPdPwrReq,
+                        cpeExtPsePortLldpPwrAlloc,
+                        cpeExtPsePortLldpPdPwrAlloc
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which provides the
+        information about the LLDP based Data Link Layer 
+        power classification characteristics of power Ethernet 
+        PSE ports."
+    ::= { cpeExtMIBGroups 15 }
+
+cpeExtPsePortCapabilitiesGroup OBJECT-GROUP
+    OBJECTS         { cpeExtPsePortCapabilities }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which provides PSE
+        port capabilities."
+    ::= { cpeExtMIBGroups 16 }
+
+cpeExtPsePortLldpPowerGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtPsePortLldpPwrClass,
+                        cpeExtPsePortLldpPdPwrClass,
+                        cpeExtPsePortLldpPdPwrSupport,
+                        cpeExtPsePortLldpPdPwrPairsOrZero
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which provide Power information
+        via MDI TLV in LLDP Protocol."
+    ::= { cpeExtMIBGroups 17 }
+
+cpeExtPseInfoPwrGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpeExtMainPseUsedPower,
+                        cpeExtMainPseRemainingPower
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is a collection of objects which provide
+        used and remaining power information for the PSE group."
+    ::= { cpeExtMIBGroups 18 }
+
 END
-
-
 
 

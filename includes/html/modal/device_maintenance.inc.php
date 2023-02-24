@@ -15,18 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
+use App\Facades\DeviceCache;
 
-use LibreNMS\Alerting\QueryBuilderParser;
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 $hour_steps = range(0, 23, 1);
@@ -40,9 +39,9 @@ foreach ($hour_steps as $hour) {
             continue;
         }
         $str_hour = $hour;
-        $str_min = $min < 10 ? '0'.$min : $min;
+        $str_min = $min < 10 ? '0' . $min : $min;
 
-        $duration = $str_hour.':'.$str_min;
+        $duration = $str_hour . ':' . $str_min;
 
         if (in_array($duration, $exclude_durations)) {
             continue;
@@ -80,7 +79,7 @@ foreach ($hour_steps as $hour) {
                     <div class="form-group">
                         <label for="maintenance-submit" class="col-sm-4 control-label"></label>
                         <div class="col-sm-8">
-                            <button type="submit" id="maintenance-submit" data-device_id="<?php echo($device['device_id']); ?>" <?php echo(\LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"')?> name="maintenance-submit">Start Maintenance</button>
+                            <button type="button" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance-submit">Start Maintenance</button>
                         </div>
                     </div>
                 </form>
@@ -89,12 +88,12 @@ foreach ($hour_steps as $hour) {
     </div>
 </div>
 <script>
-    $("#maintenance-submit").click(function() {
+    $("#maintenance-submit").on("click", function() {
         var device_id = $(this).data("device_id");
-        var title = '<?=display($device['hostname']);?>';
+        var title = '<?=\LibreNMS\Util\Clean::html(DeviceCache::get($device['device_id'])->displayName(), []); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
-        var start = '<?=date("Y-m-d H:i:00");?>';
+        var start = '<?=date('Y-m-d H:i:00'); ?>';
         var duration = $('#duration').val();
         $.ajax({
             type: 'POST',
@@ -112,6 +111,7 @@ foreach ($hour_steps as $hour) {
             success: function(data){
                 if(data['status'] == 'ok') {
                     toastr.success(data['message']);
+                    location.reload();
                 } else {
                     toastr.error(data['message']);
                 }

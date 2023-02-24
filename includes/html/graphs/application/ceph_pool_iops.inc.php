@@ -4,9 +4,9 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$ceph_pool_rrd = ceph_rrd('pool');
+$ceph_pool_rrd = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'pool', $vars['pool']]);
 
-if (rrdtool_check_rrd_exists($ceph_pool_rrd)) {
+if (Rrd::checkRrdExists($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;
 }
 
@@ -17,7 +17,7 @@ $colour_line = '36393D';
 
 $colour_area_max = 'FFEE99';
 
-$graph_max         = 1;
+$graph_max = 1;
 
 $unit_text = 'Operations';
 

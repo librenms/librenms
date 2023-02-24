@@ -3,7 +3,7 @@ text: UniPing
 type: environmental
 icon: netping
 group: netping
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

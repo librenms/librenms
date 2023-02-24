@@ -11,26 +11,26 @@
  * the source code distribution for details.
  */
 
-$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', array($vars['id']));
+$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'icmpjitter'));
+$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'icmpjitter']);
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                          Cur  Min  Max  Avg\\n'";
 
-    $rrd_options .= " DEF:PL=" . $rrd_filename . ":PacketLoss:AVERAGE ";
+    $rrd_options .= ' DEF:PL=' . $rrd_filename . ':PacketLoss:AVERAGE ';
     $rrd_options .= " LINE1.25:PL#008C00:'Packets Lost         ' ";
-    $rrd_options .= " GPRINT:PL:LAST:%3.0lf ";
-    $rrd_options .= " GPRINT:PL:MIN:%3.0lf ";
-    $rrd_options .= " GPRINT:PL:MAX:%3.0lf ";
+    $rrd_options .= ' GPRINT:PL:LAST:%3.0lf ';
+    $rrd_options .= ' GPRINT:PL:MIN:%3.0lf ';
+    $rrd_options .= ' GPRINT:PL:MAX:%3.0lf ';
     $rrd_options .= " GPRINT:PL:AVERAGE:'%3.0lf'\\\l ";
 
-    $rrd_options .= " DEF:PLA=" . $rrd_filename . ":PacketLateArrival:AVERAGE ";
+    $rrd_options .= ' DEF:PLA=' . $rrd_filename . ':PacketLateArrival:AVERAGE ';
     $rrd_options .= " LINE1.25:PLA#CC0000:'Late Arrival         ' ";
-    $rrd_options .= " GPRINT:PLA:LAST:%3.0lf ";
-    $rrd_options .= " GPRINT:PLA:MIN:%3.0lf ";
-    $rrd_options .= " GPRINT:PLA:MAX:%3.0lf ";
+    $rrd_options .= ' GPRINT:PLA:LAST:%3.0lf ';
+    $rrd_options .= ' GPRINT:PLA:MIN:%3.0lf ';
+    $rrd_options .= ' GPRINT:PLA:MAX:%3.0lf ';
     $rrd_options .= " GPRINT:PLA:AVERAGE:'%3.0lf'\\\l ";
 }

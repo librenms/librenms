@@ -12,7 +12,7 @@ IMPORTS
     rldot1dStpTrapVrblifIndex, rldot1dStpTrapVrblVID    FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 rndNotifications MODULE-IDENTITY
-                LAST-UPDATED "201006250000Z"
+                LAST-UPDATED "201006250001Z"
 				ORGANIZATION "Cisco Systems, Inc."
 
 				CONTACT-INFO
@@ -500,7 +500,7 @@ dstrSysLog  NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-         "Master receive trap from slave , and forward it as trap"
+         "Controller receive trap from member , and forward it as trap"
     ::=  { rndNotifications 175 }
 
 rlEnvMonFanStateChange NOTIFICATION-TYPE
@@ -670,14 +670,14 @@ rldot1xSupplicantLoggedOutTrap NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
         "Warning trap is indicating that supplicant was logged out
-         Since the port’s time-range state was changed to inactive."
+         Since the ports time-range state was changed to inactive."
     ::=  { rndNotifications 215 }
 
 rldot1xPortControlModeNotAutoTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-        "Warning trap is indicating that altough port’s time-range
+        "Warning trap is indicating that altough ports time-range
          Is active now, it can not start working in mode auto."
     ::=  { rndNotifications 216 }
 
@@ -711,16 +711,16 @@ rlStackVersionUpgradeTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-        "Informational trap indicating that stack slave is upgrading
-         to the image or boot version of the stack master."
+        "Informational trap indicating that stack member is upgrading
+         to the image or boot version of the stack controller."
     ::=  { rndNotifications 222 }
 
 rlStackVersionDowngradeTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-        "Warning trap indicating that stack slave is downgrading
-         to the image or boot version of the stack master."
+        "Warning trap indicating that stack member is downgrading
+         to the image or boot version of the stack controller."
     ::=  { rndNotifications 223 }
 
 -- 224-226 used by CDP
@@ -746,7 +746,35 @@ pseOverloadPort NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating that Port (x) requires more power than it should require."
     ::=  { rndNotifications 241 }
+	
+poePowerNegotiationInfo NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation resolved power in Watts."
+    ::=  { rndNotifications 242 }
+	
+poePowerNegotiation4Wire NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation 4-Wire status."
+    ::=  { rndNotifications 243 }
 
+poePowerHWFail NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power HW fail status."
+    ::=  { rndNotifications 244 }
+	
+poePowerNegotiationExpiredInfo NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation expired."
+    ::=  { rndNotifications 245 }
+    
 -- Storm control
 rlStormControlMinRateTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
@@ -762,7 +790,7 @@ rlApBackplanePortResolutionTrap NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating about backplane ethernet port resolution."
     ::=  { rndNotifications 247 }
-    
+
 -- Sfp
 sfpPortPresent NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
@@ -770,27 +798,154 @@ sfpPortPresent NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating that gbic is now present on port (X)."
     ::=  { rndNotifications 248}
-        
+
 sfpPortNotPresent NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that gbic is not present anymore on port (X)."
-    ::=  { rndNotifications 249 }    
-    
+    ::=  { rndNotifications 249 }
+
 sfpPortLoss NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that loss Diagnosed on port (X)."
-    ::=  { rndNotifications 250} 
+    ::=  { rndNotifications 250}
 
 sfpPortNotLoss NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that loss isn't active anymore on port (X)."
-    ::=  { rndNotifications 251 }     
+    ::=  { rndNotifications 251 }
 
+-- Storm control
+rlStormControlOccursTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that port storm control occurs on a port."
+    ::=  { rndNotifications 252 }
+
+-- Radius Server
+rlRadiusServTrapAcct NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server accounting event trap."
+    ::=  { rndNotifications 255 }
+
+rlRadiusServTrapAuthFailure NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server authentication failure event trap."
+    ::=  { rndNotifications 256 }
+
+rlRadiusServTrapAuthSuccess NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server authentication success event trap."
+    ::=  { rndNotifications 257 }
+   
+rlRedundantFanStateChange NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating the redundant fan status change."
+    ::=  { rndNotifications 258 }
+
+rldot1xSupplicantPortAuthorizedTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating that 802.1x supplicant port status is authorized."
+    ::= { rndNotifications 260 }
+
+rldot1xSupplicantPortUnauthorizedTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that 802.1x supplicant port status is unAuthorized."
+    ::=  { rndNotifications 261 }
+
+rldot1xCredentialTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that credential is changed, rejected or not updated."
+    ::=  { rndNotifications 262 }
+	
+poeNonPOEDetected NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating Non POE Detected unit"
+    ::=  { rndNotifications 263}	
+
+rlBoxUtilI2CReadFailureTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::=  { rndNotifications 264 }
+
+rlBoxUtilI2CWriteFailureTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::=  { rndNotifications 265 }
+	
+rlHostHlibCpldUpdateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating CPLD update FW is in progress"
+    ::=  { rndNotifications 266 }
+	
+rlBrgPvstInconsistencyEnterStateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "The trap is sent by a bridge when any of its configured ports
+         transitions to new inconsistency mode."
+    ::= { rndNotifications 268 }
+	
+rlBrgPvstInconsistencyExitStateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "The trap is sent by a bridge when any of its configured ports
+         transitions from inconsistency mode to resolved mode."
+    ::= { rndNotifications 269 }
+
+-- Sfp
+sfpPortNonCompliant NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that non-compliant SFP is inserted on port (X)."
+    ::=  { rndNotifications 275 }
+	
+poePowerPortHWFail NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating power HW fail status on a port."
+    ::=  { rndNotifications 276 }
+
+-- HTTP Client
+rlHttpClientCertAddressMismatch NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating HTTP-TLS X.509 certificate validation error of
+	 Common-Name/Subject-Alternative-Name "
+    ::=  { rndNotifications 278 }
+
+	
 END
 

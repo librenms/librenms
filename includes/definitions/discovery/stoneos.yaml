@@ -1,23 +1,33 @@
-mib: 'HILLSTONE-FAN-MIB'
+mib: HILLSTONE-FAN-MIB:HILLSTONE-POWER-MIB:HILLSTONE-TEMPERATURE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: HILLSTONE-SYSTEM-MIB::sysTotalMemory
+                used: HILLSTONE-SYSTEM-MIB::sysCurMemory
+                precision: 1024
+    os:
+        sysDescr_regex: '/(?<hardware>\S+)$/'
+        serial: HILLSTONE-SYSTEM-MIB::sysSerialNumber.0
+        version: HILLSTONE-SYSTEM-MIB::sysSoftware.0
+        version_regex: '/Version (?<version>\S+)/'
     processors:
         data:
             -
                 oid: HILLSTONE-SYSTEM-MIB::sysCPU
-                value: sysCPU
                 num_oid: '.1.3.6.1.4.1.28557.2.2.1.3.{{ $index }}'
     sensors:
         temperature:
             data:
                 -
-                    oid: HILLSTONE-TEMPERATURE-MIB::HillstoneTemperatureEntry
+                    oid: hillstoneTemperatureTable
                     value: hillstoneTemperatureValue
                     num_oid: '.1.3.6.1.4.1.28557.2.28.1.2.1.3.{{ $index }}'
                     descr: '{{ $hillstoneTemperatureDescr }}'
         state:
             data:
                 -
-                    oid: HILLSTONE-POWER-MIB::HillstonePowerEntry
+                    oid: hillstonePowerTable
                     value: hillstonePowerState
                     num_oid: '.1.3.6.1.4.1.28557.2.27.1.2.1.3.{{ $index }}'
                     descr: '{{ $hillstonePowerDescr }}'

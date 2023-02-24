@@ -1,0 +1,1271 @@
+-- *****************************************************************
+-- SOPHOS-XG-MIB
+--
+-- Copyright (c) 2015 by Sophos PLC.
+-- All rights reserved.
+-- *****************************************************************
+
+
+SFOS-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	IpAddress,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	enterprises,
+	Gauge32,
+	Counter32,
+	Counter64,
+	TimeTicks,
+	Integer32
+		FROM SNMPv2-SMI
+	InetAddress,
+	InetAddressType,
+	InetPortNumber
+		FROM INET-ADDRESS-MIB
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP,
+	MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	DisplayString,
+	TEXTUAL-CONVENTION,
+	PhysAddress
+		FROM SNMPv2-TC
+        Ipv6Address
+                FROM IPV6-TC;
+
+sophosMIB	MODULE-IDENTITY
+	  LAST-UPDATED	"201812180000Z"
+	  ORGANIZATION	"Sophos PLC"
+	  CONTACT-INFO
+						"
+						Sophos Ltd
+						The Pentagon
+						Abingdon Science Park
+						Abingdon OX14 3YP
+						United Kingdom
+
+						Phone:	+44 (0)1235 559933
+						Website:	http://www.sophos.com
+						E-mail:	sales@sophos.com
+						"
+	  DESCRIPTION			"Upadting mib file with new oids"
+	  REVISION			"201812180000Z"
+	  DESCRIPTION		
+						"
+						This MIB module defines MIB objects	which provide
+				        mechanisms to remotely configure the parameters used
+				        by XG-Firewall Agent for the generation of SNMP messages.
+						"
+	  ::= { enterprises 2604 }
+
+sfosXGMIB OBJECT IDENTIFIER ::= {sophosMIB 5}
+sfosXGMIBObjects OBJECT IDENTIFIER ::= {sfosXGMIB 1}
+-- Enumerations used in XG-Firewall system
+
+HaState ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for HA State"
+        SYNTAX INTEGER	{
+							notapplicable 	   ( 0 ),
+							auxiliary 	   ( 1 ),
+							standAlone 	   ( 2 ),
+							primary 	   ( 3 ),
+							faulty		   ( 4 ),
+							ready		   ( 5 )
+						}
+HaStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for HA Status"
+        SYNTAX INTEGER	{
+							disabled	   ( 0 ),
+							enabled 	   ( 1 )
+						}
+LoadBalancingType ::= TEXTUAL-CONVENTION
+	STATUS				current
+	DESCRIPTION		"enumerated type for HA loading balancing Status"
+	SYNTAX INTEGER	{
+							notapplicable		( 0 ),
+							loadBalanceOff 		( 1 ),
+							loadBalanceOn		( 2 )
+						}
+
+APStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for AP Status"
+        SYNTAX INTEGER	{
+							connected		( 0 ),
+							disconnected		( 1 )
+						}
+ServiceStatsType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for service status"
+        SYNTAX INTEGER	{
+							untouched	 ( 0 ),
+							stopped		 ( 1 ),
+							initializing     ( 2 ),
+							running		 ( 3 ),
+							exiting		 ( 4 ),
+							dead		 ( 5 ),
+                                                        frozen           ( 6 ),
+							unregistered     ( 7 )
+						}
+RegistrationStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for subscription status"
+        SYNTAX INTEGER	{
+							registered		( 1 ),
+							unregistered		( 2 )
+						}
+
+SubscriptionStatusType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for subscription status"
+        SYNTAX INTEGER	{
+							none			( 0 ),
+							evaluating		( 1 ),
+							notsubscribed		( 2 ),
+							subscribed		( 3 ),
+							expired			( 4 ),
+							deactivated		( 5 )
+						}
+
+IPSecVPNConnectionType ::= TEXTUAL-CONVENTION
+        STATUS				current
+        DESCRIPTION		"enumerated type for IPSec VPN Conn type"
+        SYNTAX INTEGER	{
+							host-to-host		( 1 ),
+							site-to-site		( 2 )
+						}
+						
+-- End of enums
+
+-- SFOS-XG MIB
+sfosXGDeviceInfo 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 1 }
+sfosXGDeviceStats 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 2 }
+sfosXGServiceStatus 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 3 }
+sfosXGHAStats 			OBJECT IDENTIFIER ::= { sfosXGMIBObjects 4 }
+sfosXGLicenseDetails 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 5 }
+sfosXGTunnelInfo 		OBJECT IDENTIFIER ::= { sfosXGMIBObjects 6 }
+sfosXGWiFiInfo 			OBJECT IDENTIFIER ::= { sfosXGMIBObjects 7 }
+sfosXGTrap 			OBJECT IDENTIFIER ::= { sfosXGMIBObjects 8 }
+
+--snmpBasicCompliance MODULE-COMPLIANCE
+--    STATUS  current
+  --  DESCRIPTION
+    --        "The compliance statement for SNMPv2 entities which
+      --      implement the SNMPv2 MIB."
+  --      MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+    --                       snmpBasicNotificationsGroup }
+--	 DESCRIPTION
+  --          "This group is mandatory for SNMPv2 entities which
+    --        support community-based authentication."
+
+--    ::= { snmpMIBCompliances 2 }
+
+--snmpGroup OBJECT-GROUP
+--	OBJECTS {
+--		sfosDeviceName,
+--		sfosDeviceType,
+--		sfosDeviceFWVersion,
+--		sfosDeviceAppKey,
+--		sfosWebcatVersion,
+--		sfosIPSVersion }
+--	STATUS current
+--	DESCRIPTION "A collection of object providing SFOS Device information"
+
+-- SFOS-XG MIB.sfosXGDeviceInfo
+sfosDeviceName	OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"hostname of the SFOS XG Device"
+	::= { sfosXGDeviceInfo 1 }
+
+sfosDeviceType	OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Type of Device like XG-85, XG-210 "
+	::= { sfosXGDeviceInfo 2 }
+
+sfosDeviceFWVersion	OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Current running firmware version of SFOS"
+	::= { sfosXGDeviceInfo 3 }
+
+sfosDeviceAppKey OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Appliance Key of SFOS Device"
+	::= { sfosXGDeviceInfo 4 }
+
+sfosWebcatVersion OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Current webcat version running in SFOS"
+	::= { sfosXGDeviceInfo 5 }
+
+sfosIPSVersion OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Current snort version running in SFOS"
+	::= { sfosXGDeviceInfo 6 }
+
+-- sfosXGDeviceStats
+sfosCurrentDate	OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Current system date and time"
+	::= { sfosXGDeviceStats 1 }
+
+sfosUpTime OBJECT-TYPE
+	SYNTAX			TimeTicks
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"sysUpTime will display the SNMP agent up time. 
+				This is going to display SFOS up time"
+	::= { sfosXGDeviceStats 2 }
+
+sfosDiskStatus			OBJECT IDENTIFIER ::= { sfosXGDeviceStats 4 }
+sfosMemoryStatus		OBJECT IDENTIFIER ::= { sfosXGDeviceStats 5 }
+
+sfosLiveUsersCount OBJECT-TYPE
+    SYNTAX		Gauge32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Display live user count login into captive portal"
+    ::= { sfosXGDeviceStats 6 }
+
+sfosHTTPHits OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGDeviceStats 7 }    
+    
+sfosFTPHits OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGDeviceStats 8 }
+	
+sfosMailHits			OBJECT IDENTIFIER ::= { sfosXGDeviceStats 9 }
+
+-- sfosDiskStatus.sfosDiskCapacity
+sfosDiskCapacity  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Disk capacity in MB"
+    ::= { sfosDiskStatus 1 }
+
+sfosDiskPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% Disk usage"
+    ::= { sfosDiskStatus 2 }
+	
+-- sfosDiskStatus.sfosMemoryCapacity
+sfosMemoryCapacity  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Memory capacity in MB"
+    ::= { sfosMemoryStatus 1 }
+
+sfosMemoryPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% usage of main memory"
+    ::= { sfosMemoryStatus 2 }
+ 
+sfosSwapCapacity  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Swap Capacity in MB"
+    ::= { sfosMemoryStatus 3 }
+
+sfosSwapPercentUsage  OBJECT-TYPE
+    SYNTAX			Gauge32
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"% usage of swap"
+    ::= { sfosMemoryStatus 4 }
+	
+-- sfosDiskStatus.sfosMailHits
+sfosPOP3Hits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosMailHits 1 }
+
+sfosImapHits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosMailHits 2 }
+
+sfosSmtpHits	OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosMailHits 3 }
+
+-- SFOS-XG MIB.sfosXGServiceStatus
+sfosPoP3Service OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 1 }
+
+sfosImap4Service OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 2 }
+
+sfosSmtpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 3 }
+
+sfosFtpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 4 }
+
+sfosHttpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 5 }
+
+sfosAVService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 6 }
+
+sfosASService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 7 }
+
+sfosDNSService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 8 }
+
+sfosHAService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 9 }
+
+sfosIPSService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 10 }
+
+sfosApacheService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 11 }
+
+sfosNtpService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 12 }
+
+sfosTomcatService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 13 }
+
+sfosSSLVpnService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 14 }
+
+sfosIPSecVpnService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 15 }
+
+sfosDatabaseservice OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 16 }
+
+sfosNetworkService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 17 }
+
+sfosGarnerService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 18 }
+
+sfosDroutingService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 19 }
+
+sfosSSHdService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 20 }
+
+sfosDgdService OBJECT-TYPE
+    SYNTAX			ServiceStatsType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGServiceStatus 21 }
+
+-- SFOS-XG MIB.sfosXGHAStats
+sfosHAStatus OBJECT-TYPE
+    SYNTAX			HaStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		" "
+    ::= { sfosXGHAStats 1 }
+
+sfosDeviceCurrentAppKey OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Appliance Key of current Device"
+	::= { sfosXGHAStats 2 }
+
+sfosDevicePeerAppKey OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Appliance Key of peer Device"
+	::= { sfosXGHAStats 3 }
+
+sfosDeviceCurrentHAState OBJECT-TYPE
+	SYNTAX			HaState
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"HA State of current Device"
+	::= { sfosXGHAStats 4 }
+
+sfosDevicePeerHAState OBJECT-TYPE
+	SYNTAX			HaState
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"HA State of peer Device"
+	::= { sfosXGHAStats 5 }
+
+sfosDeviceHAConfigMode OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"HA State of peer Device"
+	::= { sfosXGHAStats 6 }
+
+sfosDeviceLoadBalancing OBJECT-TYPE
+	SYNTAX			LoadBalancingType
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"sfos device load device"
+	::= { sfosXGHAStats 7 }
+
+sfosDeviceHAPort OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"SFOS dedciated port for HA"
+	::= { sfosXGHAStats 8 }
+
+sfosDeviceHACurrentIP OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"IPAddress of current Device for HA"
+	::= { sfosXGHAStats 9 }
+
+sfosDeviceHAPeerIP OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Peer device IP Address"
+	::= { sfosXGHAStats 10 }
+
+sfosDeviceHAMonitoringPort		OBJECT IDENTIFIER ::= { sfosXGHAStats 11 }
+
+-- sfosXGHAStats.sfosDeviceHAMonitoringPort
+sfosDeviceAuxAdminPort OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..128))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"SFOS Auxiliary Admin Port"
+	::= { sfosDeviceHAMonitoringPort 1 }
+
+sfosDeviceHAAuxAdminIP OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"SFOS Auxiliary Admin IP"
+	::= { sfosDeviceHAMonitoringPort 2 }
+
+sfosDeviceHAAuxAdminIPv6 OBJECT-TYPE
+	SYNTAX			Ipv6Address
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"SFOS Auxiliary Admin IPv6"
+	::= { sfosDeviceHAMonitoringPort 3 }
+
+-- SFOS-XG MIB.sfosXGLicenseDetails
+sfosDeviceBaseFWLic					OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 1 }
+sfosDeviceNetProtecLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 2 }
+sfosDeviceWebProtecLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 3 }
+sfosDeviceMailProtecLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 4 }
+sfosDeviceWebServerLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 5 }
+sfosDeviceSandstromLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 6 }
+sfosDeviceEnhancedSupportLic		OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 7 }
+sfosDeviceEnhancedPlusSupportLic	OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 8 }
+sfosDeviceCentralOrchestrationLic	OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 9 }
+
+-- sfosXGLicenseDetails.sfosDeviceBaseFWLic
+sfosBaseFWLicRegStatus OBJECT-TYPE
+    SYNTAX		SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Base Firewall protection Lic status"
+    ::= { sfosDeviceBaseFWLic 1 }
+
+sfosBaseFWLicExpiryDate OBJECT-TYPE
+    SYNTAX		DisplayString
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Base Firewall protection Lic expiry date"
+    ::= { sfosDeviceBaseFWLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceNetProtecLic
+sfosNetProtectionLicRegStatus OBJECT-TYPE
+    SYNTAX		SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Network Protection registration Lic status"
+    ::= { sfosDeviceNetProtecLic 1 }
+
+sfosNetProtectionLicExpiryDate OBJECT-TYPE
+    SYNTAX		DisplayString
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Network Protection Lic Expiry Date"
+    ::= { sfosDeviceNetProtecLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceWebProtecLic
+sfosWebProtectionLicRegStatus OBJECT-TYPE
+    SYNTAX		SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Web Protection registration Lic status"
+    ::= { sfosDeviceWebProtecLic 1 }
+
+sfosWebProtectionLicExpiryDate OBJECT-TYPE
+    SYNTAX		DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Web Protection Lic Expiry Date"
+    ::= { sfosDeviceWebProtecLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceMailProtecLic
+sfosMailProtectionLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"EMail Protection Lic Status"
+    ::= { sfosDeviceMailProtecLic 1 }
+
+sfosMailProtectionLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"EMail Protection Lic Expiry Date"
+    ::= { sfosDeviceMailProtecLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceWebServerLic
+sfosWebServerProtectionLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"web server Protection Lic status"
+    ::= { sfosDeviceWebServerLic 1 }
+
+sfosWebServerProtectionLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"web server Protection Lic Expiry Date"
+    ::= { sfosDeviceWebServerLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceSandstromLic
+sfosSandstromLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"sandstrom Protection Lic status"
+    ::= { sfosDeviceSandstromLic 1 }
+
+sfosSandstromLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"sandstrom Protection Lic Expiry Date"
+    ::= { sfosDeviceSandstromLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceEnhancedSupportLic
+sfosEnhancedSupportLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Enhanced Support Lic Status"
+    ::= { sfosDeviceEnhancedSupportLic 1 }
+
+sfosEnhancedSupportLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Enhanced Support Lic expiry date"
+    ::= { sfosDeviceEnhancedSupportLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceEnhancedPlusSupportLic
+sfosEnhancedPlusLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Enhanced Plus Support Lic Status"
+    ::= { sfosDeviceEnhancedPlusSupportLic 1 }
+
+sfosEnhancedPlusLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Enhanced Plus Support Lic expiry date"
+    ::= { sfosDeviceEnhancedPlusSupportLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceCentralOrchestrationLic
+sfosCentralOrchestrationLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Central Orchestration registration Lic Status"
+    ::= { sfosDeviceCentralOrchestrationLic 1 }
+
+sfosCentralOrchestrationLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Central Orchestration Lic expiry date"
+    ::= { sfosDeviceCentralOrchestrationLic 2 }
+
+-- SFOS-XG MIB.sfosXGTunnelInfo
+
+sfosVPNInfo				OBJECT IDENTIFIER ::= { sfosXGTunnelInfo 1 }
+
+sfosIPSecVPNConnInfo			OBJECT IDENTIFIER ::= { sfosVPNInfo 1 }
+sfosIPSecVPNPolicyInfo			OBJECT IDENTIFIER ::= { sfosVPNInfo 2 }
+
+-- sfosVPNInfo.sfosIPSecVPNConnInfo
+
+sfosIPSecVpnTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SfosIPSecVpnTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPSec Tunnel information Table"
+    ::= { sfosIPSecVPNConnInfo 1 }
+
+sfosIPSecVpnTunnelEntry OBJECT-TYPE
+    SYNTAX      SfosIPSecVpnTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPSec Tunnel information Table Entry"
+	INDEX { sfosIPSecVpnConnId }
+    ::= { sfosIPSecVpnTunnelTable 1 }
+	
+SfosIPSecVpnTunnelEntry ::= SEQUENCE {
+	sfosIPSecVpnConnId			Integer32,
+	sfosIPSecVpnConnName			DisplayString,
+	sfosIPSecVpnConnDes			DisplayString,
+	sfosIPSecVpnPolicyName			DisplayString,
+	sfosIPSecVpnConnMode			DisplayString,
+	sfosIPSecVpnConnType			IPSecVPNConnectionType,
+	sfosIPSecVpnLocalgwPort			DisplayString,
+	sfosIPSecVpnActiveTunnel		Integer32
+}
+
+sfosIPSecVpnConnId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index value that uniquely identifies a VPN tunnel within the sfosIPSecVpnTunnelTable"
+    ::= { sfosIPSecVpnTunnelEntry 1 }
+
+sfosIPSecVpnConnName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Connection Name of the tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 2 }
+
+sfosIPSecVpnConnDes OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Descriptive of the tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 3 }
+
+sfosIPSecVpnPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy Name of IPSec tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 4 }	
+
+sfosIPSecVpnConnMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Connection mode of IPSec tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 5 }	
+
+sfosIPSecVpnConnType OBJECT-TYPE
+    SYNTAX      IPSecVPNConnectionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Connection Type of IPSec Tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 6 }
+
+sfosIPSecVpnLocalgwPort OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port name which is  used as local gateway for IPSec tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 7 }
+
+sfosIPSecVpnActiveTunnel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of active tunnel"
+    ::= { sfosIPSecVpnTunnelEntry 8 }
+
+-- sfosVPNInfo.sfosIPSecVPNPolicyInfo
+
+sfosIPSecVpnPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SfosIPSecVpnPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPSec Tunnel information Table"
+    ::= { sfosIPSecVPNPolicyInfo 1 }
+
+sfosIPSecVpnPolicyEntry OBJECT-TYPE
+    SYNTAX      SfosIPSecVpnPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPSec Policy information Table Entry"
+	INDEX { sfosIPSecVpnPolicyId }
+    ::= { sfosIPSecVpnPolicyTable 1 }
+	
+SfosIPSecVpnPolicyEntry ::= SEQUENCE {
+	sfosIPSecVpnPolicyId			Integer32,
+	sfosIPSecVpnPolicyName			DisplayString,
+	sfosIPSecVpnPolicyKeyLife		Integer32,
+	sfosIPSecVpnPolicyKeyMargin		Integer32,
+	sfosIPSecVpnPolicyEncAlgo1		DisplayString,
+	sfosIPSecVpnPolicyAuthAlgo1		DisplayString,
+	sfosIPSecVpnPolicyEncAlgo2		DisplayString,
+	sfosIPSecVpnPolicyAuthAlgo2		DisplayString,
+	sfosIPSecVpnPolicyEncAlgo3		DisplayString,
+	sfosIPSecVpnPolicyAuthAlgo3		DisplayString,
+	sfosIPSecVpnPolicyKeyExchangeType	DisplayString
+}
+
+sfosIPSecVpnPolicyId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy ID of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 1 }
+
+sfosIPSecVpnPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy Name of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 2 }
+
+sfosIPSecVpnPolicyKeyLife OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Key Life time of IPSec VPN Policy"
+    ::= { sfosIPSecVpnPolicyEntry 3 }
+
+sfosIPSecVpnPolicyKeyMargin OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "ReKey margin of IPSec VPN Policy"
+    ::= { sfosIPSecVpnPolicyEntry 4 }
+
+sfosIPSecVpnPolicyEncAlgo1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enc Algo Type 1 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 5 }
+
+sfosIPSecVpnPolicyAuthAlgo1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Auth Algo Type 1 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 6 }
+
+sfosIPSecVpnPolicyEncAlgo2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enc Algo type 1 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 7 }
+
+sfosIPSecVpnPolicyAuthAlgo2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Auth Algo type 2 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 8 }
+
+sfosIPSecVpnPolicyEncAlgo3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enc Algo type 3 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 9 }
+
+sfosIPSecVpnPolicyAuthAlgo3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Auth Algo type 3 of IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 10 }
+
+sfosIPSecVpnPolicyKeyExchangeType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Key Exchange type IPSec Policy"
+    ::= { sfosIPSecVpnPolicyEntry 11 }
+
+-- SFOS-XG MIB.sfosXGWiFiInfo
+sfosDeviceAPTable OBJECT-TYPE	
+    SYNTAX		SEQUENCE OF SfosDeviceAPEntry
+    MAX-ACCESS		not-accessible
+    STATUS		current
+    DESCRIPTION		"Table of objects that contain AP details"
+    ::= { sfosXGWiFiInfo 1 }
+
+sfosDeviceAPEntry OBJECT-TYPE
+    SYNTAX		SfosDeviceAPEntry
+    MAX-ACCESS		not-accessible
+    STATUS		current
+    DESCRIPTION		"Entry of objects that contain AP details"
+    INDEX       	{ sfosDeviceAPName }
+    ::= { sfosDeviceAPTable 1 }
+
+SfosDeviceAPEntry ::= SEQUENCE {
+	sfosDeviceAPName	DisplayString,
+	sfosDeviceAPModel	DisplayString,
+	sfosDeviceAPIPAddress	IpAddress,
+	sfosDeviceAPMacAddress	PhysAddress,
+	sfosDeviceAPStatus	APStatusType,
+	sfosDeviceAPClientCount	Integer32
+}
+
+sfosDeviceAPName OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Device Name of AP"
+    ::= { sfosDeviceAPEntry 1 }
+	
+sfosDeviceAPModel OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Model Name of AP"
+    ::= { sfosDeviceAPEntry 2 }
+
+sfosDeviceAPIPAddress OBJECT-TYPE
+    SYNTAX			IpAddress
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"IP Address of AP"
+    ::= { sfosDeviceAPEntry 3 }
+
+sfosDeviceAPMacAddress OBJECT-TYPE
+    SYNTAX			MacAddress
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"MAC address of AP"
+    ::= { sfosDeviceAPEntry 4 }
+
+sfosDeviceAPStatus OBJECT-TYPE
+    SYNTAX			APStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Status of AP(up/down)"
+    ::= { sfosDeviceAPEntry 5 }
+
+sfosDeviceAPClientCount OBJECT-TYPE
+    SYNTAX		Integer32
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Number of client connected to AP"
+    ::= { sfosDeviceAPEntry 6 }
+
+sfosDeviceAPClientTable OBJECT-TYPE	
+    SYNTAX		SEQUENCE OF SfosDeviceAPClientEntry
+    MAX-ACCESS		not-accessible
+    STATUS		current
+    DESCRIPTION		"Table of objects that contain AP client details"
+    ::= { sfosXGWiFiInfo 2 }
+
+sfosDeviceAPClientEntry OBJECT-TYPE
+    SYNTAX		SfosDeviceAPClientEntry
+    MAX-ACCESS		not-accessible
+    STATUS		current
+    DESCRIPTION		"Entry of objects that contain AP client details"
+    INDEX       	{ clientIndex }
+    ::= { sfosDeviceAPClientTable 1 }
+
+SfosDeviceAPClientEntry ::= SEQUENCE {
+	  clientIndex			Integer32,
+	  clientName			DisplayString,
+	  clientIPAddType		InetAddressType,
+	  clientIPAdd			InetAddress,
+	  clientMacAdd			MacAddress,
+	  clientChannel			DisplayString,
+	  clientSSID			DisplayString
+}
+
+clientIndex OBJECT-TYPE
+    SYNTAX		Integer32 (1..65535)
+    MAX-ACCESS		not-accessible
+    STATUS		current
+    DESCRIPTION		"Index of AP client"
+    ::= { sfosDeviceAPClientEntry 1 }
+	
+clientName OBJECT-TYPE
+    SYNTAX		DisplayString
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"Name of AP client"
+    ::= { sfosDeviceAPClientEntry 2 }
+	
+clientIPAddType OBJECT-TYPE
+    SYNTAX		InetAddressType
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION		"IP Address of AP client"
+    ::= { sfosDeviceAPClientEntry 3 }
+
+clientIPAdd OBJECT-TYPE
+    SYNTAX			InetAddress
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"IP Address of AP client"
+    ::= { sfosDeviceAPClientEntry 4 }
+
+clientMacAdd OBJECT-TYPE
+    SYNTAX			MacAddress
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"MAC Address of AP client"
+    ::= { sfosDeviceAPClientEntry 5 }
+
+clientChannel OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Name of the channel to which AP client is connected"
+    ::= { sfosDeviceAPClientEntry 6 }
+
+clientSSID OBJECT-TYPE
+    SYNTAX			DisplayString (SIZE(0..128))
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Name of SSID to which AP client is connected"
+    ::= { sfosDeviceAPClientEntry 7 }
+
+
+-- SFOS-XG MIB.sfosXGTrap
+sfosNotificationAlerts		OBJECT IDENTIFIER ::=  { sfosXGTrap 1 }
+
+-- sfosXGTrap.sfosNotificationAlerts
+sfosTrapMessage	OBJECT-TYPE
+	SYNTAX			DisplayString (SIZE(0..256))
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	"Trap raw log line "
+	::= { sfosNotificationAlerts 2 }
+
+sfosNotification NOTIFICATION-TYPE
+	OBJECTS { sfosDeviceType, sfosDeviceFWVersion, sfosDeviceAppKey, sfosDeviceName, sfosCurrentDate, sfosTrapMessage}
+	STATUS			current
+	DESCRIPTION		"Trap for SFOS events for Notification"
+	::= { sfosNotificationAlerts 1 }
+
+-- conformance information
+
+sfosXGMIBConformance OBJECT IDENTIFIER ::= {sfosXGMIB 2}
+
+sfosXGMIBCompliances OBJECT IDENTIFIER ::= {sfosXGMIBConformance 1}
+sfosXGMIBGroups      OBJECT IDENTIFIER ::= {sfosXGMIBConformance 2}
+
+-- compliance statements
+sfosBasicCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION "The compliance statement for SNMP entities which implement this MIB module."
+       MODULE  -- this module
+       MANDATORY-GROUPS { sfosDeviceStatusGroup, sfosDeviceStatsGroup, sfosServiceStatusGroup,
+			sfosLicInfoGroup, sfosHAStatusGroup, sfosIPSecInfoGroup,
+			sfosWiFiInfoGroup, sfosTrapInfoGroup }
+
+       ::= { sfosXGMIBCompliances 1 }
+
+-- units of conformance
+
+sfosDeviceStatusGroup OBJECT-GROUP
+	OBJECTS {
+		sfosDeviceName,
+		sfosDeviceType,
+		sfosDeviceFWVersion,
+		sfosDeviceAppKey,
+		sfosWebcatVersion,
+		sfosIPSVersion }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS Device Status"
+	::= { sfosXGMIBGroups 1 }
+
+sfosDeviceStatsGroup OBJECT-GROUP
+	OBJECTS {
+		sfosCurrentDate,
+		sfosUpTime,
+		sfosLiveUsersCount,
+		sfosHTTPHits,
+		sfosFTPHits,
+		sfosDiskCapacity,
+		sfosDiskPercentUsage,
+		sfosMemoryCapacity,
+		sfosMemoryPercentUsage,
+		sfosSwapCapacity,
+		sfosSwapPercentUsage,
+		sfosPOP3Hits,
+		sfosImapHits,
+		sfosSmtpHits }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS Device Stats"
+	::= { sfosXGMIBGroups 2 }
+
+sfosServiceStatusGroup OBJECT-GROUP
+	OBJECTS {
+		sfosPoP3Service,
+		sfosImap4Service,
+		sfosSmtpService,
+		sfosFtpService,
+		sfosHttpService,
+		sfosAVService,
+		sfosASService,
+		sfosDNSService,
+		sfosHAService,
+		sfosIPSService,
+		sfosApacheService,
+		sfosNtpService,
+		sfosTomcatService,
+		sfosSSLVpnService,
+		sfosIPSecVpnService,
+		sfosDatabaseservice,
+		sfosNetworkService,
+		sfosGarnerService,
+		sfosDroutingService,
+		sfosSSHdService,
+		sfosDgdService }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS service status info"
+	::= { sfosXGMIBGroups 3 }
+
+sfosHAStatusGroup OBJECT-GROUP
+	OBJECTS {
+		sfosHAStatus,
+		sfosDeviceCurrentAppKey,
+		sfosDevicePeerAppKey,
+		sfosDeviceCurrentHAState,
+		sfosDevicePeerHAState,
+		sfosDeviceHAConfigMode,
+		sfosDeviceLoadBalancing,
+		sfosDeviceHAPort,
+		sfosDeviceHACurrentIP,
+		sfosDeviceHAPeerIP,
+		sfosDeviceAuxAdminPort,
+		sfosDeviceHAAuxAdminIP,
+		sfosDeviceHAAuxAdminIPv6 }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS HA info"
+	::= { sfosXGMIBGroups 4 }
+
+sfosLicInfoGroup OBJECT-GROUP
+	OBJECTS {
+		sfosBaseFWLicRegStatus,
+		sfosBaseFWLicExpiryDate,
+		sfosNetProtectionLicRegStatus,
+		sfosNetProtectionLicExpiryDate,
+		sfosWebProtectionLicRegStatus,
+		sfosWebProtectionLicExpiryDate,
+		sfosMailProtectionLicRegStatus,
+		sfosMailProtectionLicExpiryDate,
+		sfosWebServerProtectionLicRegStatus,
+		sfosWebServerProtectionLicExpiryDate,
+		sfosSandstromLicRegStatus,
+		sfosSandstromLicExpiryDate,
+		sfosEnhancedSupportLicRegStatus,
+		sfosEnhancedSupportLicExpiryDate,
+		sfosEnhancedPlusLicRegStatus,
+		sfosEnhancedPlusLicExpiryDate,
+		sfosCentralOrchestrationLicRegStatus,
+		sfosCentralOrchestrationLicExpiryDate }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS License info"
+	::= { sfosXGMIBGroups 5 }
+
+sfosIPSecInfoGroup OBJECT-GROUP
+	OBJECTS {
+	sfosIPSecVpnConnId,
+	sfosIPSecVpnConnName,
+	sfosIPSecVpnConnDes,
+	sfosIPSecVpnPolicyName,
+	sfosIPSecVpnConnMode,
+	sfosIPSecVpnConnType,
+	sfosIPSecVpnLocalgwPort,
+	sfosIPSecVpnActiveTunnel,
+	sfosIPSecVpnPolicyId,
+	sfosIPSecVpnPolicyName,
+	sfosIPSecVpnPolicyKeyLife,
+	sfosIPSecVpnPolicyKeyMargin,
+	sfosIPSecVpnPolicyEncAlgo1,
+	sfosIPSecVpnPolicyAuthAlgo1,
+	sfosIPSecVpnPolicyEncAlgo2,
+	sfosIPSecVpnPolicyAuthAlgo2,
+	sfosIPSecVpnPolicyEncAlgo3,
+	sfosIPSecVpnPolicyAuthAlgo3,
+	sfosIPSecVpnPolicyKeyExchangeType }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS IPSec VPN Status"
+	::= { sfosXGMIBGroups 6 }
+
+sfosWiFiInfoGroup OBJECT-GROUP
+	OBJECTS {
+		sfosDeviceAPName,
+		sfosDeviceAPModel,
+		sfosDeviceAPIPAddress,
+		sfosDeviceAPMacAddress,
+		sfosDeviceAPStatus,
+		sfosDeviceAPClientCount,
+		clientName,
+		clientIPAddType,
+		clientIPAdd,
+		clientMacAdd,
+		clientChannel,
+		clientSSID }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS WiFi module Info"
+	::= { sfosXGMIBGroups 7 }
+
+sfosTrapInfoGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		sfosNotification }
+	STATUS current
+	DESCRIPTION "A collection of objects providing SFOS Trap Info"
+	::= { sfosXGMIBGroups 8 }
+
+END

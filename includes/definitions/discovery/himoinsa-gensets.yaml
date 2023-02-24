@@ -1,113 +1,254 @@
-mib: DISMUNTELv00-MIB
+mib: HIMOINSAv14-MIB
 modules:
+    os:
+        version: HIMOINSAv14-MIB::version
     sensors:
         frequency:
             data:
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.1.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.2.{{ $index }}'
                     value: mainsFreqConm
                     index: 'mainsFreqConm.{{ $index }}'
-                    descr: Mains frequency
+                    descr: Frequency
+                    group: Mains
                     divisor: 10
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.8.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.9.{{ $index }}'
                     value: genFreqConm
                     index: 'genFreqConm.{{ $index }}'
-                    descr: Genset frequency
+                    descr: Frequency
+                    group: Genset
                     divisor: 10
         voltage:
             data:
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.2.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.3.{{ $index }}'
                     value: mainsVL12Conm
                     index: 'mainsVL12Conm.{{ $index }}'
-                    descr: Mains voltage 12
+                    descr: Voltage 12
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.3.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.4.{{ $index }}'
                     value: mainsVL23Conm
                     index: 'mainsVL23Conm.{{ $index }}'
-                    descr: Mains voltage 23
+                    descr: Voltage 23
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.4.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.5.{{ $index }}'
                     value: mainsVL13Conm
                     index: 'mainsVL13Conm.{{ $index }}'
-                    descr: Mains voltage 13
+                    descr: Voltage 13
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.5.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.6.{{ $index }}'
                     value: mainsVL1NConm
                     index: 'mainsVL1NConm.{{ $index }}'
-                    descr: Mains voltage 1N
+                    descr: Voltage 1N
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.6.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.7.{{ $index }}'
                     value: mainsVL2NConm
                     index: 'mainsVL2NConm.{{ $index }}'
-                    descr: Mains voltage 2N
+                    descr: Voltage 2N
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.7.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.8.{{ $index }}'
                     value: mainsVL3NConm
                     index: 'mainsVL3NConm.{{ $index }}'
-                    descr: Mains voltage 3N
+                    descr: Voltage 3N
+                    group: Mains
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.9.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.10.{{ $index }}'
                     value: genVL12Conm
                     index: 'genVL12Conm.{{ $index }}'
-                    descr: Genset voltage 12
+                    descr: Voltage 12
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.10.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.11.{{ $index }}'
                     value: genVL23Conm
                     index: 'genVL23Conm.{{ $index }}'
-                    descr: Genset voltage 23
+                    descr: Voltage 23
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.11.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.12.{{ $index }}'
                     value: genVL13Conm
                     index: 'genVL13Conm.{{ $index }}'
-                    descr: Genset voltage 13
+                    descr: Voltage 13
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.12.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.13.{{ $index }}'
                     value: genVL1NConm
                     index: 'genVL1NConm.{{ $index }}'
-                    descr: Genset voltage 1N
+                    descr: Voltage 1N
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.13.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.14.{{ $index }}'
                     value: genVL2NConm
                     index: 'genVL2NConm.{{ $index }}'
-                    descr: Genset voltage 2N
+                    descr: Voltage 2N
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.14.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.15.{{ $index }}'
                     value: genVL3NConm
                     index: 'genVL3NConm.{{ $index }}'
-                    descr: Genset voltage 3N
+                    descr: Voltage 3N
+                    group: Genset
+                -
+                    oid: batteryVolt
+                    num_oid: '.1.3.6.1.4.1.41809.1.29.{{ $index }}'
+                    index: 'batteryVolt.{{ $index }}'
+                    descr: Battery Voltage
+                    divisor: 10
+                    group: Genset
+                -
+                    oid: altenatorVolt
+                    num_oid: '.1.3.6.1.4.1.41809.1.28.{{ $index }}'
+                    index: 'altenatorVolt.{{ $index }}'
+                    descr: Alternator Voltage
+                    divisor: 10
+                    group: Genset
         current:
             data:
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.15.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.15.{{ $index }}'
                     value: ph1AmpConm
                     index: 'ph1AmpConm.{{ $index }}'
-                    descr: Phase current 1
+                    descr: Phase 1
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.16.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.16.{{ $index }}'
                     value: ph2AmpConm
                     index: 'ph2AmpConm.{{ $index }}'
-                    descr: Phase current 2
+                    descr: Phase 2
+                    group: Genset
                 -
-                    oid: conmutationmeasuresTable
-                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.17.{{ $index }}'
+                    oid: measuresConmTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.17.{{ $index }}'
                     value: ph3AmpConm
                     index: 'ph3AmpConm.{{ $index }}'
-                    descr: Phase current 3
+                    descr: Phase 3
+                    group: Genset
+        percent:
+            data:
+                -
+                    oid: fuelLevel
+                    num_oid: '.1.3.6.1.4.1.41809.1.27.{{ $index }}'
+                    index: 'fuelLevel.{{ $index }}'
+                    descr: Fuel level
+                    divisor: 10
+                    group: Genset
+        state:
+            data:
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::motorStatus
+                    index: motor
+                    descr: Motor
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaMotorStatus
+                    states:
+                        - {value: 1, generic: 2, graph: 0, descr: Running}
+                        - {value: 2, generic: 0, graph: 0, descr: Stopped}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::modeStatus
+                    index: mode
+                    descr: Mode
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaModeStatus
+                    states:
+                        - {value: 4, generic: 0, graph: 0, descr: Auto}
+                        - {value: 8, generic: 2, graph: 0, descr: Manual}
+                        - {value: 16, generic: 1, graph: 0, descr: Test}
+                        - {value: 32, generic: 2, graph: 0, descr: Blocked}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::transferPumpStatus
+                    index: transfer_pump
+                    descr: Transfer Pump
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaTransferPumpStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: Off}
+                        - {value: 64, generic: 1, graph: 0, descr: On}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::alarmStatus
+                    index: alarm
+                    descr: Alarm
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaAlarmStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: No Alarm}
+                        - {value: 128, generic: 2, graph: 0, descr: Alarm}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::commStatus
+                    index: comm
+                    descr: Commutator Mode
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaCommStatus
+                    states:
+                        - {value: 512, generic: 2, graph: 0, descr: Genset}
+                        - {value: 256, generic: 0, graph: 0, descr: Mains}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommStatus
+                    index: 'cec7_comm.{{ $index }}'
+                    descr: Commutator Mode
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7CommStatus
+                    states:
+                        - {value: 32, generic: 2, graph: 0, descr: Genset}
+                        - {value: 64, generic: 0, graph: 0, descr: Mains}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommAlarmStatus
+                    index: 'cec7_alarm.{{ $index }}'
+                    descr: Alarm
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7AlarmStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: No Alarm}
+                        - {value: 1, generic: 2, graph: 0, descr: Alarm}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7ModeStatus
+                    index: 'cec7_mode.{{ $index }}'
+                    descr: Mode
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7ModeStatus
+                    states:
+                        - {value: 2, generic: 0, graph: 0, descr: Auto}
+                        - {value: 4, generic: 2, graph: 0, descr: Manual}
+                        - {value: 8, generic: 1, graph: 0, descr: Test}
+                        - {value: 16, generic: 2, graph: 0, descr: Blocked}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}

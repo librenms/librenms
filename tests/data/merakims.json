@@ -3,38 +3,21 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": "Meraki MS",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "merakims",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "meraki.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "Meraki MS",
                     "sysContact": null,
                     "version": null,
                     "hardware": "Meraki MS",
                     "features": null,
+                    "location": null,
                     "os": "merakims",
                     "type": "network",
                     "serial": "9999999999",
-                    "icon": "meraki.png",
-                    "location": null
+                    "icon": "meraki.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -1,5 +1,17 @@
 mib:  CISCO-REMOTE-ACCESS-MONITOR-MIB
 modules:
+    os:
+        sysDescr_regex: '/Version (?<version>.*)/'
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.4
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.4
+        hardware:
+            - ENTITY-MIB::entPhysicalModelName.1
+            - ENTITY-MIB::entPhysicalModelName.4
+        hardware_mib: CISCO-PRODUCTS-MIB
     sensors:
         count:
             data:

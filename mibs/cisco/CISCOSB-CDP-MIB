@@ -8,7 +8,7 @@ CISCOSB-CDP-MIB DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-    switch001, rndNotifications                   FROM CISCOSB-MIB
+    switch001, rndNotifications             FROM CISCOSB-MIB
     rndErrorDesc, rndErrorSeverity          FROM CISCOSB-DEVICEPARAMS-MIB
     InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,
@@ -20,6 +20,8 @@ IMPORTS
     PortList                                FROM Q-BRIDGE-MIB
     VlanId                                  FROM Q-BRIDGE-MIB
     InterfaceIndexOrZero, InterfaceIndex    FROM IF-MIB
+    CiscoNetworkProtocol, 
+    CiscoNetworkAddress                     FROM CISCO-TC
     cdpCacheEntry,
     cdpCacheIfIndex,
     cdpCacheDeviceIndex                     FROM CISCO-CDP-MIB;
@@ -69,7 +71,29 @@ rlCdp MODULE-IDENTITY
          REVISION "201202140000Z"
          DESCRIPTION
                 "Added rlCdpTlvSysName to rlCdpTlvTable."
-
+         REVISION "201503040000Z"
+         DESCRIPTION
+                "Added rlCdpTlvPowerRequestTable.
+		 Added rlCdpSecondaryCacheAddressTable.
+		 Added rlCdpSecondaryCacheRequestedPowerTable.
+		 Added rlCdpTlvPowerConsumption, 
+		       rlCdpTlvPowerRequestedRequestId, 
+		       rlCdpTlvPowerRequestedPowerManagementId, 
+		       rlCdpTlvSparePairPoECapabilities 
+		       to rlCdpTlvEntry.
+		 Added rlCdpSecondaryCachePowerAvailable, 
+		       rlCdpSecondaryCachePowerConsumption,
+		       rlCdpSecondaryCacheSparePairPoECapabilities, 
+		       rlCdpSecondaryCacheDeviceId,
+		       rlCdpSecondaryCachePortId 
+		       to rlCdpSecondaryCacheEntry."
+         REVISION "201603300000Z"
+         DESCRIPTION
+                "Added rlCdpSecondaryCachePowerAvailableManagementPowerLevel,
+		       rlCdpSecondaryCachePowerAvailableRequestId,
+		       rlCdpSecondaryCachePowerAvailablePowerManagementId,
+		       rlCdpSecondaryCachePowerRequestedPowerManagementId,
+		       rlCdpSecondaryCachePowerRequestedRequestId."
         ::= { switch001 137 }
 
 RlCdpVersionTypes ::= TEXTUAL-CONVENTION
@@ -119,6 +143,7 @@ RlCdpPduActionTypes ::= TEXTUAL-CONVENTION
         bridging(2),
         flooding(3)
      }
+
 -- rlCdpVersionAdvertised
 
 rlCdpVersionAdvertised OBJECT-TYPE
@@ -163,7 +188,7 @@ rlCdpCountersTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table contains all CDP counters values, indexed by counter name"
+        "This table contains all cdp counter values, indexed by conter name"
     ::= { rlCdp 4 }
 
 rlCdpCountersEntry OBJECT-TYPE
@@ -343,11 +368,21 @@ rlCdpSecondaryCacheEntry OBJECT-TYPE
     ::= { rlCdpSecondaryCacheTable 1 }
 
 RlCdpSecondaryCacheEntry ::= SEQUENCE {
-    rlCdpSecondaryCacheMacAddress       MacAddress,
-    rlCdpSecondaryCachePlatform         DisplayString,
-    rlCdpSecondaryCacheCapabilities     OCTET STRING,
-    rlCdpSecondaryCacheVoiceVlanID      Unsigned32,
-    rlCdpSecondaryCacheTimeToLive       INTEGER
+    rlCdpSecondaryCacheMacAddress                         MacAddress,
+    rlCdpSecondaryCachePlatform                           DisplayString,
+    rlCdpSecondaryCacheCapabilities                       OCTET STRING,
+    rlCdpSecondaryCacheVoiceVlanID                        Unsigned32,
+    rlCdpSecondaryCacheTimeToLive                         INTEGER,
+    rlCdpSecondaryCachePowerAvailable                     Unsigned32,
+    rlCdpSecondaryCachePowerConsumption                   Unsigned32,
+    rlCdpSecondaryCacheSparePairPoECapabilities           BITS,
+    rlCdpSecondaryCacheDeviceId                           DisplayString,
+    rlCdpSecondaryCachePortId                             DisplayString,
+    rlCdpSecondaryCachePowerAvailableManagementPowerLevel Unsigned32,
+    rlCdpSecondaryCachePowerAvailableRequestId            Unsigned32,
+    rlCdpSecondaryCachePowerAvailablePowerManagementId    Unsigned32,
+    rlCdpSecondaryCachePowerRequestedPowerManagementId    Unsigned32,
+    rlCdpSecondaryCachePowerRequestedRequestId            Unsigned32
 }
 
 rlCdpSecondaryCacheMacAddress OBJECT-TYPE
@@ -400,6 +435,126 @@ rlCdpSecondaryCacheTimeToLive OBJECT-TYPE
             till the entry is expried. "
     ::= { rlCdpSecondaryCacheEntry 7 }
 
+rlCdpSecondaryCachePowerAvailable OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's available power, as reported in the
+        most recent CDP message. 
+	A value of 0xFFFFFFFF indicates that no Power Available TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 8 }
+
+rlCdpSecondaryCachePowerConsumption OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's consumed power, as reported in the
+        most recent CDP message. 
+	A value of 0xFFFFFFFF indicates that no Power Consumption TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 9 }
+
+rlCdpSecondaryCacheSparePairPoECapabilities OBJECT-TYPE
+    SYNTAX  BITS {
+            supported(0),
+            detectionClassificationRequired(1),
+            desiredState(2),
+            operationalState(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The remote device's Spare-Pair (4-wire) Power-Over-Ethernet negotiation capabilities.
+            The bit 'supported(0)' indicates that the device supports Spare Pair POE.
+            The bit 'detectionClassificationRequired(1)' indicates that the device requires
+	    detection/classification on the spare-pair.
+            The bit 'desiredState(2)' indicates whether the PD device desires power 
+	    on the spare pair.
+            The bit 'operationalState(3)' indicates whether the PSE device supplies power 
+	    on the spare pair."
+    ::= { rlCdpSecondaryCacheEntry 10 }
+
+rlCdpSecondaryCacheDeviceId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The remote device's Device-ID prefix, as reported in the most
+            recent CDP message.  The zero-length string indicates
+            that no Device-ID TLV was reported in the most recent CDP message."
+    ::= { rlCdpSecondaryCacheEntry 11 }
+
+rlCdpSecondaryCachePortId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The remote device's Port-ID prefix, as reported in the most
+            recent CDP message.  The zero-length string indicates
+            that no Port-ID TLV was reported in the most recent CDP message."
+    ::= { rlCdpSecondaryCacheEntry 12 }
+
+rlCdpSecondaryCachePowerAvailableManagementPowerLevel OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's Management Power Level, as reported in the
+        most recent CDP message Power Available TLV. 
+	A value of zero indicates that no Power Available TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 13 }
+
+rlCdpSecondaryCachePowerAvailableRequestId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's echoed Request ID, as reported in the
+        most recent CDP message Power Available TLV. 
+	A value of zero indicates that no Power Available TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 14 }
+
+rlCdpSecondaryCachePowerAvailablePowerManagementId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's Power Management ID, as reported in the
+        most recent CDP message Power Available TLV. 
+	A value of zero indicates that no Power Available TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 15 }
+
+rlCdpSecondaryCachePowerRequestedPowerManagementId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's echoed Power Management ID, as reported in the
+        most recent CDP message Power Requested TLV. 
+	A value of zero indicates that no Power Requested TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 16 }
+
+rlCdpSecondaryCachePowerRequestedRequestId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote device's Request ID, as reported in the
+        most recent CDP message Power Requested TLV. 
+	A value of zero indicates that no Power Requested TLV 
+	was reported in the most recently received CDP message."
+    ::= { rlCdpSecondaryCacheEntry 17 }
+
+
+
+-------------------------------------------------------------------------------
 rlCdpGlobalLogMismatchDuplexEnable OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
@@ -476,7 +631,11 @@ RlCdpTlvEntry ::= SEQUENCE {
     rlCdpTlvPowerAvailablePowerManagementId     Unsigned32,
     rlCdpTlvPowerAvailable                      Unsigned32,
     rlCdpTlvPowerAvailableManagementPowerLevel  Unsigned32,
-    rlCdpTlvSysName                             DisplayString
+    rlCdpTlvSysName                             DisplayString,
+    rlCdpTlvPowerConsumption			Unsigned32,
+    rlCdpTlvPowerRequestedRequestId		Unsigned32,
+    rlCdpTlvPowerRequestedPowerManagementId	Unsigned32,
+    rlCdpTlvSparePairPoECapabilities            BITS
 }
 
 rlCdpTlvIfIndex OBJECT-TYPE
@@ -715,7 +874,8 @@ rlCdpTlvPowerAvailable OBJECT-TYPE
     DESCRIPTION
         "The Power Available TLV Available-Power field indicates the
         number of milliwatts of power available to powered devices at the
-        time this object is instatiated."
+        time this object is instatiated.
+	A value of 0xFFFFFFFF indicates that the Power Available TLV is not advertised."
     ::= { rlCdpTlvEntry 22 }
 
 rlCdpTlvPowerAvailableManagementPowerLevel OBJECT-TYPE
@@ -736,6 +896,218 @@ rlCdpTlvSysName OBJECT-TYPE
     DESCRIPTION
             "The sysName MIB as will be advertised in subsequent CDP messages."
     ::= { rlCdpTlvEntry 24 }
+
+rlCdpTlvPowerConsumption OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of Power Consumption TLV indicates the maximum amount of
+         power, in milliwatts, expected to be obtained and consumed from
+         the interface over which the CDP packet is sent.
+	 A value of 0xFFFFFFFF indicates the TLV is not advertised."
+    ::= { rlCdpTlvEntry 25 }
+
+rlCdpTlvPowerRequestedRequestId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Requested TLV Request-ID field.
+	 A value of zero indicates that the Power Requested TLV is not advertised."
+    ::= { rlCdpTlvEntry 26 }
+
+rlCdpTlvPowerRequestedPowerManagementId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The Power Requested TLV Power-Management-ID field echoes the Management-
+         Power-ID field in the last received Power Available TLV, or to 0, 
+	 if no Power Available TLV has been received."
+    ::= { rlCdpTlvEntry 27 }
+
+rlCdpTlvSparePairPoECapabilities OBJECT-TYPE
+    SYNTAX  BITS {
+            supported(0),
+            detectionClassificationRequired(1),
+            desiredState(2),
+            operationalState(3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+	"The capabilities advertised in the Spare-Pair POE TLV.
+	The bit 'supported(0)' indicates that the device supports Spare Pair POE.
+	The bit 'detectionClassificationRequired(1)' indicates that the device requires
+	detection/classification on the spare-pair.
+	The bit 'desiredState(2)' indicates whether the PD device desires power 
+	on the spare pair.
+	The bit 'operationalState(3)' indicates whether the PSE device supplies power 
+	on the spare pair."
+    ::= { rlCdpTlvEntry 28 }
+
+-- rlCdpTlvPowerRequestTable
+
+rlCdpTlvPowerRequestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpTlvPowerRequestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table contains the local advertised requested power levels
+	 in Power Requested TLV.
+        indexed by rlCdpTlvPowerRequestEntry."
+    ::= { rlCdp 21 }
+
+rlCdpTlvPowerRequestEntry OBJECT-TYPE
+    SYNTAX      RlCdpTlvPowerRequestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlCdpTlvPowerRequestTable,
+            containing locally requested power levels advertised by CDP on one
+            interface. Entries are available only when CDP is globally enabled,
+            for interfaces on which CDP is enabled and the interface state is UP."
+    INDEX      { rlCdpTlvIfIndex, rlCdpTlvPowerRequestPowerLevelIndex }
+    ::= { rlCdpTlvPowerRequestTable 1 }
+
+RlCdpTlvPowerRequestEntry ::= SEQUENCE {
+    rlCdpTlvPowerRequestPowerLevelIndex         Unsigned32,
+    rlCdpTlvPowerRequestPowerLevel              Unsigned32
+}
+
+rlCdpTlvPowerRequestPowerLevelIndex OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An index to the list of Requested-Power-Level in Power Requested TLV."
+    ::= { rlCdpTlvPowerRequestEntry 2 }
+
+rlCdpTlvPowerRequestPowerLevel OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A possible value of the Power Consumption TLV, in milliwatts"
+    ::= { rlCdpTlvPowerRequestEntry 3 }
+
+
+--------------------------------------------------------------------------------
+
+-- rlCdpSecondaryCacheAddressTable
+
+rlCdpSecondaryCacheAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpSecondaryCacheAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "The (conceptual) table containing the list of
+	    network-layer addresses of a neighbor interface,
+	    as reported in the Address TLV of the most recently
+	    received CDP message and stored in the secondary cache."
+    ::= { rlCdp 22 }
+
+rlCdpSecondaryCacheAddressEntry OBJECT-TYPE
+    SYNTAX      RlCdpSecondaryCacheAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlCdpSecondaryCacheAddressTable,
+            containing the list of network-layer addresses of a neighbor interface,
+	    as reported in the Address TLV of the most recently received CDP message 
+	    and stored in the secondary cache. Entries are available only when CDP is 
+	    globally enabled, for interfaces on which CDP is enabled and the interface 
+	    state is UP."
+    INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex, rlCdpSecondaryCacheAddressIndex }
+    ::= { rlCdpSecondaryCacheAddressTable 1 }
+
+RlCdpSecondaryCacheAddressEntry ::= SEQUENCE {
+    rlCdpSecondaryCacheAddressIndex       INTEGER,
+    rlCdpSecondaryCacheAddressType        CiscoNetworkProtocol,
+    rlCdpSecondaryCacheAddress            CiscoNetworkAddress
+}
+
+rlCdpSecondaryCacheAddressIndex OBJECT-TYPE
+    SYNTAX     INTEGER (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of the address entry for a given
+            cdpCacheIfIndex,cdpCacheDeviceIndex pair."
+    ::= { rlCdpSecondaryCacheAddressEntry 3 }
+
+rlCdpSecondaryCacheAddressType OBJECT-TYPE
+    SYNTAX     CiscoNetworkProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "An indication of the type of address contained in the
+            corresponding instance of rlCdpSecondaryCacheAddress"
+    ::= { rlCdpSecondaryCacheAddressEntry 4 }
+
+rlCdpSecondaryCacheAddress OBJECT-TYPE
+    SYNTAX     CiscoNetworkAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A network-layer address of the device as reported in the most 
+	    recent CDP message's Address TLV. For example, if the the 
+	    corresponding instance of rlCdpSecondaryCacheAddressType had the
+            value 'ip(1)', then this object would be an IPv4-address."
+    ::= { rlCdpSecondaryCacheAddressEntry 5 }
+
+
+--------------------------------------------------------------------------------
+
+-- rlCdpSecondaryCacheRequestedPowerTable
+
+rlCdpSecondaryCacheRequestedPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCdpSecondaryCacheRequestedPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "The (conceptual) table containing the list of
+	    requested power levels by a remote device,
+	    as reported in the Power Requested TLV of the most recently
+	    received CDP message and stored in the secondary cache."
+    ::= { rlCdp 23 }
+
+rlCdpSecondaryCacheRequestedPowerEntry OBJECT-TYPE
+    SYNTAX      RlCdpSecondaryCacheRequestedPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlCdpSecondaryCacheRequestedPowerTable,
+            containing the list of requested power levels by a remote device,
+	    as reported in the Power Requested TLV of the most recently received CDP message 
+	    and stored in the secondary cache. Entries are available only when CDP is 
+	    globally enabled, for interfaces on which CDP is enabled and the interface 
+	    state is UP."
+    INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex, rlCdpSecondaryCacheRequestedPowerIndex }
+    ::= { rlCdpSecondaryCacheRequestedPowerTable 1 }
+
+RlCdpSecondaryCacheRequestedPowerEntry ::= SEQUENCE {
+    rlCdpSecondaryCacheRequestedPowerIndex       INTEGER,
+    rlCdpSecondaryCacheRequestedPowerLevel       Unsigned32
+}
+
+rlCdpSecondaryCacheRequestedPowerIndex OBJECT-TYPE
+    SYNTAX     INTEGER (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of the requested power level entry for a given
+            cdpCacheIfIndex,cdpCacheDeviceIndex pair."
+    ::= { rlCdpSecondaryCacheRequestedPowerEntry 3 }
+
+rlCdpSecondaryCacheRequestedPowerLevel OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A requested power level in the Power Requested TLV, in milliwatts."
+    ::= { rlCdpSecondaryCacheRequestedPowerEntry 4 }
 
 --------------------------------------------------------------------------------
 
@@ -759,7 +1131,7 @@ rlCdpValidateMandatoryTlvs OBJECT-TYPE
          A value of false indicates that only the Device ID TLV (0x0001) is mandatory.
          Frames containing Device ID TLV will be processed,
                  regardless of whether other TLVs are present or not."
-    DEFVAL     { false }
+    DEFVAL     { true }
     ::= {rlCdp 18}
 
 
@@ -770,7 +1142,7 @@ rlCdpInterfaceCountersTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table contains all CDP counters values, indexed by interface id."
+        "This table contains all CDP counter values, indexed by interface id."
     ::= { rlCdp 19 }
 
 rlCdpInterfaceCountersEntry OBJECT-TYPE

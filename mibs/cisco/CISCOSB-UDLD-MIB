@@ -69,9 +69,16 @@ UdldPortMode  ::= TEXTUAL-CONVENTION
 
 rlUdld MODULE-IDENTITY
     LAST-UPDATED "201208010000Z"
-    ORGANIZATION "CISCOSB Computer Communications Ltd."
+    ORGANIZATION "Cisco Systems, Inc."
+
     CONTACT-INFO
-           "CISCOSB.com"
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
     DESCRIPTION
            "This private MIB module for UDLD (Cisco Systems UniDirectional Link Detection Protocol)."
     REVISION "201208010000Z"

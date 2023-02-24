@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,9 +26,9 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\UI\DeviceTab;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NotesController implements DeviceTab
 {
@@ -62,8 +62,8 @@ class NotesController implements DeviceTab
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Device $device
+     * @param  Request  $request
+     * @param  Device  $device
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Device $device)

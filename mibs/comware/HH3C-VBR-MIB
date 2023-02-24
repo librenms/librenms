@@ -1,0 +1,413 @@
+-- ============================================================================
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Virtual Bridge (VBR) information MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2018-07-11 Initial version by Xuzhihui
+-- ============================================================================
+HH3C-VBR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        DisplayString, RowStatus, TruthValue
+    FROM SNMPv2-TC;
+-- ==================================================================
+--
+-- Module identity part
+--
+-- ==================================================================
+hh3cVbr MODULE-IDENTITY
+    LAST-UPDATED "201807111129Z"        -- 11th July, 2018 at 11:29 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Haidian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB is used to manage port extenders (PEXs) over 802.1BR.
+         This MIB is applicable to products that support PEXs."
+    REVISION
+        "201807111129Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 180 }
+
+--VBR specification information
+hh3cVbrSpecInfo OBJECT IDENTIFIER ::= { hh3cVbr 1 }
+
+hh3cVbrGroupMinId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lowest PEX group ID that can be used to allocate ECIDs for ports
+        on a PEX."
+    ::= { hh3cVbrSpecInfo 1 }
+
+hh3cVbrGroupMaxId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest PEX group ID that can be used to allocate ECID for ports
+        on a PEX."
+    ::= { hh3cVbrSpecInfo 2 }
+
+hh3cVbrMinAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lowest ID that can be assigned to a PEX."
+    ::= { hh3cVbrSpecInfo 3 }
+
+hh3cVbrMaxAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest ID that can be assigned to a PEX."
+    ::= { hh3cVbrSpecInfo 4 }
+
+--End VBR specification information
+
+
+hh3cVbrTable OBJECT IDENTIFIER ::= { hh3cVbr 2 }
+
+--VBR group table
+hh3cVbrGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVbrGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects used to configure PEX groups."
+    ::= { hh3cVbrTable 1 }
+
+hh3cVbrGroupEntry OBJECT-TYPE
+    SYNTAX      Hh3cVbrGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX group."
+    INDEX
+        {
+            hh3cVbrGroupId
+        }
+    ::= { hh3cVbrGroupTable 1 }
+
+Hh3cVbrGroupEntry ::= SEQUENCE
+    {
+        hh3cVbrGroupId               Integer32,
+        hh3cVbrGroupDescr            DisplayString,
+        hh3cVbrGroupRowStatus        RowStatus
+    }
+
+hh3cVbrGroupId OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ID that can be used to uniquely identify a PEX group.  The value range
+        is hh3cVbrGroupMinId to hh3cVbrGroupMaxId."
+    ::= { hh3cVbrGroupEntry 1 }
+
+hh3cVbrGroupDescr OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..79))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Description for the PEX group.  The default value is
+        'pex-group XXXX', where 'XXXX' is hh3cVbrGroupId.
+        Writing a zero-length string to this object resets the value to the
+        default."
+    ::= { hh3cVbrGroupEntry 2 }
+
+hh3cVbrGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The control that allows creation and deletion of entries.
+        Values include createAndGo, active, and destroy.
+        If the row to be created or modified already exists,
+        an error message is returned.  If the row to be deleted does not exist,
+        a success message is returned."
+    ::= { hh3cVbrGroupEntry 3 }
+--End VBR group table
+
+--VBR cascade-port table
+hh3cVbrCasPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVbrCasPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects used to configure PEX cascade ports."
+    ::= { hh3cVbrTable 2 }
+
+hh3cVbrCasPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cVbrCasPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX cascade port."
+    INDEX
+        {
+            hh3cVbrCasPortIndex
+        }
+    ::= { hh3cVbrCasPortTable 1 }
+
+Hh3cVbrCasPortEntry ::= SEQUENCE
+    {
+        hh3cVbrCasPortIndex         Integer32,
+        hh3cVbrCasPortAssociateId   Integer32,
+        hh3cVbrCasPortGroupID       Integer32,
+        hh3cVbrPEXStatus            INTEGER,
+        hh3cVbrPEXTier              Integer32,
+        hh3cVbrPEXDeviceMac         DisplayString,
+        hh3cVbrPEXSysname           DisplayString,
+        hh3cVbrPEXBoardType         DisplayString,
+        hh3cVbrPEXParent            Integer32,
+        hh3cVbrCasPortRowStatus     RowStatus
+    }
+
+hh3cVbrCasPortIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the cascade port for a PEX."
+    ::= { hh3cVbrCasPortEntry 1 }
+
+hh3cVbrCasPortAssociateId OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "ID assigned to the PEX that is attached to the cascade port.
+        The value range is hh3cVbrMinAssociateId to hh3cVbrMaxAssociateId.
+        The value is 0xffff if the PEX is not assigned an ID.
+        For a successful configuration, the ID must be unique among all PEXs in
+        the IRF 3.1 system."
+    DEFVAL { 65535 }
+    ::= { hh3cVbrCasPortEntry 2 }
+
+hh3cVbrCasPortGroupID OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "PEX group ID assigned to the PEX that is attached to the cascade port.
+         The value range is hh3cVbrGroupMinId to hh3cVbrGroupMaxId."
+    DEFVAL { 65535 }
+    ::= { hh3cVbrCasPortEntry 3 }
+
+hh3cVbrPEXStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            offline(1),
+            online(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the PEX.
+        If the value is offline, the PEX is absent or its configuration
+        is incomplete.
+        If the value is online, the PEX is operating correctly."
+    DEFVAL { offline }
+    ::= { hh3cVbrCasPortEntry 4 }
+
+hh3cVbrPEXTier OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tier of the PEX.
+        The value is 0xffff if the upper-tier device of the PEX
+        is not online."
+    ::= { hh3cVbrCasPortEntry 5 }
+
+hh3cVbrPEXDeviceMac OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device MAC address of the PEX."
+    ::= { hh3cVbrCasPortEntry 6 }
+
+hh3cVbrPEXSysname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device name of the PEX."
+    ::= { hh3cVbrCasPortEntry 7 }
+
+hh3cVbrPEXBoardType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device board type of the PEX."
+    ::= { hh3cVbrCasPortEntry 8 }
+
+hh3cVbrPEXParent OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Upper-tier device of the PEX.
+        The value is 0xffff if the upper-tier device of the PEX
+        is the parent fabric(CB).
+        In other situations, the value equals to the associated ID
+        of the upper-tier PEX."
+    DEFVAL { 65535 }
+    ::= { hh3cVbrCasPortEntry 9 }
+
+hh3cVbrCasPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The control that allows creation and deletion of entries.
+        Values include createAndGo, active, and destroy.
+        If the row to be created or modified already exists,
+        an error message is returned.  If the row to be deleted does not exist,
+        a success message is returned."
+    ::= { hh3cVbrCasPortEntry 10 }
+--End VBR cascade-port table
+
+--VBR upgrade table
+hh3cVbrUpgradeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVbrUpgradeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects used to upgrade PEX software
+        images or patches."
+    ::= { hh3cVbrTable 3 }
+
+hh3cVbrUpgradeEntry OBJECT-TYPE
+    SYNTAX      Hh3cVbrUpgradeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Upgrade software for PEXs, including upgrading PEX software
+        images by using an IPE file and installing or uninstalling PEX patches
+        by using a patch file.
+        Each time only one of the upgrading operations can be performed.
+        The IPE file or the patch file must be saved in the
+        flash:/pex_images directory on the parent fabric."
+    INDEX
+        {
+            hh3cVbrUpgradeAssociateId
+        }
+    ::= { hh3cVbrUpgradeTable 1 }
+
+Hh3cVbrUpgradeEntry ::= SEQUENCE
+    {
+        hh3cVbrUpgradeAssociateId   Integer32,
+        hh3cVbrUpgradeIPEFile       DisplayString,
+        hh3cVbrUpgradePatchFile     DisplayString,
+        hh3cVbrUpgradePatchAction   INTEGER,
+        hh3cVbrUpgradeStatus        INTEGER,
+        hh3cVbrInitUpgradeStatus    TruthValue
+    }
+
+hh3cVbrUpgradeAssociateId OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID assigned to a PEX.
+        The value range is hh3cVbrMinAssociateId to hh3cVbrMaxAssociateId.
+        If the value is 0xffff,this object will upgrade software for all PEXs."
+    ::= { hh3cVbrUpgradeEntry 1 }
+
+hh3cVbrUpgradeIPEFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IPE file used to upgrade PEX software images.
+        The file must be saved in the flash:/pex_images directory on
+        the parent fabric."
+    ::= { hh3cVbrUpgradeEntry 2 }
+
+hh3cVbrUpgradePatchFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The patch file used to install or uninstall PEX patches.
+        The file must be saved in the flash:/pex_images directory on
+        the parent fabric."
+    ::= { hh3cVbrUpgradeEntry 3 }
+
+hh3cVbrUpgradePatchAction OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(1),
+            inactive(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action on patches in the patch file.
+        The value active means to install the patches.
+        The value deactive means to uninstall the patches."
+    ::= { hh3cVbrUpgradeEntry 4 }
+
+hh3cVbrUpgradeStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            initial(1),
+            downloading(2),
+            upgrading(3),
+            succeeded(4),
+            failed(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Result of the upgrading operation."
+    ::= { hh3cVbrUpgradeEntry 5 }
+
+hh3cVbrInitUpgradeStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If you want to initialize the upgrade status, set the value of
+        this object to enable."
+    DEFVAL { false }
+    ::= { hh3cVbrUpgradeEntry 6 }
+
+--End VBR upgrade table
+
+-- PEX traps
+
+hh3cVbrTraps OBJECT IDENTIFIER ::= { hh3cVbr 3 }
+
+hh3cVbrTrapPrefix OBJECT IDENTIFIER ::= { hh3cVbrTraps 0 }
+
+hh3cVbrPEXRemoveOrInsert  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVbrCasPortIndex,
+            hh3cVbrCasPortAssociateId,
+            hh3cVbrPEXStatus
+        }
+    STATUS      current
+    DESCRIPTION
+        "An hh3cVbrPEXRemoveOrInsert notification is sent when a PEX
+        is removed or inserted."
+    ::= { hh3cVbrTrapPrefix 1 }
+
+END

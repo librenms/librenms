@@ -2,35 +2,35 @@
 
 @section('form')
     <div class="form-group">
-        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
-        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
+        <label for="title-{{ $id }}" class="control-label">{{ __('Widget title') }}</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="{{ __('Custom title') }}" value="{{ $title }}">
     </div>
     <div class="form-group">
-        <label for="device-{{ $id }}" class="control-label">@lang('Device')</label>
-        <select class="form-control" id="device-{{ $id }}" name="device" data-placeholder="@lang('All devices')">
+        <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
+        <select class="form-control" id="device-{{ $id }}" name="device" data-placeholder="{{ __('All devices') }}">
             @if($device)
                 <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
             @endif
         </select>
     </div>
     <div class="form-group">
-        <label for="eventtype-{{ $id }}" class="control-label">@lang('Event type')</label>
-        <select class="form-control" id="eventtype-{{ $id }}" name="eventtype" data-placeholder="@lang('All types')" data-tags="true">
+        <label for="eventtype-{{ $id }}" class="control-label">{{ __('Event type') }}</label>
+        <select class="form-control" id="eventtype-{{ $id }}" name="eventtype" data-placeholder="{{ __('All types') }}" data-tags="true">
             @if($eventtype)
                 <option value="{{ $eventtype }}">{{ $eventtype }}</option>
             @endif
         </select>
     </div>
     <div class="form-group">
-        <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
-        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
+        <label for="device_group-{{ $id }}" class="control-label">{{ __('Device group') }}</label>
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="{{ __('All Devices') }}">
             @if($device_group)
                 <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
             @endif
         </select>
     </div>
     <div class="form-group">
-        <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
+        <label for="hidenavigation-{{ $id }}" class="control-label">{{ __('Hide Navigation') }}</label>
         <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
     </div>
 @endsection

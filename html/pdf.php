@@ -13,15 +13,16 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
-    die('Unauthorized');
+if (! Auth::check()) {
+    exit('Unauthorized');
 }
 
-set_debug(strpos($_SERVER['PATH_INFO'], 'debug'));
+Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
@@ -39,10 +40,10 @@ $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 $pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 $pdf->setFontSubsetting(true);
-$pdf->SetFont('helvetica', '', 14, '', true);
+$pdf->SetFont('dejavusans', '', 14, '', true);
 $pdf->setTextShadow(['enabled' => false, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => [196, 196, 196], 'opacity' => 1, 'blend_mode' => 'Normal']);
 
-if (!empty($_GET['report'])) {
+if (! empty($_GET['report'])) {
     $report = \LibreNMS\Util\Clean::fileName($_GET['report']);
     $image = base_path('html/' . Config::get('title_image'));
     $pdf->SetHeaderData($image, 40, ucfirst($report), $project_name, [0, 0, 0], [0, 64, 128]);

@@ -1,0 +1,932 @@
+-- ==================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: MSTP MIB
+-- Reference:
+-- Version: V1.17
+-- History:
+--      v1.0 (1) Created by Zhang Shilin, 2001.6.29
+--           (2) Revised by Qi Zhenglin, 2002.01.08
+--      v1.01 2004-7-13 remove default value
+--         of hh3cdot1sMstDefaultVlanAllo & hh3cdot1sMstDefaultRegionName
+--      v1.02 2004-08-19 Revised by Song Jianyong,
+--            add hh3cdot1sStpPathCostStandard in mstp global table
+--      v1.1 2004-10-12 updated by gaolong
+--           Import OBJECT-IDENTITY, NOTIFICATION-TYPE, TEXTUAL-CONVENTION.
+--           Import dot1dStpPort.
+--           Relocate hh3cdot1sMstp MODULE-IDENTITY clause.
+--           Fix default value errors for hh3cdot1sMstBpduGuard, hh3cdot1sMstiStpPortEdgeport,
+--           hh3cdot1sMstiStpStatus, hh3cdot1sMstiPortRootGuard, hh3cdot1sMstiPortLoopGuard.
+--      v1.11 2004-10-23 Revised by Song Jianyong,
+--            modify the range of hh3cdot1sMstiPathCost value in hh3cdot1sPortTable
+--      v1.12 2005-01-22 Revised by Song Jianyong,
+--            Add an enumeration for hh3cdot1sStpForceVersion in mstp global table
+--            Add an enumeration for hh3cdot1sStpPathCostStandard in hh3cdot1sPortTable
+--            Adjust format of objects' description
+--     V1.13 2005-6-30 Updated by zhanghaihong
+--            add hh3cdot1sMstiStpPortSendingBPDUType, hh3cdot1sMstiStpOperPortPointToPoint
+--            in hh3cdot1sPortTable
+--     V1.14 2005-11-07 Updated by zhanghaihong
+--            Modify the description of hh3cdot1sMstiStpOperPortPointToPoint in
+--            hh3cdot1sPortTable.
+--            Add hh3cdot1sMstiStpPortAdminBPDUFmt, hh3cdot1sMstiStpPortOperBPDUFmt
+--            in hh3cdot1sPortTable.
+--     V1.15 2011-8-11 Updated by zhangwei
+--            Modify the range of hh3cdot1sAdminMstID, hh3cdot1sOperMstID in
+--            hh3cdot1sPortTable and hh3cdot1sInstanceID in hh3cdot1sInstanceTable.
+--            Remove the default value of hh3cdot1sMstiStpTransLimit.
+--            Add hh3cdot1sMstiStpPortRoleRestriction, hh3cdot1sMstiStpPortTcRestriction and
+--            hh3cdot1sMstiStpPortDisputed in hh3cdot1sPortTable.
+--     V1.16 2014-02-11 Updated by wangmingjun
+--            Add the binding value hh3cdot1sMstiDesignatedBridge of hh3cPortMstiBpduGuarded
+--            in mstp traps table.
+--            Add hh3cMstiNewRoot, hh3cPortPvstBpduProtection in mstp traps table.
+--     V1.17 2021-02-03 Updated by tuchanyong
+--            Add hh3cdot1sMstiPortLoopbackGuard in hh3cdot1sPortTable.
+-- ==================================================================
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+-- ------------------------------------------------------------------
+-- ------------------------------------------------------------------
+HH3C-LswMSTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY,OBJECT-TYPE, Integer32, Counter32, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    dot1dStpPortEntry, dot1dStpPort
+        FROM BRIDGE-MIB
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+    hh3cdot1sMstp MODULE-IDENTITY
+            LAST-UPDATED "202102030000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            "Added node hh3cdot1sMstiPortLoopbackGuard."
+            REVISION "202102030000Z"
+            DESCRIPTION
+            "This MIB defines objects for managing MSTP."
+            REVISION "200106290000Z"
+            DESCRIPTION
+            "The initial version of this MIB file."
+            ::= { hh3clswCommon  14 }
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+    BridgeId ::= OCTET STRING (SIZE (8))
+
+    Hh3cdot1sFormatStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Legacy means that the BPDU format is legacy.  Dot1s means that the
+        BPDU format is IEEE 802.1s.  Auto means that the format of BPDU sending
+        on the port is determined by the BPDU format of its connective port."
+    SYNTAX      INTEGER { legacy(1), dot1s(2), auto(3) }
+
+
+  hh3cdot1sStpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Whether the Bridge MSTP is enabled."
+    DEFVAL      { 2 }
+    ::= { hh3cdot1sMstp 1 }
+
+  hh3cdot1sStpForceVersion OBJECT-TYPE
+    SYNTAX      INTEGER{stp(0),rstp(2),mstp(3)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      " The mode of this Bridge spanning-tree protocol."
+    DEFVAL      { mstp}
+    ::= { hh3cdot1sMstp 2 }
+
+  hh3cdot1sStpDiameter OBJECT-TYPE
+    SYNTAX      Integer32(2..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The diameter of Bridge."
+    DEFVAL      { 7}
+    ::= { hh3cdot1sMstp 3 }
+
+  hh3cdot1sMstBridgeMaxHops OBJECT-TYPE
+    SYNTAX      Integer32(1..40)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The maximum value of the  Bridge hops."
+    DEFVAL      { 20}
+    ::= { hh3cdot1sMstp 4 }
+
+  hh3cdot1sMstMasterBridgeID OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The Bridge Identifier of the current Master Bridge."
+    ::= { hh3cdot1sMstp 5 }
+
+  hh3cdot1sMstMasterPathCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The CIST path cost from the transmitting Bridge to the Master Bridge."
+    DEFVAL      { 0}
+    ::= { hh3cdot1sMstp 6 }
+
+  hh3cdot1sMstBpduGuard OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Whether the Bridge BPDU Guard function is enabled.  If the function
+      is enabled, the port will shutdown when received BPDU and the port
+      is configured as portfast."
+    DEFVAL      { disabled}
+    ::= { hh3cdot1sMstp 7 }
+
+  hh3cdot1sMstAdminFormatSelector OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The administrative Configuration Identifier Format Selector in use
+      by the Bridge.  This has a value of 0 indicate the format specified
+      in the Standard of IEEE 802.1s."
+    DEFVAL      { 0}
+    ::= { hh3cdot1sMstp 8 }
+
+  hh3cdot1sMstAdminRegionName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This MSTP administrative region name."
+    ::= { hh3cdot1sMstp 9 }
+
+  hh3cdot1sMstAdminRevisionLevel OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This MSTP administrative revision level."
+    DEFVAL      { 0}
+    ::= { hh3cdot1sMstp 10 }
+
+  hh3cdot1sMstOperFormatSelector OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The operative Configuration Identifier Format Selector in use by the
+      Bridge.  This has a value of 0 indicate the format specified in the
+      Standard of IEEE 802.1s."
+    DEFVAL      { 0}
+    ::= { hh3cdot1sMstp 11 }
+
+  hh3cdot1sMstOperRegionName OBJECT-TYPE
+    SYNTAX      OCTET STRING( SIZE(0..32) )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This MSTP operative region name."
+    ::= { hh3cdot1sMstp 12 }
+
+  hh3cdot1sMstOperRevisionLevel OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This MSTP operative revision level."
+    DEFVAL      { 0}
+    ::= { hh3cdot1sMstp 13 }
+
+  hh3cdot1sMstOperConfigDigest OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This MSTP Region's Configuration Digest Signature Key."
+    ::= { hh3cdot1sMstp 14 }
+
+  hh3cdot1sMstRegionConfActive OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),disable(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Active the region configuration."
+    DEFVAL      { disable }
+    ::= { hh3cdot1sMstp 15 }
+
+  hh3cdot1sMstDefaultVlanAllo OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),unused(65535)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Set default configuration about VLAN allocation and all VLANs
+      are mapped to CIST."
+    ::= { hh3cdot1sMstp 16 }
+
+  hh3cdot1sMstDefaultRegionName OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),unused(65535)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Set default region name."
+    ::= { hh3cdot1sMstp 17 }
+
+-- TABLE: hh3cdot1sVIDAllocationTable ------
+  hh3cdot1sVIDAllocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cdot1sVIDAllocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTP VLAN-to-instance mapping table."
+    ::= { hh3cdot1sMstp 18 }
+
+  hh3cdot1sVIDAllocationEntry OBJECT-TYPE
+    SYNTAX      Hh3cdot1sVIDAllocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTP VLAN-to-instance mapping table entry."
+    INDEX {
+              hh3cdot1sMstVID
+             }
+    ::= { hh3cdot1sVIDAllocationTable 1 }
+
+  Hh3cdot1sVIDAllocationEntry ::=
+    SEQUENCE
+    {
+      hh3cdot1sMstVID Integer32,
+      hh3cdot1sAdminMstID Integer32,
+      hh3cdot1sOperMstID  Integer32
+    }
+
+  hh3cdot1sMstVID OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN Identifier"
+    ::={ hh3cdot1sVIDAllocationEntry 1 }
+
+  hh3cdot1sAdminMstID OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative Multiple spanning-tree instance Identifier."
+    ::={ hh3cdot1sVIDAllocationEntry 2 }
+
+  hh3cdot1sOperMstID OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operative Multiple spanning-tree instance Identifier."
+    ::={ hh3cdot1sVIDAllocationEntry 3 }
+
+-- TABLE: hh3cdot1sInstanceTable ------
+  hh3cdot1sInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cdot1sInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTI table."
+    ::= { hh3cdot1sMstp 19 }
+
+  hh3cdot1sInstanceEntry OBJECT-TYPE
+    SYNTAX      Hh3cdot1sInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTI table entry."
+    INDEX {
+              hh3cdot1sInstanceID
+             }
+    ::= { hh3cdot1sInstanceTable 1 }
+
+  Hh3cdot1sInstanceEntry ::=
+    SEQUENCE
+    {
+      hh3cdot1sInstanceID Integer32,
+      hh3cdot1sMstiBridgeID   BridgeId,
+      hh3cdot1sMstiBridgePriority Integer32,
+      hh3cdot1sMstiDesignedRoot   BridgeId,
+      hh3cdot1sMstiRootPathCost   Integer32,
+      hh3cdot1sMstiRootPort   Integer32,
+      hh3cdot1sMstiRootType   INTEGER,
+      hh3cdot1sMstiRemainingHops  Integer32,
+      hh3cdot1sMstiAdminMappedVlanListLow OCTET STRING,
+      hh3cdot1sMstiAdminMappedVlanListHigh OCTET STRING,
+      hh3cdot1sMstiOperMappedVlanListLow OCTET STRING,
+      hh3cdot1sMstiOperMappedVlanListHigh OCTET STRING
+    }
+
+  hh3cdot1sInstanceID OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multiple spanning-tree instance Identifier"
+    ::={ hh3cdot1sInstanceEntry 1 }
+
+  hh3cdot1sMstiBridgeID OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier for the spanning tree instance
+        identified by MSTID"
+    ::={ hh3cdot1sInstanceEntry 2 }
+
+  hh3cdot1sMstiBridgePriority OBJECT-TYPE
+    SYNTAX      Integer32(0..61440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Priority for the spanning tree instance
+        identified by MSTID.  Step of 4096"
+    DEFVAL      { 32768 }
+    ::={ hh3cdot1sInstanceEntry 3 }
+
+  hh3cdot1sMstiDesignedRoot OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier of the Root Bridge for the spanning
+        tree instance identified by MSTID"
+    ::={ hh3cdot1sInstanceEntry 4 }
+
+  hh3cdot1sMstiRootPathCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path cost from the transmitting Bridge to the Root Bridge
+        for the spanning tree instance  identified by MSTID"
+    ::={ hh3cdot1sInstanceEntry 5 }
+
+  hh3cdot1sMstiRootPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Root Port for the spanning tree instance identified by the MSTID"
+    ::={ hh3cdot1sInstanceEntry 6 }
+
+  hh3cdot1sMstiRootType OBJECT-TYPE
+    SYNTAX      INTEGER{normal(0), secondary(1), primary(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Config this Bridge as a primary root or secondary root and or cancel
+        the root for this spanning tree instance  identified by MSTID"
+    DEFVAL      { normal }
+    ::={ hh3cdot1sInstanceEntry 7 }
+
+  hh3cdot1sMstiRemainingHops OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remaining hops of the spanning tree instance  identified by MSTID"
+    ::={ hh3cdot1sInstanceEntry 8 }
+
+  hh3cdot1sMstiAdminMappedVlanListLow  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " The lower part of administrative Vlan list mapped to the spanning
+        tree instance identified by MSTID"
+    ::= { hh3cdot1sInstanceEntry 9 }
+
+  hh3cdot1sMstiAdminMappedVlanListHigh  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " The higher part of administrative Vlan  list mapped to the spanning
+        tree instance identified by MSTID"
+    ::= { hh3cdot1sInstanceEntry 10 }
+
+  hh3cdot1sMstiOperMappedVlanListLow  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " The lower part of operative Vlan list mapped to the spanning
+        tree instance identified by MSTID"
+    ::= { hh3cdot1sInstanceEntry 11 }
+
+  hh3cdot1sMstiOperMappedVlanListHigh  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " The higher part of operative Vlan list mapped to the spanning
+        tree instance identified by MSTID"
+    ::= { hh3cdot1sInstanceEntry 12 }
+
+-- TABLE: hh3cdot1sPortTable ------
+  hh3cdot1sPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cdot1sPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTP interface table."
+    ::= { hh3cdot1sMstp 20 }
+
+  hh3cdot1sPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cdot1sPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "MSTP interface table entry."
+    INDEX {   hh3cdot1sInstanceID,
+              hh3cdot1sMstiPortIndex
+             }
+    ::= { hh3cdot1sPortTable 1 }
+
+  Hh3cdot1sPortEntry ::=
+    SEQUENCE
+    {
+      hh3cdot1sMstiPortIndex  Integer32,
+      hh3cdot1sMstiState  INTEGER,
+      hh3cdot1sMstiPortPriority   Integer32,
+      hh3cdot1sMstiPathCost   Integer32,
+      hh3cdot1sMstiDesignatedRoot BridgeId,
+      hh3cdot1sMstiDesignatedCost Integer32,
+      hh3cdot1sMstiDesignatedBridge   BridgeId,
+      hh3cdot1sMstiDesignatedPort OCTET STRING,
+      hh3cdot1sMstiMasterBridgeID BridgeId,
+      hh3cdot1sMstiMasterPortCost Integer32,
+      hh3cdot1sMstiStpPortEdgeport    EnabledStatus,
+      hh3cdot1sMstiStpPortPointToPoint    INTEGER,
+      hh3cdot1sMstiStpMcheck  INTEGER,
+      hh3cdot1sMstiStpTransLimit  Integer32,
+      hh3cdot1sMstiStpRXStpBPDU   Counter32,
+      hh3cdot1sMstiStpTXStpBPDU   Counter32,
+      hh3cdot1sMstiStpRXTCNBPDU   Counter32,
+      hh3cdot1sMstiStpTXTCNBPDU   Counter32,
+      hh3cdot1sMstiStpRXRSTPBPDU  Counter32,
+      hh3cdot1sMstiStpTXRSTPBPDU  Counter32,
+      hh3cdot1sMstiStpRXMSTPBPDU  Counter32,
+      hh3cdot1sMstiStpTXMSTPBPDU  Counter32,
+      hh3cdot1sMstiStpClearStatistics INTEGER,
+      hh3cdot1sMstiStpDefaultPortCost INTEGER,
+      hh3cdot1sMstiStpStatus  EnabledStatus,
+      hh3cdot1sMstiPortRootGuard  EnabledStatus,
+      hh3cdot1sMstiPortLoopGuard  EnabledStatus,
+      hh3cdot1sMstiStpPortSendingBPDUType  INTEGER,
+      hh3cdot1sMstiStpOperPortPointToPoint INTEGER,
+      hh3cdot1sMstiStpPortAdminBPDUFmt  Hh3cdot1sFormatStatus,
+      hh3cdot1sMstiStpPortOperBPDUFmt  Hh3cdot1sFormatStatus,
+      hh3cdot1sMstiStpPortRoleRestriction  EnabledStatus,
+      hh3cdot1sMstiStpPortTcRestriction  EnabledStatus,
+      hh3cdot1sMstiStpPortDisputed  TruthValue,
+      hh3cdot1sMstiPortLoopbackGuard  EnabledStatus
+    }
+
+  hh3cdot1sMstiPortIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the Bridge Port"
+    ::={ hh3cdot1sPortEntry 1 }
+
+  hh3cdot1sMstiState OBJECT-TYPE
+    SYNTAX      INTEGER{disabled(1),discarding(2),learning(4),forwarding(5)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Port (i.e., Disabled, Discarding ,
+        Learning, Forwarding)"
+    ::={ hh3cdot1sPortEntry 2 }
+
+  hh3cdot1sMstiPortPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..240)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the priority field which is contained in the
+        first (in network byte order)  four bits of the (2 octet long) Port ID.
+        The other octet of the Port ID is given by the value of mstiPortIndex.
+        And step of 16"
+    DEFVAL      { 128 }
+    ::={ hh3cdot1sPortEntry 3 }
+
+  hh3cdot1sMstiPathCost OBJECT-TYPE
+    SYNTAX      Integer32(1..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The contribution of this port to the path cost of paths towards the
+        spanning tree root which include this port.  The range of path cost
+        is 1..65535 for 802.1d standard, is 1..200000000 for 802.1t standard,
+        and is 1..200000 for the legacy standard."
+    ::={ hh3cdot1sPortEntry 4 }
+
+  hh3cdot1sMstiDesignatedRoot OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier of the Root Bridge for the port of the Spanning
+         Tree instance identified by the MSTID"
+    ::={ hh3cdot1sPortEntry 5 }
+
+  hh3cdot1sMstiDesignatedCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path cost of the Designated Port of the segment connected to
+        this port.  This value is compared to the Root Path Cost field
+        in received bridge PDUs."
+    ::={ hh3cdot1sPortEntry 6 }
+
+  hh3cdot1sMstiDesignatedBridge OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier of the bridge which this port considers to
+        be the Designated Bridge for this port's segment."
+    ::={ hh3cdot1sPortEntry 7 }
+
+  hh3cdot1sMstiDesignatedPort OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Identifier of the port on the Designated Bridge
+        for this port's segment."
+    ::={ hh3cdot1sPortEntry 8 }
+
+  hh3cdot1sMstiMasterBridgeID OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier of the current Master Bridge.
+        Effective in CIST."
+    ::={ hh3cdot1sPortEntry 9 }
+
+  hh3cdot1sMstiMasterPortCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The CIST path cost from the transmitting Bridge to
+        the Master Bridge.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 10 }
+
+  hh3cdot1sMstiStpPortEdgeport OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the port fast is enabled.  Effective in CIST."
+    DEFVAL      { disabled }
+    ::={ hh3cdot1sPortEntry 11 }
+
+  hh3cdot1sMstiStpPortPointToPoint OBJECT-TYPE
+    SYNTAX      INTEGER{forceTrue (1),forceFalse (2),auto  (3)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the port connects the point to point link.  Effective in CIST."
+    DEFVAL      { auto }
+    ::={ hh3cdot1sPortEntry 12 }
+
+  hh3cdot1sMstiStpMcheck OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),unused(65535)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Forcing the state machine to send MST BPDUs in this manner
+        can be used to test whether all legacy Bridges on a given LAN
+        have been removed.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 13 }
+
+  hh3cdot1sMstiStpTransLimit OBJECT-TYPE
+    SYNTAX      Integer32(1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used by the Port Transmit state machine to limit
+        the maximum transmission rate.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 14 }
+
+  hh3cdot1sMstiStpRXStpBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received Config BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 15 }
+
+  hh3cdot1sMstiStpTXStpBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted Config BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 16 }
+
+  hh3cdot1sMstiStpRXTCNBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received TCN BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 17 }
+
+  hh3cdot1sMstiStpTXTCNBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted TCN BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 18 }
+
+  hh3cdot1sMstiStpRXRSTPBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received RST BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 19 }
+
+  hh3cdot1sMstiStpTXRSTPBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted RST BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 20 }
+
+  hh3cdot1sMstiStpRXMSTPBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received MST BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 21 }
+
+  hh3cdot1sMstiStpTXMSTPBPDU OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted MST BPDU.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 22 }
+
+  hh3cdot1sMstiStpClearStatistics OBJECT-TYPE
+    SYNTAX      INTEGER{clear(1),unused(65535)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the spanning tree statistic.  Effective in CIST."
+    ::={ hh3cdot1sPortEntry 23 }
+
+  hh3cdot1sMstiStpDefaultPortCost OBJECT-TYPE
+    SYNTAX      INTEGER{enable(1),unused(65535)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set default Port path cost."
+    ::={ hh3cdot1sPortEntry 24 }
+
+  hh3cdot1sMstiStpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the spanning tree protocol is enabled on this port.
+        Effective in CIST."
+    DEFVAL      { enabled}
+    ::={ hh3cdot1sPortEntry 25 }
+
+  hh3cdot1sMstiPortRootGuard OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the root guard is enabled.  Effective in CIST."
+    DEFVAL      { disabled }
+    ::={ hh3cdot1sPortEntry 26 }
+
+  hh3cdot1sMstiPortLoopGuard OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the loop protection is enabled.  Effective in CIST."
+    DEFVAL      { disabled }
+    ::={ hh3cdot1sPortEntry 27 }
+
+  hh3cdot1sMstiStpPortSendingBPDUType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    stp(1),
+                    rstp(2),
+                    mstp(3)
+                    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of BPDU which the port is sending."
+    ::= { hh3cdot1sPortEntry 28 }
+
+  hh3cdot1sMstiStpOperPortPointToPoint  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    true(1),
+                    false(2)
+                    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether the port has connected to a
+        point-to-point link or not.  The value of the node is an operative value.
+        The administrative value can be read from the node
+        hh3cdot1sMstiStpPortPointToPoint.  If the value of
+        hh3cdot1sMstiStpPortPointToPoint is auto, the value of this node
+        should be calculated by the network topology of this port.  If the
+        value of hh3cdot1sMstiStpPortPointToPoint is forceFalse, the value of this
+        node is false.  If the value of hh3cdot1sMstiStpPortPointToPoint is
+        forceTrue, the value of this node is true."
+    ::= { hh3cdot1sPortEntry 29 }
+
+  hh3cdot1sMstiStpPortAdminBPDUFmt  OBJECT-TYPE
+    SYNTAX     Hh3cdot1sFormatStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The value of the node is an administrative value.  Value legacy means that
+       the MST BPDU format is forced to legacy.  Value dot1s means that the MST BPDU format
+       is forced to IEEE 802.1s.  Value auto means that the format of MST BPDU sending
+       on the port is determined by the MST BPDU that the port has received.  Effective in
+       CIST."
+      ::= { hh3cdot1sPortEntry 30 }
+
+  hh3cdot1sMstiStpPortOperBPDUFmt  OBJECT-TYPE
+    SYNTAX     Hh3cdot1sFormatStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "The format of MST BPDU which the port is sending.  Value legacy means that the
+      format of MST BPDU sending on the port is legacy.  Value dot1s means that the
+      format of MST BPDU sending on the port is IEEE 802.1s.  Effective in CIST."
+    ::= { hh3cdot1sPortEntry 31 }
+
+  hh3cdot1sMstiStpPortRoleRestriction OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the role-restriction is enabled.  Effective in CIST.
+         The role-restriction causes the port not to be selected as root port for the
+         CIST or any MSTI."
+    DEFVAL      { disabled }
+    ::= { hh3cdot1sPortEntry 32 }
+
+  hh3cdot1sMstiStpPortTcRestriction OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the tc-restriction is enabled.  Effective in CIST.
+         The tc-restriction causes the port not to propagate topology changes to
+         other ports."
+    DEFVAL      { disabled }
+    ::= { hh3cdot1sPortEntry 33 }
+
+  hh3cdot1sMstiStpPortDisputed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the port is disputed for the CIST or MSTI."
+    ::= { hh3cdot1sPortEntry 34 }
+
+  hh3cdot1sMstiPortLoopbackGuard OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the loopback protection is enabled.  Effective in CIST."
+    DEFVAL      { enabled }
+    ::={ hh3cdot1sPortEntry 35 }
+
+  hh3cdot1sStpPathCostStandard  OBJECT-TYPE
+    SYNTAX      INTEGER{legacy(0),dot1d-1998(1),dot1t(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Path cost standard of the bridge.  Value dot1d-1998 is
+      IEEE 802.1d standard in 1998, value dot1t is IEEE 802.1t standard,
+      and value legacy is a private legacy standard."
+    ::= { hh3cdot1sMstp 21 }
+
+--  Mstp Traps
+
+  hh3cMstpEventsV2 OBJECT-IDENTITY
+     STATUS      current
+     DESCRIPTION "Definition point for Mstp notifications."
+     ::= { hh3cdot1sMstp 0 }
+
+  hh3cPortMstiStateForwarding NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID , hh3cdot1sMstiPortIndex}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when a port turns into
+         forwarding state form other state."
+     ::= { hh3cMstpEventsV2 1 }
+
+  hh3cPortMstiStateDiscarding NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID , hh3cdot1sMstiPortIndex}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when a port turns into
+         discarding state form forwarding state."
+     ::= { hh3cMstpEventsV2 2 }
+
+
+  hh3cBridgeLostRootPrimary NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID }
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when the bridge is no longer
+         the root bridge of the instance.  Another switch with higher
+         priority has already been the root bridge of the instance."
+     ::= { hh3cMstpEventsV2 3 }
+
+  hh3cPortMstiRootGuarded NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID , hh3cdot1sMstiPortIndex}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when a root-guard port
+         receives a superior message on the relevant instance."
+     ::= { hh3cMstpEventsV2 4 }
+
+  hh3cPortMstiBpduGuarded NOTIFICATION-TYPE
+     OBJECTS  { dot1dStpPort , hh3cdot1sMstiDesignatedBridge}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when an edged port of the BPDU-guard
+         device receives a BPDU.  If the designated bridge ID can't be obtained
+         from the BPDU, the designated bridge ID will be zero."
+     ::= { hh3cMstpEventsV2 5 }
+
+  hh3cPortMstiLoopGuarded NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID , hh3cdot1sMstiPortIndex}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when an Alternate-Port
+         or Root-Port is aged out."
+     ::= { hh3cMstpEventsV2 6 }
+
+  hh3cMstiNewRoot NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID , hh3cdot1sMstiDesignedRoot , hh3cdot1sMstiDesignedRoot}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when the sending device becomes the new
+         root of the spanning tree.  The first root bridge ID means the
+         old root bridge ID, and the second one means the new root bridge ID."
+     ::= { hh3cMstpEventsV2 7 }
+
+  hh3cPortPvstBpduProtection NOTIFICATION-TYPE
+     OBJECTS  { dot1dStpPort , hh3cdot1sMstiDesignatedBridge}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when a PVST BPDU is received on an MSTP port
+         that is enabled with the PVST protection feature.  If the designated
+         bridge ID can't be obtained from the BPDU, the designated bridge ID
+         will be zero."
+     ::= { hh3cMstpEventsV2 8 }
+END

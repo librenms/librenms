@@ -2,12 +2,12 @@
 
 @section('form')
     <div class="form-group">
-        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
-        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Default Title')" value="{{ $title }}">
+        <label for="title-{{ $id }}" class="control-label">{{ __('Widget title') }}</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="{{ __('Default Title') }}" value="{{ $title }}">
     </div>
 
     <div class="form-group">
-        <label for="device-{{ $id }}" class="control-label">@lang('Device')</label>
+        <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}" name="device" required>
             @if($device)
                 <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
@@ -16,7 +16,7 @@
     </div>
 
     <div class="form-group">
-        <label for="columnsize-{{ $id }}" class="control-label">@lang('Columns')</label>
+        <label for="columnsize-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
         <select name="columnsize" id="columnsize-{{ $id }}" class="form-control">
             <option value="1" @if($columnsize == 1) selected @endif>1</option>
             <option value="2" @if($columnsize == 2) selected @endif>2</option>

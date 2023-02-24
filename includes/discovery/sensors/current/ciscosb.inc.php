@@ -10,20 +10,23 @@
  * the source code distribution for details.
  */
 
-echo "CiscoSB";
+echo 'CiscoSB';
 
 $multiplier = 1;
-$divisor    = 1000000;
+$divisor = 1000000;
 foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
     foreach ($ciscosb_data as $key => $value) {
-        $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.'.$index.'.7';
+        if (! isset($value['rlPhyTestTableTransceiverTemp']) || $value['rlPhyTestTableTransceiverTemp'] == 0) {
+            continue;
+        }
+        $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.7';
         $sensor_type = 'rlPhyTestTableTxBias';
-        $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
-        $descr = $port_descr['ifDescr'] . ' Bias Current';
+        $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
+        $descr = trim(($port_descr['ifDescr'] ?? '') . ' Bias Current');
         $current = $value['rlPhyTestTableTxBias'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        if (is_numeric($current) && ($value['rlPhyTestTableTransceiverTemp'] != 0)) {
+        if (is_numeric($current)) {
             discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }

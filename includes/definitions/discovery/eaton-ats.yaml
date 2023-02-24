@@ -1,5 +1,9 @@
 mib: EATON-ATS2-MIB
 modules:
+    os:
+        hardware: EATON-ATS2-MIB::ats2IdentPartNumber.0
+        serial: EATON-ATS2-MIB::ats2IdentSerialNumber.0
+        version: EATON-ATS2-MIB::ats2IdentFWVersion.0
     sensors:
         voltage:
             data:

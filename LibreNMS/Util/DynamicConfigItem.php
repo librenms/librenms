@@ -15,17 +15,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Util;
 
-use App\Models\Dashboard;
 use LibreNMS\Config;
 use Validator;
 
@@ -60,7 +59,7 @@ class DynamicConfigItem implements \ArrayAccess
     /**
      * Check given value is valid. Using the type of this config item and possibly other variables.
      *
-     * @param $value
+     * @param  mixed  $value
      * @return bool|mixed
      */
     public function checkValue($value)
@@ -70,7 +69,9 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
         } elseif ($this->type == 'integer') {
-            return (!is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === "0" || $value === 0;
+            return (! is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === '0' || $value === 0;
+        } elseif ($this->type == 'float') {
+            return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
@@ -82,10 +83,22 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif ($this->type == 'array') {
             return is_array($value); // this should probably have more complex validation via validator rules
+        } elseif ($this->type == 'array-sub-keyed') {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $v) {
+                if (! is_array($v)) {
+                    return false;
+                }
+            }
+
+            return true;
         } elseif ($this->type == 'color') {
-            return (bool)preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
+            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
-            return !is_array($value);
+            return ! is_array($value);
         } elseif ($this->type === 'executable') {
             return is_file($value) && is_executable($value);
         } elseif ($this->type === 'directory') {
@@ -116,6 +129,7 @@ class DynamicConfigItem implements \ArrayAccess
             $key = $this->optionTranslationKey($option);
             $trans = __($key);
             $result[$option] = ($trans === $key ? $option : $trans);
+
             return $result;
         }, []);
     }
@@ -138,12 +152,14 @@ class DynamicConfigItem implements \ArrayAccess
     public function hasDescription()
     {
         $key = $this->descriptionTranslationKey();
+
         return __($key) !== $key;
     }
 
     public function hasHelp()
     {
         $key = $this->helpTranslationKey();
+
         return __($key) !== $key;
     }
 
@@ -161,6 +177,7 @@ class DynamicConfigItem implements \ArrayAccess
     {
         $key = $this->descriptionTranslationKey();
         $trans = __($key);
+
         return $trans === $key ? $this->name : $trans;
     }
 
@@ -187,11 +204,11 @@ class DynamicConfigItem implements \ArrayAccess
 
     public function isValid()
     {
-        return ($this->group == "" || $this->type) && !$this->hidden && !$this->disabled;
+        return ($this->group == '' || $this->type) && ! $this->hidden && ! $this->disabled;
     }
 
     /**
-     * @param mixed $value The value that was validated
+     * @param  mixed  $value  The value that was validated
      * @return string
      */
     public function getValidationMessage($value)
@@ -202,22 +219,23 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     // ArrayAccess functions
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return isset($this->$offset) ? $this->$offset : null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->$offset = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->$offset);
     }

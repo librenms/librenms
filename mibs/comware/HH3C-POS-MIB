@@ -1,0 +1,952 @@
+-- ==========================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the define of
+--              POS MIB of serial router.
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0  The initial version, created by wangshijin 2004-07-02
+-- V1.1  Refined this MIB which is completely conform with SMIv2.
+--       Make the following changes:
+--       1. Add MODULE-IDENTITY 
+--       2. Remove default value for hh3cposAppHostIP, hh3cposAppSourceIp, hh3cposAppRecvPacCounter 
+--       	hh3cposAppErrPacCouter, hh3cposAppDistrErrCounter, hh3cposAppBuffedCounter,
+--       	hh3cposAppDiscardedCounter, hh3cposPosRecvPacCounter, hh3cposPosErrPacCounter,
+--       	hh3cposPosMapErrCounter, hh3cposPosBuffedCounter, hh3cposPosDiscardedCounter                                                                                   
+--       	hh3cposFCMConnectFailCounter and hh3cposFCMTimeoutCounter because their syntax is Counter32                                 
+--       3. Modify hh3cposPosIfIndex, hh3cposAsyAppIfIndex, hh3cposFCMIfIndex, hh3cposPadIfIndex of INTEGER range
+--       4. Modify hh3cposPosId of INTEGER range 
+--       5. Add a new column object hh3cposPosInterType under hh3cposInterTable table	by caizibin  2004-10-11
+--       6. Add an enumeration called pad(3) under the hh3cposAppConnectMode  by caizibin  2004-10-11
+--       7. Add a new column object hh3cposAppX121Addr under hh3cposAppTable table	by caizibin  2004-10-11
+--	 	 8. Add new object hh3cposPadWaitTime, hh3cposPadIdleTimeout, hh3cposPadPacType, hh3cposPadEnable, 
+--	    hh3cposPadCheckSChar by caizibin  2004-10-11
+--       9.Refine some object's descrption to make them more readable 
+--	     10.Add hh3cposPadTable table 
+-- ==========================================================================
+HH3C-POS-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS
+	RowStatus  
+        FROM SNMPv2-TC  
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, IpAddress, Counter32
+        FROM SNMPv2-SMI
+    hh3cmlsr
+		FROM HH3C-OID-MIB;
+
+hh3cpos     MODULE-IDENTITY 
+        LAST-UPDATED "200410150000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION 
+                "The POS MIB module is used to manage 
+                 POS-Access. " 
+        REVISION	"200410120000Z"
+        DESCRIPTION 
+                "The lastest version of this MIB module."  
+        REVISION	"200407020000Z"
+        DESCRIPTION 
+                "The initial version of this MIB module."         
+
+		::= { hh3cmlsr 8 }   
+
+
+hh3cposAppTable   OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF Hh3cPOSAppEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The table to get and set the application informatin."
+   ::= { hh3cpos 1 }
+
+hh3cposAppEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSAppEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposAppTable."
+   INDEX     { hh3cposAppId }
+   ::= { hh3cposAppTable 1 }
+
+
+Hh3cPOSAppEntry ::= SEQUENCE {
+   hh3cposAppId
+        INTEGER,
+   hh3cposAppConnectMode
+        INTEGER,
+   hh3cposAppState
+        INTEGER,     
+   hh3cposAppIfIndex
+        INTEGER,     
+   hh3cposAppHostIP
+        IpAddress,
+   hh3cposAppPort
+        INTEGER,
+   hh3cposAppSourceIp
+        IpAddress,  
+   hh3cposAppRecvPacCounter     
+        Counter32,
+   hh3cposAppErrPacCounter
+        Counter32,
+   hh3cposAppDistrErrCounter
+        Counter32,
+   hh3cposAppBuffedCounter
+        Counter32,
+   hh3cposAppDiscardedCounter
+        Counter32,
+   hh3cposAppDebug
+        INTEGER,
+   hh3cposAppRowStatus
+        RowStatus,     		
+   hh3cposAppX121Addr
+   	OCTET STRING
+   }
+
+hh3cposAppId   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..31)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The ID of application."
+   ::= { hh3cposAppEntry 1 }
+
+hh3cposAppConnectMode   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        tcp(1),
+                        flow(2),
+                        pad(3)                        
+                }
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The connect mode of application.
+             
+             If the router and unix are connected by TCP protocol,
+             the connect mode of application is tcp.
+             
+             If the router and unix are connected by async interface, 
+             the connect mode of application is flow.
+             
+             If the router is used as POSPAD device, the connect mode of application 
+             is pad."
+   ::= { hh3cposAppEntry 2 }
+
+hh3cposAppState   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                	noset(1),
+                	down(2),
+                	up(3),
+                	ok(4),
+                	kept(5),
+                	linking(6),
+                	linked(7) 
+             	}
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The state of application."
+   DEFVAL  {1}          
+   ::= { hh3cposAppEntry 3 }
+
+hh3cposAppIfIndex   OBJECT-TYPE             
+   SYNTAX    	INTEGER(0..2147483647)
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The interface index of the application 
+             whose connect mode is flow or pad."  
+   REFERENCE  "ifIndex"          
+   ::= { hh3cposAppEntry 4 }
+
+hh3cposAppHostIP   OBJECT-TYPE
+   SYNTAX    	IpAddress
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The destination IP Address of application.
+             Used for the application whose connect mode is tcp."
+   ::= { hh3cposAppEntry 5 }
+
+hh3cposAppPort   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..65535)
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The destination port of application.
+             Used for the application whose connect mode is tcp."
+   ::= { hh3cposAppEntry 6 }
+
+hh3cposAppSourceIp   OBJECT-TYPE
+   SYNTAX    	IpAddress
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The source IP Address of application.
+             Used for the application whose connect mode is tcp."
+   ::= { hh3cposAppEntry 7 }
+
+hh3cposAppRecvPacCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets received by the application."
+   DEFVAL  {0}          
+   ::= { hh3cposAppEntry 8 }
+
+hh3cposAppErrPacCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of error packets received by the application."
+   DEFVAL  {0}          
+   ::= { hh3cposAppEntry 9 }
+
+hh3cposAppDistrErrCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets that could not be sent to POS."
+   DEFVAL  {0}          
+   ::= { hh3cposAppEntry 10 }
+
+hh3cposAppBuffedCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets stored in the buffer of application."
+   DEFVAL  {0}          
+   ::= { hh3cposAppEntry 11 }
+
+hh3cposAppDiscardedCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets discarded by the application."
+   DEFVAL  {0}          
+   ::= { hh3cposAppEntry 12 }
+
+hh3cposAppDebug   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        close(1),
+                        open(2)
+                }
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The debugging switch of application."
+   ::= { hh3cposAppEntry 13 }
+
+hh3cposAppRowStatus   OBJECT-TYPE
+   SYNTAX    	RowStatus
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The status of row. Only support active, CreateAndGo and destroy."
+   ::= { hh3cposAppEntry 14 } 
+   
+hh3cposAppX121Addr OBJECT-TYPE
+   SYNTAX    	OCTET STRING (SIZE(1..15))
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION             
+             "The destination X121 Address of application which is
+             an octet string made up of numeric.
+             Used for the application whose connect mode is pad."
+   ::= { hh3cposAppEntry 15 }  
+
+hh3cposInterTable   OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF Hh3cPOSInterEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The table to get and set the POS-Interface informatin."
+   ::= { hh3cpos 2 }
+
+hh3cposInterEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSInterEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposInterTable."
+   INDEX     { hh3cposPosId }
+   ::= { hh3cposInterTable 1 }
+
+
+Hh3cPOSInterEntry ::= SEQUENCE {
+   hh3cposPosId
+        INTEGER,
+   hh3cposPosIfIndex
+        INTEGER,
+   hh3cposPosConnectState
+        INTEGER,     
+   hh3cposPosRecvPacCounter
+        Counter32,     
+   hh3cposPosErrPacCounter
+        Counter32,
+   hh3cposPosMapErrCounter
+        Counter32,
+   hh3cposPosBuffedCounter
+        Counter32,  
+   hh3cposPosDiscardedCounter     
+        Counter32,
+   hh3cposPosInterDebug
+        INTEGER,
+   hh3cposPosInterRowStatus
+        RowStatus,
+   hh3cposPosInterType
+   	INTEGER  
+   }
+
+hh3cposPosId   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..255)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The ID of the POS-Interface."
+   ::= { hh3cposInterEntry 1 }
+
+hh3cposPosIfIndex   OBJECT-TYPE
+   SYNTAX    	INTEGER(1..2147483647)
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The interface index of the POS-Interface whose type is fcm, asy or pad-client."  
+   REFERENCE  "ifIndex"
+   ::= { hh3cposInterEntry 2 }
+
+hh3cposPosConnectState   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        noset(1),
+                        down(2),
+                        up(3),
+                        ok(4)
+                }
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The state of the POS-Interface."
+   DEFVAL  {1}          
+   ::= { hh3cposInterEntry 3 }
+
+hh3cposPosRecvPacCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets received by the POS-Interface."
+   DEFVAL  {0}          
+   ::= { hh3cposInterEntry 4 }
+
+hh3cposPosErrPacCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of error packets received by the POS-Interface."
+   DEFVAL  {0}          
+   ::= { hh3cposInterEntry 5 }
+
+hh3cposPosMapErrCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets that could not be sent to application."
+   DEFVAL  {0}          
+   ::= { hh3cposInterEntry 6 }
+
+hh3cposPosBuffedCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets stored in the buffer of the POS-Interface."
+   DEFVAL  {0}          
+   ::= { hh3cposInterEntry 7 }
+
+hh3cposPosDiscardedCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number of packets discarded by the POS-Interface."
+   DEFVAL  {0}          
+   ::= { hh3cposInterEntry 8 }
+
+hh3cposPosInterDebug   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        close(1),
+                        open(2)
+                }
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The debugging switch of the POS-Interface."
+   ::= { hh3cposInterEntry 9 }   
+
+hh3cposPosInterRowStatus   OBJECT-TYPE
+   SYNTAX    	RowStatus
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The status of row. Only support active, CreateAndGo and destroy."
+   ::= { hh3cposInterEntry 10 }   
+
+hh3cposPosInterType   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        fcm(1),
+                        asy(2),
+                        pad-client(3),
+                        pad-server(4)
+                }
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The type of interface.
+             
+             The POS-Access mode has four types: FCM-Access, ASYNC-Access, 
+             simulating POSPAD device, POSPAD-Access. 
+             
+             FCM-Access mode means POS and router are connected through PSTN.
+             In this case, hh3cposPosInterType should be set to fcm.
+             
+             ASYNC-Access mode means POS and router are connected by asynchronous cable.
+             In this case, hh3cposPosInterType should be set to asy.
+             
+             Simulating POSPAD device means router connects POS through asynchronous cable
+             and connects another router whose connect mode is pad-server through X.25 network. 
+             In this case, hh3cposPosInterType should be set to pad-client.  
+              
+             POSPAD-Access mode means router connects POSPAD device through X.25 network.
+             In this case, hh3cposPosInterType is pad-server. The hh3cposPosInterType
+             can't be set to pad-server. It is autogenerated when POSPAD device initiates
+             a connection to the router.  
+             "
+   DEFVAL  {1}
+   ::= { hh3cposInterEntry 11 }
+   
+hh3cposMapTable   OBJECT-TYPE            
+   SYNTAX    	SEQUENCE OF Hh3cPOSMapEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+		"The table to get and set the informatin of mapping relation of destination and application."
+   ::= { hh3cpos 3 }
+
+hh3cposMapEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSMapEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposMapTable."
+   INDEX     { hh3cposMapDes }
+   ::= { hh3cposMapTable 1 }
+
+
+Hh3cPOSMapEntry ::= SEQUENCE {
+   hh3cposMapDes
+        INTEGER,
+   hh3cposMapAppNumber
+        INTEGER,
+   hh3cposMapRowStatus
+        RowStatus
+   }
+
+hh3cposMapDes   OBJECT-TYPE
+   SYNTAX    	INTEGER(-1..65535)
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The destination code of the mapping item.
+             If the value is -1, it is the default item of mapping relation."
+   ::= { hh3cposMapEntry 1 }
+
+hh3cposMapAppNumber   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..31)
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The application index of the mapping item."
+
+   ::= { hh3cposMapEntry 2 }
+
+hh3cposMapRowStatus   OBJECT-TYPE
+   SYNTAX    	RowStatus
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The status of row. Only support active, CreateAndGo and destroy."
+   ::= { hh3cposMapEntry 3 } 
+   
+hh3cposAsyAppTable   OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF Hh3cPOSAsyAppEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The table to get and set the asynchronous-application interface information."
+   ::= { hh3cpos 4 }
+
+hh3cposAsyAppEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSAsyAppEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposAsyAppTable."
+   INDEX     { hh3cposAsyAppIfIndex }
+   ::= { hh3cposAsyAppTable 1 }
+
+Hh3cPOSAsyAppEntry ::= SEQUENCE {
+   hh3cposAsyAppIfIndex
+        INTEGER,
+   hh3cposAsyAppRowStatus
+        RowStatus
+   }
+
+hh3cposAsyAppIfIndex   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..2147483647)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The interface index of asynchronous-application."
+   REFERENCE  "ifIndex"
+   ::= { hh3cposAsyAppEntry 1 }
+
+hh3cposAsyAppRowStatus   OBJECT-TYPE
+   SYNTAX    	RowStatus
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The status of row. Only support active, CreateAndGo and destroy."
+   ::= { hh3cposAsyAppEntry 2 }
+      
+   
+
+hh3cposFCMTable   OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF Hh3cPOSFCMEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The table to get the information of FCM interface."
+   ::= { hh3cpos 5 }
+
+hh3cposFCMEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSFCMEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposFCMTable."
+   INDEX     { hh3cposFCMIfIndex }
+   ::= { hh3cposFCMTable 1 }
+
+
+Hh3cPOSFCMEntry ::= SEQUENCE {
+   hh3cposFCMIfIndex
+        INTEGER,
+   hh3cposFCMTimeoutCounter
+        Counter32,
+   hh3cposFCMConnectFailCounter
+        Counter32
+   }
+
+hh3cposFCMIfIndex   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..2147483647)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The index of FCM interface." 
+   REFERENCE  "ifIndex"
+   ::= { hh3cposFCMEntry 1 }
+
+hh3cposFCMTimeoutCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number that modem was hung up for timeout."
+   DEFVAL  {0}          
+   ::= { hh3cposFCMEntry 3 }
+
+hh3cposFCMConnectFailCounter   OBJECT-TYPE
+   SYNTAX    	Counter32
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "The number that modem could not handshake successfully."
+   DEFVAL  {0}          
+   ::= { hh3cposFCMEntry 4 }
+   
+   
+
+hh3cposAppSum   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..32)
+   MAX-ACCESS   read-only
+   STATUS    	current   
+   DESCRIPTION
+             "The total of configued applications."
+   DEFVAL  {0}          
+   ::= { hh3cpos 6 }
+
+
+
+hh3cposInterSum   OBJECT-TYPE
+   SYNTAX    	INTEGER(0..256)
+   MAX-ACCESS   read-only
+   STATUS    	current   
+   DESCRIPTION
+             "The total of configued POS-Interfaces."
+   DEFVAL  {0}          
+   ::= { hh3cpos 7 }
+
+
+
+hh3cposEnable   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        disable(1),
+                        enable(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To enable or diable pos-server."
+   DEFVAL  {1}          
+   ::= { hh3cpos 8 }
+
+
+
+hh3cposAppDebugAll   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        close(1),
+                        open(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To open or close the debugging switch of all applications."
+   DEFVAL  {1}          
+   ::= { hh3cpos 9 }
+
+
+
+hh3cposPosDebugAll   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        close(1),
+                        open(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To open or close the debugging switch of all POS-Interfaces."
+   DEFVAL  {1}          
+   ::= { hh3cpos 10 }
+
+
+
+hh3cposClearPacCounter   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        clear(1),
+                        counting(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To reset all packet counters of all applicaions and POS-Interfaces."
+   DEFVAL  {2}          
+   ::= { hh3cpos 11 } 
+   
+hh3cposClearFCMCounter   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        clear(1),
+                        counting(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To clear all counters of all FCM interfaces."
+   DEFVAL  {2}          
+   ::= { hh3cpos 12 }
+
+
+
+hh3cposEnableTrap   OBJECT-TYPE
+   SYNTAX    	INTEGER{
+                        disable(1),
+                        enable(2)
+                }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To enable or disable trap switch."
+   DEFVAL  {1}          
+   ::= { hh3cpos 13 }
+
+hh3cposFCMAnswerTime   OBJECT-TYPE
+   SYNTAX    	INTEGER(500..2000)
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "FCM answer time, unit:ms."
+   DEFVAL  {500}      
+      ::= { hh3cpos 14 } 
+      
+hh3cposFCMTradeTime   OBJECT-TYPE
+   SYNTAX    	INTEGER(30000..1200000)
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "FCM trade time, unit:ms."
+   DEFVAL  {60000}          
+   ::= { hh3cpos 15 }
+
+hh3cposFCMPacketInterval   OBJECT-TYPE
+   SYNTAX    	INTEGER(3500..10000)
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "FCM packet interval time, unit:ms."
+   DEFVAL  {5000}          
+   ::= { hh3cpos 16 }
+
+hh3cposPadWaitTime  OBJECT-TYPE 	
+   SYNTAX        INTEGER (100..10000)
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+	    "The time that POS-Interface needs to wait to receive another packet, unit:ms.
+	    It may be configured when router is used as POSPAD device. In other cases,
+	    It is useless."
+   ::= { hh3cpos 18 }
+
+hh3cposPadIdleTimeout OBJECT-TYPE 	
+   SYNTAX          INTEGER (0..600)
+   MAX-ACCESS      read-write
+   STATUS          current
+   DESCRIPTION
+		"If these is no packet transmitting through the time, 
+		the connection of POSPAD device and router whose connect mode 
+		is pad-server will be cut off. Unit:s."
+   ::= { hh3cpos 19 }
+
+hh3cposPadPacType	 OBJECT-TYPE	
+    SYNTAX        INTEGER { 
+    				       syn(1),
+    				       asy(2)
+                         }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+	  	"The type of packet.Between POSPAD device and router whose connect mode 
+		is pad-server, there are two types of packet. One is synchronous, 
+		the other is asynchronous."
+    DEFVAL  {1}
+    ::= { hh3cpos 20 }
+
+hh3cposPadCheckSChar  OBJECT-TYPE
+   SYNTAX    	INTEGER {
+                    disable(1),
+                    enable(2)                   
+		        }
+   MAX-ACCESS   read-write
+   STATUS    	current   
+   DESCRIPTION
+             "To enable or disable the checking of 10 04 characters in packet.
+             It is used for the router which is used as POSPAD device.
+             
+             When the value is disable, it will check packet that just includes 10 04 charaters.
+             If there are 10 04 packet, the router which is used as POSPAD device
+             will disconnect from POSPAD-access router.
+             
+             When the value is enable, it will check 10 04 characters in packet. 
+             If there are 10 04 characters in packet, the router which is used as POSPAD 
+             device will disconnect from POSPAD-access router."
+   DEFVAL  {2}          
+   ::= { hh3cpos 21 }
+
+hh3cposPadTable   OBJECT-TYPE            
+   SYNTAX    	SEQUENCE OF Hh3cPOSPadEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+		"The table to enable or disable POSPAD-Access function under serial interface."
+   ::= { hh3cpos 22 }
+
+hh3cposPadEntry   OBJECT-TYPE
+   SYNTAX    	Hh3cPOSPadEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The content of hh3cposPadTable."
+   INDEX     { hh3cposPadIfIndex }
+   ::= { hh3cposPadTable 1 }
+
+
+Hh3cPOSPadEntry ::= SEQUENCE {
+   hh3cposPadIfIndex
+        INTEGER,
+   hh3cposPadRowStatus
+        RowStatus
+   }
+
+hh3cposPadIfIndex   OBJECT-TYPE
+   SYNTAX    	INTEGER(1..2147483647)
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+             "The index of serial interface."  
+   REFERENCE  "ifIndex"
+   ::= { hh3cposPadEntry 1 }
+
+hh3cposPadRowStatus   OBJECT-TYPE
+   SYNTAX    	RowStatus
+   MAX-ACCESS   read-create
+   STATUS    	current
+   DESCRIPTION
+             "The status of row. Only support active, CreateAndGo and destroy."
+   ::= { hh3cposPadEntry 2 }  
+
+hh3cposTrap        OBJECT IDENTIFIER ::= { hh3cpos 17 }
+
+hh3cposAppNotReadyTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap when the application whose state is linked
+             isn't ready to send or receive data.
+             Only used for the application whose connect mode is tcp."
+   ::= { hh3cposTrap 1 }
+
+
+
+hh3cposAppConnectFailTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if router can not connect to the application."
+   ::= { hh3cposTrap 2 }
+   
+
+
+hh3cposAppStateChangeTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId, hh3cposAppState }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap when the state of the application is changed to down or kept."
+   ::= { hh3cposTrap 3 }
+   
+
+
+hh3cposAppNotConfigedTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the application isn't configured."
+   ::= { hh3cposTrap 4 }
+   
+
+
+hh3cposAppBuffOverFlowTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the application buffer is overflowed."
+   ::= { hh3cposTrap 5 }
+   
+
+
+hh3cposAppDebugOpenTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposAppId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the debugging switch of application is open."
+   ::= { hh3cposTrap 6 }
+   
+
+
+hh3cposAppDebugAllOpenTrap NOTIFICATION-TYPE
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the all debugging switches of application are open."
+   ::= { hh3cposTrap 7 }
+
+
+
+hh3cposInterBuffOverFlowTrap NOTIFICATION-TYPE
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the distributing buffer is overflowed."
+   ::= { hh3cposTrap 8 }
+   
+
+
+hh3cposInterStateChangeTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposPosId, hh3cposPosConnectState }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the state of POS-Interface is changed to down."
+   ::= { hh3cposTrap 9 }
+   
+
+
+hh3cposInterDebugOpenTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposPosId }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the debug of POS-Interface is open."
+   ::= { hh3cposTrap 10 }
+   
+
+
+hh3cposInterDebugAllOpenTrap NOTIFICATION-TYPE
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the all debugs of POS-Interface are open."
+   ::= { hh3cposTrap 11 }
+
+
+
+hh3cposFCMTimeoutTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposFCMIfIndex }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the modem is hung up for timeout."
+   ::= { hh3cposTrap 12 }
+   
+
+
+hh3cposFCMConnectFailTrap NOTIFICATION-TYPE
+   OBJECTS 	{ hh3cposFCMIfIndex }
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap if the handshaking of modems is not successful."
+   ::= { hh3cposTrap 13 }
+   
+   
+   
+hh3cposClearPacketCounter NOTIFICATION-TYPE
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap when the packet counter of 
+             the POS application and interface is cleared."
+   ::= { hh3cposTrap 14 }
+
+
+
+hh3cposClearFcmCounter NOTIFICATION-TYPE
+   STATUS  	current
+   DESCRIPTION
+             "The agent will send a trap when the FCM counter is cleared."
+   ::= { hh3cposTrap 15 }
+   
+END          
+

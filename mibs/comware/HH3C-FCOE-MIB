@@ -1,0 +1,869 @@
+-- =============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for configuring and monitoring Fibre Channel
+--      over Ethernet (FCoE) related entities.
+-- Reference:
+-- Version: V1.2
+-- History:
+--      V1.0 created by h06247
+--      V1.1 Added hh3cFCoEFIPSnoopingTable by zhangchangjun 02876.
+--           Modified the range of hh3cFCoECfgDATov by wangyuqiang 08530.
+--      V1.2 Added hh3cFCoEVlanCfgTable by chengzhipeng 04378 2014-05-09
+--           Modified the range of hh3cFCoECfgDATov by chengzhipeng 04378.
+--           Added hh3cFCoEFIPSnoopingFCFTable, hh3cFCoEFIPSnoopingENodeTable,
+--           hh3cFCoEFIPSnoopingVNTable and hh3cFCoEFIPSnoopingIfCfgTable by
+--           h06247 2014-11-12
+-- =============================================================================
+HH3C-FCOE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon                   FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                  FROM SNMPv2-SMI         -- [RFC2578]
+    RowStatus, TimeStamp,
+    TruthValue, MacAddress,
+    TEXTUAL-CONVENTION          FROM SNMPv2-TC          -- [RFC2578]
+    SnmpAdminString             FROM SNMP-FRAMEWORK-MIB -- [RFC3411]
+    InterfaceIndex,
+    InterfaceIndexOrZero        FROM IF-MIB             -- [RFC2863]
+    VlanIndex                   FROM Q-BRIDGE-MIB       -- [RFC4363]
+    T11FabricIndex              FROM T11-TC-MIB         -- [RFC4439]
+    fcmInstanceIndex            FROM FC-MGMT-MIB        -- [RFC4044]
+    Hh3cFcNameId                FROM HH3C-FC-TC-MIB;
+
+hh3cFCoE MODULE-IDENTITY
+    LAST-UPDATED    "201411120000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB module is for configuring and monitoring Fibre Channel
+        over Ethernet (FCoE) related entities.  This MIB defines a
+        Virtual FC (VFC) Interface as an object that represents either
+        a VF_Port or a VE_Port on an FCoE Forwarder (FCF).  VFC
+        interfaces can be created either statically (by management
+        request) or dynamically (at the time of FIP based FLOGI or ELP
+        request).
+        Other terminologies used in this MIB are defined by the
+        Hh3c FCoE standard, as defined in the FC-BB-5 specification.
+        This MIB also supports configuration of the following objects:
+        - Mapping of FCoE VLAN-ID used to carry traffic for a Fabric
+        - FC-MAP value used by the FCF operating in FPMA mode
+        - FIP snooping related objects"
+    REVISION        "201411120000Z"
+    DESCRIPTION
+        "Added hh3cFCoEFIPSnoopingFCFTable, hh3cFCoEFIPSnoopingENodeTable
+        hh3cFCoEFIPSnoopingVNTable and hh3cFCoEFIPSnoopingIfCfgTable."
+    REVISION        "201203280000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 120 }
+
+hh3cFCoEObjects  OBJECT  IDENTIFIER
+    ::= { hh3cFCoE 1 }
+hh3cFCoEConfig   OBJECT  IDENTIFIER
+    ::= { hh3cFCoEObjects 1 }
+
+Hh3cFCoEVfcBindType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Defines the different methods to identify (or bind to)
+            - the ENode associated with a particular VF_Port VFC
+            - the remote-FCF associated with a particular VE_Port VFC
+            interfaceIndex(1) - This type is used only when an ENode
+                or remote-FCF is directly connected to the local FCF
+                via one of the local Ethernet interfaces, in which
+                case the value contains the ifIndex of said Ethernet
+                interface.
+            macAddress(2) - This type is used when an ENode or
+                remote-FCF is reachable from the local FCF over a
+                (Layer-2) Ethernet network.  A FIP frame from an
+                ENode or remote-FCF is associated to a VFC only if
+                the frame's source MAC address is the same as the
+                MAC Address bound on that VFC."
+    SYNTAX INTEGER  {
+                        interfaceIndex(1),
+                        macAddress(2)
+                    }
+--
+-- FCoE Globals per Switch in a Fibre Channel Management Instance
+-- Fibre Channel Management instance is defined in [RFC4044] as a
+-- separable managed instance of Fibre Channel functionality.
+-- Fibre Channel functionality may be grouped into Fibre
+-- Channel management instances in whatever way is most
+-- convenient for the implementation(s).
+--
+-- RFC4044 also defines the fcmSwitchTable as a table of
+-- information about Fibre Channel switches which are managed
+-- by Fibre Channel management instances.  Each Fibre Channel
+-- management instance can manage one or more Fibre Channel
+-- switches.  The Switch Index, fcmSwitchIndex, is
+-- IMPORTed from the FC-MGMT-MIB as the index value
+-- to uniquely identify a Fibre Channel switch amongst
+-- those (one or more) managed by the same Fibre
+-- Channel management instance.
+-- In this MIB, the same fcmSwitchIndex is used to
+-- identify each FCF and to distinguish it from other
+-- FCFs and from other Fibre Channel switches.
+--
+--
+
+hh3cFCoECfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoECfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table facilitates configuration of FCoE parameters
+        on a per Fibre Channel management instance."
+    ::= { hh3cFCoEConfig 1 }
+
+hh3cFCoECfgEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoECfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "There is one entry in this table for each
+        Fibre Channel management instance."
+    INDEX           {
+                        fcmInstanceIndex
+                    }
+    ::= { hh3cFCoECfgTable 1 }
+
+Hh3cFCoECfgEntry ::= SEQUENCE {
+    hh3cFCoECfgFcmap                    OCTET STRING,
+    hh3cFCoECfgDynamicVfcCreation       TruthValue,
+    hh3cFCoECfgDefaultFCFPriority       Unsigned32,
+    hh3cFCoECfgDATov                    Unsigned32,
+    hh3cFCoECfgAddressingMode           INTEGER
+}
+
+hh3cFCoECfgFcmap OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (3))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object configures the FC-MAP value used by the FCF
+        when operating in FPMA mode.  The default value is 0EFC00h,
+        as written in the standard."
+    REFERENCE
+        "Fibre Channel - Backbone - 5 (FC-BB-5),
+        section 7.6 and table 47"
+    DEFVAL { '0EFC00'h }
+    ::= { hh3cFCoECfgEntry 1 }
+
+hh3cFCoECfgDynamicVfcCreation OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is set to 'true' to enable, or 'false' to
+        disable, the dynamic creation of VFC interfaces on this FCF.
+        When set to 'true', VFC interfaces are dynamically created
+        as and when a FIP-based FLOGI or ELP request is received."
+    DEFVAL { false }
+    ::= { hh3cFCoECfgEntry 2 }
+
+hh3cFCoECfgDefaultFCFPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The FIP priority value advertised by the FCF to ENodes by
+        default.  hh3cFCoEStaticVfcFCFPriority configured for a VFC
+        interface overrides this setting for the ENode associated
+        with the VFC."
+    DEFVAL { 128 }
+    ::= { hh3cFCoECfgEntry 3 }
+
+hh3cFCoECfgDATov OBJECT-TYPE
+    SYNTAX          Unsigned32 (4..600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Discovery_Advertisement_Timeout value configured for
+        the FCF.  This is used as the timeout value in seconds by
+        the FCF to send periodic Discovery Advertisements."
+    DEFVAL { 8 }
+    ::= { hh3cFCoECfgEntry 4 }
+
+hh3cFCoECfgAddressingMode OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        fpma(1),
+                        spma(2),
+                        fpmaAndSpma(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Addressing mode(s) supported by the FCF.  Implementations
+        should fail SetRequests for unsupported modes."
+    ::= { hh3cFCoECfgEntry 5 }
+
+hh3cFCoEVLANTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEVLANEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "In fabrics in which VLANs are deployed, this table facilitates
+        configuration of VLAN and Virtual Fabric associations in an
+        FCoE network.  In such fabrics, FCoE forwarding for a fabric
+        is over a VLAN in a (Layer-2) Ethernet network.  That is,
+        reachability between the ENode/remote-FCF and an FCF for a
+        given fabric is determined by the reachability provided by the
+        Ethernet network on the corresponding VLAN.
+        An active entry in this table indicates which VLAN is used
+        to transport FCoE traffic for a particular Virtual Fabric.
+        If VLANs are not deployed or not enabled, entries in this table
+        are ignored by the bridge.
+        Some implementations may allow traffic from only one Virtual
+        Fabric to be transported over a given VLAN.  Such
+        implementations should prevent multiple entries with the same
+        VLAN-ID from being created in this table.
+        Modifying existing VLAN-Virtual Fabric associations is not
+        possible.  The specific row must first be deleted and then
+        a new one created."
+    ::= { hh3cFCoEConfig 2 }
+
+hh3cFCoEVLANEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEVLANEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "There is one entry in this table for each VLAN that is
+        designated to transport FCoE traffic for a given Virtual
+        Fabric."
+    INDEX           {
+                        fcmInstanceIndex,
+                        hh3cFCoEVLANIndex,
+                        hh3cFCoEFabricIndex
+                    }
+    ::= { hh3cFCoEVLANTable 1 }
+
+Hh3cFCoEVLANEntry ::= SEQUENCE {
+        hh3cFCoEVLANIndex               VlanIndex,
+        hh3cFCoEFabricIndex             T11FabricIndex,
+        hh3cFCoEVLANOperState           INTEGER,
+        hh3cFCoEVLANRowStatus           RowStatus
+}
+
+hh3cFCoEVLANIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the VLAN-ID that the FCoE FCF function
+        is being enabled for."
+    ::= { hh3cFCoEVLANEntry 1 }
+
+hh3cFCoEFabricIndex OBJECT-TYPE
+    SYNTAX          T11FabricIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the Fabric Index of the Virtual Fabric
+        traffic which is to be transported over the VLAN identified
+        by hh3cFCoEVLANIndex."
+    ::= { hh3cFCoEVLANEntry 2 }
+
+hh3cFCoEVLANOperState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        up(1),
+                        down(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Operational state of this VLAN-Virtual Fabric association
+        entry.  The 'up' state is achieved when both the Virtual
+        Fabric and VLAN are valid."
+    ::= { hh3cFCoEVLANEntry 3 }
+
+hh3cFCoEVLANRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row.  The RowStatus becomes active
+        on successful creation of an entry."
+    ::= { hh3cFCoEVLANEntry 4 }
+
+hh3cFCoEStaticVfcTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEStaticVfcEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table facilitates the creation and deletion of static
+        VFC interfaces.  While VFCs can be dynamically created based on
+        FIP FLOGI/ELP requests, operators may want to associate certain
+        pre-configured policy for a particular ENode or a remote-FCF.
+        In such cases static VFC creation becomes necessary.  In addition
+        to being creating, a static VFC also needs to be associated to
+        an ENode or remote-FCF.  The VFC binding provides such an
+        association.  The binding does not need to be specified when
+        the row for a VFC is created, but may be specified later."
+    ::= { hh3cFCoEConfig 3 }
+
+hh3cFCoEStaticVfcEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEStaticVfcEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "There is one entry in this table for each statically created
+        VFC Interface."
+    INDEX           {
+                        fcmInstanceIndex,
+                        hh3cFCoEStaticVfcIndex
+                    }
+    ::= { hh3cFCoEStaticVfcTable 1 }
+
+Hh3cFCoEStaticVfcEntry ::= SEQUENCE {
+        hh3cFCoEStaticVfcIndex              Unsigned32,
+        hh3cFCoEStaticVfcFCFPriority        Unsigned32,
+        hh3cFCoEStaticVfcBindType           Hh3cFCoEVfcBindType,
+        hh3cFCoEStaticVfcBindIfIndex        InterfaceIndexOrZero,
+        hh3cFCoEStaticVfcBindMACAddress     MacAddress,
+        hh3cFCoEStaticVfcIfIndex            InterfaceIndex,
+        hh3cFCoEStaticVfcCreationTime       TimeStamp,
+        hh3cFCoEStaticVfcFailureCause       SnmpAdminString,
+        hh3cFCoEStaticVfcRowStatus          RowStatus
+}
+
+hh3cFCoEStaticVfcIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies a static VFC entry in this
+        table."
+    ::= { hh3cFCoEStaticVfcEntry 1 }
+
+hh3cFCoEStaticVfcFCFPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "If this VFC is for a VF_Port this object is used to configure
+        FCF priority to be advertised to the ENode associated with the
+        VFC."
+    DEFVAL { 128 }
+    ::= { hh3cFCoEStaticVfcEntry 2 }
+
+hh3cFCoEStaticVfcBindType OBJECT-TYPE
+    SYNTAX          Hh3cFCoEVfcBindType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The mechanism to identify the ENode associated with this VFC
+        if it is of type VF_Port or to identify the remote-FCF
+        associated with this VFC if it is of type VE_Port."
+    ::= { hh3cFCoEStaticVfcEntry 3 }
+
+hh3cFCoEStaticVfcBindIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is applicable only when the local FCF is
+        directly connected to an ENode or remote-FCF over a
+        specific Ethernet interface, in which case this object
+        contains the ifIndex of said Ethernet interface.
+        If the ENode or remote-FCF is not directly connected
+        to the FCF, this value of this object is zero."
+    ::= { hh3cFCoEStaticVfcEntry 4 }
+
+hh3cFCoEStaticVfcBindMACAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is applicable when the ENode or remote-FCF to
+        which the local FCF is connected is identified by a MAC
+        address.  A FIP frame from an ENode or remote-FCF is
+        associated with this VFC only if the source MAC address
+        in the frame is the same as the value of this object."
+    ::= { hh3cFCoEStaticVfcEntry 5 }
+
+hh3cFCoEStaticVfcIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The ifIndex of this Virtual FC interface."
+    ::= { hh3cFCoEStaticVfcEntry 6 }
+
+hh3cFCoEStaticVfcCreationTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The timestamp of this entry's creation time."
+    ::= { hh3cFCoEStaticVfcEntry 7 }
+
+hh3cFCoEStaticVfcFailureCause OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The cause of failure for the last bind operation.  This
+        object will be zero length if and only if the bind is
+        successful."
+    ::= { hh3cFCoEStaticVfcEntry 8 }
+
+hh3cFCoEStaticVfcRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row.  The RowStatus becomes
+        active on successful creation of a VFC.  The VFC does not
+        need to be bound for the row to be active, but the VFC must
+        be bound before becoming operational."
+    ::= { hh3cFCoEStaticVfcEntry 9 }
+
+--
+-- FIP Snooping related objects used to configure FIP Snooping
+-- on a (FIP-aware) Ethernet Bridge
+--
+
+hh3cFCoEFIPSnoopingTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEFIPSnoopingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "FCoE provides increased flexibility, but with this flexibility
+        new challenges arise in assuring highly robust Fabrics.  The FCF
+        does not have the complete control that a Fibre Channel switch
+        has.
+        Ethernet bridges commonly provide a feature called Access Control
+        Lists (ACLs).  Properly configured ACLs may emulate a point-to-point
+        link by providing the traffic enforcement previously discussed.
+        Furthermore, the FIP protocol has been designed to enable Ethernet
+        bridges to efficiently monitor FIP frames passing through them.  This
+        data facilitates the automatic configuration of these ACLs.  In
+        addition, the automatic configuration is possible independent of
+        any other ACLs that may be in use in the network for other
+        applications.  And FIP Snooping is to maintain these ACLs."
+    ::= { hh3cFCoEConfig 4 }
+
+hh3cFCoEFIPSnoopingEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEFIPSnoopingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "There is one entry in this table for each VLAN that is
+        designated to ensure that only valid FCoE traffic is allowed."
+    INDEX           {
+                        fcmInstanceIndex,
+                        hh3cFCoEFIPSnoopingVLANIndex
+                    }
+    ::= { hh3cFCoEFIPSnoopingTable 1 }
+
+Hh3cFCoEFIPSnoopingEntry ::= SEQUENCE {
+    hh3cFCoEFIPSnoopingVLANIndex    VlanIndex,
+    hh3cFCoEFIPSnoopingEnable       TruthValue,
+    hh3cFCoEFIPSnoopingFcmap        OCTET STRING
+}
+
+hh3cFCoEFIPSnoopingVLANIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the VLAN-ID that the FIP Snooping function
+        is being enabled for."
+    ::= { hh3cFCoEFIPSnoopingEntry 1 }
+
+hh3cFCoEFIPSnoopingEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable or disable FIP Snooping on an
+        Ethernet Bridge."
+    DEFVAL { false }
+    ::= { hh3cFCoEFIPSnoopingEntry 2 }
+
+hh3cFCoEFIPSnoopingFcmap OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (3))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object configures the FC-MAP value associated with the
+        FIP snooping Ethernet Bridge."
+    DEFVAL { '0EFC00'h }
+    ::= { hh3cFCoEFIPSnoopingEntry 3 }
+
+-- VLAN FCoE Configuration
+hh3cFCoEVlanCfgTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cFCoEVlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains FCoE related configurations and information of VLANs.
+         An entry in this table is created when the corresponding VLAN
+         is created and FCoE is enabled for the VLAN, as well as deleted when
+         the VLAN is deleted or FCoE is disabled for the VLAN.
+         If the switch mode is not FCF-NPV mode, all the operations
+         on any object in this table result in errors."
+    ::= { hh3cFCoEConfig 5 }
+
+hh3cFCoEVlanCfgEntry  OBJECT-TYPE
+    SYNTAX      Hh3cFCoEVlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used for managing the FCoE related configurations of a VLAN."
+    INDEX { hh3cFCoEVLANIndex }
+    ::= { hh3cFCoEVlanCfgTable 1}
+
+Hh3cFCoEVlanCfgEntry ::= SEQUENCE {
+    hh3cFCoEVlanCfgFcmap                    OCTET STRING,
+    hh3cFCoEVlanCfgFCFPriority              Unsigned32,
+    hh3cFCoEVlanCfgDATov                    Unsigned32,
+    hh3cFCoEVlanCfgRowStatus                RowStatus
+}
+
+hh3cFCoEVlanCfgFcmap OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (3))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object configures the FC-MAP value used by the FCF in a VLAN
+        when operating in FPMA mode.
+        If this object is not configured, the default value is 0EFC00h."
+    DEFVAL { '0EFC00'h }
+    ::= { hh3cFCoEVlanCfgEntry 1 }
+
+hh3cFCoEVlanCfgFCFPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The FIP priority value advertised by the FCF in a VLAN to ENodes by
+        default.
+        If this object is not configured, the default value is 128."
+    DEFVAL { 128 }
+    ::= { hh3cFCoEVlanCfgEntry 2 }
+
+hh3cFCoEVlanCfgDATov OBJECT-TYPE
+    SYNTAX          Unsigned32 (4..600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Discovery_Advertisement_Timeout value configured for
+        the FCF in a VLAN.
+        This is used as the timeout value in seconds by
+        the FCF in a VLAN to send periodic Discovery Advertisements.
+        If this object is not configured, the default value is 8."
+    DEFVAL { 8 }
+    ::= { hh3cFCoEVlanCfgEntry 3 }
+
+hh3cFCoEVlanCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Now only three states are supported:
+         createAndGo, active, and destroy."
+    ::= { hh3cFCoEVlanCfgEntry 4 }
+
+-- FIP Snooping FCF information
+hh3cFCoEFIPSnoopingFCFTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEFIPSnoopingFCFEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the remote FCF information on device."
+    ::= { hh3cFCoEConfig 6 }
+
+hh3cFCoEFIPSnoopingFCFEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEFIPSnoopingFCFEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains information about a FCF for a VLAN."
+    INDEX           {
+                      fcmInstanceIndex,
+                      hh3cFCoEFIPSnoopingFCFVLANIndex,
+                      hh3cFCoEFIPSnoopingFCFIfIndex,
+                      hh3cFCoEFIPSnoopingFCFMAC
+                    }
+    ::= { hh3cFCoEFIPSnoopingFCFTable 1 }
+
+Hh3cFCoEFIPSnoopingFCFEntry ::= SEQUENCE {
+    hh3cFCoEFIPSnoopingFCFVLANIndex     VlanIndex,
+    hh3cFCoEFIPSnoopingFCFIfIndex       InterfaceIndex,
+    hh3cFCoEFIPSnoopingFCFMAC           MacAddress,
+    hh3cFCoEFIPSnoopingFCFSwitchName    Hh3cFcNameId,
+    hh3cFCoEFIPSnoopingFCFFabricName    Hh3cFcNameId,
+    hh3cFCoEFIPSnoopingFCFENodeCount    Unsigned32
+}
+
+hh3cFCoEFIPSnoopingFCFVLANIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the VLAN-ID whose FIP Snooping function
+        gets ready on the FCF."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 1 }
+
+hh3cFCoEFIPSnoopingFCFIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies an Ethernet interface that connects
+        to the FCF."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 2 }
+
+hh3cFCoEFIPSnoopingFCFMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the Ethernet interface on the FCF directly
+        connected to the local device."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 3 }
+
+hh3cFCoEFIPSnoopingFCFSwitchName OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The switch name of the FCF."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 4 }
+
+hh3cFCoEFIPSnoopingFCFFabricName OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The fabric name of the FCF."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 5 }
+
+hh3cFCoEFIPSnoopingFCFENodeCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of ENodes that log in through this Ethernet port."
+    ::= { hh3cFCoEFIPSnoopingFCFEntry 6 }
+
+-- FIP Snooping ENode information
+hh3cFCoEFIPSnoopingENodeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEFIPSnoopingENodeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the ENode information on the local device."
+    ::= { hh3cFCoEConfig 7 }
+
+hh3cFCoEFIPSnoopingENodeEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEFIPSnoopingENodeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains information about an ENode for a VLAN."
+    INDEX           {
+                      fcmInstanceIndex,
+                      hh3cFCoEFIPSnoopingENodeVLANIndex,
+                      hh3cFCoEFIPSnoopingENodeIfIndex,
+                      hh3cFCoEFIPSnoopingENodeMAC
+                    }
+    ::= { hh3cFCoEFIPSnoopingENodeTable 1 }
+
+Hh3cFCoEFIPSnoopingENodeEntry ::= SEQUENCE {
+    hh3cFCoEFIPSnoopingENodeVLANIndex     VlanIndex,
+    hh3cFCoEFIPSnoopingENodeIfIndex       InterfaceIndex,
+    hh3cFCoEFIPSnoopingENodeMAC           MacAddress,
+    hh3cFCoEFIPSnoopingENodeName          Hh3cFcNameId
+}
+
+hh3cFCoEFIPSnoopingENodeVLANIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the VLAN-ID whose FIP Snooping function
+        gets ready on the ENode."
+    ::= { hh3cFCoEFIPSnoopingENodeEntry 1 }
+
+hh3cFCoEFIPSnoopingENodeIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies an Ethernet interface that connects
+        to the ENode."
+    ::= { hh3cFCoEFIPSnoopingENodeEntry 2 }
+
+hh3cFCoEFIPSnoopingENodeMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the ENode."
+    ::= { hh3cFCoEFIPSnoopingENodeEntry 3 }
+
+hh3cFCoEFIPSnoopingENodeName OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The node name of the ENode."
+    ::= { hh3cFCoEFIPSnoopingENodeEntry 4 }
+
+-- FIP Snooping VN information
+hh3cFCoEFIPSnoopingVNTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEFIPSnoopingVNEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the virtual N_Port information on the local device."
+    ::= { hh3cFCoEConfig 8 }
+
+hh3cFCoEFIPSnoopingVNEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEFIPSnoopingVNEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains information about a virtual N_Port."
+    INDEX           {
+                      fcmInstanceIndex,
+                      hh3cFCoEFIPSnoopingVNVLANIndex,
+                      hh3cFCoEFIPSnoopingVNENodeIfIndex,
+                      hh3cFCoEFIPSnoopingVNENodeMAC,
+                      hh3cFCoEFIPSnoopingVNFCFMAC,
+                      hh3cFCoEFIPSnoopingVNMAC
+                    }
+    ::= { hh3cFCoEFIPSnoopingVNTable 1 }
+
+Hh3cFCoEFIPSnoopingVNEntry ::= SEQUENCE {
+    hh3cFCoEFIPSnoopingVNVLANIndex     VlanIndex,
+    hh3cFCoEFIPSnoopingVNENodeIfIndex  InterfaceIndex,
+    hh3cFCoEFIPSnoopingVNENodeMAC      MacAddress,
+    hh3cFCoEFIPSnoopingVNFCFMAC        MacAddress,
+    hh3cFCoEFIPSnoopingVNMAC           MacAddress,
+    hh3cFCoEFIPSnoopingVNName          Hh3cFcNameId,
+    hh3cFCoEFIPSnoopingVNFCFIfIndex    InterfaceIndex
+}
+
+hh3cFCoEFIPSnoopingVNVLANIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the VLAN-ID through which a virtual N_Port
+        logs in to the FCF."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 1 }
+
+hh3cFCoEFIPSnoopingVNENodeIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies an Ethernet interface that connects
+        to the ENode."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 2 }
+
+hh3cFCoEFIPSnoopingVNENodeMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the ENode."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 3 }
+
+hh3cFCoEFIPSnoopingVNFCFMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the FCF."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 4 }
+
+hh3cFCoEFIPSnoopingVNMAC OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the virtual N_Port."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 5 }
+
+hh3cFCoEFIPSnoopingVNName OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The port name of the virtual N_Port."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 6 }
+
+hh3cFCoEFIPSnoopingVNFCFIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies an Ethernet interface that connects
+        to the FCF."
+    ::= { hh3cFCoEFIPSnoopingVNEntry 7 }
+
+-- FIP Snooping Config type of Ethernet
+hh3cFCoEFIPSnoopingIfCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cFCoEFIPSnoopingIfCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table is used to configure FIP Snooping working mode of the Ethernet
+        interface on the localdevice."
+    ::= { hh3cFCoEConfig 9 }
+
+hh3cFCoEFIPSnoopingIfCfgEntry OBJECT-TYPE
+    SYNTAX          Hh3cFCoEFIPSnoopingIfCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains information about FIP Snooping working mode of the
+        Ethernet interface."
+    INDEX           {
+                      fcmInstanceIndex,
+                      hh3cFCoEFIPSnoopingIfCfgIfIndex
+                    }
+    ::= { hh3cFCoEFIPSnoopingIfCfgTable 1 }
+
+Hh3cFCoEFIPSnoopingIfCfgEntry ::= SEQUENCE {
+    hh3cFCoEFIPSnoopingIfCfgIfIndex       InterfaceIndex,
+    hh3cFCoEFIPSnoopingIfCfgPortType      INTEGER
+}
+
+hh3cFCoEFIPSnoopingIfCfgIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This index uniquely identifies an Ethernet interface."
+    ::= { hh3cFCoEFIPSnoopingIfCfgEntry 1 }
+
+hh3cFCoEFIPSnoopingIfCfgPortType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                             fcf(1),
+                             enode(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The FIP Snooping working mode of an Ethernet interface on the local
+        device.  The FCF mode means that the Ethernet interface must connect
+        to an FCF.  The ENode mode means that the Ethernet interface must
+        connect to an ENode."
+    ::= { hh3cFCoEFIPSnoopingIfCfgEntry 2 }
+
+END

@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage graphs
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -36,7 +36,7 @@ foreach ($rrd_filenames as $key => $rrd_filename) {
     $seperator = ',';
     $plus = ',+';
 
-    if ($_GET['previous']) {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' DEF:' . $in . 'octets' . $i . 'X=' . $rrd_filename . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' DEF:' . $out . 'octets' . $i . 'X=' . $rrd_filename . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $in . 'octets' . $i . "X:$period";
@@ -73,7 +73,7 @@ if ($i) {
     $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
-    if ($_GET['previous'] == 'yes') {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' CDEF:' . $in . 'octetsX=' . $in_thingX . $pluses;
         $rrd_options .= ' CDEF:' . $out . 'octetsX=' . $out_thingX . $pluses;
         $rrd_options .= ' CDEF:doutoctetsX=outoctetsX,' . $stacked['stacked'] . ',*';
@@ -97,22 +97,22 @@ if ($i) {
         $rrd_options .= ' AREA:inbits#' . $colour_area_in . $stacked['transparency'] . ':';
         $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \LibreNMS\Config::get('percentile_value') . "th %\\n'";
         $rrd_options .= ' LINE1.25:inbits#' . $colour_line_in . ':In\ ';
-        $rrd_options .= ' GPRINT:inbits:LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:inbits:MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_in:%6.".$float_precision."lf%s\\\\n";
+        $rrd_options .= ' GPRINT:inbits:LAST:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:inbits:MAX:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
         $rrd_options .= ' AREA:doutbits#' . $colour_area_out . $stacked['transparency'] . ':';
         $rrd_options .= ' LINE1.25:doutbits#' . $colour_line_out . ':Out';
-        $rrd_options .= ' GPRINT:outbits:LAST:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.'.$float_precision.'lf%s';
-        $rrd_options .= ' GPRINT:outbits:MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:percentile_out:%6.".$float_precision."lf%s\\\\n";
+        $rrd_options .= ' GPRINT:outbits:LAST:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:outbits:MAX:%6.' . $float_precision . 'lf%s';
+        $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
     }
 
     $rrd_options .= ' LINE1:percentile_in#aa0000';
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
-    if ($_GET['previous'] == 'yes') {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' AREA:inbitsX#9999966' . $stacked['transparency'] . ':';
         $rrd_options .= ' AREA:doutbitsX#99999966' . $stacked['transparency'] . ':';
     }

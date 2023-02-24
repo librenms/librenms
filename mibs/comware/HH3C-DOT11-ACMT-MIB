@@ -1,0 +1,1618 @@
+-- =============================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide wireless switch object and CAPWAP
+--   tunnel information.
+-- Reference:
+-- Version: V2.6
+-- History:
+--   V1.0 created by shiyang (Richard)
+--     Initial version 2006-05-10
+--   V1.1 2007-04-27 modified by shiyang(Richard)
+--        Add apCfgChange(6) for hh3cDot11ACMtTrapTunlDwnInfo.
+--        Delete hh3cDot11ACPhysicalIndex,hh3cDot11ACGlobalCountryCode,
+--        hh3cDot11ACCtrlTunnelSecSupport and hh3cDot11ACDataTunnelSecSupport
+--        nodes.
+--   V1.2 2007-06-19 modified by Vikas K.
+--        Add hh3cDot11WLANAssocStatisInfo for hh3cDot11ACObjectGroup.
+--        Add hh3cDot11MaxAPNumPermitted and hh3cDot11MaxStationNumPermitted
+--        nodes.
+--   V1.3 2007-12-21 modified by wanghao (Kumar)
+--        Add hh3cDot11StationExDeAuthenSum and hh3cDot11StationCurAssocSum
+--        for hh3cDot11WLANAssocStatisInfo.
+--   V1.4 2008-07-09 modified by ChangHuifeng
+--        Add hh3cDot11ACMtBackupSwtTrap and hh3cDot11ACMtTrapBackupSwitchInfo
+--        for hh3cDot11ACMtNotifyGroup.
+--        Change description of hh3cDot11ACMtTunnelSetupTrap.
+--   V1.5 2008-12-03 modified by Wang Lu
+--        Add new variable bindings hh3cDot11ACMtTrapTnlAPName and
+--        hh3cDot11ACMtTrapTnlAPIPAddr to hh3cDot11ACMtTunnelSetupTrap and
+--        hh3cDot11ACMtTunnelDownTrap.
+--   V1.6 2009-05-07 modified by Wang Shaojie
+--        Add new trap hh3cDot11ACLoadBalanceTrap.
+--        Add new variable bindings hh3cDot11LoadBalanceType,
+--        hh3cDot11LoadBalanceThreshold for hh3cDot11ACLoadBalanceTrap.
+--        Add hh3cDot11ACIFLoadInfoTable to hh3cDot11ACIFLoadInfoTable.
+--   V1.7 2009-07-29 modified by Heziqi
+--        Add new variable bindings hh3cDot11ACMtTrapAPIPv6Addr
+--        to hh3cDot11ACMtTunnelSetupTrap and hh3cDot11ACMtTunnelDownTrap.
+--        Add hh3cDot11MasterAPCount, hh3cDot11SlaveAPCount,
+--        hh3cDot11ConnectAutoAPCount and hh3cDot11PersistentAPCount to
+--        hh3cDot11ACLoadInfo.
+--   V1.8 2009-08-07 modified by Wang Shaojie, Qi Kai
+--        Add new variable bindings hh3cDot11ACMtTrapTunlDwnCount
+--        to hh3cDot11ACMtTrapVarObjects
+--        Add hh3cDot11ACIfStaNum, hh3cDot11ACIfName to hh3cDot11ACIFLoadInfoTable
+--   V1.9 2009-12-01 modified by Wang Shaojie
+--        Add hh3cDot11ACStaFullTrap to hh3cDot11ACMtTraps and variable bindings
+--        hh3cDot11ACMaxStaNum for hh3cDot11ACStaFullTrap.
+--        Add hh3cDot11CtrlTunnelUpTimeTicks to hh3cDot11CAPWAPTunnelTable
+--        Add hh3cDot11AcDownloadFrameCnt, hh3cDot11AcUploadFrameCnt,
+--        hh3cDot11AcDownloadFrameBytes, hh3cDot11AcUploadFrameBytes to
+--        hh3cDot11ACLoadInfo.
+--        2010-06-10 added hh3cDot11ACBASIfTable by jinyi
+--        2010-08-04 modified by yin junjie
+--        Add new table hh3cDot11ACStaUserSecAuthStatis
+--        Add hh3cDot11ACStaUserAuthCurNumber, hh3cDot11ACStaUserConnFailCnt,
+--        hh3cDot11ACStaUserAuthReqCnt, hh3cDot11ACStaUserAuthSuccCnt,
+--        hh3cDot11ACStaUserAuthFailCnt to hh3cDot11ACStaUserSecAuthStatis.
+--   V2.0 2011-09-30 modified by Dong Laqi
+--        Add hh3cDot11ACMtTrapTnlAPSysName,hh3cDot11ACMtFirstTrapTime
+--        to hh3cDot11ACMtTrapVarObjects
+--        and variable bindings hh3cDot11ACMtFirstTrapTime for
+--        hh3cDot11ACMtTunnelSetupTrap,hh3cDot11ACMtTunnelDownTrap,
+--        hh3cDot11ACMtBackupSwtTrap.
+--        2012-02-14 modified by Dong Laqi
+--        Add hh3cDot11BackupACRole,hh3cDot11BackupACNMSIP,hh3cDot11ACBackupMode,
+--        hh3cDot11ACBackupStatus and hh3cDot11ACSwitchCnt to hh3cDot11ACLoadInfo
+--        Add hh3cDot11ACStatusSwitchTrap to hh3cDot11ACMtTraps
+--        and binding hh3cDot11ACMtTrapACStatusSwitchInfo and hh3cDot11MasterACNmsIP
+--        for hh3cDot11ACMtTrapVarObjects
+--   V2.1 2012-05-08 modified by Liu Xuping
+--        Add new table hh3cDot11ACStaSecAuthTypeStatis
+--        Add hh3cDot11ACStaUserPortalOnlineNum,hh3cDot11ACStaUserFreeAuthOnlineNum,
+--        hh3cDot11ACStaUserAssociateAuthOnlineNum,hh3cDot11ACStaUserMacAuthOnlineNum,
+--        hh3cDot11ACStaUserPortalLostConnectionCnt,
+--        hh3cDot11ACStaUserFreeAuthLostConnectionCnt,
+--        hh3cDot11ACStaUserAssociateAuthLostConnectionCnt,
+--        hh3cDot11ACStaUserMacAuthLostConnectionCnt,
+--        hh3cDot11ACStaPortalAuthReqCnt,hh3cDot11ACStaAssociateAuthReqCnt,
+--        hh3cDot11ACStaMacAuthReqCnt,
+--        hh3cDot11ACStaPortalAuthSuccCnt,hh3cDot11ACStaAssociateAuthSuccCnt,
+--        hh3cDot11ACStaMacAuthSuccCnt,
+--        hh3cDot11ACStaPortalAuthReqFailCnt,hh3cDot11ACStaAssociateAuthReqFailCnt,
+--        hh3cDot11ACStaMacAuthReqFailCnt to hh3cDot11ACStaSecAuthTypeStatis.
+--        2012-05-16 modified by lihonghao
+--        Add hh3cDot11ACSouthifPacketOutputCount,hh3cDot11ACSouthifPacketOutputBytes
+--        hh3cDot11ACSouthifPacketInputCount and hh3cDot11ACSouthifPacketInputBytes
+--        to hh3cDot11ACLoadInfo
+--        2012-08-17 modified Zhang Congcong & LiXin
+--        Add new node   hh3cDot11RunAPNumThreshold       to hh3cDot11ACObject
+--        Add new node   hh3cDot11RunAPNumOverload        to hh3cDot11ACMtTraps
+--        Add new node   hh3cDot11RunAPNumOverloadRecover to hh3cDot11ACMtTraps
+--        Add new object hh3cDot11ACMtTrapAPMacAddress    to hh3cDot11ACMtTunnelSetupTrap
+--        Add new object hh3cDot11ACMtTrapAPMacAddress    to hh3cDot11ACMtTunnelDownTrap
+--        Add new node   hh3cDot11ACMtTrapAPMacAddress    to hh3cDot11ACMtTrapVarObjects
+--   V2.2 2013-07-08 modified by Chen Guoxi
+--        Add new node   hh3cDot11StationAssocReqSum      to hh3cDot11WLANAssocStatisInfo
+--        Add new node   hh3cDot11StationReassocReqSum    to hh3cDot11WLANAssocStatisInfo
+--        Add new node   hh3cDot11StationReassocFailSum   to hh3cDot11WLANAssocStatisInfo
+--   v2.3 2013-07-08 modified by Xiao Min
+--        Add new node   hh3cDot11TotalAPconnected        to hh3cDot11ACLoadInfo
+--        Add new node   hh3cDot11RemainingAPcapacity     to hh3cDot11ACLoadInfo
+--   v2.4 2014-02-14 modified by Zhou Weichao
+--        Add new node hh3cDot11ACStaUserAutoAuthOnlineNumCM,
+--        hh3cDot11ACStaUserAutoAuthLostConnectionCntCM,
+--        hh3cDot11ACStaAutoAuthReqCntCM,
+--        hh3cDot11ACStaAutoAuthSuccCntCM,
+--        hh3cDot11ACStaAutoAuthReqFailCntCM to hh3cDot11ACStaSecAuthTypeStatis
+--        Modify node hh3cDot11ACStaUserPortalOnlineNum,
+--        hh3cDot11ACStaUserAssociateAuthOnlineNum from hh3cDot11ACStaSecAuthTypeStatis
+--        Add hh3cDot11ACStaUserAllAuthCntCM to hh3cDot11ACStaUserSecAuthStatis
+--        Add new table hh3cDot11ACPortalStatisticCMTable
+--        Add hh3cDot11ACPortalStatisticCMEntry, hh3cDot11PortalStatisticSSIDCM,
+--        hh3cACPortalStatAuthReqCM and
+--        hh3cACPortalStatAuthRespCM to hh3cDot11ACPortalStatisticCMTable
+--   v2.5 2016-03-11 modified by yubo 04460
+--        Add new node   hh3cDot11MaxNewConnCntPerSecCM to hh3cDot11ACObject
+--        Add new node   hh3cDot11IFNumberCM to hh3cDot11ACObject
+--        Add new node   hh3cDot11ACStaUserAuthRespCntCM to hh3cDot11ACStaUserSecAuthStatis
+--        2016-06-15 modified by zhouwenshuai kf6157
+--        Add new table   hh3cDot11LocalACModelTable
+--        Add Hh3cDot11LocalACModelEntry, hh3cDot11LocalACModelAlias
+--        hh3cDot11LocalACModelName,
+--        hh3cDot11LocalACManufacturer, hh3cDot11LocalACCPUType
+--        hh3cDot11LocalACCPUClockSpeed, hh3cDot11LocalACMemoryType
+--        hh3cDot11LocalACMemorySize, hh3cDot11LocalACFlashType
+--        hh3cDot11LocalACFlashSize, hh3cDot11LocalACMemSize
+--        hh3cDot11LocalACFlashSizeInBytes to hh3cDot11LocalACModelTable
+--        2016-09-05 modified by yangxiaobin ykf4651
+--        Add new node   hh3cDot11APLicenseWeight to hh3cDot11ACObject
+--   v2.6 2018-06-04 modified by wangshujuan w13748
+--        Add new node   hh3cDot11ACTotalRebootCnt to hh3cDot11ACObject
+--        Add new node   hh3cDot11APInvalidCertificateTrap  to hh3cDot11ACMtTraps
+-- =============================================================================
+HH3C-DOT11-ACMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32,
+        IpAddress,
+        Counter64,
+        TimeTicks,
+        Unsigned32,
+        Gauge32
+    FROM SNMPv2-SMI
+        IANAifType
+    FROM IANAifType-MIB
+        hh3cDot11,
+        Hh3cDot11MACModeType,
+        Hh3cDot11TunnelSecSchemType,
+        Hh3cDot11ObjectIDType
+    FROM HH3C-DOT11-REF-MIB
+        MacAddress
+    FROM SNMPv2-TC;
+
+hh3cDot11ACMT MODULE-IDENTITY
+    LAST-UPDATED "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB defines information as per wireless AC and tunnel between
+        AP and AC.
+        If NMS intends to get more detailed information for the AP and AC,
+        it could refer entPhysicalIndex in the Entity MIB to get entity
+        information.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        Radio
+        The chip set to receive and send wireless signal.
+
+        Fat AP
+        Applied in the home, SOHO and so on, and it could
+        independently work without help from AC.
+
+        Fit AP
+        Applied in the enterprise environment, it will work
+        under the control and management from AC.
+
+        Control And Provisioning of Wireless Access Points Protocol
+        The short name of protocol is CAPWAP. AC will control
+        and manage AP by CAPWAP tunnel protocol defined by IETF.
+        Also, a data tunnel will be set up between AC and AP.
+
+        Basic Service Set
+        The IEEE 802.11 BSS of an AP comprises of the
+        stations directly associating with the AP. It will
+        be identified by BSSID."
+    REVISION "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "201008041800Z"        -- Aug 04, 2010 at 18:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "200908071800Z"        -- Aug 07, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200907291800Z"        -- Jul 29, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200905072000Z"        -- May 7, 2009 at 20:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200807091800Z"        -- July 09, 2008 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200712211800Z"        -- Dec 21, 2007 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200706191800Z"        -- June 19, 2007 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new table and new nodes."
+    REVISION "200704272000Z"        -- Apr 27, 2007 at 20:00 GMT
+    DESCRIPTION
+        "Modified to fix some issue."
+    REVISION "200605101900Z"        -- May 10, 2006 at 19:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 1 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+
+--  AC Object Group Attributes
+--  DEFINED AS " The group provides AC information like MAC Mode and so on,
+--  also could refer to software version and hardware version kept
+--  by Entity MIB by Physical index"
+
+hh3cDot11ACObjectGroup OBJECT IDENTIFIER     ::= { hh3cDot11ACMT 1 }
+hh3cDot11ACObject OBJECT IDENTIFIER          ::= { hh3cDot11ACObjectGroup 1 }
+hh3cDot11ACLoadInfo OBJECT IDENTIFIER        ::= { hh3cDot11ACObjectGroup 2 }
+hh3cDot11WLANAssocStatisInfo OBJECT IDENTIFIER  ::= { hh3cDot11ACObjectGroup 3 }
+hh3cDot11ACBASInfo OBJECT IDENTIFIER  ::= { hh3cDot11ACObjectGroup 4 }
+hh3cDot11ACStaUserSecAuthStatis OBJECT IDENTIFIER    ::= { hh3cDot11ACObjectGroup 5 }
+hh3cDot11ACStaSecAuthTypeStatis OBJECT IDENTIFIER    ::= { hh3cDot11ACObjectGroup 6 }
+
+--  AC CAPWAP tunnel Group Attributes
+--  DEFINED AS "The group provides CAPWAP tunnel information"
+
+hh3cDot11CAPWAPTunnelGroup OBJECT IDENTIFIER  ::= { hh3cDot11ACMT 2 }
+
+--  AC CAPWAP Notification
+--  DEFINED AS "The notification for AC Management"
+
+hh3cDot11ACMtNotifyGroup OBJECT IDENTIFIER    ::= { hh3cDot11ACMT 3 }
+
+-- *****************************************************************************
+-- *  hh3cDot11ACObject element Definition
+-- *****************************************************************************
+hh3cDot11CurrentACMACMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11MACModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents which MAC mode defined in the CAPWAP draft is in use
+        for the AC."
+    DEFVAL      { split }
+    ::= { hh3cDot11ACObject 1 }
+
+hh3cDot11MaxAPNumPermitted OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of AP connection permitted
+        for one AC."
+    ::= { hh3cDot11ACObject 2 }
+
+hh3cDot11MaxStationNumPermitted OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of station connection
+        permitted for one AC."
+    ::= { hh3cDot11ACObject 3 }
+hh3cDot11RunAPNumThreshold OBJECT-TYPE
+    SYNTAX      Integer32(30..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+        DESCRIPTION
+        "When the percentage of run AP number is larger than this
+        threshold, a notification will be sent."
+    DEFVAL      { 100 }
+    ::= { hh3cDot11ACObject 4 }
+
+hh3cDot11MaxNewConnCntPerSecCM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum count of station connected to AC per second."
+    DEFVAL      { 300 }
+    ::= { hh3cDot11ACObject 5 }
+
+hh3cDot11IFNumberCM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "All intface in AC except console."
+    DEFVAL      { 24 }
+    ::= { hh3cDot11ACObject 6 }
+
+hh3cDot11APLicenseWeight OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the license weight of AP connection for one AC."
+    ::= { hh3cDot11ACObject 7 }
+
+hh3cDot11ACTotalRebootCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of AC restarts."
+    ::= { hh3cDot11ACObject 8 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11ACObject element Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11ACLoadInfo element Definition
+-- *****************************************************************************
+hh3cDot11APConnectCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of APs which are connecting to AC."
+    ::= { hh3cDot11ACLoadInfo 1 }
+
+hh3cDot11StationConnectCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of stations which are accessing the
+        WLAN service through AC."
+    ::= { hh3cDot11ACLoadInfo 2 }
+
+-- *****************************************************************************
+-- *  hh3cDot11ACIFLoadInfoTable Definition
+-- *****************************************************************************
+hh3cDot11ACIFLoadInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11ACIFLoadInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents AP number information of interface."
+    ::= { hh3cDot11ACLoadInfo 3 }
+
+hh3cDot11ACIFLoadInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11ACIFLoadInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents AP number information of an interface"
+    INDEX
+        {
+            hh3cDot11ACIfIndex
+        }
+    ::= { hh3cDot11ACIFLoadInfoTable 1 }
+
+Hh3cDot11ACIFLoadInfoEntry ::= SEQUENCE
+    {
+        hh3cDot11ACIfIndex       Integer32,
+        hh3cDot11ACIfApNum       Integer32,
+        hh3cDot11ACIfStaNum      Integer32,
+        hh3cDot11ACIfName        OCTET STRING
+    }
+
+hh3cDot11ACIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents index of AC interface."
+    ::= { hh3cDot11ACIFLoadInfoEntry 1 }
+
+hh3cDot11ACIfApNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents AP number connected to the AC interface."
+    ::= { hh3cDot11ACIFLoadInfoEntry 2 }
+
+hh3cDot11ACIfStaNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents Station number connected to the AC interface."
+    ::= { hh3cDot11ACIFLoadInfoEntry 3 }
+
+hh3cDot11ACIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents InterfaceName AP number connected to AC interface."
+    ::= { hh3cDot11ACIFLoadInfoEntry 4 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11ACIFLoadInfoTable element Definition
+-- *****************************************************************************
+hh3cDot11MasterAPCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of AP which have established the
+        master tunnel with AC."
+    ::= { hh3cDot11ACLoadInfo 4 }
+
+hh3cDot11SlaveAPCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of AP which have established the
+        slave tunnel with AC."
+    ::= { hh3cDot11ACLoadInfo 5 }
+
+hh3cDot11ConnectAutoAPCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of auto APs that are connecting to AC."
+    ::= { hh3cDot11ACLoadInfo 6 }
+
+hh3cDot11PersistentAPCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of persistent AP."
+    ::= { hh3cDot11ACLoadInfo 7 }
+
+hh3cDot11AcUploadFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of frames that AP sends to AC through LWAPP tunnel."
+    ::= { hh3cDot11ACLoadInfo 8 }
+
+hh3cDot11AcDownloadFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of frames that AC sends to AP through LWAPP tunnel."
+    ::= { hh3cDot11ACLoadInfo 9 }
+
+hh3cDot11AcUploadFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the bytes of frames that AP sends to AC through LWAPP tunnel."
+    ::= { hh3cDot11ACLoadInfo 10 }
+
+hh3cDot11AcDownloadFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the bytes of frames that AC sends to AP through LWAPP tunnel."
+    ::= { hh3cDot11ACLoadInfo 11 }
+
+hh3cDot11BackupACRole OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            null(1),
+            master(2),
+            slave(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the Identity of the AC
+         null:   Not configured
+         master: Master AC
+         slave:  Slave AC."
+    DEFVAL      { null }
+    ::= { hh3cDot11ACLoadInfo 12 }
+
+hh3cDot11BackupACNMSIP OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the manger IP address of the slave ac."
+    ::= { hh3cDot11ACLoadInfo 13 }
+
+hh3cDot11ACBackupMode OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            null(1),
+            hotBackup(2),
+            coldBackup(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the ac backup mode."
+        DEFVAL      { null }
+    ::= { hh3cDot11ACLoadInfo 14 }
+
+hh3cDot11ACBackupStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            active(1),
+            standby(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the ac backup status."
+    ::= { hh3cDot11ACLoadInfo 15 }
+
+hh3cDot11ACSwitchCnt OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the ac switch times."
+    ::= { hh3cDot11ACLoadInfo 16 }
+
+hh3cDot11ACSouthifPacketOutputCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Represents the count of output packets with the down-link interface."
+    ::= { hh3cDot11ACLoadInfo 17 }
+
+hh3cDot11ACSouthifPacketOutputBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Represents the bytes of output packets with the down-link interface."
+    ::= { hh3cDot11ACLoadInfo 18 }
+
+hh3cDot11ACSouthifPacketInputCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Represents the count of input packets with the down-link interface."
+    ::= { hh3cDot11ACLoadInfo 19 }
+
+hh3cDot11ACSouthifPacketInputBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Represents the bytes of input packets with the down-link interface."
+    ::= { hh3cDot11ACLoadInfo 20 }
+
+hh3cDot11TotalAPconnected OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of AP which are connected to AC."
+    ::= { hh3cDot11ACLoadInfo 21 }
+
+hh3cDot11RemainingAPcapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the remaining AP capacity of the AC."
+    ::= { hh3cDot11ACLoadInfo 22 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11ACLoad element Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WLANAssocStatisInfo Definition
+-- *****************************************************************************
+hh3cDot11StationAssocSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station association."
+    ::= { hh3cDot11WLANAssocStatisInfo 1 }
+
+hh3cDot11StationAssocFailSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station association failure."
+    ::= { hh3cDot11WLANAssocStatisInfo 2 }
+
+hh3cDot11StationReassocSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station reassociation."
+    ::= { hh3cDot11WLANAssocStatisInfo 3 }
+
+hh3cDot11StationAssocRejectedSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station association rejected on
+        account of resource limit."
+    ::= { hh3cDot11WLANAssocStatisInfo 4 }
+
+hh3cDot11StationExDeAuthenSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of exceptional station deauthentication
+        (Without sending a deauthentication to AP)."
+    ::= { hh3cDot11WLANAssocStatisInfo 5 }
+
+hh3cDot11StationCurAssocSum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of current associated stations."
+    ::= { hh3cDot11WLANAssocStatisInfo 6 }
+
+hh3cDot11StationAssocReqSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station association request."
+    ::= { hh3cDot11WLANAssocStatisInfo 7 }
+
+hh3cDot11StationReassocReqSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station reassociation request."
+    ::= { hh3cDot11WLANAssocStatisInfo 8 }
+
+hh3cDot11StationReassocFailSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of station reassociation failure."
+    ::= { hh3cDot11WLANAssocStatisInfo 9 }
+-- *****************************************************************************
+-- *  End of hh3cDot11WLANAssocStatisInfo Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- * hh3cDot11ACBASInfo Definition
+-- *****************************************************************************
+hh3cDot11ACBASSysObjects OBJECT IDENTIFIER  ::= { hh3cDot11ACBASInfo 1 }
+hh3cDot11ACBASTableObjects OBJECT IDENTIFIER  ::= { hh3cDot11ACBASInfo 2 }
+
+hh3cDot11ACBASIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11ACBASIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the BAS information of interfaces."
+    ::= { hh3cDot11ACBASTableObjects 3 }
+
+hh3cDot11ACBASIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11ACBASIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the BAS information of an interface"
+    INDEX
+        {
+            hh3cDot11ACBASIfIndex
+        }
+    ::= { hh3cDot11ACBASIfTable 1 }
+
+Hh3cDot11ACBASIfEntry ::= SEQUENCE
+    {
+        hh3cDot11ACBASIfIndex       Integer32,
+        hh3cDot11ACBASIfDescr       OCTET STRING,
+        hh3cDot11ACBASIfType        IANAifType
+    }
+
+hh3cDot11ACBASIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the BAS interface. "
+    ::= { hh3cDot11ACBASIfEntry 1 }
+
+hh3cDot11ACBASIfDescr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the BAS interface. "
+    ::= { hh3cDot11ACBASIfEntry 2 }
+
+hh3cDot11ACBASIfType OBJECT-TYPE
+    SYNTAX      IANAifType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of the BAS interface. "
+    ::= { hh3cDot11ACBASIfEntry 3 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11ACBASInfo Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11ACStaUserSecAuthStatis element Definition
+-- *****************************************************************************
+hh3cDot11ACStaUserAuthCurNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current number of user authenticated with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 1 }
+
+hh3cDot11ACStaUserConnFailCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of user disconnected with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 2 }
+
+hh3cDot11ACStaUserAuthReqCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of user authenticate request with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 3 }
+
+hh3cDot11ACStaUserAuthSuccCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of users authenticated successful with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 4 }
+
+hh3cDot11ACStaUserAuthFailCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of user authenticated failed with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 5 }
+
+hh3cDot11ACStaUserAllAuthCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of users authenticated with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 6 }
+
+hh3cDot11ACStaUserAuthRespCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of user authenticate response with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 7 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11StaUserSecAuthStatis element Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11ACStaSecAuthTypeStatis element Definition
+-- *****************************************************************************
+hh3cDot11ACStaUserPortalOnlineNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of online portal users authenticated by RADIUS,
+        including MAC-trigger and IMSIAuth users."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 1 }
+
+hh3cDot11ACStaUserFreeAuthOnlineNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of online user is no need authenticated."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 2 }
+
+hh3cDot11ACStaUserAssociateAuthOnlineNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of online users authenticated by associated authentication,
+        excluding AutoAuth users."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 3 }
+
+hh3cDot11ACStaUserMacAuthOnlineNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The numbers of online user which is launched authentication by MAC address and
+        authenticated by Radius."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 4 }
+
+hh3cDot11ACStaUserPortalLostConnectionCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For PortalAuth user, represents disconnection count but voluntarily disconnect,
+        it should not delete authenticated user when client roamed."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 5 }
+
+hh3cDot11ACStaUserFreeAuthLostConnectionCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For FreeAuth user, represents disconnection count but voluntarily disconnect,
+        it should not delete authenticated user when client roamed."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 6 }
+
+hh3cDot11ACStaUserAssociateAuthLostConnectionCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For AssociateAuth user, represents disconnection count but voluntarily disconnect,
+        it should not delete authenticated user when client roamed."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 7 }
+
+hh3cDot11ACStaUserMacAuthLostConnectionCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For MacAuth user, represents disconnection count but voluntarily disconnect,
+        it should not delete authenticated user when client roamed."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 8 }
+
+hh3cDot11ACStaPortalAuthReqCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents PortalAuth request count after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 9 }
+
+hh3cDot11ACStaAssociateAuthReqCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents AssociateAuth request count after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 10 }
+
+hh3cDot11ACStaMacAuthReqCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents MacAuth request count after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 11 }
+
+hh3cDot11ACStaPortalAuthSuccCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of PortalAuth authenticated successfully after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 12 }
+
+hh3cDot11ACStaAssociateAuthSuccCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of AssociateAuth authenticated successfully after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 13 }
+
+hh3cDot11ACStaMacAuthSuccCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of MacAuth authenticated successfully after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 14 }
+
+hh3cDot11ACStaPortalAuthReqFailCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of PortalAuth failure in request after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 15 }
+
+hh3cDot11ACStaAssociateAuthReqFailCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of AssociateAuth failure in request after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 16 }
+
+hh3cDot11ACStaMacAuthReqFailCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents count of MacAuth failure in request after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 17 }
+
+hh3cDot11ACStaUserAutoAuthOnlineNumCM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of online users authenticated by auto authentication."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 18 }
+
+hh3cDot11ACStaUserAutoAuthLostConnectionCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the disconnection count of AutoAuth users, excluding the ones
+        who disconnect AP by themselves."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 19 }
+
+hh3cDot11ACStaAutoAuthReqCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of AutoAuth requests after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 20 }
+
+hh3cDot11ACStaAutoAuthSuccCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of successful AutoAuth authentications after AP up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 21 }
+
+hh3cDot11ACStaAutoAuthReqFailCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of failed AutoAuth requests after AP is up."
+    ::= { hh3cDot11ACStaSecAuthTypeStatis 22 }
+-- *****************************************************************************
+-- *  End of hh3cDot11ACStaSecAuthTypeStatis element Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11ACPortalStatisticCMTable Definition
+-- *****************************************************************************
+hh3cDot11ACPortalStatisticCMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11ACPortalStatisticCMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table describes portal statistics information."
+    ::= { hh3cDot11ACObjectGroup 7 }
+
+hh3cDot11ACPortalStatisticCMEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11ACPortalStatisticCMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the portal statistics information of an SSID."
+    INDEX
+        {
+            hh3cDot11ACPortalStatisticSSIDCM
+        }
+    ::= { hh3cDot11ACPortalStatisticCMTable 1 }
+
+Hh3cDot11ACPortalStatisticCMEntry ::= SEQUENCE
+    {
+        hh3cDot11ACPortalStatisticSSIDCM             OCTET STRING,
+        hh3cDot11ACPortalStatAuthReqCM                  Counter32,
+        hh3cDot11ACPortalStatAuthRespCM                 Counter32
+    }
+
+hh3cDot11ACPortalStatisticSSIDCM OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the service policy name."
+    ::= { hh3cDot11ACPortalStatisticCMEntry 1 }
+
+hh3cDot11ACPortalStatAuthReqCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of portal authentication requests from
+        portal server to AC."
+    ::= { hh3cDot11ACPortalStatisticCMEntry 2 }
+
+hh3cDot11ACPortalStatAuthRespCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of portal authentication responses from
+        AC to portal server."
+    ::= { hh3cDot11ACPortalStatisticCMEntry 3 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11ACPortalStatisticCMTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11LocalACModelTable Definition
+-- *****************************************************************************
+hh3cDot11LocalACModelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LocalACModelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the capability information for a specific
+        kind of local AC."
+    ::= { hh3cDot11ACObjectGroup 8 }
+
+hh3cDot11LocalACModelEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LocalACModelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains capability information for a specific kind
+        of local AC."
+    INDEX
+        {
+            hh3cDot11LocalACModelAlias
+        }
+    ::= { hh3cDot11LocalACModelTable 1 }
+
+Hh3cDot11LocalACModelEntry ::= SEQUENCE
+    {
+        hh3cDot11LocalACModelAlias         OCTET STRING,
+        hh3cDot11LocalACModelName          OCTET STRING,
+        hh3cDot11LocalACManufacturer       OCTET STRING,
+        hh3cDot11LocalACCPUType            OCTET STRING,
+        hh3cDot11LocalACCPUClockSpeed      Unsigned32,
+        hh3cDot11LocalACMemoryType         OCTET STRING,
+        hh3cDot11LocalACMemorySize         Unsigned32,
+        hh3cDot11LocalACFlashType          OCTET STRING,
+        hh3cDot11LocalACFlashSize          Unsigned32,
+        hh3cDot11LocalACMemSize            Counter64,
+        hh3cDot11LocalACFlashSizeInBytes   Counter64
+    }
+
+hh3cDot11LocalACModelAlias OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents alias of local AC model name."
+    ::= { hh3cDot11LocalACModelEntry 1 }
+
+hh3cDot11LocalACModelName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents local AC model name."
+    ::= { hh3cDot11LocalACModelEntry 2 }
+
+hh3cDot11LocalACManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'SMI Network Management Private Enterprise Codes'
+        assigned by the IANA, which means the vendor of local AC."
+    ::= { hh3cDot11LocalACModelEntry 3 }
+
+hh3cDot11LocalACCPUType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the CPU type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 4 }
+
+hh3cDot11LocalACCPUClockSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Hz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the clock speed of CPU."
+    ::= { hh3cDot11LocalACModelEntry 5 }
+
+hh3cDot11LocalACMemoryType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the memory card type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 6 }
+
+hh3cDot11LocalACMemorySize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kbytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC memory card."
+    ::= { hh3cDot11LocalACModelEntry 7 }
+
+hh3cDot11LocalACFlashType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the flash card type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 8 }
+
+hh3cDot11LocalACFlashSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kbytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC flash card."
+    ::= { hh3cDot11LocalACModelEntry 9 }
+
+hh3cDot11LocalACMemSize OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC memory card."
+    ::= { hh3cDot11LocalACModelEntry 10 }
+
+hh3cDot11LocalACFlashSizeInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the size of local AC flash card in bytes."
+    ::= { hh3cDot11LocalACModelEntry 11 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LocalACModelTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11CAPWAPTunnelTable Definition
+-- *****************************************************************************
+hh3cDot11CAPWAPTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11CAPWAPTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table will list all the APs which are connecting to the AC
+        by the CAPWAP tunnel protocol."
+    ::= { hh3cDot11CAPWAPTunnelGroup 1 }
+
+hh3cDot11CAPWAPTunnelEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11CAPWAPTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of data tunnel and control
+        tunnel of AP which is connecting to AC."
+    INDEX
+        {
+            hh3cDot11CurrTunnelAPID
+        }
+    ::= { hh3cDot11CAPWAPTunnelTable 1 }
+
+Hh3cDot11CAPWAPTunnelEntry ::= SEQUENCE
+    {
+        hh3cDot11CurrTunnelAPID         Hh3cDot11ObjectIDType,
+        hh3cDot11CtrlTunnelCurrSec      Hh3cDot11TunnelSecSchemType,
+        hh3cDot11CtrlTunnelUpTime       Integer32,
+        hh3cDot11DataTunnelCurrSec      Hh3cDot11TunnelSecSchemType,
+        hh3cDot11DataTunnelUpTime       Integer32,
+        hh3cDot11CtrlTunnelUpTimeTicks  TimeTicks
+    }
+
+hh3cDot11CurrTunnelAPID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "To uniquely identify the CAPWAP tunnel set up between the AP
+        identified by APID and a specific AC."
+    ::= { hh3cDot11CAPWAPTunnelEntry 1 }
+
+hh3cDot11CtrlTunnelCurrSec OBJECT-TYPE
+    SYNTAX      Hh3cDot11TunnelSecSchemType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents what security scheme is in use for
+        control tunnel."
+    DEFVAL      { cleartxt }
+    ::= { hh3cDot11CAPWAPTunnelEntry 2 }
+
+hh3cDot11CtrlTunnelUpTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long for control tunnel up. If the value is zero,
+        then tunnel is not set up."
+    ::= { hh3cDot11CAPWAPTunnelEntry 3 }
+
+hh3cDot11DataTunnelCurrSec OBJECT-TYPE
+    SYNTAX      Hh3cDot11TunnelSecSchemType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents what security scheme is in use for
+        data tunnel."
+    DEFVAL      { cleartxt }
+    ::= { hh3cDot11CAPWAPTunnelEntry 4 }
+
+hh3cDot11DataTunnelUpTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long for data tunnel up.
+        If the value is zero, then tunnel is not set up."
+    ::= { hh3cDot11CAPWAPTunnelEntry 5 }
+
+hh3cDot11CtrlTunnelUpTimeTicks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long control tunnel is up.
+         If the value is zero, then tunnel is not set up."
+    ::= { hh3cDot11CAPWAPTunnelEntry 6 }
+-- *****************************************************************************
+-- *    End of hh3cDot11CAPWAPTunnelTable  TABLE
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *     Notifications OF hh3cDot11ACMtNotifyGroup
+-- *****************************************************************************
+-- AC Management Notification
+
+        hh3cDot11ACMtTraps OBJECT IDENTIFIER
+    ::= { hh3cDot11ACMtNotifyGroup 0 }
+
+hh3cDot11ACMtTunnelSetupTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrTunnelAPID,
+            hh3cDot11ACMtTrapTunlUpInfo,
+            hh3cDot11ACMtTrapTnlAPName,
+            hh3cDot11ACMtTrapTnlAPIPAddr,
+            hh3cDot11ACMtTrapAPIPv6Addr,
+            hh3cDot11ACMtFirstTrapTime,
+            hh3cDot11ACMtTrapAPMacAddress
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by AC when CAPWAP tunnel becomes up.
+        By this way, NMS will immediately know tunnel up event.
+        It is unnecessary to identify whether it is control or data
+        tunnel."
+    ::= { hh3cDot11ACMtTraps 1 }
+
+hh3cDot11ACMtTunnelDownTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrTunnelAPID,
+            hh3cDot11ACMtTrapTunlDwnInfo,
+            hh3cDot11ACMtTrapTnlAPName,
+            hh3cDot11ACMtTrapTnlAPIPAddr,
+            hh3cDot11ACMtTrapAPIPv6Addr,
+            hh3cDot11ACMtTrapTunlDwnCount,
+            hh3cDot11ACMtTrapTnlAPSysName,
+            hh3cDot11ACMtFirstTrapTime,
+            hh3cDot11ACMtTrapAPMacAddress
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by AC when CAPWAP tunnel becomes down.
+        By this way, NMS will immediately know tunnel down event.
+        It is unnecessary to identify whether it is control or data
+        tunnel."
+    ::= { hh3cDot11ACMtTraps 2 }
+
+hh3cDot11ACMtBackupSwtTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11ACMtTrapBackupSwitchInfo,
+            hh3cDot11ACMtFirstTrapTime
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent by AC when AC switches from master to slave
+        or from slave to master."
+    ::= { hh3cDot11ACMtTraps 3 }
+
+hh3cDot11ACLoadBalanceTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11LoadBalanceType,
+            hh3cDot11LoadBalanceThreshold
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent by AC when load-balance is enabled on AC."
+    ::= { hh3cDot11ACMtTraps 4 }
+
+hh3cDot11ACStaFullTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11ACMaxStaNum
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification will be sent when STA is full on AC."
+    ::={ hh3cDot11ACMtTraps 5 }
+
+hh3cDot11ACStatusSwitchTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11ACStatusSwitchInfo,
+            hh3cDot11SourceACNmsIP
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification will be sent when AC switches from standby to active
+        or from standby to active."
+    ::={ hh3cDot11ACMtTraps 6}
+
+hh3cDot11RunAPNumOverload NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11MaxAPNumPermitted,
+            hh3cDot11APConnectCount
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification will be sent by AC when run AP number exceeds the threshold."
+    ::= { hh3cDot11ACMtTraps 7}
+
+hh3cDot11RunAPNumOverloadRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11MaxAPNumPermitted,
+            hh3cDot11APConnectCount
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification will be sent by AC when run AP number
+        recover normal from overload state."
+    ::= { hh3cDot11ACMtTraps 8 }
+
+hh3cDot11APInvalidCertificateTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11ACMtTrapACMacAddress,
+            hh3cDot11ACMtTrapAPMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "The AC sends the notification once the certificate of an AP expires."
+    ::= { hh3cDot11ACMtTraps 9 }
+
+-- AC Management Notification Variable object
+
+        hh3cDot11ACMtTrapVarObjects OBJECT IDENTIFIER
+    ::= { hh3cDot11ACMtNotifyGroup 1 }
+
+hh3cDot11ACMtTrapTunlDwnInfo OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            tunnelTimeout(1),
+            keyUpdateFailure(2),
+            apReset(3),
+            apCrash(4),
+            apDeleted(5),
+            apCfgChange(6)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason for tunnel down.
+        The following values are supported:
+        tunnelTimeout     - When AC detects the tunnel is broken,
+        - it will notify NMS.
+        keyUpdateFailure  - rekey process is failed, tunnel will be broken.
+        apReset           - Administrator reset AP.
+        apCrash           - AP reboot for system crash.
+        apDeleted         - Delete AP from AC and trigger tunnel down.
+        apCfgChange       - The configuration for AP was changed."
+    ::= { hh3cDot11ACMtTrapVarObjects 1 }
+
+hh3cDot11ACMtTrapTunlUpInfo OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            up(1)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason for tunnel up.
+        The following values are supported:
+        up(1)  - The AP joined AC.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 2 }
+
+hh3cDot11ACMtTrapBackupSwitchInfo OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            masterToSlave(1),
+            slaveToMaster(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents status which the AC switches to.
+        The following values are supported:
+        masterToSlave  - The AC switches from master to slave.
+        slaveToMaster  - The AC switches from slave to master.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 3 }
+
+hh3cDot11ACMtTrapTnlAPName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents name of the AP which sets up the tunnel with the AC.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 4 }
+
+hh3cDot11ACMtTrapTnlAPIPAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents IP address of the AP which sets up the tunnel with the AC.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 5 }
+
+hh3cDot11LoadBalanceType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            traffic(1),
+            session(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents which kind load balance is enabled by AC.
+         The following values are supported:
+         traffic mode load-balancing: traffic snapshot is considered.
+         session mode load-balancing: the number of users associated
+                                      with the AP/radio is considered.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 6 }
+
+hh3cDot11LoadBalanceThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the value of load balance threshold.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 7 }
+
+hh3cDot11ACMtTrapAPIPv6Addr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents IPv6 address of the AP which sets up the tunnel with
+        the AC."
+    ::= { hh3cDot11ACMtTrapVarObjects 8 }
+
+hh3cDot11ACMtTrapTunlDwnCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents how many times that the tunnel between AC and AP has down."
+    ::= { hh3cDot11ACMtTrapVarObjects 9 }
+
+hh3cDot11ACMaxStaNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the max number of STA on AC."
+    ::= { hh3cDot11ACMtTrapVarObjects 10 }
+
+hh3cDot11ACMtTrapTnlAPSysName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents system name of the AP which sets up the tunnel with the AC."
+    ::= { hh3cDot11ACMtTrapVarObjects 11 }
+
+hh3cDot11ACMtFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the first trap time."
+    ::= { hh3cDot11ACMtTrapVarObjects 12 }
+
+hh3cDot11ACStatusSwitchInfo OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            activeToStandby(1),
+            standbyToActive(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents status which the AC switches to.
+        The following values are supported:
+        activeToStandby  - The AC switches from active to standby.
+        standbyToActive  - The AC switches from standby to active.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 13 }
+
+hh3cDot11SourceACNmsIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the NMS IP address of master AC.
+        "
+    ::= { hh3cDot11ACMtTrapVarObjects 14 }
+
+hh3cDot11ACMtTrapAPMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "Represents the MAC address of an AP."
+    ::= { hh3cDot11ACMtTrapVarObjects 15 }
+
+hh3cDot11ACMtTrapACMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "Represents the MAC address of the AC."
+    ::= { hh3cDot11ACMtTrapVarObjects 16 }
+
+-- *****************************************************************************
+-- *     End OF NotifyGroup
+-- *****************************************************************************
+END

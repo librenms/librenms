@@ -1,0 +1,142 @@
+-- ============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB is used for configuration of OBJP(object policy).
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 created by gaoyu.
+-- ============================================================================
+HH3C-OBJP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI;
+
+--
+-- Node definitions
+--
+
+hh3cObjp MODULE-IDENTITY
+    LAST-UPDATED "201403101536Z"        -- Mar 10, 2014 at 15:36 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "Object-policy management information base for managing devices
+        that support object policy.
+        "
+    REVISION "201403101536Z"            -- Mar 10, 2014 at 15:36 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 155 }
+
+--
+-- Nodes of hh3cObjpZonePairObjects
+--
+hh3cObjpZonePairObjects OBJECT IDENTIFIER ::= { hh3cObjp 1 }
+
+--
+-- Nodes of hh3cObjpZonePairRunningInfoTable
+--
+hh3cObjpZonePairRunningInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cObjpZonePairRunningInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Object policy of zone pair running information base."
+    ::= { hh3cObjpZonePairObjects 1 }
+
+hh3cObjpZonePairRunningInfoEntry OBJECT-TYPE
+    SYNTAX Hh3cObjpZonePairRunningInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Object policy of zone pair running information entry."
+    INDEX
+    {
+        hh3cObjpZonePairSrcZone,
+        hh3cObjpZonePairDstZone,
+        hh3cObjpZonePairIPVersion,
+        hh3cObjpZonePairRuleID
+    }
+    ::= { hh3cObjpZonePairRunningInfoTable 1 }
+
+Hh3cObjpZonePairRunningInfoEntry ::=
+    SEQUENCE
+    {
+        hh3cObjpZonePairSrcZone
+            OCTET STRING,
+        hh3cObjpZonePairDstZone
+            OCTET STRING,
+        hh3cObjpZonePairIPVersion
+            INTEGER,
+        hh3cObjpZonePairRuleID
+            Unsigned32,
+        hh3cObjpZonePairMatchPacketCount
+            Counter64,
+        hh3cObjpZonePairLastMatchTime
+            Unsigned32
+    }
+
+hh3cObjpZonePairSrcZone OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1..31))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Name of the source security zone."
+    ::= { hh3cObjpZonePairRunningInfoEntry 1 }
+
+hh3cObjpZonePairDstZone OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1..31))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Name of the destination security zone."
+    ::= { hh3cObjpZonePairRunningInfoEntry 2 }
+
+hh3cObjpZonePairIPVersion OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        ipv4(1),
+        ipv6(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IP protocol version."
+    ::= { hh3cObjpZonePairRunningInfoEntry 3 }
+
+hh3cObjpZonePairRuleID OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65534)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Rule ID of object policy."
+    ::= { hh3cObjpZonePairRunningInfoEntry 4 }
+
+hh3cObjpZonePairMatchPacketCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of packets matching the rule."
+    ::= { hh3cObjpZonePairRunningInfoEntry 5 }
+
+hh3cObjpZonePairLastMatchTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interval in seconds between the last match and 1970/1/1 00:00:00."
+    ::= { hh3cObjpZonePairRunningInfoEntry 6 }
+
+END

@@ -1,0 +1,1615 @@
+-- extracted from draft-ietf-idr-bgp4-mibv2-15.txt
+-- at Wed Jul 4 11:46:02 2018
+
+-- Renumbered to sit underneath Dell's enterprise.
+
+-- *****************************************************************
+-- DELLEMC-OS10-BGP4V2-MIB
+--
+--
+-- Copyright (c) 2018 by Dell Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+	DELLEMC-OS10-BGP4V2-MIB DEFINITIONS ::= BEGIN
+    --  This module provides authoritative definitions for Dell EMC Networking OS10
+    --  BGP4V2 MIB.
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Counter32, Gauge32, Unsigned32
+            FROM SNMPv2-SMI
+	os10Experiment
+	    FROM DELLEMC-OS10-SMI-MIB
+        InetAddressType, InetAddress, InetPortNumber,
+        InetAutonomousSystemNumber, InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        TruthValue, RowPointer, TimeStamp, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB;
+
+        os10Bgp4V2Mib MODULE-IDENTITY
+            LAST-UPDATED "202002251200Z"
+            ORGANIZATION "Dell EMC"
+            CONTACT-INFO "http://www.dell.com/support"
+            DESCRIPTION
+                    "The MIB module for the BGP-4 protocol."
+					
+            REVISION     "202002251200Z"
+            DESCRIPTION
+                    "Changed the MAX-ACCESS of bgp4V2AdjRibsOutIndex to not-accessible."
+
+            REVISION     "201807041200Z"
+            DESCRIPTION
+                    "Dell EMC Networking OS10 Experiment object IDs added."
+
+            REVISION "201401240000Z"
+            DESCRIPTION
+                    "This MIB updates and replaces the BGP MIB defined in
+                    RFC 4273."
+            ::= { os10Experiment 1 }
+
+     Os10Bgp4V2IdentifierTC ::= TEXTUAL-CONVENTION
+         DISPLAY-HINT "1d."
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP Identifier.  BGP Identifiers
+              are presented in the received network byte order.
+
+              The BGP Identifier is displayed as if it is an IP address,
+              even if it would be an illegal one."
+         REFERENCE
+             "RFC 4273, Section 4.2"
+         SYNTAX OCTET STRING(SIZE (4))
+
+     Os10Bgp4V2AddressFamilyIdentifierTC ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP AFI.  The value of this object
+              should be restricted to be between the values of 0 and
+              65535."
+         REFERENCE
+             "RFC 4760, Section 3"
+         SYNTAX INTEGER {
+                 ipv4(1),
+                 ipv6(2)
+             }
+
+     Os10Bgp4V2SubsequentAddressFamilyIdentifierTC ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+             "The representation of a BGP SAFI"
+         REFERENCE
+             "RFC 4760, Section 3.  The value of this object should be
+              restricted to be between the values of 0 and 255."
+         SYNTAX INTEGER {
+                 unicast(1),
+                 multicast(2),
+                 mpls(4)
+             }
+
+    -- Top level components of this MIB module
+
+    -- Notifications
+    os10bgp4V2Notifications OBJECT IDENTIFIER ::= { os10Bgp4V2Mib 0 }
+
+    -- Objects
+    os10bgp4V2Objects OBJECT IDENTIFIER ::= { os10Bgp4V2Mib 1 }
+
+    -- Conformance
+    os10bgp4V2Conformance OBJECT IDENTIFIER ::= { os10Bgp4V2Mib 2 }
+
+
+    --
+    -- Per-instance BGP discontinuities
+    --
+
+    os10bgp4V2DiscontinuityTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2DiscontinuityEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of BGP-4 discontinuities.  Discontinuities that have
+             external visibility occur on a per-BGP instance basis.
+             Transitions by a given BGP peer will result in a consistent
+             BGP view within that instance and thus do not represent a
+             discontinuity from a protocol standpoint."
+        ::= { os10bgp4V2Objects 1 }
+
+    os10bgp4V2DiscontinuityEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2DiscontinuityEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry repsenting information about a discontinuity event
+             for a given BGP instance."
+        INDEX {
+            os10bgp4V2PeerInstance
+        }
+        ::= { os10bgp4V2DiscontinuityTable 1 }
+
+    Os10Bgp4V2DiscontinuityEntry ::= SEQUENCE {
+        os10bgp4V2DiscontinuityTime
+            TimeStamp
+        }
+
+    os10bgp4V2DiscontinuityTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value of sysUpTime at the most recent occasion at which
+             this BGP management instance has suffered a discontinuity."
+         ::= { os10bgp4V2DiscontinuityEntry 1 }
+
+    --
+    -- Per-peer session management information.
+    --
+
+    os10bgp4V2PeerTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "BGP peer table.  This table contains, one entry per BGP
+             peer, information about the connections with BGP peers."
+        ::= { os10bgp4V2Objects 2 }
+
+    os10bgp4V2PeerEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry containing information about the connection with
+             a remote BGP peer."
+        INDEX {
+            os10bgp4V2PeerInstance,
+            os10bgp4V2PeerRemoteAddrType,
+            os10bgp4V2PeerRemoteAddr
+        }
+        ::= { os10bgp4V2PeerTable 1 }
+
+    Os10Bgp4V2PeerEntry ::= SEQUENCE {
+        -- INDEX information
+        os10bgp4V2PeerInstance
+            Unsigned32,
+        os10bgp4V2PeerLocalAddrType
+            InetAddressType,
+        os10bgp4V2PeerLocalAddr
+            InetAddress,
+        os10bgp4V2PeerRemoteAddrType
+            InetAddressType,
+        os10bgp4V2PeerRemoteAddr
+            InetAddress,
+
+        -- Local
+        os10bgp4V2PeerLocalPort
+            InetPortNumber,
+        os10bgp4V2PeerLocalAs
+            InetAutonomousSystemNumber,
+        os10bgp4V2PeerLocalIdentifier
+            Os10Bgp4V2IdentifierTC,
+
+        -- Remote
+        os10bgp4V2PeerRemotePort
+            InetPortNumber,
+        os10bgp4V2PeerRemoteAs
+            InetAutonomousSystemNumber,
+        os10bgp4V2PeerRemoteIdentifier
+            Os10Bgp4V2IdentifierTC,
+
+	-- Session status
+        os10bgp4V2PeerAdminStatus
+            INTEGER,
+        os10bgp4V2PeerState
+            INTEGER,
+        os10bgp4V2PeerDescription
+            SnmpAdminString
+    }
+
+    os10bgp4V2PeerInstance OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The routing instance index.
+
+             Some BGP implementations permit the creation of
+             multiple instances of a BGP routing process. An
+             example includes routers running BGP/MPLS IP Virtual
+             Private Networks.
+
+             Implementations that do not support multiple
+             routing instances should return 1 for this object."
+        ::= { os10bgp4V2PeerEntry 1 }
+
+    os10bgp4V2PeerLocalAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address family of the local end of the peering
+             session."
+        ::= { os10bgp4V2PeerEntry 2 }
+
+    os10bgp4V2PeerLocalAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The local IP address of this entry's BGP connection.
+
+             An implementation is required to support IPv4 peering
+             sessions in which case the length of this object is 4.
+             An implementation MAY support IPv6 peering
+             sessions in which case the length of this object is 16.
+             IPv6 link-local peering sessions MAY be supported by
+             this MIB.  In this case the length of this object is 20."
+        ::= { os10bgp4V2PeerEntry 3 }
+
+    os10bgp4V2PeerRemoteAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address family of the remote end of the peering
+             session.
+
+             An implementation is required to support IPv4 peering
+             sessions in which case the length of this object is 4.
+             An implementation MAY support IPv6 peering
+             sessions in which case the length of this object is 16.
+             IPv6 link-local peering sessions MAY be supported by
+             this MIB.  In this case the length of this object is 20."
+        ::= { os10bgp4V2PeerEntry 4 }
+
+    os10bgp4V2PeerRemoteAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The remote IP address of this entry's BGP peer."
+        ::= { os10bgp4V2PeerEntry 5 }
+
+    os10bgp4V2PeerLocalPort OBJECT-TYPE
+        SYNTAX     InetPortNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The local port for the TCP connection between the BGP
+             peers."
+        ::= { os10bgp4V2PeerEntry 6 }
+
+    os10bgp4V2PeerLocalAs OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Some implementations of BGP can represent themselves
+             as multiple ASes. This is the AS that this peering
+             session is representing itself as to the remote peer."
+        ::= { os10bgp4V2PeerEntry 7 }
+
+    os10bgp4V2PeerLocalIdentifier OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP Identifier of the local system for this peering
+             session.  It is REQUIRED that all os10bgp4V2PeerLocalIdentifier
+             values for the same os10bgp4V2PeerInstance be identical."
+        REFERENCE
+            "RFC 4271, Section 4.2, 'BGP Identifier'."
+        ::= { os10bgp4V2PeerEntry 8 }
+
+    os10bgp4V2PeerRemotePort OBJECT-TYPE
+        SYNTAX     InetPortNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The remote port for the TCP connection between the BGP
+             peers.
+
+             Note that the objects os10bgp4V2PeerLocalAddr,
+             os10bgp4V2PeerLocalPort, os10bgp4V2PeerRemoteAddr and
+             os10bgp4V2PeerRemotePort provide the appropriate reference to
+             the standard MIB TCP connection table, or even the ipv6
+             TCP MIB as in RFC 4022."
+        REFERENCE
+            "RFC 2012 - SNMPv2 Management Information Base for the
+             Transmission Control Protocol using SMIv2.
+             RFC 4022 - IP Version 6 Management Information Base
+             for the Transmission Control Protocol."
+        ::= { os10bgp4V2PeerEntry 9 }
+
+    os10bgp4V2PeerRemoteAs OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The remote autonomous system number received in the BGP
+             OPEN message."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { os10bgp4V2PeerEntry 10 }
+
+    os10bgp4V2PeerRemoteIdentifier OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP Identifier of this entry's remote BGP peer.
+
+             This entry should be 0.0.0.0 unless the
+             os10bgp4V2PeerState is in the openconfirm or the
+             established state."
+        REFERENCE
+            "RFC 4271, Section 4.2, 'BGP Identifier'."
+        ::= { os10bgp4V2PeerEntry 11 }
+
+    os10bgp4V2PeerAdminStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+            halted(1),
+            running(2)
+        }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Whether or not the BGP FSM for this remote peer is
+             halted or running. The BGP FSM for a remote peer is
+             halted after processing a Stop event. Likewise, it is
+             in the running state after a Start event.
+
+             The os10bgp4V2PeerState will generally be in the idle state
+             when the FSM is halted, although some extensions such
+             as Graceful Restart will leave the peer in the Idle
+             state but with the FSM running."
+        REFERENCE
+            "RFC 4271, Section 8.1.2."
+        ::= { os10bgp4V2PeerEntry 12 }
+
+    os10bgp4V2PeerState OBJECT-TYPE
+        SYNTAX     INTEGER {
+            idle(1),
+            connect(2),
+            active(3),
+            opensent(4),
+            openconfirm(5),
+            established(6)
+        }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The BGP peer connection state."
+        REFERENCE
+            "RFC 4271, Section 8.2.2."
+        ::= { os10bgp4V2PeerEntry 13 }
+
+
+    os10bgp4V2PeerDescription OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A user configured description identifying this peer.  When
+             this object is not the empty string, this object SHOULD
+             contain a description that is unique within a given BGP
+             instance for this peer."
+        ::= { os10bgp4V2PeerEntry 14 }
+
+
+    --
+    -- Per-peer error management information.
+    --
+
+    os10bgp4V2PeerErrorsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerErrorsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "On a per-peer basis, this table reflects the last
+             protocol-defined error encountered and reported on
+             the peer session."
+        ::= { os10bgp4V2Objects 3 }
+
+    os10bgp4V2PeerErrorsEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerErrorsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains information about errors sent
+             and received for a particular BGP peer."
+        AUGMENTS {
+            os10bgp4V2PeerEntry
+        }
+        ::= { os10bgp4V2PeerErrorsTable 1 }
+
+    Os10Bgp4V2PeerErrorsEntry ::= SEQUENCE {
+        os10bgp4V2PeerLastErrorCodeReceived
+            Unsigned32,
+        os10bgp4V2PeerLastErrorSubCodeReceived
+            Unsigned32,
+        os10bgp4V2PeerLastErrorReceivedTime
+            TimeStamp,
+        os10bgp4V2PeerLastErrorReceivedText
+            SnmpAdminString,
+        os10bgp4V2PeerLastErrorReceivedData
+            OCTET STRING,
+        os10bgp4V2PeerLastErrorCodeSent
+            Unsigned32,
+        os10bgp4V2PeerLastErrorSubCodeSent
+            Unsigned32,
+        os10bgp4V2PeerLastErrorSentTime
+            TimeStamp,
+        os10bgp4V2PeerLastErrorSentText
+            SnmpAdminString,
+        os10bgp4V2PeerLastErrorSentData
+            OCTET STRING
+    }
+
+    os10bgp4V2PeerLastErrorCodeReceived OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code received from this peer via
+             NOTIFICATION message on this connection.  If no error has
+             occurred, this field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 1 }
+
+    os10bgp4V2PeerLastErrorSubCodeReceived OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last subcode received from this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 2 }
+
+    os10bgp4V2PeerLastErrorReceivedTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The timestamp that the last NOTIFICATION was received from
+             this peer."
+        REFERENCE
+            "RFC 4271, Section 4.5."
+        ::= { os10bgp4V2PeerErrorsEntry 3 }
+
+    os10bgp4V2PeerLastErrorReceivedText OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object contains an implementation specific
+             explanation of the error that was reported."
+        ::= { os10bgp4V2PeerErrorsEntry 4 }
+
+    os10bgp4V2PeerLastErrorReceivedData OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4075))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code's data seen by this peer.
+
+             Per RFC 2578, some implementations may have limitations
+             dealing with OCTET STRINGS larger than 255.  Thus, this
+             data may be truncated."
+        REFERENCE
+            "RFC 4271, Section 4.5,
+             RFC 2578, Section 7.1.2,
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 5 }
+
+    os10bgp4V2PeerLastErrorCodeSent OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code sent to this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 6 }
+
+    os10bgp4V2PeerLastErrorSubCodeSent OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last subcode sent to this peer via NOTIFICATION
+             message on this connection.  If no error has occurred, this
+             field is zero."
+        REFERENCE
+            "RFC 4271, Section 4.5.
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 7 }
+
+    os10bgp4V2PeerLastErrorSentTime OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The timestamp that the last NOTIFICATION was sent to
+             this peer."
+        REFERENCE
+            "RFC 4271, Section 4.5."
+        ::= { os10bgp4V2PeerErrorsEntry 8 }
+
+    os10bgp4V2PeerLastErrorSentText OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object contains an implementation specific
+             explanation of the error that is being reported."
+        ::= { os10bgp4V2PeerErrorsEntry 9 }
+
+    os10bgp4V2PeerLastErrorSentData OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4075))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The last error code's data sent to this peer.
+
+             Per RFC 2578, some implementations may have limitations
+             dealing with OCTET STRINGS larger than 255.  Thus, this
+             data may be truncated."
+        REFERENCE
+            "RFC 4271, Section 4.5,
+             RFC 2578, Section 7.1.2
+             RFC 4486 optionally supported.
+             RFC 3362, Section 5 optionally supported."
+        ::= { os10bgp4V2PeerErrorsEntry 10 }
+
+
+    --
+    -- Per-peer Event Times
+    --
+
+    os10bgp4V2PeerEventTimesTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerEventTimesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table reporting the per-peering session amount
+             of time elapsed and update events since the peering
+             session advanced into the established state."
+        ::= { os10bgp4V2Objects 4 }
+
+    os10bgp4V2PeerEventTimesEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerEventTimesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each row contains a set of statistics about time
+             spent and events encountered in the peer session
+             established state."
+        AUGMENTS {
+            os10bgp4V2PeerEntry
+        }
+        ::= { os10bgp4V2PeerEventTimesTable 1 }
+
+    Os10Bgp4V2PeerEventTimesEntry ::= SEQUENCE {
+        os10bgp4V2PeerFsmEstablishedTime
+            Gauge32,
+        os10bgp4V2PeerInUpdatesElapsedTime
+            Gauge32
+    }
+
+    os10bgp4V2PeerFsmEstablishedTime OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This timer indicates how long (in seconds) this peer
+             has been in the established state or how long since this
+             peer was last in the established state.  It is set to
+             zero when a new peer is configured or when the router is
+             booted.  If the peer has never reached the established
+             state, the value remains zero."
+        REFERENCE
+            "RFC 4271, Section 8."
+        ::= { os10bgp4V2PeerEventTimesEntry 1 }
+
+    os10bgp4V2PeerInUpdatesElapsedTime OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Elapsed time (in seconds) since the last BGP UPDATE
+             message was received from the peer.  Each time
+             bgpPeerInUpdates is incremented, the value of this
+             object is set to zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 8.2.2, Established state."
+
+        ::= { os10bgp4V2PeerEventTimesEntry 2 }
+
+    --
+    -- Per-Peer Configured Timers
+    --
+
+    os10bgp4V2PeerConfiguredTimersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerConfiguredTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Per peer management data on BGP session timers."
+        ::= { os10bgp4V2Objects 5 }
+
+    os10bgp4V2PeerConfiguredTimersEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerConfiguredTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry corresponds to the current state of
+             BGP timers on a given peering session."
+        AUGMENTS {
+            os10bgp4V2PeerEntry
+        }
+        ::= { os10bgp4V2PeerConfiguredTimersTable 1 }
+
+    Os10Bgp4V2PeerConfiguredTimersEntry ::= SEQUENCE {
+        os10bgp4V2PeerConnectRetryInterval
+            Unsigned32,
+        os10bgp4V2PeerHoldTimeConfigured
+            Unsigned32,
+        os10bgp4V2PeerKeepAliveConfigured
+            Unsigned32,
+        os10bgp4V2PeerMinASOrigInterval
+            Unsigned32,
+        os10bgp4V2PeerMinRouteAdverInterval
+            Unsigned32
+    }
+
+    os10bgp4V2PeerConnectRetryInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the ConnectRetry timer.
+             The suggested value for this timer is 120 seconds."
+        REFERENCE
+            "RFC 4271, Section 8.2.2.  This is the value used
+             to initialize the 'ConnectRetryTimer'."
+        ::= { os10bgp4V2PeerConfiguredTimersEntry 1 }
+
+    os10bgp4V2PeerHoldTimeConfigured OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 3..65535 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the Hold Timer
+             established with the peer.  The value of this object is
+             calculated by this BGP speaker, using the smaller of the
+             values in bgpPeerHoldTimeConfigured and the Hold Time
+             received in the OPEN message.
+
+             This value must be at least three seconds if it is not
+             zero (0).
+
+             If the Hold Timer has not been established with the
+             peer this object MUST have a value of zero (0).
+
+             If the bgpPeerHoldTimeConfigured object has a value of
+             (0), then this object MUST have a value of (0)."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { os10bgp4V2PeerConfiguredTimersEntry 2 }
+
+    os10bgp4V2PeerKeepAliveConfigured OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 1..21845 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the KeepAlive timer
+             configured for this BGP speaker with this peer.  The
+             value of this object will only determine the KEEPALIVE
+             messages' frequency relative to the value specified in
+             bgpPeerHoldTimeConfigured; the actual time interval for
+             the KEEPALIVE messages is indicated by bgpPeerKeepAlive.
+
+             A reasonable maximum value for this timer would be one
+             third of that of bgpPeerHoldTimeConfigured.
+
+             If the value of this object is zero (0), no periodic
+             KEEPALIVE messages are sent to the peer after the BGP
+             connection has been established.  The suggested value
+             for this timer is 30 seconds."
+        REFERENCE
+            "RFC 4271, Section 4.4.
+             RFC 4271, Section 10."
+        ::= { os10bgp4V2PeerConfiguredTimersEntry 3 }
+
+    os10bgp4V2PeerMinASOrigInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the
+             MinASOriginationInterval timer.
+
+             The suggested value for this timer is 15 seconds."
+        REFERENCE
+            "RFC 4271, Section 9.2.1.2.
+             RFC 4271, Section 10."
+        ::= { os10bgp4V2PeerConfiguredTimersEntry 4 }
+
+    os10bgp4V2PeerMinRouteAdverInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..65535)
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval (in seconds) for the
+             MinRouteAdvertisementInterval timer.
+
+             The suggested value for this timer is 30 seconds for
+             EBGP connections and 5 seconds for IBGP connections."
+        REFERENCE
+            "RFC 4271, Section 9.2.1.1.
+             RFC 4271, Section 10."
+        ::= { os10bgp4V2PeerConfiguredTimersEntry 5 }
+
+    --
+    -- Per-Peer Negotiated Timers
+    --
+
+    os10bgp4V2PeerNegotiatedTimersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerNegotiatedTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Configured values of per-peer timers are seen
+             in the os10bgp4V2PeerConfiguredTimersTable.
+
+             Values in this table reflect the current
+             operational values, after negotiation from values
+             derived from initial configuration."
+        ::= { os10bgp4V2Objects 6 }
+
+    os10bgp4V2PeerNegotiatedTimersEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerNegotiatedTimersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry reflects a value of the currently
+             operational, negotiated timer as reflected in the
+             Os10Bgp4V2PeerNegotiatedTimersEntry."
+        AUGMENTS {
+            os10bgp4V2PeerEntry
+        }
+        ::= { os10bgp4V2PeerNegotiatedTimersTable 1 }
+
+    Os10Bgp4V2PeerNegotiatedTimersEntry ::= SEQUENCE {
+        os10bgp4V2PeerHoldTime
+            Unsigned32,
+        os10bgp4V2PeerKeepAlive
+            Unsigned32
+    }
+
+    os10bgp4V2PeerHoldTime OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 3..65535 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value of this object is calculated by this BGP
+             Speaker as being;
+
+             zero (0) - if this was the value sent by the peer and
+             this value is permitted by this BGP Speaker. In this
+             case, no keepalive messages are sent and the Hold Timer
+             is not set.
+
+             At least three (3). This value is the smaller of
+             the value sent by this peer in the OPEN message and
+             os10bgp4V2PeerHoldTimeConfigured for this peer.
+
+             If the peer is not in the established state, the value
+             of this object is zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.2."
+        ::= { os10bgp4V2PeerNegotiatedTimersEntry 1 }
+
+    os10bgp4V2PeerKeepAlive OBJECT-TYPE
+        SYNTAX     Unsigned32 ( 0 | 1..21845 )
+        UNITS      "seconds"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Time interval in seconds for the KeepAlive timer
+             established with the peer. The value of this object
+             is calculated by this BGP speaker such that, when
+             compared with os10bgp4V2PeerHoldTime, it has the same
+             proportion as what os10bgp4V2PeerKeepAliveConfigured has
+             when compared with os10bgp4V2PeerHoldTimeConfigured. If
+             the value of this object is zero (0), it indicates
+             that the KeepAlive timer has not been established
+             with the peer, or, the value of
+             os10bgp4V2PeerKeepAliveConfigured is zero (0).
+
+             If the peer is not in the established state, the value
+             of this object is zero (0)."
+        REFERENCE
+            "RFC 4271, Section 4.4."
+        ::= { os10bgp4V2PeerNegotiatedTimersEntry 2 }
+
+    --
+    -- Per-peer counters
+    --
+
+    os10bgp4V2PeerCountersTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PeerCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The counters associated with a BGP Peer."
+        ::= { os10bgp4V2Objects 7 }
+
+    os10bgp4V2PeerCountersEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PeerCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Each entry contains counters of message transmissions
+             and FSM transitions for a given BGP Peering session."
+        AUGMENTS {
+            os10bgp4V2PeerEntry
+        }
+        ::= { os10bgp4V2PeerCountersTable 1 }
+
+    Os10Bgp4V2PeerCountersEntry ::= SEQUENCE {
+        os10bgp4V2PeerInUpdates
+            Counter32,
+        os10bgp4V2PeerOutUpdates
+            Counter32,
+        os10bgp4V2PeerInTotalMessages
+            Counter32,
+        os10bgp4V2PeerOutTotalMessages
+            Counter32,
+        os10bgp4V2PeerFsmEstablishedTransitions
+            Counter32
+    }
+
+    os10bgp4V2PeerInUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of BGP UPDATE messages received on this
+             connection."
+        ::= { os10bgp4V2PeerCountersEntry 1 }
+
+    os10bgp4V2PeerOutUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of BGP UPDATE messages transmitted on this
+             connection."
+        ::= { os10bgp4V2PeerCountersEntry 2 }
+
+    os10bgp4V2PeerInTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of messages received from the remote
+             peer on this connection."
+        ::= { os10bgp4V2PeerCountersEntry 3 }
+
+    os10bgp4V2PeerOutTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of messages transmitted to the remote
+             peer on this connection."
+        ::= { os10bgp4V2PeerCountersEntry 4 }
+
+    os10bgp4V2PeerFsmEstablishedTransitions OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The total number of times the BGP FSM transitioned into
+             the established state for this peer."
+        ::= { os10bgp4V2PeerCountersEntry 5 }
+
+    --
+    -- Per-Peer Prefix Gauges
+    --
+
+    os10bgp4V2PrefixGaugesTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2PrefixGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Additional per-peer, per AFI-SAFI counters for
+             prefixes"
+        ::= { os10bgp4V2Objects 8 }
+
+    os10bgp4V2PrefixGaugesEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2PrefixGaugesEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Entry containing information about a bgp-peers prefix
+             counters."
+        INDEX {
+            os10bgp4V2PeerInstance,
+            os10bgp4V2PeerRemoteAddrType,
+            os10bgp4V2PeerRemoteAddr,
+            os10bgp4V2PrefixGaugesAfi,
+            os10bgp4V2PrefixGaugesSafi
+        }
+        ::= { os10bgp4V2PrefixGaugesTable 1 }
+
+    Os10Bgp4V2PrefixGaugesEntry ::= SEQUENCE {
+        os10bgp4V2PrefixGaugesAfi
+            Os10Bgp4V2AddressFamilyIdentifierTC,
+        os10bgp4V2PrefixGaugesSafi
+            Os10Bgp4V2SubsequentAddressFamilyIdentifierTC,
+        os10bgp4V2PrefixInPrefixes
+            Gauge32,
+        os10bgp4V2PrefixInPrefixesAccepted
+            Gauge32,
+        os10bgp4V2PrefixOutPrefixes
+            Gauge32
+    }
+
+    os10bgp4V2PrefixGaugesAfi OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2AddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The AFI index of the per-peer, per prefix counters"
+        ::= { os10bgp4V2PrefixGaugesEntry 1 }
+
+    os10bgp4V2PrefixGaugesSafi OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2SubsequentAddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The SAFI index of the per-peer, per prefix counters"
+        ::= { os10bgp4V2PrefixGaugesEntry 2 }
+
+    os10bgp4V2PrefixInPrefixes OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes received from a peer and are
+             stored in the Adj-Ribs-In for that peer.
+
+             Note that this number does not reflect prefixes that
+             have been discarded due to policy."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { os10bgp4V2PrefixGaugesEntry 3 }
+
+    os10bgp4V2PrefixInPrefixesAccepted OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in the Adj-Ribs-In and are eligible to become active
+             in the Loc-Rib."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { os10bgp4V2PrefixGaugesEntry 4 }
+
+    os10bgp4V2PrefixOutPrefixes OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of prefixes for a peer that are installed
+             in that peer's Adj-Ribs-Out."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { os10bgp4V2PrefixGaugesEntry 5 }
+
+    --
+    -- BGP NLRI
+    --
+
+    os10bgp4V2NlriTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2NlriEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The BGP-4 Received Path Attribute Table contains
+             information about paths to destination networks
+             received from all BGP4 peers. Collectively, this
+             represents the Adj-Ribs-In. The route where
+             os10bgp4V2NlriBest is true represents, for this NLRI,
+             the route that is installed in the LocRib from the
+             Adj-Ribs-In."
+        REFERENCE
+            "RFC 4271, Sections 3.2 and 9."
+        ::= { os10bgp4V2Objects 9 }
+
+    os10bgp4V2NlriEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2NlriEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Information about a path to a network."
+        INDEX {
+            os10bgp4V2PeerInstance,
+            os10bgp4V2NlriAfi,
+            os10bgp4V2NlriSafi,
+            os10bgp4V2NlriPrefixType,
+            os10bgp4V2NlriPrefix,
+            os10bgp4V2NlriPrefixLen,
+            os10bgp4V2PeerRemoteAddrType,
+            os10bgp4V2PeerRemoteAddr,
+            os10bgp4V2NlriIndex
+        }
+        ::= { os10bgp4V2NlriTable 1 }
+
+    Os10Bgp4V2NlriEntry ::= SEQUENCE {
+        os10bgp4V2NlriIndex
+            Unsigned32,
+        os10bgp4V2NlriAfi
+            Os10Bgp4V2AddressFamilyIdentifierTC,
+        os10bgp4V2NlriSafi
+            Os10Bgp4V2SubsequentAddressFamilyIdentifierTC,
+        os10bgp4V2NlriPrefixType
+             InetAddressType,
+        os10bgp4V2NlriPrefix
+            InetAddress,
+        os10bgp4V2NlriPrefixLen
+            InetAddressPrefixLength,
+        os10bgp4V2NlriBest
+            TruthValue,
+        os10bgp4V2NlriCalcLocalPref
+            Unsigned32,
+        os10bgp4V2NlriOrigin
+            INTEGER,
+        os10bgp4V2NlriNextHopAddrType
+            InetAddressType,
+        os10bgp4V2NlriNextHopAddr
+            InetAddress,
+        os10bgp4V2NlriLinkLocalNextHopAddrType
+            InetAddressType,
+        os10bgp4V2NlriLinkLocalNextHopAddr
+            InetAddress,
+        os10bgp4V2NlriLocalPrefPresent
+            TruthValue,
+        os10bgp4V2NlriLocalPref
+            Unsigned32,
+        os10bgp4V2NlriMedPresent
+            TruthValue,
+        os10bgp4V2NlriMed
+            Unsigned32,
+        os10bgp4V2NlriAtomicAggregate
+            TruthValue,
+        os10bgp4V2NlriAggregatorPresent
+            TruthValue,
+        os10bgp4V2NlriAggregatorAS
+            InetAutonomousSystemNumber,
+        os10bgp4V2NlriAggregatorAddr
+            Os10Bgp4V2IdentifierTC,
+        os10bgp4V2NlriAsPathCalcLength
+            Unsigned32,
+        os10bgp4V2NlriAsPathString
+            SnmpAdminString,
+        os10bgp4V2NlriAsPath
+            OCTET STRING,
+        os10bgp4V2NlriPathAttrUnknown
+            OCTET STRING
+    }
+
+    os10bgp4V2NlriIndex OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This index allows for multiple instances of a base
+             prefix for a certain AFI-SAFI from a given peer.
+             This is currently useful for two things:
+             1. Allowing for a peer in future implementations to
+                send more than a single route instance.
+             2. Allow for extensions which extend the NLRI field
+                to send the same prefix while utilizing other
+                extension specific information. An example of
+                this is RFC 3107 - Carrying MPLS labels in BGP."
+        REFERENCE
+            "RFC 3107 - Carrying Label Information in BGP-4."
+        ::= { os10bgp4V2NlriEntry 1 }
+
+    os10bgp4V2NlriAfi OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2AddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address family of the prefix for this NLRI.
+
+             Note that the AFI is not necessarily equivalent to
+             the an InetAddressType."
+        REFERENCE
+            "RFC 4760 - Multiprotocol Extensions for BGP-4"
+        ::= { os10bgp4V2NlriEntry 2 }
+
+    os10bgp4V2NlriSafi OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2SubsequentAddressFamilyIdentifierTC
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The subsequent address family of the prefix for
+             this NLRI"
+        REFERENCE
+            "RFC 4760 - Multiprotocol Extensions for BGP-4"
+        ::= { os10bgp4V2NlriEntry 3 }
+
+    os10bgp4V2NlriPrefixType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The type of the IP address prefix in the
+             Network Layer Reachability Information field.
+             The value of this object is derived from the
+             appropriate value from the os10bgp4V2NlriAfi field.
+             Where an appropriate InetAddressType is not
+             available, the value of the object must be
+             unknown(0)."
+        ::= { os10bgp4V2NlriEntry 4 }
+
+    os10bgp4V2NlriPrefix OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An IP address prefix in the Network Layer
+             Reachability Information field. This object
+             is an IP address containing the prefix with
+             length specified by os10bgp4V2NlriPrefixLen.
+             Any bits beyond the length specified by
+             os10bgp4V2NlriPrefixLen are zeroed.
+
+             An implementation is required to support IPv4
+             prefixes.  In this case, the object length
+             is (0..4).
+
+             An implementation MAY support IPv6 prefixes.
+             In this case, the object length is (0..16)"
+        REFERENCE
+            "RFC 4271, Section 4.3."
+        ::= { os10bgp4V2NlriEntry 5 }
+
+    os10bgp4V2NlriPrefixLen OBJECT-TYPE
+        SYNTAX     InetAddressPrefixLength
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Length in bits of the address prefix in
+             the Network Layer Reachability Information field."
+        ::= { os10bgp4V2NlriEntry 6 }
+
+    os10bgp4V2NlriBest OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "An indication of whether or not this route
+             was chosen as the best BGP4 route for this
+             destination."
+        REFERENCE
+            "RFC 4271, Section 9.1.2."
+        ::= { os10bgp4V2NlriEntry 7 }
+
+    os10bgp4V2NlriCalcLocalPref OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The degree of preference calculated by the
+             receiving BGP4 speaker for an advertised
+             route.
+
+             In the case where this prefix is ineligible, the
+             value of this object will be zero (0)."
+        REFERENCE
+            "RFC 4271, Section 9.1.1"
+        ::= { os10bgp4V2NlriEntry 8 }
+
+    os10bgp4V2NlriOrigin OBJECT-TYPE
+        SYNTAX     INTEGER {
+            igp(1),-- networks are interior
+            egp(2),-- networks learned via the EGP protocol
+            incomplete(3) -- networks that
+                          -- are learned by some other
+                          -- means
+            }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The ultimate origin of the path information."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.1."
+        ::= { os10bgp4V2NlriEntry 9 }
+
+    os10bgp4V2NlriNextHopAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address family of the address for
+             the border router that should be used
+             to access the destination network."
+        ::= { os10bgp4V2NlriEntry 10 }
+
+    os10bgp4V2NlriNextHopAddr OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(4..20))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address of the border router that
+             should be used to access the destination
+             network. This address is the nexthop
+             address received in the UPDATE packet associated with
+             this prefix.
+
+             Note that for RFC2545 style double nexthops,
+             this object will always contain the global scope
+             nexthop. bgpPathAttrLinkLocalNextHop will contain
+             the linklocal scope nexthop, if it is present.
+
+             In the case a mechanism is developed to use only a link
+             local nexthop, os10bgp4V2NlriNextHopAddr will contain the
+             link local nexthop."
+        REFERENCE
+            "RFC 4271, Section 4.3,
+             RFC 4271, Section 5.1.3,
+             RFC 2545, Section 3."
+        ::= { os10bgp4V2NlriEntry 11 }
+
+    os10bgp4V2NlriLinkLocalNextHopAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The address type for IPv6 link local addresses.
+             This is present only when receiving RFC 2545
+             style double nexthops.
+
+             This object is optionally present in BGP
+             implementations that do not support IPv6.
+
+             When no IPv6 link local nexthop is present, the value of
+             this object should be unknown(0)."
+        REFERENCE
+            "RFC 2545, Section 3."
+        ::= { os10bgp4V2NlriEntry 12 }
+
+    os10bgp4V2NlriLinkLocalNextHopAddr OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value contains an IPv6 link local address
+             and is present only when receiving RFC 2545 style
+             double nexthops.
+
+             This object is optionally present in BGP
+             implementations that do not support IPv6.
+
+             When no IPv6 link local nexthop is present, the length of
+             this object should be zero."
+        REFERENCE
+            "RFC 2545, Section 3."
+        ::= { os10bgp4V2NlriEntry 13 }
+
+    os10bgp4V2NlriLocalPrefPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the LOCAL_PREF value was sent in
+             the UPDATE message."
+        ::= { os10bgp4V2NlriEntry 14 }
+
+    os10bgp4V2NlriLocalPref OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The originating BGP4 speakers degree of preference for an
+             advertised route."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.5."
+        ::= { os10bgp4V2NlriEntry 15 }
+
+    os10bgp4V2NlriMedPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the MED value was sent in
+             the UPDATE message."
+        ::= { os10bgp4V2NlriEntry 16 }
+
+    os10bgp4V2NlriMed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This metric is used to discriminate between multiple
+             exit points to an adjacent autonomous system.  When the MED
+             value is absent but has a calculated default value, this
+             object will contain the calculated value."
+        REFERENCE
+            "RFC 4271, Section 4.3.
+             RFC 4271, Section 5.1.4."
+        ::= { os10bgp4V2NlriEntry 17 }
+
+    os10bgp4V2NlriAtomicAggregate OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the ATOMIC_AGGREGATE Path Attribute
+             is present and indicates that the NLRI MUST NOT be made
+             more specific."
+        REFERENCE
+            "RFC 4271, Sections 5.1.6 and 9.1.4."
+        ::= { os10bgp4V2NlriEntry 18 }
+
+    os10bgp4V2NlriAggregatorPresent OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value is true when the AGGREGATOR path attribute
+             was sent in the UPDATE message."
+        ::= { os10bgp4V2NlriEntry 19 }
+
+    os10bgp4V2NlriAggregatorAS OBJECT-TYPE
+        SYNTAX     InetAutonomousSystemNumber
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The AS number of the last BGP4 speaker that performed route
+             aggregation. When os10bgp4V2NlriAggregatorPresent is
+             false, the value of this object should be zero (0)."
+        REFERENCE
+            "RFC 4271, Section 5.1.7.
+             RFC 4271, Section 9.2.2.2."
+        ::= { os10bgp4V2NlriEntry 20 }
+
+    os10bgp4V2NlriAggregatorAddr OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2IdentifierTC
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The IP address of the last BGP4 speaker that performed
+             route aggregation.  When os10bgp4V2NlriAggregatorPresent is
+             false, the value of this object should be 0.0.0.0"
+        REFERENCE
+            "RFC 4271, Section 5.1.7.
+             RFC 4271, Section 9.2.2.2."
+        ::= { os10bgp4V2NlriEntry 21 }
+
+    os10bgp4V2NlriAsPathCalcLength OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This value represents the calculated length of the
+             AS Path according to the rules of the BGP
+             specification.  This value is used in route selection."
+        REFERENCE
+            "RFC 4271, Section 9.1.2.2.a"
+        ::= { os10bgp4V2NlriEntry 22 }
+
+    os10bgp4V2NlriAsPathString OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is a string depicting the autonomous system
+             path to this network which was received from the
+             peer which advertised it. The format of the string
+             is implementation-dependent, and should be designed
+             for operator readability.
+
+             Note that SnmpAdminString is only capable of representing a
+             maximum of 255 characters.  This may lead to the string
+             being truncated in the presence of a large AS Path.  It is
+             RECOMMENDED that when this object's contents will be
+             truncated that the final 3 octets be reserved for the
+             ellipses string, '...'.  os10bgp4V2NlriAsPath may give access
+             to the full AS Path."
+         ::= { os10bgp4V2NlriEntry 23 }
+
+    -- Maximum size of the following is derived as
+    -- 4096 max message size
+    -- - 16 BGP message marker bytes
+    -- - 2 BGP message size
+    -- - 1 BGP message type (UPDATE with unknown attr)
+    -- - 2 UPDATE routes length (even assuming no routes)
+    -- - 2 UPDATE path attributes length
+    -- - 1 path attribute flag octet
+    -- ---------
+    -- 4072 bytes maximum per-message attribute value data
+
+    os10bgp4V2NlriAsPath OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(2..4072))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "In order to provide a canonicalized form of the BGP-4
+             AS_PATH along with the human-readable
+             os10bgp4V2NlriAsPathString, which may be truncated, this object
+             contains the contents of the BGP-4 AS_PATH Path Attribute.
+             This object may be parsed using the rules defined for
+             Four-octet ASes as defined in RFC 4893.  RFC 4271, Section
+             4.3, 'Path Attributes: b) AS_PATH' as amended by RFC 5065,
+             Section 3 defines the general format of the AS_PATH path
+             attribute and its code points.
+
+             In brief, the AS_PATH is composed of a sequence of AS
+             Segments.  Each AS Segment is represented by a triple:
+             <path segment type, path segment length,
+             path segment value>.
+
+             The path segment type and path segment length fields are
+             one octet in length each.
+
+             The path segment type field may be one of:
+               1 - AS_SET (RFC 4721, Section 4.3)
+               2 - AS_SEQUENCE (RFC 4721, Section 4.3)
+               3 - AS_CONFED_SEQUENCE (RFC 3065, Section 5)
+               4 - AS_CONFED_SET (RFC 3065, Section 5)
+
+             The path segment length field contains the number of ASes
+             (not the number of octets) in the path segment value field.
+             The path segment value field contains one or more AS
+             numbers, each encoded as a 4-octet length field in network
+             byte order.
+
+             Note that since an SNMP agent may truncate this object to
+             less than its maximum theoretical length of 4072 octets
+             users of this object should be prepared to deal with a
+             truncated and thus malformed AS_PATH.  It is RECOMMENDED
+             that when such truncation would occur on the boundary of an
+             encoded AS that the partial AS be discarded from this
+             object and the object's size be adjusted accordingly.
+             Further, it is also RECOMMENDED that when such truncation,
+             either alone or in conjuction with the truncation of a
+             partially encoded AS described previously, would yield an
+             empty path segment value field that the path segment type
+             and path segment length components of the truncated AS_PATH
+             also be discarded and the object's size be adjusted
+             accordingly."
+         REFERENCE
+             "RFC 4271, Section 4.3.
+              RFC 5065, Section 5.
+              RFC 4893."
+         ::= { os10bgp4V2NlriEntry 24 }
+
+    os10bgp4V2NlriPathAttrUnknown OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..4072))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Path Attributes not understood by this implementation
+             SHOULD be be presented in this object.  Those Path
+             Attributes use the type, length, value encoding documented
+             in RFC 4271, Section 4.3, 'Path Attributes'.
+
+             Note that since an SNMP agent may truncate this object to
+             less than its maximum theoretical length of 4072 octets
+             users of this object should be prepared to deal with a
+             truncated and thus malformed Path Attribute."
+         REFERENCE
+             "RFC 4271, Section 4.3."
+         ::= { os10bgp4V2NlriEntry 25 }
+
+
+
+    --
+    -- Adj-Ribs-Out Table
+    --
+
+    os10bgp4V2AdjRibsOutTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Os10Bgp4V2AdjRibsOutEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table contains on a per-peer basis one or more
+             routes from the os10bgp4V2NlriTable that have been
+             placed in this peer's Adj-Ribs-Out."
+        REFERENCE
+            "RFC 4271, Section 3.2."
+        ::= { os10bgp4V2Objects 10 }
+
+    os10bgp4V2AdjRibsOutEntry OBJECT-TYPE
+        SYNTAX     Os10Bgp4V2AdjRibsOutEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "List of BGP routes that have been placed into a
+             peer's Adj-Ribs-Out."
+        INDEX {
+            os10bgp4V2PeerInstance,
+            os10bgp4V2NlriAfi,
+            os10bgp4V2NlriSafi,
+            os10bgp4V2NlriPrefixType,
+            os10bgp4V2NlriPrefix,
+            os10bgp4V2NlriPrefixLen,
+            os10bgp4V2PeerRemoteAddrType,
+            os10bgp4V2PeerRemoteAddr,
+            os10bgp4V2AdjRibsOutIndex
+        }
+        ::= { os10bgp4V2AdjRibsOutTable 1 }
+
+    Os10Bgp4V2AdjRibsOutEntry ::= SEQUENCE {
+        os10bgp4V2AdjRibsOutIndex
+            Unsigned32,
+        os10bgp4V2AdjRibsOutRoute
+            RowPointer
+    }
+
+    os10bgp4V2AdjRibsOutIndex OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..4294967295)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Certain extensions to BGP permit multiple instance of
+             a per afi, per safi prefix to be advertised to a peer.
+             This object allows the enumeration of them."
+        ::= { os10bgp4V2AdjRibsOutEntry 1 }
+
+		
+    os10bgp4V2AdjRibsOutRoute OBJECT-TYPE
+        SYNTAX     RowPointer
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object points to the route in the os10bgp4V2NlriTable
+             that corresponds to the entry in the peer's
+             Adj-Rib-Out. Outgoing route maps are not
+             reflected at this point as those are part of the
+             Update-Send process."
+        REFERENCE
+            "RFC 4271, Section 9.2."
+        ::= { os10bgp4V2AdjRibsOutEntry 2 }
+END

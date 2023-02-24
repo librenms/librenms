@@ -1,0 +1,332 @@
+-- =======================================================================
+-- Copyright (C) 2002-2004 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: User-interfaces management mib
+-- Reference:
+-- Version: V1.6
+-- History:
+--  V1.0 Initial version 2002-12-20
+--  V1.1 2004-10-12 updated by gaolong
+--       Remove hh3cVtyAccUserIndex, hh3cVtyAccConnway from hh3cUIMgtBasicGroup
+--       because they are not accessbile objects.
+--  V1.2 Updated by tanbo 02122, 2004-12-20
+--       Add hh3cConStatus for console re-authentication.
+--  V1.3 2005-01-03 updated by huguohua02576
+--       Modified hh3cVtyAccAclNum's attribute.
+--       Added rowstatus for hh3cVtyAccTable.
+--  V1.4 2005-08-15 updated by wangrui01736
+--       Add enumeration value linkinbound(3) for hh3cVtyAccConnway.
+--  V1.5 2006-11-03 updated by songhao02718
+--       Add enumeration value acl6inbound(11) and acl6outbound(12) for hh3cVtyAccConnway.
+--  V1.6 2007-12-12 updated by miaochunyan05345
+--       Add hh3cTerminalUserName, hh3cTerminalSource, hh3cTerminalUserAuthFailureReason,
+--       hh3cLogIn, hh3cLogOut and hh3cLogInAuthenFailure.
+-- =======================================================================
+HH3C-UI-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    RowStatus,DisplayString
+        FROM SNMPv2-TC
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI;
+
+
+hh3cUIMgt MODULE-IDENTITY
+    LAST-UPDATED "200404081405Z"            -- April 08, 2004 at 14:05 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "User interfaces management MIB"
+    ::= { hh3cCommon 2 }
+
+
+--
+-- Node definitions
+--
+
+hh3cUIMgtObjects OBJECT IDENTIFIER ::= { hh3cUIMgt 1 }
+
+hh3cUIBasicInfo OBJECT IDENTIFIER ::= { hh3cUIMgtObjects 1 }
+
+hh3cUIScalarObjects OBJECT IDENTIFIER ::= { hh3cUIBasicInfo 1 }
+
+hh3cUITrapBindObjects OBJECT IDENTIFIER ::= { hh3cUIBasicInfo 2 }
+
+hh3cTerminalUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "
+        It represents the name of the logging user when login with authentication,
+        otherwise login mode, such as Console, AUX, TTY, VTY etc.
+        "
+    ::= { hh3cUITrapBindObjects 1 }
+
+hh3cTerminalSource OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "
+        Login mode, such as Console, AUX, TTY, VTY etc.
+        "
+    ::= { hh3cUITrapBindObjects 2 }
+
+hh3cTerminalUserAuthFailureReason OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            exceedRetries(1),
+            authTimeout(2),
+            otherReason(3)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason why a user failed to log in."
+    ::= { hh3cUITrapBindObjects 3 }
+
+hh3cUINotifications OBJECT IDENTIFIER ::= { hh3cUIBasicInfo 3 }
+
+hh3cUINotificationsPrefix OBJECT IDENTIFIER ::= { hh3cUINotifications 0 }
+
+hh3cLogIn NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTerminalUserName,
+            hh3cTerminalSource
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        This notification is generated when a user logs in.
+        "
+    ::= { hh3cUINotificationsPrefix 1 }
+
+hh3cLogOut NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTerminalUserName,
+            hh3cTerminalSource
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        This notification is generated when a user logs out.
+        "
+    ::= { hh3cUINotificationsPrefix 2 }
+
+hh3cLogInAuthenFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTerminalUserName,
+            hh3cTerminalSource,
+            hh3cTerminalUserAuthFailureReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        This notification is generated when a user fails to log in
+        because of authentication.
+        "
+    ::= { hh3cUINotificationsPrefix 3 }
+
+hh3cVtyMan OBJECT IDENTIFIER ::= { hh3cUIMgtObjects 2 }
+
+-- hh3cVtyAccTable===============================================================
+hh3cVtyAccTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVtyAccEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Description."
+    ::= { hh3cVtyMan 1 }
+
+hh3cVtyAccEntry OBJECT-TYPE
+    SYNTAX      Hh3cVtyAccEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Description."
+    INDEX
+        {
+            hh3cVtyAccUserIndex,
+            hh3cVtyAccConnway
+        }
+    ::= { hh3cVtyAccTable 1 }
+
+Hh3cVtyAccEntry ::= SEQUENCE
+    {
+        hh3cVtyAccUserIndex         Integer32,
+        hh3cVtyAccConnway           INTEGER,
+        hh3cVtyAccAclNum            Integer32,
+        hh3cVtyAccEntryRowStatus    RowStatus
+    }
+
+hh3cVtyAccUserIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The relative index of the user interface of vty.
+        "
+    ::= { hh3cVtyAccEntry 1 }
+
+hh3cVtyAccConnway OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            inbound(1),
+            outbound(2),
+            linkinbound(3),
+            acl6inbound(11),
+            acl6outbound(12)
+        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        inbound(1):Filter login connections from current UI with ipv4 layer acl.
+        outbound(2):Filter logout connections from current UI with ipv4 layer acl.
+        linkinbound(3):Filter login connections from current UI with link layer acl.
+        acl6inbound(11):Filter login connections from current UI with ipv6 layer acl.
+        acl6outbound(12):Filter logout connections from current UI with ipv6 layer acl.
+        "
+    ::= { hh3cVtyAccEntry 2 }
+
+hh3cVtyAccAclNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The filter rule number of ACL.
+        "
+    ::= { hh3cVtyAccEntry 3 }
+
+hh3cVtyAccEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The status of this conceptual row. Now only support CreateAndGo and
+        Destroy and Active.
+        "
+    ::= { hh3cVtyAccEntry 4 }
+
+
+-- hh3cConStatus=================================================================
+hh3cConStatus OBJECT IDENTIFIER ::= { hh3cUIMgtObjects 3 }
+
+-- hh3cConStatusTable============================================================
+hh3cConStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cConStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The current status of CONSOLE user interface. A group of
+        attributes are used to describe the current status.
+        "
+    ::= { hh3cConStatus 1 }
+
+hh3cConStatusEntry OBJECT-TYPE
+    SYNTAX      Hh3cConStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        An entry of hh3cConStatusTable.
+        "
+    INDEX
+        {
+            hh3cConUserIndex
+        }
+    ::= { hh3cConStatusTable 1 }
+
+Hh3cConStatusEntry ::= SEQUENCE
+    {
+        hh3cConUserIndex    Integer32,
+        hh3cConReAuth       INTEGER
+    }
+
+hh3cConUserIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The index of the user interface of CONSOLE.
+        It's equal to current UserID.
+        "
+    ::= { hh3cConStatusEntry 1 }
+
+hh3cConReAuth OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            disable(1),
+            enable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        The re-authentication attribute of current user interface.
+        After disconnection of current user interface, connection
+        is rebuilt, at the moment
+        disable(1): re-authentication is not need.
+        enable(2): re-authentication is need.
+        "
+    ::= { hh3cConStatusEntry 2 }
+
+-- hh3cUIMgtMIBConformance18=====================================================
+hh3cUIMgtMIBConformance18 OBJECT IDENTIFIER ::= { hh3cUIMgt 2 }
+
+hh3cUIMgtMIBCompliances OBJECT IDENTIFIER ::= { hh3cUIMgtMIBConformance18 1 }
+
+hh3cUIMgtMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement"
+    MODULE -- this module
+    MANDATORY-GROUPS
+        {
+            hh3cUIMgtBasicGroup,
+            hh3cConStatusGroup
+        }
+    ::= { hh3cUIMgtMIBCompliances 1 }
+
+hh3cUIMgtManMIBGroups OBJECT IDENTIFIER ::= { hh3cUIMgtMIBConformance18 2 }
+
+hh3cUIMgtBasicGroup OBJECT-GROUP
+    OBJECTS
+        {
+            hh3cVtyAccAclNum
+        }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for a basic implement."
+    ::= { hh3cUIMgtManMIBGroups 1 }
+
+hh3cConStatusGroup OBJECT-GROUP
+    OBJECTS
+        {
+            hh3cConReAuth
+        }
+    STATUS      current
+    DESCRIPTION
+        "A collection of current user interface status."
+    ::= { hh3cUIMgtManMIBGroups 2 }
+
+END

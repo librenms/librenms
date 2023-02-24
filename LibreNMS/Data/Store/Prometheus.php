@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @copyright  2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,11 +26,12 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
-use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
-use Log;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
+use LibreNMS\Util\Proxy;
+use Log;
 
 class Prometheus extends BaseDatastore
 {
@@ -38,6 +39,7 @@ class Prometheus extends BaseDatastore
     private $base_uri;
     private $default_opts;
     private $enabled;
+    private $prefix;
 
     public function __construct(\GuzzleHttp\Client $client)
     {
@@ -47,11 +49,15 @@ class Prometheus extends BaseDatastore
         $url = Config::get('prometheus.url');
         $job = Config::get('prometheus.job', 'librenms');
         $this->base_uri = "$url/metrics/job/$job/instance/";
+        $this->prefix = Config::get('prometheus.prefix', '');
+        if ($this->prefix) {
+            $this->prefix = "$this->prefix" . '_';
+        }
 
         $this->default_opts = [
             'headers' => ['Content-Type' => 'text/plain'],
         ];
-        if ($proxy = get_proxy()) {
+        if ($proxy = Proxy::get($url)) {
             $this->default_opts['proxy'] = $proxy;
         }
 
@@ -72,30 +78,33 @@ class Prometheus extends BaseDatastore
     {
         $stat = Measurement::start('put');
         // skip if needed
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
         try {
-            $vals = "";
-            $promtags = "/measurement/" . $measurement;
+            $vals = '';
+            $promtags = '/measurement/' . $measurement;
 
             foreach ($fields as $k => $v) {
                 if ($v !== null) {
-                    $vals .= "$k $v\n";
+                    $vals .= $this->prefix . "$k $v\n";
                 }
             }
 
             foreach ($tags as $t => $v) {
                 if ($v !== null) {
-                    $promtags .= (Str::contains($v, "/") ? "/$t@base64/". base64_encode($v) : "/$t/$v");
+                    $promtags .= (Str::contains($v, '/') ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
                 }
             }
             $options = $this->getDefaultOptions();
             $options['body'] = $vals;
 
             $promurl = $this->base_uri . $device['hostname'] . $promtags;
-            $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
+            if (Config::get('prometheus.attach_sysname', false)) {
+                $promurl .= '/sysName/' . $device['sysName'];
+            }
+            $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 
             Log::debug("Prometheus put $promurl: ", [
                 'measurement' => $measurement,
@@ -112,7 +121,7 @@ class Prometheus extends BaseDatastore
                 Log::error('Prometheus Error: ' . $result->getReasonPhrase());
             }
         } catch (GuzzleException $e) {
-            Log::error("Prometheus Exception: " . $e->getMessage());
+            Log::error('Prometheus Exception: ' . $e->getMessage());
         }
     }
 
@@ -124,7 +133,7 @@ class Prometheus extends BaseDatastore
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

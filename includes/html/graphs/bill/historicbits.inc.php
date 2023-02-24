@@ -3,12 +3,12 @@
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 
-$bill_hist_id = mres($vars['bill_hist_id']);
-$reducefactor = mres($vars['reducefactor']);
+$bill_hist_id = $vars['bill_hist_id'];
+$reducefactor = $vars['reducefactor'];
 
 if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
-        $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($bill_id, $bill_hist_id));
+        $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);
         $dur = $extents['to'] - $extents['from'];
         $reducefactor = round(($dur / 300 / (($vars['height'] - 100) * 3)), 0);
 
@@ -33,7 +33,7 @@ if (is_numeric($bill_hist_id)) {
 // print_r(json_encode($graph_data));
 // exit();
 
-$n    = count($graph_data['ticks']);
+$n = count($graph_data['ticks']);
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][($n - 1)];
 
@@ -57,7 +57,7 @@ function InvertCallback($x)
 
 function YCallback($y)
 {
-    return format_si($y, 2, 0);
+    return \LibreNMS\Util\Number::formatSi($y, 2, 0, '');
 }
 
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
@@ -98,7 +98,6 @@ $graph->xgrid->Show(true, true);
 $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 $graph->ygrid->SetFill(true, '#EFEFEF@0.5', '#FFFFFF@0.5');
 
-
 // Graph Series
 $lineplot = new LinePlot($graph_data['tot_data'], $graph_data['ticks']);
 $lineplot->SetLegend('Traffic total');
@@ -118,10 +117,10 @@ $lineplot_out->SetFillColor('lightblue@0.4');
 $lineplot_out->SetWeight(1);
 
 if (strtolower($graph_data['bill_type']) == 'cdr') {
-    $lineplot_95th = new LinePlot(array($graph_data['rate_95th'], $graph_data['rate_95th']), array($xmin, $xmax));
+    $lineplot_95th = new LinePlot([$graph_data['rate_95th'], $graph_data['rate_95th']], [$xmin, $xmax]);
     $lineplot_95th->SetColor('red');
 } elseif (strtolower($graph_data['bill_type']) == 'quota') {
-    $lineplot_ave = new LinePlot(array($graph_data['rate_average'], $graph_data['rate_average']), array($xmin, $xmax));
+    $lineplot_ave = new LinePlot([$graph_data['rate_average'], $graph_data['rate_average']], [$xmin, $xmax]);
     $lineplot_ave->SetColor('red');
 }
 

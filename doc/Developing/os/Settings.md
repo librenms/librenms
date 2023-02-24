@@ -1,6 +1,3 @@
-source: os/Settings.md
-path: blob/master/doc/
-
 # Optional OS Settings
 
 This page documents settings that can be set in the os yaml files or
@@ -31,6 +28,12 @@ $config['os']['vrp']['disabled_sensors']['current'] = true;
 
 ```php
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
+```
+
+- Filter all 'power' sensors with description matching regexp ```'/ Power [TR]x /'``` for Operating System iosxr.
+
+```php
+$config['os']['iosxr']['disabled_sensors_regex']['power'][] = '/ Power [TR]x /';
 ```
 
 - Ignore all temperature sensors
@@ -93,6 +96,10 @@ per-device in the webui and per os or globally in config.php. Usually,
 a poller module will not work if it's corresponding discovery module
 is not enabled.
 
+You should avoid setting these to false in the OS definitions unless it has a
+significant negative impact on polling.  Setting modules in the definition
+reduces user control of modules.
+
 ```yaml
 poller_modules:
     bgp-peers: true
@@ -106,10 +113,19 @@ discovery_modules:
 
 Some devices have buggy snmp implementations and don't respond well to
 the more efficient snmpbulkwalk. To disable snmpbulkwalk and only use
-snmpwalk for an os set the following.
+snmpwalk for an OS set the following.
 
 ```yaml
-nobulk: true
+snmp_bulk: false
+```
+
+If only some specific OIDs fail with snmpbulkwalk. You can disable just those OIDs.
+This needs to match exactly the OID being walked by LibreNMS. MIB::oid is preferred to prevent name collisions.
+
+```yaml
+oids:
+    no_bulk:
+        - UCD-SNMP-MIB::laLoadInt
 ```
 
 #### Limit the oids per snmpget

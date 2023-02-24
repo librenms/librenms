@@ -1,0 +1,725 @@
+-- *****************************************************************
+-- AE-TC.mib: CALIX Active Ethernet ONT Textual Conventions
+--
+-- Calix confidential and proprietary.
+--
+-- Copyright (c) 2008 Calix Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+AE-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    Gauge32
+        FROM SNMPv2-SMI
+    ;
+
+AeEquipmentType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The physical equipment of an ONT, from the ONT
+         itself to the user side interface ports it contains."
+    SYNTAX      INTEGER {
+                    ont(1),
+                    ethernet(2),
+                    pots(3),
+                    video(4),
+                    t1e1(5),
+                    rfReturn(6),
+                    wan(7),
+                    iphost(8)
+                    }
+
+AeEquipmentInstance ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance of the physical equipment the alarm is assocaited with.
+         The ONT itself is always instance 0. The port type equipment ave
+         values from 1 to however may ports are present on the ONT"
+    SYNTAX      INTEGER (0..24)
+
+AeAlarmType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of the ONT alarm abstracted from a particular
+         piece of equipment. The value eventOnly(1) is special as
+         it indicates the trap as a simple event, not tied to
+         a specific alarm."
+    SYNTAX      INTEGER {
+                    eventOnly(1),
+                    onBattery(2),
+                    badBattery(3),
+                    missingBattery(4),
+                    laserEOL(5),
+                    lowSigLevel(6),
+                    linkDownPort1(7),
+                    mgmtDhcpRenewal(8),
+                    firmwareUpgradeFail(9),
+                    timeUpdateFail(10),
+                    voipDhcpRenewal(11),
+                    voipRegistration(12),
+                    voipRegAuth(13),
+                    linkDownPort2(14),
+                    linkDownPort3(15),
+                    linkDownPort4(16),
+                    linkDownPort5(17),
+                    linkDownPort6(18),
+                    linkDownPort7(19),
+                    linkDownPort8(20),
+                    voipConfigTftpFail(21),
+                    upsMissing(22),
+                    lowBattery(23),
+                    ontT1E1HardwareFail(24),
+                    tdmPort1LOS(25),             -- local T1/E1 Loss of Signal (transmitting L-bit)
+                    tdmPort1AIS(26),             -- local T1/E1 Alarm Indication Signal
+                    tdmPort1Loopback(27),        -- local T1/E1 Loopback
+                    tdmPort1Powerdown(28),       -- local T1/E1 Power Conservation
+                    tdmPort1PWE3LOS(29),        -- local PWE3 Loss of Signal (packet loss; transmitting R-bit)
+                    tdmPort1PWE3FELOS(30),     -- remote PWE3 Loss of Signal (receiving R-bit)
+                    tdmPort1FELOS(31),          -- remote T1/E1 Loss of Signal (receiving L-bit)
+                    tdmPort1PWE3Malformed(32),  -- packet size mismatch between local and remote PWE3
+                    tdmPort1PWE3Mismatch(33),   -- PWE3 provisioning mismatch
+                    tdmPort2LOS(34),
+                    tdmPort2AIS(35),
+                    tdmPort2Loopback(36),
+                    tdmPort2Powerdown(37),
+                    tdmPort2PWE3LOS(38),
+                    tdmPort2PWE3FELOS(39),
+                    tdmPort2FELOS(40),
+                    tdmPort2PWE3Malformed(41),
+                    tdmPort2PWE3Mismatch(42),
+                    tdmPort3LOS(43),
+                    tdmPort3AIS(44),
+                    tdmPort3Loopback(45),
+                    tdmPort3Powerdown(46),
+                    tdmPort3PWE3LOS(47),
+                    tdmPort3PWE3FELOS(48),
+                    tdmPort3FELOS(49),
+                    tdmPort3PWE3Malformed(50),
+                    tdmPort3PWE3Mismatch(51),
+                    tdmPort4LOS(52),
+                    tdmPort4AIS(53),
+                    tdmPort4Loopback(54),
+                    tdmPort4Powerdown(55),
+                    tdmPort4PWE3LOS(56),
+                    tdmPort4PWE3FELOS(57),
+                    tdmPort4FELOS(58),
+                    tdmPort4PWE3Malformed(59),
+                    tdmPort4PWE3Mismatch(60),
+                    tdmPort5LOS(61),
+                    tdmPort5AIS(62),
+                    tdmPort5Loopback(63),
+                    tdmPort5Powerdown(64),
+                    tdmPort5PWE3LOS(65),
+                    tdmPort5PWE3FELOS(66),
+                    tdmPort5FELOS(67),
+                    tdmPort5PWE3Malformed(68),
+                    tdmPort5PWE3Mismatch(69),
+                    tdmPort6LOS(70),
+                    tdmPort6AIS(71),
+                    tdmPort6Loopback(72),
+                    tdmPort6Powerdown(73),
+                    tdmPort6PWE3LOS(74),
+                    tdmPort6PWE3FELOS(75),
+                    tdmPort6FELOS(76),
+                    tdmPort6PWE3Malformed(77),
+                    tdmPort6PWE3Mismatch(78),
+                    tdmPort7LOS(79),
+                    tdmPort7AIS(80),
+                    tdmPort7Loopback(81),
+                    tdmPort7Powerdown(82),
+                    tdmPort7PWE3LOS(83),
+                    tdmPort7PWE3FELOS(84),
+                    tdmPort7FELOS(85),
+                    tdmPort7PWE3Malformed(86),
+                    tdmPort7PWE3Mismatch(87),
+                    tdmPort8LOS(88),
+                    tdmPort8AIS(89),
+                    tdmPort8Loopback(90),
+                    tdmPort8Powerdown(91),
+                    tdmPort8PWE3LOS(92),
+                    tdmPort8PWE3FELOS(93),
+                    tdmPort8FELOS(94),
+                    tdmPort8PWE3Malformed(95),
+                    tdmPort8PWE3Mismatch(96),
+                    configFileCommandError(97),
+                    configFileMicError(98),
+                    cachedConfigFileInUse(99),
+                    cachedVoipConfigInUse(100),
+                    mep1NeMaxLoss(101),
+                    mep1NeAvgLoss(102),
+                    mep1FeMaxLoss(103),
+                    mep1FeAvgLoss(104),
+                    mep1MaxDM(105),
+                    mep1AvgDM(106),
+                    mep1MaxDMVar(107),
+                    mep1AvgDMVar(108),
+                    mep1CcmLoc(109),
+                    mep1CcmMac(110),
+                    mep1CcmMeg(111),
+                    mep1CcmMep(112),
+                    mep1CcmPeriod(113),
+                    mep1CcmRdi(114),
+                    mep2NeMaxLoss(115),
+                    mep2NeAvgLoss(116),
+                    mep2FeMaxLoss(117),
+                    mep2FeAvgLoss(118),
+                    mep2MaxDM(119),
+                    mep2AvgDM(120),
+                    mep2MaxDMVar(121),
+                    mep2AvgDMVar(122),
+                    mep2CcmLoc(123),
+                    mep2CcmMac(124),
+                    mep2CcmMeg(125),
+                    mep2CcmMep(126),
+                    mep2CcmPeriod(127),
+                    mep2CcmRdi(128),
+                    mep3NeMaxLoss(129),
+                    mep3NeAvgLoss(130),
+                    mep3FeMaxLoss(131),
+                    mep3FeAvgLoss(132),
+                    mep3MaxDM(133),
+                    mep3AvgDM(134),
+                    mep3MaxDMVar(135),
+                    mep3AvgDMVar(136),
+                    mep3CcmLoc(137),
+                    mep3CcmMac(138),
+                    mep3CcmMeg(139),
+                    mep3CcmMep(140),
+                    mep3CcmPeriod(141),
+                    mep3CcmRdi(142),
+                    mep4NeMaxLoss(143),
+                    mep4NeAvgLoss(144),
+                    mep4FeMaxLoss(145),
+                    mep4FeAvgLoss(146),
+                    mep4MaxDM(147),
+                    mep4AvgDM(148),
+                    mep4MaxDMVar(149),
+                    mep4AvgDMVar(150),
+                    mep4CcmLoc(151),
+                    mep4CcmMac(152),
+                    mep4CcmMeg(153),
+                    mep4CcmMep(154),
+                    mep4CcmPeriod(155),
+                    mep4CcmRdi(156),
+                    mep5NeMaxLoss(157),
+                    mep5NeAvgLoss(158),
+                    mep5FeMaxLoss(159),
+                    mep5FeAvgLoss(160),
+                    mep5MaxDM(161),
+                    mep5AvgDM(162),
+                    mep5MaxDMVar(163),
+                    mep5AvgDMVar(164),
+                    mep5CcmLoc(165),
+                    mep5CcmMac(166),
+                    mep5CcmMeg(167),
+                    mep5CcmMep(168),
+                    mep5CcmPeriod(169),
+                    mep5CcmRdi(170),
+                    mep6NeMaxLoss(171),
+                    mep6NeAvgLoss(172),
+                    mep6FeMaxLoss(173),
+                    mep6FeAvgLoss(174),
+                    mep6MaxDM(175),
+                    mep6AvgDM(176),
+                    mep6MaxDMVar(177),
+                    mep6AvgDMVar(178),
+                    mep6CcmLoc(179),
+                    mep6CcmMac(180),
+                    mep6CcmMeg(181),
+                    mep6CcmMep(182),
+                    mep6CcmPeriod(183),
+                    mep6CcmRdi(184),
+                    mep7NeMaxLoss(185),
+                    mep7NeAvgLoss(186),
+                    mep7FeMaxLoss(187),
+                    mep7FeAvgLoss(188),
+                    mep7MaxDM(189),
+                    mep7AvgDM(190),
+                    mep7MaxDMVar(191),
+                    mep7AvgDMVar(192),
+                    mep7CcmLoc(193),
+                    mep7CcmMac(194),
+                    mep7CcmMeg(195),
+                    mep7CcmMep(196),
+                    mep7CcmPeriod(197),
+                    mep7CcmRdi(198),
+                    mep8NeMaxLoss(199),
+                    mep8NeAvgLoss(200),
+                    mep8FeMaxLoss(201),
+                    mep8FeAvgLoss(202),
+                    mep8MaxDM(203),
+                    mep8AvgDM(204),
+                    mep8MaxDMVar(205),
+                    mep8AvgDMVar(206),
+                    mep8CcmLoc(207),
+                    mep8CcmMac(208),
+                    mep8CcmMeg(209),
+                    mep8CcmMep(210),
+                    mep8CcmPeriod(211),
+                    mep8CcmRdi(212),
+                    mep9NeMaxLoss(213),
+                    mep9NeAvgLoss(214),
+                    mep9FeMaxLoss(215),
+                    mep9FeAvgLoss(216),
+                    mep9MaxDM(217),
+                    mep9AvgDM(218),
+                    mep9MaxDMVar(219),
+                    mep9AvgDMVar(220),
+                    mep9CcmLoc(221),
+                    mep9CcmMac(222),
+                    mep9CcmMeg(223),
+                    mep9CcmMep(224),
+                    mep9CcmPeriod(225),
+                    mep9CcmRdi(226),
+                    mep10NeMaxLoss(227),
+                    mep10NeAvgLoss(228),
+                    mep10FeMaxLoss(229),
+                    mep10FeAvgLoss(230),
+                    mep10MaxDM(231),
+                    mep10AvgDM(232),
+                    mep10MaxDMVar(233),
+                    mep10AvgDMVar(234),
+                    mep10CcmLoc(235),
+                    mep10CcmMac(236),
+                    mep10CcmMeg(237),
+                    mep10CcmMep(238),
+                    mep10CcmPeriod(239),
+                    mep10CcmRdi(240),
+                    rfc2544SvcAff(241),
+                    rxLinkFltEth1(242),
+                    rxLinkFltEth2(243),
+                    rxLinkFltEth3(244),
+                    rxLinkFltEth4(245),
+                    rxLinkFltEth5(246),
+                    rxLinkFltEth6(247),
+                    rxLinkFltEth7(248),
+                    rxLinkFltEth8(249),
+                    rxLinkFltWan1(250),
+                    rxLinkFltWan2(251),
+                    rxDyingGaspEth1(252),
+                    rxDyingGaspEth2(253),
+                    rxDyingGaspEth3(254),
+                    rxDyingGaspEth4(255),
+                    rxDyingGaspEth5(256),
+                    rxDyingGaspEth6(257),
+                    rxDyingGaspEth7(258),
+                    rxDyingGaspEth8(259),
+                    rxDyingGaspWan1(260),
+                    rxDyingGaspWan2(261),
+                    rxCritEventEth1(262),
+                    rxCritEventEth2(263),
+                    rxCritEventEth3(264),
+                    rxCritEventEth4(265),
+                    rxCritEventEth5(266),
+                    rxCritEventEth6(267),
+                    rxCritEventEth7(268),
+                    rxCritEventEth8(269),
+                    rxCritEventWan1(270),
+                    rxCritEventWan2(271),
+                    loamOperDownEth1(272),
+                    loamOperDownEth2(273),
+                    loamOperDownEth3(274),
+                    loamOperDownEth4(275),
+                    loamOperDownEth5(276),
+                    loamOperDownEth6(277),
+                    loamOperDownEth7(278),
+                    loamOperDownEth8(279),
+                    loamOperDownWan1(280),
+                    loamOperDownWan2(281),
+                    sipCfgFileRetrieve(282),
+                    sipCfgFileInvalid(283)
+                    }
+
+AeCondStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The status of the ONT alarm - on/off"
+    SYNTAX      INTEGER {
+                    on(1),
+                    off(2)
+                    }
+AeCondSeverityLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The severity level of the ONT Alarm"
+    SYNTAX      INTEGER {
+                    critical(1),
+                    major(2),
+                    minor(3),
+                    warning(4),
+                    info(5),
+                    unknown(6),
+                    clear(7) -- used when aeAlarmStatus is off(2)
+                    }
+
+AeCondServiceAffecting ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value indicated whether this alarm is service affecting or not"
+    SYNTAX      INTEGER {
+                    yes(1),
+                    no(2)
+                    }
+
+AeBriefText ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "40a"
+    STATUS      current
+    DESCRIPTION
+        "generic text field of moderate size"
+    SYNTAX      OCTET STRING (SIZE (0..40))
+
+AeText ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128a"
+    STATUS      current
+    DESCRIPTION
+        "generic text field"
+    SYNTAX      OCTET STRING (SIZE (0..128))
+
+AeTime ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "UTC time integer of the ONT Alarm."
+    SYNTAX      Integer32
+
+AeFsanSerialNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The FSAN Serial Number of the ONT expressed as 4 charaters and 8 hex digits."
+    SYNTAX      OCTET STRING (SIZE(12))
+
+AeMfgSerialNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16a"
+    STATUS      current
+    DESCRIPTION
+        "The MFG Serial Number of the ONT expressed as decimal digits."
+    SYNTAX      OCTET STRING (SIZE(16))
+
+AeRegistrationID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "10a"
+    STATUS      current
+    DESCRIPTION
+        "The Registration ID of the ONT expressed as max 10 char numerical string."
+    SYNTAX      OCTET STRING (SIZE(0..10))
+
+AeOntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "State of ONT SNMP provisioning
+           booting(1)      -- ONT initializing and not yet provisioned, SNMP agent not
+                              fully operational
+           unregistered(2) -- SNMP agent operational, ONT not yet registered by CMS
+           registered(3)   -- SNMP agent operational, ONT has been registered by CMS"
+    SYNTAX      INTEGER {
+                    booting(1),
+                    unregistered(2),
+                    registered(3)
+                }
+
+AeSnmpVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "SNMP Version"
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    v2c(2),
+                    v3(3)
+                }
+
+AeOntModelNum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8a"
+    STATUS      current
+    DESCRIPTION
+        "The model number of the ONT."
+    SYNTAX      OCTET STRING (SIZE(1..8))
+
+AeOntFirmwareVersion ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "20a"
+    STATUS      current
+    DESCRIPTION
+        "The Firmware version of the ONT"
+    SYNTAX      OCTET STRING (SIZE(1..20))
+
+AeOntRegistrationPeriod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The time period (in seconds) between the sending of recurring ONT
+         registraion SNMP traps. (0 to disable)"
+    SYNTAX      INTEGER (0..3600)
+
+AeDeviceClass ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8a"
+    STATUS      current
+    DESCRIPTION
+        "Device class (ONT)"
+    SYNTAX      OCTET STRING (SIZE(1..8))
+
+AeConfigMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ONT configuration method, i.e. config file, TR69, SNMP, etc"
+    SYNTAX      INTEGER {
+                    file(1),
+                    snmp(2),
+                    tr69(3),
+                    dynfile(4)
+                    }
+
+AeConfigFilename ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "80a"
+    STATUS      current
+    DESCRIPTION
+        "ONT configuration filename in used"
+    SYNTAX      OCTET STRING (SIZE(0..80))
+
+AeConfigFileMarker ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "80a"
+    STATUS      current
+    DESCRIPTION
+        "ONT configuration filename marker"
+    SYNTAX      OCTET STRING (SIZE(0..80))
+
+AeConfigMIC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ONT configuration file MIC"
+    SYNTAX      OCTET STRING (SIZE(16))
+
+AeDeviceStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Device status, i.e., acquired IP address, configured with ONT specific
+                 file, generic file, cached file, etc"
+    SYNTAX      INTEGER {
+                    acquiredIp(1),
+                    specificFile(2),
+                    genericFile(3),
+                    cachedFile(4)
+                    }
+
+AeConfigStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Configuration status, i.e., no errors, configured with errors, not configured"
+    SYNTAX      INTEGER {
+                    notConfigured(1),
+                    manufacturing(2),
+                    noErrors(3),
+                    withErrors(4)
+                    }
+
+AePwe3AggInstance ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance for the PWE3 aggregate interface. This is the Ethernet
+         interface for the PWE3 subsystem. The ONT only supports a single
+         instance of this interface."
+    SYNTAX      INTEGER (1..1)
+
+AePwe3T1Instance ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance for the PWE3 T1 port."
+    SYNTAX      INTEGER (1..8)
+
+AePwe3BundleInstance ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance for the PWE3 T1 bundle (packet stream). Initially, there
+         is only a single bundle per T1 port (SAToP)."
+    SYNTAX      INTEGER (0..4095)
+
+PerfCurrentCount ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      Gauge32
+
+PerfInvalidFlag ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the PM data valid."
+    SYNTAX      INTEGER {
+                     invalid(0),
+                     ok(1),
+                     pending(2)
+                }
+
+AeThresholdCrossingIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This represents the index into the threshold crossing table.
+
+         Note that the threshold crossing table is not currently implemented."
+    SYNTAX      INTEGER(1..64)
+
+AeThresholdCrossingPointer ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This represents the index into the threshold crossing table.
+         A value of zero is invalid and indicates threshold crossings
+         are not used.
+
+         Note that the threshold crossing table is not currently implemented."
+    SYNTAX      INTEGER(0..64)
+
+----------------------------------------------------------------------
+-- Voice (VoIP/SIP) related items
+--		may copied from OMCI-TC.mib and MUST share the same SYNTAX
+----------------------------------------------------------------------
+
+AeVoiceSvcIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Uniquely identifies a Voice (VoIP/SIP) service instance on the ONT.
+         Same as the POTS Port number because only one Voice Service can be
+         applied to a POTS Port. Historically there have been as many as 20
+         POTS Ports per Calix ONT."
+    SYNTAX      INTEGER (1..20)
+
+AeVoipCfgState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VoIP service status of the ONT VoIP Service"
+    SYNTAX      INTEGER {
+                    inactive(0),
+                    active(1),
+                    initializing(2),
+                    fault(3),
+                    reserved1(4),
+                    reserved2(5),
+                    reserved3(6),
+                    reserved4(7),
+                    reserved5(8),
+                    reserved6(9),
+                    reserved7(10),
+                    reserved8(11),
+                    reserved9(12),
+                    reserved10(13),
+                    reserved11(14),
+                    reserved12(15),
+                    mac(16),
+                    presence(17),
+                    nohost(18),
+                    static(19),
+                    dhcpconfig(20),
+                    dhcpacquire(21),
+                    configpend(22),
+                    tftpfail(23),
+                    tftpfilenotfound(24),
+                    proxyfail(25),
+		    running(26),
+		    enabled(27),
+		    assnconnected(28),
+		    disabled(29),
+		    assndisconnected(30)
+                }
+
+AeVoipServerStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates the VoIP Server Status of the VoIP service on
+         a Voice Port."
+    SYNTAX      INTEGER {
+                    none(0),
+                    registered(1),
+                    insession(2),
+                    failregicmp(3),
+                    failregtcp(4),
+                    failregauth(5),
+                    failregtimeout(6),
+                    failregserver(7),
+                    failinviteicmp(8),
+                    failinvitetcp(9),
+                    failinviteauth(10),
+                    failinvitetimeout(11),
+                    failinviteserver(12),
+                    notconfigured(13),
+                    configdone(14),
+		    oos(15),
+		    rsip(16),
+		    quarantine(17),
+		    active(18)
+                }
+
+AeSipCallStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates the SIP Call Status of the VoIP service on
+         a Voice Port."
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    idle(1),
+                    dialing(2),
+                    invite(3),
+                    ringback(4),
+                    busy(5),
+                    ringing(6),
+                    active(7),
+                    hold(8),
+                    disconnecting(9),
+                    disconnected(10)
+                }
+
+
+AeHookState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Values for POTS hook state."
+    SYNTAX      INTEGER {
+                    onHook(0),
+                    offHook(1)
+                }
+
+AeVoipIpLineStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates, using a bitmap, the current IP line status of the voip port:
+         0x00 indicates that the line is administratively turned off.
+         0x01 indicates that the line is administratively turned on.
+         0x02 indicates that the line has RTP transmit enabled.
+         0x04 indicates that the line has RTP receive enabled.
+         0x08 indicates that the line has been put on hold.
+         0x16 indicates that the line is in 3way conference call.
+         0x32 indicates that the call is waiting on the line."
+    SYNTAX      INTEGER {
+                    inactive(0),
+                    active(1),
+                    snd(2),
+                    rec(4),
+                    sndRec(6),
+                    hold(8),
+                    threeway(16),
+                    callwait(32)
+                }
+
+AeRtpEncodeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates the RTP encode type received:
+         0 G.711 u-law.
+         NOTE: only mu-law support in these ONTs at this time."
+    SYNTAX      INTEGER {
+                    ulaw(0)
+                }
+
+AeRtpPacketSize ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates the last RTP packet type received:
+         80  10ms packet size.
+         160 20ms packet size."
+    SYNTAX      INTEGER {
+                    tenMS(80),
+                    twentyMS(160)
+                }
+
+AeClearAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the PM data valid."
+    SYNTAX      INTEGER {
+                     idle(0),
+                     clear(1)
+                }
+
+END

@@ -1,6 +1,6 @@
 <form class="form-inline">
     <div class="input-group">
-        <input id="settings-search" type="search" class="form-control" placeholder="@lang('Search Settings')" style="border-radius: 4px">
+        <input id="settings-search" type="search" class="form-control" placeholder="{{ __('Search Settings') }}" style="border-radius: 4px">
     </div>
 </form>
 
@@ -36,7 +36,7 @@
         }).on('keyup', function (e) {
             // on enter go to the first selection
             if (e.which === 13) {
-                $('.tt-selectable').first().click();
+                $('.tt-selectable').first().trigger( "click" );
             }
         });
     </script>

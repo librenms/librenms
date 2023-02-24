@@ -1,0 +1,2082 @@
+-- ============================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description:  This MIB file is used for configuration of NAT.
+--                include :1.NAT pool
+--                         2.NAT out bound
+--                         3.NAT inside server
+--                         4.NAT aging-time
+--                         5.NAT blacklist
+--                         6.NAT statistics information
+--                         7.NAT DNS
+-- Reference:
+-- Version: V1.8
+-- History:
+-- V1.0 2004/09/17 created by xiaoshuchao
+-- V1.1 2005/06/01 Modified by liguanmin
+--      Modify the value range of the node hh3cNATOutboundPoolIdx
+-- V1.2 2007/05/22 Modified by tangjiafeng
+--      Modify the value range of the node hh3cNATSessionPeerPort
+-- V1.3 2014/07/11 Modified by hupengfei
+--      Add the hh3cNATTotalNATSessionCount, hh3cNATEimTableCount,
+--      hh3cNATInboundNoPATTableCount, hh3cNATOutboundNoPATTableCount,
+--      hh3cNATMaxDynamicPortblock, hh3cNATMaxStaticPortblock,
+--      hh3cNATActiveDynamicPortblock, hh3cNATActiveStaticPortblock
+-- V1.4 2016/12/25 Modified by wangxiaohua
+--      Add the hh3cNATSessionCreateRate
+-- V1.5 2017/04/07 Modified by wangfuchao
+--      Add the hh3cNATAddrGrpStatTable
+-- V1.6 2019/10/10 Modified by quanxin
+--      Add the hh3cNATCurBandwidthRatio
+--      Add the hh3cNATBandwidthTraps
+-- V1.7 2019/12/01 Modified by z15066
+--      Add the hh3cInstAddrGrpUsgTable
+--      Add the hh3cInstAddrGrpMemberUsgTable
+--      Add the hh3cInstAddrGrpUsageTraps
+-- V1.8 2020/12/29 Modified by w21520
+--      Add the hh3cNatIPPoolGroupTable
+--      Add the hh3cNatIPPoolAddrUsageExceedTraps
+--      Add the hh3cNatIPPoolAddrUsageRecoveryTraps
+--      Add the hh3cInstAddrUsgTotalIPCount, hh3cInstAddrUsgUsedIPCount,
+--      hh3cInstAddrUsgUnusedIPCount, hh3cInstAddrMemUsgGrpIPMask
+-- ============================================================================
+HH3C-NAT-MIB DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        hh3cCommon
+                                FROM HH3C-OID-MIB
+                        ifIndex
+                                FROM IF-MIB
+                        TimeTicks, IpAddress, Integer32, Counter32, Counter64, Unsigned32, OBJECT-TYPE,
+                        MODULE-IDENTITY, NOTIFICATION-TYPE
+                                FROM SNMPv2-SMI
+                        RowStatus, DisplayString
+                                FROM SNMPv2-TC;
+
+
+                hh3cNat MODULE-IDENTITY
+                        LAST-UPDATED "202012291440Z"             -- December 29, 2020 at 14:40 GMT
+                        ORGANIZATION
+                            "New H3C Tech. Co., Ltd."
+                        CONTACT-INFO
+                            "Platform Team New H3C Tech. Co., Ltd.
+                            Hai-Dian District Beijing P.R. China
+                            http://www.h3c.com
+                            Zip:100085
+                            "
+                        DESCRIPTION
+                                "Add the hh3cNatIPPoolGroupTable,
+                                hh3cNatIPPoolAddrUsageExceedTraps,
+                                hh3cNatIPPoolAddrUsageRecoveryTraps"
+
+                        REVISION "202012291440Z"                -- December 29, 2020 at 14:40 GMT
+                        DESCRIPTION
+                                "This MIB contains objects to manage configuration of NAT.
+                                There are no constraints on this MIB."
+
+                        REVISION "201912011446Z"                -- December 1, 2019 at 14:46 GMT
+                        DESCRIPTION
+                                "Add the hh3cInstAddrGrpUsgTable,
+                                hh3cInstAddrGrpMemberUsgTable,
+                                hh3cInstAddrGrpUsageTraps."
+
+                        REVISION "201910101752Z"                -- October 10, 2019 at 17:52 GMT
+                        DESCRIPTION
+                                "Add the hh3cNATCurBandwidthRatio,
+                                 hh3cNATBandwidthTraps."
+                        REVISION "201704071503Z"                -- April 7, 2017 at 15:03 GMT
+                        DESCRIPTION
+                                "Add the hh3cNATAddrGrpStatTable."
+
+                        REVISION "201612251105Z"                -- December 25, 2016 at 11:05 GMT
+                        DESCRIPTION
+                                "Add the hh3cNATSessionCreateRate."
+
+                        REVISION "201407111115Z"                -- July 11, 2014 at 11:15 GMT
+                        DESCRIPTION
+                                "Add the hh3cNATTotalNATSessionCount,
+                                 hh3cNATEimTableCount,
+                                 hh3cNATInboundNoPATTableCount,
+                                 hh3cNATOutboundNoPATTableCount,
+                                 hh3cNATMaxDynamicPortblock,
+                                 hh3cNATMaxStaticPortblock,
+                                 hh3cNATActiveDynamicPortblock,
+                                 hh3cNATActiveStaticPortblock."
+
+                        REVISION "200501201518Z"                -- January 20, 2005 at 15:18 GMT
+                        DESCRIPTION
+                                "The initial revision of this MIB module."
+                        ::= { hh3cCommon 18 }
+
+
+
+
+--
+-- Node definitions
+--
+
+-- Global Variants
+                hh3cNATGlobalVars OBJECT IDENTIFIER ::= { hh3cNat 1 }
+
+
+--                     **************Global Variants***************
+-- NAT Clear Session
+                hh3cNATClearSession OBJECT IDENTIFIER ::= { hh3cNATGlobalVars 1 }
+
+
+                hh3cNATClearSessionSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board in which administrator wants to
+                                clear data of the session. In router, the value is 255
+                                because no NAT board in it. This node only supports 'set' operation.
+                                The return value of 'get' operation is meaningless."
+                        ::= { hh3cNATClearSession 1 }
+
+
+-- NAT blacklist UserConnectLimitPara
+                hh3cNATBLConnectLimitPara OBJECT IDENTIFIER ::= { hh3cNATGlobalVars 2 }
+
+
+                hh3cNATBLConnectHighValue OBJECT-TYPE
+                        SYNTAX Integer32 (20..20000)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The maximal connection amount.  If the connection amount exceeds the
+                                value, the IP address will be added into blacklist.  The IP address
+                                will not be removed from blacklist until the connection amount is
+                                less than the minimal connection amount."
+                        DEFVAL { 500 }
+                        ::= { hh3cNATBLConnectLimitPara 1 }
+
+
+                hh3cNATBLConnectLowValue OBJECT-TYPE
+                        SYNTAX Integer32 (20..20000)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The minimal connection amount."
+                        DEFVAL { 200 }
+                        ::= { hh3cNATBLConnectLimitPara 2 }
+
+
+                hh3cNATBLConnectHighRate OBJECT-TYPE
+                        SYNTAX Integer32 (20..21474836)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The maximal connection rate(in second).  If the connection rate exceed the
+                                value, the IP address will be added into blacklist.  The IP address
+                                will not be removed from blacklist until the connection rate is
+                                less than the minimal connection rate."
+                        DEFVAL { 250 }
+                        ::= { hh3cNATBLConnectLimitPara 3 }
+
+
+                hh3cNATBLConnectLowRate OBJECT-TYPE
+                        SYNTAX Integer32 (20..21474836)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The minimal connection rate(in second)."
+                        DEFVAL { 100 }
+                        ::= { hh3cNATBLConnectLimitPara 4 }
+
+
+                hh3cNATBLSpecialConnectHighRate OBJECT-TYPE
+                        SYNTAX Integer32 (20..21474836)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The maximal special connection rate(in second).  When administrator
+                                wants to control the speed of connection, he can selects the connection
+                                speed rate or special connection rate."
+                        DEFVAL { 250 }
+                        ::= { hh3cNATBLConnectLimitPara 5 }
+
+
+                hh3cNATBLSpecialConnectLowRate OBJECT-TYPE
+                        SYNTAX Integer32 (20..21474836)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The minimal special connection rate(in second)."
+                        DEFVAL { 100 }
+                        ::= { hh3cNATBLConnectLimitPara 6 }
+
+
+-- NAT blacklist property control Enable
+                hh3cNATBLCtrlEnable OBJECT IDENTIFIER ::= { hh3cNATGlobalVars 3 }
+
+
+                hh3cNATBLConnectSumEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Enable or disable the connection amount control."
+                        DEFVAL { disable }
+                        ::= { hh3cNATBLCtrlEnable 1 }
+
+
+                hh3cNATBLConnectRateEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Enable or disable the connection rate control."
+                        DEFVAL { disable }
+                        ::= { hh3cNATBLCtrlEnable 2 }
+
+
+-- NAT NP aging-time
+                hh3cNATNPTimer OBJECT IDENTIFIER ::= { hh3cNATGlobalVars 4 }
+
+
+                hh3cNATNPAgingTime OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                fast(1),
+                                slow(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "There are two kinds of aging time in NP.  One is fast and the other is
+                                slow.  Administrator can select one or other.  The default is fast."
+                        DEFVAL { fast }
+                        ::= { hh3cNATNPTimer 1 }
+
+
+                hh3cNATMibObjects OBJECT IDENTIFIER ::= { hh3cNat 2 }
+
+
+--                      **************MibObjects***************
+-- NAT address pool table
+                hh3cNATPoolInfoTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATPoolInfoEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "NAT address pool table : The address in the pool is
+                                the IP address in the global network. The pool can span
+                                255 IP addresses.All address pools configured by administrator
+                                are recorded in this table."
+                        ::= { hh3cNATMibObjects 1 }
+
+
+                hh3cNATPoolInfoEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATPoolInfoEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of NAT address pool table."
+                        INDEX { hh3cNATPoolIdx }
+                        ::= { hh3cNATPoolInfoTable 1 }
+
+
+                Hh3cNATPoolInfoEntry ::=
+                        SEQUENCE {
+                                hh3cNATPoolIdx
+                                        Integer32,
+                                hh3cNATPoolStartIpAddr
+                                        IpAddress,
+                                hh3cNATPoolEndIpAddr
+                                        IpAddress,
+                                hh3cNATPoolSlotNo
+                                        Integer32,
+                                hh3cNATPoolRefCounter
+                                        Integer32,
+                                hh3cNATPoolRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATPoolIdx OBJECT-TYPE
+                        SYNTAX Integer32 (1..320)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Index of the address pool: The index uniquely indicates
+                                the address pool in the system, and its range is from 1 to 320. "
+                        ::= { hh3cNATPoolInfoEntry 1 }
+
+
+                hh3cNATPoolStartIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The start IP address of address pool:
+                                It must be less than or equal to the end IP address."
+                        ::= { hh3cNATPoolInfoEntry 2 }
+
+
+                hh3cNATPoolEndIpAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end IP address of address pool:
+                                It must be more than or equal to the start IP address."
+                        ::= { hh3cNATPoolInfoEntry 3 }
+
+
+                hh3cNATPoolSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board to which the address pool is bound.
+                                The address translation is processed by this NAT board .
+                                The relation between address pool and slotNo is n:1.
+                                When the address pool is not bound to the NAT board,the value is 255. "
+                        ::= { hh3cNATPoolInfoEntry 4 }
+
+
+                hh3cNATPoolRefCounter OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The counter of reference.  An address pool can be associated with
+                                more than one ACL and the counter of reference is recorded in this
+                                field.  When the address pool is not associated with ACL, the value is 0."
+                        ::= { hh3cNATPoolInfoEntry 5 }
+
+
+                hh3cNATPoolRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                If hh3cNATPoolIdx, hh3cNATPoolStartIpAddr and
+                                hh3cNATPoolEndIpAddr were provided correctly,
+                                its value is changed 'active'."
+                        ::= { hh3cNATPoolInfoEntry 6 }
+
+
+--     NAT Out bound Table
+                hh3cNATOutboundTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATOutboundEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "NAT out bound table: through associating ACL number,
+                                address pool with NAT board, administrator can designate
+                                which inside IP address can be translated to global IP
+                                address in the pool and the translation is processed by
+                                which NAT board."
+                        ::= { hh3cNATMibObjects 2 }
+
+
+                hh3cNATOutboundEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATOutboundEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of NAT out bound table."
+                        INDEX { ifIndex, hh3cNATOutboundAclNo }
+                        ::= { hh3cNATOutboundTable 1 }
+
+
+                Hh3cNATOutboundEntry ::=
+                        SEQUENCE {
+                                hh3cNATOutboundAclNo
+                                        Integer32,
+                                hh3cNATOutboundPoolIdx
+                                        Integer32,
+                                hh3cNATOutboundIsNoPat
+                                        INTEGER,
+                                hh3cNATOutboundSlotNo
+                                        Integer32,
+                                hh3cNATOutboundRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATOutboundAclNo OBJECT-TYPE
+                        SYNTAX Integer32 (2000..3999)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of ACL(Access Control List).  When the packet accords with
+                                the rule in the ACL, its source IP address will be translated to IP
+                                address in Address pool."
+                        ::= { hh3cNATOutboundEntry 1 }
+
+
+                hh3cNATOutboundPoolIdx OBJECT-TYPE
+                        SYNTAX Integer32 (0..320 | 2147483647)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The index of address pool in hh3cNATPoolInfoTable.
+                                when administrator doesn't use the address pool and
+                                use the IP address of the interface as the address of
+                                global network, the value is 2147483647."
+                        ::= { hh3cNATOutboundEntry 2 }
+
+
+                hh3cNATOutboundIsNoPat OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                true(1),
+                                false(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to use no pat manner.  The translation of no pat
+                                is that the translation doesn't use the port information of packet."
+                        DEFVAL { false }
+                        ::= { hh3cNATOutboundEntry 3 }
+
+
+                hh3cNATOutboundSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board.  In router, the value is 255 because no NAT board in it."
+                        ::= { hh3cNATOutboundEntry 4 }
+
+
+                hh3cNATOutboundRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                If hh3cNATOutboundAclNo or hh3cNATOutboundAclNo
+                                and hh3cNATOutboundPoolIdx were provided correctly,
+                                its value is changed 'active'."
+                        ::= { hh3cNATOutboundEntry 5 }
+
+
+--     NAT inside Server Table
+                hh3cNATServerTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATServerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "NAT inside Server Table.  Administrator can configure server in the
+                                private network which can provide service for people in the public network.
+                                The translation map is :
+                                (InsideIP     , InsidePort--> GlobalIP, GlobalPort    )
+                                (InsideIP + 1 , InsidePort--> GlobalIP, GlobalPort + 1)
+                                (InsideIP + 2 , InsidePort--> GlobalIP, GlobalPort + 2)
+                                ...
+                                ...
+                                ...
+                                (InsideIP+n(=InsideIP2),InsidePort--> GlobalIP,GlobalPort+n(=GlobalPort2))
+                                "
+                        ::= { hh3cNATMibObjects 3 }
+
+
+                hh3cNATServerEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATServerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of NAT inside server table."
+                        INDEX { ifIndex, hh3cNATServerProType, hh3cNATServerGlobalIP, hh3cNATServerStartGlobalPort, hh3cNATServerVpnIndex
+                                 }
+                        ::= { hh3cNATServerTable 1 }
+
+
+                Hh3cNATServerEntry ::=
+                        SEQUENCE {
+                                hh3cNATServerProType
+                                        Integer32,
+                                hh3cNATServerGlobalIP
+                                        IpAddress,
+                                hh3cNATServerStartGlobalPort
+                                        Integer32,
+                                hh3cNATServerEndGlobalPort
+                                        Integer32,
+                                hh3cNATServerStartInsideIP
+                                        IpAddress,
+                                hh3cNATServerEndInsideIP
+                                        IpAddress,
+                                hh3cNATServerInsidePort
+                                        Integer32,
+                                hh3cNATServerSlotNo
+                                        Integer32,
+                                hh3cNATServerVpnIndex
+                                        Integer32,
+                                hh3cNATServerAclNumber
+                                        Integer32,
+                                hh3cNATServerRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATServerProType OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The type of protocol: icmp(1), tcp(6), udp(17) and others."
+                        ::= { hh3cNATServerEntry 1 }
+
+
+                hh3cNATServerGlobalIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The global IP address of Inside Server."
+                        ::= { hh3cNATServerEntry 2 }
+
+
+                hh3cNATServerStartGlobalPort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The start global port of Inside Server.
+                                When the port need not be configured, the value is 0."
+                        ::= { hh3cNATServerEntry 3 }
+
+
+                hh3cNATServerEndGlobalPort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end global port of Inside Server.  When administrator doesn't
+                                configure a series of inside server, the value is 0.
+                                If the value is not zero, the value of (GlobalPort2-GlobalPort)
+                                must be equal to (InsideIP2 - InsideIP)."
+                        ::= { hh3cNATServerEntry 4 }
+
+
+                hh3cNATServerStartInsideIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The start private IP address of Inside Server."
+                        ::= { hh3cNATServerEntry 5 }
+
+
+                hh3cNATServerEndInsideIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The end private IP address of Inside Server.  When administrator doesn't
+                                configure a series of inside server, the value is 0.0.0.0."
+                        ::= { hh3cNATServerEntry 6 }
+
+
+                hh3cNATServerInsidePort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The private port of Inside Server."
+                        ::= { hh3cNATServerEntry 7 }
+
+
+                hh3cNATServerSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board.  In router, the value is 255 because no NAT board in it."
+                        ::= { hh3cNATServerEntry 8 }
+
+
+                hh3cNATServerVpnIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The VPN index of server."
+                        ::= { hh3cNATServerEntry 10 }
+
+
+                hh3cNATServerAclNumber OBJECT-TYPE
+                        SYNTAX Integer32 (1..10000)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Number of basic or advanced ACL."
+                        ::= { hh3cNATServerEntry 11 }
+
+
+                hh3cNATServerRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                If hh3cNATServerProType, hh3cNATServerGlobalIP, hh3cNATServerGlobalPort
+                                and hh3cNATServerInsideIP were provided correctly,
+                                its value is changed 'active'."
+                        ::= { hh3cNATServerEntry 12 }
+
+
+--     NAT Time out Table
+                hh3cNATTimeOutTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATTimeOutEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "NAT Time out Table. When a connection is established,
+                                if there are not any actives in this connection between
+                                the time, it will be disconnected."
+                        ::= { hh3cNATMibObjects 4 }
+
+
+                hh3cNATTimeOutEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATTimeOutEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of NAT Time out Table."
+                        INDEX { hh3cNATTimeOutProtocol }
+                        ::= { hh3cNATTimeOutTable 1 }
+
+
+                Hh3cNATTimeOutEntry ::=
+                        SEQUENCE {
+                                hh3cNATTimeOutProtocol
+                                        INTEGER,
+                                hh3cNATTimeOutTimeValue
+                                        Integer32
+                         }
+
+                hh3cNATTimeOutProtocol OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                tcp(1),
+                                udp(2),
+                                icmp(3),
+                                pptp(4),
+                                dns(5),
+                                tcpFin(6),
+                                tcpSyn(7),
+                                ftpCtrl(8),
+                                ftpData(9)
+                                }
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The type of protocol."
+                        ::= { hh3cNATTimeOutEntry 1 }
+
+
+                hh3cNATTimeOutTimeValue OBJECT-TYPE
+                        SYNTAX Integer32 (10..86400)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The time of time out."
+                        ::= { hh3cNATTimeOutEntry 2 }
+
+
+--     NAT blacklist Enable(start/stop) Table
+                hh3cNATBLEnableTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATBLEnableEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "NAT blacklist function Enable Table.  In this table, administrator can decide
+                                whether to start the function of blacklist in the NAT board.
+                                When the function of blacklist can't be set for a NAT board,
+                                the number of NAT board is 256."
+                        ::= { hh3cNATMibObjects 5 }
+
+
+                hh3cNATBLEnableEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATBLEnableEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of NAT blacklist Enable Table."
+                        INDEX { hh3cNATBLEnableSlotNo }
+                        ::= { hh3cNATBLEnableTable 1 }
+
+
+                Hh3cNATBLEnableEntry ::=
+                        SEQUENCE {
+                                hh3cNATBLEnableSlotNo
+                                        Integer32,
+                                hh3cNATBLEnable
+                                        INTEGER
+                         }
+
+                hh3cNATBLEnableSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board.
+                                When the function of blacklist can't be set for a NAT board,
+                                the value is 255."
+                        ::= { hh3cNATBLEnableEntry 1 }
+
+
+                hh3cNATBLEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Start or stop of function of blacklist."
+                        DEFVAL { disable }
+                        ::= { hh3cNATBLEnableEntry 2 }
+
+
+--     NAT special IP ConnectLimitPara Table
+                hh3cNATBLIPConnectLimitParaTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATBLIPConnectLimitParaEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of connection control of special IP address.  In this table, administrator can decide to
+                                adopt which manner to control the connection which IP address is the
+                                special IP address."
+                        ::= { hh3cNATMibObjects 6 }
+
+
+                hh3cNATBLIPConnectLimitParaEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATBLIPConnectLimitParaEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of the table of connection control of special IP address."
+                        INDEX { hh3cNATBLIPConnectLimitParaIP }
+                        ::= { hh3cNATBLIPConnectLimitParaTable 1 }
+
+
+                Hh3cNATBLIPConnectLimitParaEntry ::=
+                        SEQUENCE {
+                                hh3cNATBLIPConnectLimitParaIP
+                                        IpAddress,
+                                hh3cNATBLIPConnectHighValue
+                                        Integer32,
+                                hh3cNATBLIPConnectLowValue
+                                        Integer32,
+                                hh3cNATBLIPUseSpecialConnectRate
+                                        INTEGER,
+                                hh3cNATBLIPConnectLimitRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATBLIPConnectLimitParaIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The special IP address.  The IP is private IP address."
+                        ::= { hh3cNATBLIPConnectLimitParaEntry 1 }
+
+
+                hh3cNATBLIPConnectHighValue OBJECT-TYPE
+                        SYNTAX Integer32 (20..20000)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The maximal connection amount.  It must be more than the minimal connection amount."
+                        DEFVAL { 500 }
+                        ::= { hh3cNATBLIPConnectLimitParaEntry 2 }
+
+
+                hh3cNATBLIPConnectLowValue OBJECT-TYPE
+                        SYNTAX Integer32 (20..20000)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The minimal connection amount.  It must be less than the maximal connection amount."
+                        DEFVAL { 200 }
+                        ::= { hh3cNATBLIPConnectLimitParaEntry 3 }
+
+
+                hh3cNATBLIPUseSpecialConnectRate OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                true(1),
+                                false(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether to use the special connection rate control."
+                        DEFVAL { false }
+                        ::= { hh3cNATBLIPConnectLimitParaEntry 4 }
+
+
+                hh3cNATBLIPConnectLimitRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                 If hh3cNATBLIPConnectHighValue, hh3cNATBLIPConnectLowValue
+                                 and hh3cNATBLIPUseSpecialConnectRate were provided correctly,
+                                 its value is changed 'active'."
+                        ::= { hh3cNATBLIPConnectLimitParaEntry 5 }
+
+
+--     NAT blacklist Manager Table
+                hh3cNATBLManagerTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATBLManagerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The management table of blacklist.
+                                The table doesn't support 'getnext' operation."
+                        ::= { hh3cNATMibObjects 7 }
+
+
+                hh3cNATBLManagerEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATBLManagerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of management table of blacklist."
+                        INDEX { hh3cNATBLIpAdress, hh3cNATBLSlotNo }
+                        ::= { hh3cNATBLManagerTable 1 }
+
+
+                Hh3cNATBLManagerEntry ::=
+                        SEQUENCE {
+                                hh3cNATBLIpAdress
+                                        IpAddress,
+                                hh3cNATBLSlotNo
+                                        Integer32,
+                                hh3cNATBLConSum
+                                        Integer32,
+                                hh3cNATBLConSpd
+                                        INTEGER
+                         }
+
+                hh3cNATBLIpAdress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The IP address of entry of blacklist."
+                        ::= { hh3cNATBLManagerEntry 1 }
+
+
+                hh3cNATBLSlotNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board."
+                        ::= { hh3cNATBLManagerEntry 2 }
+
+
+                hh3cNATBLConSum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The connection amount."
+                        ::= { hh3cNATBLManagerEntry 3 }
+
+
+                hh3cNATBLConSpd OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                red(1),
+                                yellow(2),
+                                green(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The state of connection rate:
+                                red(1)   : the connection rate is above the upper limit.
+                                yellow(2): the connection rate is between the upper and lower limit.
+                                green(3) : the connection rate is below the lower limit."
+                        ::= { hh3cNATBLManagerEntry 4 }
+
+
+--     NAT Statistics Info
+                hh3cNATStatTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The statistics information table of NAT module."
+                        ::= { hh3cNATMibObjects 8 }
+
+
+                hh3cNATStatEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of statistics information table of NAT module."
+                        INDEX { hh3cNATStatNATBoardNo }
+                        ::= { hh3cNATStatTable 1 }
+
+
+                Hh3cNATStatEntry ::=
+                        SEQUENCE {
+                                hh3cNATStatNATBoardNo
+                                        Integer32,
+                                hh3cNATStatActiveTblCount
+                                        Counter32,
+                                hh3cNATStatActiveTblCountInNP
+                                        Counter32,
+                                hh3cNATStatActiveNatTblCount
+                                        Counter32,
+                                hh3cNATStatActiveSvrTblCount
+                                        Counter32,
+                                hh3cNATStatActivePoolTblCount
+                                        Counter32,
+                                hh3cNATStatNumOfUsedPort
+                                        Counter32,
+                                hh3cNATStatNumOfGoodPkt
+                                        Counter32,
+                                hh3cNATStatNumOfBadPkt
+                                        Counter32,
+                                hh3cNATStaticSessionCount
+                                        Integer32,
+                                hh3cNATFragmentSessionCount
+                                        Integer32,
+                                hh3cNATSequenceSessionCount
+                                        Integer32,
+                                hh3cNATLogCount
+                                        Integer32
+                         }
+
+                hh3cNATStatNATBoardNo OBJECT-TYPE
+                        SYNTAX Integer32 (1..14 | 255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The number of NAT board.  In router, the value is 255 because no NAT board in it."
+                        ::= { hh3cNATStatEntry 1 }
+
+
+                hh3cNATStatActiveTblCount OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active PAT session count In software."
+                        ::= { hh3cNATStatEntry 2 }
+
+
+                hh3cNATStatActiveTblCountInNP OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active PAT session count In NP."
+                        ::= { hh3cNATStatEntry 3 }
+
+
+                hh3cNATStatActiveNatTblCount OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active NO-PAT session count."
+                        ::= { hh3cNATStatEntry 4 }
+
+
+                hh3cNATStatActiveSvrTblCount OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active SERVER session count."
+                        ::= { hh3cNATStatEntry 5 }
+
+
+                hh3cNATStatActivePoolTblCount OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active address pool session count."
+                        ::= { hh3cNATStatEntry 6 }
+
+
+                hh3cNATStatNumOfUsedPort OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of used port in NP."
+                        ::= { hh3cNATStatEntry 7 }
+
+
+                hh3cNATStatNumOfGoodPkt OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of good packet in NP."
+                        ::= { hh3cNATStatEntry 8 }
+
+
+                hh3cNATStatNumOfBadPkt OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of bad packet in NP."
+                        ::= { hh3cNATStatEntry 9 }
+
+
+                hh3cNATStaticSessionCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active STATIC session count."
+                        ::= { hh3cNATStatEntry 10 }
+
+
+                hh3cNATFragmentSessionCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active fragment packet session count."
+                        ::= { hh3cNATStatEntry 11 }
+
+
+                hh3cNATSequenceSessionCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Active session table count hash by private IP."
+                        ::= { hh3cNATStatEntry 12 }
+
+
+                hh3cNATLogCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Buffered Nat LOG table count."
+                        ::= { hh3cNATStatEntry 13 }
+
+
+--     nat session
+                hh3cNATSessionTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATSessionEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The nat session information table.  There is the address translation information in the table.
+                                The sketch map of connection is
+                                pc1(private Net)------------------>NAT Device ------------------>Server(public Net)
+                                InsideIP, InsidePort---->translating to GlobalIP, GlobalPort------>PeerIP, PeerPort.
+                                "
+                        ::= { hh3cNATMibObjects 9 }
+
+
+                hh3cNATSessionEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATSessionEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of session information table."
+                        INDEX { hh3cNATSessionHashNumber, hh3cNATSessionProtocol, hh3cNATSessionInsideIP, hh3cNATSessionInsidePort, hh3cNATSessionPeerIP,
+                                hh3cNATSessionPeerPort, hh3cNATSessionVpnIndex }
+                        ::= { hh3cNATSessionTable 1 }
+
+
+                Hh3cNATSessionEntry ::=
+                        SEQUENCE {
+                                hh3cNATSessionHashNumber
+                                        Integer32,
+                                hh3cNATSessionProtocol
+                                        Integer32,
+                                hh3cNATSessionGlobalIP
+                                        IpAddress,
+                                hh3cNATSessionGlobalPort
+                                        Integer32,
+                                hh3cNATSessionInsideIP
+                                        IpAddress,
+                                hh3cNATSessionInsidePort
+                                        Integer32,
+                                hh3cNATSessionPeerIP
+                                        IpAddress,
+                                hh3cNATSessionPeerPort
+                                        Integer32,
+                                hh3cNATSessionVpnIndex
+                                        Integer32,
+                                hh3cNATSessionTTL
+                                        Integer32,
+                                hh3cNATSessionStatus
+                                        Integer32,
+                                hh3cNATSessionLeftTime
+                                        TimeTicks
+                         }
+
+                hh3cNATSessionHashNumber OBJECT-TYPE
+                        SYNTAX Integer32 (1..300000)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The row number of the hash table."
+                        ::= { hh3cNATSessionEntry 1 }
+
+
+                hh3cNATSessionProtocol OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The protocol type of session."
+                        ::= { hh3cNATSessionEntry 2 }
+
+
+                hh3cNATSessionGlobalIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The global IP of session. "
+                        ::= { hh3cNATSessionEntry 3 }
+
+
+                hh3cNATSessionGlobalPort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The global port of session."
+                        ::= { hh3cNATSessionEntry 4 }
+
+
+                hh3cNATSessionInsideIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The Inside IP of session."
+                        ::= { hh3cNATSessionEntry 5 }
+
+
+                hh3cNATSessionInsidePort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The Inside port of session."
+                        ::= { hh3cNATSessionEntry 6 }
+
+
+                hh3cNATSessionPeerIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The peer IP of session."
+                        ::= { hh3cNATSessionEntry 7 }
+
+
+                hh3cNATSessionPeerPort OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The peer port of session."
+                        ::= { hh3cNATSessionEntry 8 }
+
+
+                hh3cNATSessionVpnIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The VPN index of session."
+                        ::= { hh3cNATSessionEntry 9 }
+
+
+                hh3cNATSessionTTL OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The TTL of session."
+                        ::= { hh3cNATSessionEntry 10 }
+
+
+                hh3cNATSessionStatus OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The status of session."
+                        ::= { hh3cNATSessionEntry 11 }
+
+
+                hh3cNATSessionLeftTime OBJECT-TYPE
+                        SYNTAX TimeTicks
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Left time of session."
+                        ::= { hh3cNATSessionEntry 12 }
+
+
+                hh3cNATStaticConfTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATStaticConfEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Static Nat configuration table."
+                        ::= { hh3cNATMibObjects 10 }
+
+
+                hh3cNATStaticConfEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATStaticConfEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Configure static Nat."
+                        INDEX { hh3cNATStaticInsideIp }
+                        ::= { hh3cNATStaticConfTable 1 }
+
+
+                Hh3cNATStaticConfEntry ::=
+                        SEQUENCE {
+                                hh3cNATStaticInsideIp
+                                        IpAddress,
+                                hh3cNATStaticGlobalIp
+                                        IpAddress,
+                                hh3cNATStaticRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATStaticInsideIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Inside ip address."
+                        ::= { hh3cNATStaticConfEntry 1 }
+
+
+                hh3cNATStaticGlobalIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Global Ip address."
+                        ::= { hh3cNATStaticConfEntry 2 }
+
+
+                hh3cNATStaticRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                If hh3cNATStaticInsideIp and hh3cNATStaticGlobalIp were provided correctly,
+                                its value is changed 'active'."
+                        ::= { hh3cNATStaticConfEntry 3 }
+
+
+                hh3cNATStaticEnableTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATStaticEnableEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Active the static Nat on interface."
+                        ::= { hh3cNATMibObjects 11 }
+
+
+                hh3cNATStaticEnableEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATStaticEnableEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Active the static Nat on interface."
+                        INDEX { ifIndex }
+                        ::= { hh3cNATStaticEnableTable 1 }
+
+
+                Hh3cNATStaticEnableEntry ::=
+                        SEQUENCE {
+                                hh3cNATStaticEnable
+                                        INTEGER
+                         }
+
+                hh3cNATStaticEnable OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disable(0),
+                                enable(1)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Enable/disable the static Nat on the interface(hh3cNatStaticEnableIfIndex).
+                                disable  (0)
+                                enable   (1)
+                                                            "
+                        ::= { hh3cNATStaticEnableEntry 2 }
+
+
+                hh3cNATDnsMapTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF Hh3cNATDnsMapEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table is used to set mapping of DNS."
+                        ::= { hh3cNATMibObjects 12 }
+
+
+                hh3cNATDnsMapEntry OBJECT-TYPE
+                        SYNTAX Hh3cNATDnsMapEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of hh3cNATDnsMapTable."
+                        INDEX { hh3cNATDnsMapDomainName }
+                        ::= { hh3cNATDnsMapTable 1 }
+
+
+                Hh3cNATDnsMapEntry ::=
+                        SEQUENCE {
+                                hh3cNATDnsMapDomainName
+                                        DisplayString,
+                                hh3cNATDnsMapGlobalIp
+                                        IpAddress,
+                                hh3cNATDnsMapGlobalPort
+                                        Integer32,
+                                hh3cNATDnsMapProtocolType
+                                        INTEGER,
+                                hh3cNATDnsMapLastUseTime
+                                        TimeTicks,
+                                hh3cNATDnsMapRowStatus
+                                        RowStatus
+                         }
+
+                hh3cNATDnsMapDomainName OBJECT-TYPE
+                        SYNTAX DisplayString
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Domain name."
+                        ::= { hh3cNATDnsMapEntry 1 }
+
+
+                hh3cNATDnsMapGlobalIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Global IP address."
+                        ::= { hh3cNATDnsMapEntry 2 }
+
+
+                hh3cNATDnsMapGlobalPort OBJECT-TYPE
+                        SYNTAX Integer32 (1..65535)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                " Global port number."
+                        ::= { hh3cNATDnsMapEntry 3 }
+
+
+                hh3cNATDnsMapProtocolType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                any(0),
+                                typeTCP(1),
+                                typeUDP(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "TCP   Transmission Control Protocol.
+                                UDP   User Datagram Protocol."
+                        ::= { hh3cNATDnsMapEntry 4 }
+
+
+                hh3cNATDnsMapLastUseTime OBJECT-TYPE
+                        SYNTAX TimeTicks
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Its value is the time that the device uses
+                                from startup to last use 'Dns Map'record.
+                                If the value is 0,the device never use this
+                                record."
+                        ::= { hh3cNATDnsMapEntry 5 }
+
+
+                hh3cNATDnsMapRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Only support 'destroy' and 'createAndGo'.
+                                If hh3cNATDnsMapDomainName, hh3cNATDnsMapGlobalIp
+                                and hh3cNATDnsMapGlobalPortor hh3cNATDnsMapDomainName,
+                                hh3cNATDnsMapGlobalIp, hh3cNATDnsMapGlobalPort and
+                                hh3cNATDnsMapProtocolType were provided correctly,
+                                its value is changed 'active'."
+                        ::= { hh3cNATDnsMapEntry 6 }
+
+--     new NAT statistics
+                hh3cNATStatVer2Table OBJECT-TYPE
+                        SYNTAX  SEQUENCE OF Hh3cNATStatVer2TableEntry
+                        MAX-ACCESS  not-accessible
+                        STATUS  current
+                        DESCRIPTION
+                        "The new statistics of NAT."
+                    ::= { hh3cNATMibObjects 13 }
+
+                hh3cNATStatVer2TableEntry OBJECT-TYPE
+                    SYNTAX  Hh3cNATStatVer2TableEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "An entry (conceptual row) representing NAT
+                     statistics information."
+                    INDEX { hh3cNATStatChassis, hh3cNATStatSlot, hh3cNATStatCPUID }
+                ::= { hh3cNATStatVer2Table 1 }
+
+                Hh3cNATStatVer2TableEntry ::= SEQUENCE {
+                    hh3cNATStatChassis                       Unsigned32,
+                    hh3cNATStatSlot                          Unsigned32,
+                    hh3cNATStatCPUID                         Unsigned32,
+                    hh3cNATTotalNATSessionCount              Unsigned32,
+                    hh3cNATEimTableCount                     Unsigned32,
+                    hh3cNATInboundNoPATTableCount            Unsigned32,
+                    hh3cNATOutboundNoPATTableCount           Unsigned32,
+                    hh3cNATMaxDynamicPortblock               Unsigned32,
+                    hh3cNATMaxStaticPortblock                Unsigned32,
+                    hh3cNATActiveDynamicPortblock            Unsigned32,
+                    hh3cNATActiveStaticPortblock             Unsigned32,
+                    hh3cNATSessionCreateRate                 Unsigned32,
+                    hh3cNATCurBandwidthRatio                 Unsigned32
+                    }
+
+                hh3cNATStatChassis   OBJECT-TYPE
+                    SYNTAX Unsigned32(0..65534)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "An IRF member device ID."
+                ::= { hh3cNATStatVer2TableEntry  1 }
+
+                hh3cNATStatSlot    OBJECT-TYPE
+                    SYNTAX Unsigned32(0..65534)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "The slot where the card resides."
+                ::= { hh3cNATStatVer2TableEntry  2 }
+
+                hh3cNATStatCPUID   OBJECT-TYPE
+                    SYNTAX Unsigned32(0..7)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "CPU ID."
+                ::= { hh3cNATStatVer2TableEntry  3 }
+
+                hh3cNATTotalNATSessionCount   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current NAT sessions."
+                ::= { hh3cNATStatVer2TableEntry  4 }
+
+                hh3cNATEimTableCount   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current EIM tables."
+                ::= { hh3cNATStatVer2TableEntry  5 }
+
+                hh3cNATInboundNoPATTableCount   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current NO-PAT tables built on NAT inbound
+                     translation."
+                ::= { hh3cNATStatVer2TableEntry  6 }
+
+                hh3cNATOutboundNoPATTableCount   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current NO-PAT tables built on NAT outbound
+                     translation."
+                ::= { hh3cNATStatVer2TableEntry  7 }
+
+                hh3cNATMaxDynamicPortblock   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current NAT444 dynamic port blocks."
+                ::= { hh3cNATStatVer2TableEntry  8 }
+
+                hh3cNATMaxStaticPortblock   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current NAT444 static port blocks."
+                ::= { hh3cNATStatVer2TableEntry  9 }
+
+                hh3cNATActiveDynamicPortblock   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current active NAT444 dynamic port blocks."
+                ::= { hh3cNATStatVer2TableEntry  10 }
+
+                hh3cNATActiveStaticPortblock   OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of current active NAT444 static port blocks."
+                ::= { hh3cNATStatVer2TableEntry  11 }
+
+                hh3cNATSessionCreateRate       OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The rate of nat session create."
+                ::= { hh3cNATStatVer2TableEntry  12 }
+
+hh3cNATCurBandwidthRatio     OBJECT-TYPE
+                    SYNTAX Unsigned32(0..100)
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The value of the current CGN card bandwidth usage."
+                ::= { hh3cNATStatVer2TableEntry  13 }
+
+-- Nodes of NAT Address Group Statistics
+
+        hh3cNATAddrGrpStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cNATAddrGrpStatTableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics of NAT address groups."
+            ::= { hh3cNATMibObjects 14 }
+
+        hh3cNATAddrGrpStatTableEntry OBJECT-TYPE
+            SYNTAX Hh3cNATAddrGrpStatTableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry (conceptual row) representing NAT
+                     address group statistics."
+            INDEX
+            {
+                hh3cNATAddrGrpStatChassis,
+                hh3cNATAddrGrpStatSlot,
+                hh3cNATAddrGrpStatCPUID,
+                hh3cNATAddrGrpStatAddrGrpNum
+            }
+            ::= { hh3cNATAddrGrpStatTable 1 }
+
+        Hh3cNATAddrGrpStatTableEntry ::=
+        SEQUENCE
+        {
+            hh3cNATAddrGrpStatChassis
+                Unsigned32,
+            hh3cNATAddrGrpStatSlot
+                Unsigned32,
+            hh3cNATAddrGrpStatCPUID
+                Unsigned32,
+            hh3cNATAddrGrpStatAddrGrpNum
+                Unsigned32,
+            hh3cNATAddrGrpStatFailAllocPort
+                Unsigned32,
+            hh3cNATAddrGrpStatAddrGrpSessCnt
+                Counter64
+        }
+
+        hh3cNATAddrGrpStatChassis OBJECT-TYPE
+            SYNTAX Unsigned32(0..65534)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An IRF member device ID."
+            ::= { hh3cNATAddrGrpStatTableEntry 1 }
+
+        hh3cNATAddrGrpStatSlot OBJECT-TYPE
+            SYNTAX Unsigned32(0..65534)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot where the card resides."
+            ::= { hh3cNATAddrGrpStatTableEntry 2 }
+
+        hh3cNATAddrGrpStatCPUID OBJECT-TYPE
+            SYNTAX Unsigned32(0..7)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "CPU ID."
+            ::= { hh3cNATAddrGrpStatTableEntry 3 }
+
+        hh3cNATAddrGrpStatAddrGrpNum OBJECT-TYPE
+            SYNTAX Unsigned32(0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The NAT address group number."
+            ::= { hh3cNATAddrGrpStatTableEntry 4 }
+
+        hh3cNATAddrGrpStatFailAllocPort OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The count of NAT port allocation failures."
+            ::= { hh3cNATAddrGrpStatTableEntry 5 }
+
+        hh3cNATAddrGrpStatAddrGrpSessCnt OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The session count of current NAT address group."
+            ::= { hh3cNATAddrGrpStatTableEntry 6 }
+-- Describe objects for CGN bandwidth usage trap
+hh3cNATBandwidthTraps OBJECT IDENTIFIER ::= { hh3cNATMibObjects 15 }
+hh3cNATBandwidthPrefix OBJECT IDENTIFIER ::= { hh3cNATBandwidthTraps 0 }
+hh3cNATBandwidthTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNATBandwidthRatio,
+            hh3cNATChassis,
+            hh3cNATSlot,
+            hh3cNATCpu
+        }
+    STATUS      current
+    DESCRIPTION
+    "Send trap when the bandwidth usage of a CGN card has reached the hh3cNATBandwidthRatio."
+    ::= { hh3cNATBandwidthPrefix 1 }
+hh3cNATBandwidthRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNATChassis,
+            hh3cNATSlot,
+            hh3cNATCpu
+         }
+    STATUS      current
+    DESCRIPTION
+    "Send trap when the CGN card bandwidth usage has dropped below the threshold."
+    ::= { hh3cNATBandwidthPrefix 2 }
+hh3cNATBandwidthTrapObjects OBJECT IDENTIFIER ::= { hh3cNATBandwidthTraps 1 }
+hh3cNATBandwidthRatio OBJECT-TYPE
+SYNTAX      Unsigned32
+UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The usage of CGN card bandwidth."
+    ::= { hh3cNATBandwidthTrapObjects 1 }
+hh3cNATChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65534)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "An IRF member device ID."
+    ::= { hh3cNATBandwidthTrapObjects 2 }
+hh3cNATSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65534)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The slot where the card resides."
+    ::= { hh3cNATBandwidthTrapObjects 3 }
+hh3cNATCpu OBJECT-TYPE
+    SYNTAX      Unsigned32(0..7)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "CPU ID."
+    ::= { hh3cNATBandwidthTrapObjects 4 }
+
+-- Describe objects for NAT Instance Address Group Resource Usage
+hh3cInstAddrGrpUsgTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hh3cInstAddrGrpUsgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The usage of NAT instance address group resources(port-block usage)."
+::= { hh3cNATMibObjects 16 }
+
+hh3cInstAddrGrpUsgEntry OBJECT-TYPE
+   SYNTAX Hh3cInstAddrGrpUsgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "The resource usage info of an address group."
+   INDEX {
+           hh3cInstAddrUsgInstName,
+           hh3cInstAddrUsgGrpIndex
+         }
+::= { hh3cInstAddrGrpUsgTable 1 }
+
+Hh3cInstAddrGrpUsgEntry ::= SEQUENCE
+{
+   hh3cInstAddrUsgInstName    OCTET STRING,
+   hh3cInstAddrUsgGrpIndex    Unsigned32,
+   hh3cInstAddrUsgInstIndex   Unsigned32,
+   hh3cInstAddrUsgGrpUsage    Unsigned32,
+   hh3cInstAddrUsgTotalIPCount  Unsigned32,
+   hh3cInstAddrUsgUsedIPCount   Unsigned32,
+   hh3cInstAddrUsgUnusedIPCount Unsigned32
+}
+
+hh3cInstAddrUsgInstName OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (1..32))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT instance name."
+::= { hh3cInstAddrGrpUsgEntry 1 }
+
+hh3cInstAddrUsgGrpIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..65536)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT address group ID."
+::= { hh3cInstAddrGrpUsgEntry 2 }
+
+hh3cInstAddrUsgInstIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..127)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "NAT instance index."
+::= { hh3cInstAddrGrpUsgEntry 3 }
+
+hh3cInstAddrUsgGrpUsage OBJECT-TYPE
+   SYNTAX Unsigned32(0..100)
+   UNITS "percent"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The usage of address group resources."
+::= { hh3cInstAddrGrpUsgEntry 4 }
+
+hh3cInstAddrUsgTotalIPCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The total number of NAT addresses."
+::= { hh3cInstAddrGrpUsgEntry 5 }
+
+hh3cInstAddrUsgUsedIPCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The number of NAT addresses used."
+::= { hh3cInstAddrGrpUsgEntry 6 }
+
+hh3cInstAddrUsgUnusedIPCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   UNITS "percent"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The number of NAT addresses not in use."
+::= { hh3cInstAddrGrpUsgEntry 7 }
+
+-- Describe objects for NAT Instance Address Group Member Resource Usage
+hh3cInstAddrGrpMemberUsgTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hh3cInstAddrGrpMemberUsgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The usage of CGN address group member resources(port-block usage)."
+::= { hh3cNATMibObjects 17 }
+
+hh3cInstAddrGrpMemberUsgEntry OBJECT-TYPE
+   SYNTAX Hh3cInstAddrGrpMemberUsgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "The resource usage info of an address group member."
+   INDEX {
+           hh3cInstAddrMemUsgInstName,
+           hh3cInstAddrMemUsgGrpIndex,
+           hh3cInstAddrMemUsgGrpStartIP
+         }
+::= { hh3cInstAddrGrpMemberUsgTable 1 }
+
+Hh3cInstAddrGrpMemberUsgEntry ::= SEQUENCE
+{
+   hh3cInstAddrMemUsgInstName     OCTET STRING,
+   hh3cInstAddrMemUsgGrpIndex     Unsigned32,
+   hh3cInstAddrMemUsgGrpStartIP   IpAddress,
+   hh3cInstAddrMemUsgGrpEndIP     IpAddress,
+   hh3cInstAddrMemUsgInstIndex    Unsigned32,
+   hh3cInstAddrMemUsgGrpUsage     Unsigned32,
+   hh3cInstAddrMemUsgGrpIPMask    OCTET STRING
+}
+
+hh3cInstAddrMemUsgInstName OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (1..32))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT instance name."
+::= { hh3cInstAddrGrpMemberUsgEntry 1 }
+
+hh3cInstAddrMemUsgGrpIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..65536)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT address group ID."
+::= { hh3cInstAddrGrpMemberUsgEntry 2 }
+
+hh3cInstAddrMemUsgGrpStartIP OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT address group member start IP address."
+::= { hh3cInstAddrGrpMemberUsgEntry 3 }
+
+hh3cInstAddrMemUsgGrpEndIP OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "NAT address group member end IP address."
+::= { hh3cInstAddrGrpMemberUsgEntry 4 }
+
+hh3cInstAddrMemUsgInstIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..127)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "NAT instance index."
+::= { hh3cInstAddrGrpMemberUsgEntry 5 }
+
+hh3cInstAddrMemUsgGrpUsage OBJECT-TYPE
+   SYNTAX Unsigned32(0..100)
+   UNITS "percent"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The usage of address group member resources."
+::= { hh3cInstAddrGrpMemberUsgEntry 6 }
+
+hh3cInstAddrMemUsgGrpIPMask OBJECT-TYPE
+   SYNTAX OCTET STRING ( SIZE(0..32) )
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "NAT address mask."
+::= { hh3cInstAddrGrpMemberUsgEntry 7 }
+
+-- Describe objects for NAT Instance Address Group Usage Trap
+hh3cInstAddrGrpUsageTraps OBJECT IDENTIFIER ::= { hh3cNATMibObjects 18 }
+
+hh3cInstAddrGrpUsagePrefix OBJECT IDENTIFIER ::= { hh3cInstAddrGrpUsageTraps 0 }
+hh3cInstAddrGrpUsageTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cInstAddrTrapInstName,
+   hh3cInstAddrTrapGrpIndex,
+   hh3cInstAddrTrapInstIndex,
+   hh3cInstAddrTrapUsgThreshold
+}
+STATUS current
+DESCRIPTION
+"Send trap when hh3cInstAddrUsgGrpUsage reached the threshold."
+::= { hh3cInstAddrGrpUsagePrefix 1 }
+
+hh3cInstAddrGrpUsageRecovTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cInstAddrTrapInstName,
+   hh3cInstAddrTrapGrpIndex,
+   hh3cInstAddrTrapInstIndex
+}
+STATUS current
+DESCRIPTION
+"Send trap when dropped below the threshold."
+::= { hh3cInstAddrGrpUsagePrefix 2 }
+
+hh3cInstAddrGrpUsageTrapInfo OBJECT IDENTIFIER ::= { hh3cInstAddrGrpUsageTraps 1 }
+hh3cInstAddrTrapInstName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE (1..32))
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT instance name."
+::= { hh3cInstAddrGrpUsageTrapInfo 1 }
+
+hh3cInstAddrTrapGrpIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..65536)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT address group ID."
+::= { hh3cInstAddrGrpUsageTrapInfo 2 }
+
+hh3cInstAddrTrapInstIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..127)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT instance index."
+::= { hh3cInstAddrGrpUsageTrapInfo 3 }
+
+hh3cInstAddrTrapUsgThreshold OBJECT-TYPE
+   SYNTAX Unsigned32(0..100)
+   UNITS "percent"
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT address group usage reached the threshold."
+::= { hh3cInstAddrGrpUsageTrapInfo 4 }
+
+-- Describe objects for NAT IP Pool Address Group Table
+hh3cNatIPPoolGroupTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hh3cNatIPPoolGroupEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The usage of NAT IP pool address group resources."
+::= { hh3cNATMibObjects 19 }
+
+hh3cNatIPPoolGroupEntry OBJECT-TYPE
+   SYNTAX Hh3cNatIPPoolGroupEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "The resource usage info of an IP pool address group."
+   INDEX {
+           hh3cNatIPPoolName
+         }
+::= { hh3cNatIPPoolGroupTable 1 }
+
+Hh3cNatIPPoolGroupEntry ::= SEQUENCE
+{
+   hh3cNatIPPoolName        OCTET STRING,
+   hh3cNatIPPoolAddrUsage   Unsigned32,
+   hh3cNatIPPoolTotalCount  Unsigned32,
+   hh3cNatIPPoolUsedCount   Unsigned32,
+   hh3cNatIPPoolUnusedCount Unsigned32
+}
+
+hh3cNatIPPoolName OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (1..32))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+   "NAT IP pool name."
+::= { hh3cNatIPPoolGroupEntry 1 }
+
+hh3cNatIPPoolAddrUsage OBJECT-TYPE
+   SYNTAX Unsigned32(0..100)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The usage of NAT IP pool address group resources."
+::= { hh3cNatIPPoolGroupEntry 2 }
+
+hh3cNatIPPoolTotalCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The total number of NAT addresses."
+::= { hh3cNatIPPoolGroupEntry 3 }
+
+hh3cNatIPPoolUsedCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The number of NAT addresses used."
+::= { hh3cNatIPPoolGroupEntry 4 }
+
+hh3cNatIPPoolUnusedCount OBJECT-TYPE
+   SYNTAX Unsigned32(0..65536)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The number of NAT addresses not in use."
+::= { hh3cNatIPPoolGroupEntry 5 }
+
+-- Describe objects for NAT IP Pool Address Group Usage Trap
+hh3cNatIPPoolAddrUsageExceedTraps OBJECT IDENTIFIER ::= { hh3cNATMibObjects 20 }
+
+hh3cNatIPPoolAddrUsageExceedPrefix OBJECT IDENTIFIER ::= { hh3cNatIPPoolAddrUsageExceedTraps 0 }
+hh3cNatIPPoolAddrUsageExceedTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapIPPoolName,
+   hh3cNatTrapIPPoolAddrUsage
+}
+STATUS current
+DESCRIPTION
+"Send trap when NatIPPoolAddrUsageExceed reached the threshold."
+::= { hh3cNatIPPoolAddrUsageExceedPrefix 1 }
+
+hh3cNatIPPoolAddrUsageRecoveryTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapIPPoolName,
+   hh3cNatTrapIPPoolAddrUsage
+}
+STATUS current
+DESCRIPTION
+"Send trap when dropped below the threshold."
+::= { hh3cNatIPPoolAddrUsageExceedPrefix 2 }
+
+hh3cNatIPPoolAddrUsageTrapExceed OBJECT IDENTIFIER ::= { hh3cNatIPPoolAddrUsageExceedTraps 1 }
+hh3cNatTrapIPPoolName OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (1..32))
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT IP pool name."
+::= { hh3cNatIPPoolAddrUsageTrapExceed 1 }
+
+hh3cNatTrapIPPoolAddrUsage OBJECT-TYPE
+   SYNTAX Unsigned32(0..100)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "NAT IP pool address usage."
+::= { hh3cNatIPPoolAddrUsageTrapExceed 2 }
+
+END

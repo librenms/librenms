@@ -15,26 +15,26 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model
 {
     /**
      * Check if query is already joined with a table
      *
-     * @param Builder $query
-     * @param string $table
+     * @param  Builder  $query
+     * @param  string  $table
      * @return bool
      */
     public static function isJoined($query, $table)
@@ -48,15 +48,16 @@ abstract class BaseModel extends Model
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Helper function to determine if user has access based on device permissions
      *
-     * @param Builder $query
-     * @param User $user
-     * @param string $table
+     * @param  Builder  $query
+     * @param  User  $user
+     * @param  string  $table
      * @return Builder
      */
     protected function hasDeviceAccess($query, User $user, $table = null)
@@ -69,15 +70,15 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->whereIn("$table.device_id", \Permissions::devicesForUser($user));
+        return $query->whereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user));
     }
 
     /**
      * Helper function to determine if user has access based on port permissions
      *
-     * @param Builder $query
-     * @param User $user
-     * @param string $table
+     * @param  Builder  $query
+     * @param  User  $user
+     * @param  string  $table
      * @return Builder
      */
     protected function hasPortAccess($query, User $user, $table = null)
@@ -91,8 +92,8 @@ abstract class BaseModel extends Model
         }
 
         return $query->where(function ($query) use ($table, $user) {
-            return $query->whereIn("$table.port_id", \Permissions::portsForUser($user))
-                ->orWhereIn("$table.device_id", \Permissions::devicesForUser($user));
+            return $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
+                ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user));
         });
     }
 }

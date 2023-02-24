@@ -1,6 +1,7 @@
 os: comware
 text: 'HPE Comware'
 type: network
+mib_dir: comware
 icon: hpe
 over:
     - { graph: device_bits, text: Traffic }

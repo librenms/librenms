@@ -4,10 +4,11 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/scl enable rh-python36 -- /opt/librenms/librenms-service.py -v
+ExecReload=/bin/kill -HUP $MAINPID
 WorkingDirectory=/opt/librenms
 User=librenms
 Group=librenms
-RestartSec=2
+RestartSec=10
 Restart=always
 
 [Install]

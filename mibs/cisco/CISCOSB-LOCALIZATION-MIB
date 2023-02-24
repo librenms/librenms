@@ -17,7 +17,7 @@ IMPORTS
     TruthValue, RowStatus                   FROM SNMPv2-TC;
 
 rlLocalization MODULE-IDENTITY
-         LAST-UPDATED "200503150000Z"
+         LAST-UPDATED "200503150001Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -104,6 +104,12 @@ RlLocalizationLanguagesEntry ::= SEQUENCE {
     rlLocalizationLanguageCode                DisplayString,
     rlLocalizationNumOfSections               INTEGER (0..100),
     rlLocalizationNumOfEmbSections            INTEGER (0..100),
+    rlLocalizationDirection                   DisplayString (SIZE(0..3)),
+    rlLocalizationDateFormat                  DisplayString (SIZE(0..20)),
+    rlLocalizationTimeFormat                  DisplayString (SIZE(0..20)),
+    rlLocalizationNumberFormat                DisplayString (SIZE(0..20)),
+    rlLocalizationShortButtonWidthPercentage  INTEGER (50..300),
+    rlLocalizationLongButtonWidthPercentage   INTEGER (50..300),
     rlLocalizationVersion                     DisplayString (SIZE(0..15)),
     rlLocalizationMd5ChksumFile               DisplayString
 }
@@ -168,7 +174,61 @@ rlLocalizationNumOfEmbSections OBJECT-TYPE
     DESCRIPTION
         "Number of sections of the diagnostics file which is technically split."
     ::= { rlLocalizationLanguagesEntry 7 }
+    
+rlLocalizationDirection OBJECT-TYPE
 
+    SYNTAX      DisplayString  (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Direction of text in language file (ltr/rtl)"
+    ::= { rlLocalizationLanguagesEntry 8 }
+    
+rlLocalizationDateFormat OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Allowed formats of date of the language file"
+    ::= { rlLocalizationLanguagesEntry 9 }
+    
+rlLocalizationTimeFormat OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Allowed formats of time of the language file"
+    ::= { rlLocalizationLanguagesEntry 10 }
+    
+rlLocalizationNumberFormat OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE(0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Allowed formats of numbers of the language file"
+    ::= { rlLocalizationLanguagesEntry 11 }
+    
+rlLocalizationShortButtonWidthPercentage OBJECT-TYPE
+
+    SYNTAX      INTEGER (50..300)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multiplier for the length of short buttons of the language file"
+    ::= { rlLocalizationLanguagesEntry 12 }
+    
+rlLocalizationLongButtonWidthPercentage OBJECT-TYPE
+
+    SYNTAX      INTEGER (50..300)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multiplier for the length of long buttons of the language file"
+    ::= { rlLocalizationLanguagesEntry 13 }
+    
 rlLocalizationVersion OBJECT-TYPE
 
     SYNTAX      DisplayString  (SIZE(0..15))
@@ -176,7 +236,7 @@ rlLocalizationVersion OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The version of the language file (x.y.z.w)"
-    ::= { rlLocalizationLanguagesEntry 8 }
+    ::= { rlLocalizationLanguagesEntry 14 }
 
 rlLocalizationMd5ChksumFile OBJECT-TYPE
 
@@ -185,7 +245,7 @@ rlLocalizationMd5ChksumFile OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The MD5 of the language file (as string)"
-    ::= { rlLocalizationLanguagesEntry 9 }
+    ::= { rlLocalizationLanguagesEntry 15 }
 
 
 END

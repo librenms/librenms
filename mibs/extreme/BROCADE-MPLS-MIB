@@ -1,0 +1,763 @@
+-- MIB File: BROCADE-MPLS-MIB.mib
+-- *********************************************************************
+-- BROCADE-MPLS-MIB.mib: Extreme MPLS MIB
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+BROCADE-MPLS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Counter32, Counter64, IpAddress, Integer32
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp, RowStatus
+        FROM SNMPv2-TC
+    TruthValue,TEXTUAL-CONVENTION
+	 FROM SNMPv2-TC
+    MplsTunnelAffinity
+        FROM MPLS-TC-STD-MIB
+    bcsiModules 
+        FROM Brocade-REG-MIB
+	;
+
+
+brocadeMplsMIB MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+        "This is Extreme's proprietary MIB module for Multi-Protocol Label Switched Paths.
+
+        Copyright (c) 2018 Extreme Networks, Inc.
+               All rights reserved.
+               This Extreme Networks SNMP Management Information Base Specification
+               embodies Extreme Networks' confidential and proprietary
+               intellectual property. Extreme Networks retains all
+               title and ownership in the Specification, including any revisions.
+
+               This Specification is supplied AS IS, and Extreme Networks makes
+               no warranty, either express or implied, as to the use,
+               operation, condition, or performance of the specification, and any unintended
+               consequence it may on the user environment."
+
+    REVISION	 "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION     "201609280000Z"  -- 28 September 2016
+    DESCRIPTION
+        "Moved the OIDs for this MIB from foundry to Extreme (bcsi) tree."
+
+    REVISION        "201305290000Z"  -- 29 May 2013
+    DESCRIPTION
+        "Changed mplsLspName and mplsLspPathName size to 64 from 32 and 16 respectively."
+
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION      "200802060000Z"		-- Feb 6, 2008
+    DESCRIPTION
+        "Add support for proprietary extensions to the VLL and VPLS mib."
+    ::= { bcsiModules 10 }
+    
+bcsiMplsNotifications    OBJECT IDENTIFIER ::=  { brocadeMplsMIB 0 }
+bcsiMplsObjects 		 OBJECT IDENTIFIER ::=  { brocadeMplsMIB 1 }
+bcsiMplsConformance 	 OBJECT IDENTIFIER ::=  { brocadeMplsMIB 2 }
+
+
+-- Textual Conventions
+
+ClassOfService ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "Class Of Service (COS) value of a given management entity.
+       Value 255 means that COS is not explicitly configured. Valid COS values
+       are between 0 and 7."
+   SYNTAX        Unsigned32(0..7 | 255)
+
+
+-- Objects
+
+bcsiMplsInfo      OBJECT IDENTIFIER ::= { bcsiMplsObjects 1 }
+bcsiMplsLspInfo   OBJECT IDENTIFIER ::= { bcsiMplsObjects 2 }
+bcsiMplsVllInfo   OBJECT IDENTIFIER ::= { bcsiMplsObjects 3 }
+bcsiMplsVplsInfo  OBJECT IDENTIFIER ::= { bcsiMplsObjects 4 }
+
+bcsiMplsVersion OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "MPLS version number."
+    ::= { bcsiMplsInfo 1 }
+
+--
+-- Administrative groups, also known as resource classes or link colors,
+-- allows MPLS-enabled interfaces to be assigned to various classes.
+-- For ease of use to a user, a groupname can be associated to a single or
+-- multiple administrative group.
+-- Up to 32 administrative groups can be configured on the device.
+--
+
+bcsiMplsAdminGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BcsiMplsAdminGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "List of administrative groups (by ID) that have a configured group name."
+    ::= { bcsiMplsInfo 2 }
+
+bcsiMplsAdminGroupEntry OBJECT-TYPE
+    SYNTAX     BcsiMplsAdminGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Information about an administrative group entry."
+    INDEX { bcsiMplsAdminGroupId }
+    ::= { bcsiMplsAdminGroupTable 1 }
+
+BcsiMplsAdminGroupEntry ::=
+    SEQUENCE {
+        bcsiMplsAdminGroupId    		Unsigned32,
+        bcsiMplsAdminGroupName  		DisplayString,
+        bcsiMplsAdminGroupRowStatus  	RowStatus
+}
+
+bcsiMplsAdminGroupId OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..32)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Identifies the administrative group ID in 1-based.
+         The end user of this object must convert this to 0-based since this
+         maps to the bit position in the constraint-based link selection."
+    ::= { bcsiMplsAdminGroupEntry 1 }
+
+bcsiMplsAdminGroupName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The group name that this administrative group is associated with."
+    ::= { bcsiMplsAdminGroupEntry 2 }
+
+bcsiMplsAdminGroupRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The row status of an entry.
+         Note: Set request to this table is not supported in this release.
+         Always returns 'active' for the existing entries."
+    ::= { bcsiMplsAdminGroupEntry 3 }
+
+
+--
+-- MPLS-enabled Interface Table
+--
+
+bcsiMplsInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BcsiMplsInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "List of MPLS-enabled Interfaces."
+    ::= { bcsiMplsInfo 3 }
+
+bcsiMplsInterfaceEntry OBJECT-TYPE
+    SYNTAX     BcsiMplsInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Information about an MPLS interface entry."
+    INDEX { bcsiMplsInterfaceIndex }
+    ::= { bcsiMplsInterfaceTable 1 }
+
+BcsiMplsInterfaceEntry::=
+    SEQUENCE {
+        bcsiMplsInterfaceIndex        	Unsigned32,
+        bcsiMplsInterfaceAdminGroup   	MplsTunnelAffinity,
+        bcsiMplsInterfaceRowStatus     	RowStatus
+	}
+
+bcsiMplsInterfaceIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ifIndex of the MPLS-enabled port or VE interface."
+    ::= { bcsiMplsInterfaceEntry 1 }
+
+bcsiMplsInterfaceAdminGroup OBJECT-TYPE
+    SYNTAX     MplsTunnelAffinity
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Specifies which administrative groups this MPLS-enabled
+         interface belongs to."
+    ::= { bcsiMplsInterfaceEntry 2 }
+
+bcsiMplsInterfaceRowStatus     OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The row status of an entry.
+         Note: Set request to this table is not supported in this release.
+         Always returns 'active' for the existing entries."
+    ::= { bcsiMplsInterfaceEntry 3 }
+
+
+bcsiMplsConfiguredLsps OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION "Number of configured LSPs. Sum of RSVP and static configured LSPs.
+                    DEPRECATED BY mplsTunnelConfigured IN rfc3812-MPLS-TE-STD-MIB."
+    ::= { bcsiMplsLspInfo 1 }
+
+bcsiMplsActiveLsps OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION "Number of active LSPs. Sum of RSVP, LDP and static LSPs.
+                    DEPRECATED BY mplsTunnelActive IN rfc3812-MPLS-TE-STD-MIB."
+    ::= { bcsiMplsLspInfo 2 }
+
+
+--
+-- MPLS LSP Table
+--
+
+bcsiMplsLspTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BcsiMplsLspEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "List of Configured Label Switched Paths."
+    ::= { bcsiMplsLspInfo 3 }
+
+bcsiMplsLspEntry OBJECT-TYPE
+    SYNTAX     BcsiMplsLspEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about a particular
+         Label Switched Path."
+    INDEX { bcsiMplsLspSignalingProto, bcsiMplsLspIndex }
+    ::= { bcsiMplsLspTable 1 }
+
+BcsiMplsLspEntry ::=
+    SEQUENCE {
+        bcsiMplsLspSignalingProto      			INTEGER,
+        bcsiMplsLspIndex            			Unsigned32,
+        bcsiMplsLspName             			DisplayString,
+        bcsiMplsLspState            			INTEGER,
+        bcsiMplsLspPackets          			Counter64,
+        bcsiMplsLspAge              			TimeStamp,
+        bcsiMplsLspTimeUp           			TimeStamp,
+        bcsiMplsLspPrimaryTimeUp    			TimeStamp,
+        bcsiMplsLspTransitions      			Counter32,
+        bcsiMplsLspLastTransition   			TimeStamp,
+        bcsiMplsLspFrom             			IpAddress,
+        bcsiMplsLspTo               			IpAddress,
+        bcsiMplsLspPathName             		DisplayString,
+        bcsiMplsLspPathType             		INTEGER,
+        bcsiMplsLspAdaptive             		TruthValue,
+        bcsiMplsLspBfdSessionId      			Unsigned32,
+        bcsiMplsLspReoptimizeTimer  			Unsigned32,
+        bcsiMplsLspCoS			   				ClassOfService,
+        bcsiMplsLspHopLimit						Unsigned32,
+        bcsiMplsLspCspf   						INTEGER,
+        bcsiMplsLspCspfTieBreaker				INTEGER,
+        bcsiMplsLspFrrMode						INTEGER,
+        bcsiMplsLspFrrSetupPriority				Unsigned32,
+        bcsiMplsLspFrrHoldingPriority			Unsigned32,
+        bcsiMplsLspFrrHopLimit					Unsigned32,
+        bcsiMplsLspFrrBandwidth					Unsigned32,
+        bcsiMplsLspFrrAdmGrpIncludeAny			MplsTunnelAffinity,
+        bcsiMplsLspFrrAdmGrpIncludeAll			MplsTunnelAffinity,
+        bcsiMplsLspFrrAdmGrpExcludeAny			MplsTunnelAffinity,
+        bcsiMplsLspPathSelectMode				INTEGER,
+        bcsiMplsLspPathSelectPathname   		DisplayString,
+        bcsiMplsLspPathSelectRevertTimer 		Unsigned32,
+        bcsiMplsLspShortcutOspfAllowed			TruthValue,
+        bcsiMplsLspShortcutIsisAllowed			TruthValue,
+        bcsiMplsLspShortcutIsisLevel			INTEGER,
+        bcsiMplsLspShortcutIsisAnnounce			TruthValue,
+        bcsiMplsLspShortcutIsisAnnounceMetric	Integer32,
+        bcsiMplsLspShortcutIsisRelativeMetric	Integer32
+}
+
+bcsiMplsLspSignalingProto OBJECT-TYPE
+    SYNTAX     INTEGER {
+        ldp(1),
+        rsvp(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "MPLS signaling protocol used by this LSP."
+    ::= { bcsiMplsLspEntry 1 }
+
+bcsiMplsLspIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "The unique index of the LSP in the system for a given signaling protocol."
+    ::= { bcsiMplsLspEntry 2 }
+
+bcsiMplsLspName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Name of the Label Switched Path."
+    ::= { bcsiMplsLspEntry 3 }
+
+bcsiMplsLspState OBJECT-TYPE
+    SYNTAX     INTEGER {
+               unknown(1),
+               up(2),
+               down(3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "The operational state of the LSP."
+    ::= { bcsiMplsLspEntry 4 }
+
+bcsiMplsLspPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of egress Layer-3 VPN and IPoMPLS packets
+        meeting the in-label and tunnel criteria."
+    ::= { bcsiMplsLspEntry 5 }
+
+bcsiMplsLspAge OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The age, since creation of this LSP in 10-millisecond periods."
+    ::= { bcsiMplsLspEntry 6 }
+
+bcsiMplsLspTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP has been operational. The percentage up time
+         can be determined by computing
+         (bcsiMplsLspTimeUp/bcsiMplsLspAge * 100 %)."
+    ::= { bcsiMplsLspEntry 7 }
+
+bcsiMplsLspPrimaryTimeUp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total time in 10-millisecond units that this
+         LSP's primary path has been operational. The
+         percentage contribution of the primary
+         path to the operational time is given by
+         (bcsiMplsLspPrimaryTimeUp/bcsiMplsLspTimeUp * 100) %."
+    ::= { bcsiMplsLspEntry 8 }
+
+bcsiMplsLspTransitions OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of state transitions (up -> down and
+         down -> up) this LSP has undergone."
+    ::= { bcsiMplsLspEntry 9 }
+
+bcsiMplsLspLastTransition OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The time in 10-millisecond units since the last
+         transition occurred on this LSP."
+    ::= { bcsiMplsLspEntry 10 }
+
+bcsiMplsLspFrom OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of this LSP."
+    ::= { bcsiMplsLspEntry 11 }
+
+bcsiMplsLspTo OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Destination IP address of this LSP."
+    ::= { bcsiMplsLspEntry 12 }
+
+bcsiMplsLspPathName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The name of the active path for this LSP, if
+         any.  If there is none, the name should be
+         empty; in that case, the rest of the fields
+         in bcsiMplsLspEntry are meaningless."
+    ::= { bcsiMplsLspEntry 13 }
+
+bcsiMplsLspPathType OBJECT-TYPE
+    SYNTAX     INTEGER {
+        other(1),
+        primary(2),
+        standby(3),
+        secondary(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of path that is active, i.e., a
+         primary path, a standby path, or a generic
+         secondary path. This field is meaningless
+         unless bcsiMplsLspPathName is not empty"
+    ::= { bcsiMplsLspEntry 14 }
+
+bcsiMplsLspAdaptive OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates if the LSP supports adaptive mechanism or not."
+    ::= { bcsiMplsLspEntry 15 }
+
+bcsiMplsLspBfdSessionId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The BFD session ID associated to this LSP. Zero indicates
+         there is no BFD session for this LSP. Non-zero value is an
+         index to an entry in the bfdSessTable"
+    ::= { bcsiMplsLspEntry 16 }
+
+ bcsiMplsLspReoptimizeTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 ( 0 | 300..65535 )
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of seconds from the beginning of one reoptimization
+         attempt to the beginning of the next attempt."
+    ::= { bcsiMplsLspEntry 17 }
+
+bcsiMplsLspCoS OBJECT-TYPE
+    SYNTAX          ClassOfService
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The Class of Service for this LSP."
+    ::= { bcsiMplsLspEntry 18 }
+
+bcsiMplsLspHopLimit OBJECT-TYPE
+    SYNTAX          Unsigned32 ( 0..255 )
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of hops this LSP can traverse."
+    ::= { bcsiMplsLspEntry 19 }
+
+bcsiMplsLspCspf OBJECT-TYPE
+    SYNTAX          INTEGER {
+               enabled(1),
+               disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates if CSPF path calculation is enabled
+         on this LSP."
+    ::= { bcsiMplsLspEntry 20 }
+
+bcsiMplsLspCspfTieBreaker OBJECT-TYPE
+    SYNTAX          INTEGER {
+               random(1),
+               leastFill(2),
+               mostFill(3)
+    }
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The tie-breaker to use for selecting CSPF
+         equal-cost paths. The value of this variable is
+         meaningless if the bcsiMplsLspCspf is 'disabled'."
+    ::= { bcsiMplsLspEntry 21 }
+
+bcsiMplsLspFrrMode OBJECT-TYPE
+    SYNTAX          INTEGER {
+               none(1),
+               detour(2),
+               facility(3)
+    }
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates which protection method is to be used
+         for Fast Reroute. 'detour' means one-to-one backup
+         and 'facility' for facility backup."
+    ::= { bcsiMplsLspEntry 22 }
+
+bcsiMplsLspFrrSetupPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The setup priority for MPLS Fast Reroute.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 23 }
+
+bcsiMplsLspFrrHoldingPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The hold priority for MPLS Fast Reroute.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 24 }
+
+bcsiMplsLspFrrHopLimit OBJECT-TYPE
+    SYNTAX          Unsigned32 ( 0..255 )
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The hop limit for MPLS Fast Reroute.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 25 }
+
+bcsiMplsLspFrrBandwidth OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The bandwidth constraint for MPLS Fast Reroute.
+         The value 0 means that the detour route uses a
+         best-effort value for bandwidth.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 26 }
+
+bcsiMplsLspFrrAdmGrpIncludeAny OBJECT-TYPE
+    SYNTAX          MplsTunnelAffinity
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The administrative group setting that the device
+         includes any of the interfaces that are members of
+         the group when calculating detour routes for this LSP.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 27 }
+
+bcsiMplsLspFrrAdmGrpIncludeAll OBJECT-TYPE
+    SYNTAX          MplsTunnelAffinity
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The administrative group setting that an interface
+         must be a member of to be considered in a detour
+         route for the LSP. Any interface that is not a member
+         of all the groups is eliminated from consideration.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 28 }
+
+bcsiMplsLspFrrAdmGrpExcludeAny OBJECT-TYPE
+    SYNTAX          MplsTunnelAffinity
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The administrative group setting that the device
+         excludes any of the interfaces that are members of
+         the group when calculating detour routes for this LSP.
+         The value of this variable is meaningless if the
+         bcsiMplsLspFrrMode is 'none'."
+    ::= { bcsiMplsLspEntry 29 }
+
+bcsiMplsLspPathSelectMode OBJECT-TYPE
+    SYNTAX          INTEGER {
+               auto(1),
+               manual(2),
+               unconditional(3)
+    }
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the path selection mode to use.
+         Auto-select is the default mode. I this mode, the
+         primary path is always selected to carry traffic when
+         the primary path has stayed operating in the working
+         state for at least the amount of time specified in
+         bcsiMplsLspPathSelectRevertTimer.
+         For manual-select, traffic is switched to a user-
+         selected path specified in bcsiMplsLspPathSelectPathname
+         after the selected path has stayed operating in the
+         working state for at least the amount of time specified
+         in bcsiMplsLspPathSelectRevertTimer.
+         For unconditional-select, traffic is switched to and
+         stays on the selected path regardless of the path's
+         condition even if it is in a failure state."
+    ::= { bcsiMplsLspEntry 30 }
+
+bcsiMplsLspPathSelectPathname OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The user-selected pathname when the bcsiMplsLspPathSelectMode
+         is either 'manual' or 'unconditional'."
+    ::= { bcsiMplsLspEntry 31 }
+
+bcsiMplsLspPathSelectRevertTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of seconds to wait after the primary or selected
+         path comes up before traffic reverts to that path.
+         A value of 0 indicates that it will switch immediately
+         after the current working path goes down."
+    ::= { bcsiMplsLspEntry 32 }
+
+bcsiMplsLspShortcutOspfAllowed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates that this LSP allows shortcut between nodes in an AS.
+         OSPF includes the LSP in its SPF calculation."
+    ::= { bcsiMplsLspEntry 33 }
+
+bcsiMplsLspShortcutIsisAllowed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates that this LSP allows shortcut through the
+         network to a destination based on the path's cost (metric).
+         Traffic is forwarded through this LSP to destinations
+         within the IS-IS routing domain. IS-IS includes the LSP
+         in its SPF calculation."
+    ::= { bcsiMplsLspEntry 34 }
+
+bcsiMplsLspShortcutIsisLevel OBJECT-TYPE
+    SYNTAX          INTEGER {
+               level1(1),
+               level2(2),
+               level1and2(3)
+    }
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the level of IS-IS routing enabled on the device.
+         The value of this variable is meaningless if the
+         bcsiMplsLspShortcutIsisAllowed is 'false'."
+    ::= { bcsiMplsLspEntry 35 }
+
+bcsiMplsLspShortcutIsisAnnounce OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates that this IS-IS shortcut will be announced or
+         advertised. The metric to announce is specified by
+         bcsiMplsLspShortcutIsisAnnounceMetric.
+         The value of this variable is meaningless if the
+         bcsiMplsLspShortcutIsisAllowed is 'false'."
+    ::= { bcsiMplsLspEntry 36 }
+
+bcsiMplsLspShortcutIsisAnnounceMetric OBJECT-TYPE
+    SYNTAX          Integer32 (1..16777215)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the metric value to announce for this shortcut.
+         The value of this variable is meaningless if the
+         bcsiMplsLspShortcutIsisAnnounce is 'false'. Default value is 10."
+    ::= { bcsiMplsLspEntry 37 }
+
+bcsiMplsLspShortcutIsisRelativeMetric OBJECT-TYPE
+    SYNTAX          Integer32 (-16777215..16777215)
+    MAX-ACCESS read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the relative metric used to compute the LSP cost
+         when announce is not enabled.
+         The value of this variable is meaningless if the
+         bcsiMplsLspShortcutIsisAllowed is 'false'."
+    ::= { bcsiMplsLspEntry 38 }
+
+
+-- definition of MPLS traps
+--
+bcsiMplsLspUpNotification NOTIFICATION-TYPE
+OBJECTS { bcsiMplsLspName,
+          bcsiMplsLspPathName } -- LspPath
+STATUS current
+DESCRIPTION
+     "An bcsiMplsLspUpNotification trap signifies that the
+     specified LSP is up. The current active
+     path for the LSP is bcsiMplsLspPathName."
+--#TYPE "Foundry Trap: MPLS LSP Up"
+--#SUMMARY "LSP %s using path %s is up."
+--#ARGUMENTS { 0, 1 }
+--#SEVERITY INFORMATIONAL
+--#STATE OPERATIONAL
+::= { bcsiMplsNotifications 1 }
+
+
+bcsiMplsLspDownNotification NOTIFICATION-TYPE
+OBJECTS { bcsiMplsLspName,
+          bcsiMplsLspPathName } -- LspPath
+STATUS current
+DESCRIPTION
+     "An bcsiMplsLspDownNotification trap signifies that the
+     specified LSP is down, because the current
+     active path bcsiMplsLspPathName went down."
+--#TYPE "Foundry Trap: MPLS LSP Down"
+--#SUMMARY "LSP %s using path %s is down."
+--#ARGUMENTS { 0, 1 }
+--#SEVERITY INFORMATIONAL
+--#STATE OPERATIONAL
+::= { bcsiMplsNotifications 2 }
+
+
+bcsiMplsLspChangeNotification NOTIFICATION-TYPE
+OBJECTS { bcsiMplsLspName,
+          bcsiMplsLspPathName } -- LspPath
+STATUS current
+DESCRIPTION
+     "An bcsiMplsLspChangeNotification trap signifies that the
+     the specified LSP has switched traffic to
+     the new active path 'toLspPath'. The LSP maintains
+     up state before and after the switch over"
+--#TYPE "Foundry Trap: MPLS LSP Change"
+--#SUMMARY "LSP %s switches to new active path %s."
+--#ARGUMENTS { 0, 1 }
+--#SEVERITY INFORMATIONAL
+--#STATE OPERATIONAL
+::= { bcsiMplsNotifications 3 }
+
+END
+
+
+

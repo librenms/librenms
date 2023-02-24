@@ -15,15 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\DB;
+
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Collection;
 
 trait SyncsModels
 {
@@ -31,30 +34,66 @@ trait SyncsModels
      * Sync several models for a device's relationship
      * Model must implement \LibreNMS\Interfaces\Models\Keyable interface
      *
-     * @param \App\Models\Device $device
-     * @param string $relationship
-     * @param \Illuminate\Support\Collection $models
+     * @param  \App\Models\Device  $device
+     * @param  string  $relationship
+     * @param  \Illuminate\Support\Collection  $models  \LibreNMS\Interfaces\Models\Keyable
      * @return \Illuminate\Support\Collection
      */
-    protected function syncModels($device, $relationship, $models)
+    protected function syncModels($device, $relationship, $models): Collection
     {
         $models = $models->keyBy->getCompositeKey();
-        $existing = $device->$relationship->keyBy->getCompositeKey();
+        $existing = $device->$relationship->groupBy->getCompositeKey();
 
-        foreach ($existing as $exist_key => $exist_value) {
+        foreach ($existing as $exist_key => $existing_rows) {
             if ($models->offsetExists($exist_key)) {
                 // update
-                $exist_value->fill($models->get($exist_key)->getAttributes())->save();
+                foreach ($existing_rows as $index => $existing_row) {
+                    if ($index == 0) {
+                        $existing_row->fill($models->get($exist_key)->getAttributes())->save();
+                    } else {
+                        // delete extra rows at this key
+                        $existing_row->delete();
+                        $existing_rows->forget($index);
+                    }
+                }
             } else {
                 // delete
-                $exist_value->delete();
+                $existing_rows->each->delete();
                 $existing->forget($exist_key);
             }
         }
 
         $new = $models->diffKeys($existing);
-        $device->$relationship()->saveMany($new);
+        if (is_a($device->$relationship(), HasManyThrough::class)) {
+            // if this is a distant relation, the models need the intermediate relationship set
+            // just save assuming things are correct
+            $new->each->save();
+        } else {
+            $device->$relationship()->saveMany($new);
+        }
 
-        return $existing->merge($new);
+        return $existing->map->first()->merge($new);
+    }
+
+    /**
+     * Combine a list of existing and potentially new models
+     * If the model exists fill any new data from the new models
+     *
+     * @param  \Illuminate\Support\Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
+     * @param  \Illuminate\Support\Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
+     * @return \Illuminate\Support\Collection
+     */
+    protected function fillNew(Collection $existing, Collection $discovered): Collection
+    {
+        $all = $existing->keyBy->getCompositeKey();
+        foreach ($discovered as $new) {
+            if ($found = $all->get($new->getCompositeKey())) {
+                $found->fill($new->getAttributes());
+            } else {
+                $all->put($new->getCompositeKey(), $new);
+            }
+        }
+
+        return $all;
     }
 }

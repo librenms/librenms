@@ -11,7 +11,8 @@ CISCOSB-rndMng DEFINITIONS ::= BEGIN
 -- 20-Jun-2006  Added   rlRebootDelay
 -- 19-Dec-2006  Added   resetToFactoryDefaults
 -- 04-Apr-2012  Added   rlScheduledReload
--- 04-Dec-2012  Added   rlSysNameTable
+-- 04-Dec-2012  Added   rlSysNameTable 
+-- 10-Aug-2018  Added   rlDefaultSysName
 
 IMPORTS
     switch001                                               FROM CISCOSB-MIB
@@ -24,7 +25,7 @@ IMPORTS
 
 
 rndMng  MODULE-IDENTITY
-        LAST-UPDATED "201212040000Z"
+        LAST-UPDATED "201212040001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -344,6 +345,14 @@ rlGroupMngDeviceLastSeen  OBJECT-TYPE
        this device. "
      ::=  { rlGroupMngDeviceEntry 10 }
 
+rlPrivateMIBroot OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the object identifier of the private MIB root in this device."
+    ::= { rndMng 12 }
+
 rlRunningCDBequalToStartupCDB OBJECT-TYPE
 
    SYNTAX     TruthValue
@@ -352,6 +361,7 @@ rlRunningCDBequalToStartupCDB OBJECT-TYPE
    DESCRIPTION
       "Indicates whether there are changes in running CDB that were not saved in flash."
      ::=  { rndMng 13 }
+
 
 rlClearMib OBJECT-TYPE
     SYNTAX DisplayString
@@ -485,6 +495,27 @@ rlSysNameRowStatus OBJECT-TYPE
          row installation and removal conventions."
     ::= { rlSysNameEntry 4 }
 
+-------------------------------------------------------------------------------
 
+rlErrdisableLinkFlappingCause OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable Link flapping error disable in the switch."
+    ::= { rndMng 20 }
+
+
+-------------------------------------------------------------------------------
+
+rlDefaultSysName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..160))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The default value for the administratively-assigned name for this managed node.
+             If the name is unknown, the value is the zero-length string."
+    ::= { rndMng 21 }
+	
 END
 

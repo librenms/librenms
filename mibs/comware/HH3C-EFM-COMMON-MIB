@@ -1,0 +1,2527 @@
+-- ===========================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: This MIB is excerpted from the draft-ietf-hubmib-efm-mib-02 directly
+--              only changed the object name,added the hh3c as prefix.
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 created by liyue.
+--     Define MODULE-IDENTITY for hh3cEfmOamMIB
+-- V1.1 modified by liuhongxu for hh3cDot3OamEventLogEventTotal
+--      adjust format by longyin
+-- V1.2 modified description by lvhuipeng for hh3cDot3OamStatsTable
+--      add by lvhuipeng for hh3cDot3OamStats2Table
+-- =================================================================
+HH3C-EFM-COMMON-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+          hh3cEpon
+              FROM HH3C-OID-MIB
+          MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32,
+          Integer32, NOTIFICATION-TYPE, Counter64
+              FROM SNMPv2-SMI
+          TEXTUAL-CONVENTION, MacAddress, DateAndTime
+              FROM SNMPv2-TC
+          CounterBasedGauge64
+              FROM HCNUM-TC
+          ifIndex
+              FROM IF-MIB
+          MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+              FROM SNMPv2-CONF;
+
+
+      hh3cEfmOamMIB MODULE-IDENTITY
+        LAST-UPDATED "201508041147Z"  -- August 4, 2015
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+          "The MIB module for managing the new Ethernet OAM features
+          introduced by the Ethernet in the First Mile task force (IEEE
+          802.3ah).  The functionality presented here is based on IEEE
+          802.3ah [802.3ah], released in October, 2004.
+
+          In particular, this MIB focused on the changes to Clause 30 of
+          the draft that are not specific to any physical layer.  These
+          changes are primarily reflected in the new OAM features
+          developed under this project, that can be applied to any
+          Ethernet like interface.  The OAM features are described in
+          Clause 57 of [802.3ah].
+          This MIB is excerpted from the draft files directly,only changed
+          the object name,added the hh3c as prefix.
+
+          The following reference is used throughout this MIB module:
+
+            [802.3ah] refers to:
+              IEEE Std 802.3ah-2004: 'Draft amendment to -
+              Information technology - Telecommunications and
+              information exchange between systems - Local and
+              metropolitan are networks - Specific requirements - Part
+              3: Carrier sense multiple access with collision detection
+              (CSMA/CD) access method and physical layer specifications
+              - Media Access Control Parameters, Physical Layers and
+              Management Parameters for subscriber access networks',
+              October 2004.
+
+            [802-2001] refers to:
+              'IEEE Standard for LAN/MAN (Local Area
+              Network/Metropolitan Area Network): Overview and
+              Architecture', IEEE 802, June 2001."
+   -- RFC Editor: Update XXXX to appropriate RFC number
+   -- RFC Editor: Remove these notes
+   
+   	REVISION    "201508041147Z"  -- August 4, 2015
+        DESCRIPTION "Change description of hh3cDot3OamStatsTable, add the 
+                     objects of hh3cDot3OamStats2Table"
+         ::= { hh3cEpon 3 }
+   -- RFC Editor: Replace value with IANA assigned number
+   -- RFC Editor: Remove these notes
+
+
+      --
+      -- Sections of the EFM OAM MIB
+      --
+         hh3cDot3OamMIB         OBJECT IDENTIFIER ::= { hh3cEfmOamMIB 1 }
+         hh3cDot3OamConformance OBJECT IDENTIFIER ::= { hh3cEfmOamMIB 2 }
+
+
+      --
+      -- Textual conventions for OAM MIB
+      --
+      Dot3Oui ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+          "24-bit Organizationally Unique Identifier.  Information on
+          OUIs can be found in IEEE 802-2001 [802-2001] Clause 9."
+        SYNTAX       OCTET STRING(SIZE(3))
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Control group
+      --
+
+
+
+      hh3cDot3OamTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDot3OamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Primary controls and status for the OAM capabilities of an
+          Ethernet like interface.  There will be one row in this table
+          for each Ethernet like interface in the system that supports
+          the Ethernet OAM functions defined in [802.3ah]."
+        ::= { hh3cDot3OamMIB 1 }
+
+      hh3cDot3OamEntry OBJECT-TYPE
+        SYNTAX     Hh3cDot3OamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "An entry in the table, containing information on the Ethernet
+          OAM function for a single Ethernet like interface."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamTable 1 }
+
+      Hh3cDot3OamEntry ::=
+        SEQUENCE {
+          hh3cDot3OamAdminState                  INTEGER,
+          hh3cDot3OamOperStatus                  INTEGER,
+          hh3cDot3OamMode                        INTEGER,
+          hh3cDot3OamMaxOamPduSize               Integer32,
+          hh3cDot3OamConfigRevision              Unsigned32,
+          hh3cDot3OamFunctionsSupported          BITS
+        }
+
+
+      hh3cDot3OamAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disabled(1),
+                      enabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to provision the default administrative
+          OAM mode for this interface.  This object represents the
+          desired state of OAM for this interface.
+
+          The hh3cDot3OamAdminState always starts in the disabled(1) state
+          until an explicity management action or configuration
+          information retained by the system causes a transition to the
+          enabled(2) state.
+          Note that the value of this object is ignored when the
+          interface is not operating in full-duplex mode.  OAM is not
+          supported on half-duplex links."
+        REFERENCE   "[802.3ah], 30.3.6.1.2"
+        ::= { hh3cDot3OamEntry 1 }
+
+      hh3cDot3OamOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      disabled(1),
+                      linkfault(2),
+                      passiveWait(3),
+                      activeSendLocal(4),
+                      sendLocalAndRemote(5),
+                      sendLocalAndRemoteOk(6),
+                      oamPeeringLocallyRejected(7),
+                      oamPeeringRemotelyRejected(8),
+                      operational(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "At initialization and failure conditions, two OAM entities on
+          the same full-duplex Ethernet link begin a discovery phase to
+          determine what OAM capabilities may be used on that link.  The
+          progress of this initialization is controlled by the OAM
+          sublayer.
+
+          This value is always disabled(1) if OAM is disabled on this
+          interface via the hh3cDot3OamAdminState.
+
+          If the link has detected a fault and is transmitting OAMPDUs
+          with a link fault indication, the value is linkFault(2).
+
+          The passiveWait(3) state is returned only by OAM entities in
+          passive mode (hh3cDot3OamMode) and reflects the state in which the
+          OAM entity is waiting to see if the peer device is OAM
+          capable.  The activeSendLocal(4) is used by active mode
+          devices (hh3cDot3OamMode) and reflects the OAM entity actively
+          trying to discover whether the peer has OAM capability but has
+          not yet made that determination.
+
+          The state sendLocalAndRemote(5) reflects that the local OAM
+          entity has discovered the peer but has not yet accepted or
+          rejected the configuration of the peer.  The local device can,
+          for whatever reason, decide that the peer device is
+          unacceptable and decline OAM peering.  If the local OAM entity
+          rejects the peer OAM entity, the state becomes
+          oamPeeringLocallyRejected(7).  If the OAM peering is allowed
+          by the local device, the state moves to
+          sendLocalAndRemoteOk(6).  Note that both the
+          sendLocalAndRemote(5) and oamPeeringLocallyRejected(7) states
+          fall within the state SEND_LOCAL_REMOTE of the Discovery state
+          diagram [802.3ah, Figure 57-5], with the difference being
+          whether the local OAM client has actively rejected the peering
+          or has just not indicated any decision yet.  Whether a peering
+          decision has been made is indicated via the local flags field
+          in the OAMPDU (reflected in the aOAMLocalFlagsField of
+          30.3.6.1.10).
+
+          If the remote OAM entity rejects the peering, the state
+          becomes oamPeeringRemotelyRejected(8).  Note that both the
+          sendLocalAndRemoteOk(6) and oamPeeringRemotelyRejected(8)
+          states fall within the state SEND_LOCAL_REMOTE_OK of the
+          Discovery state diagram [802.3ah, Figure 57-5], with the
+          difference being whether the remote OAM client has rejected
+          the peering or has just not yet decided.  This is indicated
+          via the remote flags field in the OAM PDU (reflected in the
+          aOAMRemoteFlagsField of 30.3.6.1.11).
+
+          When the local OAM entity learns that both it and the remote
+          OAM entity have accepted the peering, the state moves to
+          operational(9) corresponding to the SEND_ANY state of the
+          Discovery state diagram [802.3ah, Figure 57-5]."
+        REFERENCE   "[802.3ah], 30.3.6.1.4, 30.3.6.1.10, 30.3.6.1.11"
+        ::= { hh3cDot3OamEntry 2 }
+
+      hh3cDot3OamMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      active(1),
+                      passive(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object configures the mode of OAM operation for this
+          Ethernet like interface.  OAM on Ethernet interfaces may be in
+          'active' mode or 'passive' mode.  These two modes differ in
+          that active mode provides additional capabilities to initiate
+          monitoring activities with the remote OAM peer entity, while
+          passive mode generally waits for the peer to initiate OAM
+          actions with it.  As an example, an active OAM entity can put
+          the remote OAM entity in a loopback state, where a passive OAM
+          entity cannot.
+
+          Changing this value results in incrementing the configuration
+          revision field of locally generated OAMPDUs (30.3.6.1.12) and
+          potentially re-doing the OAM discovery process if the
+          hh3cDot3OamOperStatus was already operational(9)."
+        REFERENCE   "[802.3ah], 30.3.6.1.3"
+        ::= { hh3cDot3OamEntry 3 }
+
+      hh3cDot3OamMaxOamPduSize OBJECT-TYPE
+        SYNTAX      Integer32 (64..1522)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The largest OAMPDU that the OAM entity supports.  OAM
+          entities exchange maximum OAMPDU sizes and negotiate to use
+          the smaller of the two maximum OAMPDU sizes between the peers.
+          This value is determined by the local implementation.
+          "
+        REFERENCE   "[802.3ah], 30.3.6.1.8"
+        ::= { hh3cDot3OamEntry 4 }
+
+      hh3cDot3OamConfigRevision OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The configuration revision of the OAM entity as reflected in
+          the latest OAMPDU sent by the OAM entity.  The config revision
+          is used by OAM entities to indicate configuration changes have
+          occured which might require the peer OAM entity to re-evaluate
+          whether the peering is allowed.  See local_satisfied in
+          [802.3ah, 57.3.1.2]."
+        REFERENCE   "[802.3ah], 30.3.6.1.12"
+        ::= { hh3cDot3OamEntry 5 }
+
+      hh3cDot3OamFunctionsSupported OBJECT-TYPE
+        SYNTAX      BITS {
+                      unidirectionalSupport (0),
+                      loopbackSupport(1),
+                      eventSupport(2),
+                      variableSupport(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The OAM functions supported on this Ethernet like interface.
+          OAM consists of separate functional sets beyond the basic
+          discovery process which is always required.  These functional
+          groups can be supported independently by any implementation.
+          These values are communicated to the peer via the local
+          configuration field of Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.6"
+        ::= { hh3cDot3OamEntry 6 }
+
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Peer group
+      --
+
+
+      hh3cDot3OamPeerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDot3OamPeerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Information about the OAM peer for a particular Ethernet like
+          interface.  OAM entities communicate with a single OAM peer
+          entity on full-duplex Ethernet links on which OAM is enabled
+          and operating properly.
+
+          In certain states, the OAM peer information is not available.
+          Whether peer information is available is communicated via the
+          hh3cDot3OamPeerStatus object.  When this object is inactive, all
+          other information in the row is to be considered invalid."
+        ::= { hh3cDot3OamMIB 2 }
+
+      hh3cDot3OamPeerEntry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamPeerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing information on the peer OAM
+          entity for a single Ethernet like interface.
+
+          Note that there is at most one OAM peer for each Ethernet like
+          interface.  There is exactly one row in this table for each
+          Ethernet like interface supporting OAM."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamPeerTable 1 }
+
+
+      Hh3cDot3OamPeerEntry ::=
+        SEQUENCE {
+          hh3cDot3OamPeerStatus                   INTEGER,
+          hh3cDot3OamPeerMacAddress               MacAddress,
+          hh3cDot3OamPeerVendorOui                Dot3Oui,
+          hh3cDot3OamPeerVendorInfo               Unsigned32,
+          hh3cDot3OamPeerMode                     INTEGER,
+          hh3cDot3OamPeerMaxOamPduSize            Integer32,
+          hh3cDot3OamPeerConfigRevision           Unsigned32,
+          hh3cDot3OamPeerFunctionsSupported       BITS
+        }
+
+
+
+      hh3cDot3OamPeerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      active(1),
+                      inactive(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object indicates whether the information in this row
+          should be considered valid.  When active(1), the information
+          is valid and represents the current peer of the OAM entity.
+          When inactive(2), the information in this row is invalid.
+
+          A value of inactive(2) is returned if the hh3cDot3OamOperStatus is
+          disabled, passiveWait, or activeSendLocal.  For all other
+          values of hh3cDot3OamOperStatus, a value of active(1) is returned.
+          "
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamPeerEntry 1 }
+
+      hh3cDot3OamPeerMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The MAC address of the peer OAM entity.  The MAC address is
+          derived from the most recently received OAMPDU.  This value is
+          initialized to all zeros (0x000000000000).  This value is
+          invalid if the hh3cDot3OamPeerStatus is inactive.
+
+          An OAMPDU is indicated by a valid frame with (1) destination
+          MAC address equal to that of the reserved MAC address for Slow
+          Protocols (See 43B of [802.3ah]), (2) a lengthOrType field
+          equal to the reserved type for Slow Protocols, (3) and a Slow
+          Protocols subtype equal to that of the subtype reserved for
+          OAM."
+        REFERENCE   "[802.3ah], 30.3.6.1.5."
+        ::= { hh3cDot3OamPeerEntry 2 }
+
+
+      hh3cDot3OamPeerVendorOui OBJECT-TYPE
+        SYNTAX      Dot3Oui
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The OUI of the OAM peer as reflected in the latest
+          Information OAMPDU received with a Local Information TLV.  The
+          OUI can be used to identify the vendor of the remote OAM
+          entity.  This value is initialized to all zeros (0x000000).
+          This value is considered invalid if the hh3cDot3OamPeerStatus is
+          inactive.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, (4) a OAM code that equals the code
+          reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.16."
+        ::= { hh3cDot3OamPeerEntry 3 }
+
+
+      hh3cDot3OamPeerVendorInfo OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Vendor Info of the OAM peer as reflected in the latest
+          Information OAMPDU received with a Local Information TLV.  The
+          vendor information field is within the Local Information TLV,
+          and can be used to determine additional information about the
+          peer entity.  The format of the vendor information is
+          unspecified within the 32-bit field.  This value is intialized
+          to all zeros (0x00000000).  This value is invalid if the
+          hh3cDot3OamPeerStatus is inactive.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) a OAM code that equals the
+          code reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.17."
+        ::= { hh3cDot3OamPeerEntry 4 }
+
+
+      hh3cDot3OamPeerMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      active(1),
+                      passive(2),
+                      unknown(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The mode of the OAM peer as reflected in the latest
+          Information OAMPDU received with a Local Information TLV.  The
+          mode of the peer can be determined from the Configuration
+          field in the Local Information TLV of the last Information
+          OAMPDU received from the peer.  This value is initialized to
+          unknown(3), and is not valid if the hh3cDot3OamPeerStatus is
+          inactive.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) a OAM code that equals the
+          code reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.7."
+        ::= { hh3cDot3OamPeerEntry 5 }
+
+      hh3cDot3OamPeerMaxOamPduSize OBJECT-TYPE
+        SYNTAX      Integer32 (64..1522)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum size of OAMPDU supported by the peer as reflected
+          in the latest Information OAMPDU received with a Local
+          Information TLV.   Ethernet OAM on this interface must not use
+          OAMPDUs that exceed this size.  The maximum OAMPDU size can be
+          determined from the PDU Configuration field of the Local
+          Information TLV of the last Information OAMPDU received from
+          the peer.  This value is initialized to 64, and is invalid if
+          the hh3cDot3OamPeerStatus is inactive.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) a OAM code that equals the
+          code reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.9."
+        ::= { hh3cDot3OamPeerEntry 6 }
+
+
+      hh3cDot3OamPeerConfigRevision OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The configuration revision of the OAM peer as reflected in
+          the latest OAMPDU.  This attribute is changed by the peer
+          whenever it has a local configuration change for Ethernet OAM
+          this interface.  This value is initialized to all zeros
+          (0x00000000), and is invalid if the hh3cDot3OamPeerStatus is
+          inactive.
+
+          The configuration revision can be determined from the Revision
+          field of the Local Information TLV of the most recently
+          received Information OAMPDU with a Local Information TLV.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) a OAM code that equals the
+          code reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], 30.3.6.1.13."
+        ::= { hh3cDot3OamPeerEntry 7 }
+
+
+      hh3cDot3OamPeerFunctionsSupported OBJECT-TYPE
+        SYNTAX      BITS {
+                      unidirectionalSupport (0),
+                      loopbackSupport(1),
+                      eventSupport(2),
+                      variableSupport(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The OAM functions supported on this Ethernet like interface.
+          OAM consists of separate functionality sets above the basic
+          discovery process.  This value indicates the capabilities of
+          the peer OAM entity with respect to these functions.  This
+          value is initialized so all bits are clear, and is invalid if
+          the hh3cDot3OamPeerStatus is inactive.
+
+          The capbilities of the OAM peer can be determined from the
+          configuration field of the Local Information TLV of the most
+          recently received Information OAMPDU with a Local Information
+          TLV.
+
+          An Information OAMPDU is indicated by a valid frame with (1)
+          destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (See 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) a OAM code that equals the
+          code reserved for Information OAMPDUs."
+        REFERENCE   "[802.3ah], REFERENCE 30.3.6.1.7."
+        ::= { hh3cDot3OamPeerEntry 8 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Loopback group
+      --
+
+
+      hh3cDot3OamLoopbackTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDot3OamLoopbackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table contains methods to control the loopback state of
+          the local link as well as indicating the status of the
+          loopback function.
+
+          Loopback can be used to place the remote OAM entity in a state
+          where every received frame (except OAMPDUs) are echoed back
+          over the same interface on which they were received.   In this
+          state, at the remote entity, 'normal' traffic is disabled as
+          only the looped back frames are transmitted on the interface.
+          Loopback is thus an intrusive operation that prohibits normal
+          data flow and should be used accordingly."
+        ::= { hh3cDot3OamMIB 3 }
+
+      hh3cDot3OamLoopbackEntry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamLoopbackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing information on the loopback
+          status for a single Ethernet like interface.  There is an
+          entry in this table for every Ethernet like interface on which
+          supports OAM and loopback function within OAM (as indicated in
+          hh3cDot3OamFunctionsSupported)."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamLoopbackTable 1 }
+
+      Hh3cDot3OamLoopbackEntry ::=
+        SEQUENCE {
+          hh3cDot3OamLoopbackCommand            INTEGER,
+          hh3cDot3OamLoopbackStatus             INTEGER,
+          hh3cDot3OamLoopbackIgnoreRx           INTEGER
+        }
+
+
+
+
+      hh3cDot3OamLoopbackCommand OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      noLoopback (1),
+                      startRemoteLoopback (2),
+                      stopRemoteLoopback (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This attribute initiates or terminates remote loopback with
+          an OAM peer.  Writing startRemoteLoopback(2) to this attribute
+          cause the local OAM client to send a loopback OAMPDU to the
+          OAM peer with the loopback enable flags set.  Writing
+          stopRemoteLoopback(3) to this attribute will cause the local
+          OAM client to send a loopback OAMPDU to the OAM peer with the
+          loopback enable flags cleared.  Writing noLoopback to this
+          attribute has no effect.
+
+          Writes to this attribute are ignored unless the OAM status of
+          this interface is 'operational' (hh3cDot3OamOperStatus).
+
+          The attribute always returns noLoopback on a read.  To
+          determine the loopback status, use the attribute
+          hh3cDot3OamLoopbackStatus."
+        REFERENCE   "[802.3ah], 57.2.11"
+        ::= { hh3cDot3OamLoopbackEntry 1 }
+
+      hh3cDot3OamLoopbackStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      noLoopback (1),
+                      initiatingLoopback (2),
+                      remoteLoopback (3),
+                      terminatingLoopback (4),
+                      localLoopback (5),
+                      unknown (6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The loopback status of the OAM entity.  This status is
+          determined by a combination of the local parser and
+          multiplexer states, the remote parser and multiplexer states,
+          as well as by the actions of the local OAM client.  When
+          operating in normal mode with no loopback in progress, the
+          status reads noLoopback(1).
+
+          If the OAM client has sent an Loopback OAMPDU and is waiting
+          for a response, where the local parser and multiplexer states
+          are DISCARD (see [802.3ah, 57.2.11.1]), the status is
+          'initiatingLoopback'.  In this case, the local OAM entity has
+          yet to receive any acknowledgement that the remote OAM entity
+          has received its loopback command request.
+
+          If the local OAM client knows that the remote OAM entity is in
+          loopback mode (via the remote state information as described
+          in [802.3ah, 57.2.11.1, 30.3.6.1.15]), the status is
+          remoteLoopback(3).  If the local OAM client is in the process
+          of terminating the remote loopback [802.3ah, 57.2.11.3,
+          30.3.6.1.14], with its local multiplexer and parser states in
+          DISCARD, the status is terminatingLoopback(4).  If the remote
+          OAM client has put the local OAM entity in loopback mode as
+          indicated by its local parser state, the status is
+          localLoopback(5).
+
+          The unknown(6) status indicates the parser and multiplexer
+          combination is unexpected.  This status may be returned if the
+          OAM loopback is in a transition state but should not persist.
+
+          The values of this attribute correspond to the following
+          values of the local and remote parser and multiplexer states.
+
+            value            LclPrsr   LclMux    RmtPrsr   RmtMux
+            noLoopback         FWD       FWD       FWD       FWD
+            initLoopback     DISCARD   DISCARD     FWD       FWD
+            rmtLoopback      DISCARD     FWD      LPBK    DISCARD
+            tmtngLoopback    DISCARD   DISCARD    LPBK    DISCARD
+            lclLoopback        LPBK    DISCARD   DISCARD     FWD
+            unknown            ***   any other combination   ***
+          "
+        REFERENCE   "[802.3ah], REFERENCE 57.2.11, 30.3.61.14,
+          30.3.6.1.15"
+        ::= { hh3cDot3OamLoopbackEntry 2 }
+
+      hh3cDot3OamLoopbackIgnoreRx OBJECT-TYPE
+        SYNTAX      INTEGER { ignore(1), process(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Since OAM loopback is a distruptive operation (user traffic
+          does not pass), this attribute provides a mechanism to provide
+          controls over whether received OAM loopback commands are
+          processed or ignored.  When the value is ignore(1), received
+          loopback commands are ignored.  When the value is process(2),
+          OAM loopback commands are processed.  The default value is to
+          ignore loopback commands (ignore(1)).
+
+          The attribute has no meaning if the local OAM entity does not
+          support the loopback function (as defined in
+          hh3cDot3OamFunctionsSupported)."
+        REFERENCE   "[802.3ah], REFERENCE 57.2.11, 30.3.61.14,
+          30.3.6.1.15"
+        ::= { hh3cDot3OamLoopbackEntry 3 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Statistics group
+      --
+
+
+      hh3cDot3OamStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDot3OamStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Statistics for the OAM function on a particular Ethernet like
+          interface."
+        ::= { hh3cDot3OamMIB 4 }
+
+      hh3cDot3OamStatsEntry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing statistics information on
+          the Ethernet OAM function for a single Ethernet like
+          interface."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamStatsTable 1 }
+
+      Hh3cDot3OamStatsEntry ::=
+        SEQUENCE {
+                  hh3cDot3OamInformationTx                Counter32,
+                  hh3cDot3OamInformationRx                Counter32,
+                  hh3cDot3OamUniqueEventNotificationTx    Counter32,
+                  hh3cDot3OamUniqueEventNotificationRx    Counter32,
+                  hh3cDot3OamDuplicateEventNotificationTx Counter32,
+                  hh3cDot3OamDuplicateEventNotificationRx Counter32,
+                  hh3cDot3OamLoopbackControlTx            Counter32,
+                  hh3cDot3OamLoopbackControlRx            Counter32,
+                  hh3cDot3OamVariableRequestTx            Counter32,
+                  hh3cDot3OamVariableRequestRx            Counter32,
+                  hh3cDot3OamVariableResponseTx           Counter32,
+                  hh3cDot3OamVariableResponseRx           Counter32,
+                  hh3cDot3OamOrgSpecificTx                Counter32,
+                  hh3cDot3OamOrgSpecificRx                Counter32,
+                  hh3cDot3OamUnsupportedCodesTx           Counter32,
+                  hh3cDot3OamUnsupportedCodesRx           Counter32,
+                  hh3cDot3OamFramesLostDueToOam           Counter32
+                 }
+
+
+      hh3cDot3OamInformationTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Information OAMPDUs transmitted on
+          this interface.
+
+          An Information OAMPDU is identified by a valid frame with (1)
+          a destination MAC address that equals the reserved MAC address
+          for Slow Protocols (see 43B of [802.3ah]), (2) a lengthOrType
+          field that equals the reserved type for Slow Protocols, (3) a
+          Slow Protocols subtype that equals the subtype reserved for OAM,
+          and (4) an OAMPDU code that equals the OAM Information code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.20."
+        ::= { hh3cDot3OamStatsEntry 1 }
+
+      hh3cDot3OamInformationRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Information OAMPDUs received on this
+          interface.
+
+          An Information OAMPDU is identified by a valid frame with (1)
+          a destination MAC address that equals the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Information code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.21."
+        ::= { hh3cDot3OamStatsEntry 2 }
+
+
+
+      hh3cDot3OamUniqueEventNotificationTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of unique Event OAMPDUs transmitted on
+          this interface.  Event notifications may be sent in duplicate
+          to increase the probability of being successfully received,
+          given the possiblity that a frame may be lost in transit.
+
+          An Event Notification OAMPDU is identified by a valid frame
+          with (1) a destination MAC address that equals the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals
+          the OAM Event code.
+
+          An Event Notification OAMPDU is uniquely identified by its
+          Sequence Number field.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+
+        REFERENCE   "[802.3ah], 30.3.6.1.22."
+        ::= { hh3cDot3OamStatsEntry 3 }
+
+      hh3cDot3OamUniqueEventNotificationRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of unique Event OAMPDUs received on
+          this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) a destination MAC address that equals the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals
+          the OAM Event code.
+
+          An Event Notification OAMPDU is uniquely identified by its
+          Sequence Number field.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.24."
+        ::= { hh3cDot3OamStatsEntry 4 }
+
+      hh3cDot3OamDuplicateEventNotificationTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of duplicate Event OAMPDUs transmitted
+          on this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) a destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Event code.
+
+          A duplicate Event Notification OAMPDU is indicated as an Event
+          Notification OAMPDU with a Sequence Number field that is
+          identical to the previously transmitted Event Notification
+          OAMPDU Sequence Number.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.23."
+        ::= { hh3cDot3OamStatsEntry 5 }
+
+      hh3cDot3OamDuplicateEventNotificationRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of duplicate Event OAMPDUs received on
+          this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Event code.
+
+          A duplicate Event Notification OAMPDU is indicated as an Event
+          Notification OAMPDU with a Sequence Number field that is
+          identical to the previously received Event Notification OAMPDU
+          Sequence Number.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.25."
+        ::= { hh3cDot3OamStatsEntry 6 }
+
+      hh3cDot3OamLoopbackControlTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Loopback Control OAMPDUs transmitted
+          on this interface.
+
+          A Loopback Conrol OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Loopback Control code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.26."
+        ::= { hh3cDot3OamStatsEntry 7 }
+
+      hh3cDot3OamLoopbackControlRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Loopback Control OAMPDUs transmitted
+          on this interface.
+
+          A Loopback Control OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Loopback Control code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.27."
+        ::= { hh3cDot3OamStatsEntry 8 }
+
+      hh3cDot3OamVariableRequestTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Request OAMPDUs transmitted
+          on this interface.
+
+          A Variable Request OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Request code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.28."
+        ::= { hh3cDot3OamStatsEntry 9 }
+
+      hh3cDot3OamVariableRequestRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Request OAMPDUs received on
+          this interface.
+
+          A Variable Request OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Request code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.29."
+        ::= { hh3cDot3OamStatsEntry 10 }
+
+      hh3cDot3OamVariableResponseTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Response OAMPDUs
+          transmitted on this interface.
+
+          A Variable Response OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Response code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.30."
+        ::= { hh3cDot3OamStatsEntry 11 }
+
+      hh3cDot3OamVariableResponseRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Response OAMPDUs received
+          on this interface.
+
+          A Variable Response OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Response code.
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.31."
+        ::= { hh3cDot3OamStatsEntry 12 }
+
+       hh3cDot3OamOrgSpecificTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Organization Specific OAMPDUs
+          transmitted on this interface.
+
+          An Organization Specific OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Organization Specific code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.32."
+        ::= { hh3cDot3OamStatsEntry 13 }
+
+      hh3cDot3OamOrgSpecificRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+
+          "A count of the number of Organization Specific OAMPDUs
+          received on this interface.
+
+          An Organization Specific OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Organization Specific code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.33."
+        ::= { hh3cDot3OamStatsEntry 14 }
+
+      hh3cDot3OamUnsupportedCodesTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of OAMPDUs transmitted  on this
+          interface with an unsupported op-code.
+
+          An unsupported opcode OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          opcode for a function that is not supported by the device.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.18."
+        ::= { hh3cDot3OamStatsEntry 15 }
+
+      hh3cDot3OamUnsupportedCodesRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of OAMPDUs received on this interface
+          with an unsupported op-code.
+
+          An unsupported opcode OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          opcode for a function that is not supported by the device.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.19."
+        ::= { hh3cDot3OamStatsEntry 16 }
+
+      hh3cDot3OamFramesLostDueToOam OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of frames that were dropped by the OAM
+          multiplexer.  Since the OAM mulitplexer has multiple inputs
+          and a single output, there may be cases where frames are
+          dropped due to transmit resource contention.  This counter is
+          incremented whenever a frame is dropped by the OAM layer.
+          When this counter is incremented, no other counters in this
+          MIB are incremented.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime."
+        REFERENCE   "[802.3ah], 30.3.6.1.46."
+        ::= { hh3cDot3OamStatsEntry 17 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Event Configuration group
+      --
+
+
+      hh3cDot3OamEventConfigTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF Hh3cDot3OamEventConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "Ethernet OAM includes the ability to generate and receive
+          event notifications to indicate various link problems.  This
+          table contains the mechanisms to configure the thresholds to
+          generate the standard Ethernet OAM events.
+
+          These events are:
+            - Errored Symbol Period Event.  Generated when the number of
+              symbol errors exceeds a threshold within a given window
+              defined by a number of symbols (e.g. 1,000 symbols out of
+              1,000,000 had errors).
+            - Errored Frame Period Event.  Generated when the number of
+              frame errors exceeds a threshold within a given window
+              defined by a number of frames (e.g. 10 frames out of 1000
+              had errors).
+            - Errored Frame Event.  Generated when the number of frame
+              errors exceeds a threshold within a given window defined
+              by a period of time (e.g. 10 frames in 1 second had
+              errors).
+            - Errored Frame Seconds Summary Event.  Generated when the
+              number of errored frame seconds exceeds a threshold within
+              a given time period (e.g. 10 errored frame seconds within
+              the last 100 seconds).  An errored frame second is defined
+              as a 1 second interval which had >0 frame errors.
+          "
+        ::= { hh3cDot3OamMIB 5 }
+
+      hh3cDot3OamEventConfigEntry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Event configuration information is available for every
+          Ethernet like interface that supports OAM and the event
+          function of OAM as indicated in the hh3cDot3OamFunctionsSupported
+          attribute.
+
+          Event configuration controls when the local management entity
+          sends Event Notification OAMPDUs to its OAM peer."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamEventConfigTable 1 }
+
+      Hh3cDot3OamEventConfigEntry ::=
+        SEQUENCE {
+                  hh3cDot3OamErrSymPeriodWindowHi        Unsigned32,
+                  hh3cDot3OamErrSymPeriodWindowLo        Unsigned32,
+                  hh3cDot3OamErrSymPeriodThresholdHi     Unsigned32,
+                  hh3cDot3OamErrSymPeriodThresholdLo     Unsigned32,
+                  hh3cDot3OamErrSymPeriodEvNotifEnable   INTEGER,
+                  hh3cDot3OamErrFramePeriodWindow        Unsigned32,
+                  hh3cDot3OamErrFramePeriodThreshold     Unsigned32,
+                  hh3cDot3OamErrFramePeriodEvNotifEnable INTEGER,
+                  hh3cDot3OamErrFrameWindow              Unsigned32,
+                  hh3cDot3OamErrFrameThreshold           Unsigned32,
+                  hh3cDot3OamErrFrameEvNotifEnable       INTEGER,
+                  hh3cDot3OamErrFrameSecsSummaryWindow   Integer32,
+                  hh3cDot3OamErrFrameSecsSummaryThreshold Integer32,
+                  hh3cDot3OamErrFrameSecsEvNotifEnable   INTEGER
+                }
+
+      hh3cDot3OamErrSymPeriodWindowHi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The two objects hh3cDot3OamErrSymPeriodWindowHi and
+          hh3cDot3OamErrSymPeriodLo together form an unsigned 64-bit
+          integer representing the number of symbols over which this
+          threshold event is defined.  This is defined as
+          hh3cDot3OamErrSymPeriodWindow = ((2^32)*hh3cDot3OamErrSymPeriodWindowHi)
+                                          + hh3cDot3OamErrSymPeriodWindowLo
+
+          If hh3cDot3OamErrSymPeriodThreshold symbol errors occur within a
+          window of hh3cDot3OamErrSymPeriodWindow symbols, an Event
+          Notification OAMPDU should be generated with an Errored Symbol
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.34"
+        ::= { hh3cDot3OamEventConfigEntry 1 }
+
+      hh3cDot3OamErrSymPeriodWindowLo OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The two objects hh3cDot3OamErrSymPeriodWindowHi and
+          hh3cDot3OamErrSymPeriodWindowLo together form an unsigned 64-bit
+          integer representing the number of symbols over which this
+          threshold event is defined.  This is defined as
+
+        hh3cDot3OamErrSymPeriodWindow = ((2^32)*hh3cDot3OamErrSymPeriodWindowHi)
+                                          + hh3cDot3OamErrSymPeriodWindowLo
+
+          If hh3cDot3OamErrSymPeriodThreshold symbol errors occur within a
+          window of hh3cDot3OamErrSymPeriodWindow symbols, an Event
+          Notification OAMPDU should be generated with an Errored Symbol
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.34"
+        ::= { hh3cDot3OamEventConfigEntry 2 }
+
+      hh3cDot3OamErrSymPeriodThresholdHi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The two objects hh3cDot3OamErrSymPeriodThresholdHi and
+          hh3cDot3OamErrSymPeriodThresholdLo together form an unsigned
+          64-bit integer representing the number of symbol errors that
+          must occur within a given window to cause this event.
+
+          This is defined as
+
+            hh3cDot3OamErrSymPeriodThreshold =
+                              ((2^32) * hh3cDot3OamErrSymPeriodThresholdHi)
+                                      + hh3cDot3OamErrSymPeriodThresholdLo
+          If hh3cDot3OamErrSymPeriodThreshold symbol errors occur within a
+          window of hh3cDot3OamErrSymPeriodWindow symbols, an Event
+          Notification OAMPDU should be generated with an Errored Symbol
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.34"
+        ::= { hh3cDot3OamEventConfigEntry 3 }
+
+      hh3cDot3OamErrSymPeriodThresholdLo OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The two objects hh3cDot3OamErrSymPeriodThresholdHi and
+          hh3cDot3OamErrSymPeriodThresholdLo together form an unsigned
+          64-bit integer representing the number of symbol errors that
+          must occur within a given window to cause this event.
+
+          This is defined as
+
+            hh3cDot3OamErrSymPeriodThreshold =
+                              ((2^32) * hh3cDot3OamErrSymPeriodThresholdHi)
+                                      + hh3cDot3OamErrSymPeriodThresholdLo
+
+
+          If hh3cDot3OamErrSymPeriodThreshold symbol errors occur within a
+          window of hh3cDot3OamErrSymPeriodWindow symbols, an Event
+          Notification OAMPDU should be generated with an Errored Symbol
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.34"
+        ::= { hh3cDot3OamEventConfigEntry 4 }
+
+      hh3cDot3OamErrSymPeriodEvNotifEnable OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether the occurence of Errored Symbol Period
+          Events should result in Event Notification OAMPDUs generated
+          by the OAM layer.
+
+          By default, this object should have the value enabled(1) for
+          Ethernet like interfaces that support OAM.  If the OAM layer
+          does not support event notifications (as indicated via the
+          hh3cDot3OamFunctionsSupported attribute), this value is ignored.
+          "
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventConfigEntry 5 }
+
+
+
+
+      hh3cDot3OamErrFramePeriodWindow OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The number of frames over which the threshold is defined.
+
+          If hh3cDot3OamErrFramePeriodThreshold frame errors occur within a
+          window of hh3cDot3OamErrFramePeriodWindow frames, an Event
+          Notification OAMPDU should be generated with an Errored Frame
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.38"
+        ::= { hh3cDot3OamEventConfigEntry 6 }
+
+      hh3cDot3OamErrFramePeriodThreshold OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The number of frame errors that must occur for this event to
+          be triggered.
+
+          If hh3cDot3OamErrFramePeriodThreshold frame errors occur within a
+          window of hh3cDot3OamErrFramePeriodWindow frames, an Event
+          Notification OAMPDU should be generated with an Errored Frame
+          Period Event TLV indicating the threshold has been crossed in
+          this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.38"
+        ::= { hh3cDot3OamEventConfigEntry 7 }
+
+      hh3cDot3OamErrFramePeriodEvNotifEnable OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether the occurence of an Errored Frame Period
+          Event should result in an Event Notification OAMPDU generated
+          by the OAM layer.
+
+          By default, this object should have the value enabled(1) for
+          Ethernet like interfaces that support OAM.  If the OAM layer
+          does not support event notifications (as indicated via the
+          hh3cDot3OamFunctionsSupported attribute), this value is ignored."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventConfigEntry 8 }
+
+      hh3cDot3OamErrFrameWindow OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The amount of time (in 100ms increments) over which the
+          threshold is defined.
+
+         If hh3cDot3OamErrFrameThreshold frame errors occur within a window
+         of hh3cDot3OamErrFrameWindow seconds (measured in tenths of
+         seconds), an Event Notification OAMPDU should be generated with
+         an Errored Frame Event TLV indicating the threshold has been
+         crossed in this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.36"
+        ::= { hh3cDot3OamEventConfigEntry 9 }
+
+
+      hh3cDot3OamErrFrameThreshold OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The number of frame errors that must occur for this event to
+          be triggered.
+
+          If hh3cDot3OamErrFrameThreshold frame errors occur within a window
+          of hh3cDot3OamErrFrameWindow (in tenths of seconds), an Event
+          Notification OAMPDU should be generated with an Errored Frame
+          Event TLV indicating the threshold has been crossed in this
+          window."
+        REFERENCE   "[802.3ah], 30.3.6.1.36"
+        ::= { hh3cDot3OamEventConfigEntry 10 }
+
+      hh3cDot3OamErrFrameEvNotifEnable OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether the occurence of an Errored Frame Event
+          should result in an Event Notification OAMPDU generated by the
+          OAM layer.
+
+          By default, this object should have the value enabled(1) for
+          Ethernet like interfaces that support OAM.  If the OAM layer
+          does not support event notifications (as indicated via the
+          hh3cDot3OamFunctionsSupported attribute), this value is ignored."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventConfigEntry 11 }
+
+      hh3cDot3OamErrFrameSecsSummaryWindow OBJECT-TYPE
+        SYNTAX      Integer32 (100..9000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The amount of time (in 100ms intervals) over which the
+          threshold is defined.
+
+          If hh3cDot3OamErrFrameSecsSummaryThreshold frame errors occur
+          within a window of hh3cDot3OamErrFrameSecsSummaryWindow (in tenths
+          of seconds), an Event Notification OAMPDU should be generated
+          with an Errored Frame Seconds Summary Event TLV indicating the
+          threshold has been crossed in this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.40"
+        ::= { hh3cDot3OamEventConfigEntry 12 }
+
+      hh3cDot3OamErrFrameSecsSummaryThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (1..900)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The number of errored frame seconds that must occur for this
+          event to be triggered.
+
+          If hh3cDot3OamErrFrameSecsSummaryThreshold frame errors occur
+          within a window of hh3cDot3OamErrFrameSecsSummaryWindow (in tenths
+          of seconds), an Event Notification OAMPDU should be generated
+          with an Errored Frame Seconds Summary Event TLV indicating the
+          threshold has been crossed in this window."
+        REFERENCE   "[802.3ah], 30.3.6.1.40"
+        ::= { hh3cDot3OamEventConfigEntry 13 }
+
+      hh3cDot3OamErrFrameSecsEvNotifEnable OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Indicates whether the occurence of an Errored Frame Seconds
+          Summary Event should result in an Event Notification OAMPDU
+          generated by the OAM layer.
+
+          By default, this object should have the value enabled(1) for
+          Ethernet like interfaces that support OAM.  If the OAM layer
+          does not support event notifications (as indicated via the
+          hh3cDot3OamFunctionsSupported attribute), this value is ignored."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventConfigEntry 14 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Event Status group
+      --
+
+      hh3cDot3OamEventLogTable   OBJECT-TYPE
+        SYNTAX       SEQUENCE OF Hh3cDot3OamEventLogEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+          "This table records a history of the events that have occurred
+          at the Ethernet OAM level.  These events can include locally
+          detected events, which may result in locally generated
+          OAMPDUs, and remotely detected events, which are detected by
+          the OAM peer entity and signaled to the local entity via
+          Ethernet OAM.  Ethernet OAM events can be signaled by Event
+          Notification OAMPDUs or by the flags field in any OAMPDU."
+          ::= { hh3cDot3OamMIB 6 }
+
+      hh3cDot3OamEventLogEntry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamEventLogEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hh3cDot3OamEventLogTable."
+        INDEX       { ifIndex, hh3cDot3OamEventLogIndex }
+        ::= { hh3cDot3OamEventLogTable 1 }
+
+      Hh3cDot3OamEventLogEntry ::=
+        SEQUENCE {
+          hh3cDot3OamEventLogIndex                Unsigned32,
+          hh3cDot3OamEventLogTimestamp            DateAndTime,
+          hh3cDot3OamEventLogOui                  Dot3Oui,
+          hh3cDot3OamEventLogType                 Unsigned32,
+          hh3cDot3OamEventLogLocation             INTEGER,
+          hh3cDot3OamEventLogWindowHi             Unsigned32,
+          hh3cDot3OamEventLogWindowLo             Unsigned32,
+          hh3cDot3OamEventLogThresholdHi          Unsigned32,
+          hh3cDot3OamEventLogThresholdLo          Unsigned32,
+          hh3cDot3OamEventLogValue                CounterBasedGauge64,
+          hh3cDot3OamEventLogRunningTotal         CounterBasedGauge64,
+          hh3cDot3OamEventLogEventTotal           Unsigned32
+        }
+
+      hh3cDot3OamEventLogIndex       OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An arbitrary integer for identifiying individual events
+          within the event log."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventLogEntry 1 }
+
+      hh3cDot3OamEventLogTimestamp  OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The date and time that this event instance occurred."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventLogEntry 2 }
+
+      hh3cDot3OamEventLogOui  OBJECT-TYPE
+        SYNTAX      Dot3Oui
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The OUI of the entity defining the object type.  All IEEE
+          802.3 defined events (as appearing in [802.3ah] except for the
+          Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of
+          0x0180C2.  Organizations defining their own Event Notification
+          TLVs include their OUI in the Event Notification TLV which
+          gets reflected here."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventLogEntry 3 }
+
+
+      hh3cDot3OamEventLogType      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The type of event that generated this entry in the event log.
+
+          When the OUI is the IEEE 802.3 OUI of 0x0180C2, the following
+          event types are defined:
+              erroredSymbolEvent(1),
+              erroredFramePeriodEvent (2),
+              erroredFrameEvent(3),
+              erroredFrameSecondsEvent(4),
+              linkFault(256),
+              dyingGaspEvent(257),
+              criticalLinkEvent(258)
+          The first four are considered threshold crossing events as
+          they are generated when a metric exceeds a given value within
+          a specified window.  The other three are not threshold
+          crossing events.
+
+          When the OUI is not 0x0180C2, then some other organization has
+          defined the event space.  If event subtyping is known to the
+          implementation, it may be reflected here.  Otherwise, this
+          value should return all Fs (0xFFFFFFFF).
+          "
+        REFERENCE   "[802.3ah], 30.3.6.1.10 and 57.5.3."
+        ::= { hh3cDot3OamEventLogEntry 4 }
+
+      hh3cDot3OamEventLogLocation OBJECT-TYPE
+        SYNTAX      INTEGER { local(1), remote(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Whether this event occurred locally, or was received from the
+          OAM peer via Ethernet OAM."
+        REFERENCE   "N/A"
+        ::= { hh3cDot3OamEventLogEntry 5 }
+
+      hh3cDot3OamEventLogWindowHi      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the event represents a threshold crossing event, the two
+          objects hh3cDot3OamEventWindowHi and hh3cDot3OamEventWindowLo form an
+          unsigned 64-bit integer yielding the window over which the
+          value was measured for the threshold crossing event (e.g. 5,
+          when 11 occurrences happened in 5 seconds while the threshold
+          was 10).   The two objects are combined as:
+
+          hh3cDot3OamEventLogWindow = ((2^32) * hh3cDot3OamEventLogWindowHi)
+                                          + hh3cDot3OamEventLogWindowLo
+
+
+          Otherwise, this value is returned as all F's (0xFFFFFFFF) and
+          adds no useful information."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 6 }
+
+      hh3cDot3OamEventLogWindowLo      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the event represents a threshold crossing event, the two
+          objects hh3cDot3OamEventWindowHi and hh3cDot3OamEventWindowLo form an
+          unsigned 64-bit integer yielding the window over which the
+          value was measured for the threshold crossing event (e.g. 5,
+          when 11 occurrences happened in 5 seconds while the threshold
+          was 10).   The two objects are combined as:
+          hh3cDot3OamEventLogWindow = ((2^32) * hh3cDot3OamEventLogWindowHi)
+                                          + hh3cDot3OamEventLogWindowLo
+
+          Otherwise, this value is returned as all F's (0xFFFFFFFF) and
+          adds no useful information."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 7 }
+
+      hh3cDot3OamEventLogThresholdHi      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the event represents a threshold crossing event, the two
+          objects hh3cDot3OamEventThresholdHi and hh3cDot3OamEventThresholdLo
+          form an unsigned 64-bit integer yielding the value that was
+          crossed for the threshold crossing event (e.g. 10, when 11
+          occurrences happened in 5 seconds while the threshold was 10).
+          The two objects are combined as:
+
+        hh3cDot3OamEventLogThreshold = ((2^32) * hh3cDot3OamEventLogThresholdHi)
+                                           + hh3cDot3OamEventLogThresholdLo
+
+          Otherwise, this value is returned as all F's (0xFFFFFFFF) and
+          adds no useful information."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 8 }
+
+      hh3cDot3OamEventLogThresholdLo      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the event represents a threshold crossing event, the two
+          objects hh3cDot3OamEventThresholdHi and hh3cDot3OamEventThresholdLo
+          form an unsigned 64-bit integer yielding the value that was
+          crossed for the threshold crossing event (e.g. 10, when 11
+          occurrences happened in 5 seconds while the threshold was 10).
+          The two objects are combined as:
+
+        hh3cDot3OamEventLogThreshold = ((2^32) * hh3cDot3OamEventLogThresholdHi)
+                                           + hh3cDot3OamEventLogThresholdLo
+
+          Otherwise, this value is returned as all F's (0xFFFFFFFF) and
+          adds no useful information."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 9 }
+
+
+
+      hh3cDot3OamEventLogValue      OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the event represents a threshold crossing event, this
+          value indicates the value of the parameter within the given
+          window that generated this event (e.g. 11, when 11 occurrences
+          happened in 5 seconds while the threshold was 10).
+
+          Otherwise, this value is returned as all F's
+          (0xFFFFFFFFFFFFFFFF) and adds no useful information.
+          "
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 10 }
+
+      hh3cDot3OamEventLogRunningTotal      OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This value respresents the total number of times this
+          occurence has happened since the last reset (e.g. 3253, when
+          3253 symbol errors have occurred since the last reset, which
+          has resulted in 51 symbol error threshold crossing events
+          since the last reset)."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 11 }
+
+      hh3cDot3OamEventLogEventTotal      OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This value respresents the total number of times one or more
+          of these occurences have resulted in an event (e.g. 51 when
+          3253 symbol errors have occurred since the last reset, which
+          has resulted in 51 symbol error threshold crossing events
+          since the last reset)."
+        REFERENCE   "[802.3ah], 30.3.6.1.37 and 57.5.3.2."
+        ::= { hh3cDot3OamEventLogEntry 12 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Notifications
+      --
+
+      hh3cDot3OamTraps OBJECT IDENTIFIER ::= { hh3cDot3OamMIB 7 }
+
+      hh3cDot3OamTrapsPrefix OBJECT IDENTIFIER ::= { hh3cDot3OamTraps 0 }
+
+      hh3cDot3OamThresholdEvent NOTIFICATION-TYPE
+        OBJECTS { ifIndex,
+                  hh3cDot3OamEventLogTimestamp,
+                  hh3cDot3OamEventLogOui,
+                  hh3cDot3OamEventLogType,
+                  hh3cDot3OamEventLogLocation,
+                  hh3cDot3OamEventLogWindowHi,
+                  hh3cDot3OamEventLogWindowLo,
+                  hh3cDot3OamEventLogThresholdHi,
+                  hh3cDot3OamEventLogThresholdLo,
+                  hh3cDot3OamEventLogValue,
+                  hh3cDot3OamEventLogRunningTotal,
+                  hh3cDot3OamEventLogEventTotal
+                }
+        STATUS  current
+        DESCRIPTION
+          "A hh3cDot3OamThresholdEvent notification is sent when a local or
+          remote threshold crossing event is detected.  A local
+          threshold crossing event is detected by the local entity,
+          while a remote threshold crossing event is detected by the
+          reception of an Ethernet OAM Event Notification OAMPDU
+          indicating a threshold event.
+
+          This notification should not be sent more than once per
+          second.
+
+          The management entity should periodically check
+          hh3cDot3OamEventLogTable to detect any missed events."
+       ::= { hh3cDot3OamTrapsPrefix 1 }
+
+
+      hh3cDot3OamNonThresholdEvent NOTIFICATION-TYPE
+        OBJECTS { ifIndex,
+                  hh3cDot3OamEventLogTimestamp,
+                  hh3cDot3OamEventLogOui,
+                  hh3cDot3OamEventLogType,
+                  hh3cDot3OamEventLogLocation,
+                  hh3cDot3OamEventLogEventTotal
+                }
+        STATUS  current
+        DESCRIPTION
+          "A hh3cDot3OamNonThresholdEvent notification is sent when a local
+          or remote non-threshold crossing event is detected.  A local
+          event is detected by the local entity, while a remote event is
+          detected by the reception of an Ethernet OAM Event
+          Notification OAMPDU indicating a non-threshold crossing event.
+          This notification should not be sent more than once per
+          second.
+
+          The management entity should periodically check
+          hh3cDot3OamEventLogTable to detect any missed events."
+       ::= { hh3cDot3OamTrapsPrefix 2 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Statistics group two
+      --
+
+      hh3cDot3OamStats2Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDot3OamStats2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Statistics for the OAM function on a particular Ethernet-like
+          interface.
+          
+          This object is similar to hh3cDot3OamStatsTable."
+        ::= { hh3cDot3OamMIB 8 }
+
+      hh3cDot3OamStats2Entry OBJECT-TYPE
+        SYNTAX      Hh3cDot3OamStats2Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing statistics on the Ethernet
+          OAM function for a single Ethernet-like interface."
+        INDEX       { ifIndex }
+        ::= { hh3cDot3OamStats2Table 1 }
+
+      Hh3cDot3OamStats2Entry ::=
+        SEQUENCE {
+                  hh3cDot3Oam2InformationTx                Counter64,
+                  hh3cDot3Oam2InformationRx                Counter64,
+                  hh3cDot3Oam2UniqueEventNotificationTx    Counter64,
+                  hh3cDot3Oam2UniqueEventNotificationRx    Counter64,
+                  hh3cDot3Oam2DuplicateEventNotificationTx Counter64,
+                  hh3cDot3Oam2DuplicateEventNotificationRx Counter64,
+                  hh3cDot3Oam2LoopbackControlTx            Counter64,
+                  hh3cDot3Oam2LoopbackControlRx            Counter64,
+                  hh3cDot3Oam2VariableRequestTx            Counter64,
+                  hh3cDot3Oam2VariableRequestRx            Counter64,
+                  hh3cDot3Oam2VariableResponseTx           Counter64,
+                  hh3cDot3Oam2VariableResponseRx           Counter64,
+                  hh3cDot3Oam2OrgSpecificTx                Counter64,
+                  hh3cDot3Oam2OrgSpecificRx                Counter64,
+                  hh3cDot3Oam2UnsupportedCodesTx           Counter64,
+                  hh3cDot3Oam2UnsupportedCodesRx           Counter64,
+                  hh3cDot3Oam2FramesLostDueToOam           Counter64
+                 }
+
+
+      hh3cDot3Oam2InformationTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Information OAMPDUs transmitted on
+          this interface.
+
+          An Information OAMPDU is identified by a valid frame with (1)
+          a destination MAC address that equals the reserved MAC address
+          for Slow Protocols (see 43B of [802.3ah]), (2) a lengthOrType
+          field that equals the reserved type for Slow Protocols, (3) a
+          Slow Protocols subtype that equals the subtype reserved for OAM,
+          and (4) an OAMPDU code that equals the OAM Information code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamInformationTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.20."
+        ::= { hh3cDot3OamStats2Entry 1 }
+
+      hh3cDot3Oam2InformationRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Information OAMPDUs received on this
+          interface.
+
+          An Information OAMPDU is identified by a valid frame with (1)
+          a destination MAC address that equals the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Information code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamInformationRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.21."
+        ::= { hh3cDot3OamStats2Entry 2 }
+
+
+
+      hh3cDot3Oam2UniqueEventNotificationTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of unique Event OAMPDUs transmitted on
+          this interface.  Event notifications may be sent in duplicate
+          to increase the probability of being successfully received,
+          given the possiblity that a frame may be lost in transit.
+
+          An Event Notification OAMPDU is identified by a valid frame
+          with (1) a destination MAC address that equals the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals
+          the OAM Event code.
+
+          An Event Notification OAMPDU is uniquely identified by its
+          Sequence Number field.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamUniqueEventNotificationTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.22."
+        ::= { hh3cDot3OamStats2Entry 3 }
+
+      hh3cDot3Oam2UniqueEventNotificationRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of unique Event OAMPDUs received on
+          this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) a destination MAC address that equals the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field that equals the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals
+          the OAM Event code.
+
+          An Event Notification OAMPDU is uniquely identified by its
+          Sequence Number field.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamUniqueEventNotificationRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.24."
+        ::= { hh3cDot3OamStats2Entry 4 }
+
+      hh3cDot3Oam2DuplicateEventNotificationTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of duplicate Event OAMPDUs transmitted
+          on this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) a destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype that equals the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Event code.
+
+          A duplicate Event Notification OAMPDU is indicated as an Event
+          Notification OAMPDU with a Sequence Number field that is
+          identical to the previously transmitted Event Notification
+          OAMPDU Sequence Number.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamDuplicateEventNotificationTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.23."
+        ::= { hh3cDot3OamStats2Entry 5 }
+
+      hh3cDot3Oam2DuplicateEventNotificationRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of duplicate Event OAMPDUs received on
+          this interface.  Event notification OAMPDUs may be sent in
+          duplicate to increase the probability of being successfully
+          received, given the possiblity that a frame may be lost in
+          transit.
+
+          An Event Notification OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Event code.
+
+          A duplicate Event Notification OAMPDU is indicated as an Event
+          Notification OAMPDU with a Sequence Number field that is
+          identical to the previously received Event Notification OAMPDU
+          Sequence Number.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamDuplicateEventNotificationRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.25."
+        ::= { hh3cDot3OamStats2Entry 6 }
+
+      hh3cDot3Oam2LoopbackControlTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Loopback Control OAMPDUs transmitted
+          on this interface.
+
+          A Loopback Conrol OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Loopback Control code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamLoopbackControlTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.26."
+        ::= { hh3cDot3OamStats2Entry 7 }
+
+      hh3cDot3Oam2LoopbackControlRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Loopback Control OAMPDUs transmitted
+          on this interface.
+
+          A Loopback Control OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Loopback Control code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamLoopbackControlRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.27."
+        ::= { hh3cDot3OamStats2Entry 8 }
+
+      hh3cDot3Oam2VariableRequestTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Request OAMPDUs transmitted
+          on this interface.
+
+          A Variable Request OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Request code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamVariableRequestTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.28."
+        ::= { hh3cDot3OamStats2Entry 9 }
+
+      hh3cDot3Oam2VariableRequestRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Request OAMPDUs received on
+          this interface.
+
+          A Variable Request OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Request code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamVariableRequestRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.29."
+        ::= { hh3cDot3OamStats2Entry 10 }
+
+      hh3cDot3Oam2VariableResponseTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Response OAMPDUs
+          transmitted on this interface.
+
+          A Variable Response OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Response code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamVariableResponseTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.30."
+        ::= { hh3cDot3OamStats2Entry 11 }
+
+      hh3cDot3Oam2VariableResponseRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Variable Response OAMPDUs received
+          on this interface.
+
+          A Variable Response OAMPDU is indicated by a valid frame with
+          (1) destination MAC address equal to that of the reserved MAC
+          address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Variable Response code.
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamVariableResponseRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.31."
+        ::= { hh3cDot3OamStats2Entry 12 }
+
+       hh3cDot3Oam2OrgSpecificTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of Organization Specific OAMPDUs
+          transmitted on this interface.
+
+          An Organization Specific OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Organization Specific code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamOrgSpecificTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.32."
+        ::= { hh3cDot3OamStats2Entry 13 }
+
+      hh3cDot3Oam2OrgSpecificRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+
+          "A count of the number of Organization Specific OAMPDUs
+          received on this interface.
+
+          An Organization Specific OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          OAM Organization Specific code.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamOrgSpecificRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.33."
+        ::= { hh3cDot3OamStats2Entry 14 }
+
+      hh3cDot3Oam2UnsupportedCodesTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of OAMPDUs transmitted  on this
+          interface with an unsupported op-code.
+
+          An unsupported opcode OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          opcode for a function that is not supported by the device.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamUnsupportedCodesTx."
+        REFERENCE   "[802.3ah], 30.3.6.1.18."
+        ::= { hh3cDot3OamStats2Entry 15 }
+
+      hh3cDot3Oam2UnsupportedCodesRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of OAMPDUs received on this interface
+          with an unsupported op-code.
+
+          An unsupported opcode OAMPDU is indicated by a valid frame
+          with (1) destination MAC address equal to that of the reserved
+          MAC address for Slow Protocols (see 43B of [802.3ah]), (2) a
+          lengthOrType field equal to the reserved type for Slow
+          Protocols, (3) a Slow Protocols subtype equal to that of the
+          subtype reserved for OAM, and (4) an OAMPDU code that equals the
+          opcode for a function that is not supported by the device.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamUnsupportedCodesRx."
+        REFERENCE   "[802.3ah], 30.3.6.1.19."
+        ::= { hh3cDot3OamStats2Entry 16 }
+
+      hh3cDot3Oam2FramesLostDueToOam OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A count of the number of frames that were dropped by the OAM
+          multiplexer.  Since the OAM mulitplexer has multiple inputs
+          and a single output, there may be cases where frames are
+          dropped due to transmit resource contention.  This counter is
+          incremented whenever a frame is dropped by the OAM layer.
+          When this counter is incremented, no other counters in this
+          MIB are incremented.
+
+          Discontinuities of this counter can occur at re-initialization
+          of the management system, and at other times as indicated by
+          the value of the ifCounterDiscontinuityTime.
+          
+          This object is similar to hh3cDot3OamFramesLostDueToOam."
+        REFERENCE   "[802.3ah], 30.3.6.1.46."
+        ::= { hh3cDot3OamStats2Entry 17 }
+
+
+      ------------------------------------------------------------------
+      --
+      -- Ethernet OAM Compliance group
+      --
+
+
+      hh3cDot3OamGroups OBJECT IDENTIFIER ::= { hh3cDot3OamConformance 1 }
+      hh3cDot3OamCompliances OBJECT IDENTIFIER ::= { hh3cDot3OamConformance 2 }
+
+      -- Compliance statements
+
+      hh3cDot3OamCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION "The compliance statement for managed entities
+                     supporting OAM on Ethernet like interfaces.
+                     "
+      MODULE   -- this module
+        MANDATORY-GROUPS { hh3cDot3OamControlGroup,
+                           hh3cDot3OamPeerGroup,
+                           hh3cDot3OamStatsBaseGroup
+                         }
+
+        GROUP       hh3cDot3OamLoopbackGroup
+        DESCRIPTION
+          "This group is mandatory for all IEEE 802.3 OAM
+          implementations that support loopback functionality."
+
+        GROUP       hh3cDot3OamErrSymbolPeriodEventGroup
+        DESCRIPTION
+          "This group is mandatory for all IEEE 802.3 OAM
+          implementations that support event functionality."
+
+        GROUP       hh3cDot3OamErrFramePeriodEventGroup
+        DESCRIPTION
+          "This group is mandatory for all IEEE 802.3 OAM
+          implementations that support event functionality."
+
+        GROUP       hh3cDot3OamErrFrameEventGroup
+        DESCRIPTION
+          "This group is mandatory for all IEEE 802.3 OAM
+          implementations that support event functionality."
+
+        GROUP       hh3cDot3OamErrFrameSecsSummaryEventGroup
+        DESCRIPTION
+          "This group is mandatory for all IEEE 802.3 OAM
+          implementations that support event functionality."
+
+        GROUP       hh3cDot3OamEventLogGroup
+        DESCRIPTION
+          "This group is optional for all IEEE 802.3 OAM
+          implementations."
+
+        GROUP       hh3cDot3OamNotificationGroup
+        DESCRIPTION
+          "This group is optional for all IEEE 802.3 OAM
+          implementations."
+          
+       GROUP       hh3cDot3Oam2StatsBaseGroup
+        DESCRIPTION
+          "This group is optional for all IEEE 802.3 OAM
+          implementations."
+
+        ::= { hh3cDot3OamCompliances 1 }
+
+
+     hh3cDot3OamControlGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamAdminState,
+                        hh3cDot3OamOperStatus,
+                        hh3cDot3OamMode,
+                        hh3cDot3OamMaxOamPduSize,
+                        hh3cDot3OamConfigRevision,
+                        hh3cDot3OamFunctionsSupported
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects providing the abilities,
+          configuration, and status of an Ethernet OAM entity."
+        ::= { hh3cDot3OamGroups 1 }
+
+     hh3cDot3OamPeerGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamPeerStatus,
+                        hh3cDot3OamPeerMacAddress,
+                        hh3cDot3OamPeerVendorOui,
+                        hh3cDot3OamPeerVendorInfo,
+                        hh3cDot3OamPeerMode,
+                        hh3cDot3OamPeerFunctionsSupported,
+                        hh3cDot3OamPeerMaxOamPduSize,
+                        hh3cDot3OamPeerConfigRevision
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects providing the abilities,
+          configuration, and status of a peer Ethernet OAM entity."
+        ::= { hh3cDot3OamGroups 2 }
+
+
+
+     hh3cDot3OamStatsBaseGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamInformationTx,
+                        hh3cDot3OamInformationRx,
+                        hh3cDot3OamUniqueEventNotificationTx,
+                        hh3cDot3OamUniqueEventNotificationRx,
+                        hh3cDot3OamDuplicateEventNotificationTx,
+                        hh3cDot3OamDuplicateEventNotificationRx,
+                        hh3cDot3OamLoopbackControlTx,
+                        hh3cDot3OamLoopbackControlRx,
+                        hh3cDot3OamVariableRequestTx,
+                        hh3cDot3OamVariableRequestRx,
+                        hh3cDot3OamVariableResponseTx,
+                        hh3cDot3OamVariableResponseRx,
+                        hh3cDot3OamOrgSpecificTx,
+                        hh3cDot3OamOrgSpecificRx,
+                        hh3cDot3OamUnsupportedCodesTx,
+                        hh3cDot3OamUnsupportedCodesRx,
+                        hh3cDot3OamFramesLostDueToOam
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects providing the statistics for the
+          number of various transmit and recieve events for OAM on an
+          Ethernet like interface.  Note that all of these counters must
+          be supported even if the related function (as described in
+          hh3cDot3OamFunctionsSupported) is not supported."
+        ::= { hh3cDot3OamGroups 3 }
+
+     hh3cDot3OamLoopbackGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamLoopbackCommand,
+                        hh3cDot3OamLoopbackStatus,
+                        hh3cDot3OamLoopbackIgnoreRx
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects for controlling the OAM remote
+          loopback function."
+        ::= { hh3cDot3OamGroups 4 }
+
+     hh3cDot3OamErrSymbolPeriodEventGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamErrSymPeriodWindowHi,
+                        hh3cDot3OamErrSymPeriodWindowLo,
+                        hh3cDot3OamErrSymPeriodThresholdHi,
+                        hh3cDot3OamErrSymPeriodThresholdLo,
+                        hh3cDot3OamErrSymPeriodEvNotifEnable
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects for configuring the thresholds for an
+          Errored Symbol Period Event.
+
+          Each [802.3ah] defined Event Notification TLV has its own
+          conformance group because each event can be implemented
+          independently of any other."
+        ::= { hh3cDot3OamGroups 5 }
+
+     hh3cDot3OamErrFramePeriodEventGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamErrFramePeriodWindow,
+                        hh3cDot3OamErrFramePeriodThreshold,
+                        hh3cDot3OamErrFramePeriodEvNotifEnable
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects for configuring the thresholds for an
+          Errored Frame Period Event.
+
+          Each [802.3ah] defined Event Notification TLV has its own
+          conformance group because each event can be implemented
+          independently of any other."
+        ::= { hh3cDot3OamGroups 6 }
+
+     hh3cDot3OamErrFrameEventGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamErrFrameWindow,
+                        hh3cDot3OamErrFrameThreshold,
+                        hh3cDot3OamErrFrameEvNotifEnable
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects for configuring the thresholds for an
+          Errored Frame Event.
+
+          Each [802.3ah] defined Event Notification TLV has its own
+          conformance group because each event can be implemented
+          independently of any other."
+        ::= { hh3cDot3OamGroups 7 }
+
+     hh3cDot3OamErrFrameSecsSummaryEventGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3OamErrFrameSecsSummaryWindow,
+                        hh3cDot3OamErrFrameSecsSummaryThreshold,
+                        hh3cDot3OamErrFrameSecsEvNotifEnable
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects for configuring the thresholds for an
+          Errored Frame Seconds Summary Event.
+
+          Each [802.3ah] defined Event Notification TLV has its own
+          conformance group because each event can be implemented
+          independently of any other."
+        ::= { hh3cDot3OamGroups 8 }
+
+     hh3cDot3OamEventLogGroup OBJECT-GROUP
+       OBJECTS {  hh3cDot3OamEventLogTimestamp,
+                  hh3cDot3OamEventLogOui,
+                  hh3cDot3OamEventLogType,
+                  hh3cDot3OamEventLogLocation,
+                  hh3cDot3OamEventLogWindowHi,
+                  hh3cDot3OamEventLogWindowLo,
+                  hh3cDot3OamEventLogThresholdHi,
+                  hh3cDot3OamEventLogThresholdLo,
+                  hh3cDot3OamEventLogValue,
+                  hh3cDot3OamEventLogRunningTotal,
+                  hh3cDot3OamEventLogEventTotal
+                }
+       STATUS      current
+       DESCRIPTION
+          "A collection of objects for configuring the thresholds for an
+          Errored Frame Seconds Summary Event and maintaining the event
+          information."
+        ::= { hh3cDot3OamGroups 9 }
+
+     hh3cDot3OamNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+                   hh3cDot3OamThresholdEvent,
+                   hh3cDot3OamNonThresholdEvent
+                     }
+       STATUS      current
+       DESCRIPTION
+         "A collection of notifications used by Ethernet OAM to signal
+         to a management entity that local or remote events have occured
+         on a specified Ethernet link."
+       ::= { hh3cDot3OamGroups 10 }
+       
+       hh3cDot3Oam2StatsBaseGroup OBJECT-GROUP
+        OBJECTS     {   hh3cDot3Oam2InformationTx,
+                        hh3cDot3Oam2InformationRx,
+                        hh3cDot3Oam2UniqueEventNotificationTx,
+                        hh3cDot3Oam2UniqueEventNotificationRx,
+                        hh3cDot3Oam2DuplicateEventNotificationTx,
+                        hh3cDot3Oam2DuplicateEventNotificationRx,
+                        hh3cDot3Oam2LoopbackControlTx,
+                        hh3cDot3Oam2LoopbackControlRx,
+                        hh3cDot3Oam2VariableRequestTx,
+                        hh3cDot3Oam2VariableRequestRx,
+                        hh3cDot3Oam2VariableResponseTx,
+                        hh3cDot3Oam2VariableResponseRx,
+                        hh3cDot3Oam2OrgSpecificTx,
+                        hh3cDot3Oam2OrgSpecificRx,
+                        hh3cDot3Oam2UnsupportedCodesTx,
+                        hh3cDot3Oam2UnsupportedCodesRx,
+                        hh3cDot3Oam2FramesLostDueToOam
+                    }
+        STATUS      current
+        DESCRIPTION
+          "A collection of objects providing the statistics for the
+          number of various transmit and recieve events for OAM on an
+          Ethernet like interface.  Note that all of these counters must
+          be supported even if the related function (as described in
+          hh3cDot3OamFunctionsSupported) is not supported."
+        ::= { hh3cDot3OamGroups 11 }
+
+      END

@@ -1,5 +1,17 @@
 mib: IES5206-MIB
 modules:
+    mempools:
+        data:
+            -
+                oid: IES5206-MIB::memStatsTable
+                percent_used: IES5206-MIB::memStatsCurrent
+                descr: 'Memory {{ $index }}'
+                type: ies52xxM-mem
+                warn_percent: IES5206-MIB::memStatsHighThreshold
+    os:
+        hardware: IES5206-MIB::sysProductDescr.0
+        serial: IES5206-MIB::sysSerialNumber.0
+        version: IES5206-MIB::sysBootupFwVersion.0
     processors:
         data:
             -

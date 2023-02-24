@@ -1,0 +1,1438 @@
+    HIMOINSAv14-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+     enterprises
+         FROM RFC1155-SMI
+     OBJECT-TYPE
+         FROM RFC-1212
+     TRAP-TYPE
+         FROM RFC-1215
+	 DisplayString
+		 FROM RFC1213-MIB
+	 Gauge, Counter, IpAddress
+		FROM RFC1155-SMI;
+
+
+	InterfaceIndex ::= INTEGER
+
+        himoinsa       OBJECT IDENTIFIER ::= { enterprises 41809 }
+
+        measures        OBJECT IDENTIFIER ::= { himoinsa 1 }
+
+        parameters      OBJECT IDENTIFIER ::= { himoinsa 2 }
+
+        traps           OBJECT IDENTIFIER ::= { himoinsa 3 }
+
+        mainsFreq OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 1 }
+
+        mainsVL12 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 2 }
+
+        mainsVL23 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 3 }
+
+        mainsVL13 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 4 }
+
+        mainsVL1N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 5 }
+
+        mainsVL2N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 6 }
+
+        mainsVL3N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 7 }
+
+        genFreq OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 8 }
+
+        genVL12 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 9 }
+
+        genVL23 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 10 }
+
+        genVL13 OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 11 }
+
+        genVL1N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 12 }
+
+        genVL2N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 13 }
+
+        genVL3N OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 14 }
+
+        ph1Amp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 15 }
+
+        ph2Amp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 16 }
+
+        ph3Amp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 17 }
+
+        flagsCurrent OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 18 }
+
+		pFCTotal OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measures 19 }
+
+		pFC1 OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measures 20 }
+
+		pFC2 OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measures 21 }
+
+		pFC3 OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measures 22 }
+
+        realPow OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 23 }
+
+        appPow OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 24 }
+
+        reactivePow OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 25 }
+
+        speed OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 26 }
+
+        fuelLevel OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 27 }
+
+        altenatorVolt OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 28 }
+
+        batteryVolt OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 29 }
+
+        waterTemp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 30 }
+
+        oilPress OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 31 }
+
+        oilTemp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 32 }
+
+        sensorDet OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 33 }
+
+        units OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 34 }
+
+        totalInstantPower OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 35 }
+
+		partialInstantPower OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 36 }
+
+        powerPerDay OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 37 }
+
+        powerPerMonth OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 38 }
+
+        powerPerYear OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 39 }
+
+        totalRunningTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 40 }
+
+        partialRunningTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 41 }
+
+        successfulStarts OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 42 }
+
+        unsuccessfulStarts OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 43 }
+
+        switchPanelCount OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 44 }
+
+        secondaryBatteryVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 45 }
+
+        status OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 46 }
+
+        alarmBitMapHigh OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 47 }
+
+        alarmBitMapLow OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 48 }
+
+        alarmBitMapHigh1 OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 49 }
+
+		falloArranqueMeasure OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 50 }
+
+		nivelCombustibleMeasure OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 51 }
+
+		caidaGrupoMeasure OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 52 }
+
+		caidaRedMeasure OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 53 }
+
+		caidaGrupoConmMeasure OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 54 }
+
+        measuresConmTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF MeasuresConmEntry
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measures 55 }
+
+
+        measuresConmEntry OBJECT-TYPE
+                SYNTAX MeasuresConmEntry
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                INDEX { measuresConmIndex }
+                ::= { measuresConmTable 1 }
+
+        MeasuresConmEntry ::= SEQUENCE {
+		measuresConmIndex
+			InterfaceIndex,
+        mainsFreqConm
+            INTEGER,
+        mainsVL12Conm
+            INTEGER,
+		mainsVL23Conm
+		    INTEGER,
+		mainsVL13Conm
+		    INTEGER,
+		mainsVL1NConm
+		    INTEGER,
+		mainsVL2NConm
+		    INTEGER,
+		mainsVL3NConm
+		    INTEGER,
+		genFreqConm
+            INTEGER,
+        genVL12Conm
+            INTEGER,
+		genVL23Conm
+		    INTEGER,
+		genVL13Conm
+		    INTEGER,
+		genVL1NConm
+		    INTEGER,
+		genVL2NConm
+		    INTEGER,
+		genVL3NConm
+		    INTEGER,
+		ph1AmpConm
+		    INTEGER,
+		ph2AmpConm
+		    INTEGER,
+		ph3AmpConm
+		    INTEGER,
+		flagsCurrentConm
+		    Gauge,
+		pFCTotalConm
+		    INTEGER,
+		pFC1Conm
+		    INTEGER,
+		pFC2Conm
+		    INTEGER,
+		pFC3Conm
+		    INTEGER,
+		realPowConm
+		    INTEGER,
+		appPowConm
+		    INTEGER,
+		reactPowConm
+			INTEGER,
+		mainsControlType
+		    INTEGER,
+		statusConm
+			Gauge,
+		alarmBitMapConm
+			Gauge
+        }
+
+        measuresConmIndex OBJECT-TYPE
+                SYNTAX InterfaceIndex
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 1 }
+
+        mainsFreqConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 2 }
+
+        mainsVL12Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 3 }
+
+        mainsVL23Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 4 }
+
+        mainsVL13Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 5 }
+
+        mainsVL1NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 6 }
+
+        mainsVL2NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 7 }
+
+        mainsVL3NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 8 }
+
+        genFreqConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 9 }
+
+        genVL12Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 10 }
+
+        genVL23Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 11 }
+
+        genVL13Conm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 12 }
+
+        genVL1NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 13 }
+
+        genVL2NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 14 }
+
+        genVL3NConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 15 }
+
+        ph1AmpConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 16 }
+
+        ph2AmpConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 17 }
+
+        ph3AmpConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 18 }
+
+        flagsCurrentConm OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 19 }
+
+		pFCTotalConm OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measuresConmEntry 20 }
+		pFC1Conm OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measuresConmEntry 21 }
+
+		pFC2Conm OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measuresConmEntry 22 }
+
+		pFC3Conm OBJECT-TYPE
+				SYNTAX INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+						""
+				::= { measuresConmEntry 23 }
+
+        realPowConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 24 }
+
+        appPowConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 25 }
+
+        reactPowConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 26 }
+
+        mainsControlType OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 27 }
+
+        statusConm OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 28 }
+
+        alarmBitMapConm OBJECT-TYPE
+                SYNTAX Gauge
+                ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { measuresConmEntry 29 }
+
+        startsCount OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 1 }
+
+        timeBetweenStarts OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 2 }
+
+        startDelay OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 3 }
+
+        preheatingTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 4 }
+
+        startupTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 5 }
+
+        loadActivationTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 6 }
+
+        nominalConditionTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 7 }
+
+        dplusActivationTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 8 }
+
+		eJP1ActivationDelayTime  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-write
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 9 }
+
+        mainsActivationDelay OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 10 }
+
+        coolingTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 11 }
+
+		pEActivationTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 12 }
+
+        counterDetectionTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 13 }
+
+        maximumAlarmActivationTime OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 14 }
+
+        phaseNumber OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 15 }
+
+        maxGensetVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 16 }
+
+        minGensetVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 17 }
+
+        maxGensetAsymetryValue OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 18 }
+
+        maxGensetFrequency OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 19 }
+
+        minGensetFrequency OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 20 }
+
+        maxGensetCurrent OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 21 }
+
+        shortCircuitDetection OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 22 }
+
+        gensetNominalPower OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 23 }
+
+        maxReversePower OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 24 }
+
+        maxPickupSpeed OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 25 }
+
+        minPickupSpeed OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 26 }
+
+        maxMainsVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 27 }
+
+        minMainsVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 28 }
+
+        maxMainsFrequency OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 29 }
+
+        minMainsFrequency OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 30 }
+
+        minBatteryVoltage OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 31 }
+
+        transferPumpMinLevel OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 32 }
+
+        transferPumpMaxLevel OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 33 }
+
+        startingVoltageGensetSignal OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 34 }
+
+        startingVoltageAlternator OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 35 }
+
+        startingSpeed OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 36 }
+
+        engineFlywheelTeeth OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 37 }
+
+        fuelReserveLevel OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 38 }
+
+        lowOilPressure OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 39 }
+
+        highWaterTemperatureThreshold OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 40 }
+
+        lowEngineTemperature OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 41 }
+
+        minPreheatingTemp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 42 }
+
+        maxPreheatingTemp OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 43 }
+
+        deviceIpAddress OBJECT-TYPE
+                SYNTAX IpAddress
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 44 }
+
+        deviceMaskSubnet OBJECT-TYPE
+                SYNTAX IpAddress
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 45 }
+
+        deviceGateway OBJECT-TYPE
+                SYNTAX IpAddress
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 46 }
+
+        managerAddress OBJECT-TYPE
+                SYNTAX IpAddress
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 47 }
+
+        agentSNMPPort OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 48 }
+
+        managertrapsPort OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 49 }
+
+        reset OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 50 }
+
+		version  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-only
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 51 }
+
+		gensetStartStop  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-write
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 52 }
+
+		gensetMode  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-write
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 53 }
+
+		mainsBreakerStatus  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-write
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 54 }
+
+		gensetBreakerStatus  OBJECT-TYPE
+				SYNTAX  	INTEGER
+				ACCESS		read-write
+				STATUS		current
+				DESCRIPTION
+						""
+				::= { parameters 55 }
+
+        parametersConmTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF ParametersConmEntry
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parameters 56 }
+
+        parametersConmEntry OBJECT-TYPE
+                SYNTAX ParametersConmEntry
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                INDEX { parametersConmIndex }
+                ::= { parametersConmTable 1 }
+
+        ParametersConmEntry ::= SEQUENCE {
+            parametersConmIndex InterfaceIndex,
+            phaseNumberConm INTEGER,
+            maxGensetVoltageConm INTEGER,
+            minGensetVoltageConm INTEGER,
+            maxGensetAsymetryValueConm INTEGER,
+            maxGensetFrequencyConm INTEGER,
+            minGensetFrequencyConm INTEGER,
+            maxGensetCurrentConm INTEGER,
+            shortCircuitDetectionConm INTEGER,
+            gensetNominalPowerConm INTEGER,
+            maxReversePowerConm INTEGER,
+            maxPickupSpeedConm INTEGER,
+            minPickupSpeedConm INTEGER,
+            maxMainsVoltageConm INTEGER,
+            minMainsVoltageConm INTEGER,
+            maxMainsFrequencyConm INTEGER,
+            minMainsFrequencyConm INTEGER,
+            startingVoltageValueConm INTEGER
+        }
+
+        parametersConmIndex OBJECT-TYPE
+                SYNTAX InterfaceIndex
+                ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 1 }
+
+        phaseNumberConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 2 }
+
+        maxGensetVoltageConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 3 }
+
+        minGensetVoltageConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 4 }
+
+        maxGensetAsymetryValueConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 5 }
+
+        maxGensetFrequencyConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 6 }
+
+        minGensetFrequencyConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 7 }
+
+        maxGensetCurrentConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 8 }
+
+        shortCircuitDetectionConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 9 }
+
+        gensetNominalPowerConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 10 }
+
+        maxReversePowerConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 11 }
+
+        maxPickupSpeedConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 12 }
+
+        minPickupSpeedConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 13 }
+
+        maxMainsVoltageConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 14 }
+
+        minMainsVoltageConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 15 }
+
+        maxMainsFrequencyConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 16 }
+
+        minMainsFrequencyConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 17 }
+
+        startingVoltageValueConm OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        ""
+                ::= { parametersConmEntry 18 }
+
+		alarmString OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 1 }
+
+		falloArranque OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 2 }
+
+		nivelCombustible OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 4 }
+
+		caidaGrupo OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 6 }
+
+		caidaRed OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 8 }
+
+		caidaGrupoConm OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                        ""
+                ::= { traps 10 }
+
+    END

@@ -1,0 +1,160 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Description: Service loopback group MIB.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version
+-- =====================================================================
+HH3C-SLBG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cSlbg MODULE-IDENTITY
+    LAST-UPDATED "201210160000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip: 100085"
+    DESCRIPTION
+        "Service loopback group MIB."
+    REVISION "201210160000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 130 }
+
+---------------------------------------------------------------
+-- Node definitions
+---------------------------------------------------------------
+
+hh3cSlbgMibTable OBJECT IDENTIFIER ::= { hh3cSlbg 1 }
+
+hh3cSlbgGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSlbgGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of service loopback group objects."
+    ::= { hh3cSlbgMibTable 1 }
+
+hh3cSlbgGroupEntry OBJECT-TYPE
+    SYNTAX Hh3cSlbgGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The service loopback group entry."
+    INDEX { hh3cSlbgGroupNumber }
+    ::= { hh3cSlbgGroupTable 1 }
+
+Hh3cSlbgGroupEntry ::=
+    SEQUENCE {
+        hh3cSlbgGroupNumber
+            Unsigned32,
+        hh3cSlbgGroupSrvType
+            BITS,
+        hh3cSlbgGroupRowStatus
+            RowStatus
+     }
+
+hh3cSlbgGroupNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Serial number of the service loopback group."
+    ::= { hh3cSlbgGroupEntry 1 }
+
+hh3cSlbgGroupSrvType OBJECT-TYPE
+    SYNTAX BITS
+        {
+            ipv6(0),
+            ipv6mc(1),
+            tunnel(2),
+            multicastTunnel(3),
+            mpls(4)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Service type of the service loopback group.
+         ipv6: IPv6 unicast service type.
+         ipv6mc: IPv6 multicast service type.
+         tunnel: Unicast tunnel service type.
+         multicastTunnel: Multicast tunnel service type.
+         mpls: MPLS service type."
+    ::= { hh3cSlbgGroupEntry 2 }
+
+hh3cSlbgGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to create, modify, or delete rows.
+         hh3cSlbgGroupNumber and hh3cSlbgGroupSrvType must have a valid value before a row can be activated."
+    ::= { hh3cSlbgGroupEntry 3 }
+
+hh3cSlbgPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSlbgPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of port objects."
+    ::= { hh3cSlbgMibTable 2 }
+
+hh3cSlbgPortEntry OBJECT-TYPE
+    SYNTAX Hh3cSlbgPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The service loopback group port entry."
+    INDEX { hh3cSlbgPortIndex }
+    ::= { hh3cSlbgPortTable 1 }
+
+Hh3cSlbgPortEntry ::=
+    SEQUENCE {
+        hh3cSlbgPortIndex
+            InterfaceIndex,
+        hh3cSlbgPortAttachedGroupNumber
+            Unsigned32,
+        hh3cSlbgPortSelectedGroupNumber
+            Unsigned32
+    }
+
+hh3cSlbgPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Interface index of the port, which is defined in RFC1213 (MIB-II)."
+    ::= { hh3cSlbgPortEntry 1 }
+
+hh3cSlbgPortAttachedGroupNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of the service group number to which this port is assigned.
+         The value is zero if the port is not assigned to any service loopback group."
+    ::= { hh3cSlbgPortEntry 2 }
+
+hh3cSlbgPortSelectedGroupNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the service group number to which this selected port is assigned.
+         The value is zero if the port is not selected or not assigned to any service loopback group."
+    ::= { hh3cSlbgPortEntry 3 }
+
+END

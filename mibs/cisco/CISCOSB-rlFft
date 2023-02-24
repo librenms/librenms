@@ -5,11 +5,13 @@ CISCOSB-rlFft DEFINITIONS ::= BEGIN
 -- Date:       17 May 2004
 
 IMPORTS
-    switch001                                                     FROM CISCOSB-MIB
+    switch001                                               FROM CISCOSB-MIB
     Unsigned32, IpAddress,
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
     RowStatus, TruthValue, PhysAddress, DisplayString,
-    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC;
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength                                 FROM INET-ADDRESS-MIB;
 
 
     Percents ::= TEXTUAL-CONVENTION
@@ -31,15 +33,15 @@ IMPORTS
 
 rlFFT            MODULE-IDENTITY
                  LAST-UPDATED "200406010000Z"
-				 ORGANIZATION "Cisco Small Business"
+                 ORGANIZATION "Cisco Systems, Inc."
 
-				 CONTACT-INFO
-				 "Postal: 170 West Tasman Drive
-				 San Jose , CA 95134-1706
-				 USA
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
 
-				 Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-				 Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                  DESCRIPTION
                       "The private MIB module definition for switch001 Fast Forwarding Tables."
@@ -60,7 +62,7 @@ rlIpFftMibVersion OBJECT-TYPE
         "MIB's version, the current version is 1."
     ::= { rlIpFFT 1 }
 
-rlIpMaxFftNumber OBJECT-TYPE
+rlInetMaxFftNumber OBJECT-TYPE
     SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
@@ -68,7 +70,7 @@ rlIpMaxFftNumber OBJECT-TYPE
         "The maximum number of IP FFTs."
     ::= { rlIpFFT 2 }
 
-rlIpFftDynamicSupported OBJECT-TYPE
+rlInetFftDynamicSupported OBJECT-TYPE
     SYNTAX  INTEGER {
         supported (1),
         unsupported (2)
@@ -79,7 +81,7 @@ rlIpFftDynamicSupported OBJECT-TYPE
         "Specifies whether dynamic IP FFTs are supported."
     ::= { rlIpFFT 3 }
 
-rlIpFftSubnetSupported OBJECT-TYPE
+rlInetFftSubnetSupported OBJECT-TYPE
     SYNTAX  INTEGER {
         supported (1),
         unsupported (2)
@@ -101,7 +103,7 @@ rlIpFftUnknownAddrMsgUsed OBJECT-TYPE
         "Specifies whether the 3SW uses the unknown address message."
     ::= { rlIpFFT 5 }
 
-rlIpFftAgingTimeSupported OBJECT-TYPE
+rlInetFftAgingTimeSupported OBJECT-TYPE
     SYNTAX  INTEGER {
         supported (1),
         unsupported (2)
@@ -123,7 +125,7 @@ rlIpFftSrcAddrSupported OBJECT-TYPE
         "Specifies whether an IP subtable per station contains source IP address."
     ::= { rlIpFFT 7 }
 
-rlIpFftAgingTimeout OBJECT-TYPE
+rlInetFftAgingTimeout OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-write
     STATUS      current
@@ -159,8 +161,8 @@ rlIpFftYellowBoundary OBJECT-TYPE
 -- The IP FFT Number Routers Table
 --
 
-rlIpFftNumTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftNumEntry
+rlInetFftNumTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftNumEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -168,52 +170,71 @@ rlIpFftNumTable OBJECT-TYPE
          the IP SFFTs and IP NFFTs. "
     ::= { rlIpFFT 12 }
 
-rlIpFftNumEntry OBJECT-TYPE
-    SYNTAX  RlIpFftNumEntry
+rlInetFftNumEntry OBJECT-TYPE
+    SYNTAX  RlInetFftNumEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry (conceptual row) containing the containing routes' numbers
          of IP SFFT and IP NFFT "
-    INDEX  { rlIpFftNumIndex }
-    ::= { rlIpFftNumTable 1 }
+    INDEX  { rlInetFftNumIndex, rlInetFftNumAddressType }
+    ::= { rlInetFftNumTable 1 }
 
-RlIpFftNumEntry ::= SEQUENCE {
-    rlIpFftNumIndex             INTEGER,
-    rlIpFftNumStnRoutesNumber   INTEGER,
-    rlIpFftNumSubRoutesNumber   INTEGER
+RlInetFftNumEntry ::= SEQUENCE {
+    rlInetFftNumIndex             INTEGER,
+    rlInetFftNumAddressType       InetAddressType,
+    rlInetFftNumStnRoutesNumber   INTEGER,
+    rlInetFftNumSubRoutesNumber   INTEGER,
+    rlInetFftNumInetTomeRoutesNumber INTEGER
 }
 
-rlIpFftNumIndex OBJECT-TYPE
+rlInetFftNumIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of the index of the IP FFT. "
-    ::= { rlIpFftNumEntry 1 }
+    ::= { rlInetFftNumEntry 1 }
 
-rlIpFftNumStnRoutesNumber OBJECT-TYPE
+rlInetFftNumAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inet address type that are contained in the IP SFFT. "
+    ::= { rlInetFftNumEntry 2 }
+
+rlInetFftNumStnRoutesNumber OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The number of routes that are contained in the IP SFFT. "
-    ::= { rlIpFftNumEntry 2 }
+    ::= { rlInetFftNumEntry 3 }
 
-rlIpFftNumSubRoutesNumber OBJECT-TYPE
+rlInetFftNumSubRoutesNumber OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The number of routes that are contained in the IP NFFT. "
-    ::= { rlIpFftNumEntry 3 }
+    ::= { rlInetFftNumEntry 4 }
+
+rlInetFftNumInetTomeRoutesNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of routes that are Inet To Me. "
+    ::= { rlInetFftNumEntry 5 }
+
 
 --
 -- The IP Fast Forwarding Table per station
 --
 
-rlIpFftStnTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftStnEntry
+rlInetFftStnTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftStnEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -221,66 +242,76 @@ rlIpFftStnTable OBJECT-TYPE
          per station for IP datagrams. "
     ::= { rlIpFFT 13 }
 
-rlIpFftStnEntry OBJECT-TYPE
-    SYNTAX  RlIpFftStnEntry
+rlInetFftStnEntry OBJECT-TYPE
+    SYNTAX  RlInetFftStnEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry (conceptual row) contains the IP fast forwarding
           information for IP datagrams from a particular source and
           destination addresses."
-    INDEX  { rlIpFftStnIndex, rlIpFftStnMrid, rlIpFftStnDstIpAddress }
-    ::= { rlIpFftStnTable 1 }
+    INDEX  { rlInetFftStnIndex, rlInetFftStnMrid, rlInetFftStnDstInetAddressType, rlInetFftStnDstInetAddress }
+    ::= { rlInetFftStnTable 1 }
 
-RlIpFftStnEntry ::= SEQUENCE {
-    rlIpFftStnIndex          INTEGER,
-    rlIpFftStnMrid           INTEGER,
-    rlIpFftStnDstIpAddress   IpAddress,
-    rlIpFftStnDstRouteIpMask IpAddress,
-    rlIpFftStnDstIpAddrType  INTEGER,
-    rlIpFftStnDstMacAddress  PhysAddress,
-    rlIpFftStnSrcMacAddress  PhysAddress,
-    rlIpFftStnOutIfIndex     INTEGER,
-    rlIpFftStnVid            INTEGER,
-    rlIpFftStnTaggedMode     INTEGER,
-    rlIpFftStnAge            INTEGER
+RlInetFftStnEntry ::= SEQUENCE {
+    rlInetFftStnIndex          INTEGER,
+    rlInetFftStnMrid           INTEGER,
+    rlInetFftStnDstInetAddressType  InetAddressType,
+    rlInetFftStnDstInetAddress      InetAddress,
+    rlInetFftStnDstRouteInetPrefix  InetAddressPrefixLength,
+    rlInetFftStnDstInetAddrType     INTEGER,
+    rlInetFftStnDstMacAddress  PhysAddress,
+    rlInetFftStnSrcMacAddress  PhysAddress,
+    rlInetFftStnOutIfIndex     INTEGER,
+    rlInetFftStnVid            INTEGER,
+    rlInetFftStnTaggedMode     INTEGER,
+    rlInetFftStnAge            INTEGER
 }
 
-rlIpFftStnIndex OBJECT-TYPE
+rlInetFftStnIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of the index of the IP FFT. "
-    ::= { rlIpFftStnEntry 1 }
+    ::= { rlInetFftStnEntry 1 }
 
-rlIpFftStnMrid OBJECT-TYPE
+rlInetFftStnMrid OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The router's Instance Identifier in the SFFT. "
-    ::= { rlIpFftStnEntry 2 }
+    ::= { rlInetFftStnEntry 2 }
 
-rlIpFftStnDstIpAddress OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftStnDstInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Ip destination type for which this entry
+         contains IP forwarding information."
+    ::= { rlInetFftStnEntry 3 }
+
+rlInetFftStnDstInetAddress OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The IP destination address for which this entry
          contains IP forwarding information."
-    ::= { rlIpFftStnEntry 3 }
+    ::= { rlInetFftStnEntry 4 }
 
-rlIpFftStnDstRouteIpMask OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftStnDstRouteInetPrefix OBJECT-TYPE
+    SYNTAX  InetAddressPrefixLength
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-         "The IP destination mask for which this entry
+         "The IP destination prefix for which this entry
           contains IP forwarding information."
-    ::= { rlIpFftStnEntry 4 }
+    ::= { rlInetFftStnEntry 5 }
 
-rlIpFftStnDstIpAddrType OBJECT-TYPE
+rlInetFftStnDstInetAddrType OBJECT-TYPE
     SYNTAX  INTEGER {
         local (1),
         remote (2)
@@ -289,41 +320,41 @@ rlIpFftStnDstIpAddrType OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP destination address type. "
- ::= { rlIpFftStnEntry 5 }
+ ::= { rlInetFftStnEntry 6 }
 
-rlIpFftStnDstMacAddress OBJECT-TYPE
+rlInetFftStnDstMacAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The MAC destination address."
-    ::= { rlIpFftStnEntry 6}
+    ::= { rlInetFftStnEntry 7}
 
-rlIpFftStnSrcMacAddress OBJECT-TYPE
+rlInetFftStnSrcMacAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The MAC source address."
-    ::= { rlIpFftStnEntry 7 }
+    ::= { rlInetFftStnEntry 8 }
 
-rlIpFftStnOutIfIndex OBJECT-TYPE
+rlInetFftStnOutIfIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of ifIndex of output physical port."
-    ::= { rlIpFftStnEntry 8 }
+    ::= { rlInetFftStnEntry 9 }
 
-rlIpFftStnVid  OBJECT-TYPE
+rlInetFftStnVid  OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The vid of the output port."
-    ::= { rlIpFftStnEntry 9 }
+    ::= { rlInetFftStnEntry 10 }
 
-rlIpFftStnTaggedMode OBJECT-TYPE
+rlInetFftStnTaggedMode OBJECT-TYPE
     SYNTAX  INTEGER {
         untagged  (1),
         tagged           (2),
@@ -335,22 +366,22 @@ rlIpFftStnTaggedMode OBJECT-TYPE
         "The tagged value of the port. When the Tagged field is not
          a part of the FFT table in the ASIC,
          the Tagged field gets the BasedPortConfig value "
-    ::= { rlIpFftStnEntry 10 }
+    ::= { rlInetFftStnEntry 11 }
 
-rlIpFftStnAge OBJECT-TYPE
+rlInetFftStnAge OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The age of the entry in seconds from the inserting."
-    ::= { rlIpFftStnEntry 11 }
+    ::= { rlInetFftStnEntry 12 }
 
 --
 -- The IP Fast Forwarding Table per subnet
 --
 
-rlIpFftSubTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftSubEntry
+rlInetFftSubTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftSubEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -358,230 +389,311 @@ rlIpFftSubTable OBJECT-TYPE
          per subnet for IP datagrams. "
     ::= { rlIpFFT 14 }
 
-rlIpFftSubEntry OBJECT-TYPE
-    SYNTAX  RlIpFftSubEntry
+rlInetFftSubEntry OBJECT-TYPE
+    SYNTAX  RlInetFftSubEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry (conceptual row) containing the IP fast forwarding
          information for IP datagrams from a particular source and
          destination addresses."
-    INDEX  { rlIpFftSubMrid , rlIpFftSubDstIpSubnet, rlIpFftSubDstIpMask }
+    INDEX  { rlInetFftSubMrid , rlInetFftSubDstInetSubnetType, rlInetFftSubDstInetSubnet, rlInetFftSubDstInetPrefix }
 
-    ::= { rlIpFftSubTable 1 }
+    ::= { rlInetFftSubTable 1 }
 
-RlIpFftSubEntry ::= SEQUENCE {
-    rlIpFftSubMrid          INTEGER,
-    rlIpFftSubDstIpSubnet   IpAddress,
-    rlIpFftSubDstIpMask     IpAddress,
-    rlIpFftSubNextHopSetRefCount INTEGER,
-    rlIpFftSubNextHopCount       INTEGER,
-    rlIpFftSubNextHopIfindex1    INTEGER,
-    rlIpFftSubNextHopIpAddr1     IpAddress,
-    rlIpFftSubNextHopIfindex2    INTEGER,
-    rlIpFftSubNextHopIpAddr2     IpAddress,
-    rlIpFftSubNextHopIfindex3    INTEGER,
-    rlIpFftSubNextHopIpAddr3     IpAddress,
-    rlIpFftSubNextHopIfindex4    INTEGER,
-    rlIpFftSubNextHopIpAddr4     IpAddress,
-    rlIpFftSubNextHopIfindex5    INTEGER,
-    rlIpFftSubNextHopIpAddr5     IpAddress,
-    rlIpFftSubNextHopIfindex6    INTEGER,
-    rlIpFftSubNextHopIpAddr6     IpAddress,
-    rlIpFftSubNextHopIfindex7    INTEGER,
-    rlIpFftSubNextHopIpAddr7     IpAddress,
-    rlIpFftSubNextHopIfindex8    INTEGER,
-    rlIpFftSubNextHopIpAddr8     IpAddress,
-    rlIpFftSubAge           INTEGER
+RlInetFftSubEntry ::= SEQUENCE {
+    rlInetFftSubMrid                    INTEGER,
+    rlInetFftSubDstInetSubnetType       InetAddressType,
+    rlInetFftSubDstInetSubnet           InetAddress,
+    rlInetFftSubDstInetPrefix           InetAddressPrefixLength,
+    rlInetFftSubNextHopSetRefCount      INTEGER,
+    rlInetFftSubNextHopCount            INTEGER,
+    rlInetFftSubNextHopIfindex1         INTEGER,
+    rlInetFftSubNextHopInetAddr1Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr1        InetAddress,
+    rlInetFftSubNextHopIfindex2         INTEGER,
+    rlInetFftSubNextHopInetAddr2Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr2        InetAddress,
+    rlInetFftSubNextHopIfindex3         INTEGER,
+    rlInetFftSubNextHopInetAddr3Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr3        InetAddress,
+    rlInetFftSubNextHopIfindex4         INTEGER,
+    rlInetFftSubNextHopInetAddr4Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr4        InetAddress,
+    rlInetFftSubNextHopIfindex5         INTEGER,
+    rlInetFftSubNextHopInetAddr5Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr5        InetAddress,
+    rlInetFftSubNextHopIfindex6         INTEGER,
+    rlInetFftSubNextHopInetAddr6Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr6        InetAddress,
+    rlInetFftSubNextHopIfindex7         INTEGER,
+    rlInetFftSubNextHopInetAddr7Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr7        InetAddress,
+    rlInetFftSubNextHopIfindex8         INTEGER,
+    rlInetFftSubNextHopInetAddr8Type    InetAddressType,
+    rlInetFftSubNextHopInetAddr8        InetAddress,
+    rlInetFftSubAge                     INTEGER
 }
 
-rlIpFftSubMrid OBJECT-TYPE
+rlInetFftSubMrid OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The router's Instance Identifier in the NFFT. "
-    ::= { rlIpFftSubEntry 1 }
+    ::= { rlInetFftSubEntry 1 }
 
-rlIpFftSubDstIpSubnet OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubDstInetSubnetType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP destination subnet type for which this entry
+         contains IP forwarding information."
+    ::= { rlInetFftSubEntry 2 }
+
+rlInetFftSubDstInetSubnet OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The IP destination subnet for which this entry
          contains IP forwarding information."
-    ::= { rlIpFftSubEntry 2 }
+    ::= { rlInetFftSubEntry 3 }
 
-rlIpFftSubDstIpMask OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubDstInetPrefix OBJECT-TYPE
+    SYNTAX  InetAddressPrefixLength
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The IP destination mask for which this entry
+        "The IP destination prefix for which this entry
          contains IP forwarding information."
-    ::= { rlIpFftSubEntry 3 }
+    ::= { rlInetFftSubEntry 4 }
 
-rlIpFftSubAge OBJECT-TYPE
-    SYNTAX  INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The age of the entry in seconds from the inserting."
-
-    ::= { rlIpFftSubEntry 4 }
-
-rlIpFftSubNextHopSetRefCount OBJECT-TYPE
+rlInetFftSubNextHopSetRefCount OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The number of NFFT entries that used the given NextHop set (ECMP path). "
 
-    ::= { rlIpFftSubEntry 5 }
+    ::= { rlInetFftSubEntry 5 }
 
-rlIpFftSubNextHopCount OBJECT-TYPE
+rlInetFftSubNextHopCount OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The number of used NextHops in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 6 }
+    ::= { rlInetFftSubEntry 6 }
 
-rlIpFftSubNextHopIfindex1 OBJECT-TYPE
+rlInetFftSubNextHopIfindex1 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The first NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 7 }
+    ::= { rlInetFftSubEntry 7 }
 
-rlIpFftSubNextHopIpAddr1 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr1Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 8 }
+
+rlInetFftSubNextHopInetAddr1 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The first NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 8 }
+    ::= { rlInetFftSubEntry 9 }
 
-rlIpFftSubNextHopIfindex2 OBJECT-TYPE
+rlInetFftSubNextHopIfindex2 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The second NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 9 }
+    ::= { rlInetFftSubEntry 10 }
 
-rlIpFftSubNextHopIpAddr2 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr2Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 11 }
+
+rlInetFftSubNextHopInetAddr2 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The second NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 10 }
+    ::= { rlInetFftSubEntry 12 }
 
-rlIpFftSubNextHopIfindex3 OBJECT-TYPE
+rlInetFftSubNextHopIfindex3 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The third NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 11 }
+    ::= { rlInetFftSubEntry 13 }
 
-rlIpFftSubNextHopIpAddr3 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr3Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 14 }
+
+rlInetFftSubNextHopInetAddr3 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The third NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 12 }
+    ::= { rlInetFftSubEntry 15 }
 
-rlIpFftSubNextHopIfindex4 OBJECT-TYPE
+rlInetFftSubNextHopIfindex4 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The fourth NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 13 }
+    ::= { rlInetFftSubEntry 16 }
 
-rlIpFftSubNextHopIpAddr4 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr4Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 17 }
+
+rlInetFftSubNextHopInetAddr4 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The fourth NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 14 }
+    ::= { rlInetFftSubEntry 18 }
 
-rlIpFftSubNextHopIfindex5 OBJECT-TYPE
+rlInetFftSubNextHopIfindex5 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The fifth NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 15 }
+    ::= { rlInetFftSubEntry 19 }
 
-rlIpFftSubNextHopIpAddr5 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr5Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 20 }
+
+rlInetFftSubNextHopInetAddr5 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The fifth NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 16 }
+    ::= { rlInetFftSubEntry 21 }
 
-rlIpFftSubNextHopIfindex6 OBJECT-TYPE
+rlInetFftSubNextHopIfindex6 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The six NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 17 }
+    ::= { rlInetFftSubEntry 22 }
 
-rlIpFftSubNextHopIpAddr6 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr6Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 23 }
+
+rlInetFftSubNextHopInetAddr6 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The six NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 18 }
+    ::= { rlInetFftSubEntry 24 }
 
-rlIpFftSubNextHopIfindex7 OBJECT-TYPE
+rlInetFftSubNextHopIfindex7 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The seven NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 19 }
+    ::= { rlInetFftSubEntry 25 }
 
-rlIpFftSubNextHopIpAddr7 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr7Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 26 }
+
+rlInetFftSubNextHopInetAddr7 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The seven NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 20 }
+    ::= { rlInetFftSubEntry 27 }
 
-rlIpFftSubNextHopIfindex8 OBJECT-TYPE
+rlInetFftSubNextHopIfindex8 OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The eight NextHop Ifindex in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 21 }
+    ::= { rlInetFftSubEntry 28 }
 
-rlIpFftSubNextHopIpAddr8 OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftSubNextHopInetAddr8Type OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first NextHop IP address type in the given NextHop set (ECMP path) for the NFFT entry. "
+    ::= { rlInetFftSubEntry 29 }
+
+rlInetFftSubNextHopInetAddr8 OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The eight NextHop IP address in the given NextHop set (ECMP path) for the NFFT entry. "
-    ::= { rlIpFftSubEntry 22 }
+    ::= { rlInetFftSubEntry 30 }
 
+rlInetFftSubAge OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The age of the entry in seconds from the inserting."
+
+    ::= { rlInetFftSubEntry 31 }
 
 --
 -- The IP FFT Counters Table
 --
 
-rlIpFftCountersTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftCountersEntry
+rlInetFftCountersTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftCountersEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -589,62 +701,62 @@ rlIpFftCountersTable OBJECT-TYPE
          per one IP FFT."
     ::= { rlIpFFT 15 }
 
-rlIpFftCountersEntry OBJECT-TYPE
-    SYNTAX  RlIpFftCountersEntry
+rlInetFftCountersEntry OBJECT-TYPE
+    SYNTAX  RlInetFftCountersEntry
     MAX-ACCESS      not-accessible
     STATUS              current
     DESCRIPTION
         "An entry (conceptual row) containing the IP Counters
          information containing amount of IP datagrams passed
          by certain IP FFT."
-    INDEX  { rlIpFftCountersIndex }
-    ::= { rlIpFftCountersTable 1 }
+    INDEX  { rlInetFftCountersIndex }
+    ::= { rlInetFftCountersTable 1 }
 
-RlIpFftCountersEntry ::= SEQUENCE {
-    rlIpFftCountersIndex    INTEGER,
-    rlIpFftInReceives       INTEGER,
-    rlIpFftForwDatagrams    INTEGER,
-    rlIpFftInDiscards       INTEGER
+RlInetFftCountersEntry ::= SEQUENCE {
+    rlInetFftCountersIndex    INTEGER,
+    rlInetFftInReceives       INTEGER,
+    rlInetFftForwDatagrams    INTEGER,
+    rlInetFftInDiscards       INTEGER
 }
 
-rlIpFftCountersIndex OBJECT-TYPE
+rlInetFftCountersIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of the index of the IP FFT."
-    ::= { rlIpFftCountersEntry 1 }
+    ::= { rlInetFftCountersEntry 1 }
 
-rlIpFftInReceives  OBJECT-TYPE
+rlInetFftInReceives  OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The amount of received IP datagrams "
-    ::= { rlIpFftCountersEntry 2 }
+    ::= { rlInetFftCountersEntry 2 }
 
-rlIpFftForwDatagrams OBJECT-TYPE
+rlInetFftForwDatagrams OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The amount of forwarded IP datagrams "
-    ::= { rlIpFftCountersEntry 3 }
+    ::= { rlInetFftCountersEntry 3 }
 
-rlIpFftInDiscards OBJECT-TYPE
+rlInetFftInDiscards OBJECT-TYPE
     SYNTAX          INTEGER
     MAX-ACCESS          read-only
     STATUS              current
     DESCRIPTION
         "The amount of discarded IP datagrams "
-    ::= { rlIpFftCountersEntry 4 }
+    ::= { rlInetFftCountersEntry 4 }
 
 --
 -- The IP NextHop Table (used by NFFT and Remote SFFT)
 --
 
-rlIpFftNextHopTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftNextHopEntry
+rlInetFftNextHopTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftNextHopEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -652,47 +764,58 @@ rlIpFftNextHopTable OBJECT-TYPE
          used for routing IP datagrams. "
     ::= { rlIpFFT 16 }
 
-rlIpFftNextHopEntry OBJECT-TYPE
-    SYNTAX  RlIpFftNextHopEntry
+rlInetFftNextHopEntry OBJECT-TYPE
+    SYNTAX  RlInetFftNextHopEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry (conceptual row) contains the NextHop info
           information for routing IP datagrams."
 
-    INDEX  { rlIpFftNextHopifindex, rlIpFftNextHopIpAddress }
-    ::= { rlIpFftNextHopTable 1 }
+    INDEX  { rlInetFftNextHopifindex, rlInetFftNextHopInetAddressType, rlInetFftNextHopInetAddress}
+    ::= { rlInetFftNextHopTable 1 }
 
-RlIpFftNextHopEntry ::= SEQUENCE {
-    rlIpFftNextHopifindex        INTEGER,
-    rlIpFftNextHopIpAddress      IpAddress,
-    rlIpFftNextHopValid          INTEGER,
-    rlIpFftNextHopType           INTEGER,
-    rlIpFftNextHopReferenceCount INTEGER,
-    rlIpFftNextHopNetAddress     PhysAddress,
-    rlIpFftNextHopVid            INTEGER,
-    rlIpFftNextHopMacAddress     PhysAddress,
-    rlIpFftNextHopOutIfIndex     INTEGER
+RlInetFftNextHopEntry ::= SEQUENCE {
+    rlInetFftNextHopifindex        INTEGER,
+    rlInetFftNextHopInetAddressType InetAddressType,
+    rlInetFftNextHopInetAddress    InetAddress,
+    rlInetFftNextHopValid          INTEGER,
+    rlInetFftNextHopType           INTEGER,
+    rlInetFftNextHopReferenceCount INTEGER,
+    rlInetFftNextHopNetAddress     PhysAddress,
+    rlInetFftNextHopVid            INTEGER,
+    rlInetFftNextHopMacAddress     PhysAddress,
+    rlInetFftNextHopOutIfIndex     INTEGER
 }
 
-rlIpFftNextHopifindex OBJECT-TYPE
+rlInetFftNextHopifindex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of the IP Interface index of the NextHop. "
-    ::= { rlIpFftNextHopEntry 1 }
+    ::= { rlInetFftNextHopEntry 1 }
 
-rlIpFftNextHopIpAddress OBJECT-TYPE
-    SYNTAX  IpAddress
+rlInetFftNextHopInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of a NextHop for which an entry contains
+         IP forwarding information. "
+    ::= { rlInetFftNextHopEntry 2 }
+
+
+rlInetFftNextHopInetAddress OBJECT-TYPE
+    SYNTAX  InetAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The IP address of a NextHop for which an entry contains
          IP forwarding information. "
-    ::= { rlIpFftNextHopEntry 2 }
+    ::= { rlInetFftNextHopEntry 3 }
 
-rlIpFftNextHopValid OBJECT-TYPE
+rlInetFftNextHopValid OBJECT-TYPE
     SYNTAX  INTEGER {
         valid (1),
         invalid (2)
@@ -702,9 +825,9 @@ rlIpFftNextHopValid OBJECT-TYPE
     DESCRIPTION
         "The NextHop Valid bit. When L2 info is missing,
          a NextHop has Invalid value. "
- ::= { rlIpFftNextHopEntry 3 }
+ ::= { rlInetFftNextHopEntry 4 }
 
-rlIpFftNextHopType OBJECT-TYPE
+rlInetFftNextHopType OBJECT-TYPE
     SYNTAX  INTEGER {
         local  (1),
         remote (2),
@@ -715,9 +838,9 @@ rlIpFftNextHopType OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The NextHop type. "
- ::= { rlIpFftNextHopEntry 4 }
+ ::= { rlInetFftNextHopEntry 5 }
 
-rlIpFftNextHopReferenceCount OBJECT-TYPE
+rlInetFftNextHopReferenceCount OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
@@ -731,46 +854,46 @@ rlIpFftNextHopReferenceCount OBJECT-TYPE
          IF LPM is NOT supported:
                NextHop_ref_count used to save number of
                Remote SFFT entries that use the NextHop. "
- ::= { rlIpFftNextHopEntry 5 }
+ ::= { rlInetFftNextHopEntry 6 }
 
-rlIpFftNextHopNetAddress OBJECT-TYPE
+rlInetFftNextHopNetAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The NextHop Physical Address."
- ::= { rlIpFftNextHopEntry 6 }
+ ::= { rlInetFftNextHopEntry 7 }
 
-rlIpFftNextHopVid  OBJECT-TYPE
+rlInetFftNextHopVid  OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The vid of the output port."
-    ::= { rlIpFftNextHopEntry 7 }
+    ::= { rlInetFftNextHopEntry 8 }
 
-rlIpFftNextHopMacAddress OBJECT-TYPE
+rlInetFftNextHopMacAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The MAC destination address."
-    ::= { rlIpFftNextHopEntry 8}
+    ::= { rlInetFftNextHopEntry 9}
 
-rlIpFftNextHopOutIfIndex OBJECT-TYPE
+rlInetFftNextHopOutIfIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of ifIndex of output physical port."
-    ::= { rlIpFftNextHopEntry 9 }
+    ::= { rlInetFftNextHopEntry 10 }
 
 --
 -- The L2 info Table (used by NextHop and Direct SFFT)
 --
 
-rlIpFftL2InfoTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF RlIpFftL2InfoEntry
+rlInetFftL2InfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlInetFftL2InfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -778,46 +901,46 @@ rlIpFftL2InfoTable OBJECT-TYPE
          used for routing IP datagrams. "
     ::= { rlIpFFT 17 }
 
-rlIpFftL2InfoEntry OBJECT-TYPE
-    SYNTAX  RlIpFftL2InfoEntry
+rlInetFftL2InfoEntry OBJECT-TYPE
+    SYNTAX  RlInetFftL2InfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry (conceptual row) contains the L2 info
           information for routing IP datagrams."
 
-    INDEX  { rlIpFftL2InfoIfindex, rlIpFftL2InfoDstMacAddress }
-    ::= { rlIpFftL2InfoTable 1 }
+    INDEX  { rlInetFftL2InfoIfindex, rlInetFftL2InfoDstMacAddress }
+    ::= { rlInetFftL2InfoTable 1 }
 
-RlIpFftL2InfoEntry ::= SEQUENCE {
-    rlIpFftL2InfoIfindex        INTEGER,
-    rlIpFftL2InfoDstMacAddress  PhysAddress,
-    rlIpFftL2InfoValid          INTEGER,
-    rlIpFftL2InfoType           INTEGER,
-    rlIpFftL2InfoReferenceCount INTEGER,
-    rlIpFftL2InfoVid            INTEGER,
-    rlIpFftL2InfoSrcMacAddress  PhysAddress,
-    rlIpFftL2InfoOutIfIndex     INTEGER,
-    rlIpFftL2InfoTaggedMode     INTEGER
+RlInetFftL2InfoEntry ::= SEQUENCE {
+    rlInetFftL2InfoIfindex        INTEGER,
+    rlInetFftL2InfoDstMacAddress  PhysAddress,
+    rlInetFftL2InfoValid          INTEGER,
+    rlInetFftL2InfoType           INTEGER,
+    rlInetFftL2InfoReferenceCount INTEGER,
+    rlInetFftL2InfoVid            INTEGER,
+    rlInetFftL2InfoSrcMacAddress  PhysAddress,
+    rlInetFftL2InfoOutIfIndex     INTEGER,
+    rlInetFftL2InfoTaggedMode     INTEGER
 }
 
-rlIpFftL2InfoIfindex OBJECT-TYPE
+rlInetFftL2InfoIfindex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The VLAN Ifindex of the destination port. "
-    ::= { rlIpFftL2InfoEntry 1 }
+    ::= { rlInetFftL2InfoEntry 1 }
 
-rlIpFftL2InfoDstMacAddress OBJECT-TYPE
+rlInetFftL2InfoDstMacAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The MAC destination address."
-    ::= { rlIpFftL2InfoEntry 2}
+    ::= { rlInetFftL2InfoEntry 2}
 
-rlIpFftL2InfoValid OBJECT-TYPE
+rlInetFftL2InfoValid OBJECT-TYPE
     SYNTAX  INTEGER {
         valid (1),
         invalid (2)
@@ -827,9 +950,9 @@ rlIpFftL2InfoValid OBJECT-TYPE
     DESCRIPTION
         "The L2 info entry valid bit. When L2 info is missing some information,
           an L2 info has Invalid value. "
- ::= { rlIpFftL2InfoEntry 3 }
+ ::= { rlInetFftL2InfoEntry 3 }
 
-rlIpFftL2InfoType OBJECT-TYPE
+rlInetFftL2InfoType OBJECT-TYPE
     SYNTAX  INTEGER {
         other (1),
         vlan  (2)
@@ -839,42 +962,42 @@ rlIpFftL2InfoType OBJECT-TYPE
     DESCRIPTION
         "The L2 info type. With Enthernet media l2 info type is vlan.
         WIth Tunneling feature, l2 info type will be expanded. "
- ::= { rlIpFftL2InfoEntry 4 }
+ ::= { rlInetFftL2InfoEntry 4 }
 
-rlIpFftL2InfoReferenceCount OBJECT-TYPE
+rlInetFftL2InfoReferenceCount OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
      "The reference count contains a number of
       NextHop entries that use this L2 info."
- ::= { rlIpFftL2InfoEntry 5 }
+ ::= { rlInetFftL2InfoEntry 5 }
 
-rlIpFftL2InfoVid OBJECT-TYPE
+rlInetFftL2InfoVid OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The vid of the destination port. "
-    ::= { rlIpFftL2InfoEntry 6 }
+    ::= { rlInetFftL2InfoEntry 6 }
 
-rlIpFftL2InfoSrcMacAddress OBJECT-TYPE
+rlInetFftL2InfoSrcMacAddress OBJECT-TYPE
     SYNTAX  PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The MAC source address placed to Ehernet Header of IP forwarded packet."
-    ::= { rlIpFftL2InfoEntry 7}
+    ::= { rlInetFftL2InfoEntry 7}
 
-rlIpFftL2InfoOutIfIndex OBJECT-TYPE
+rlInetFftL2InfoOutIfIndex OBJECT-TYPE
     SYNTAX  INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of ifIndex of output physical port the packet is forwarded through."
-    ::= { rlIpFftL2InfoEntry 8 }
+    ::= { rlInetFftL2InfoEntry 8 }
 
-rlIpFftL2InfoTaggedMode OBJECT-TYPE
+rlInetFftL2InfoTaggedMode OBJECT-TYPE
     SYNTAX  INTEGER {
         untagged  (1),
         tagged           (2),
@@ -886,7 +1009,23 @@ rlIpFftL2InfoTaggedMode OBJECT-TYPE
         "The tagged value of the port. When the Tagged field is not
          a part of the FFT table in the ASIC,
          the Tagged field get the BasedPortConfig value."
-    ::= { rlIpFftL2InfoEntry 9 }
+    ::= { rlInetFftL2InfoEntry 9 }
+
+rlIpv6FftRedBoundary OBJECT-TYPE
+    SYNTAX  Percents
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The red boundary in percents."
+    ::= { rlIpFFT 18 }
+
+rlIpv6FftYellowBoundary OBJECT-TYPE
+    SYNTAX  Percents
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The yellow boundary in percents."
+    ::= { rlIpFFT 19 }
 
 ---
 --- rlIpxFFT

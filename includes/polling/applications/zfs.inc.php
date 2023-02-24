@@ -1,16 +1,12 @@
 <?php
 
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'zfs';
-$app_id = $app['app_id'];
-
-echo $name;
-
 // Is set to false later if missing keys are found.
-$not_legacy=1;
+$not_legacy = 1;
 
 try {
     $zfs = json_app_get($device, $name, 1)['data'];
@@ -18,12 +14,13 @@ try {
     //old version with out the data key
     $zfs = $e->getParsedJson();
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('deleted', 'DERIVE', 0)
     ->addDataset('evict_skip', 'DERIVE', 0)
@@ -135,7 +132,7 @@ $fields = [
     'pre_meta_misses_per' => $zfs['pre_meta_misses_per'],
 ];
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -157,7 +154,7 @@ unset($metrics['pools']); // remove pools it is an array, re-add data below
 
 foreach ($zfs['pools'] as $pool) {
     $pools[] = $pool['name'];
-    $rrd_name = ['app', $name, $app_id, $pool['name']];
+    $rrd_name = ['app', $name, $app->app_id, $pool['name']];
     $fields = [
         'alloc' => $pool['alloc'],
         'size' => $pool['size'],
@@ -168,7 +165,7 @@ foreach ($zfs['pools'] as $pool) {
         'dedup' => $pool['dedup'],
     ];
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $pool_rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $pool_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     // insert flattened pool metrics into the metrics array
@@ -177,42 +174,18 @@ foreach ($zfs['pools'] as $pool) {
     }
 }
 
-//
-// component processing for ZFS
-//
-$device_id=$device['device_id'];
-$options= [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'zfs'],
-    ],
-];
+// check for added or removed pools
+$old_pools = $app->data['pools'] ?? [];
+$added_pools = array_diff($pools, $old_pools);
+$removed_pools = array_diff($old_pools, $pools);
 
-$component=new LibreNMS\Component();
-$components=$component->getComponents($device_id, $options);
-
-// if no pools, delete zfs components
-if (empty($pools)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-                 $component->deleteComponent($component_id);
-        }
-    }
-} else {
-    if (isset($components[$device_id])) {
-        $zfsc = $components[$device_id];
-    } else {
-        $zfsc = $component->createComponent($device_id, 'zfs');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($pools);
-
-    $id = $component->getFirstComponentID($zfsc);
-    $zfsc[$id]['label'] = 'ZFS';
-    $zfsc[$id]['pools'] = json_encode($pools);
-
-    $component->setComponentPrefs($device_id, $zfsc);
+// if we have any source pools, save and log
+if (count($added_pools) > 0 || count($removed_pools) > 0) {
+    $app->data = ['pools' => $pools];
+    $log_message = 'ZFS Pool Change:';
+    $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
+    $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
+    log_event($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', $metrics);

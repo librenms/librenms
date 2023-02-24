@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -18,7 +18,7 @@ use LibreNMS\Config;
 
 $no_refresh = true;
 $param = [];
-$device_id = (int)$vars['device'];
+$device_id = (int) $vars['device'];
 
 $pagetitle[] = 'Outages';
 ?>
@@ -39,15 +39,14 @@ $pagetitle[] = 'Outages';
         '<?php echo csrf_field() ?>'+
         '<div class="form-group">' +
         <?php
-        if (!isset($vars['fromdevice'])) {
+        if (! isset($vars['fromdevice'])) {
             ?>
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
             <?php
             if ($device_id) {
                 echo "'<option value=$device_id>" . format_hostname(device_by_id_cache($device_id)) . "</option>' +";
-            }
-            ?>
+            } ?>
         '</select>' +
             <?php
         } else {
@@ -111,7 +110,7 @@ $pagetitle[] = 'Outages';
         }
     });
 
-    <?php if (!isset($vars['fromdevice'])) { ?>
+    <?php if (! isset($vars['fromdevice'])) { ?>
     $("#device").select2({
         theme: "bootstrap",
         dropdownAutoWidth : true,

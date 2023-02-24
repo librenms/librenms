@@ -14,7 +14,7 @@ IMPORTS
     InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB;
 
 rlDhcpCl MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "200701020001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
@@ -578,7 +578,8 @@ RlDhcpClInformationEntry ::= SEQUENCE {
     rlDhcpClInformationTftpServerName     DisplayString,
     rlDhcpClInformationTftpFileName       DisplayString,
     rlDhcpClInformationTimeZone           DisplayString,
-    rlDhcpClInformationTftpImageName      DisplayString
+    rlDhcpClInformationTftpImageName      DisplayString,
+    rlDhcpClInformationPnpData            DisplayString
 }
 
 rlDhcpClInformationIfIndex          OBJECT-TYPE
@@ -670,6 +671,14 @@ rlDhcpClInformationTftpImageName OBJECT-TYPE
     DESCRIPTION
         "Image filename to use in autoupdate process received by DHCP client."
     ::= { rlDhcpClInformationEntry 12 }
+
+rlDhcpClInformationPnpData   OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The pnp string received by DHCP client."
+    ::= { rlDhcpClInformationEntry 13 }
 
 -- rlDhcpClInformationDnsServerListEntry --
 
@@ -801,5 +810,53 @@ rlDhcpClAutoUpdateScpFileExtention OBJECT-TYPE
                  When no vlaue is specified, 'scp' extension is used."
     DEFVAL{ "scp" }
     ::= { rlDhcpCl 31 }
+
+
+------------------------------
+-- rlDhcpClEnabledByDefaultRemovedTable
+------------------------------
+
+-- rlDhcpClEnabledByDefaultRemovedTable --
+
+rlDhcpClEnabledByDefaultRemovedTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlDhcpClEnabledByDefaultRemovedEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION "DHCP Client flag is relevant when host parameter dhcp_client_active_on_start is TRUE.
+                 If the MIB has non zero value the meaning is that DHCP client has removed from configuration by the user
+                 on the interface and signs to application not to add DHCP client entry. Otherwise (zero value) - the meaning is
+                 that DHCP client entry must be added. "
+    ::= { rlDhcpCl 32 }
+
+rlDhcpClEnabledByDefaultRemovedEntry OBJECT-TYPE
+    SYNTAX     RlDhcpClEnabledByDefaultRemovedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in rlDhcpClEnabledByDefaultRemovedTable."
+    INDEX      { rlDhcpClEnabledByDefaultRemovedIfIndex }
+    ::= { rlDhcpClEnabledByDefaultRemovedTable 1 }
+
+RlDhcpClEnabledByDefaultRemovedEntry ::= SEQUENCE {
+    rlDhcpClEnabledByDefaultRemovedIfIndex            InterfaceIndex,
+    rlDhcpClEnabledByDefaultRemovedStatus             RowStatus
+}
+
+rlDhcpClEnabledByDefaultRemovedIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The removed dhcp client interface, enabled by default. "
+    ::= { rlDhcpClEnabledByDefaultRemovedEntry  1 }
+
+rlDhcpClEnabledByDefaultRemovedStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry."
+    ::= { rlDhcpClEnabledByDefaultRemovedEntry   2}
+
 
 END

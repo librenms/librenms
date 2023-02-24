@@ -1,0 +1,136 @@
+CISCOSB-QUEUE-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- QUEUE-STATISTICS MIB
+-- Title:      CISCOSB Queue-Statistics Private MIB
+--             This Private MIB manages Queue-Statistics
+-- Version:    8.00
+-- Date:       07 July 2016
+--
+-- -------------------------------------------------------------
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+    Counter64, Integer32                            FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue, 
+    RowStatus                                       FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero            FROM IF-MIB
+    StatisticsDPType                                FROM CISCOSB-POLICY-MIB
+    switch001                                       FROM CISCOSB-MIB;
+    
+----------------------------------------------------
+--              MIBS definitions                  --
+----------------------------------------------------
+
+rlQueueStatistics MODULE-IDENTITY
+    LAST-UPDATED "201607070000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+           "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+		 
+		 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+		 
+    DESCRIPTION
+           "This private MIB module for Queue-Statistics"
+    REVISION "201607070000Z"
+    DESCRIPTION
+           "Initial revision."
+     ::= { switch001 233 }
+     
+     
+-----------------------------------
+-- rlInterfaceQueueStatisticsClear (scalar)
+-----------------------------------
+rlInterfaceQueueStatisticsClear OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This scalar indicates on which interface to clear queue statistics.
+	 A value of zero means to clear queue statistics on all interfaces."
+    ::= { rlQueueStatistics 1 }
+
+-----------------------------------
+-- rlInterfaceQueueStatisticsTable
+-----------------------------------
+rlInterfaceQueueStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlInterfaceQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies packets/bytes pass/drop counters per Port/Queue/Drop Precedence "
+    ::= { rlQueueStatistics 2 }
+
+rlInterfaceQueueStatisticsEntry OBJECT-TYPE
+    SYNTAX RlInterfaceQueueStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes packets/bytes pass/drop counters 
+	for a given combination of port/Queue/Drop Precedence."
+    INDEX {rlInterfaceQueueStatisticsIfIndex, rlInterfaceQueueStatisticsQueue, rlInterfaceQueueStatisticsDP}
+    ::= { rlInterfaceQueueStatisticsTable 1 }
+
+RlInterfaceQueueStatisticsEntry ::= SEQUENCE {
+       rlInterfaceQueueStatisticsIfIndex            InterfaceIndex,
+       rlInterfaceQueueStatisticsQueue              INTEGER,
+       rlInterfaceQueueStatisticsDP                 StatisticsDPType,
+       rlInterfaceQueueStatisticsTxPackets          Counter64,
+       rlInterfaceQueueStatisticsTxBytes            Counter64,
+       rlInterfaceQueueStatisticsDroppedPackets     Counter64,
+       rlInterfaceQueueStatisticsDroppedBytes       Counter64
+}
+
+rlInterfaceQueueStatisticsIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Interface index."
+    ::= { rlInterfaceQueueStatisticsEntry 1 }
+
+rlInterfaceQueueStatisticsQueue OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Queue Number"
+    ::= { rlInterfaceQueueStatisticsEntry 2 }
+
+rlInterfaceQueueStatisticsDP OBJECT-TYPE
+    SYNTAX StatisticsDPType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Drop Precedence"
+    ::= { rlInterfaceQueueStatisticsEntry 3 }
+
+rlInterfaceQueueStatisticsTxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of packets enqueued for transmission"
+    ::= { rlInterfaceQueueStatisticsEntry 4 }
+
+rlInterfaceQueueStatisticsTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of bytes enqueued for transmission"
+    ::= { rlInterfaceQueueStatisticsEntry 5 }
+
+rlInterfaceQueueStatisticsDroppedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of tail-dropped packets"
+    ::= { rlInterfaceQueueStatisticsEntry 6 }
+
+rlInterfaceQueueStatisticsDroppedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of tail-dropped bytes"
+    ::= { rlInterfaceQueueStatisticsEntry 7 }
+
+END
+

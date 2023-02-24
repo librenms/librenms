@@ -19,7 +19,7 @@ IMPORTS
 
 
 rlSecSd  MODULE-IDENTITY
-          LAST-UPDATED "201108310000Z"
+          LAST-UPDATED "201108310001Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -258,7 +258,7 @@ RlSecSdRuleOwnerType ::= TEXTUAL-CONVENTION
         DESCRIPTION
             "An entry in the rlSecSdMngSessionsTable."
         INDEX   { rlSecSdMngSessionId }
-    ::= {rlSecSdMngSessionsTable 2}
+    ::= {rlSecSdMngSessionsTable 1}
 
     RlSecSdMngSessionsEntry ::= SEQUENCE {
         rlSecSdMngSessionId          INTEGER,

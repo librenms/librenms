@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,8 +36,8 @@ class BgpBackwardTransition implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -47,15 +47,16 @@ class BgpBackwardTransition implements SnmptrapHandler
 
         $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $bgpPeerIp)->first();
 
-        if (!$bgpPeer) {
+        if (! $bgpPeer) {
             Log::error('Unknown bgp peer handling bgpBackwardTransition trap: ' . $bgpPeerIp);
+
             return;
         }
 
         $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
 
         if ($bgpPeer->isDirty('bgpPeerState')) {
-            \Log::event('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->device_id, 'bgpPeer', 5, $bgpPeerIp);
+            $trap->log('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, 5, 'bgpPeer', $bgpPeerIp);
         }
 
         $bgpPeer->save();

@@ -3,7 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
-    $etherlike_oids = array(
+    $etherlike_oids = [
         'dot3StatsAlignmentErrors',
         'dot3StatsFCSErrors',
         'dot3StatsSingleCollisionFrames',
@@ -17,18 +17,18 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
         'dot3StatsFrameTooLongs',
         'dot3StatsInternalMacReceiveErrors',
         'dot3StatsSymbolErrors',
-    );
+    ];
 
-    $rrd_oldname= 'etherlike-'.$port['ifIndex']; // TODO: remove oldname check?
-    $rrd_name = getPortRrdName($port_id, 'dot3');
+    $rrd_oldname = 'etherlike-' . $port['ifIndex']; // TODO: remove oldname check?
+    $rrd_name = Rrd::portName($port_id, 'dot3');
 
     $rrd_def = new RrdDefinition();
-    $fields = array();
+    $fields = [];
     foreach ($etherlike_oids as $oid) {
         $oid_ds = str_replace('dot3Stats', '', $oid);
         $rrd_def->addDataset($oid_ds, 'COUNTER', null, 100000000000);
 
-        $data = ($this_port[$oid] + 0);
+        $data = cast_number($this_port[$oid]);
         $fields[$oid] = $data;
     }
 

@@ -1,12 +1,11 @@
-mib: ATEN-PE-CFG_int.mib:ATEN-PE-CFG_str.mib
+mib: ATEN-PE-CFG
 modules:
     sensors:
         power:
-            options:
-                skip_values_lt: -200
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
+                    skip_value_lt: -200
                     value: outletIntegerPower
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.4.{{ $index }}'
                     divisor: 1000
@@ -15,12 +14,11 @@ modules:
                     low_limit: 0
                     high_limit: 2400
         current:
-            options:
-                skip_values_lt: -200
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
                     value: outletIntegerCurrent
+                    skip_value_lt: -200
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.2.{{ $index }}'
                     divisor: 1000
                     descr: 'Port {{ $outletName }}'
@@ -28,12 +26,11 @@ modules:
                     low_limit: 0
                     high_limit: 10
         voltage:
-            options:
-                skip_values_lt: -200
             data:
                 -
-                    oid: ATEN-PE-CFG::outlet
+                    oid: outlet
                     value: outletIntegerVoltage
+                    skip_value_lt: -200
                     num_oid: '.1.3.6.1.4.1.21317.1.3.2.2.2.2.99.1.3.{{ $index }}'
                     divisor: 1000
                     descr: 'Port {{ $outletName }}'

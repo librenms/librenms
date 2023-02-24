@@ -1,0 +1,126 @@
+   TPLINK-DDMSTATUS-MIB DEFINITIONS ::= BEGIN
+
+         IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE
+          	  	        FROM SNMPv2-SMI
+          	ifIndex
+						FROM RFC1213-MIB
+			DisplayString
+						FROM SNMPv2-TC
+			tplinkDdmManageMIBObjects
+						FROM TPLINK-DDMMANAGE-MIB;
+						
+		   		ddmStatus MODULE-IDENTITY  
+				    LAST-UPDATED    "200908270000Z"
+				    ORGANIZATION    "TPLINK"
+				    CONTACT-INFO		"www.tplink.com"
+				    DESCRIPTION			"The view of DDM status."
+				    REVISION        "200908270000Z"
+				    DESCRIPTION			"Initial version of this MIB module."
+				    ::= { tplinkDdmManageMIBObjects 7 } 
+			 												
+				ddmStatusTable OBJECT-TYPE
+					SYNTAX SEQUENCE OF DDMStatusEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A table that is used to view the DDM status for specific ports on the Switch."
+					::= { ddmStatus 1 }
+				
+				ddmStatusEntry OBJECT-TYPE
+					SYNTAX			DDMStatusEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A list of information for every port."	
+					INDEX { ifIndex }
+					::= { ddmStatusTable 1 }
+					
+				DDMStatusEntry ::=
+				SEQUENCE
+				{
+                    ddmStatusPort				DisplayString(SIZE(0..255)),
+					ddmStatusTemperature		DisplayString(SIZE(0..30)),
+					ddmStatusVoltage			DisplayString(SIZE(0..30)),
+					ddmStatusBiasCurrent		DisplayString(SIZE(0..30)),
+					ddmStatusTxPow				DisplayString(SIZE(0..30)),
+					ddmStatusRxPow				DisplayString(SIZE(0..30)),
+					ddmStatusDataReady			DisplayString(SIZE(0..30)),
+					ddmStatusLossSignal			DisplayString(SIZE(0..30)),
+					ddmStatusTxFault			DisplayString(SIZE(0..30))
+				}
+				         
+				ddmStatusPort OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..255))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the port number."
+					::= { ddmStatusEntry 1 }
+
+				ddmStatusTemperature OBJECT-TYPE
+					SYNTAX 				DisplayString(SIZE(0..30)) 
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the temperature of the port."
+					::= { ddmStatusEntry 2 }
+				
+				ddmStatusVoltage OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30)) 
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the voltage of the port."
+					::=	{ ddmStatusEntry 3 }
+		        
+				ddmStatusBiasCurrent OBJECT-TYPE
+					SYNTAX 				DisplayString(SIZE(0..30)) 
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the bias current of the port."
+					::= { ddmStatusEntry 4 }
+				
+				ddmStatusTxPow OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30)) 
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the tx power of the port."
+					::=	{ ddmStatusEntry 5 }
+
+				ddmStatusRxPow OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the rx power of the port."
+					::= { ddmStatusEntry 6 }
+						
+				ddmStatusDataReady OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates whether SFP is operational or not."
+					::= { ddmStatusEntry 7 }
+
+				ddmStatusLossSignal OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates whether local SFP reports signal loss or not."
+					::= { ddmStatusEntry 8 }
+
+				ddmStatusTxFault OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates whether remote SFP reports signal loss or not."
+					::= { ddmStatusEntry 9 }
+													
+END
+					

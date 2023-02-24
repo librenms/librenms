@@ -12,7 +12,7 @@ IMPORTS
 
 rlEee MODULE-IDENTITY  --  5-May-2010
 
-        LAST-UPDATED  "201003150000Z"
+        LAST-UPDATED  "202105170000Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -81,13 +81,15 @@ rlEeePortSupported OBJECT-TYPE
                     rlEeePortSupported10M(0),
                     rlEeePortSupported100M(1),
                     rlEeePortSupported1G(2),
-                    rlEeePortSupported10G(3)
+                    rlEeePortSupported10G(3),
+					rlEeePortSupported2500M(4),
+					rlEeePortSupported5G(5)
                 }
     MAX-ACCESS       read-only
     STATUS           current
     DESCRIPTION
         "Bit map that indicates whether EEE supported on the phy of the ifindex per speed
-         0 - speed 10m; 1 - 100m; 2 - 1g; 3 - 10g"
+         0 - speed 10m; 1 - 100m; 2 - 1g; 3 - 10g; 4 - 2.5g; 5 - 5g"
     ::= { rlEeePortEntry 2 }
 
 rlEeePortRemoteStatus OBJECT-TYPE

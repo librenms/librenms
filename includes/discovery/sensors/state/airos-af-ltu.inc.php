@@ -15,15 +15,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Denny Friebe
  * @author     Denny Friebe <denny.friebe@icera-network.de>
  */
-
-$oids = snmpwalk_cache_oid($device, 'afLTUStaTxRate', array(), 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaTxRate
+$oids = snmpwalk_cache_oid($device, 'afLTUStaTxRate', [], 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaTxRate
 $oids = snmpwalk_cache_oid($device, 'afLTUStaRxRate', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaRxRate
 
 foreach ($oids as $index => $entry) {

@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -50,7 +50,7 @@ $('#confirm-delete').on('show.bs.modal', function(event) {
     $( "p" ).first().text( 'If you would like to remove the alert rule named \''+alert_name+'\' then please click Delete.' );
 });
 
-$('#alert-rule-removal').click('', function(event) {
+$('#alert-rule-removal').on('click', function(event) {
     event.preventDefault();
     var alert_id = $("#alert_id").val();
     var alert_name = $("#alert_name").val();

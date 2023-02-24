@@ -1,6 +1,3 @@
-source: Alerting/Creating-Transport.md
-path: blob/master/doc/
-
 # Creating a new Transport
 
 ## File location
@@ -23,7 +20,7 @@ you want your alert to do.
 
 `configTemplate()` - This is used to define the form that will accept
 the transport config in the webui and then what data should be
-validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/5.7/validation)
+validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/validation)
 
 The following function is __not__ required for new Transports and is
 for legacy reasons only. `deliverAlertOld()`.

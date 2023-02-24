@@ -1,0 +1,6 @@
+modules:
+  os:
+    hardware: ESI-MIB::genProductNumber.0
+    serial: ESI-MIB::genSerialNumber.0
+    version: ESI-MIB::genVersion.0
+    sysDescr_regex: '/(?<features>(wireless|wired))/i'

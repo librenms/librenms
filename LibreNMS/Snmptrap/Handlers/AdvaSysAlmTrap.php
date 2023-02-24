@@ -15,13 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Adva system alarm traps. This handler will log the description and a
  * description of the alarm.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaSysAlmTrap implements SnmptrapHandler
 {
@@ -39,24 +38,24 @@ class AdvaSysAlmTrap implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
     {
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
         switch ($alSeverity) {
-            case "critical":
+            case 'critical':
                 $logSeverity = 5;
                 break;
-            case "major":
+            case 'major':
                 $logSeverity = 4;
                 break;
-            case "minor":
+            case 'minor':
                 $logSeverity = 3;
                 break;
-            case "cleared":
+            case 'cleared':
                 $logSeverity = 1;
                 break;
             default:
@@ -65,6 +64,6 @@ class AdvaSysAlmTrap implements SnmptrapHandler
         }
 
         $sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
-        Log::event("System Alarm: $sysAlmDescr Status: $alSeverity", $device->device_id, 'trap', $logSeverity);
+        $trap->log("System Alarm: $sysAlmDescr Status: $alSeverity", $logSeverity);
     }
 }

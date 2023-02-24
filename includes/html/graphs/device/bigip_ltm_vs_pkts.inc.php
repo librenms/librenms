@@ -12,8 +12,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-ltm-vs');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-ltm-vs'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -24,20 +24,20 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
-        $ds_in  = 'pktsin';
+    $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
+        $ds_in = 'pktsin';
         $ds_out = 'pktsout';
 
-        $colour_area_in  = 'AA66AA';
-        $colour_line_in  = '330033';
+        $colour_area_in = 'AA66AA';
+        $colour_line_in = '330033';
         $colour_area_out = 'FFDD88';
         $colour_line_out = 'FF6600';
 
         $in_text = 'Packets in';
         $out_text = 'Packets out';
 
-        $colour_area_in_max  = 'cc88cc';
+        $colour_area_in_max = 'cc88cc';
         $colour_area_out_max = 'FFefaa';
 
         $graph_max = 1;

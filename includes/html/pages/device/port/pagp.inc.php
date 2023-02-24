@@ -3,7 +3,7 @@
 use LibreNMS\Config;
 
 // FIXME functions!
-if (!$graph_type) {
+if (! $graph_type) {
     $graph_type = 'pagp_bits';
 }
 
@@ -28,8 +28,8 @@ echo "<a href='#' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEF
 echo "<a href='#' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT" . Config::get('overlib_defaults') . ", WIDTH, 350);\" onmouseout=\"return nd();\">
       <img src='$yearly_traffic' border=0></a>";
 
-foreach (dbFetchRows('SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?', array($port['ifIndex'], $device['device_id'])) as $member) {
+foreach (dbFetchRows('SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?', [$port['ifIndex'], $device['device_id']]) as $member) {
     $member = cleanPort($member);
-    echo "$br<i class='fa fa-anchor fa-lg icon-theme' aria-hidden='true'></i> <strong>".generate_port_link($member).' (PAgP)</strong>';
+    echo "$br<i class='fa fa-anchor fa-lg icon-theme' aria-hidden='true'></i> <strong>" . generate_port_link($member) . ' (PAgP)</strong>';
     $br = '<br />';
 }

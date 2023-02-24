@@ -1,0 +1,186 @@
+-- =============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Multiprotocol Label Switching Traffic Engineering MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2013-06-13 Initial version Created by Neng Yan
+-- =============================================================================
+HH3C-MPLSTE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    ;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cMplsTe MODULE-IDENTITY
+    LAST-UPDATED
+        "201306131800Z"        -- Jan 13, 2013 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "Multiprotocol Label Switching Traffic Engineering MIB"
+    REVISION
+        "201306131800Z"   -- Jan 13, 2013 at 18:00 GMT
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { hh3cCommon 143 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+hh3cMplsTeObjects      OBJECT IDENTIFIER ::= { hh3cMplsTe 1 }
+
+hh3cMplsTeScalarGroup  OBJECT IDENTIFIER ::= { hh3cMplsTeObjects 1 }
+
+hh3cMplsTeStatus    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global configuration of MPLS(Multiprotocol Label Switching)
+        TE(Traffic Engineering)."
+    ::= { hh3cMplsTeScalarGroup 1 }
+
+hh3cMplsTeRsvpStatus    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global configuration of RSVP(Resource Reservation Protocol)."
+    ::= { hh3cMplsTeScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cMplsTeTable Definition
+-- =============================================================================
+hh3cMplsTeTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsTeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring MPLS TE parameters."
+    ::= { hh3cMplsTeObjects 2 }
+
+hh3cMplsTeEntry     OBJECT-TYPE
+    SYNTAX      Hh3cMplsTeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring MPLS TE parameters."
+    INDEX
+    {
+        hh3cMplsTeIndex
+    }
+    ::= { hh3cMplsTeTable 1 }
+
+Hh3cMplsTeEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsTeIndex                 Unsigned32,
+        hh3cMplsTeCapability            TruthValue,
+        hh3cMplsTeRowStatus             RowStatus
+    }
+
+hh3cMplsTeIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of TE interface."
+    ::= { hh3cMplsTeEntry 1 }
+
+hh3cMplsTeCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The TE capability of an interface."
+    DEFVAL { false }
+    ::= { hh3cMplsTeEntry 2 }
+
+hh3cMplsTeRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot
+        be modified when the value of this object is 'active'."
+    ::= { hh3cMplsTeEntry 3 }
+-- =============================================================================
+-- End of hh3cMplsTeTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsTeRsvpTable Definition
+-- =============================================================================
+hh3cMplsTeRsvpTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsTeRsvpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring RSVP(Resource Reservation Protocol)
+        TE parameters."
+    ::= { hh3cMplsTeObjects 3 }
+
+hh3cMplsTeRsvpEntry     OBJECT-TYPE
+    SYNTAX      Hh3cMplsTeRsvpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring RSVP TE parameters."
+    INDEX
+    {
+        hh3cMplsTeRsvpIndex
+    }
+    ::= { hh3cMplsTeRsvpTable 1 }
+
+Hh3cMplsTeRsvpEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsTeRsvpIndex                 Unsigned32,
+        hh3cMplsTeRsvpCapability            TruthValue,
+        hh3cMplsTeRsvpRowStatus             RowStatus
+    }
+
+hh3cMplsTeRsvpIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of RSVP interface."
+    ::= { hh3cMplsTeRsvpEntry 1 }
+
+hh3cMplsTeRsvpCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The RSVP capability of an interface."
+    DEFVAL { false }
+    ::= { hh3cMplsTeRsvpEntry 2 }
+
+hh3cMplsTeRsvpRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot
+        be modified when the value of this object is 'active'."
+    ::= { hh3cMplsTeRsvpEntry 3 }
+-- =============================================================================
+-- End of hh3cMplsTeRsvpTable Definition
+-- =============================================================================
+
+END

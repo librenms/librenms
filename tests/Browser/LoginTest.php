@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Browser;
 
 use App\Models\User;
 use App\Models\UserPref;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Hash;
 use Laravel\Dusk\Browser;
 use LibreNMS\Config;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
@@ -13,12 +13,16 @@ use LibreNMS\Tests\DuskTestCase;
 
 /**
  * Class LoginTest
- * @package LibreNMS\Tests\Browser
+ *
  * @group browser
  */
 class LoginTest extends DuskTestCase
 {
-    use DatabaseMigrations;
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+    }
 
     /**
      * @throws \Throwable
@@ -27,10 +31,9 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
-            $user = factory(User::class)->create([
-                'password' => password_hash($password, PASSWORD_DEFAULT)
-            ]);
-
+            $user = User::factory()->create([
+                'password' => Hash::make($password),
+            ]); /** @var User $user */
             $browser->visit(new LoginPage())
                 ->type('username', $user->username)
                 ->type('password', 'wrong_password')
@@ -53,9 +56,9 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $password = 'another_password';
-            $user = factory(User::class)->create([
-                'password' => password_hash($password, PASSWORD_DEFAULT)
-            ]);
+            $user = User::factory()->create([
+                'password' => Hash::make($password),
+            ]); /** @var User $user */
             Config::persist('twofactor', true); // set to db
             UserPref::setPref($user, 'twofactor', [
                 'key' => '5P3FLXBX7NU3ZBFOTWZL2GL5MKFEWBOA', // known key: 634456, 613687, 064292
@@ -77,6 +80,7 @@ class LoginTest extends DuskTestCase
                 ->logout();
 
             $user->delete();
+            \App\Models\Config::where('config_name', 'twofactor')->delete();
         });
     }
 }

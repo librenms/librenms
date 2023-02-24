@@ -87,7 +87,7 @@ netSnmpExampleSleeper OBJECT-TYPE
     ::= { netSnmpExampleScalars 2 }
 
 netSnmpExampleString OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      SnmpAdminString
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION

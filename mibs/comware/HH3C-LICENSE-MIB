@@ -1,0 +1,972 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: License management
+-- Reference:
+-- Version: V1.4
+-- History:
+--   V1.0 2013-09-18 Initial version by Song Hao and Deng Kai.
+--   V1.1 2019-01-14 Modified version by Song Hao and Deng Shuhua.
+--      Add hh3cLicenseServerIp and hh3cLicenseServerPort to Hh3cLicenseDevInfoEntry
+--      Add notification objects:
+--          hh3cLicenseReconnectWithServer
+--          hh3cLicenseDisconnectWithServer
+--   V1.2 2019-11-07 Modified version by Deng Shuhua.
+--      Add serverLicense to hh3cLicenseFeatureState
+--   V1.3 2020-07-27 Modified version by Lu Xiang.
+--      Add Add hh3cLicenseLowerUsageThreshold, hh3cLicenseUpperUsageThreshold
+--          and hh3cLicenseCurrentUsageRate to hh3cLicenseNotificationBindings
+--      Add notification objects:
+--          hh3cLicenseBelowUsageThreshold
+--          hh3cLicenseOverUsageThreshold
+--   V1.4 2021-01-13 Modified version by Liu Xiaohong.
+--      Add preLicense to hh3cLicenseFeatureState
+-- =================================================================
+HH3C-LICENSE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus, DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    PhysicalIndex, PhysicalIndexOrZero
+        FROM ENTITY-MIB;
+
+hh3cLicense MODULE-IDENTITY
+    LAST-UPDATED "202101131000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Haidian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB is used to manage license, including license key,
+        activation key and activation file."
+    REVISION "202101131000Z"
+    DESCRIPTION
+        "Add preLicense to hh3cLicenseFeatureState."
+    REVISION "202007271000Z"
+    DESCRIPTION
+        "Add Add hh3cLicenseLowerUsageThreshold, hh3cLicenseUpperUsageThreshold
+         and hh3cLicenseCurrentUsageRate to hh3cLicenseNotificationBindings
+         Add notification objects:
+         hh3cLicenseBelowUsageThreshold and hh3cLicenseOverUsageThreshold."
+    REVISION "201911121000Z"
+    DESCRIPTION
+        "Add serverLicense to hh3cLicenseFeatureState."
+    REVISION "201901141000Z"
+    DESCRIPTION
+        "Add hh3cLicenseServerIp and hh3cLicenseServerPort to
+         Hh3cLicenseDevInfoEntry.  Add notification objects:
+         hh3cLicenseReconnectWithServer and hh3cLicenseDisconnectWithServer."
+    REVISION "201309181000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 145 }
+
+-- Defined the framework
+hh3cLicenseScalarObjects OBJECT IDENTIFIER ::= { hh3cLicense 1 }
+hh3cLicenseTables OBJECT IDENTIFIER ::= { hh3cLicense 2 }
+hh3cLicenseNotifications OBJECT IDENTIFIER ::= { hh3cLicense 3 }
+
+-- Begin of scalar objects
+hh3cLicenseNotifyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the notifications of license should be
+        generated."
+    DEFVAL { true }
+    ::= { hh3cLicenseScalarObjects 1 }
+
+hh3cLicenseOpEntryMaxNum OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the maximum number of entries
+        that may be held in hh3cLicenseOpEntry.
+
+        When the number of entries in hh3cLicenseOpEntry reached the value
+        of this object, the oldest entry would be destroyed automatic after
+        executing a new operation."
+    DEFVAL { 10 }
+    ::= { hh3cLicenseScalarObjects 2 }
+
+hh3cLicenseNextFreeOpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the appropriate value for hh3cLicenseOpIndex
+        that can be used to create an entry in hh3cLicenseOpTable."
+    ::= { hh3cLicenseScalarObjects 3 }
+-- End of scalar objects
+
+-- Begin of device information
+hh3cLicenseDevInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLicenseDevInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that displays device information which use to apply license."
+    ::= { hh3cLicenseTables 1 }
+
+hh3cLicenseDevInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cLicenseDevInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that displays device information of license."
+    INDEX
+        {
+            hh3cLicensePhysicalIndex
+        }
+    ::= { hh3cLicenseDevInfoTable 1 }
+
+Hh3cLicenseDevInfoEntry ::= SEQUENCE
+    {
+        hh3cLicensePhysicalIndex       PhysicalIndex,
+        hh3cLicenseSN                  SnmpAdminString,
+        hh3cLicenseDeviceIDType        INTEGER,
+        hh3cLicenseDeviceID            SnmpAdminString,
+        hh3cLicenseHardwareInfo        SnmpAdminString,
+        hh3cLicenseMaxNum              Unsigned32,
+        hh3cLicenseUsedNum             Unsigned32,
+        hh3cLicenseRecyclableNum       Unsigned32,
+        hh3cLicenseInstallType         INTEGER,
+        hh3cLicenseFileStoragePath     SnmpAdminString,
+        hh3cLicenseServerIp            IpAddress,
+        hh3cLicenseServerPort          Unsigned32
+    }
+
+hh3cLicensePhysicalIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex of the device.
+
+        The meaning of this object is associated with the management state
+        which from hh3cLicenseInstallType.
+
+        Note that:
+        1) hh3cLicenseInstallType is installInChassis.
+           This object represents the entPhysicalIndex of the local active MPU.
+
+        2) hh3cLicenseInstallType is installInSlot.
+           This object represents the entPhysicalIndex of MPU boards.
+
+        3) hh3cLicenseInstallType is installInCPU.
+           This object represents the entPhysicalIndex of the CPUs on an MPU board.
+        "
+    ::= { hh3cLicenseDevInfoEntry 1 }
+
+hh3cLicenseSN OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of the device."
+    ::= { hh3cLicenseDevInfoEntry 2 }
+
+hh3cLicenseDeviceIDType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  invalid(1),
+                  keyString(2),
+                  file(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The types of device ID.
+
+        invalid - The device ID is invalid.
+        keyString - The device ID is a string.
+        file - The device ID is a file."
+    ::= { hh3cLicenseDevInfoEntry 3 }
+
+hh3cLicenseDeviceID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string represents the device ID.
+
+        For example:
+        Device ID: XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX
+
+        This object can not be read when hh3cLicenseDeviceIDType is invalid,
+        and a file name with full path while hh3cLicenseDeviceIDType is file.
+
+        For example:
+        Device ID: flash:/xxx.did"
+    ::= { hh3cLicenseDevInfoEntry 4 }
+
+hh3cLicenseHardwareInfo OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The information of the device hardware."
+    ::= { hh3cLicenseDevInfoEntry 5 }
+
+hh3cLicenseMaxNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The max number of licenses that can be installed in device."
+    ::= { hh3cLicenseDevInfoEntry 6 }
+
+hh3cLicenseUsedNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of installed licenses."
+    ::= { hh3cLicenseDevInfoEntry 7 }
+
+hh3cLicenseRecyclableNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of recyclable storage for licenses."
+    ::= { hh3cLicenseDevInfoEntry 8 }
+
+hh3cLicenseInstallType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  invalid(1),
+                  installInChassis(2),
+                  installInSlot(3),
+                  installInCPU(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of license management.
+        This object determines the instance of
+        hh3cLicensePhysicalIndex and hh3cLicenseOpPhysicalIndex.
+
+        invalid - The state is invalid as driver fault.
+
+        installInChassis - License is chassis locked.
+
+        installInSlot - License is MPU locked.
+
+        installInCPU - License is CPU locked."
+    ::= { hh3cLicenseDevInfoEntry 9 }
+
+hh3cLicenseFileStoragePath   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The storage path of the installed license files."
+    ::= { hh3cLicenseDevInfoEntry 10 }
+
+hh3cLicenseServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the license server."
+    ::= { hh3cLicenseDevInfoEntry 11 }
+
+hh3cLicenseServerPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the license server."
+    ::= { hh3cLicenseDevInfoEntry 12 }
+-- End of device information
+
+-- Begin of general information
+hh3cLicenseGeneralTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLicenseGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that displays general information of installed license."
+    ::= { hh3cLicenseTables 2 }
+
+hh3cLicenseGeneralEntry OBJECT-TYPE
+    SYNTAX      Hh3cLicenseGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that displays general information of
+        installed license."
+    INDEX
+        {
+            hh3cLicensePhysicalIndex,
+            hh3cLicenseIndex
+        }
+    ::= { hh3cLicenseGeneralTable 1 }
+
+Hh3cLicenseGeneralEntry ::= SEQUENCE
+    {
+        hh3cLicenseIndex                Unsigned32,
+        hh3cLicenseFeature              SnmpAdminString,
+        hh3cLicenseProductDescr         OCTET STRING,
+        hh3cLicenseFileDescr            SnmpAdminString,
+        hh3cLicenseState                INTEGER,
+        hh3cLicenseActivationFile       SnmpAdminString,
+        hh3cLicenseActivationKey        SnmpAdminString,
+        hh3cLicenseLicenseKey           SnmpAdminString,
+        hh3cLicenseUninstActivationFile SnmpAdminString,
+        hh3cLicenseUninstActivationKey  SnmpAdminString,
+        hh3cLicenseType                 INTEGER,
+        hh3cLicenseInstalledTime        DateAndTime,
+        hh3cLicenseUninstalledTime      DateAndTime,
+        hh3cLicenseDaysLeft             Unsigned32,
+        hh3cLicenseValidityStart        DateAndTime,
+        hh3cLicenseValidityEnd          DateAndTime,
+        hh3cLicenseExpiredDays          Unsigned32,
+        hh3cLicenseCount                Unsigned32
+    }
+
+hh3cLicenseIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID that can be used to uniquely identify a license.
+        It may use a stable storage index."
+    ::= { hh3cLicenseGeneralEntry 1 }
+
+hh3cLicenseFeature OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..1024))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the licensed feature.
+
+        When there multiple features, this object will display with space
+        as delimiter."
+    ::= { hh3cLicenseGeneralEntry 2 }
+
+hh3cLicenseProductDescr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..1024))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The product description in a license."
+    ::= { hh3cLicenseGeneralEntry 3 }
+
+hh3cLicenseFileDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..1024))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The file description in activation file."
+    ::= { hh3cLicenseGeneralEntry 4 }
+
+hh3cLicenseState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  invalid(1),
+                  inuse(2),
+                  usable(3),
+                  expired(4),
+                  uninstalled(5),
+                  unusable(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of an installed license.
+
+        invalid - The license is invalid and cannot be used.
+        inuse - The license is being used.
+        usable - The license is available for use.
+                 1. If multiple days-restricted licenses for one feature
+                    are installed, only one license is in 'inuse' state and
+                    the rest licenses are in 'usable' state.
+                 2. A date-restricted license is in this state if its
+                    start date is not reached.
+        expired - The license has expired.
+        uninstalled - The license has been uninstalled.
+        unusable - The license cannot be used."
+    ::= { hh3cLicenseGeneralEntry 5 }
+
+hh3cLicenseActivationFile OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of an installed activation file, with device name and
+        file name.
+
+        For example:
+        flash:/license/210231A1V0A1290000012013032718261184345.ak
+        "
+    ::= { hh3cLicenseGeneralEntry 6 }
+
+hh3cLicenseActivationKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The activation key that has been installed.
+
+        For example:
+        Activation Key: dyKT-x3vc-W@Ca-n4gn-Yo83-rVY3-C8:7-e3pg"
+    ::= { hh3cLicenseGeneralEntry 7 }
+
+hh3cLicenseLicenseKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The license key that has been installed."
+    ::= { hh3cLicenseGeneralEntry 8 }
+
+hh3cLicenseUninstActivationFile OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If an activation file is uninstalled, the system creates an
+        uninstall file.  Use this file together with the SN and DID of the
+        transfer destination to register the license for the transfer
+        destination."
+    ::= { hh3cLicenseGeneralEntry 9 }
+
+hh3cLicenseUninstActivationKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If an activation key is uninstalled, the system creates an
+        uninstall key.  Use this key together with the SN and DID of the
+        transfer destination to register the license for the transfer
+        destination."
+    ::= { hh3cLicenseGeneralEntry 10 }
+
+hh3cLicenseType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  unknown(1),
+                  permanent(2),
+                  daysRestricted(3),
+                  trialDaysRestricted(4),
+                  dateRestricted(5),
+                  trialDateRestricted(6),
+                  countRestricted(7),
+                  trialCountRestricted(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "License type by validity period.
+
+        unknown - The system cannot obtain the license type.
+
+        permanent - Purchased license that never expires and is always valid.
+
+        daysRestricted - Purchased license that is valid for a period in days.
+        trialDaysRestricted - Free trial license that is valid for
+                              a period in days.
+
+        dateRestricted - Purchased license that is valid for an
+                         absolute date range.
+        trialDateRestricted - Free trial license that is valid for
+                              an absolute date range.
+
+        countRestricted - Purchased license that is valid for
+                          several useing times.
+        trialCountRestricted - Free trial license that is valid for
+                               several useing times.
+        "
+    ::= { hh3cLicenseGeneralEntry 11 }
+
+hh3cLicenseInstalledTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time when the license was installed.
+
+        For example, it would be displayed as:
+        2013-9-20,13:30:15.0
+        "
+    ::= { hh3cLicenseGeneralEntry 12 }
+
+hh3cLicenseUninstalledTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the license was uninstalled.
+
+        For example, it would be displayed as:
+        2013-9-26,15:12:20.0
+        "
+    ::= { hh3cLicenseGeneralEntry 13 }
+
+hh3cLicenseDaysLeft OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remaining days of the license.
+        This object is available for a days-restricted license."
+    ::= { hh3cLicenseGeneralEntry 14 }
+
+hh3cLicenseValidityStart OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Start date for a date-restricted license.
+        This object is available for a date-restricted license.
+        But if the start date is not limited, this object is unavailable.
+
+        For example, it would be displayed as:
+        2013-9-26,15:12:20.0
+        "
+    ::= { hh3cLicenseGeneralEntry 15 }
+
+hh3cLicenseValidityEnd OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "End date for a date-restricted license.
+        This object is available for a date-restricted license.
+        But if the end date is not limited, this object is unavailable.
+
+        For example, it would be displayed as:
+        2014-9-26,15:12:20.0
+        "
+    ::= { hh3cLicenseGeneralEntry 16 }
+
+hh3cLicenseExpiredDays OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Passed days after a license has been expired."
+    ::= { hh3cLicenseGeneralEntry 17 }
+
+hh3cLicenseCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The effective number of license.
+        This object is available for a count-restricted license."
+    ::= { hh3cLicenseGeneralEntry 18 }
+-- End of general information
+
+-- Begin of feature information
+hh3cLicenseFeatureTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLicenseFeatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that displays installed licenses for features."
+    ::= { hh3cLicenseTables 3 }
+
+hh3cLicenseFeatureEntry OBJECT-TYPE
+    SYNTAX      Hh3cLicenseFeatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that displays installed licenses for features."
+    INDEX
+        {
+            hh3cLicensePhysicalIndex,
+            IMPLIED hh3cLicenseFeatureName
+        }
+    ::= { hh3cLicenseFeatureTable 1 }
+
+Hh3cLicenseFeatureEntry ::= SEQUENCE
+    {
+        hh3cLicenseFeatureName      SnmpAdminString,
+        hh3cLicenseFeatureState     INTEGER
+    }
+
+hh3cLicenseFeatureName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Feature that must be licensed before being used."
+    ::= { hh3cLicenseFeatureEntry 1 }
+
+hh3cLicenseFeatureState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  notLicensed(1),
+                  trialLicense(2),
+                  formalLicense(3),
+                  serverLicense(4),
+                  preLicense(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "License type by purchasing state.
+
+        notLicensed - The feature is not licensed.
+        trialLicense - The feature is using trial license.
+        formalLicense - The feature is using purchased license.
+        serverLicense - The feature is using license authorized by license server.
+        preLicense - The feature is using pre-installed license."
+    ::= { hh3cLicenseFeatureEntry 2 }
+-- End of feature information
+
+-- Begin of operation table
+hh3cLicenseOpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLicenseOpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that used to install or uninstall license."
+    ::= { hh3cLicenseTables 4 }
+
+hh3cLicenseOpEntry OBJECT-TYPE
+    SYNTAX      Hh3cLicenseOpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects used to install or uninstall license."
+    INDEX
+        {
+            hh3cLicenseOpIndex
+        }
+    ::= { hh3cLicenseOpTable 1 }
+
+Hh3cLicenseOpEntry ::= SEQUENCE
+    {
+        hh3cLicenseOpIndex          Unsigned32,
+        hh3cLicenseOpPhysicalIndex  PhysicalIndexOrZero,
+        hh3cLicenseOpType           INTEGER,
+        hh3cLicenseOpString         SnmpAdminString,
+        hh3cLicenseOpNotifyEnable   TruthValue,
+        hh3cLicenseOpRowStatus      RowStatus,
+        hh3cLicenseOpState          INTEGER,
+        hh3cLicenseOpFailedReason   SnmpAdminString,
+        hh3cLicenseOpEndTime        TimeTicks
+    }
+
+hh3cLicenseOpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID that can be used to uniquely identify an operation."
+    ::= { hh3cLicenseOpEntry 1 }
+
+hh3cLicenseOpPhysicalIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates that the entPhysicalIndex of the device
+        where the operation is being executed.
+
+        The meaning of this object is associated with the management state
+        from hh3cLicenseInstallType.
+
+        Note that:
+        1) hh3cLicenseInstallType is installInChassis.
+           This object represents the entPhysicalIndex of chassis local master.
+
+        2) hh3cLicenseInstallType is installInSlot.
+           This object represents the entPhysicalIndex of MPU boards.
+
+        3) hh3cLicenseInstallType is installInCPU.
+           This object represents the entPhysicalIndex of CPUs.
+
+        This object must be set and can not be set to zero when
+        executing an operation.
+        "
+    ::= { hh3cLicenseOpEntry 2 }
+
+hh3cLicenseOpType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  compress(1),
+                  delete(2),
+                  installActivationFile(3),
+                  installActivationKey(4),
+                  installLicenseKey(5),
+                  uninstallActivationFile(6),
+                  uninstallActivationKey(7),
+                  uninstallLicenseKey(8)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of this operation.
+
+        compress - Compress the license storage if the free license storage
+                   is not sufficient.
+        Note that:
+        1) After compressing, the expired licenses and uninstalled licenses
+           in the storage area will be cleared.
+        2) The DID changes each time the license storage is compressed.
+        3) Before performing a compression, make sure all activation files
+           generated based on the old DID have been installed.
+           They cannot be installed after the compression.
+
+        delete - Compress one license storage only.
+
+        installActivationFile   -  Install an activation file.
+
+        installActivationKey    -  Install an activation key.
+
+        installLicenseKey       -  Install a license key.
+
+        uninstallActivationFile -  Uninstall an activation file.
+
+        uninstallActivationKey  -  Uninstall an activation key.
+
+        uninstallLicenseKey     -  Uninstall a license key."
+    ::= { hh3cLicenseOpEntry 3 }
+
+hh3cLicenseOpString OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object might be an activation file name, an activation key or
+        a license key that is to be installed, uninstalled or deleted.
+
+        The operation type is specified in hh3cLicenseOpType.
+
+        For compressing, this object must not be bound when creating a row.
+
+        For deletion, this object could be an activation file, an activation
+        key or a license key.
+
+        For installActivationFile and uninstallActivationFile,
+        this object must be a name of an activation file, with full path.
+        Such as: flash:/license/210231A1V0A1290000012013032718261184345.ak
+
+        For installActivationKey and uninstallActivationKey,
+        this object must be an activation key.
+
+        For installLicenseKey and uninstallLicenseKey,
+        this object must be a license key."
+    ::= { hh3cLicenseOpEntry 4 }
+
+hh3cLicenseOpNotifyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether 'hh3cLicenseOpCompletion' notifications
+        will be generated after this operation is completed.
+
+        Note that, this object is meaningless if the value of
+        'hh3cLicenseNotifyEnable' is 'false'."
+    DEFVAL { false }
+    ::= { hh3cLicenseOpEntry 5 }
+
+hh3cLicenseOpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+
+        When an entry was in active status, values of any object in this entry
+        are forbidden to be changed."
+    ::= { hh3cLicenseOpEntry 6 }
+
+hh3cLicenseOpState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  opInProgress(1),
+                  opSuccessful(2),
+                  opFailed(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of this operation.
+
+        opInProgress - This operation is in progress.
+        opSuccessful - Successful to execute this operation.
+        opFailed - Failed to execute this operation,
+                   and 'hh3cLicenseOpFailedReason' will indicate the detailed
+                   cause of the failure."
+    ::= { hh3cLicenseOpEntry 7 }
+
+hh3cLicenseOpFailedReason OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the detailed cause of the failure when this
+        operation failed."
+    ::= { hh3cLicenseOpEntry 8 }
+
+hh3cLicenseOpEndTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when the operation is done."
+    ::= { hh3cLicenseOpEntry 9 }
+-- End of operation table
+
+-- Begin of notifications
+hh3cLicenseNotificationPrefix OBJECT IDENTIFIER ::= { hh3cLicenseNotifications 0 }
+
+hh3cLicenseOpCompletion NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicenseOpIndex,
+            hh3cLicenseOpPhysicalIndex,
+            hh3cLicenseOpType,
+            hh3cLicenseOpString,
+            hh3cLicenseOpState,
+            hh3cLicenseOpFailedReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a license operation completed."
+    ::= { hh3cLicenseNotificationPrefix 1 }
+
+hh3cLicenseActivationFileLost NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicensePhysicalIndex,
+            hh3cLicenseActivationFile
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the activation file
+        has been lost."
+    ::= { hh3cLicenseNotificationPrefix 2 }
+
+hh3cLicenseActivationFileRestored NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicensePhysicalIndex,
+            hh3cLicenseActivationFile
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the activation file
+        restored successfully."
+    ::= { hh3cLicenseNotificationPrefix 3 }
+
+hh3cLicenseExpired NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicenseFeatureName,
+            hh3cLicenseFeatureState
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the license expires."
+    ::= { hh3cLicenseNotificationPrefix 4 }
+
+hh3cLicenseExpireWarning NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicenseFeatureName,
+            hh3cLicenseFeatureState,
+            hh3cLicenseBindValidityPeriodRemaining
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when is about to expire."
+    ::= { hh3cLicenseNotificationPrefix 5 }
+
+hh3cLicenseReconnectWithServer NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicensePhysicalIndex,
+            hh3cLicenseServerIp,
+            hh3cLicenseServerPort
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the license client is reconnected to the license server."
+    ::= { hh3cLicenseNotificationPrefix 6 }
+
+hh3cLicenseDisconnectWithServer NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicensePhysicalIndex,
+            hh3cLicenseServerIp,
+            hh3cLicenseServerPort
+        }
+    STATUS      current
+    DESCRIPTION
+        " This notification is generated when the license client is disconnected from the license server."
+    ::= { hh3cLicenseNotificationPrefix 7 }
+
+hh3cLicenseBelowUsageThreshold NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicenseFeatureName,
+            hh3cLicenseLowerUsageThreshold,
+            hh3cLicenseUpperUsageThreshold,
+            hh3cLicenseCurrentUsageRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the license usage drops below warning threshold."
+    ::= { hh3cLicenseNotificationPrefix 8 }
+
+hh3cLicenseOverUsageThreshold NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLicenseFeatureName,
+            hh3cLicenseLowerUsageThreshold,
+            hh3cLicenseUpperUsageThreshold,
+            hh3cLicenseCurrentUsageRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the license usage is over warning threshold."
+    ::= { hh3cLicenseNotificationPrefix 9 }
+-- End of notifications
+
+-- Begin of notification bindings
+hh3cLicenseNotificationBindings OBJECT IDENTIFIER ::= { hh3cLicenseNotifications 1 }
+
+hh3cLicenseBindValidityPeriodRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "days"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the remaining days before
+        the feature's license expires."
+    ::= { hh3cLicenseNotificationBindings 1 }
+hh3cLicenseLowerUsageThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the lower warning threshold of usage."
+    ::= { hh3cLicenseNotificationBindings 2 }
+hh3cLicenseUpperUsageThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the upper warning threshold of usage."
+    ::= { hh3cLicenseNotificationBindings 3 }
+hh3cLicenseCurrentUsageRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the license current usage rate."
+    ::= { hh3cLicenseNotificationBindings 4 }
+-- End of notification bindings
+
+END

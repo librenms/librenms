@@ -9,13 +9,13 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Unsigned32,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, TruthValue, RowStatus
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, MacAddress
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF
     switch001, rndNotifications
         FROM CISCOSB-MIB
-    LldpPortList, LldpPortNumber, LldpManAddress
+    LldpPortList, LldpPortNumber, LldpManAddress, lldpRemEntry, lldpPortConfigEntry
         FROM LLDP-MIB
     PortList
         FROM Q-BRIDGE-MIB
@@ -28,11 +28,14 @@ IMPORTS
     LldpXMedCapabilities
         FROM LLDP-EXT-MED-MIB
     rndErrorDesc, rndErrorSeverity
-        FROM CISCOSB-DEVICEPARAMS-MIB;
-
+        FROM CISCOSB-DEVICEPARAMS-MIB
+    lldpV2LocPortIfIndex, lldpV2RemLocalIfIndex
+        FROM LLDP-V2-MIB
+	InetAddressType, InetAddress, InetVersion            
+		FROM INET-ADDRESS-MIB;
 
 rlLldp MODULE-IDENTITY
-         LAST-UPDATED "200506200000Z"
+         LAST-UPDATED "202105190000Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -45,15 +48,20 @@ rlLldp MODULE-IDENTITY
 
          DESCRIPTION
                 "This private MIB module adds MIBs to LLDP (Link Layer Discovery Protocol)."
-         REVISION "200506200000Z"
+         REVISION "202105190000Z"
          DESCRIPTION
                 "Initial revision."
         ::= { switch001 110 }
 
-rlLldpObjects          OBJECT IDENTIFIER ::= { rlLldp 1 }
+rlLldpObjects           OBJECT IDENTIFIER ::= { rlLldp 1 }
 
-rlLldpConfig           OBJECT IDENTIFIER ::= { rlLldpObjects 1 }
-rlLldpXMedConfig       OBJECT IDENTIFIER ::= { rlLldpObjects 2 }
+rlLldpConfig            OBJECT IDENTIFIER ::= { rlLldpObjects 1 }
+rlLldpXMedConfig        OBJECT IDENTIFIER ::= { rlLldpObjects 2 }
+rlLldpTLVsTxOverload    OBJECT IDENTIFIER ::= { rlLldpObjects 3 }
+rlLldpRemStatus         OBJECT IDENTIFIER ::= { rlLldpObjects 4 }
+rlLldpLocalSystemData   OBJECT IDENTIFIER ::= { rlLldpObjects 5 }
+rlLldpRemoteSystemsData OBJECT IDENTIFIER ::= { rlLldpObjects 6 }
+rlLldpV2Config          OBJECT IDENTIFIER ::= { rlLldpObjects 7 }
 
 PolicyNumber ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -125,6 +133,10 @@ PolicyAppVoiceUpdateMode ::= TEXTUAL-CONVENTION
                     manual(0),
                     auto(1)
                 }
+
+------------------------------------------------------------------------------
+-- Local Device Configuration 'rlLldpConfig  OBJECT IDENTIFIER ::= { rlLldpObjects 1 }'
+------------------------------------------------------------------------------
 
 rlLldpEnabled OBJECT-TYPE
     SYNTAX      TruthValue
@@ -279,19 +291,119 @@ rlLldpAutoAdvPortsStatus OBJECT-TYPE
     DESCRIPTION
        "The row status variable, used according to
        row installation and removal conventions."
-    ::= { rlLldpAutoAdvLocPortManAddrEntry 6 }
+    ::= { rlLldpAutoAdvLocPortManAddrEntry 6 }	
 
---rlLldpLocChassisId  OBJECT-TYPE
---    SYNTAX      OCTET STRING(SIZE(1..20))
---    MAX-ACCESS  read-write
---    STATUS      current
---    DESCRIPTION
---            "The string value used to identify the chassis component associated
---             with the local system. As a result of updating this variable,
---             lldpLocChassisid will have the same value, and the MIB
---             lldpLocChassisIdSubtype will have the value local(7). "
---    ::= { rlLldp 2}
+rlLldpChassisIdSubtype OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    macAddress(4),
+                    local(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The type of encoding used to identify the chassis
+            associated with the local system."
 
+    REFERENCE
+            "IEEE 802.1AB-2004 9.5.2.2"
+    DEFVAL  { macAddress }
+    ::= { rlLldpConfig 5 }
+
+
+rlLldpPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information that controls the transmission of
+            non-standard TLVs on LLDP transmission capable ports.
+
+            This configuration object augments the lldpPortConfigEntry of
+            the LLDP-MIB, therefore it is only present along with the port
+            configuration defined by the associated lldpPortConfigEntry entry."
+    ::= { rlLldpConfig 6 }
+
+rlLldpPortConfigEntry  OBJECT-TYPE
+    SYNTAX      RlLldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry in rlLldpConfigTable. Augment the lldpPortConfigEntry."
+    AUGMENTS { lldpPortConfigEntry }
+    ::= { rlLldpPortConfigTable 1 }
+
+RlLldpPortConfigEntry  ::= SEQUENCE {
+   rlLldpPortConfig4wireTxEnable  			TruthValue,
+   rlLldpPortConfigAdvManAddrMode			INTEGER,
+   rlLldpPortConfigAutoAdvManAddrOwnerIfId	Integer32   
+}
+
+rlLldpPortConfig4wireTxEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The rlLldpPortConfigTLVsTxEnable, which is defined as
+            a truth value and configured by the network management,
+            determines whether the 4-wire-poe TLV is allowed on a given LLDP
+            transmission capable port."
+    DEFVAL  { false }
+    ::= { rlLldpPortConfigEntry 1 }
+
+
+rlLldpPortConfigAdvManAddrMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+						manual (0),
+						none (1),
+						auto (2)
+						}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A value of 'true' indicates that management address TLV does not been advertised
+             by the local port. Moreover, the configuration of automatic management address
+             advertisment is disabled.
+             A value of 'false' indicates that management address being advertised, 
+			 either by automatic mechanism or by user-defined management address."
+    DEFVAL { 0 }
+    ::= { rlLldpPortConfigEntry 2 }
+	
+rlLldpPortConfigAutoAdvManAddrOwnerIfId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The integer value is used to identify the interface number
+            (port, trunk or vlan) that the port will advertise its management addresses. 
+			Value 0 means that the management address will be taken from the port that advertise."
+    DEFVAL  { 0 }
+    ::= { rlLldpPortConfigEntry 3 }
+	
+
+rlLldpClearGlobalStatistics OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "An action scalar. Clear LLDP Global statistics counters.
+			The value in the scalar is not relevant."    
+    ::= { rlLldpConfig 7 }
+	
+rlLldpClearPortStatistics OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A set of ports that are identified by a PortList, in which
+            each port is represented as a bit.
+            Clears the LLDP port staistics information accordingly to the
+            specified PortList.
+            The default value for rlLldpClearPortlStatistics object is an empty binary string,
+            which means no ports are specified to be cleared.
+            This object behaviors as an event (write-only) than
+            reading this object always results in an Empty Port List of length zero." 
+	DEFVAL  { ''H } -- empty octet string
+    ::= { rlLldpConfig 8 }
 
 
 ------------------------------------------------------------------------------
@@ -461,7 +573,62 @@ rlLldpXMedLocMediaPolicyContainerRowStatus OBJECT-TYPE
     ::= { rlLldpXMedLocMediaPolicyContainerEntry 9 }
 
 ------------------------------------------------------------------------------
--- LLDP - TX TLV overloading
+-- LLDP - MED Local Voice VLAN update mode
+------------------------------------------------------------------------------
+
+rlLldpXMedNetPolVoiceUpdateMode OBJECT-TYPE
+    SYNTAX      PolicyAppVoiceUpdateMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpXMedConfig 2 }
+	
+------------------------------------------------------------------------------
+-- LLDP - MED Operational Status (whether the interface Tx MED TLVs)
+-- Private MIB which enhance lldpXMedPortConfigTable - 'rlLldpXMedPortConfigTbale'
+------------------------------------------------------------------------------
+
+rlLldpXMedPortConfigTable OBJECT-TYPE				
+    SYNTAX      SEQUENCE OF RlLldpXMedPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per policy number
+             of media policy container configuration."
+    ::= { rlLldpXMedConfig 3 }
+
+rlLldpXMedPortConfigEntry OBJECT-TYPE
+    SYNTAX      RlLldpXMedPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Configuration of a particular policy in the media policy container."
+    INDEX   { lldpPortConfigPortNum }
+    ::= { rlLldpXMedPortConfigTable 1 }
+
+RlLldpXMedPortConfigEntry ::= SEQUENCE {
+              rlLldpXMedPortConfigTxOperStatus INTEGER }
+
+rlLldpXMedPortConfigTxOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+						not-relevant (0),
+						enabled (1),
+						disabled (2)
+						}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field indicates whether this interface is operational 
+			transmitted LLDP MED TLVs.
+			To transmit MED TLVs, the interface must be MED enabled and must be connected to an LLDP-MED device. 
+			The switch waits for the LLDP-MED device to advertise its information before the switch transmits its own LLDP-MED TLVs, 
+			at which point the operational status becomes enabled"
+    DEFVAL { 0 }
+    ::= { rlLldpXMedPortConfigEntry 1 }
+
+------------------------------------------------------------------------------
+-- LLDP - TX TLV overloading 'rlLldpTLVsTxOverload'
 ------------------------------------------------------------------------------
 
 
@@ -473,7 +640,7 @@ rlLldpTLVsTxOverloadingTable OBJECT-TYPE
             "A table that show the which of the LLDP TLVs are not transmitted
             on individual ports due to insufficient room in the frame
             and the size of each TLV."
-    ::= {  rlLldpObjects 3 }
+    ::= {  rlLldpTLVsTxOverload 1 }
 
 
 rlLldpTLVsTxOverloadingEntry  OBJECT-TYPE
@@ -530,7 +697,9 @@ rlLldpTxOverloadingGroupId OBJECT-TYPE
                     -- 802.1 TLVs
                     xDot1(9),
                     -- DCBX TLVs
-                    dcbx(10)
+                    dcbx(10),
+                                        -- Cisco TLVs
+                                        cisco(11)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -586,7 +755,7 @@ rlLldpTLVsTxOverloadingSizeTable OBJECT-TYPE
     DESCRIPTION
             "A table that show the total size of the all TLVs
             and the LLDPDU free size  ."
-    ::= {  rlLldpObjects 4 }
+    ::= {  rlLldpTLVsTxOverload 2 }
 
 rlLldpTLVsTxOverloadingSizeEntry  OBJECT-TYPE
     SYNTAX      RlLldpTLVsTxOverloadingSizeEntry
@@ -642,7 +811,7 @@ rlLldpTLVsTxOverloadingPorts OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Port list that represent the overloading state of each port"
-    ::= { rlLldpObjects 5 }
+    ::= { rlLldpTLVsTxOverload 3 }
 
 ------------------------------------------------------------------------------
 -- LLDP - TX TLV overloading trap
@@ -663,18 +832,6 @@ rlLldpTLVsTxOverloadingStateExitTrap NOTIFICATION-TYPE
 
 
 ------------------------------------------------------------------------------
--- LLDP - MED Local Voice VLAN update mode
-------------------------------------------------------------------------------
-
-rlLldpXMedNetPolVoiceUpdateMode OBJECT-TYPE
-    SYNTAX      PolicyAppVoiceUpdateMode
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            ""
-    ::= { rlLldpObjects 7 }
-
-------------------------------------------------------------------------------
 -- LLDP - Remote Time to Live
 ------------------------------------------------------------------------------
 
@@ -684,7 +841,7 @@ rlLldpRemTtlTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
                 "This table contains the remote device Time To Live LLDP TLV."
-     ::= { rlLldpObjects 8 }
+     ::= { rlLldpRemStatus 1 }
 
 rlLldpRemTtlEntry  OBJECT-TYPE
     SYNTAX      RlLldpRemTtlEntry
@@ -711,22 +868,260 @@ rlLldpRemTtl OBJECT-TYPE
             "This object contains the remote device Time To Live LLDP TLV."
     ::= { rlLldpRemTtlEntry 1 }
 
-rlLldpChassisIdSubtype OBJECT-TYPE
-    SYNTAX      INTEGER {
-                    macAddress(4),
-                    local(7)
-                }
-    MAX-ACCESS  read-write
+------------------------------------------------------------------------------
+--        rlLldpLocalSystemData   OBJECT IDENTIFIER ::= { rlLldpObjects 5 }
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- rlLldpLoc4WirePowerTable
+------------------------------------------------------------------------------
+rlLldpLoc4WirePowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLldpLoc4WirePowerEntry
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "The type of encoding used to identify the chassis
-            associated with the local system."
+            "This table contains one row per port of power ethernet
+            information "
+    ::= { rlLldpLocalSystemData 1 }
 
+rlLldpLoc4WirePowerEntry OBJECT-TYPE
+    SYNTAX      RlLldpLoc4WirePowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a particular port component."
+    INDEX  { lldpV2LocPortIfIndex }
+    ::= { rlLldpLoc4WirePowerTable 1 }
+
+RlLldpLoc4WirePowerEntry ::= SEQUENCE {
+        rlLldpLoc4WirePowerSupported            TruthValue,
+        rlLldpLoc4WirePowerSpPairDetClasReq     TruthValue,
+        rlLldpLoc4WirePowerPdSpPairDesStEn      TruthValue,
+        rlLldpLoc4WirePowerPseSpPairOpStEn      TruthValue
+}
+
+rlLldpLoc4WirePowerSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpLoc4WirePowerEntry 1 }
+
+rlLldpLoc4WirePowerSpPairDetClasReq OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpLoc4WirePowerEntry 2 }
+
+rlLldpLoc4WirePowerPdSpPairDesStEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpLoc4WirePowerEntry 3 }
+
+rlLldpLoc4WirePowerPseSpPairOpStEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpLoc4WirePowerEntry 4 }
+
+
+------------------------------------------------------------------------------
+--        rlLldpRemoteSystemsData OBJECT IDENTIFIER ::= { rlLldpObjects 6 }
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- rlLldpRem4WirePowerTable   MIB_rlLldpRem4WirePowerEntry_CNS
+------------------------------------------------------------------------------
+rlLldpRem4WirePowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLldpRem4WirePowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per port of power ethernet
+            information "
+    ::= { rlLldpRemoteSystemsData 1 }
+
+rlLldpRem4WirePowerEntry OBJECT-TYPE
+    SYNTAX      RlLldpRem4WirePowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a particular port component."
+    INDEX  {
+           lldpRemTimeMark,
+           lldpRemLocalPortNum,
+           lldpRemIndex
+    }
+    ::= { rlLldpRem4WirePowerTable 1 }
+
+RlLldpRem4WirePowerEntry ::= SEQUENCE {
+        rlLldpRem4WirePowerSupported            TruthValue,
+        rlLldpRem4WirePowerSpPairDetClasReq     TruthValue,
+        rlLldpRem4WirePowerPdSpPairDesStEn      TruthValue,
+        rlLldpRem4WirePowerPseSpPairOpStEn      TruthValue
+}
+
+rlLldpRem4WirePowerSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpRem4WirePowerEntry 1 }
+
+rlLldpRem4WirePowerSpPairDetClasReq OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpRem4WirePowerEntry 2 }
+
+rlLldpRem4WirePowerPdSpPairDesStEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpRem4WirePowerEntry 3 }
+
+rlLldpRem4WirePowerPseSpPairOpStEn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { rlLldpRem4WirePowerEntry 4 }
+	
+------------------------------------------------------------------------------
+-- rlLldpRemTable Augment to lldpRemTable
+------------------------------------------------------------------------------
+
+rlLldpRemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RllldpRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table is AUGMENT for lldpRemTable. Each entry consists Source MAC address."
+    ::= { rlLldpRemoteSystemsData 2 }
+
+rlLldpRemEntry  OBJECT-TYPE
+    SYNTAX      RllldpRemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry that consists source MAC address of the remote station."
+    AUGMENTS { lldpRemEntry }
+    ::= { rlLldpRemTable 1 }
+	
+RllldpRemEntry  ::= SEQUENCE {
+    rlLldpRemSrcMacAddr		MacAddress,
+	rlLldpRemActiveStation  TruthValue
+}
+
+rlLldpRemSrcMacAddr  OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Source MAC address of the remote station."    
+    ::= { rlLldpRemEntry 1 }
+
+rlLldpRemActiveStation  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Indicates whether the entry is active (the port is up and LLDP Rx is enabled)."    
+    ::= { rlLldpRemEntry 2 }
+	
+------------------------------------------------------------------------------
+--        rlLldpV2Config          OBJECT IDENTIFIER ::= { rlLldpObjects 7 }
+------------------------------------------------------------------------------
+
+rlLldpV2AutoAdvLocPortManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLldpV2AutoAdvLocPortManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains automaticaly selected management address,
+            advertised on the local port."
     REFERENCE
-            "IEEE 802.1AB-2004 9.5.2.2"
-    DEFVAL  { macAddress }
-    ::= { rlLldpConfig 5 }
+            "Marvell LLDP"
+    ::= { rlLldpV2Config 1 }
 
+rlLldpV2AutoAdvLocPortManAddrEntry OBJECT-TYPE
+    SYNTAX      RlLldpV2AutoAdvLocPortManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a local port, which advertises the Management
+            address automatically. Entry also included an interface number, on
+            which the Management address is assigned.
+            Each management address should have distinct 'management address
+            type' (rlLldpAutoAdvManAddrSubtype) and 'management address'
+            (rlLldpAutoAdvManAddr)."
 
+    INDEX   { rlLldpV2AutoAdvLocPortNum, rlLldpV2AutoAdvManAddrType,  rlLldpV2AutoAdvManAddr}
+    ::= { rlLldpV2AutoAdvLocPortManAddrTable 1 }
+
+RlLldpV2AutoAdvLocPortManAddrEntry ::= SEQUENCE {
+      rlLldpV2AutoAdvLocPortNum         LldpPortNumber,
+	  rlLldpV2AutoAdvManAddrType       	InetAddressType,
+	  rlLldpV2AutoAdvManAddr            InetAddress,
+      rlLldpV2AutoAdvManAddrOwnerIfId   Integer32
+}
+
+rlLldpV2AutoAdvLocPortNum   OBJECT-TYPE
+    SYNTAX      LldpPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the port component
+            (contained in the local chassis with the LLDP agent)
+            associated with this entry.
+
+            The value of this object is used as a port index to the
+            rlLldpAutoAdvLocPortManAddrTable."
+    ::= { rlLldpV2AutoAdvLocPortManAddrEntry 1 }
+	
+rlLldpV2AutoAdvManAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The type of management address identifier encoding used in
+            the associated 'rlLldpAutoAdvManAddr' object."
+    ::= { rlLldpV2AutoAdvLocPortManAddrEntry 2 }
+	
+rlLldpV2AutoAdvManAddr  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify the management address is
+            automatically advertised by local port, and assigned on the
+            associated 'rlLldpAutoAdvManAddrOwnerIfId' interface."
+    ::= { rlLldpV2AutoAdvLocPortManAddrEntry 3 }
+
+rlLldpV2AutoAdvManAddrOwnerIfId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The integer value is used to identify the interface number
+            (port, trunk or vlan). The management address, automatically
+            advertised from associated 'rlLldpAutoAdvLocPortNum' local port is
+            assigned to mentioned 'rlLldpAutoAdvManAddrOwnerIfId' interface."    
+    ::= { rlLldpV2AutoAdvLocPortManAddrEntry 4 }
+	
 END
 

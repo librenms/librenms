@@ -1,10 +1,8 @@
 <?php
 
-if ($_GET['legend']) {
-    $legend = $_GET['legend'];
-}
+$legend = $graph_params->visible('legend');
 
-$rrd_options  = "--alt-autoscale-max -E --start $from --end ".($to - 150)." --width $width --height $height ";
+$rrd_options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
 $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 if ($height < '99') {
     $rrd_options .= ' --only-graph';
@@ -12,17 +10,17 @@ if ($height < '99') {
 
 $i = 1;
 
-foreach (explode(',', $_GET['id']) as $ifid) {
-    $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
+foreach (explode(',', $vars['id']) as $ifid) {
+    $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-    if (rrdtool_check_rrd_exists($rrd_file)) {
-        $rrd_options .= ' DEF:inoctets'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
-        $rrd_options .= ' DEF:outoctets'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
-        $in_thing    .= $seperator.'inoctets'.$i.',UN,0,'.'inoctets'.$i.',IF';
-        $out_thing   .= $seperator.'outoctets'.$i.',UN,0,'.'outoctets'.$i.',IF';
-        $pluses      .= $plus;
-        $seperator    = ',';
-        $plus         = ',+';
+    if (Rrd::checkRrdExists($rrd_file)) {
+        $rrd_options .= ' DEF:inoctets' . $i . '=' . $rrd_file . ':INOCTETS:AVERAGE';
+        $rrd_options .= ' DEF:outoctets' . $i . '=' . $rrd_file . ':OUTOCTETS:AVERAGE';
+        $in_thing .= $seperator . 'inoctets' . $i . ',UN,0,' . 'inoctets' . $i . ',IF';
+        $out_thing .= $seperator . 'outoctets' . $i . ',UN,0,' . 'outoctets' . $i . ',IF';
+        $pluses .= $plus;
+        $seperator = ',';
+        $plus = ',+';
         $i++;
     }
 }
@@ -30,33 +28,33 @@ foreach (explode(',', $_GET['id']) as $ifid) {
 unset($seperator);
 unset($plus);
 
-foreach (explode(',', $_GET['idb']) as $ifid) {
-    $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
+foreach (explode(',', $vars['idb']) as $ifid) {
+    $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
-    if (rrdtool_check_rrd_exists($rrd_file)) {
-        $rrd_options .= ' DEF:inoctetsb'.$i.'='.$rrd_file.':INOCTETS:AVERAGE';
-        $rrd_options .= ' DEF:outoctetsb'.$i.'='.$rrd_file.':OUTOCTETS:AVERAGE';
-        $in_thingb   .= $seperator.'inoctetsb'.$i.',UN,0,'.'inoctetsb'.$i.',IF';
-        $out_thingb  .= $seperator.'outoctetsb'.$i.',UN,0,'.'outoctetsb'.$i.',IF';
-        $plusesb     .= $plus;
-        $seperator    = ',';
-        $plus         = ',+';
+    if (Rrd::checkRrdExists($rrd_file)) {
+        $rrd_options .= ' DEF:inoctetsb' . $i . '=' . $rrd_file . ':INOCTETS:AVERAGE';
+        $rrd_options .= ' DEF:outoctetsb' . $i . '=' . $rrd_file . ':OUTOCTETS:AVERAGE';
+        $in_thingb .= $seperator . 'inoctetsb' . $i . ',UN,0,' . 'inoctetsb' . $i . ',IF';
+        $out_thingb .= $seperator . 'outoctetsb' . $i . ',UN,0,' . 'outoctetsb' . $i . ',IF';
+        $plusesb .= $plus;
+        $seperator = ',';
+        $plus = ',+';
         $i++;
     }
 }
 
 if ($inverse) {
-    $in  = 'out';
+    $in = 'out';
     $out = 'in';
 } else {
-    $in  = 'in';
+    $in = 'in';
     $out = 'out';
 }
 
-$rrd_options .= ' CDEF:'.$in.'octets='.$in_thing.$pluses;
-$rrd_options .= ' CDEF:'.$out.'octets='.$out_thing.$pluses;
-$rrd_options .= ' CDEF:'.$in.'octetsb='.$in_thingb.$plusesb;
-$rrd_options .= ' CDEF:'.$out.'octetsb='.$out_thingb.$plusesb;
+$rrd_options .= ' CDEF:' . $in . 'octets=' . $in_thing . $pluses;
+$rrd_options .= ' CDEF:' . $out . 'octets=' . $out_thing . $pluses;
+$rrd_options .= ' CDEF:' . $in . 'octetsb=' . $in_thingb . $plusesb;
+$rrd_options .= ' CDEF:' . $out . 'octetsb=' . $out_thingb . $plusesb;
 $rrd_options .= ' CDEF:doutoctets=outoctets,-1,*';
 $rrd_options .= ' CDEF:inbits=inoctets,8,*';
 $rrd_options .= ' CDEF:outbits=outoctets,8,*';

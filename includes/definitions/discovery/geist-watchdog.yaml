@@ -1,5 +1,8 @@
 mib: GEIST-V4-MIB:GEIST-MIB-V3
 modules:
+    os:
+        version: GEIST-MIB-V3::productVersion.0
+        serial: GEIST-MIB-V3::climateSerial.1
     sensors:
         temperature:
             options:

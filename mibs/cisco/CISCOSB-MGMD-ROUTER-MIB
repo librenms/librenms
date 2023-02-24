@@ -1,0 +1,342 @@
+CISCOSB-MGMD-ROUTER-MIB DEFINITIONS ::= BEGIN
+-- Title:                CISCOSB IGMP
+--                       IGMP Router Private MIB
+--                       based on MGMD Router standard MIB MGMD-MIB (rfc5519)
+-- Version:              0.00
+-- Date:                 01 July 2011
+
+IMPORTS
+    switch001                              FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2, Counter32, Gauge32,
+    Unsigned32, TimeTicks            FROM SNMPv2-SMI
+    InetAddress, InetAddressType     FROM INET-ADDRESS-MIB
+    RowStatus,TruthValue,
+    DisplayString                    FROM SNMPv2-TC
+    NpgOperStatus                    FROM CISCOSB-PIM-MIB
+    mgmdRouterInterfaceEntry         FROM MGMD-STD-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB;
+
+rlIgmp MODULE-IDENTITY
+        LAST-UPDATED "201107210000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for IGMP Router
+                 in CISCOSB devices."
+        REVISION "201107210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 225 }
+
+----------------------------------------------------------
+-- RLinterfaceTable
+----------------------------------------------------------
+--Common Textual Conventions
+
+AdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The desired administrative state of a MIB row."
+    SYNTAX      INTEGER {
+                  adminStatusUp(1),
+                  adminStatusDown(2)
+                }
+
+rlMgmdInterfaceExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlMgmdInterfaceExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) Extension Interface table listing the entries
+             with counters of the standard interface table."
+
+    ::= { rlIgmp 1 }
+
+rlMgmdInterfaceExtEntry OBJECT-TYPE
+    SYNTAX     RlMgmdInterfaceExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlMgmdInterfaceExtTable."
+    AUGMENTS   { mgmdRouterInterfaceEntry }
+
+    ::= { rlMgmdInterfaceExtTable 1 }
+
+
+RlMgmdInterfaceExtEntry ::= SEQUENCE{
+    rlMgmdRouterInterfaceExtStatsUpTime             TimeTicks,
+    rlMgmdRouterInterfaceExtEnableStats             TruthValue,
+    rlMgmdRouterInterfaceExtNumFailedJoins          Unsigned32,
+    rlMgmdRouterInterfaceExtNumIgmpV1Msgs           Unsigned32,
+    rlMgmdRouterInterfaceExtNumIgmpV2MldV1Msgs      Unsigned32,
+    rlMgmdRouterInterfaceExtNumIgmpV3MldV2Msgs      Unsigned32,
+    rlMgmdRouterInterfaceExtNumInvalidMsgsRcvd      Unsigned32,
+    rlMgmdRouterInterfaceExtNumGenQueriesSent       Unsigned32,
+    rlMgmdRouterInterfaceExtNumSpecQueriesSent      Unsigned32,
+    rlmgmdRouterInterfaceQrRobustness               Unsigned32,
+    rlmgmdRouterInterfaceQrQueryInterval            Unsigned32,
+    rlmgmdRouterInterfaceQrQueryMaxResponseTime     Unsigned32,
+    rlmgmdRouterInterfaceQrLastMembQueryIntvl       Unsigned32,
+    rlmgmdRouterInterfaceExtSrcAndGrpFilter         DisplayString,
+    rlMgmdRouterInterfaceExtAdminStatus             AdminStatus,
+    rlMgmdRouterInterfaceExtOperStatus              NpgOperStatus,
+    rlMgmdRouterInterfaceExtIsQuerier               TruthValue,
+    rlMgmdRouterInterfaceExtProxyDownProtected      INTEGER
+
+}
+
+
+
+rlMgmdRouterInterfaceExtStatsUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since the statistics counters for this interface
+             were last reset.
+
+             This field is reset to zero when
+             rlMgmdRouterInterfaceExtEnableStats is modified to 'true'.
+
+             This value may wrap."
+
+    ::= { rlMgmdInterfaceExtEntry 1 }
+
+rlMgmdRouterInterfaceExtEnableStats OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "This object defines whether DC-IGMP returns
+          interface-specific statistics on MIB GET operations
+          for this interface's MIB row.
+           If this object is modified from 'true' to 'false' and back to 'true',
+           the statistics fields are reset. This field is readable and writeable."
+
+       ::= { rlMgmdInterfaceExtEntry 2 }
+
+
+rlMgmdRouterInterfaceExtNumFailedJoins OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of failed joins received for this interface - that is,
+            the number of times a group membership could not be added on this
+            interface."
+
+    ::= { rlMgmdInterfaceExtEntry 3 }
+
+rlMgmdRouterInterfaceExtNumIgmpV1Msgs OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMPv1 messages received for this interface.
+            This includes both valid and invalid messages."
+
+    ::= { rlMgmdInterfaceExtEntry 4 }
+
+rlMgmdRouterInterfaceExtNumIgmpV2MldV1Msgs OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMPv2 or Mldv1 messages received for this interface.
+            This includes both valid and invalid messages."
+
+    ::= { rlMgmdInterfaceExtEntry 5}
+
+rlMgmdRouterInterfaceExtNumIgmpV3MldV2Msgs OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMPv3 or Mldv2 messages received for this interface.
+            This includes both valid and invalid messages."
+
+    ::= { rlMgmdInterfaceExtEntry 6}
+
+rlMgmdRouterInterfaceExtNumInvalidMsgsRcvd OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of Invalid IGMP or MLD messages received for this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 7}
+
+rlMgmdRouterInterfaceExtNumGenQueriesSent OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of General Queries sent for this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 8}
+
+rlMgmdRouterInterfaceExtNumSpecQueriesSent OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of Specific Queries sent for this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 9}
+
+
+rlmgmdRouterInterfaceQrRobustness OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of Robustness in use on this interface.
+
+            The Robustness Variable allows tuning for the expected
+            packet loss on a subnet.  If a subnet is expected to be
+            lossy, the Robustness Variable may be increased.  IGMP and
+            MLD is robust to (Robustness Variable-1) packet losses.
+
+            For IGMPv3/MLDv2, this may differ from the value
+            configured using mgmdRouterInterfaceRobustness if the
+            local router is not the querier on this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 10 }
+
+rlmgmdRouterInterfaceQrQueryInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of Query Interval in use on this interface.
+
+            The frequency at which IGMP or MLD General Query packets
+            are transmitted on this interface.
+
+            For IGMPv3/MLDv2, this may differ from the value
+            configured using mgmdRouterInterfaceQueryInterval if the
+            local router is not the querier on this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 11 }
+
+rlmgmdRouterInterfaceQrQueryMaxResponseTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of Maximum Query Response Time in use on this
+            interface.
+
+            For IGMPv3/MLDv2, this may differ from the value
+            configured using mgmdRouterInterfaceQueryMaxResponseTime
+            if the local router is not the querier on this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 12 }
+
+rlmgmdRouterInterfaceQrLastMembQueryIntvl OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of Last Member Query Interval in use on this
+            interface.
+
+            The Last Member Query Interval is the Max Response Time
+            inserted into Group-Specific and Group-and-Source-specific
+            Queries sent in response to Leave messages, and is also
+            the amount of time between successive Specific Query
+            messages.  This value may be tuned to modify the leave
+            latency of the network.  A reduced value results in
+            reduced time to detect the loss of the last member of a
+            group.
+
+            The value of this object is irrelevant if
+            mgmdRouterInterfaceVersion is 1.
+
+            The value of this object is also irrelevant if this
+            interface is configured to use immediate-leave behavior
+            without a last member query - that is, if
+            mgmdRouterInterfaceImmedtLeave is 'true' and
+            mgmdRouterInterfaceQryBefImmdLv is 'false'.
+
+            For IGMPv3/MLDv2, this may differ from the value
+            configured using mgmdRouterInterfaceLastMembQueryIntvl if
+            the local router is not the querier on this interface."
+
+    ::= { rlMgmdInterfaceExtEntry 13 }
+
+rlmgmdRouterInterfaceExtSrcAndGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The interface will ignore requests to join any
+            group/source pair that is not included in the extended
+            access list with a list index corresponding to the value
+            configured for this object.
+
+            If the value of this object is 0, no requests are ignored
+            as a result of this object.
+
+            This object deprecates the dcmgmdRouterInterfaceAllowSSMList
+            object.  If both of these (S,G) filters are set to
+            non-zero values, then both take effect for SSM groups -
+            that is, a request to join an SSM group/source pair is
+            only accepted if it passes through both filters.
+
+            If both this object and the
+            dcmgmdRouterInterfaceAllowASMList object are set to non-zero
+            values, then a request to join an ASM group/source pair is
+            only accepted if it passes through both filters."
+    DEFVAL { "" }
+    ::= { rlMgmdInterfaceExtEntry 14 }
+
+rlMgmdRouterInterfaceExtAdminStatus OBJECT-TYPE
+    SYNTAX       AdminStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+            "The desired administrative state of the interface."
+    DEFVAL { adminStatusDown }
+    ::= { rlMgmdInterfaceExtEntry 15 }
+
+rlMgmdRouterInterfaceExtOperStatus OBJECT-TYPE
+    SYNTAX     NpgOperStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current operational state of the interface."
+    ::= { rlMgmdInterfaceExtEntry 16 }
+
+rlMgmdRouterInterfaceExtIsQuerier OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "???"
+    ::= { rlMgmdInterfaceExtEntry 17 }
+
+rlMgmdRouterInterfaceExtProxyDownProtected OBJECT-TYPE
+   SYNTAX      INTEGER {
+    	unspecified(-1),
+    	enabled(1),
+    	disabled(2)
+   }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Enable/Disable IGMP Proxy Downstream protected on the interface."
+    ::= { rlMgmdInterfaceExtEntry 18 }
+
+END
+

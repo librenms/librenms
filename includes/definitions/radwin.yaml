@@ -1,6 +1,7 @@
 os: radwin
 text: RADWIN
 type: wireless
+mib_dir: radwin
 icon: radwin
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -1,0 +1,270 @@
+-- =================================================================
+-- Copyright (c) 2004-2011 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB is designed to get DAR(Deeper Application Recognition)
+--              packet statistic information.
+-- Reference: DAR-MIB
+-- Version: V1.0
+-- History:
+--   V1.0 created by wangchenxiao
+--     Initial version 2010-11-03
+-- =================================================================
+HH3C-DAR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    ifIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    Counter64, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+
+hh3cDar MODULE-IDENTITY
+    LAST-UPDATED "201011030000Z"            -- Nov. 03, 2010  GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip: 100085"
+    DESCRIPTION
+        "The MIB is designed to get DAR packet statistics."
+    ::= { hh3cCommon 112 }
+
+Hh3cDarProtocol   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The protocols DAR support."
+    SYNTAX INTEGER {
+        invalidProtocol(1),
+        bgp(2),
+        cifs(3),
+        citrix(4),
+        cuseeme(5),
+        dhcp(6),
+        dns(7),
+        egp(8),
+        eigrp(9),
+        exchange(10),
+        fasttrack(11),
+        finger(12),
+        ftp(13),
+        gnutella(14),
+        gopher(15),
+        gre(16),
+        http(17),
+        h323(18),
+        icmp(19),
+        igmp(20),
+        imap(21),
+        ip(22),
+        ipinip(23),
+        ipsec(24),
+        ipv6(25),
+        irc(26),
+        kerberos(27),
+        l2tp(28),
+        ldap(29),
+        mgcp(30),
+        napster(31),
+        netbios(32),
+        netshow(33),
+        nfs(34),
+        nntp(35),
+        notes(36),
+        novadign(37),
+        ntp(38),
+        pcanywhere(39),
+        pop3(40),
+        pptp(41),
+        printer(42),
+        rcmd(43),
+        rip(44),
+        rsvp(45),
+        rtcp(46),
+        rtp(47),
+        rtsp(48),
+        secureftp(49),
+        securehttp(50),
+        secureimap(51),
+        secureirc(52),
+        secureldap(53),
+        securenntp(54),
+        securepop3(55),
+        securetelnet(56),
+        sip(57),
+        skinny (58),
+        smtp(59),
+        snmp(60),
+        socks(61),
+        sqlnet(62),
+        sqlserver(63),
+        ssh(64),
+        streamwork(65),
+        sunrpc(66),
+        syslog(67),
+        tcp(68),
+        tcphandshake(69),
+        telnet(70),
+        tftp(71),
+        total(72),
+        udp(73),
+        unknownothers(74),
+        unknowntcp(75),
+        unknownudp(76),
+        userdefine001(77),
+        userdefine002(78),
+        userdefine003(79),
+        userdefine004(80),
+        userdefine005(81),
+        userdefine006(82),
+        userdefine007(83),
+        userdefine008(84),
+        userdefine009(85),
+        userdefine010(86),
+        vdolive(87),
+        winmx(88),
+        xwindows(89)
+    }
+-- ========================================================================
+-- Node definitions
+-- ========================================================================
+--Begin the node of hh3cDarIfObjects.
+
+hh3cDarIfObjects OBJECT IDENTIFIER ::= { hh3cDar 1 }
+
+--Begin the node of hh3cDarIfStatisticsObjects.
+
+hh3cDarIfStatisticsObjects OBJECT IDENTIFIER ::= { hh3cDarIfObjects 1 }
+
+
+-- ===============================================
+-- Begin the table of hh3cDarStatisticsTable.
+-- ===============================================
+
+hh3cDarStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDarStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains packet statistics of DAR."
+    ::= { hh3cDarIfStatisticsObjects 1 }
+
+hh3cDarStatisticsEntry OBJECT-TYPE
+    SYNTAX Hh3cDarStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry items."
+    INDEX { ifIndex, hh3cDarStatisticsProtocolID }
+    ::= { hh3cDarStatisticsTable 1 }
+
+Hh3cDarStatisticsEntry ::=
+    SEQUENCE {
+        hh3cDarStatisticsProtocolID
+            Hh3cDarProtocol,
+        hh3cDarStatisticsProtocolName
+            OCTET STRING,
+        hh3cDarStatisticsInPkts
+            Counter64,
+        hh3cDarStatisticsInBytes
+            Counter64,
+        hh3cDarStatisticsInBitRate
+            Counter64,
+        hh3cDarStatisticsMaxInBitRate
+            Counter64,
+        hh3cDarStatisticsOutPkts
+            Counter64,
+        hh3cDarStatisticsOutBytes
+            Counter64,
+        hh3cDarStatisticsOutBitRate
+            Counter64,
+        hh3cDarStatisticsMaxOutBitRate
+            Counter64
+    }
+
+hh3cDarStatisticsProtocolID OBJECT-TYPE
+    SYNTAX Hh3cDarProtocol
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Protocol id."
+    ::= { hh3cDarStatisticsEntry 1 }
+
+hh3cDarStatisticsProtocolName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Protocol name."
+    ::= { hh3cDarStatisticsEntry 2 }
+
+hh3cDarStatisticsInPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of incoming packets of the specific protocol."
+    ::= { hh3cDarStatisticsEntry 3 }
+
+hh3cDarStatisticsInBytes OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The number of incoming octets of the specific protocol."
+   ::= { hh3cDarStatisticsEntry 4 }
+
+hh3cDarStatisticsInBitRate OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "Incoming bitrate of the specific protocol in last 5 minutes."
+   ::= { hh3cDarStatisticsEntry 5 }
+
+hh3cDarStatisticsMaxInBitRate OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "Max incoming bitrate of the specific protocol in last 5 minutes."
+   ::= { hh3cDarStatisticsEntry 6 }
+
+hh3cDarStatisticsOutPkts OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The number of outgoing packets of the specific protocol."
+   ::= { hh3cDarStatisticsEntry 7 }
+
+hh3cDarStatisticsOutBytes OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "The number of outgoing octets of the specific protocol."
+   ::= { hh3cDarStatisticsEntry 8 }
+
+hh3cDarStatisticsOutBitRate OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "Outgoing bitrate of the specific protocol in last 5 minutes."
+   ::= { hh3cDarStatisticsEntry 9 }
+
+hh3cDarStatisticsMaxOutBitRate OBJECT-TYPE
+   SYNTAX Counter64
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "Max outgoing bitrate of the specific protocol in last 5 minutes."
+   ::= { hh3cDarStatisticsEntry 10 }
+
+END

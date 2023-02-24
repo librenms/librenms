@@ -1,0 +1,1306 @@
+	XF-RADIOLINK-PTP-MODEM-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			entPhysicalIndex
+				FROM ENTITY-MIB
+			ifIndex
+				FROM IF-MIB
+			MODULE-COMPLIANCE, OBJECT-GROUP
+				FROM SNMPv2-CONF
+			TEXTUAL-CONVENTION
+				FROM SNMPv2-TC
+			OBJECT-TYPE, MODULE-IDENTITY, Integer32
+				FROM SNMPv2-SMI
+			xfRadioLink
+				FROM XF-TOP-MIB
+			xfTermRowIndex
+			        FROM XF-RADIOLINK-PTP-TERMINAL-MIB;
+
+
+		xfRadioLinkPtpModemMIB MODULE-IDENTITY
+			LAST-UPDATED "201205290000Z"  -- 29 May 2012
+			ORGANIZATION
+				"Ericsson AB"
+			CONTACT-INFO
+				"
+				Ericsson AB
+				BU Networks
+				SE-431 84  Molndal
+				Sweden
+				"
+			DESCRIPTION
+				"
+				This MIB defines objects for point-to-point Radiolink modems ().
+				"
+
+            REVISION "201206240000Z"  -- 24 June 2012
+            DESCRIPTION
+			    "
+			    Rev PK2
+			    * pdhToTdmAndSDHToSFPHAndSDHToPtP added to xfMMUInterfaceCapability
+			    * Adjusted values in xfMMUBerAlarmThresholdCapability
+			    "
+
+            REVISION "201205290000Z"  -- 29 May 2012
+            DESCRIPTION
+				"
+				Rev PK1
+				Added xfMMUBerAlarmThresholdCapability for MMU3A
+				"
+
+            REVISION "201105230000Z"  -- 23 May 2011
+            DESCRIPTION
+			    "
+			    Rev Y
+			    Official R-State for TN 4.4 FP
+			    "
+
+            REVISION "201104060000Z"  -- 6 April 2011
+            DESCRIPTION
+			    "
+			    Rev PY3
+			    Changes for Mini Link LH 1.0.
+			    Added fftStaticLH(6), fftAdmodLH(7),
+                fftXpicLH(8) and fftXpicAdmodLH(9)to xfTermFrameFormatType
+			    "
+
+			REVISION "201102010000Z"  -- 1 February 2011
+			DESCRIPTION
+			    "
+			    Rev PY2
+			    New value for xfMMUChannelModulation:
+			      qam1024(11)
+			    "
+
+			REVISION "201012130000Z"  -- 13 December 2010
+			DESCRIPTION
+			    "
+			    Rev PY1
+			    Added new enum value supportsAtpcFallbackTimer to MMUAtpcCapability
+			    "
+
+			REVISION "201001190000Z"  -- 19 January 2010
+			DESCRIPTION
+			    "
+			    Rev X
+			    Official R-State for TN 4.3
+			    "
+
+			REVISION "200911300000Z"  -- 30 november 2009
+			DESCRIPTION
+			    "
+			    Rev PX4
+			    Updated MMUAlarmStatus with tree alarms.
+			    New alarms:
+			    	 syncOverRLNotSupported
+			    	 rauPowerSupplyChanged
+			    	 congestionControlNotSupported
+			    "
+
+			REVISION "200911260000Z"  -- 26 november 2009
+			DESCRIPTION
+			    "
+			    Rev PX3
+			    Change type of xfMMURAUSupplyVoltage from Integer32 to INTEGER.
+			    Values:
+			    	other(1)
+			    	p55V(2)
+			    	m48V(3)
+			    	p24V(4)
+			    "
+
+			REVISION "200911180000Z"  -- 18 november 2009
+			DESCRIPTION
+			    "
+			    Rev PX2
+			    Added supportsAtpcFallback in MMUAtpcCapability.
+			    "
+
+			REVISION "200909180000Z"  -- 18 september 2009
+			DESCRIPTION
+			    "
+			    Rev PX
+			    Added xfMMURAUSupplyVoltage in xfModemTable.
+			    "
+
+			REVISION "200906260000Z"  -- 26 june 2009
+			DESCRIPTION
+			    "
+			    Rev V
+			    Update revision histry.
+			    The Revision U is lost due to human errors.
+			    "
+
+			REVISION "200906240000Z"  -- 24 june 2009
+			DESCRIPTION
+			    "
+			    Rev V
+			    Official Rev for TN 4.2
+			    "
+
+			REVISION "200904200000Z"  -- 20 april 2009
+			DESCRIPTION
+			    "
+			    Rev T
+			    Official Rev for TN 4.1 FP.
+			    "
+
+			REVISION "200904140000Z"  -- 14 april 2009
+			DESCRIPTION
+			    "
+			    Rev PT9
+			    Changes for TN 4.2
+
+			    Added channelspacing chsp3500kHz(10).
+			    "
+
+
+			REVISION "200903040000Z"  -- 04 mars 2009
+			DESCRIPTION
+			    "
+			    Rev PT8
+			    Changed name on MMUFrameFormatType->fftAdaptive to fftAdmod
+			    "
+
+
+
+			REVISION "200810020000Z"  -- 02 october 2008
+			DESCRIPTION
+			    "
+			    Rev PT7
+			    Changed object in xfModemCapabilityTable:
+			      from xfMMUDCHNCapacity to xfMMUDCNCapacity.
+
+			    Fixed double index issue in xfRLPtpTerminalXTable
+			    "
+
+			REVISION "200809160000Z"  -- 16 september 2008
+			DESCRIPTION
+			    "
+			    Rev PT6
+			    Changes for TN 4.1,
+			    Added new vaules in MMUFrameFormatType.
+			    "
+
+			REVISION "200808150000Z"  -- 15 august 2008
+			DESCRIPTION
+			    "
+			    Rev PT5
+			    Changes for TN 4.1,
+			    Fixed wrong values in xfTermFrameFormatRev for xfModemCapabilityTable
+			    "
+
+		        REVISION "200806250000Z"  -- 25 june 2008
+			DESCRIPTION
+			    "
+			    Rev PT4
+			    Changes for TN 4.1,
+			    Changes in table: xfModemCapabilityTable
+			    "
+
+			REVISION "200806240000Z"  -- 24 june 2008
+			DESCRIPTION
+			    "
+			    Rev PT3
+			    Changes for TN 4.1,
+			    Changes in table: xfModemCapabilityTable (xfMMUChannelModulation)
+			    "
+
+                        REVISION "200806180000Z"  -- 18 june 2008
+			DESCRIPTION
+			    "
+			    Rev PT2
+			    Changes for TN 4.1,
+			    Changes in table: xfModemCapabilityTable
+			    "
+
+			REVISION "200806040000Z"  -- 4 june 2008
+			DESCRIPTION
+			    "
+			    Rev PT1
+			    Changes for TN 4.1
+			      New table: xfModemCapabilityTable
+			    "
+
+			REVISION "200806030000Z"  -- 3 june 2008
+			DESCRIPTION
+			    "
+			    Rev S
+			    Ordinary revision. No other changes.
+			    "
+
+			REVISION "200804090000Z"  -- 9 apr 2008
+			DESCRIPTION
+			    "
+			    Rev PS7
+			    Changes for TN4.0:
+			      incompatibleUnitMMU renamed to runningConfigNotAccepted in MMUAlarmStatus
+
+			    "
+			REVISION "200803030000Z"  -- 3 mar 2008
+			DESCRIPTION
+			    "
+			    Rev PS6
+			    Changes for TN4.0:
+			      MMUCapCapability extended with two new values: sixtynineDS1 and eightyDS1
+			      xfModemTable extended with one new MO: xfMMUInterfaceCapability
+
+			    "
+      REVISION "200802260000Z"  -- 26 feb 2008
+			DESCRIPTION
+			    "
+			    Rev T
+			        Added defaultConfigNotAccepted in MMUAlarmStatus.
+				  "
+
+      REVISION "200711120000Z"  -- 12 nov 2007
+			DESCRIPTION
+			    "
+			    Rev S
+			        Error correction:
+			           incompatibleUnitMMU ->
+			             incompatibleUnitMMU0
+			             incompatibleUnitMMU1
+			             incompatibleUnitMMU2
+				  "
+
+      REVISION "200710240000Z"  -- 24 oct 2007
+			DESCRIPTION
+			    "
+			    Rev N.
+			        Ordinary revision, for TN 3.3 - according to 1/155 19-CRH 109 625/1 Uae Rev V.
+			        Added incompatibleUnitMMU in MMUAlarmStatus.
+				  "
+      REVISION "200708140000Z"  -- 14 Aug 2007
+			DESCRIPTION
+			    "
+			    Rev PN2.
+					New value for MMUCapCapability:
+					  oneStm1OneJ1
+				  "
+
+      REVISION "200707030000Z"  -- 3 july 2007
+			DESCRIPTION
+			    "
+			    Rev PN1.
+					New values for MMUCapCapability:
+						stm1DS1(15),
+						stm150MHz(16),
+						twentytwoE1(17),
+						thirtyfiveE1(18),
+						fortysixE1(19),
+						seventyfiveE1(20)
+				  "
+
+      REVISION "200706040000Z"  -- 4 june 2007
+			DESCRIPTION
+			    "
+			    Rev M
+				  Changes according to 1/15519-CRH109625/1 Uae Rev U
+  				- xfMMUChannelCompanionSlot: Changed comment regarding access limitation at far end.
+  				- xfRAUIFLoopEnable: Changed comment regarding access limitation at far end.
+				  "
+
+      REVISION "200701170000Z"  -- 17 jan 2007
+			DESCRIPTION
+			    "
+			    Rev L
+				  Changes according to 1/15519-CRH109625/1 Uae Rev S
+  				- xfRAUIFAlarms: ifLosL2R --> notused
+  				- xfLINERSAlarms : removed laserFailure and laserDegraded
+  				                   added sfpLos
+  			  -
+				  "
+
+      REVISION "200611140000Z"
+			DESCRIPTION
+			    "
+			    Rev K: Changes according to 1/15519-CRH109625/1 Uae Rev N
+  				- interMMUChannelFailure added in MMUAlarmStatus
+  				- wstClockLossR2L replaced by lofR2L in xfRAUIFAlarms
+  				- xfRADIORSTable moved to XF-RADIOLINK-PTP-TERMINAL-MIB
+  				- xfRADIORSPerformanceTable moved to XF-RADIOLINK-PTP-TERMINAL-MIB
+          "
+
+      REVISION "200609191325Z"
+			DESCRIPTION
+			    "
+			    Rev J: Changes according to 1/15519-CRH109625/1 Uae Rev M, plus errata
+  				- xfModemTable and xfRAUIFTable updated
+  				- New tables: xfRADIORSTable, xfRADIORSPerformanceTable and xfLINERSTable
+          "
+
+      REVISION "200603200000Z"
+			DESCRIPTION
+			    "
+			    Rev. H.
+				- Changes according to 1/15519-CRH109625/1 Uae Rev K
+				- Addition of Enum values for MMUModCapability and MMUCapCapability to support ANSI.
+                            "
+
+			REVISION "200602240000Z"
+			DESCRIPTION
+			    "
+			    Rev. G.
+				- Access restrictions explained in the description field for each MO.
+        - Default value declarations in the description fields also includes the numerical value.
+			    "
+
+		    REVISION "200601310000Z"
+			DESCRIPTION
+			    "
+			    Rev. F.
+				- xfMMUSlotPosition (integer, read-only) added in xfModemTable
+			    "
+
+		    REVISION "200503020000Z"
+			DESCRIPTION
+			    "
+			    Rev. E.
+				- Changes according to 1/15519-CRH109625/1 Uae Rev E and corrections:
+				- Correction: Alarm bits for dmodClock restored in MO xfRAUIFAlarms (xfRAUIFTable).
+				- Alarm bits for unknown removed in MO xfRAUIFAlarms (xfRAUIFTable).
+				- Status for MO xfMMUModIndexNotValid in xfModemTable set obsolete.
+				- farEndRxLoop changed to rxLoop, in xfRAUIFStatus
+			    "
+
+		    REVISION "200412130000Z"
+			DESCRIPTION
+			    "
+			    Rev. D
+			    	- Changes according to 1/15519-CRH109625/1 Uae Rev D
+		     - MO xfRAUIFCapacity removed from xfRAUIFTable
+		     - MO xfRAUIFFarEndRxLoop renamed to xfRAUIFRxLoop in xfRAUIFTable
+		     - Alarm bits for dmodClock removed in MO xfRAUIFAlarms (xfRAUIFTable)
+		     - Alarm bits for aisReceived and Unknown added in MO xfRAUIFAlarms (xfRAUIFTable)
+		        -DEFVAL removed. Default values declared in corresponding description fields.
+			    "
+
+		    REVISION "200407020000Z"
+			DESCRIPTION
+			    "
+			    Rev. C
+			    	- All config alarms are removed
+			    	- xfRAUIFConnectionLoop changed to xfRAUIFFarEndRxLoop
+			    "
+		    REVISION "200406160000Z"
+			DESCRIPTION
+			    "
+			    Rev. B
+			    	- All config alarms are defined
+			    	- Alarms are updated with new names
+                    -
+			    "
+            REVISION "200405250000Z"
+			DESCRIPTION
+			    "
+			    Rev. PB2
+			    	- Some minor changes
+			    "
+			REVISION "200404260000Z"
+			DESCRIPTION
+				"
+				Rev. PB1  	Capacity and loop handling MO's are added.
+						Alarms are defined.
+				"
+			REVISION "200401200000Z"
+			DESCRIPTION
+				"
+				Rev. A  	Other is added to integer enumerations.
+				"
+			REVISION "200312170000Z"
+			DESCRIPTION
+				"
+				Rev. PA1  	Initial revision
+				"
+
+			::= { xfRadioLink 2 }
+
+
+--
+-- Textual conventions
+--
+
+	MMUAlarmStatus ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+          "
+          This TC enumerates the the alarm status.
+          RCC - Communication is lost on the Radio Communication Channel,
+                between the MMU and RAU. RCC alarm for the modem will generate hardware
+                error for the radio (which will lead to radio operational status out of service).
+          ICC - Communication is lost on the Internal Communication Channel,
+                between two MMU2B or between the MMU2 and SMU2, in the same
+                terminal.
+          ATPCCapabilityAlarmFarEnd - The terminal on the far end is configured
+                for ATPC, but at least one of the indoor units does not support
+                ATPC.
+          HCC - Communication is lost on the Hop Communication Channel,
+                between the MMU and the far end MMU.
+
+          XPICCable - Disconnection of the XPIC cross-cable carrying the baseband signal
+                      received in one polarization, e.g. V, to the XPU board of the other
+                      polarization, i.e. H if the other is V.
+
+          XPICLos   - The loss of the XPIC baseband cross-signal with cross-cable connected.
+
+          interMMUChannelFailure - High level fault on inter MMU communication of RS.
+                                   Only valid in protection.
+
+          runningConfigNotAccepted - The MMU/RAU/SFP couldn.t accept the running configuration;
+                                     the service LED is flashing.
+
+          defaultConfigNotAccepted - Default config not accepted.
+
+          syncOverRLNotSupported - Current MMU, once provisioned as having sync over RL, does not support sync over RL.
+
+          rauPowerSupplyChanged - RAU power supply has changed automatically due to undervoltage or bad grounding detection.
+
+          congestionControlNotSupported - Far-end (i.e. CN) congestion control is not supported by modem; the service LED is flashing.
+
+
+	   	  Alarm status is indicated by 24 bits"
+
+       	SYNTAX BITS
+       	{
+       	  rcc0(0),
+       	  rcc1(1),
+       	  rcc2(2),
+       	  icc0(3),
+       	  icc1(4),
+       	  icc2(5),
+       	  atpcCapabilityAlarmFarEnd0(6),
+       	  atpcCapabilityAlarmFarEnd1(7),
+       	  atpcCapabilityAlarmFarEnd2(8),
+       	  hcc0(9),
+       	  hcc1(10),
+       	  hcc2(11),
+       	  xpicCable0(12),
+       	  xpicCable1(13),
+       	  xpicCable2(14),
+       	  xpicLos0(15),
+       	  xpicLos1(16),
+       	  xpicLos2(17),
+       	  interMMUChannelFailure0(18),
+       	  interMMUChannelFailure1(19),
+       	  interMMUChannelFailure2(20),
+       	  runningConfigNotAccepted0(21),
+       	  runningConfigNotAccepted1(22),
+       	  runningConfigNotAccepted2(23),
+       	  defaultConfigNotAccepted0(24),
+       	  defaultConfigNotAccepted1(25),
+       	  defaultConfigNotAccepted2(26),
+       	  syncOverRLNotSupported0(27),
+       	  syncOverRLNotSupported1(28),
+       	  syncOverRLNotSupported2(29),
+       	  rauPowerSupplyChanged0(30),
+       	  rauPowerSupplyChanged1(31),
+       	  rauPowerSupplyChanged2(32),
+       	  congestionControlNotSupported0(33),
+       	  congestionControlNotSupported1(34),
+       	  congestionControlNotSupported2(35)
+       	}
+
+	MMUModIndexStatus ::= TEXTUAL-CONVENTION
+       	STATUS current
+       	DESCRIPTION
+           "This TC enumerates modulation index status values
+            codes"
+       	SYNTAX INTEGER
+       	{
+		  other(1),
+		  modIndexValid(2),
+		  modIndexNotValid(3)
+		}
+
+	MMUAtpcCapability ::= TEXTUAL-CONVENTION
+       	STATUS current
+       	DESCRIPTION
+           "This TC enumerates atpc capabilities values
+            codes"
+       	SYNTAX INTEGER
+       	{
+       	  other(1),
+       	  noAtpcSupport(2),
+       	  doesNotExist(3),
+       	  atpcCapabilityUnknown(4),
+       	  supportsAtpc(5),
+       	  supportsAtpcFallback(6),
+       	  supportsAtpcFallbackTimer(7)
+       	}
+
+	MMUModCapability ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+          "This TC enumerates the modulation capabilities.
+          Modulation capabilities is indicated by 5 bits:
+            bits 01234
+             00000 undetermined
+             00001 C-QPSK
+             00010 16-QAM
+             00011 C-QPSK & 16-QAM
+             00100 128-QAM
+             01000  32-QAM
+             10000  64-QAM
+             ...
+             11111 C-QPSK & 16-QAM & 128-QAM & 32-QAM & 64-QAM
+		      "
+       	SYNTAX BITS
+       	{
+       	  cqpsk(0),
+       	  qam16(1),
+       	  qam128(2),
+          qam32(3),
+          qam64(4)
+       	}
+
+	MMUCapCapability ::= TEXTUAL-CONVENTION
+       	STATUS current
+       	DESCRIPTION
+           "This TC enumerates capacity capabilities values. Capacity
+	    	capabilities is indicated by 15 bits"
+       	SYNTAX BITS
+       	{
+           oneE1(0),
+           twoE1(1),
+           fourE1(2),
+           oneE2(3),
+           twoE2(4),
+           oneE3oneE1(5),
+           twoE3(6),
+           fourE3(7),
+           fourDS1(8),
+           eightDS1(9),
+           sixteenDS1(10),
+           seventeenDS1(11),
+           stm0(12),
+           stm1(13),
+           thirtytwoDS1(14),
+           stm1DS1(15),
+           stm150MHz(16),
+           twentytwoE1(17),
+           thirtyfiveE1(18),
+           fortysixE1(19),
+           seventyfiveE1(20),
+           oneStm1OneJ1(21),
+           sixtynineDS1(22),
+           eightyDS1(23)
+       	}
+
+
+ 	MMUChannelSpacingCapability ::= TEXTUAL-CONVENTION
+       	STATUS current
+       	DESCRIPTION
+           "Channel spacing capability"
+       	SYNTAX INTEGER
+            {
+              chspUnknown(0),
+              chsp7MHz(1),
+              chsp14MHz(2),
+              chsp20MHz(3),
+              chsp28MHz(4),
+              chsp30MHz(5),
+              chsp40MHz(6),
+              chsp50MHz(7),
+              chsp56MHz(8),
+              chsp10MHz(9),
+              chsp3500kHz(10)
+            }
+
+
+        MMUFrameFormatType ::= TEXTUAL-CONVENTION
+       	STATUS current
+       	DESCRIPTION
+           "Frame format type.
+
+            Values:
+              fftUnknown(0)
+              fftStatic(1)
+              fftAdmod(2)
+              fftXpic(3)
+              fftXpicAdmod(4)
+              fftLegacy(5)
+              fftStaticLH(6)
+              fftAdmodLH(7)
+              fftXpicLH(8)
+              fftXpicAdmodLH(9)
+
+           "
+       	SYNTAX INTEGER
+            {
+              fftUnknown(0),
+              fftStatic(1),
+              fftAdMod(2),
+              fftXpic(3),
+              fftXpicAdmod(4),
+              fftLegacy(5),
+              fftStaticLH(6),
+              fftAdmodLH(7),
+              fftXpicLH(8),
+              fftXpicAdmodLH(9)
+
+            }
+
+
+        ModemModulation ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Type of modulation."
+	SYNTAX INTEGER
+	{
+          other(1),
+          cqpsk(2),
+          qam16(3),
+          qam128(4),
+          qam32(5),
+          qam64(6),
+          qam4(7),
+          qam8(8),
+          qam256(9),
+          qam512(10),
+          qam1024(11)
+	}
+
+
+--
+-- Node definitions
+--
+	xfRadioLinkPtpModemObjects OBJECT IDENTIFIER
+					::= { xfRadioLinkPtpModemMIB 1 }
+	xfRadioLinkPtpModemConformance OBJECT IDENTIFIER
+					::= { xfRadioLinkPtpModemMIB 2 }
+
+------------------------------------------------------------------------------
+-- xfModemTable
+------------------------------------------------------------------------------
+	xfModemTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF XfModemEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Table for Radiolink point-to-points modem managed objects.
+			The tabled is indexed with entPhysicalIndex.
+			"
+		::= { xfRadioLinkPtpModemObjects 1 }
+
+	xfModemEntry OBJECT-TYPE
+		SYNTAX XfModemEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the xfModemTable"
+		INDEX { entPhysicalIndex}
+		::= { xfModemTable 1 }
+
+	XfModemEntry ::=
+		SEQUENCE
+		{
+		  xfMMUAlarmStatus		MMUAlarmStatus,
+		  xfMMUModIndexNotValid		MMUModIndexStatus,
+		  xfMMUAtpcCapability		MMUAtpcCapability,
+		  xfMMUModCapability		MMUModCapability,
+		  xfMMUCapacityCapability	MMUCapCapability,
+		  xfMMUProtectionPath		INTEGER,
+		  xfMMUSlotPosition		Integer32,
+		  xfMMUChannelModeCapability	BITS,
+		  xfMMUChannelCompanionSlot	Integer32,
+		  xfMMUChannelCompanionIndex	Integer32,
+		  xfMMUInterfaceCapability	BITS,
+		  xfMMURAUSupplyVoltage		INTEGER
+		}
+
+--
+-- The xfModemTable MOs
+--
+
+	xfMMUAlarmStatus OBJECT-TYPE
+		SYNTAX MMUAlarmStatus
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows the alarm status of the modem.
+			"
+       		::= { xfModemEntry 1 }
+
+	xfMMUModIndexNotValid OBJECT-TYPE
+		SYNTAX MMUModIndexStatus
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+			"
+			This object shows if modulation index is valid. OBSOLETE.
+			"
+		::= { xfModemEntry 2 }
+
+	xfMMUAtpcCapability OBJECT-TYPE
+		SYNTAX MMUAtpcCapability
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows the atpc capability.
+			"
+		::= { xfModemEntry 3 }
+
+	xfMMUModCapability OBJECT-TYPE
+		SYNTAX MMUModCapability
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows the modulation capability.
+			"
+		::= { xfModemEntry 4 }
+
+	xfMMUCapacityCapability OBJECT-TYPE
+		SYNTAX MMUCapCapability
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows the capacity capability.
+			"
+		::= { xfModemEntry 5 }
+
+	xfMMUProtectionPath OBJECT-TYPE
+		SYNTAX INTEGER { other(1), mmuRa1(2), mmuRa2(3) }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object indicates what radio path the modem
+			belongs to.
+			"
+		::= { xfModemEntry 6 }
+
+	xfMMUSlotPosition OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The AMM slot position in which the MMU2 X is inserted in.
+			0 = Unknown, 1-20 = slot position.
+			"
+		::= { xfModemEntry 7 }
+
+	xfMMUChannelModeCapability   OBJECT-TYPE
+		SYNTAX BITS
+		{
+			ccdp(0),
+			accp(1),
+			acap(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Channel capability.
+			"
+		::= { xfModemEntry 8 }
+
+	xfMMUChannelCompanionSlot    OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			Slot number of companion channel MMU (XPIC/CCDP).
+			Default value: 0
+			Near end access: read-write
+			Far end access: read-only (Traffic Node only)
+			"
+		::= { xfModemEntry 9 }
+
+	xfMMUChannelCompanionIndex   OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			0 if CCDP not selected
+      entPhysicalIndex of companion channel MMU (XPIC/CCDP) according to
+      xfMMUChannelCompanionSlot setting.
+			"
+		::= { xfModemEntry 10 }
+
+    xfMMUInterfaceCapability   OBJECT-TYPE
+        SYNTAX BITS
+        {
+            pdhToTdmHier(0),
+            pdhToTdmFlat(1),
+            pdhToTdmFlatAndBitpipeToPtp(2),
+            pdhToTdmAndSDHToSFP(3),
+            pdhToTdmAndSDHToPtp(4),
+            pdhToTdmAndSDHToSFPHAndSDHToPtP(5)
+        }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Interface capability for MMU.
+			"
+		::= { xfModemEntry 11 }
+
+
+	xfMMURAUSupplyVoltage   OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+		 other(1),
+		 p55V(2),
+		 m48V(3),
+		 p24V(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The radio nominal supply voltage.
+
+			Values:
+			other(1)
+			p55V(2) default
+			m48V(3)
+			p24V(4)
+			"
+		::= { xfModemEntry 12 }
+
+
+------------------------------------------------------------------------------
+-- xfRAUIFTable
+------------------------------------------------------------------------------
+	xfRAUIFTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF XfRAUIFEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Table for rau interface objects. The tabled is indexed with
+			ifIndex.
+			"
+		::= { xfRadioLinkPtpModemObjects 2 }
+
+	xfRAUIFEntry OBJECT-TYPE
+		SYNTAX XfRAUIFEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the xfRAUIFTable"
+		INDEX { ifIndex}
+		::= { xfRAUIFTable 1 }
+
+	XfRAUIFEntry ::=
+		SEQUENCE
+		{
+		  xfRAUIFLoopEnable		        INTEGER,
+		  xfRAUIFRxLoop           	INTEGER,
+		  xfRAUIFAlarms                 BITS,
+		  xfRAUIFStatus                 BITS
+		}
+
+--
+-- The xfRAUIFTable MOs
+--
+
+
+
+	xfRAUIFLoopEnable OBJECT-TYPE
+		SYNTAX INTEGER { other(1), enable(2), disable(3) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This object manage the IF loop.
+			Default value: disable(3)
+			Near end access: read-write
+			Far end access: no access
+			"
+       		::= { xfRAUIFEntry 1 }
+
+	xfRAUIFRxLoop OBJECT-TYPE
+		SYNTAX INTEGER { other(1), enable(2), disable(3) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This object manage the Far end rx loop.
+			Default value: disable(3)
+			"
+       		::= { xfRAUIFEntry 2 }
+
+	xfRAUIFAlarms OBJECT-TYPE
+		SYNTAX BITS
+		{
+		  dmodClock0(0),
+		  dmodClock1(1),
+		  dmodClock2(2),
+
+		  los0(3),
+		  los1(4),
+		  los2(5),
+
+		  rxIfInput0(6),
+		  rxIfInput1(7),
+		  rxIfInput2(8),
+
+		  txIfInput0(9),
+		  txIfInput1(10),
+		  txIfInput2(11),
+
+		  radioFrame0(12),
+		  radioFrame1(13),
+		  radioFrame2(14),
+
+		  ber0(15),
+		  ber1(16),
+		  ber2(17),
+
+		  radioId0(18),
+		  radioId1(19),
+		  radioId2(20),
+
+		  modIndex0(21),
+		  modIndex1(22),
+		  modIndex2(23),
+
+		  aisReceived0(24),
+		  aisReceived1(25),
+		  aisReceived2(26),
+
+		  carrierRecoveryLoss0(27),
+		  carrierRecoveryLoss1(28),
+		  carrierRecoveryLoss2(29),
+
+		  wstLosL2R0(30),
+		  wstLosL2R1(31),
+		  wstLosL2R2(32),
+
+		  wstLosR2L0(33),
+		  wstLosR2L1(34),
+		  wstLosR2L2(35),
+
+		  lofR2L0(36),
+		  lofR2L1(37),
+		  lofR2L2(38),
+
+		  notused0(39),
+		  notused1(40),
+		  notused2(41),
+
+		  ifLosR2L0(42),
+		  ifLosR2L1(43),
+		  ifLosR2L2(44),
+
+		  earlyWarning0(45),
+		  earlyWarning1(46),
+		  earlyWarning2(47),
+
+		  lber0(48),
+		  lber1(49),
+		  lber2(50),
+
+		  hber0(51),
+		  hber1(52),
+		  hber2(53)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows rau if related alarms.
+			"
+       		::= { xfRAUIFEntry 3 }
+
+	xfRAUIFStatus OBJECT-TYPE
+		SYNTAX BITS
+		{
+		  rxLoop0(0),
+		  rxLoop1(1),
+		  rxLoop2(2),
+		  ifLoop0(3),
+		  ifLoop1(4),
+		  ifLoop2(5)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows test loop status.
+			"
+		::= { xfRAUIFEntry 4 }
+
+
+
+
+------------------------------------------------------------------------------
+-- xfLINERSTable
+------------------------------------------------------------------------------
+	xfLINERSTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF XfLINERSEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Traffic node extension of ifTable. The tabled is indexed with
+			ifIndex.
+			"
+		::= { xfRadioLinkPtpModemObjects 3 }
+
+	xfLINERSEntry OBJECT-TYPE
+		SYNTAX XfLINERSEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the xfLINERSTable"
+		INDEX { ifIndex}
+		::= { xfLINERSTable 1 }
+
+	XfLINERSEntry ::=
+		SEQUENCE
+		{
+		  xfLINERSAlarms    BITS
+		}
+
+
+--
+-- The xfLINERSTable MOs
+--
+
+  xfLINERSAlarms OBJECT-TYPE
+		SYNTAX BITS
+		{
+		  timLineSide0(0),
+		  timLineSide1(1),
+		  timLineSide2(2),
+
+		  lofL2R0(3),
+		  lofL2R1(4),
+		  lofL2R2(5),
+
+		  losL2R0(6),
+		  losL2R1(7),
+		  losL2R2(8),
+
+		  sfpLos0(9),
+		  sfpLos1(10),
+		  sfpLos2(11)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This object shows line rs related alarms.
+			"
+       		::= { xfLINERSEntry 1 }
+
+
+------------------------------------------------------------------------------
+-- xfModemCapabilityTable
+------------------------------------------------------------------------------
+	xfModemCapabilityTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF XfModemCapabilityEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Table for misc. modem capability information.
+			"
+		::= { xfRadioLinkPtpModemObjects 4 }
+
+	xfModemCapabilityEntry OBJECT-TYPE
+		SYNTAX XfModemCapabilityEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the xfModemCapabilityTable"
+		INDEX { entPhysicalIndex, xfTermRowIndex }
+		::= { xfModemCapabilityTable 1 }
+
+	XfModemCapabilityEntry ::=
+		SEQUENCE
+		{
+		          xfMMUChannelSpacing               MMUChannelSpacingCapability,
+                  xfMMUChannelModulation            ModemModulation,
+                  xfMMUMaxTribCapacity              Integer32,
+                  xfMMUDCNCapacity                  Integer32,
+                  xfMMUMaxCapacity                  Integer32,
+                  xfMMUFrameFormatType              MMUFrameFormatType,
+                  xfMMUFrameFormatRev               INTEGER,
+				  xfMMUBerAlarmThresholdCapability  BITS
+		}
+
+
+--
+-- The xfModemCapabilityTable MOs
+--
+
+  xfMMUChannelSpacing OBJECT-TYPE
+            SYNTAX MMUChannelSpacingCapability
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Channel spacing.
+                    ETSI: 3.5, 7, 14, 28, 40, 56 MHz
+                    ANSI: 10, 20, 30, 40, 50 MHz
+                "
+       		::= { xfModemCapabilityEntry 1 }
+
+  xfMMUChannelModulation OBJECT-TYPE
+            SYNTAX ModemModulation
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object shows the channel modulation.
+                Values:
+
+          cqpsk(2)    CQPSK
+          qam16(3)    16-QAM
+          qam128(4)   128-QAM
+          qam32(5)    32-QAM
+          qam64(6)    64-QAM
+          qam4(7)     4-QAM
+          qam8(8)     8-QAM
+          qam256(9)   256-QAM
+          qam512(10)  512-QAM
+          qam1024(11) 1024-QAM
+          "
+       		::= { xfModemCapabilityEntry 2 }
+
+
+       xfMMUMaxTribCapacity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Max tributaries."
+       		::= { xfModemCapabilityEntry 3 }
+
+
+       xfMMUDCNCapacity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "DCN Hop Capacity."
+       		::= { xfModemCapabilityEntry 4 }
+
+       xfMMUMaxCapacity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Max Capacity."
+       		::= { xfModemCapabilityEntry 5 }
+
+       xfMMUFrameFormatType OBJECT-TYPE
+            SYNTAX MMUFrameFormatType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Frame format type.
+
+            Values:
+              fftUnknown(0)
+              fftStatic(1)
+              fftAdMod(2)
+              fftXpic(3)
+              fftXpicAdmod(4)
+              fftLegacy(5)"
+       		::= { xfModemCapabilityEntry 6 }
+
+       xfMMUFrameFormatRev OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              ffOther(1),
+              ffVersion0(2),
+              ffVersion1(3),
+              ffVersion2(4),
+              ffVersion3(5),
+              ffVersion4(6),
+              ffVersion5(7),
+              ffVersion6(8),
+              ffVersion7(9),
+              ffVersion8(10),
+              ffVersion9(11),
+              ffVersion10(12),
+              ffVersion11(13),
+              ffVersion12(14),
+              ffVersion13(15),
+              ffVersion14(16),
+              ffVersion15(17)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Frame format revision."
+            ::= { xfModemCapabilityEntry 7 }
+
+        xfMMUBerAlarmThresholdCapability OBJECT-TYPE
+            SYNTAX BITS
+            {
+              berThrCap1e3(0),
+              berThrCap1e4(1),
+              berThrCap1e5(2),
+              berThrCap1e6(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "List of the allowed BER thresholds."
+            ::= { xfModemCapabilityEntry 8 }
+
+--
+-- Conformance
+--
+	xfRadioLinkPtpModemCompliances OBJECT IDENTIFIER ::= { xfRadioLinkPtpModemConformance 1 }
+
+	xfRadioLinkPtpModemGroups OBJECT IDENTIFIER ::= { xfRadioLinkPtpModemConformance 2 }
+
+   	xfRadioLinkPtpModemFullCompliance MODULE-COMPLIANCE
+       		STATUS      current
+       		DESCRIPTION
+           		"The compliance statement for SNMP entities which
+            		implement everything."
+       		MODULE -- This Module
+           	MANDATORY-GROUPS { xfRadioLinkPtpModemCompleteGroup }
+       		::= { xfRadioLinkPtpModemCompliances 1 }
+
+
+
+	xfRadioLinkPtpModemCompleteGroup OBJECT-GROUP
+       	OBJECTS
+       	{
+       	  xfMMUAlarmStatus,
+       	  xfMMUModIndexNotValid,
+       	  xfMMUAtpcCapability,
+		  xfMMUModCapability,
+		  xfMMUCapacityCapability,
+		  xfMMUProtectionPath,
+		  xfMMUSlotPosition,
+		  xfMMUChannelModeCapability,
+		  xfMMUChannelCompanionSlot,
+		  xfMMUChannelCompanionIndex,
+		  xfMMUInterfaceCapability,
+		  xfRAUIFLoopEnable,
+		  xfRAUIFRxLoop,
+		  xfRAUIFAlarms,
+		  xfRAUIFStatus,
+		  xfLINERSAlarms,
+		  xfMMUChannelSpacing,
+                  xfMMUChannelModulation,
+                  xfMMUMaxTribCapacity,
+                  xfMMUDCNCapacity,
+                  xfMMUMaxCapacity,
+                  xfMMUFrameFormatType,
+                  xfMMUFrameFormatRev,
+                  xfMMURAUSupplyVoltage
+		}
+		STATUS current
+       	DESCRIPTION
+           		"A collection of all current objects in this MIB
+           		module."
+		::= { xfRadioLinkPtpModemGroups 1 }
+
+	END

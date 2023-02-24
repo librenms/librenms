@@ -1,0 +1,855 @@
+-- =============================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide the probing feature.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by sunanzhi
+--     Initial version 2016-03-28
+-- =============================================================================
+HH3C-DOT11-PROBE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TimeTicks, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    hh3cDot11
+        FROM HH3C-OID-MIB;
+
+hh3cDot11PROBE MODULE-IDENTITY
+    LAST-UPDATED "201603280951Z"        -- March 28, 2016 at 09:51 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB provides information about the probing feature.
+        Probing is designed to detect wireless devices around a sensor.
+        "
+    REVISION "201603280951Z"        -- March 28, 2016 at 09:51 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= {  hh3cDot11 17 }
+
+--
+-- Textual conventions
+--
+Hh3cDot11PROBEEnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The enable status values for objects.
+        Values include enabled and disabled."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+Hh3cDot11PROBERadioType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents AP's 802.11 radio type of 802.11a/b/g/n as per
+        the standard.
+        The following values are supported:
+        dot11a  - 802.11a
+        dot11b  - 802.11b
+        dot11g  - 802.11g
+        dot11n  - 802.11n
+        dot11gn  - 802.11gn
+        dot11an  - 802.11an
+        dot11ac  - 802.11ac
+        dot11gac  - 802.11gac"
+    SYNTAX INTEGER
+        {
+        dot11a(1),
+        dot11b(2),
+        dot11g(4),
+        dot11n(8),
+        dot11gn(16),
+        dot11an(32),
+        dot11ac(64),
+        dot11gac(128)
+       }
+
+Hh3cDot11PROBEDevStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the status of devices detected by probing."
+    SYNTAX INTEGER
+        {
+        active(1),
+        inactive(2)
+       }
+
+Hh3cDot11PROBEChannel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the channel number."
+    SYNTAX Integer32 (1..224)
+
+Hh3cDot11PROBEEncryptMethod ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the frame encryption cipher types (bitmap) for
+        frames on IEEE 802.11 radio interfaces.
+        The MIB defines TC by referring to the 802.11i protocol.
+        The following bits are supported:
+        first bit:    none,
+        second bit:   wep,
+        third bit:    wep40,
+        fourth bit:   tkip
+        fifth bit:    reserve
+        sixth bit:    ccmp
+        seventh bit:  wep104
+        eighth bit:   wep128"
+    SYNTAX Integer32 (1..65535)
+
+Hh3cDot11PROBEAuthMethod ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the key management mode (bitmap), compliant with 802.11i.
+        The following bits are supported:
+        first bit:   none         - No key management mode is specified,
+        second bit:  dot1x        - 802.1X authentication.
+        third bit:   psk          - Pre-shared key authentication,
+        fourth bit:  other        - Other authentication."
+    SYNTAX Integer32 (1..65535)
+
+Hh3cDot11PROBESecurityType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the AP security type (bitmap).
+        The following bits are supported:
+        first bit:   none,
+        second bit:  wpa2,
+        third bit:   wpa,
+        fourth bit:  wlanex
+        fifth bit:   wep"
+    SYNTAX Integer32 (1..255)
+
+--
+-- Node definitions
+--
+hh3cDot11PROBEConfigGroup OBJECT IDENTIFIER ::= { hh3cDot11PROBE 1 }
+hh3cDot11PROBEDataGroup OBJECT IDENTIFIER ::= { hh3cDot11PROBE 2 }
+
+hh3cDot11PROBERadioCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBERadioCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the configuration of probing enable status."
+    ::= { hh3cDot11PROBEConfigGroup 1 }
+
+hh3cDot11PROBERadioCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBERadioCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains the enable status of probing."
+    INDEX { hh3cDot11PROBERadioCfgApName, hh3cDot11PROBERadioCfgRadioId }
+    ::= { hh3cDot11PROBERadioCfgTable 1 }
+
+Hh3cDot11PROBERadioCfgEntry ::= SEQUENCE {
+        hh3cDot11PROBERadioCfgApName            OCTET STRING,
+        hh3cDot11PROBERadioCfgRadioId           Integer32,
+        hh3cDot11PROBERadioCfgStatus            Hh3cDot11PROBEEnabledStatus
+    }
+
+hh3cDot11PROBERadioCfgApName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the AP name."
+    ::= { hh3cDot11PROBERadioCfgEntry 1 }
+
+hh3cDot11PROBERadioCfgRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the radio ID of the AP."
+    ::= { hh3cDot11PROBERadioCfgEntry 2 }
+
+hh3cDot11PROBERadioCfgStatus OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The enable status of probing configuration on the radio."
+    ::= { hh3cDot11PROBERadioCfgEntry 3 }
+
+hh3cDot11PROBEClientTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBEClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains information about clients detected by probing."
+    ::= { hh3cDot11PROBEDataGroup 1 }
+
+hh3cDot11PROBEClientEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about a client detected by probing."
+    INDEX { hh3cDot11PROBEClientMac }
+    ::= { hh3cDot11PROBEClientTable 1 }
+
+Hh3cDot11PROBEClientEntry ::= SEQUENCE {
+        hh3cDot11PROBEClientMac                MacAddress,
+        hh3cDot11PROBEClientBSSID              MacAddress,
+        hh3cDot11PROBEClientSSID               OCTET STRING,
+        hh3cDot11PROBEClientIsDiss             TruthValue,
+        hh3cDot11PROBEClientStatus             Hh3cDot11PROBEDevStatus,
+        hh3cDot11PROBEClientDuratTime          TimeTicks,
+        hh3cDot11PROBEClientVendor             OCTET STRING,
+        hh3cDot11PROBEClientRptApNum           Integer32,
+        hh3cDot11PROBEClientWorkChannel        Hh3cDot11PROBEChannel,
+        hh3cDot11PROBEClientRSSIMax            Integer32,
+        hh3cDot11PROBEClientRSSIMin            Integer32,
+        hh3cDot11PROBEClientRSSI               Integer32,
+        hh3cDot11PROBEClientFirstTime          OCTET STRING,
+        hh3cDot11PROBEClientLastTime           OCTET STRING
+    }
+
+hh3cDot11PROBEClientMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the client detected by probing."
+    ::= { hh3cDot11PROBEClientEntry 1 }
+
+hh3cDot11PROBEClientBSSID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the BSSID with which the detected client is associated."
+    ::= { hh3cDot11PROBEClientEntry 2 }
+
+hh3cDot11PROBEClientSSID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the SSID with which the detected client is associated."
+    ::= { hh3cDot11PROBEClientEntry 3 }
+
+hh3cDot11PROBEClientIsDiss OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the detected client is disassociated."
+    ::= { hh3cDot11PROBEClientEntry 4 }
+
+hh3cDot11PROBEClientStatus OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEDevStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 5 }
+
+hh3cDot11PROBEClientDuratTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duration of the detected client status."
+    ::= { hh3cDot11PROBEClientEntry 6 }
+
+hh3cDot11PROBEClientVendor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..127))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 7 }
+
+hh3cDot11PROBEClientRptApNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors that have detected the client."
+    ::= { hh3cDot11PROBEClientEntry 8 }
+
+hh3cDot11PROBEClientWorkChannel OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the channel on which the sensor detected
+        the client."
+    ::= { hh3cDot11PROBEClientEntry 9 }
+
+hh3cDot11PROBEClientRSSIMax OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the maximum RSSI of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 10 }
+
+hh3cDot11PROBEClientRSSIMin OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the minimum RSSI of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 11 }
+
+hh3cDot11PROBEClientRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the RSSI of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 12 }
+
+hh3cDot11PROBEClientFirstTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the First Report Time of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 13 }
+
+hh3cDot11PROBEClientLastTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the Last Report Time of the detected client."
+    ::= { hh3cDot11PROBEClientEntry 14 }
+
+hh3cDot11PROBEStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBEStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains statistic information about detected clients."
+    ::= { hh3cDot11PROBEDataGroup 2 }
+
+hh3cDot11PROBEStatEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains statistic information about a detected station."
+    INDEX { hh3cDot11PROBEStatTime }
+    ::= { hh3cDot11PROBEStatTable 1 }
+
+Hh3cDot11PROBEStatEntry ::= SEQUENCE {
+        hh3cDot11PROBEStatTime            OCTET STRING,
+        hh3cDot11PROBEStatRssiMaxNum      Integer32,
+        hh3cDot11PROBEStatRssiMiddleNum   Integer32,
+        hh3cDot11PROBEStatRssiMinNum      Integer32,
+        hh3cDot11PROBEStatTotalNum        Integer32,
+        hh3cDot11PROBEStatAssocNum        Integer32,
+        hh3cDot11PROBEStatDissocNum       Integer32
+    }
+
+hh3cDot11PROBEStatTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..256))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the statistics collection time of the detected client."
+    ::= { hh3cDot11PROBEStatEntry 1 }
+
+hh3cDot11PROBEStatRssiMaxNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the maximum RSSI of the detected client."
+    ::= { hh3cDot11PROBEStatEntry 2 }
+
+hh3cDot11PROBEStatRssiMiddleNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the medium RSSI of the detected client."
+    ::= { hh3cDot11PROBEStatEntry 3 }
+
+hh3cDot11PROBEStatRssiMinNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the minimum RSSI of the detected client."
+    ::= { hh3cDot11PROBEStatEntry 4 }
+
+hh3cDot11PROBEStatTotalNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the total number of detected clients."
+    ::= { hh3cDot11PROBEStatEntry 5 }
+
+hh3cDot11PROBEStatAssocNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of detected associated clients."
+    ::= { hh3cDot11PROBEStatEntry 6 }
+
+hh3cDot11PROBEStatDissocNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of detected disassociated clients."
+    ::= { hh3cDot11PROBEStatEntry 7 }
+
+hh3cDot11PROBEApTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBEApEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains information about AP detected by probing."
+    ::= { hh3cDot11PROBEDataGroup 3 }
+
+hh3cDot11PROBEApEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEApEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about a detected AP."
+    INDEX { hh3cDot11PROBEApMacAddress }
+    ::= { hh3cDot11PROBEApTable 1 }
+
+Hh3cDot11PROBEApEntry ::= SEQUENCE {
+        hh3cDot11PROBEApMacAddress                MacAddress,
+        hh3cDot11PROBEApSsid                      OCTET STRING,
+        hh3cDot11PROBEApStatus                    Hh3cDot11PROBEDevStatus,
+        hh3cDot11PROBEApStatusDuTime              TimeTicks,
+        hh3cDot11PROBEApVendor                    OCTET STRING,
+        hh3cDot11PROBEApRadioType                 Hh3cDot11PROBERadioType,
+        hh3cDot11PROBEApSecurityType              Hh3cDot11PROBESecurityType,
+        hh3cDot11PROBEApEncryMethod               Hh3cDot11PROBEEncryptMethod,
+        hh3cDot11PROBEApAuthMethod                Hh3cDot11PROBEAuthMethod,
+        hh3cDot11PROBEApIsBroadSSID               TruthValue,
+        hh3cDot11PROBEApQosSupport                TruthValue,
+        hh3cDot11PROBEApBeaconIntvl               Integer32,
+        hh3cDot11PROBEApUpDuration                TimeTicks,
+        hh3cDot11PROBEApSCWS                      TruthValue,
+        hh3cDot11PROBEApRptSensorNum              Integer32,
+        hh3cDot11PROBEApChannel                   Hh3cDot11PROBEChannel,
+        hh3cDot11PROBEApRSSIMax                   Integer32,
+        hh3cDot11PROBEApRSSIMin                   Integer32,
+        hh3cDot11PROBEApRSSI                      Integer32,
+        hh3cDot11PROBEApFirstRptTime              OCTET STRING,
+        hh3cDot11PROBEApLastRptTime               OCTET STRING
+    }
+
+hh3cDot11PROBEApMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 1 }
+
+hh3cDot11PROBEApSsid OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the SSID of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 2 }
+
+hh3cDot11PROBEApStatus OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEDevStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the device status of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 3}
+
+hh3cDot11PROBEApStatusDuTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the last report time of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 4 }
+
+hh3cDot11PROBEApVendor OBJECT-TYPE
+    SYNTAX OCTET STRING   (SIZE (0..127))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 5 }
+
+hh3cDot11PROBEApRadioType OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBERadioType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type used by the detected AP."
+    ::= { hh3cDot11PROBEApEntry 6}
+
+hh3cDot11PROBEApSecurityType OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBESecurityType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the security suites of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 7 }
+
+hh3cDot11PROBEApEncryMethod OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEEncryptMethod
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the encryption method used by the detected AP."
+    ::= { hh3cDot11PROBEApEntry 8 }
+
+hh3cDot11PROBEApAuthMethod OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEAuthMethod
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the authentication method used by the detected AP."
+    ::= { hh3cDot11PROBEApEntry 9 }
+
+hh3cDot11PROBEApIsBroadSSID OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the support of the detected AP for broadcasting the SSID."
+    ::= { hh3cDot11PROBEApEntry 10 }
+
+hh3cDot11PROBEApQosSupport OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the support of the detected AP for QoS."
+    ::= { hh3cDot11PROBEApEntry 11 }
+
+hh3cDot11PROBEApBeaconIntvl OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the beacon interval of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 12 }
+
+hh3cDot11PROBEApUpDuration OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the amount of time that has elapsed since AP
+        started to work, which is calculated by using beacon/probe
+        response frame."
+    ::= { hh3cDot11PROBEApEntry 13 }
+
+hh3cDot11PROBEApSCWS OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the support for channel bandwidth of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 14 }
+
+hh3cDot11PROBEApRptSensorNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors that have detected the AP."
+    ::= { hh3cDot11PROBEApEntry 15 }
+
+hh3cDot11PROBEApChannel OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio channel on which the detected AP operates."
+    ::= { hh3cDot11PROBEApEntry 16 }
+
+hh3cDot11PROBEApRSSIMax OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the maximum RSSI of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 17 }
+
+hh3cDot11PROBEApRSSIMin OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the minimum RSSI of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 18 }
+
+hh3cDot11PROBEApRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the RSSI of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 19 }
+
+hh3cDot11PROBEApFirstRptTime OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the first report time of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 20 }
+
+hh3cDot11PROBEApLastRptTime OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the last report time of the detected AP."
+    ::= { hh3cDot11PROBEApEntry 21 }
+
+hh3cDot11PROBEApAssoCltTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBEApAssoCltEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains information about associated clients."
+    ::= { hh3cDot11PROBEDataGroup 4 }
+
+hh3cDot11PROBEApAssoCltEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEApAssoCltEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about an associated client."
+    INDEX { hh3cDot11PROBEApAssoCltApMac, hh3cDot11PROBEApAssoCltCltMac }
+    ::= { hh3cDot11PROBEApAssoCltTable 1 }
+
+Hh3cDot11PROBEApAssoCltEntry ::= SEQUENCE {
+        hh3cDot11PROBEApAssoCltApMac               MacAddress,
+        hh3cDot11PROBEApAssoCltCltMac              MacAddress,
+        hh3cDot11PROBEApAssoCltIsAsso              TruthValue
+    }
+
+hh3cDot11PROBEApAssoCltApMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the AP."
+    ::= { hh3cDot11PROBEApAssoCltEntry 1 }
+
+hh3cDot11PROBEApAssoCltCltMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the client."
+    ::= { hh3cDot11PROBEApAssoCltEntry 2 }
+
+hh3cDot11PROBEApAssoCltIsAsso OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the detected client has been associated with the AP."
+    ::= { hh3cDot11PROBEApAssoCltEntry 3 }
+
+hh3cDot11PROBEApRepSenTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBEApRepSenEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains information about the sensor that detected the AP."
+    ::= { hh3cDot11PROBEDataGroup 5 }
+
+hh3cDot11PROBEApRepSenEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEApRepSenEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about the sensor that detected the AP."
+    INDEX { hh3cDot11PROBEApRepSenApMac, hh3cDot11PROBEApRepSenSenName }
+    ::= { hh3cDot11PROBEApRepSenTable 1 }
+
+Hh3cDot11PROBEApRepSenEntry ::= SEQUENCE {
+        hh3cDot11PROBEApRepSenApMac                MacAddress,
+        hh3cDot11PROBEApRepSenSenName              OCTET STRING,
+        hh3cDot11PROBEApRepSenRadioId              Integer32,
+        hh3cDot11PROBEApRepSenRssi                 Integer32,
+        hh3cDot11PROBEApRepSenChannel              Hh3cDot11PROBEChannel,
+        hh3cDot11PROBEApRepSenFirRepTim            OCTET STRING,
+        hh3cDot11PROBEApRepSenLasRepTim            OCTET STRING
+    }
+
+hh3cDot11PROBEApRepSenApMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the AP."
+    ::= { hh3cDot11PROBEApRepSenEntry 1 }
+
+hh3cDot11PROBEApRepSenSenName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of the sensor."
+    ::= { hh3cDot11PROBEApRepSenEntry 2 }
+
+hh3cDot11PROBEApRepSenRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio ID of the sensor."
+    ::= { hh3cDot11PROBEApRepSenEntry 3 }
+
+hh3cDot11PROBEApRepSenRssi OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the RSSI of the sensor."
+    ::= { hh3cDot11PROBEApRepSenEntry 4 }
+
+hh3cDot11PROBEApRepSenChannel OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the channel on which the sensor detected
+        the AP."
+    ::= { hh3cDot11PROBEApRepSenEntry 5 }
+
+hh3cDot11PROBEApRepSenFirRepTim OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duration of the detected AP."
+    ::= { hh3cDot11PROBEApRepSenEntry 6 }
+
+hh3cDot11PROBEApRepSenLasRepTim OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duration of the detected AP."
+    ::= { hh3cDot11PROBEApRepSenEntry 7 }
+
+hh3cDot11PROBECliRepSenTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11PROBECliRepSenEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains information about the sensor that detected the client."
+    ::= { hh3cDot11PROBEDataGroup 6 }
+
+hh3cDot11PROBECliRepSenEntry OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBECliRepSenEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about the sensor that detected the client."
+    INDEX { hh3cDot11PROBECliRepSenCliMac, hh3cDot11PROBECliRepSenSenName }
+    ::= { hh3cDot11PROBECliRepSenTable 1 }
+
+Hh3cDot11PROBECliRepSenEntry ::= SEQUENCE {
+        hh3cDot11PROBECliRepSenCliMac               MacAddress,
+        hh3cDot11PROBECliRepSenSenName              OCTET STRING,
+        hh3cDot11PROBECliRepSenRadioId              Integer32,
+        hh3cDot11PROBECliRepSenRssi                 Integer32,
+        hh3cDot11PROBECliRepSenChannel              Hh3cDot11PROBEChannel,
+        hh3cDot11PROBECliRepSenFRepTime             OCTET STRING,
+        hh3cDot11PROBECliRepSenLRepTime             OCTET STRING,
+        hh3cDot11PROBECliRepSenAssAPMac             MacAddress
+    }
+
+hh3cDot11PROBECliRepSenCliMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the client."
+    ::= { hh3cDot11PROBECliRepSenEntry 1 }
+
+hh3cDot11PROBECliRepSenSenName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of the sensor."
+    ::= { hh3cDot11PROBECliRepSenEntry 2 }
+
+hh3cDot11PROBECliRepSenRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio ID of the sensor."
+    ::= { hh3cDot11PROBECliRepSenEntry 3 }
+
+hh3cDot11PROBECliRepSenRssi OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the RSSI of the sensor."
+    ::= { hh3cDot11PROBECliRepSenEntry 4 }
+
+hh3cDot11PROBECliRepSenChannel OBJECT-TYPE
+    SYNTAX Hh3cDot11PROBEChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the channel on which the sensor detected
+        the client."
+    ::= { hh3cDot11PROBECliRepSenEntry 5 }
+
+hh3cDot11PROBECliRepSenFRepTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duration of the detected client."
+    ::= { hh3cDot11PROBECliRepSenEntry 6 }
+
+hh3cDot11PROBECliRepSenLRepTime OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the duration of the detected client."
+    ::= { hh3cDot11PROBECliRepSenEntry 7 }
+
+hh3cDot11PROBECliRepSenAssAPMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the associated AP."
+    ::= { hh3cDot11PROBECliRepSenEntry 8 }
+
+END

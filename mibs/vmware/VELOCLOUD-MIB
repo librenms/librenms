@@ -1,0 +1,42 @@
+-------------------------------
+-- VeloCloud MIB Definitions --
+--                           --
+-- Contains:                 --
+--      .velocloud(45346)    --
+--          .orchestrator(1) --
+--          .edge(2)         --
+--          .gateway(3)      --
+-------------------------------
+
+VELOCLOUD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises    FROM SNMPv2-SMI
+;
+
+velocloud MODULE-IDENTITY
+    LAST-UPDATED        "201908020000Z"
+    ORGANIZATION        "VMware Corporation"
+    CONTACT-INFO        "postal:    VMware Corporation 
+                                    World Headquarters
+                                    3401 Hillview Avenue
+                                    Palo Alto, CA 943043
+                                    USA
+                        
+                         web:       www.velocloud.com
+                         email:     contact@velocloud.com"
+    DESCRIPTION         "Top-level infrastructure of the VeloCloud enterprise MIB tree"
+    
+    REVISION            "201908020000Z"
+    DESCRIPTION         "Implementation of VeloCloud Edge MIB Objects"
+    
+    REVISION            "201701180000Z"
+    DESCRIPTION         "Implementation of VCO MIB Objects"
+
+    REVISION            "201701130000Z"
+    DESCRIPTION         "Inital definition of VeloCloud MIB Objects"
+::= { enterprises 45346 }
+
+modules                 OBJECT IDENTIFIER ::= { velocloud 1 }
+
+END

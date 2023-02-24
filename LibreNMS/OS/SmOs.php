@@ -20,8 +20,8 @@ class SmOs extends OS implements
 
     public function discoverWirelessRate()
     {
-        $oids = snmpwalk_group($this->getDevice(), 'linkTxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2);
-        $oids = snmpwalk_group($this->getDevice(), 'linkRxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2, $oids);
+        $oids = snmpwalk_group($this->getDeviceArray(), 'linkTxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2);
+        $oids = snmpwalk_group($this->getDeviceArray(), 'linkRxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2, $oids);
         $sensors = [];
 
         foreach ($oids as $link => $radioEntry) {
@@ -60,7 +60,7 @@ class SmOs extends OS implements
                 }
             }
 
-            if (!empty($totalOids['rx'])) {
+            if (! empty($totalOids['rx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
@@ -73,7 +73,7 @@ class SmOs extends OS implements
                 );
             }
 
-            if (!empty($totalOids['tx'])) {
+            if (! empty($totalOids['tx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
@@ -92,7 +92,7 @@ class SmOs extends OS implements
 
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioPrx', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioPrx', [], 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
 
         foreach ($oids as $index => $entry) {
@@ -106,12 +106,13 @@ class SmOs extends OS implements
                 $entry['radioPrx']
             );
         }
+
         return $sensors;
     }
 
     public function discoverWirelessFrequency()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioTxFrequency', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioTxFrequency', [], 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
 
         foreach ($oids as $index => $entry) {
@@ -127,12 +128,13 @@ class SmOs extends OS implements
                 1000
             );
         }
+
         return $sensors;
     }
 
     public function discoverWirelessMse()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioNormalizedMse', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioNormalizedMse', [], 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
 
         foreach ($oids as $index => $entry) {
@@ -146,13 +148,14 @@ class SmOs extends OS implements
                 $entry['radioNormalizedMse']
             );
         }
+
         return $sensors;
     }
 
     public function getRadioLabel($index)
     {
         if (is_null($this->radioLabels)) {
-            $this->radioLabels = snmpwalk_group($this->getDevice(), 'radioLabel', 'SIAE-RADIO-SYSTEM-MIB');
+            $this->radioLabels = snmpwalk_group($this->getDeviceArray(), 'radioLabel', 'SIAE-RADIO-SYSTEM-MIB');
         }
 
         return $this->radioLabels[$index]['radioLabel'] ?? $index;
@@ -161,7 +164,7 @@ class SmOs extends OS implements
     public function getLinkLabel($index)
     {
         if (is_null($this->linkLabels)) {
-            $this->linkLabels = snmpwalk_group($this->getDevice(), 'linkLabel', 'SIAE-RADIO-SYSTEM-MIB');
+            $this->linkLabels = snmpwalk_group($this->getDeviceArray(), 'linkLabel', 'SIAE-RADIO-SYSTEM-MIB');
         }
 
         return $this->linkLabels[$index]['linkLabel'] ?? $index;

@@ -1,0 +1,3018 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2017 bintec elmeg GmbH, All Rights Reserved
+-- $Revision: 1.56.1.2 $ 
+
+BIANCA-BRICK-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	    Integer32, Unsigned32, Counter32, Gauge32, Counter64,
+	    IpAddress, TimeTicks, mib-2, enterprises
+	        FROM SNMPv2-SMI
+	
+	    DisplayString, TimeStamp, TruthValue
+	        FROM SNMPv2-TC
+
+            bintec, bibo, sys, Date, HexValue
+                FROM BINTEC-MIB
+
+	    TRAP-TYPE
+		FROM RFC-1215
+
+
+	    sysDescr, sysName
+		FROM SNMPv2-MIB
+
+	    ;
+
+	biboMIB MODULE-IDENTITY
+	    LAST-UPDATED "201703240000Z"
+	    ORGANIZATION
+	        "bintec elmeg GmbH"
+	    CONTACT-INFO
+		"EMail:   info@bintec-elmeg.com
+		 Web:     www.bintec-elmeg.com
+		"
+	    DESCRIPTION
+	        "MIB module for vendor specific box definitions.
+		 Note: bibo stands for BinTec box stemming from the times where
+		       the company was still called BinTec."
+	    REVISION     "201004280000Z"
+	    DESCRIPTION
+	        "First version conforming to SMIv2."
+	    ::= { bintec 250 }
+
+	--  This MIB module uses the extended OBJECT-TYPE macro as
+	--  defined in [14];
+
+
+	--  MIB-II (same prefix as MIB-I)
+	admin		OBJECT IDENTIFIER
+	    ::= { bibo 1 }
+
+    -- Some variables for administration of the BIANCA/BRICK
+
+--	biboAdmTrapCommunity OBJECT-TYPE
+--	    SYNTAX  DisplayString (SIZE (0..255))
+--	    MAX-ACCESS  read-write
+--	    STATUS  mandatory
+--	    - BINTEC   NOTRAP
+--	    DESCRIPTION
+--		"Community name for sending traps."
+--	    DEFVAL { "snmp-Trap" }
+--	::= { admin 4 }
+--
+--	biboAdmSnmpVersion OBJECT-TYPE
+--	    SYNTAX  INTEGER { version1(1),
+--                             version1-compat(2),
+--                              version1p1(3),
+--                             version1p1-compat(4),
+--                              version1p1-auto(5)
+--                            }
+--	    MAX-ACCESS  read-write
+--	    STATUS  mandatory
+--
+--	    DESCRIPTION
+--		"SNMP Version.
+--		    version1        : SNMP version V1
+--		    version1_compat : SNMP version V1 compatibility mode
+--				      without the appending private OID 
+--				      part (.i). This is for some SNMP managers
+--				      that cannot handle this extension.
+--				      In this mode rows with identical
+--				      index variable content cannot be read
+--				      correctly.
+--		    p1 (patch1)     : getnext returns the lexicographical next
+--                                     OID (ever!)
+--		    version1p1_auto : use version1p1_compat if possible
+--		                      use version1p1 if nessesary
+--
+--		 Usually the OIDs have the format:
+--		    .1.3.6.x.x   .y.y .i
+--			    			
+--		.1.3.6.x.x: is the constant part of the OID of the 
+--			    variable specified in MIB-source
+--		.y.y      : is the specific part of the OID to identify 
+--			    exactly a row.
+--			    It is the content of all index variables.
+--		.i        : is a consecutively incremented index number, 
+--			    to distinguish rows with identical index variables
+--	       "
+--	    DEFVAL { version1p1-auto }
+--	::= { admin 5 }
+--
+--	biboAdmSnmpPort OBJECT-TYPE
+--	    SYNTAX  INTEGER
+--	    MAX-ACCESS  read-write
+--	    STATUS  current
+--
+--	    DESCRIPTION
+--		"SNMP listen port."
+--	    DEFVAL { 161 }
+--	::= { admin 6 }
+--
+--	biboAdmSnmpTrapPort OBJECT-TYPE
+--	    SYNTAX  INTEGER
+--	    MAX-ACCESS  read-write
+--	    STATUS  current
+--	    - BINTEC   NOTRAP
+--	    DESCRIPTION
+--		"SNMP trap port."
+--	    DEFVAL { 162 }
+--	::= { admin 7 }
+ 
+	biboAdmIpAddr OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Local IP address. If this object is set, it's value will be
+                used as the source address for all IP packets that are sent.
+                Otherwise, the IP address used will be retrieved from the
+                ipRouteTable, for the interface the IP packet is to be 
+                transmitted over."
+	::= { admin 8 }
+ 
+--	biboAdmTrapBrdCast OBJECT-TYPE
+--	    SYNTAX  INTEGER { on(1), off(2) }
+--	    MAX-ACCESS  read-write
+--	    STATUS  current
+--	    - BINTEC   NOTRAP
+--	    DESCRIPTION
+--		"Enable/disable trap broadcasting."
+--	    DEFVAL { off }
+--	::= { admin 9 }
+ 
+ 	biboAdmTrapHostTable OBJECT-TYPE
+ 	    SYNTAX  SEQUENCE OF BiboAdmTrapHostEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"The biboAdmTrapHostTable defines where traps are sent
+                (i.e., which hosts). If the table is empty traps are 
+                broadcasted.
+                
+                Creating entries: Entries are added by assigning an IP
+                address value to the biboAdmTrapHostAddr field.
+                
+                Deleting entries: Entries can be removed by assigning
+                ing the respective biboAdmTrapHostStatus field to 
+                'delete'."
+ 	::= { admin 10 }
+
+        biboAdmTrapHostEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmTrapHostEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 	    DESCRIPTION
+ 		  ""
+ 	    INDEX   { biboAdmTrapHostAddr }
+ 	::= { biboAdmTrapHostTable 1 }
+
+ 	BiboAdmTrapHostEntry ::= SEQUENCE {
+ 	    biboAdmTrapHostAddr   IpAddress,
+	    biboAdmTrapHostStatus INTEGER
+ 	}
+ 
+ 	biboAdmTrapHostAddr OBJECT-TYPE
+ 	    SYNTAX  IpAddress
+ 	    MAX-ACCESS  read-write
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"Ip-Address where traps are sent."
+ 	::= { biboAdmTrapHostEntry 1 }
+ 
+ 	biboAdmTrapHostStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		valid(1), 
+		delete(2)
+	    }
+ 	    MAX-ACCESS  read-write
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"Status is always valid, and set to delete only to discard
+		 the whole entry."
+	    DEFVAL { valid }
+ 	::= { biboAdmTrapHostEntry 2 }
+ 
+        biboAdmSyslogMaxEntries OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS  read-write
+            STATUS  current
+ 
+            DESCRIPTION
+                "Maximum Number of syslog messages stored in memory."
+	    DEFVAL { 20 }
+        ::= { admin 11 }
+
+	biboAdmSyslogTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmSyslogEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The biboAdmSyslogTable keeps track of syslog messages
+                received. The size of the table (number of entries), is 
+                limited by the value of biboAdmSyslogMaxEntries. The 
+                columns specify attributes for each message generated. As
+                this information only reports events on the system, all
+                fields are read-only.
+
+                Creating entries: Entries can only be created by the
+                system and are made each time a syslog message is 
+                generated.
+
+                Deleting entries: Entries are removed by the system
+                once the size limit (biboAdmSyslogMaxEntries) is reached."
+	::= { admin 12 }
+
+ 	biboAdmLogHostTable OBJECT-TYPE
+ 	    SYNTAX  SEQUENCE OF BiboAdmLogHostEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"The biboAdmLogHostTable lists hosts which are to 
+                receive syslog messages. This table also defines which
+                types and levels of messages to send.
+
+                Creating entries: Entries are created by setting a IP address
+                to biboAdmLogHostAddr.
+
+                Deleting entries: Entries are removed by setting the
+                appropriate biboAdmLogHostLevel field to 'delete'."
+ 	::= { admin 13 }
+ 
+        biboAdmLogHostEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmLogHostEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 	    DESCRIPTION
+ 		  ""
+ 	    INDEX   { biboAdmLogHostAddr }
+ 	::= { biboAdmLogHostTable 1 }
+
+ 	BiboAdmLogHostEntry ::= SEQUENCE {
+ 	    biboAdmLogHostAddr 					IpAddress,
+	    biboAdmLogHostLevel					INTEGER,
+	    biboAdmLogHostFacility				INTEGER,
+	    biboAdmLogHostType					INTEGER,
+	    biboAdmLogHostTimestamp				INTEGER,
+	    biboAdmLogHostMethod				INTEGER
+ 	}
+ 
+ 	biboAdmLogHostAddr OBJECT-TYPE
+ 	    SYNTAX  IpAddress
+ 	    MAX-ACCESS  read-write
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"Ip-Address where syslog messages are sent. If the
+		 facility is set to memory or console, this field is
+		 not used."
+ 	::= { biboAdmLogHostEntry 1 }
+
+	biboAdmLogHostLevel OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		emerg(1), 
+		alert(2), 
+		crit(3), 
+		err(4), 
+		warning(5), 
+		notice(6), 
+		info(7), 
+		debug(8), 
+		delete(9)
+	    } 
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"Priorities lower or equal this level are sent to loghost.
+                 The delete priority is used to discard the whole entry."
+	    DEFVAL { info }
+	::= { biboAdmLogHostEntry 2 }
+
+	biboAdmLogHostFacility OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		local0(1), 
+		local1(2), 
+		local2(3), 
+		local3(4), 
+		local4(5), 
+		local5(6), 
+		local6(7), 
+		local7(8)
+	    } 
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The facility used for the syslog messages being generated."
+	    DEFVAL { local0 }
+	::= { biboAdmLogHostEntry 4 }
+
+	biboAdmLogHostType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	        system(1),
+                acct(2),
+                all(3)
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	
+	    DESCRIPTION
+                "The subject of the messages that are to be generated. system
+                 means all subjects except accounting, all means all subjects."
+	    DEFVAL { all }
+         ::= { biboAdmLogHostEntry 5 }
+
+	biboAdmLogHostTimestamp OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       	none(1),
+		time(2),
+		all(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	
+	    DESCRIPTION
+                "This object describes the format of the timestamp.
+		   none(1)  = no timestamp,
+		   time(2)  = only time is printed,
+		   all(3)   = date and time is printed."
+	    DEFVAL { none }
+         ::= { biboAdmLogHostEntry 6 }
+
+	biboAdmLogHostMethod OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	       	udp(1),
+		tcp(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	
+	    DESCRIPTION
+                "This object provides protocol for sending syslog messages:
+		   udp(1)  = udp
+		   tcp(2)  = tcp
+                "
+	    DEFVAL { udp }
+         ::= { biboAdmLogHostEntry 7 }
+
+--  Configuration 
+
+ 	biboAdmConfigTable OBJECT-TYPE
+ 	    SYNTAX  SEQUENCE OF BiboAdmConfigEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"The biboAdmConfigTable is used for assigning 
+                parameters for managing configuration files.
+
+                Creating entries: Entries are added to this table by 
+                assigning a value to the biboAdmConfigCmd object. (i.e., The
+                intermediate result of executing, cmd=save, creates an
+                entry to this table.).
+
+                Deleting entries: Entries can only be removed by the
+                system and is done only after the requested action has
+                been performed (i.e. Once the cmd=save action is 
+                complete.)."
+ 	::= { admin 14 }
+
+        biboAdmConfigEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmConfigEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 	    DESCRIPTION
+ 		  ""
+ 	    INDEX   { biboAdmConfigCmd }
+ 	::= { biboAdmConfigTable 1 }
+
+ 	BiboAdmConfigEntry ::= SEQUENCE {
+ 	    biboAdmConfigCmd 				INTEGER,
+	    biboAdmConfigObject				OBJECT IDENTIFIER,
+	    biboAdmConfigPath				DisplayString,
+	    biboAdmConfigPathNew			DisplayString,
+	    biboAdmConfigHost				IpAddress,
+	    biboAdmConfigState				INTEGER,
+	    biboAdmConfigFile				DisplayString,
+	    biboAdmConfigTimeout			INTEGER,
+	    biboAdmConfigHostUrl			DisplayString,
+	    biboAdmConfigCertIndex			INTEGER
+ 	}
+
+ 	biboAdmConfigDirTable OBJECT-TYPE
+ 	    SYNTAX  SEQUENCE OF BiboAdmConfigDirEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 
+ 	    DESCRIPTION
+ 		"Configuration directory table. This table contains
+		all available configuration files in flash memory."
+ 	::= { admin 15 }
+
+        biboAdmConfigDirEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmConfigDirEntry
+ 	    MAX-ACCESS  not-accessible
+ 	    STATUS  current
+ 	    DESCRIPTION
+ 		  ""
+ 	    INDEX   { biboAdmConfigDirName }
+ 	::= { biboAdmConfigDirTable 1 }
+
+ 	BiboAdmConfigDirEntry ::= SEQUENCE {
+	    biboAdmConfigDirName			DisplayString,
+ 	    biboAdmConfigDirCount 			INTEGER,
+	    biboAdmConfigDirContent			DisplayString,
+	    biboAdmConfigDirSaveDate			DisplayString
+ 	}
+
+        biboAdmConfigCmd OBJECT-TYPE
+            SYNTAX  INTEGER  {
+	    	save(1),
+	    	load(2),
+		put(3),
+		get(4),
+		state(5),
+		delete(6),
+		move(7),
+		copy(8),
+		reboot(9),
+		reorg(10),
+		unload(11),
+		put-all(12),
+		get-all(13),
+		load-keep-certs(14),
+                load-from-default(15)
+		}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Command for configuration handling. Possible values are :
+	
+		save(1)		= save configuration (to FLASH)
+		load(2)		= load configuration (from FLASH)
+		put(3)		= write configuration (via TFTP)
+		get(4)		= read configuration (via TFTP)
+		state(5)	= write complete configuration (via TFTP)
+                delete(6)	= delete configuration (within FLASH)
+		move(7)		= move configuration (within FLASH)
+		copy(8)		= copy configuration (within FLASH)
+		reboot(9)	= reboot the system
+		reorg(10)	= reorganizes the flash
+		unload(11)	= remove loaded configuration (from RAM)
+		put_all(12)	= write configuration (via TFTP), 
+				  include not accessible variables
+		get_all(13)	= read configuration (via TFTP), 
+				  including not accessible variables
+		load_keep_certs(14) = load configuration (from FLASH),
+				  do not overwrite already loaded certificates
+                load-from-default(15) = load default configuration (from GENFILES)"
+
+	    DEFVAL { save }
+        ::= { biboAdmConfigEntry 1 }
+
+        biboAdmConfigObject OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Table object id (OID) to save/load. If this field is
+		set, only this table is saved/loaded. Otherwise all tables
+		are saved/loaded."
+        ::= { biboAdmConfigEntry 2 }
+
+        biboAdmConfigPath OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "NAme of the configuration file in flash memory to save/load."
+        ::= { biboAdmConfigEntry 3 }
+
+        biboAdmConfigPathNew OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "New name of configuration file in flash memory to move/copy"
+        ::= { biboAdmConfigEntry 4 }
+
+        biboAdmConfigHost OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "TFTP host's IP address to send/receive the file to/from.
+		The configuration is transfered directly from flash
+		memory (biboAdmConfigPath) to TFTP-file (biboAdmConfigFile)."
+        ::= { biboAdmConfigEntry 5 }
+
+        biboAdmConfigState OBJECT-TYPE
+            SYNTAX  INTEGER  { todo(1), running(2), done(3), error(4),
+				delayed(5), stopped(6)
+	     }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The state of this command (i.e., biboAdmConfigCmd).
+
+		todo(1)	    : the command will start soon
+	        running(2)  : the command is currently executing
+	        done(3)	    : the command has successfully completed
+	        error(4)    : the command has failed (see biboAdmSyslogTable)
+		delayed(5)  : the command is delayed due to given Timeout
+		stopped(6)  : the command has stopped (Timeout set to -1)
+		"
+	    DEFVAL { todo }
+        ::= { biboAdmConfigEntry 6 }
+
+        biboAdmConfigFile OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "TFTP filename to read/write from/to the specified host.
+		The configuration file received is stored in flash memory
+		specified by biboAdmConfigPath. 
+		The actual configuration is not changed."
+        ::= { biboAdmConfigEntry 7 }
+
+        biboAdmConfigTimeout OBJECT-TYPE
+            SYNTAX  INTEGER 
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Set this value (default 0) to delay a new command for this
+		 amount of seconds.
+		 The value is counting down to show the remaining time
+		 (State=delayed).
+		 To stop a scheduled but delayed command set this value
+		 to -1.
+		 timeout = 0	cmd executed immediately (default)
+                 timeout > 0	cmd executed in timeout seconds (counting down)
+                 timeout < 0	cmd execution stopped  (deleted)
+		 "
+	    DEFVAL { 0 }
+        ::= { biboAdmConfigEntry 8 }
+
+        biboAdmConfigHostUrl OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "This is a host URL specifying the location to
+		 retrieve or store the configuration file.
+		 The last filename part must be missing and is given
+		 in biboAdmConfigFile.
+		 If this object is given biboAdmConfigHost is ignored.
+		 format:
+		 http://server/path/
+		 tftp://server/path/
+		 xmodem:[1k][@9600]
+		"
+        ::= { biboAdmConfigEntry 9 }
+
+        biboAdmConfigCertIndex OBJECT-TYPE
+            SYNTAX  INTEGER 
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+		"The index of the certificate to use (from the certTable).
+		 Only used for biboAdmConfigCmd = get / get-all and for
+		 use with biboAdmConfigHostUrl, of course.
+		 If set to 0, no client certificate is used.
+
+		 Default value is 0."
+	    DEFVAL { 0 }
+        ::= { biboAdmConfigEntry 10 }
+--- 
+---
+---
+
+        biboAdmConfigDirName OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Name of the configuration file in flash memory."
+        ::= { biboAdmConfigDirEntry 1 }
+
+        biboAdmConfigDirCount OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Number of tables saved in the file."
+        ::= { biboAdmConfigDirEntry 2 }
+
+        biboAdmConfigDirContent OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Description of directory's contents (e.g., <all> or a 
+                series of table numbers)."
+        ::= { biboAdmConfigDirEntry 3 }
+
+	biboAdmConfigDirSaveDate OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Date when configuration was saved. It reflects value of
+		 variable biboExtAdmConfigSaveDate which gets set when the
+		 configuration is saved to flash.
+		 This also means: if a configuration doesn't contain this
+		 variable no date is available."
+	::= { biboAdmConfigDirEntry 4 }
+
+
+-- Board Table
+
+	biboAdmBoardTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmBoardEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The biboAdmBoardTable lists information about the 
+                installed communications modules. This table is updated
+                after every system boot up.
+
+                Creating entries: Entries are created by the system
+                upon detecting the installed hardware.
+
+                Deleting entries: Entries are removed by the system
+                as a result of removed hardware."
+	::= { admin 17 }
+
+	biboAdmBoardEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmBoardEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboABrdSlot, biboABrdUnit }
+	::= { biboAdmBoardTable 1 }
+
+	BiboAdmBoardEntry ::=
+	    SEQUENCE {
+		biboABrdSlot				INTEGER,
+		biboABrdType				DisplayString,
+		biboABrdHWRelease			DisplayString,
+		biboABrdFWRelease			DisplayString,
+		
+		biboABrdPartNo				DisplayString,
+		biboABrdConnector                       INTEGER,
+		biboABrdUnit				INTEGER,
+		biboABrdSerialNo			DisplayString,
+		
+		biboABrdCategory			INTEGER
+	    }
+
+	biboABrdSlot OBJECT-TYPE
+	    SYNTAX  INTEGER (0..31) 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The slot, or location of this module."
+	::= { biboAdmBoardEntry 1 }
+
+	biboABrdType OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The name of this module."
+	::= { biboAdmBoardEntry 2 }
+
+	biboABrdHWRelease OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The hardware release of this module."
+	::= { biboAdmBoardEntry 3 }
+
+	biboABrdFWRelease OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The firmware release of this module."
+	::= { biboAdmBoardEntry 4 }
+
+	biboABrdPartNo OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The part number of this module."
+	::= { biboAdmBoardEntry 5 }
+
+	biboABrdConnector OBJECT-TYPE
+	    SYNTAX  INTEGER { auto(1), rj45(2), bnc(3), subd15(4),
+			      rj45-10mbit-hdup(5), rj45-10mbit-fdup(6), 
+			      rj45-100mbit-hdup(7), rj45-100mbit-fdup(8) }
+	    MAX-ACCESS  read-write
+	    STATUS  obsolete
+
+	    DESCRIPTION
+		"The type of connector used for this module. For 
+                modules with more than one connector this value can be
+                changed/switched by setting this object. For example,
+                the CM-BNCTP module supports both twisted pair
+                (RJ45) and 10Base2 (BNC) connectors. If this object is set
+                to 'AUTO' then the BRICK will automatically detect
+                which connector type is being used."
+	::= { biboAdmBoardEntry 6 }
+
+	biboABrdUnit OBJECT-TYPE
+	    SYNTAX  INTEGER (0..99) 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The logical unit number of this interface."
+	    DEFVAL { 0 }
+	::= { biboAdmBoardEntry 7 }
+
+	biboABrdSerialNo OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The serial number of this module."
+	::= { biboAdmBoardEntry 8 }
+
+	biboABrdCategory OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		system-board(1),
+		ethernet(2),
+		isdn-bri(3),
+		isdn-pmx(4),
+		pots(5),
+		dsl(6),
+		wlan(7),
+		tty(8),
+		dsp(9),
+		usb(10),
+		crypt(11),
+		mobile(12)
+	    } 
+	    MAX-ACCESS  read-only
+	    STATUS      current
+
+	    DESCRIPTION
+		"Board category. It can be one of the following:
+			system-board(1),
+			ethernet(2),
+			isdn-bri(3),
+			isdn-pmx(4),
+			pots(5),
+			dsl(6),
+			wlan(7),
+			tty(8),
+			dsp(9),
+			usb(10),
+			crypt(11),
+			mobile(12)
+
+		It advices users of which MIB table to look at when searching
+		for additional configuration informations."
+	::= { biboAdmBoardEntry 9 }
+
+-- user defined traps
+
+	biboAdmUsrTrapTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmUsrTrapEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The biboAdmUsrTrapTable lists user-defined objects that
+                are used to create traps. These traps are sent locally, but
+                can also be sent to remote hosts using the 
+                biboAdmTrapHostTable.
+
+                Creating entries: Entries are created by assigning the
+                biboATrpObj object a valid object identifier.
+
+                Deleting entries: Entries are removed by setting the
+                entry's biboATrpStatus object to 'delete'."
+	::= { admin 18 }
+
+	biboAdmUsrTrapEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmUsrTrapEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboATrpObj }
+	::= { biboAdmUsrTrapTable 1 }
+
+	BiboAdmUsrTrapEntry ::=
+	    SEQUENCE {
+		biboATrpObj		OBJECT IDENTIFIER,
+		biboATrpStatus 		INTEGER
+	    }
+
+	biboATrpObj OBJECT-TYPE
+	    SYNTAX  OBJECT IDENTIFIER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The object identifier of an object to use. Each time this
+                object's value changes, a trap is created and sent. Either a
+                single leaf (single variable) or a table (of objects) can be
+                specified."
+	::= { biboAdmUsrTrapEntry 1 }
+
+	biboATrpStatus OBJECT-TYPE
+	    SYNTAX  INTEGER { valid(1), delete(2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+		"The status of this entry. Upon creation of a new entry,
+                this object's value is set to 'valid'."
+	    DEFVAL { valid }
+	::= { biboAdmUsrTrapEntry 2 }
+
+	biboAdmDomainName OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Domain name."
+            DEFVAL { "" }
+	::= { admin 19 }
+
+	biboAdmNameServer OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"IP address of name server."
+	::= { admin 20 }
+
+	biboAdmNameServ2 OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"IP address of second name server."
+	::= { admin 21 }
+
+	biboAdmBridgeEnable OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled (2) }
+	    MAX-ACCESS  read-write
+	    STATUS  obsolete
+	    DESCRIPTION
+		"Sets bridging to enable / disable status."
+	    DEFVAL { enabled }
+	::= { admin 22 }
+
+	biboAdmCapiTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TCP port for remote CAPI demon."
+	    DEFVAL { 2662 }
+	::= { admin 23 }
+
+	biboAdmTraceTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TCP port for trace demon."
+	    DEFVAL { 7000 }
+	::= { admin 24 }
+
+	biboAdmRipUdpPort OBJECT-TYPE
+	    SYNTAX  INTEGER 
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"UDP port for RIP. Setting this object 
+		 to zero disables RIP."
+	    DEFVAL { 520 }
+	::= { admin 25 }
+
+        biboAdmSWVersion OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..255))
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "This is the software release version. It's either identical to
+		 biboAdmSWVersionOS or biboAdmSWVersionOEM."
+        ::= { admin 26 }
+ 
+	biboAdmTimeServer OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The IP address of the time server."
+	::= { admin 27 }
+
+	biboAdmTimeOffset OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is the time offset from GMT in seconds.
+		 If the set value is in the range from -24 to 24,
+		 it means hours, and is automatically converted
+		 to seconds."
+	    DEFVAL { 0 }
+	::= { admin 28 }
+
+	biboAdmConsoleSyslog OBJECT-TYPE
+	    SYNTAX  INTEGER { enable(1), disable(2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Specifies whether to direct syslog messages to the
+                console."
+	    DEFVAL { disable }
+	::= { admin 29 }
+ 
+	biboAdmSyslogTableLevel OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		emerg(1), 
+		alert(2), 
+		crit(3), 
+		err(4), 
+		warning(5), 
+		notice(6), 
+		info(7), 
+		debug(8) 
+	    } 
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Specifies which message levels to post to the
+                biboAdmSyslogTable and the console, if applicable."
+	    DEFVAL { info }
+	::= { admin 30 }
+
+	biboAdmSystemId OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This object contains the system Identification String."
+	::= { admin 31 }
+
+	biboAdmLicInfoTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmLicInfoEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"This table contains an entry for each feature, that
+		 can be activated by a license. The licenses have to
+		 be entered in the biboAdmLicenseTable. This tabl
+		 indicates the current state of the different licenses."
+	::= { admin 32 }
+
+	biboAdmLicInfoEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmLicInfoEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboAdmLicInfoType, biboAdmLicInfoStatus }
+	::= { biboAdmLicInfoTable 1 }
+
+	BiboAdmLicInfoEntry ::=
+	    SEQUENCE {
+		biboAdmLicInfoType			INTEGER,
+		biboAdmLicInfoStatus			INTEGER,
+		biboAdmLicInfoId			DisplayString,
+		biboAdmLicInfoSlot			INTEGER,
+
+		biboAdmLicInfoMaxLic			Counter32,
+		biboAdmLicInfoInUse			Counter32,
+		biboAdmLicInfoHwSerial			DisplayString,
+		biboAdmLicInfoUnit			INTEGER,
+		biboAdmLicInfoLimit			Counter32,
+		biboAdmLicInfoFree 			Counter32
+	    }
+
+	biboAdmLicInfoType OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		ip(1), capi(2), bridge(3), x25(4), ipx(5), stac(6),
+		frame-relay(7), tapi(8), ospf(9), extended-lan(10),
+		tunneling(11), taf(12), extended-wan(13), leased-line(14),
+		lcr(15),
+		app-power-phone(17), app-operator-desk(18),
+		app-voice-mail-server(19), app-accounting-tool(20),
+		app-intelligent-voice(21), app-6(22),
+		e25(29),
+		ipsec(33), ipseccb-ipxfer(34), bgp(35),
+		uefs(36), siplan(37), siptrunk(38), pim(39),
+		call-by-call(40), fax(41), sipout(42), brrp(43),
+		wlan-controller(44), terminal-option(45),
+		data-encr-accel(46), voice-mail-system(47), pptp(48),
+		ethernet(128), bri(129), g703(130), pri(131), 
+		modem(132), g7032pri(133), slots(134), e3(135), 
+		serial(136), shdsl(137), vdsl(138)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The licenseable feature."
+	::= { biboAdmLicInfoEntry 1 }
+
+	biboAdmLicInfoStatus OBJECT-TYPE
+	    SYNTAX  INTEGER  {
+		builtin(1), valid-license(2), invalid-license(3), no-license(4),
+		erase-internal(5)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The current state of the license."
+	::= { biboAdmLicInfoEntry 2 }
+
+	biboAdmLicInfoId OBJECT-TYPE
+	    SYNTAX DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The complete serial id string of the special license."
+	::= { biboAdmLicInfoEntry 3 }
+
+	biboAdmLicInfoSlot OBJECT-TYPE
+	    SYNTAX INTEGER (0..255)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"In case of a hardware license corresponding to a dedicated
+		 module serial number, it is the slot number of the module."
+	::= { biboAdmLicInfoEntry 4 }
+
+	biboAdmLicInfoMaxLic OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The max number of allowed chunks."
+	::= { biboAdmLicInfoEntry 5 }
+
+	biboAdmLicInfoInUse OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The current number of chunks in use."
+	::= { biboAdmLicInfoEntry 6 }
+
+	biboAdmLicInfoHwSerial OBJECT-TYPE
+	    SYNTAX DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The complete serial id string of the special license."
+	::= { biboAdmLicInfoEntry 7 }
+
+	biboAdmLicInfoUnit OBJECT-TYPE
+	    SYNTAX INTEGER (0..255)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"In case of a hardware license corresponding to a dedicated
+		 module serial number, it is the unit number of the module."
+	::= { biboAdmLicInfoEntry 8 }
+
+	biboAdmLicInfoLimit OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The maximum number of licenseable chunks."
+	::= { biboAdmLicInfoEntry 9 }
+
+	biboAdmLicInfoFree OBJECT-TYPE
+	    SYNTAX Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The number of free default licences."
+	::= { biboAdmLicInfoEntry 10 }
+
+
+
+
+	biboAdmBootpRelayServer OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object contains the destination IP address to 
+		 which BOOTP/DHCP request are forwarded by the 
+		 BIANCA/BRICK BOOTP relay agent.
+
+                 If this entry is empty no BOOTP forwarding is done."
+	::= { admin 33 }
+
+	biboAdmRadiusServer OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object contains the IP address of the RADIUS
+		 server (remote dial in user service). If set to 0.0.0.0
+		 RADIUS services are generally disabled (default).
+		 The corresponding Radius password is configured in the
+		 biboAdmRadiusSecret variable."
+	::= { admin 34 }
+
+	biboAdmLocalPPPIdent OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is the local ID string used for PPP authentication
+		 (PAP/CHAP). In pre4.3 versions the sysName has been used
+		 as the local ID string. This is, for increased ease and
+		 transparency of system configuration, no longer true."
+            DEFVAL { "" }
+	::= { admin 35 }
+
+	biboAdmHttpTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TCP port for the HTTP server. Default port is 80, 0 disables
+		 the HTTP server."
+	    DEFVAL { 80 }
+	::= { admin 36 }
+
+	biboAdmTapiTcpPort OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"TCP port for remote TAPI demon."
+	    DEFVAL { 2663 }
+	::= { admin 37 }
+
+	biboAdmTimeProtocol OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),
+		time-udp(2),
+		time-tcp(3),
+		time-sntp(4),
+		isdn(5)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This field specifies from which source the bricks internal
+		 clock is synchronised:
+		 none(1)      = no time synchronisation
+		 time-udp(2)  = UDP/TIME (RFC 868), from biboAdmTimeServer
+		 time-tcp(3)  = TCP/TIME (RFC 868), from biboAdmTimeServer
+		 time-sntp(4) = SNTP (RFC 1769),    from biboAdmTimeServer
+		 isdn(5)      = examines ISDN time, from controller stack 0"
+	    DEFVAL { time-udp }
+	::= { admin 38 }
+
+	biboAdmTimeUpdate OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is the interval for timeserver requests (in seconds).
+		 If the set value is in the range from -24 to 24,
+		 it means hours, and is automatically converted
+		 to seconds.
+		 If the time comes from ISDN, the time is updated
+		 with the next call after this interval."
+	    DEFVAL { 24 }
+	::= { admin 39 }
+
+
+	biboAdmWINS1 OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The IP address of the WINS server (NetBIOS Name Server)."
+	::= { admin 40 }
+
+
+	biboAdmWINS2 OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The IP address of the alternate WINS server."
+	::= { admin 41 }
+
+	admin-2 OBJECT IDENTIFIER
+	    ::= { bibo 22 }
+
+-- Card Table
+
+	biboAdmCardTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmCardEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The biboAdmCardTable lists installed cards."
+	::= { admin 42 }
+
+	biboAdmCardEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmCardEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboACrdSlot }
+	::= { biboAdmCardTable 1 }
+
+	BiboAdmCardEntry ::=
+	    SEQUENCE {
+		biboACrdSlot				INTEGER,
+		biboACrdType				DisplayString,
+		biboACrdState				INTEGER,
+		biboACrdCpldVersion			DisplayString,
+		biboACrdFpgaVersion			DisplayString,
+		biboACrdTemp				INTEGER,
+		biboACrdTempAlarmThreshold		INTEGER,
+		biboACrdTempAlarmTrap			INTEGER,
+		biboACrdAdmin				INTEGER,
+		biboACrdTempAlarmThresholdCriticalLow	INTEGER
+	    }
+
+	biboACrdSlot OBJECT-TYPE
+	    SYNTAX  INTEGER (0..31) 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The slot, or location of this card."
+	::= { biboAdmCardEntry 1 }
+
+	biboACrdType OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The name of this card."
+	::= { biboAdmCardEntry 2 }
+	
+	biboACrdState OBJECT-TYPE
+	    SYNTAX  INTEGER { down(1), running(2), fail(3), stopped(4), 
+                stopping(5), starting (6) }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"State of the card."
+	    DEFVAL { down }
+	::= { biboAdmCardEntry 3 }
+
+	biboACrdCpldVersion OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Version of onboard CPLD."
+	::= { biboAdmCardEntry 4 }
+	
+	biboACrdFpgaVersion OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Version of loaded FPGA firmware."
+	::= { biboAdmCardEntry 5 }
+
+	biboACrdTemp OBJECT-TYPE
+	    SYNTAX  INTEGER (0..250)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+                "This variable shows the actual card temperature
+                in the unit Celsius."
+	::= { biboAdmCardEntry 6 }
+
+	biboACrdTempAlarmThreshold OBJECT-TYPE
+	    SYNTAX  INTEGER (0..250)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+                "Card temperature threshold."
+	::= { biboAdmCardEntry 7 }
+
+	biboACrdTempAlarmTrap OBJECT-TYPE
+	    SYNTAX  INTEGER { normal(1), critical(2) }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+                "If the card temperature raises above the threshold,
+                a trap is generated every 60 seconds."
+	::= { biboAdmCardEntry 8 }
+
+	biboACrdAdmin OBJECT-TYPE
+	    SYNTAX  INTEGER { up(1), down(2), reconfig(3) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Administrative manipulation of card state."
+	::= { biboAdmCardEntry 9 }
+
+	biboACrdTempAlarmThresholdCriticalLow OBJECT-TYPE
+	    SYNTAX  INTEGER (0..250)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+
+	    DESCRIPTION
+                "Lower Card temperature threshold to return state from critical
+		 to normal. Mustn't exceed biboACrdTempAlarmThreshold!
+
+		 When temperature reaches biboACrdTempAlarmThreshold state
+		 changes to critical. This state persists until temperature
+		 falls below biboACrdTempAlarmThreshUncriticalLow where state
+		 changes back to normal."
+	::= { biboAdmCardEntry 10 }
+
+
+        biboAdmTraps	OBJECT IDENTIFIER ::= { admin 43 }
+
+	biboAdmTrapACrdTempCritical TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp,
+	        biboACrdTempAlarmThreshold
+	    }
+	    DESCRIPTION   "This trap signifies that the Card temperature raises
+	                   above the critical alarm-threshold"
+	::= 1
+
+	biboAdmTrapACrdTempOk TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp,
+	        biboACrdTempAlarmThreshold
+	    }
+	    DESCRIPTION   "A normal Card temperature has been restored."
+	::= 2
+
+	biboAdmTrapACrdDown TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp
+	    }
+	    DESCRIPTION   "This trap signifies that the specified Card is down"
+	::= 3
+
+	biboAdmTrapACrdRunning TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp
+	    }
+	    DESCRIPTION   "This trap signifies that the specified Card
+	                   is up/running"
+	::= 4
+
+	biboAdmTrapACrdFailed TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp
+	    }
+	    DESCRIPTION   "This trap signifies that the specified Card
+	                   has failed"
+	::= 5
+
+	biboAdmTrapACrdStopped TRAP-TYPE
+	    ENTERPRISE    biboAdmTraps
+	    VARIABLES     {
+	        sysDescr,
+	        sysName,
+	        biboACrdSlot,
+	        biboACrdType,
+	        biboACrdState,
+	        biboACrdTemp
+	    }
+	    DESCRIPTION   "This trap signifies that the specified Card
+	                   is stopped"
+	::= 6
+
+--	biboAdmSnmpLinkTrapEvent OBJECT-TYPE
+--	    SYNTAX  INTEGER { none(1),
+--			      any(2),
+--			      up(3),
+--                             down(4)
+--                            }
+--	    MAX-ACCESS  read-write
+--	    STATUS  current
+--
+--	    DESCRIPTION
+--               "Defines the ifOperStatus transition(s) of an ifTable object
+--               that generates a SNMP linkUp/linkDown trap:
+--
+--                   none : disable linkUp/linkDown trap generation.
+--
+--		    any : enable bintec like trap generation.
+--                          - entering the up state generates a up trap
+--                          - any other state change generates a down trap
+--
+--		     up : enable rfc1157 like trap generation.
+--                          - entering the up state generates a up trap
+--                          - leaving the up state generates a down trap
+--
+--		   down : enable rfc2233 like trap generation.
+--                          - leaving the down state generates a up trap
+--                          - entering the down state generates a down trap
+--
+--                 Seven parameters are sent in each linkUp/linkDown trap pdu:
+--                   1. ifEntry.ifIndex       (mandatory for linkUp/Down traps)
+--                   2. ifEntry.ifDescr
+--                   3. ifEntry.ifType
+--                   4. ifEntry.ifAdminStatus
+--                   5. ifEntry.ifOperStatus
+--                   6. system.Description
+--                   7. system.Name"
+--	    DEFVAL { up }
+--	::= { admin 44 }
+
+	biboAdmExtendedBanner OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is an additional banner message which is displayed
+		 after the standard welcome message at boot time.
+		 This message is typically used to display info regarding
+		 a special configuration of the router."
+            DEFVAL { "" }
+	::= { admin 45 }
+
+      biboAdmBootpRelayServ2 OBJECT-TYPE
+             SYNTAX  IpAddress
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                 "This object contains the second destination IP address
+                  to which BOOTP/DHCP request are forwarded by the
+                  BIANCA/BRICK BOOTP relay agent.
+
+                  If this entry is empty no BOOTP forwarding is done."
+         ::= { admin 47 }
+
+	biboAdmTimedBootPolicy OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		normal(1),	-- same behaviour as in normal operation
+		aggressive(2),	-- send more frequent retries for 10 minutes
+		endless(3) 	-- same as aggressive, do not stop at all
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object specifies the frequency with which the timed
+		 requests the time (using the specified time protocol)
+		 after system startup until the first reply is received.
+		 Possible values:
+		  normal(1):	 -- 5 retries after 1, 2, 4, 8, 16 minutes
+		  aggressive(2): -- retry 10 minutes with 1, 2, 4, 8, 10, 10, ...
+				    seconds of timeout
+		  endless(3):    -- same as aggressive except there is no time 
+				    limit."
+	    DEFVAL { endless }
+	::= { admin 48 }
+
+        biboAdmAcctlogFormat OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..255))
+            MAX-ACCESS  read-write
+            STATUS  current
+
+            DESCRIPTION
+                "Specifies the format of accounting messages sent by
+                the syslog protocol. The format can consist of any order
+                of random strings, backslash escaped sequences like '\t','\n', etc. 
+                or the following format tags:
+
+                Tag     Meaning
+                %d      Date the session opened; in DD.MM.YY format.
+                %t      Time the session opened: in HH:MM:SS format
+                %a      session age in seconds
+                %c      protocol type
+                %i      source IP address
+                %r      source port 
+                %f      source interface index
+                %I      destination IP address
+                %R      destination port 
+                %F      destination interface index
+                %p      outgoing packets
+                %o      outgoing octets
+                %P      incoming packets
+                %O      incoming octets
+                %s      message sequence counter
+		%%	'%'
+
+                The format for accounting messages is per default: 
+
+                'INET: %d %t %a %c %i:%r/%f -> %I:%R/%F %p %o %P %O [%s]'
+
+                "
+            DEFVAL {  "INET: %d %t %a %c %i:%r/%f -> %I:%R/%F %p %o %P %O [%s]" }
+        ::= { admin 49 }
+
+        biboAdmAcctlogMaxEntries OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS  read-write
+            STATUS  current
+ 
+            DESCRIPTION
+                "Maximum Number of accounting messages stored in memory."
+	    DEFVAL { 20 }
+        ::= { admin 50 }
+
+	biboAdmAcctlogTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF BiboAdmAcctlogEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The biboAdmAcctlogTable keeps track of accounting messages
+                received.  The columns specify attributes for each message generated. As
+                this information only reports events on the system, all
+                fields are read-only.
+
+                Creating entries: Entries can only be created by the
+                system and are made each time a message for accounting is 
+                generated.
+
+                Deleting entries: Entries are removed by the system
+                the messages are sent to the loghost."
+	::= { admin 51 }
+
+	biboAdmAcctlogEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmAcctlogEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboAdmAcctlogLevel }
+	::= { biboAdmAcctlogTable 1 }
+
+	BiboAdmAcctlogEntry ::=
+	    SEQUENCE {
+                biboAdmAcctlogTimeStamp                  Date,
+                biboAdmAcctlogLevel                      INTEGER,
+                biboAdmAcctlogMessage                    DisplayString,
+                biboAdmAcctlogSubject                    INTEGER
+	    }
+
+	biboAdmAcctlogTimeStamp OBJECT-TYPE
+	    SYNTAX  Date 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Time message was generated."
+	::= { biboAdmAcctlogEntry 1 }
+
+	biboAdmAcctlogLevel OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		emerg(1), 
+		alert(2), 
+		crit(3), 
+		err(4), 
+		warning(5), 
+		notice(6), 
+		info(7), 
+		debug(8) 
+	    } 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Level of acct message."
+	    DEFVAL { info }
+	::= { biboAdmAcctlogEntry 2 }
+
+	biboAdmAcctlogMessage OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The text of the acct message."
+	::= { biboAdmAcctlogEntry 4 }
+
+	biboAdmAcctlogSubject OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+                acct(1), 
+                isdn(2), 
+                inet(3), 
+                x25(4), 
+                ipx(5), 
+                capi(6), 
+                ppp(7), 
+                bridge(8),
+                config(9),
+                snmp(10),
+                x21(11),
+                token(12),
+                ether(13),
+                radius(14),
+                tapi(15),
+                ospf(16),
+                fr(17),
+                modem(18),
+                rip(19),
+                atm(20),
+                pabx(21),
+                ipsec(22),
+                tty(23),
+                bgp(24),
+                tacacs(25),
+                brrp(26),
+		mps(27),
+		voip(28),
+		tr069(29),
+		wlan(30),
+		usb(31),
+		http(32),
+		inet6(33),
+                wlc(34),
+                ldap(35),
+		osp(36),
+		wtp(37),
+		tremp(38),
+		presence(39)
+	    } 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Subject of the acct message."
+	    DEFVAL { acct }
+	::= { biboAdmAcctlogEntry 5 }
+
+	biboAdmSyslogEntry OBJECT-TYPE
+	    SYNTAX  BiboAdmSyslogEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		""
+	    INDEX { biboAdmSyslogTimeStamp, biboAdmSyslogLevel }
+	::= { biboAdmSyslogTable 1 }
+
+	BiboAdmSyslogEntry ::=
+	    SEQUENCE {
+		biboAdmSyslogTimeStamp			Date,
+		biboAdmSyslogLevel			INTEGER,
+		biboAdmSyslogMessage			DisplayString,
+		biboAdmSyslogSubject			INTEGER
+	    }
+
+	biboAdmSyslogTimeStamp OBJECT-TYPE
+	    SYNTAX  Date 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Time message was generated."
+	::= { biboAdmSyslogEntry 1 }
+
+	biboAdmSyslogLevel OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		emerg(1), 
+		alert(2), 
+		crit(3), 
+		err(4), 
+		warning(5), 
+		notice(6), 
+		info(7), 
+		debug(8) 
+	    } 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Level of syslog message."
+	    DEFVAL { emerg }
+	::= { biboAdmSyslogEntry 2 }
+
+	biboAdmSyslogMessage OBJECT-TYPE
+	    SYNTAX  DisplayString 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"The text of the syslog message."
+	::= { biboAdmSyslogEntry 4 }
+
+	biboAdmSyslogSubject OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+		acct(1), 
+		isdn(2), 
+		inet(3), 
+		x25(4), 
+		ipx(5), 
+		capi(6), 
+		ppp(7), 
+		bridge(8),
+		config(9),
+		snmp(10),
+	        x21(11),
+	        token(12),
+	        ether(13),
+	        radius(14),
+	        tapi(15),
+		ospf(16),
+		fr(17),
+		modem(18),
+		rip(19),
+		atm(20),
+		pabx(21),
+		ipsec(22),
+		tty(23),
+		bgp(24),
+		tacacs(25),
+		brrp(26),
+		mps(27),
+		voip(28),
+		tr069(29),
+		wlan(30),
+		usb(31),
+		http(32),
+		inet6(33),
+                wlc(34),
+                ldap(35),
+		osp(36),
+		wtp(37),
+		tremp(38),
+		presence(39)
+	    } 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+
+	    DESCRIPTION
+		"Subject of the syslog message."
+	    DEFVAL { acct }
+	::= { biboAdmSyslogEntry 5 }
+
+
+	biboAdmTimeSource OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		none(1),	-- time has not been initialized yet
+		rtc(2),		-- time has been initialized by real time clock
+		manual(3),	-- time has been set manually
+		isdn(4),	-- time has been set by ISDN
+		server(5),	-- time has been received from a time server
+		gps(6)		-- time has been received from GPS
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The source of the current system time."
+            DEFVAL { none }
+	::= { admin 52 }
+
+	biboAdmIsdnTimeUpdate OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		enabled(1),	   -- time retrieval over ISDN is enabled
+		disabled(2),	   -- time retrieval over ISDN is disabled
+		convert(3)	   -- convert setting in TimeProtocol
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object specifies whether a time value which has been 
+		 retrieved via ISDN should be used to set the system time.
+		 Note that the time retrieved via ISDN is ignored if the system
+		 time has been set by a time server previously."
+            DEFVAL { convert }
+	::= { admin 53 }
+
+        biboAdmSyslogTcpRetries OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS  read-write
+            STATUS  current
+
+            DESCRIPTION
+                "Maximum number of attempts to connect a syslog server over TCP."
+            DEFVAL { 3 }
+        ::= { admin 55 }
+
+        biboAdmSWVersionOS OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..255))
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "This is the OS software release version as it was always found
+		 in biboAdmSWVersion."
+        ::= { admin 56 }
+ 
+        biboAdmSWVersionOEM OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..255))
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "This is the OEM software release version.
+		 Either there's a separate OEM version defined or this is
+		 identical to biboAdmSWVersionOS."
+        ::= { admin 57 }
+ 
+        biboAdmStartMode OBJECT-TYPE
+            SYNTAX  INTEGER { normal(1), service(2) }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "If service procedure is activated, mode is set to service,
+		 otherwise mode is set to normal."
+        ::= { admin 58 }
+ 
+
+	extadmin	OBJECT IDENTIFIER
+	    ::= { admin-2 1 }
+
+	biboExtAdmMonAddress OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The IP address of the host machine running the Activity
+		 Monitor program. This program displays the information
+		 about the current state of all interfaces.
+		 Periodically UDP packets are send to this IP address,
+		 to refresh the data automatically on the target host.
+		 The value 255.255.255.255 represents the broadcast address
+		 of the first LAN interface (e.g. 10.255.255.255), so
+		 more than one Activity Monitor on different hosts can 
+		 receive the data."
+	    DEFVAL { 'ffffffff'H  }
+	::= { extadmin 1 }
+
+	biboExtAdmMonPort OBJECT-TYPE
+	    SYNTAX  INTEGER (0 .. 65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"UDP port for the Activity Monitor protocol."
+	    DEFVAL { 2107 }
+	::= { extadmin 2 }
+
+	biboExtAdmMonType OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+			off(1), physical(2), physical-virt(3)
+		    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This parameter configures the content of the Activity Monitor 
+		 packets, or disables it:
+		    off          : Activity Monitor disabled
+		    physical     : send only physical interfaces information
+		    physical-virt: send physical and virtual interface
+                                   information."
+	    DEFVAL { off }
+	::= { extadmin 3 }
+
+	biboExtAdmMonUpdate OBJECT-TYPE
+	    SYNTAX  INTEGER (0 .. 60)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is the time interval for the Activity Monitor 
+		 for sending packets (in seconds) to the specified IP address.
+		 The value of 0 disables sending Activity Monitor packets."
+	    DEFVAL { 5 }
+	::= { extadmin 4 }
+
+	biboExtAdmProcRouted OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled (2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	        "enabled: The routed process is running.
+	                  RIP and/or OSPF are available (subject to licenses).
+	
+	                  This is the default behavior of the system.
+	
+	                  Hints:
+	
+	                  RIP  may be enabled/disabled by 'biboAdmRipUdpPort'
+	                  OSPF may be enabled/disabled by 'ospfAdminStat'
+	
+	                  RIP  may be if-specific ena/disabled by 'ipExtIfRip*'
+	                  OSPF may be if-specific ena/disabled by 'ipExtIfOspf'
+	
+	                  ... but a running routed process consumes CPU-Time
+	                  to keep in sync with interface/routing tables - even
+	                  if RIP and OSPF are disabled (global or if-specific).
+	
+	        disabled: The routed process is stopped.
+	                  RIP and/or OSPF are unavailable.
+	
+	                  Hints:
+	
+	                  A stopped routed process consumes no CPU-Time.
+	
+	                  Set ipExtAdmProcRouted to 'disabled' is recommended
+	                  if both protocols (RIP and OSPF) not used in the
+	                  specific router environment.
+	        "
+	    DEFVAL { enabled }
+	::= { extadmin 5 }
+
+	biboExtAdmProcWatchDog OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled (2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	        "enabled: The watchd process is running.
+			  up/down transitions on interfaces delivered by
+		          various protocols like ping/ifOperStatus/VRRP
+		          are processed by parsing a task table and slave
+		          interfaces are switched up/down according to the
+		          task definition.
+		disabled: The watchd process is stopped."
+	    DEFVAL { disabled }
+	::= { extadmin 7 }
+
+	biboExtAdmProcSSHd OBJECT-TYPE
+	    SYNTAX  INTEGER { enabled(1), disabled (2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+	        "enabled: The sshd process is running.
+		disabled: The sshd process is stopped."
+	    DEFVAL { enabled }
+	::= { extadmin 8 }
+
+	biboExtAdmScheduleInterval OBJECT-TYPE
+	    SYNTAX  INTEGER (0 .. 65535)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This is the time interval in seconds for the Schedule
+		 daemon watching any events (recommended value: 300).
+		 The value 0 disables the scheduler.
+		 Referring table: scheduleTable"
+	    DEFVAL { 0 }
+	::= { extadmin 9 }
+
+	biboExtAdmUpdatePath OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Default URL for automatic SW updates, e.g. http://server/path/
+                 This setting is IGNORED if chkUpdSrvAdminOperURL is not empty.
+                 Otherwise, related chkUpdSrv entry is allocated for it.
+		 If URL does NOT end with '/' then it is considered being
+                 complete and copied to related chkUpdSrvDownloadLink.
+                 Otherwise, following parts are appended automatically.
+                   '<sysname>[-<mode>]/<sysname>[-<mode>]-s_current'"
+	    DEFVAL { "http://system-update.eu/" }
+	::= { extadmin 10 }
+
+	biboExtAdmBackRtVerify OBJECT-TYPE
+	    SYNTAX  INTEGER { always(1), interface-dependent(2), never(3) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object activates an additional check for incoming 
+		 packets. If set to always (1), incoming packets are only
+		 accepted if return packets sent back to their source IP
+		 address would be sent over the same interface. This prevents
+		 packets being passed from untrusted interfaces to this
+		 interface. If set to interface-dependent (2), this check
+		 will be performed only if enabled for the associated ingress
+		 interface (see ipExtIfBackRtVerify). If set to never (2),
+		 this check will be never performed, regardless wether enabled
+		 or not for the associated interface."
+	    DEFVAL { interface-dependent }
+	::= { extadmin 11 }
+
+	biboExtAdmRerouteViaDefault OBJECT-TYPE
+	    SYNTAX  INTEGER { disabled(1), enabled(2) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object controls the behaviour of the routing algorithm 
+		 when a network route exists for routing a packet, but is 
+		 temporarily unusable because the status of the associated 
+		 interface prevents transmission. In such a case, the routing 
+		 algorithm tries to select an alternate route to allow the 
+		 packet to reach its destination. If set to disabled (1), 
+		 default routes are discarded during the search for a suitable 
+		 alternate route. If set to enabled (2), a default route may 
+		 be selected for rerouting provided it is the most appropriate 
+		 route available."
+	    DEFVAL { disabled }
+	::= { extadmin 12 }
+
+	biboExtAdmGUILanguage OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE(3))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object specifies the language used within the graphical
+		 user interface (currently new web based interface only).
+		 Valid abbreviations (in principle) are defined in ISO 639-2."
+	    DEFVAL { "eng" }
+	::= { extadmin 13 }
+
+	biboExtAdmIpLogging OBJECT-TYPE
+	    SYNTAX  BITS        { nat(0), tcppr(1), dns(2), ips(3), acl(4) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This bitfield enables logging of dedicated subsystems
+		 within the INET subject:
+		 	nat		: NAT
+		 	tcppr		: TCP processing (MSS clamping, ...)
+		 	dns		: DNS
+		 	ips		: IP session management
+                        acl             : Local Services Access Control
+		 ." 
+	    DEFVAL { { nat, tcppr, dns, ips, acl } }
+	::= { extadmin 14 }
+
+	biboExtAdmRadiusNasId OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"An administratively-assigned NAS identifier for this managed
+		 node. If configured this variable is used for each RADIUS
+		 request in order to set the associated NAS-IDENTIFIER RADIUS
+		 attribute value."
+	::= { extadmin 15 }
+
+        biboExtAdmConfigSaveDate OBJECT-TYPE
+            SYNTAX  Date
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Timestamp when configuration gets/got saved (system local
+		 time)."
+	    DEFVAL { 0 }
+        ::= { extadmin 17 }
+ 
+        biboExtAdmSnmpShellPrompt OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Defines prompt of application SNMP shell.
+		 A set of escape sequences is defined with escape character
+		 being a backslash '\':
+		    - 'e': gets replaced by escape character (0x1b)
+		    - 'h': gets replaced by system name (i.e. host)
+		    - 'T': can be used for MIB context replacements ...
+			     %n -> current MIB table name
+			     %# -> current MIB table number
+			     %g -> current MIB group number
+			   A longer string can be put within parentheses '(' ')'
+			   causing the whole string to be left out if no context
+			   is available instead of only the MIB variables.
+
+			   Examples, assuming context MIB table 'system':
+			     String		       Yields
+			     ------------------------+------------------------
+			     \T%n		     | 'system'
+			     \T( MIB{%n/#%#/g:%g\)}) | ' MIB{system/#1/g:1}'
+		    - 'l': gets replaced by log name (i.e. user, normally admin)
+		    - 'd': can be used for date/time replacements with '%'
+			   escaped replacements ...
+			     %C -> century
+			     %d -> day of month (01..31)
+			     %D -> date in format 'MM/DD/YY'
+			     %F -> date in format YYYY-MM-DD
+			     %H -> hour (00..23)
+			     %I -> hour (01..12)
+			     %j -> day of year (1..366)
+			     %k -> hour ( 0..23)
+			     %l -> hour ( 1..12)
+			     %m -> month (01..12)
+			     %M -> minute (00..59)
+			     %p -> AM/PM
+			     %P -> am/pm
+			     %R -> 24 hour time in format HH:MM
+			     %s -> seconds sincs 1970-01-01 00:00:00 UTC
+			     %S -> seconds (00..59)
+			     %T -> 24 hour time in format HH:MM:SS
+			     %u -> day of week (1..7)
+			     %w -> day of week (0..6)
+			     %y -> year (last two digits, 00..99)
+			     %Y -> year
+			   A longer string can be put within parentheses '(' ')'
+			   to save repetitions of leading '\d' for every
+			   replacement.
+		    - 'u': gets replaced by system's uptime in format
+			       [D ]HH:MM:SS
+
+		 Default value is '\h:\t(%n)> '."
+	    DEFVAL { "\h:\T(%n)> " }
+        ::= { extadmin 18 }
+
+	biboExtAdmMinArpLifeTime OBJECT-TYPE
+	    SYNTAX  INTEGER (0 .. 86400)
+	    UNITS   "s"
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object defines the minimum lifetime (in seconds)
+		 of ipNetToMediaTable entries."
+	    DEFVAL { 0 }
+	::= { extadmin 19 }
+
+	biboExtAdmInitialGUIView OBJECT-TYPE
+	    SYNTAX  INTEGER { full-access(1), user(2), initial-operation(3) }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This object controls the initial GUI  behavior for admin login 		
+		for boxes with supports of 'GUI Views' and  'Initial Operation View' in GUI.
+		full-access:       show the complete admin navigation. 
+		user:              show the user view
+		initial-operation: show the initial operation view.
+		If initial operation is not supported fall back to user view,
+		if user view is not supported fall back to full access."
+	    DEFVAL { initial-operation }
+	::= { extadmin 21 }
+
+ 
+-- Time Server Table
+
+	timeServerTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF TimeServerEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+		"This table contains the list of time servers."
+	::= { admin 54 }
+
+	timeServerEntry OBJECT-TYPE
+	    SYNTAX  TimeServerEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"This object contains a time server entry."
+	    INDEX   {
+		timeSrvPriority
+	    }
+        ::= { timeServerTable 1 }
+
+	TimeServerEntry ::=
+	    SEQUENCE {
+	        timeSrvPriority			INTEGER,
+		timeSrvProtocol			INTEGER,
+		timeSrvAddress			DisplayString
+	    }
+
+	timeSrvPriority OBJECT-TYPE
+	    SYNTAX INTEGER (0..128)
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	        "The priority of the time server.
+		 The time servers are queried in the order of ascending priority 
+		 value, i.e. 0 first, 1 second ... ."
+	::= { timeServerEntry 1 }
+
+	timeSrvProtocol OBJECT-TYPE
+	    SYNTAX INTEGER {
+		delete(1),	-- delete this entry
+	        time-udp (2),	-- time protocol over udp
+		time-tcp (3),	-- time protocol over tcp
+		sntp (4),	-- sntp protocol
+		disabled (5)	-- disabled
+	    }
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		"The protocol used for the time server."
+	    DEFVAL { sntp }
+	::= { timeServerEntry 2 }
+
+	timeSrvAddress OBJECT-TYPE
+	    SYNTAX DisplayString
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		"The IP Address or DNS name of the time server. If a DNS name 
+		 is specified here, it is resolved on demand."
+	::= { timeServerEntry 3 }
+
+-- End Time Server Table
+    
+	biboAdmNTPServer OBJECT-TYPE
+	    SYNTAX INTEGER {
+		disabled(1),
+		enabled(2),
+		clientdepend(3)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This field controls the NTP server. If it is set to 
+		 disabled(1) client requests will be ignored. Setting it
+		 to enabled(2) on every client request a server answer
+		 is transmitted. In clientdepend(3) mode only a answer to
+		 a client request is sent if an external reference exists."
+	    DEFVAL { disabled }
+	::= { admin 59 }
+
+	biboAdmTimeZone OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The name of the currently set timezone. The corresponding
+		 timezone must exist in timeZoneTable."
+	::= { admin 60 }
+
+	timeZoneTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF TimeZoneEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+		"This table contains the list of availabe timezones."
+	::= { admin 61 }
+
+	timeZoneEntry OBJECT-TYPE
+	    SYNTAX  TimeZoneEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"This object contains a time zone entry."
+	    INDEX   {
+		timeZoneIndex
+	    }
+        ::= { timeZoneTable 1 }
+
+	TimeZoneEntry ::=
+	    SEQUENCE {
+		timeZoneIndex			INTEGER,
+		timeZoneName			DisplayString,
+		timeZoneAlias			DisplayString,
+		timeZoneOffset			INTEGER
+	    }
+
+	timeZoneIndex OBJECT-TYPE
+	    SYNTAX INTEGER
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"Index in Timezone Table."
+	::= { timeZoneEntry 1 }
+
+	timeZoneName OBJECT-TYPE
+	    SYNTAX DisplayString
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"The Name of a Timezone."
+	::= { timeZoneEntry 2 }
+
+	timeZoneAlias OBJECT-TYPE
+	    SYNTAX DisplayString
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"The abbreviation of a timezone."
+	::= { timeZoneEntry 3 }
+
+	timeZoneOffset OBJECT-TYPE
+	    SYNTAX INTEGER
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"Timezone offset from UTC in seconds. Note that this contains
+		 no information about daylight saving for this timezone"
+	::= { timeZoneEntry 4 }
+
+
+        ntpServerTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF NtpServerEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "List of DHCP-client-learned NTP-servers, relevant only if
+                 related administrative table timeServer is empty."
+        ::= { admin 64 }
+
+        ntpServerEntry OBJECT-TYPE
+            SYNTAX      NtpServerEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "This object contains a time server entry."
+            INDEX { ntpServerPriority }
+        ::= { ntpServerTable 1 }
+
+        NtpServerEntry ::=
+            SEQUENCE {
+                ntpServerPriority   INTEGER,
+                ntpServerAddress    DisplayString
+            }
+
+        ntpServerPriority OBJECT-TYPE
+            SYNTAX      INTEGER (0..128)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Priority of NTP-server. Lower value means 'preferred'."
+        ::= { ntpServerEntry 1 }
+
+        ntpServerAddress OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "IP-address or FQDN of NTP-server."
+        ::= { ntpServerEntry 2 }
+
+	sysStat		OBJECT IDENTIFIER
+	    ::= { sys 500 }
+
+	sysStatBootConfig OBJECT-TYPE
+	    SYNTAX INTEGER {
+		none(1),	-- no config at all
+	        bootfac(2),	-- factory boot config
+		default(3),	-- default config
+		boot(4)		-- boot config from flash
+	    }
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"After system boot this variable shows which configuration
+		 was loaded:
+		    none:	no configuration whatsoever
+		    bootfac:	factory boot configuration
+		    default:	default configuration as provided by image
+		    boot:	configuration found in flash."
+	    DEFVAL { none }
+	::= { sysStat 1 }
+
+	sysStatFunctionState OBJECT-TYPE
+	    SYNTAX INTEGER { on(1), off(2) }
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"This variable contains the current function state, which is
+                 toggeled by pressing the function button on the device."
+	::= { sysStat 2 }
+
+	-- next variable is intentionally saved to indicate operation mode
+	-- a configuration was saved with
+	sysStatOperationMode OBJECT-TYPE
+	    SYNTAX  INTEGER { plain(0), mgw(1), pbx(2) }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This variable defines the operation mode of the device
+		 concerning telephony functionality.
+
+	     	 If any voice functionality is integrated it can be either
+		 mgw(1) for Media GateWay functionality of pbx(2) for a
+		 full-fledged telephone system.
+	     
+		 For systems w/o voice functionality the variable has value
+		 plain(0)."
+	::= { sysStat 3 }
+
+	sysStatConfigConvert OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+                idle(1), 
+                start(2) 
+            }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"This variable handles the Configuration Conversion from
+                 pbx to mgw (later may be mgw to pbx)
+		 For systems w/o voice functionality the variable has value
+		 plain(0)."
+            DEFVAL{ idle }
+	::= { sysStat 4 }
+
+	sysStatConfigConvertState OBJECT-TYPE
+	    SYNTAX  INTEGER { 
+                idle(1), 
+                progress(2), 
+                done(3), 
+                failed(4) 
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This variable handles the Configuration Conversion state
+                
+                    idle        - No conversion in progress
+                    progress    - conversion in progress
+                    done        - conversion done
+                    failed      - conversion not possible
+
+                The value is set to progress during tne coversion progress.
+                On errer e.g configuration parameters already exists the
+                State is set to failed otherwise the State is set to idle
+                on success."
+            DEFVAL{ idle } 
+	::= { sysStat 5 }
+
+
+
+-- Trace buffers
+ 
+        traceBuffers   OBJECT IDENTIFIER ::= { admin 65 }
+ 
+        -- administrative section
+        trcBufAdmin  OBJECT IDENTIFIER ::= { traceBuffers 1 }
+ 
+	trcBufTable OBJECT-TYPE
+            SYNTAX	SEQUENCE OF TrcBufEntry
+            MAX-ACCESS	not-accessible
+            STATUS	current
+            DESCRIPTION
+		"This table contains the list trace buffers."
+	::= { trcBufAdmin 1 }
+ 
+	trcBufEntry OBJECT-TYPE
+	    SYNTAX	TrcBufEntry
+	    MAX-ACCESS	not-accessible
+	    STATUS	current
+	    DESCRIPTION
+		"This object contains a trace buffer entry."
+	    INDEX   {
+		trcBufIndex
+	    }
+        ::= { trcBufTable 1 }
+ 
+	TrcBufEntry ::=
+	    SEQUENCE {
+	        trcBufIndex		INTEGER,
+		trcBufDevice		DisplayString,
+		trcBufMode		INTEGER,
+		trcBufDataMode		INTEGER,
+		trcBufSize		INTEGER,
+		trcBufDataSize		INTEGER,
+		trcBufDate		INTEGER,
+                trcBufDescr		DisplayString,
+                trcBufID		Unsigned32,
+                trcBufOperation		INTEGER
+	    }
+ 
+	trcBufIndex OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "Unique Index of the trace buffer"
+	::= { trcBufEntry 1 }
+ 
+	trcBufDevice OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "The device representing this trace buffer"
+	::= { trcBufEntry 2 }
+ 
+	trcBufMode OBJECT-TYPE
+	    SYNTAX	INTEGER { single-shot(1), continuous(2) }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "Indicates operation mode of trace buffer:
+		   single-shot: just fill buffer up to maximum size
+		   continuous:  ring buffer mode
+ 
+		 In single-shot mode every write attempt that would exceed
+		 buffer limits, causes the buffer to get closed for writing
+		 and the write attempt to fail (as any further attempts will).
+ 
+		 In continuous mode the buffer is filled up to the maximum size,
+		 and overwrite older data as new data gets written.
+ 
+		 Variable is meaningless as long as variable trcBufOperation
+		 is set to unused."
+	::= { trcBufEntry 3 }
+ 
+	trcBufDataMode OBJECT-TYPE
+	    SYNTAX	INTEGER {
+	    	bytestream(1),
+		message(2),
+		message-per-session(3)
+	    }
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "Indicates how trace buffer treats data written to it:
+ 
+		 In bytestream mode no structure is imposed on written data,
+		 buffer will get completely filled up if enough data is written.
+		 Data overwrite is done byte-by-byte.
+ 
+		 Mode message keeps the data structure in messages as passed
+		 down to the trace buffer and allows for reading them back in
+		 same portions as written.
+ 
+		 Mode message-per-session treats any data written to trace
+		 buffer between opening and closing it as one message.
+ 
+		 Variable is meaningless as long as variable trcBufOperation
+		 is set to unused.
+ 
+                 NOTE: modes message and message-per-session only reflect the
+                 last state; it depends on the application(s) writing to the
+                 trace buffer in which mode it is used, so this variable can
+                 toggle between these two states over time."
+	::= { trcBufEntry 4 }
+ 
+	trcBufSize OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "The maximum size of the trace buffer"
+	::= { trcBufEntry 5 }
+ 
+	trcBufDataSize OBJECT-TYPE
+	    SYNTAX	INTEGER
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "The current data size of the trace buffer"
+	::= { trcBufEntry 6 }
+ 
+	trcBufDate OBJECT-TYPE
+	    SYNTAX      Date
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "Time and date of the buffer creation"
+	::= { trcBufEntry 7 }
+ 
+	trcBufDescr OBJECT-TYPE
+	    SYNTAX	DisplayString
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "Optional descriptive information of the buffer's purpose."
+            DEFVAL { "" }
+	::= { trcBufEntry 8 }
+ 
+	trcBufID OBJECT-TYPE
+	    SYNTAX	Unsigned32
+	    MAX-ACCESS	read-only
+	    STATUS	current
+	    DESCRIPTION
+	        "Optional identificator for the buffer."
+            DEFVAL { "" }
+	::= { trcBufEntry 9 }
+ 
+	trcBufOperation OBJECT-TYPE
+	    SYNTAX INTEGER {
+	        unused(1),
+	        idle(2),
+	        read(3),
+	        write(4),
+		read-write(5),
+		closed(6)
+	    }
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The current status of the trace buffer:
+		   unused:     Device is free to be used
+	           idle :      Device is parameterized but not open
+	           read :      Device is open for reading
+	           write:      Device is open for writing
+		   read-write: Device is open for reading and writing
+		   full:       No more writing to buffer possible
+ 
+		 Value read-write would normally refer to two processes.
+		 Value full indicates that no more data can be written to
+		 buffer; it will remain unchanged until it gets deleted."
+	    DEFVAL { unused }
+	::= { trcBufEntry 10 }
+ 
+ 
+        trcBufOper OBJECT IDENTIFIER ::= { traceBuffers 2 }
+ 
+        trcBufStatNBufs OBJECT-TYPE
+	    SYNTAX          Unsigned32
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+	        "Number of trace buffers supported by running firmware."
+	::= { trcBufOper 1 }
+ 
+ 
+        trcBufStat OBJECT IDENTIFIER ::= { traceBuffers 3 }
+ 
+        trcBufStatNUnused OBJECT-TYPE
+	    SYNTAX          Unsigned32
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+	        "Number of trace buffers currently available to store data."
+	::= { trcBufStat 1 }
+ 
+        trcBufStatNOpen OBJECT-TYPE
+	    SYNTAX          Unsigned32
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+	        "Number of trace buffers currently available for appending
+                 data."
+	::= { trcBufStat 2 }
+ 
+        trcBufStatNFull OBJECT-TYPE
+	    SYNTAX          Unsigned32
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+	        "Number of trace buffers currently available for reading data
+                 only (i.e. in state 'full')."
+	::= { trcBufStat 3 }
+ 
+-- End Trace Buffers
+
+-- Begin automatic update check sechedule
+
+        chkUpdSrv OBJECT IDENTIFIER ::= { extadmin 22 }
+
+        chkUpdSrvAdmin OBJECT IDENTIFIER
+        ::= {  chkUpdSrv 1 }
+
+        chkUpdSrvAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                disabled(1),
+                ondemand(2),
+                periodic(3),
+                checknow(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Tells when to fetch/process the XML-file-contents pointed at
+                by chkUpdSrvAdminOperURL (if not empty string).
+                disabled: Clear chkUpdSrvAdminOperURL and supress further
+                          fetch-attempts.
+                ondemand: Fetch at system-start and at every change of
+                          chkUpdSrvAdminOperURL (unless empty string).
+                periodic: In addition to 'ondemand', fetch also periodically
+                          with specified chkUpdSrvAdminInterval.
+                checknow: Fetch now and switch-back AdminStatus to previous
+                          value (i.e. to disabled, ondemand, periodic).
+                "
+            DEFVAL { periodic }
+        ::= { chkUpdSrvAdmin 1 }
+
+        chkUpdSrvAdminInterval OBJECT-TYPE
+            SYNTAX      INTEGER (1..8191)
+            UNITS       "h"
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Period in hours for checking for available updates.
+                Default value is once a week (7 * 24 = 168 hours).
+                Ignored if chkUpdSrvAdminStatus is NOT periodic.
+                "
+            DEFVAL { 168 }
+        ::= { chkUpdSrvAdmin 2 }
+
+        chkUpdSrvAdminURL OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Sets location of the XML description file, UNLESS value is set
+                already at compile-time (see chkUpdSrvAdminOperURL).
+                "
+        ::= { chkUpdSrvAdmin 3 }
+
+        chkUpdSrvAdminOperURL OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Shows location of the XML description file, coming from either
+                chkUpdSrvAdminURL or fixed compile-time-URL, or forced to empty
+                string if chkUpdSrvAdminStatus is disabled.
+                If resulting string is empty then chkUpdSrvTable is filled for
+                biboExtAdmUpdatePath instead, unless also empty.
+                "
+        ::= { chkUpdSrvAdmin 4 }
+
+        chkUpdSrvAdminDefaultDigestType OBJECT-TYPE
+            SYNTAX      INTEGER {
+                crc32(1),
+                sha256(2),
+                signature(3),
+                none(16)
+            }
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Default digest-checking-method (if not specified in XML-file)
+                "
+            DEFVAL {sha256 }
+        ::= { chkUpdSrvAdmin 5 }
+
+        chkUpdSrvAdminOperStatus OBJECT-TYPE
+            SYNTAX      INTEGER {
+                disabled(1),
+                idle(2),
+                checking(3)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Current activity and state.
+                "
+            DEFVAL { idle }
+        ::= { chkUpdSrvAdmin 6 }
+
+        chkUpdSrvAdminLastSuccessfulCheckTime OBJECT-TYPE
+            SYNTAX      Date
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "If not 0, tells when chkUpdSrvTable was last updated
+                successfully for contents coming from either
+                chkUpdSrvAdminOperURL or biboExtAdmUpdatePath.
+                Is reset to 0 whenever chkUpdSrvAdminOperURL changes.
+                "
+        ::= { chkUpdSrvAdmin 7 }
+
+        chkUpdSrvAdminLastFailedCheckTime OBJECT-TYPE
+            SYNTAX      Date
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "If not 0, tells time of last unsuccessful update-attempt.
+                If bigger than chkUpdSrvAdminLastSuccessfulCheckTime then
+                retries are scheduled (see chkUpdSrvAdminLastFailedTries).
+                Is reset to 0 whenever chkUpdSrvAdminOperURL changes.
+                "
+        ::= { chkUpdSrvAdmin 8 }
+
+        chkUpdSrvAdminLastFailedCheckInfo OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Display-status of last unsuccessful update-attempt.
+                (Not updated for successful checks.)
+                Is flushed to empty whenever chkUpdSrvAdminOperURL changes.
+                "
+            DEFVAL { "" }
+        ::= { chkUpdSrvAdmin 9 }
+
+        chkUpdSrvAdminActiveProductClass OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Currently active product-class.
+                "
+        ::= { chkUpdSrvAdmin 10 }
+
+        chkUpdSrvAdminAlternativeProductClass OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Alternative product-class (empty if unknown).
+                "
+        ::= { chkUpdSrvAdmin 11 }
+
+        chkUpdSrvAdminLastFailedTries OBJECT-TYPE
+            SYNTAX      INTEGER
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "If not 0, tells that retries are scheduled for latest failed
+                update-check, and how many tries have been done yet (see also
+                chkUpdSrvAdminLastFailedCheckTime for related timestamp).
+                Is reset to 0 whenever update-check succeeds or restarts (e.g.
+                due to changed chkUpdSrvAdminOperURL).
+                "
+        ::= { chkUpdSrvAdmin 12 }
+
+        chkUpdSrvTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChkUpdSrvEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "List of available update-files. When update-command is called
+                with dummy-URL 'http:', it looks for a matching default-entry
+                in this table to get a proper chkUpdSrvDownloadLink.
+                "
+        ::= { chkUpdSrv 2 }
+
+        chkUpdSrvEntry OBJECT-TYPE
+            SYNTAX  ChkUpdSrvEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "Detailed info per listed update-file.
+                "
+            INDEX   {
+                chkUpdSrvIndex
+            }
+        ::= { chkUpdSrvTable 1 }
+
+        ChkUpdSrvEntry ::=
+            SEQUENCE {
+                chkUpdSrvIndex              INTEGER,
+                chkUpdSrvProductClass       DisplayString,
+                chkUpdSrvFileType           INTEGER,
+                chkUpdSrvFileDescr          DisplayString,
+                chkUpdSrvFileVersion        DisplayString,
+                chkUpdSrvFileDigestType     INTEGER,
+                chkUpdSrvFileDigestValue    DisplayString,
+                chkUpdSrvDownloadLink       DisplayString,
+                chkUpdSrvRelNoteLink        DisplayString,
+                chkUpdSrvFileUpdatable      INTEGER
+            }
+
+        chkUpdSrvIndex OBJECT-TYPE
+            SYNTAX      INTEGER
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Unique identification of the entry.
+                "
+        ::= { chkUpdSrvEntry 1 }
+
+        chkUpdSrvProductClass OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Product-class for file.
+                "
+        ::= { chkUpdSrvEntry 2 }
+
+        chkUpdSrvFileType OBJECT-TYPE
+            SYNTAX      INTEGER {
+                blup(1),
+                boss(2),
+                logic(3),
+                bootmon(4),
+                adsl(5),
+                vdsl(6),
+                gphy(7),
+                systelarchive(20),
+                voicemailarchive(21),
+                guixlation(30),
+                thirdparty(50)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Type of file.
+                "
+            DEFVAL { blup }
+        ::= { chkUpdSrvEntry 3 }
+
+        chkUpdSrvFileDescr OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE (0..64))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Additional file-description,
+                used for language and third party files.
+                "
+        ::= { chkUpdSrvEntry 4 }
+
+        chkUpdSrvFileVersion OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE (0..64))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Version of file (empty if unknown).
+                "
+        ::= { chkUpdSrvEntry 5 }
+
+        chkUpdSrvFileDigestType OBJECT-TYPE
+            SYNTAX      INTEGER {
+                crc32(1),
+                sha256(2),
+                signature(3),
+                none(16)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Method to be used for digest-checking
+                "
+            DEFVAL {sha256 }
+        ::= { chkUpdSrvEntry 6 }
+
+        chkUpdSrvFileDigestValue OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Hash/signature for this file, depending on digest-type.
+                "
+        ::= { chkUpdSrvEntry 7 }
+
+        chkUpdSrvDownloadLink OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "URL for downloading this file.
+                "
+        ::= { chkUpdSrvEntry 8 }
+
+        chkUpdSrvRelNoteLink OBJECT-TYPE
+            SYNTAX      DisplayString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "URL for downloading release-notes (if any) for this file.
+                "
+            DEFVAL { "" }
+        ::= { chkUpdSrvEntry 9 }
+
+        chkUpdSrvFileUpdatable OBJECT-TYPE
+            SYNTAX      INTEGER {
+                false(1),
+                true(2),
+                unknown(3)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Tells if system can be updated with this file.
+                false: Update will not work or have no effect
+                true: Update will have effect
+                unknown: No info available (e.g. unknown file-version)
+                "
+            DEFVAL { unknown }
+        ::= { chkUpdSrvEntry 10 }
+
+END		-- of BIANCA-BRICK definitions

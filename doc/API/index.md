@@ -1,11 +1,7 @@
-source: API/index.md
-path: blob/master/doc/
-
 ## Versioning
 
 Versioning an API is a minefield which saw us looking at numerous
-options on how to do this. Paul wrote an excellent blog post which
-touches on this: <https://blog.librenms.org/2014/09/restful-apis/>
+options on how to do this.
 
 We have currently settled on using versioning within the API end point
 itself `/api/v0`. As the API itself is new and still in active
@@ -48,7 +44,7 @@ Output:
 ## Input
 
 Input to the API is done in three different ways, sometimes a
-combination two or three of these.
+combination of two or three of these.
 
 - Passing parameters via the api route. For example when obtaining a
   devices details you will pass the hostname of the device in the route: `/api/v0/devices/:hostname`.
@@ -59,22 +55,23 @@ combination two or three of these.
   updating information via the API, for instance adding a new device:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}'-H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
 ```
 
 ## Output
 
 Output from the API currently is via two output types:
 
-- JSON Most API responses will output json. As show in the example for
+- JSON: Most API responses will output json. As shown in the example for
   calling the API endpoint.
-- PNG This is for when the request is for an image such as a graph for a switch port.
+- PNG: This is for when the request is for an image such as a graph for a switch port.
 
 ## Endpoint Categories
 
 - [Devices](Devices.md)
 - [DeviceGroups](DeviceGroups.md)
 - [Ports](Ports.md)
+- [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)

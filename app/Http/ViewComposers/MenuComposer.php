@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,21 +33,26 @@ use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
+use App\Models\PortGroup;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use Auth;
+use App\Plugins\Hooks\MenuEntryHook;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
+use PluginManager;
 
 class MenuComposer
 {
     /**
      * Bind data to the view.
      *
-     * @param  View $view
+     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
@@ -78,7 +83,7 @@ class MenuComposer
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
-            collect();
+            new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         // Service menu
@@ -91,13 +96,26 @@ class MenuComposer
         $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
-        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))->filter();
+
+        $custom_descr = [];
+        foreach ((array) Config::get('custom_descr', []) as $descr) {
+            $custom_descr_name = is_array($descr) ? $descr[0] : $descr;
+            if (empty($custom_descr_name)) {
+                continue;
+            }
+            $custom_descr[] = ['name' => $custom_descr_name,
+                'icon' => is_array($descr) ? $descr[1] : 'fa-connectdevelop',
+            ];
+        }
+        $vars['custom_port_descr'] = collect($custom_descr)->filter();
         $vars['port_groups_exist'] = Config::get('int_customers') ||
             Config::get('int_transit') ||
             Config::get('int_peering') ||
             Config::get('int_core') ||
             Config::get('int_l2tp') ||
             $vars['custom_port_descr']->isNotEmpty();
+
+        $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();
@@ -109,6 +127,7 @@ class MenuComposer
             ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
                 $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
+
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });
 
@@ -127,7 +146,7 @@ class MenuComposer
                         'url' => 'vrf',
                         'icon' => 'arrows',
                         'text' => 'VRFs',
-                    ]
+                    ],
                 ];
             }
 
@@ -137,7 +156,7 @@ class MenuComposer
                         'url' => 'mpls',
                         'icon' => 'tag',
                         'text' => 'MPLS',
-                    ]
+                    ],
                 ];
             }
 
@@ -147,7 +166,17 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
-                    ]
+                    ],
+                ];
+            }
+
+            if ($routing_count['isis']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'isis',
+                        'icon' => 'arrows-alt',
+                        'text' => 'ISIS Adjacencies',
+                    ],
                 ];
             }
 
@@ -157,7 +186,7 @@ class MenuComposer
                         'url' => 'cisco-otv',
                         'icon' => 'exchange',
                         'text' => 'Cisco OTV',
-                    ]
+                    ],
                 ];
             }
 
@@ -192,7 +221,7 @@ class MenuComposer
                         'url' => 'cef',
                         'icon' => 'exchange',
                         'text' => 'Cisco CEF',
-                    ]
+                    ],
                 ];
             }
         }
@@ -227,6 +256,14 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+
+        // Plugins
+        $vars['has_v1_plugins'] = Plugins::count() != 0;
+        $vars['v1_plugin_menu'] = Plugins::call('menu');
+        $vars['has_v2_plugins'] = PluginManager::hasHooks(MenuEntryHook::class);
+        $vars['menu_hooks'] = PluginManager::call(MenuEntryHook::class);
+
+        $vars['browser_push'] = $user->hasBrowserPushTransport();
 
         $view->with($vars);
     }

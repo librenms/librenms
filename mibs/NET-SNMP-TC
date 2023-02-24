@@ -93,6 +93,7 @@ win32		  OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 13 } -- unlucky
 hpux11            OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 14 }
 aix               OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 15 }
 macosx            OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 16 }
+dragonfly         OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 17 }
 unknown           OBJECT IDENTIFIER ::= { netSnmpAgentOIDs 255 }
 
 
@@ -119,5 +120,9 @@ netSnmpAAL5PVCDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 3 }
 netSnmpUDPIPv6Domain	OBJECT IDENTIFIER ::= { netSnmpDomains 4 } -- obsolete
 netSnmpTCPIPv6Domain	OBJECT IDENTIFIER ::= { netSnmpDomains 5 } -- obsolete
 netSnmpCallbackDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 6 }
+netSnmpAliasDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 7 }
+netSnmpDTLSUDPDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 8 }
+netSnmpDTLSSCTPDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 9 }
+netSnmpTLSTCPDomain	OBJECT IDENTIFIER ::= { netSnmpDomains 10 }
 
 END

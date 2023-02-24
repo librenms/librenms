@@ -1,0 +1,139 @@
+-- =============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide wlan access controler maitenace feature.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by haoshitong 10530
+--     Initial version 2014-09-28
+-- =============================================================================
+HH3C-WLANMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cWlanMt MODULE-IDENTITY
+    LAST-UPDATED "201409281747Z"        -- September 28, 2014 at 14:50 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB provides information about WlanMt(Wlan Maintenance) feature.
+
+        WlanMt is designed to be employed in an area that is serviced
+        by an existing wireless network.
+        It reflect the running situation on VCpu whitch used to forward packets.
+        These information include: VCpu-Usage(Past 5 secons), Total Rx\Tx\Drop
+        packets per VCpu.
+        "
+    REVISION "201409281747Z"        -- September 28, 2014 at 14:50 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= {  hh3cCommon 157 }
+
+--
+-- Node definitions
+--
+
+hh3cWlanMtVCpuInfoGroup OBJECT IDENTIFIER ::= { hh3cWlanMt 1 }
+
+hh3cWlanMtVCpuInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWlanMtVCpuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible VCpu information."
+    ::= { hh3cWlanMtVCpuInfoGroup 1 }
+
+hh3cWlanMtVCpuInfoEntry OBJECT-TYPE
+    SYNTAX Hh3cWlanMtVCpuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible information of each VCpu."
+    INDEX { hh3cWlanMtVcpuID }
+    ::= { hh3cWlanMtVCpuInfoTable 1 }
+
+Hh3cWlanMtVCpuInfoEntry ::=
+    SEQUENCE {
+        hh3cWlanMtVcpuID
+            Unsigned32,
+        hh3cWlanMtVcpuUsage
+            Unsigned32,
+        hh3cWlanMtVcpuRx
+            Counter64,
+        hh3cWlanMtVcpuTx
+            Counter64,
+        hh3cWlanMtVcpuDrop
+            Counter64
+    }
+
+hh3cWlanMtVcpuID OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the Id of the VCpu."
+    ::= { hh3cWlanMtVCpuInfoEntry 1 }
+
+hh3cWlanMtVcpuUsage OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the usage of the VCpu."
+    ::= { hh3cWlanMtVCpuInfoEntry 2 }
+
+hh3cWlanMtVcpuRx OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has recieved."
+    ::= { hh3cWlanMtVCpuInfoEntry 3 }
+
+hh3cWlanMtVcpuTx OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has transmitted."
+    ::= { hh3cWlanMtVCpuInfoEntry 4 }
+
+hh3cWlanMtVcpuDrop OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has Dropped."
+    ::= { hh3cWlanMtVCpuInfoEntry 5 }
+
+hh3cWlanMtFrameToCpu OBJECT IDENTIFIER ::= { hh3cWlanMt 2 }
+
+hh3cWlanMtToCpuTxFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total packets send to cpu successfully."
+    ::= { hh3cWlanMtFrameToCpu 1 }
+
+hh3cWlanMtToCpuDropFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total packets send to cpu failed."
+    ::= { hh3cWlanMtFrameToCpu 2 }
+
+END

@@ -1,0 +1,448 @@
+-- ============================================================================
+-- Copyright (C) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: There are three standard MIB definitions, "LLDP-MIB", "LLDP-EXT-
+--     DOT1-MIB", "LLDP-EXT-DOT3-MIB", define almost all MIB objects of LLDP.
+--     This document defines more MIB objects privately For LLDP implementation.
+--      1)LLDP default global status is disabled, a management object needed to
+--        enable it.
+--      2)LLDP needs to be compliable with CDP (Non standard IEEE link layer di-
+--        scovery protocol).  A management object needed to enable or disable
+--        compliance.
+--      3)For compliance with CDP, port based control management object is need-
+--        ed.
+--      4)LLDP is able to control the status of a port that connects to a neigh-
+--        bor by matching local neighbor identity information with the informat-
+--        ion in the received chassis ID TLV and port ID TLV.
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0 created by qizhenglin 2009-03-20
+-- V1.1 2015-09-01 Updated by zhaixiaoxiang
+--      Add hh3clldpPortConfigValidationAction and hh3clldpPortConfigAgingAction
+--       to hh3clldpPortConfigTable
+--      Add the hh3clldpNbIdentityTable, hh3clldpPortStatusTable, and hh3clldpN-
+--      otifications tables.
+-- V1.2 2019-03-07 Updated by tuchanyong
+--      Add hh3clldpRemManAddrTable.
+-- V1.3 2019-09-17 Updated by tongwenxin
+--      The value 'rx(3)' is added for data type 'hh3clldpPortConfigCDPComplian-
+--      ceStatus'.
+-- ============================================================================
+HH3C-LLDP-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    AddressFamilyNumbers
+        FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+    LldpPortNumber, lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex,
+    LldpManAddrIfSubtype, lldpRemManAddr, lldpRemManAddrSubtype
+        FROM LLDP-MIB;
+
+hh3clldp MODULE-IDENTITY
+    LAST-UPDATED "201909170000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co.,Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "LLDP extended management information."
+    REVISION  "201909170000Z"
+    DESCRIPTION "Add the value of hh3clldpPortConfigCDPComplian."
+    REVISION  "201903070000Z"
+    DESCRIPTION "Add hh3clldpRemManAddrTable."
+    REVISION  "201509010000Z"
+    DESCRIPTION "Update this MIB module."
+    REVISION  "200903210000Z"
+    DESCRIPTION "The initial revision of this MIB module."
+    ::= { hh3cCommon 100 }
+
+hh3clldpObjects                    OBJECT IDENTIFIER ::= { hh3clldp 1 }
+hh3clldpNotifications              OBJECT IDENTIFIER ::= { hh3clldp 2 }
+--
+-- LLDP extended MIB Objects
+--
+hh3clldpConfiguration              OBJECT IDENTIFIER ::= { hh3clldpObjects 1 }
+hh3clldpRemoteSystemsData          OBJECT IDENTIFIER ::= { hh3clldpObjects 2 }
+--
+-- LLDP extended global configuration
+--
+hh3clldpAdminStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global administratively desired status of the local LLDP agent."
+    ::= { hh3clldpConfiguration 1 }
+
+hh3clldpComplianceCDPStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global administratively desired status of CDP Compliance."
+    ::= { hh3clldpConfiguration 2 }
+
+--
+-- hh3clldpPortConfigTable: LLDP configuration on a per port basis
+--
+
+hh3clldpPortConfigTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3clldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port-based table that controls extended functions."
+    ::= { hh3clldpConfiguration 3 }
+
+hh3clldpPortConfigEntry   OBJECT-TYPE
+    SYNTAX      Hh3clldpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "LLDP extended configuration information for a particular port.  This c-
+        onfiguration parameter controls compliance with other non-standard link
+        layer discovery protocol such as CDP."
+    INDEX  { hh3clldpPortConfigPortNum }
+    ::= { hh3clldpPortConfigTable 1 }
+
+Hh3clldpPortConfigEntry ::= SEQUENCE {
+    hh3clldpPortConfigPortNum         LldpPortNumber,
+    hh3clldpPortConfigCDPComplianceStatus        INTEGER,
+    hh3clldpPortConfigValidationAction           Integer32,
+    hh3clldpPortConfigAgingAction                Integer32 }
+
+hh3clldpPortConfigPortNum   OBJECT-TYPE
+    SYNTAX      LldpPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the port component associated with th-
+         is entry."
+    ::= { hh3clldpPortConfigEntry 1 }
+
+hh3clldpPortConfigCDPComplianceStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+       txAndRx(1),
+       disabled(2),
+       rx(3)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The administratively desired CDP Compliance status of the local LLDP a-
+        gent.  If the associated hh3clldpPortConfigCDPComplianceStatus object h-
+        as a value of 'txAndRx', then the LLDP agent will receive CDP frames on
+        this port, and will transmit CDP frames only after receiving a CDP fram-
+        es.If the associated lldpPortConfigAdminStatus object has a value of 'd-
+        isabled', LLDP agent will not transmit or receive CDP frames on this po-
+        rt.If the associated hh3clldpPortConfigCDPComplianceStatus object has a
+        value of 'rx', then the LLDP agent will receive CDP frames on this port,
+        and will not transmit CDP frames."
+    DEFVAL  { disabled }
+    ::= { hh3clldpPortConfigEntry 2 }
+
+hh3clldpPortConfigValidationAction  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action that neighbor validation takes on a port.  Bit 1 indicates the
+        block action.  Bit 2 indicates the shutdown action."
+    ::= { hh3clldpPortConfigEntry 3 }
+
+hh3clldpPortConfigAgingAction  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Action that neighbor aging takes on a port.  Bit 1 indicates the block
+         action.  Bit 2 indicates the shutdown action."
+    ::= { hh3clldpPortConfigEntry 4 }
+
+--
+-- hh3clldpNbIdentityTable:
+--
+
+hh3clldpNbIdentityTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3clldpNbIdentityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the neighbor identity information of a port."
+    ::= { hh3clldpConfiguration 4 }
+
+hh3clldpNbIdentityEntry   OBJECT-TYPE
+    SYNTAX      Hh3clldpNbIdentityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the neighbor identity information of a
+        port."
+    INDEX  { hh3clldpNbIdentityPortNum }
+    ::= { hh3clldpNbIdentityTable 1 }
+
+Hh3clldpNbIdentityEntry ::= SEQUENCE {
+    hh3clldpNbIdentityPortNum          LldpPortNumber,
+    hh3clldpNbIdentityChassisIDSubtype INTEGER,
+    hh3clldpNbIdentityChassisID        OCTET STRING,
+    hh3clldpNbIdentityPortIDSubtype    INTEGER,
+    hh3clldpNbIdentityPortID           OCTET STRING,
+    hh3clldpNbIdentityRowStatus        RowStatus }
+
+hh3clldpNbIdentityPortNum   OBJECT-TYPE
+    SYNTAX      LldpPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port number."
+    ::= { hh3clldpNbIdentityEntry 1 }
+
+hh3clldpNbIdentityChassisIDSubtype  OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(0),
+        chassisComponent(1),
+        interfaceAlias(2),
+        portComponent(3),
+        macAddress(4),
+        networkAddress(5),
+        interfaceName(6),
+        local(7)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Chassis ID subtype.  The value range is 0 to 7, and the default value
+        is 0.  The values 1 to 7 represents the chassis component, interface al-
+        ias, port component, MAC address, network address, interface name, and
+        locally assigned subtypes, respectively."
+    ::= { hh3clldpNbIdentityEntry 2 }
+
+hh3clldpNbIdentityChassisID  OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Chassis ID, a case-insensitive string of 1 to 255 characters.
+        By default, the string is empty.  If the value of
+        hh3clldpNbIdentityChassisIDSubtype is 4, the chassis ID must be
+        a MAC address in H-H-H format."
+    ::= { hh3clldpNbIdentityEntry 3 }
+
+hh3clldpNbIdentityPortIDSubtype  OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(0),
+        interfaceAlias(1),
+        portComponent(2),
+        macAddress(3),
+        networkAddress(4),
+        interfaceName(5),
+        agentCircuitId(6),
+        local(7)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Port ID subtype.  The value range is 0 to 7, and the default
+         value is 0.  The values 1 to 7 represents the interface alias, port co-
+         mponent, MAC address, network address, interface name, agent circuit
+         ID, and locally assigned subtypes, respectively."
+    ::= { hh3clldpNbIdentityEntry 4 }
+
+hh3clldpNbIdentityPortID  OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Port ID, a case-insensitive string of 1 to 255 characters.
+        By default, the string is empty.  If the value of
+        hh3clldpNbIdentityPortIDSubtype is 3, the port ID must be
+        a MAC address in H-H-H format."
+    ::= { hh3clldpNbIdentityEntry 5 }
+
+hh3clldpNbIdentityRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row status: CreateAndGo, Active, or Destroy."
+    ::= { hh3clldpNbIdentityEntry 6 }
+
+--
+-- hh3clldpPortStatusTable
+--
+
+hh3clldpPortStatusTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3clldpPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the state information of a port."
+    ::= { hh3clldpConfiguration 5 }
+
+hh3clldpPortStatusEntry   OBJECT-TYPE
+    SYNTAX      Hh3clldpPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the state information of a port."
+    INDEX  { hh3clldpPortStatusPortNum }
+    ::= { hh3clldpPortStatusTable 1 }
+
+Hh3clldpPortStatusEntry ::= SEQUENCE {
+    hh3clldpPortStatusPortNum      LldpPortNumber,
+    hh3clldpPortValidationStatus   Integer32,
+    hh3clldpPortAgingStatus        Integer32
+    }
+
+hh3clldpPortStatusPortNum   OBJECT-TYPE
+    SYNTAX      LldpPortNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Port number."
+    ::= { hh3clldpPortStatusEntry 1 }
+
+hh3clldpPortValidationStatus  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Neighbor validation protection status of the port.  The default value
+         is 0."
+    ::= { hh3clldpPortStatusEntry 2 }
+
+hh3clldpPortAgingStatus  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Neighbor aging protection status of the port.  The default value is
+         0."
+    ::= { hh3clldpPortStatusEntry 3 }
+
+--
+-- hh3clldpRemManAddrTable
+--
+
+hh3clldpRemManAddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3clldpRemManAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains management address information on the remote
+         system."
+    ::= { hh3clldpRemoteSystemsData 1 }
+
+hh3clldpRemManAddrEntry OBJECT-TYPE
+    SYNTAX Hh3clldpRemManAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing management address information."
+    INDEX { lldpRemTimeMark,
+            lldpRemLocalPortNum,
+            lldpRemIndex,
+            lldpRemManAddrSubtype,
+            lldpRemManAddr }
+    ::= { hh3clldpRemManAddrTable 1 }
+
+Hh3clldpRemManAddrEntry ::=    SEQUENCE {
+    hh3clldpRemManAddrSubtype      AddressFamilyNumbers,
+    hh3clldpRemManAddr             OCTET STRING,
+    hh3clldpRemManAddrIfSubtype    LldpManAddrIfSubtype,
+    hh3clldpRemManAddrIfId         Integer32,
+    hh3clldpRemManAddrOID          OBJECT IDENTIFIER }
+
+hh3clldpRemManAddrSubtype OBJECT-TYPE
+    SYNTAX AddressFamilyNumbers
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of management address identifier."
+    ::= { hh3clldpRemManAddrEntry 1 }
+
+hh3clldpRemManAddr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The management address associated with the remote system.  The value
+        of the management address is a string of 1 to 255 characters.
+
+        If the value of hh3clldpRemManAddrSubtype is 1, the management address
+        must be a IPv4 address in the dotted-decimal format.  If the value of
+        hh3clldpRemManAddrSubtype is 2, the management address must be a IPv6
+        address in the most appropriate IPv6 address format."
+    ::= { hh3clldpRemManAddrEntry 2 }
+
+hh3clldpRemManAddrIfSubtype OBJECT-TYPE
+    SYNTAX LldpManAddrIfSubtype
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The enumeration value that identifies the interface numbering
+         method used for defining the interface number."
+    ::= { hh3clldpRemManAddrEntry 3 }
+
+hh3clldpRemManAddrIfId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The integer value used to identify the interface number
+         regarding the management address component associated with
+         the remote system."
+    ::= { hh3clldpRemManAddrEntry 4 }
+
+hh3clldpRemManAddrOID OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OID value used to identify the type of hardware component
+         or protocol entity associated with the management address
+         advertised by the remote system agent."
+    ::= { hh3clldpRemManAddrEntry 5 }
+
+--
+-- ***********************************************************
+--
+--        L L D P   M I B   N O T I F I C A T I O N S
+--
+-- ***********************************************************
+--
+
+hh3clldpPortStatusTrap OBJECT IDENTIFIER ::= { hh3clldpNotifications 0 }
+
+hh3clldpValidationStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        hh3clldpPortStatusPortNum,
+        hh3clldpPortValidationStatus
+    }
+    STATUS        current
+    DESCRIPTION
+        "This notification will be sent when the neighbor validation
+         protection status of a port is changed."
+    ::= { hh3clldpPortStatusTrap 1 }
+
+hh3clldpAgingStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        hh3clldpPortStatusPortNum,
+        hh3clldpPortAgingStatus
+    }
+    STATUS        current
+    DESCRIPTION
+        "This notification will be sent when the neighbor aging protection
+          status of a port is changed."
+    ::= { hh3clldpPortStatusTrap 2 }
+END

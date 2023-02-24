@@ -1,6 +1,3 @@
-source: Support/CLI-Tools.md
-path: blob/master/doc/
-
 # Command line tools
 
 Here's a brief list of command line tools, some might be missing.
@@ -36,5 +33,5 @@ purge-ports.php with that file as input:
 
 ```
 echo 'SELECT port_id FROM ports, devices WHERE devices.device_id = ports.device_id AND deleted = 1' | mysql -h your_DB_server -u your_DB_user -p --skip-column-names your_DB_name > ports_to_delete
-./purge-ports.php -f ports_to_delete
+./purge-port.php -f ports_to_delete
 ```

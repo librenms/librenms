@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2015 Aaron Daniels <aaron@daniels.id.au>
  * @author     Aaron Daniels <aaron@daniels.id.au>
  */
@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
+use App\Models\Eventlog;
 use Illuminate\Support\Arr;
 use Log;
 
@@ -49,7 +50,7 @@ class Component
     public function getComponentCount($device_id = null)
     {
         $counts = \App\Models\Component::query()->when($device_id, function ($query, $device_id) {
-            $query->where('device_id', $device_id);
+            return $query->where('device_id', $device_id);
         })->selectRaw('type, count(*) as count')->groupBy('type')->pluck('count', 'type');
 
         return $counts->isEmpty() ? false : $counts->all();
@@ -58,14 +59,14 @@ class Component
     public function getComponentType($TYPE = null)
     {
         if (is_null($TYPE)) {
-            $SQL = "SELECT DISTINCT `type` as `name` FROM `component` ORDER BY `name`";
+            $SQL = 'SELECT DISTINCT `type` as `name` FROM `component` ORDER BY `name`';
             $row = dbFetchRow($SQL, []);
         } else {
-            $SQL = "SELECT DISTINCT `type` as `name` FROM `component` WHERE `type` = ? ORDER BY `name`";
+            $SQL = 'SELECT DISTINCT `type` as `name` FROM `component` WHERE `type` = ? ORDER BY `name`';
             $row = dbFetchRow($SQL, [$TYPE]);
         }
 
-        if (!isset($row)) {
+        if (! isset($row)) {
             // We didn't find any component types
             return false;
         } else {
@@ -80,7 +81,7 @@ class Component
             ->with('prefs');
 
         // Device_id is shorthand for filter C.device_id = $device_id.
-        if (!is_null($device_id)) {
+        if (! is_null($device_id)) {
             $options['filter']['device_id'] = ['=', $device_id];
         }
 
@@ -122,13 +123,13 @@ class Component
 
     public function getComponentStatus($device = null)
     {
-        $sql_query = "SELECT status, count(status) as count FROM component WHERE";
+        $sql_query = 'SELECT status, count(status) as count FROM component WHERE';
         $sql_param = [];
         $add = 0;
 
-        if (!is_null($device)) {
+        if (! is_null($device)) {
             // Add a device filter to the SQL query.
-            $sql_query .= " `device_id` = ?";
+            $sql_query .= ' `device_id` = ?';
             $sql_param[] = $device;
             $add++;
         }
@@ -137,8 +138,8 @@ class Component
             // No filters, remove " WHERE" -6
             $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
         }
-        $sql_query .= " GROUP BY status";
-        d_echo("SQL Query: " . $sql_query);
+        $sql_query .= ' GROUP BY status';
+        d_echo('SQL Query: ' . $sql_query);
 
         // $service is not null, get only what we want.
         $result = dbFetchRows($sql_query, $sql_param);
@@ -150,7 +151,8 @@ class Component
             $count[$v['status']] = $v['count'];
         }
 
-        d_echo("Component Count by Status: " . print_r($count, true) . "\n");
+        d_echo('Component Count by Status: ' . print_r($count, true) . "\n");
+
         return $count;
     }
 
@@ -158,7 +160,8 @@ class Component
     {
         if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...
-            d_echo("Required arguments are missing. Component ID: " . $component_id . ", Start: " . $start . ", End: " . $end . "\n");
+            d_echo('Required arguments are missing. Component ID: ' . $component_id . ', Start: ' . $start . ', End: ' . $end . "\n");
+
             return false;
         }
 
@@ -166,7 +169,7 @@ class Component
         $return = [];
 
         // 1. find the previous value, this is the value when $start occurred.
-        $sql_query = "SELECT status FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` < ? ORDER BY `id` desc LIMIT 1";
+        $sql_query = 'SELECT status FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` < ? ORDER BY `id` desc LIMIT 1';
         $sql_param = [$component_id, $start];
         $result = dbFetchRow($sql_query, $sql_param);
         if ($result == false) {
@@ -176,11 +179,12 @@ class Component
         }
 
         // 2. Then we just need a list of all the entries for the time period.
-        $sql_query = "SELECT status, `timestamp`, message FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` >= ? AND `timestamp` < ? ORDER BY `timestamp`";
+        $sql_query = 'SELECT status, `timestamp`, message FROM `component_statuslog` WHERE `component_id` = ? AND `timestamp` >= ? AND `timestamp` < ? ORDER BY `timestamp`';
         $sql_param = [$component_id, $start, $end];
         $return['data'] = dbFetchRows($sql_query, $sql_param);
 
-        d_echo("Status Log Data: " . print_r($return, true) . "\n");
+        d_echo('Status Log Data: ' . print_r($return, true) . "\n");
+
         return $return;
     }
 
@@ -200,7 +204,7 @@ class Component
         try {
             return ComponentStatusLog::create(['component_id' => $component_id, 'status' => $status, 'message' => $message])->id;
         } catch (\Exception $e) {
-            Log::debug("Failed to create component status log");
+            Log::debug('Failed to create component status log');
         }
 
         return 0;
@@ -215,10 +219,10 @@ class Component
     public function setComponentPrefs($device_id, $updated)
     {
         $updated = Arr::wrap($updated);
-        \App\Models\Component::whereIn('id', array_keys($updated))
+        \App\Models\Component::whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($updated) {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated) {
                 $update = $updated[$component->id];
                 unset($update['type']);  // can't change type
 
@@ -233,17 +237,17 @@ class Component
 
                     // If the Status has changed we need to add a log entry
                     if ($component->isDirty('status')) {
-                        Log::debug("Status Changed - Old: " . $component->getOriginal('status') . ", New: $component->status\n");
+                        Log::debug('Status Changed - Old: ' . $component->getOriginal('status') . ", New: $component->status\n");
                         $this->createStatusLogEntry($component->id, $component->status, $component->error);
                     }
                     $component->save();
 
-                    Log::event($message, $component->device_id, 'component', 3, $component->id);
+                    Eventlog::log($message, $component->device_id, 'component', 3, $component->id);
                 }
 
                 // update preferences
                 $prefs = collect($updated[$component->id])->filter(function ($value, $attr) {
-                    return !array_key_exists($attr, $this->reserved);
+                    return ! array_key_exists($attr, $this->reserved);
                 });
 
                 $invalid = $component->prefs->keyBy('id');
@@ -254,18 +258,18 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component_id);
+                            Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component->id);
                             $existing->save();
                         }
                     } else {
                         $component->prefs()->save(new ComponentPref(['attribute' => $attribute, 'value' => $value]));
-                        Log::event("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', 3, $component->id);
+                        Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', 3, $component->id);
                     }
                 }
 
                 foreach ($invalid as $pref) {
                     $pref->delete();
-                    Log::event("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', 4);
+                    Eventlog::log("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', 4);
                 }
             });
 
@@ -276,19 +280,20 @@ class Component
      * Get the component id for the first component in the array
      * Only set $device_id if using the array from getCompenents(), which is keyed by device_id
      *
-     * @param array $component_array
-     * @param int $device_id
+     * @param  array  $component_array
+     * @param  int  $device_id
      * @return int the component id
      */
     public function getFirstComponentID($component_array, $device_id = null)
     {
-        if (!is_null($device_id) && isset($component_array[$device_id])) {
+        if (! is_null($device_id) && isset($component_array[$device_id])) {
             $component_array = $component_array[$device_id];
         }
 
         foreach ($component_array as $id => $array) {
             return $id;
         }
+
         return -1;
     }
 }

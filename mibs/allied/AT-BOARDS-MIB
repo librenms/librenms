@@ -1,7 +1,7 @@
 -- ============================================================================
 -- AT-BOARDS.MIB, Allied Telesis enterprise MIB: boards identifiers
 --
--- Copyright (c) 2006 by Allied Telesis, Inc.
+-- Copyright (c) 2017 by Allied Telesis, Inc.
 -- All rights reserved.
 --
 -- ============================================================================
@@ -16,7 +16,7 @@
 
 
         boards MODULE-IDENTITY
-            LAST-UPDATED "201009280000Z"
+            LAST-UPDATED "202104220000Z"
             ORGANIZATION
                 "Allied Telesis, Inc."
             CONTACT-INFO
@@ -26,46 +26,304 @@
                 release is a subtree beneath which release ids are assigned.
                 ifTypes is a subtree beneath which interface type ids are assigned.
                 chips is a subtree beneath which chip ids are assigned."
-            REVISION "200606140000Z"
+            REVISION "202104220000Z"
             DESCRIPTION
-                "Initial version of this MIB module."
-            REVISION "200702070000Z"
+                "Add board ID for x530-10GHXm, x530-18GHXm"
+            REVISION "202103250000Z"
             DESCRIPTION
-                "Added boardID for AT-8824R."
-            REVISION "200703210000Z"
+                "Rename VFW to vFW"
+            REVISION "202102250000Z"
             DESCRIPTION
-                "Added boardID for x900-48FS."
+                "Add board ID for AR4050S-5G product"
+            REVISION "202102110000Z"
+            DESCRIPTION
+                "Add board ID for AT-VFW"
+            REVISION "202101180000Z"
+            DESCRIPTION
+                "Add board ID for AT-x950-52XTQm"
+            REVISION "202010140000Z"
+            DESCRIPTION
+                "Add board ID for x530DP-52GHXm"
+            REVISION "202006240000Z"
+            DESCRIPTION
+                "Add board ID for AT-x950-52XSQ"
+            REVISION "202006220000Z"
+            DESCRIPTION
+                "Add board ID for SBx81GP24v2"
+            REVISION "202006180000Z"
+            DESCRIPTION
+                "Add board ID for SBx81CFC960v2"
+            REVISION "202006020000Z"
+            DESCRIPTION
+                "Add board ID for x530L-10GHXm, x530DP-28GHXm and GS980MX/10HSm"
+            REVISION "201912040000Z"
+            DESCRIPTION
+                "Add board ID for IE340-12GP, IE340-12GT"
+            REVISION "201907300000Z"
+            DESCRIPTION
+                "Add board ID for IE340L-18GP"
+            REVISION "201906050000Z"
+            DESCRIPTION
+                "Added board ID for AT-FS980M/28DP"
+            REVISION "201905290000Z"
+            DESCRIPTION
+                "Update IE340 products for 5.4.9-1"
+            REVISION "201905280000Z"
+            DESCRIPTION
+                "Added board ID for x320 and GS980EM products"
+            REVISION "201905220000Z"
+            DESCRIPTION
+                "Added board ID for x530-52 and GS980MX/52 products"
+            REVISION "201903110000Z"
+            DESCRIPTION
+                "Added OID for SBx81CFC960 product, and added SBx81GC40 product"
+            REVISION "201903080000Z"
+            DESCRIPTION
+                "Added board ID for AT-SBxFAN12v2"
+            REVISION "201810030000Z"
+            DESCRIPTION
+                "Added board ID for GS980MX/28 products"
+            REVISION "201809040000Z"
+            DESCRIPTION
+                "Added board ID for x530-28 products"
+            REVISION "201808300000Z"
+            DESCRIPTION
+                 "Added board ID for x530L products"
+            REVISION "201808220000Z"
+            DESCRIPTION
+                 "Added board ID for IE341 products"
+            REVISION "201808170000Z"
+            DESCRIPTION
+                "Added board ID for AT-x550-18XSQ (Replacement PHY) variant"
+            REVISION "201807190000Z"
+            DESCRIPTION
+                "Added board ID for AR1050V product"
+            REVISION "201805290000Z"
+            DESCRIPTION
+                "Replace incorrect syntax in new board definitions"
+            REVISION "201804060000Z"
+            DESCRIPTION
+                "Added board ID for x950 products, XEM2-12XTm and XEM2-8XS."
+            REVISION "201803200000Z"
+            DESCRIPTION
+                "Added board ID for x230L products"
+            REVISION "201801180000Z"
+            DESCRIPTION
+                "Added board ID for IE210 products"
+            REVISION "201712080000Z"
+            DESCRIPTION
+                "Added x220/GS980M products."
+            REVISION "201711140000Z"
+            DESCRIPTION
+                "Added board ID for IE340 products"
+            REVISION "201710190000Z"
+            DESCRIPTION
+                "Rename pprx55018XSPQ to pprx55018XSPQm."
+            REVISION "201705110000Z"
+            DESCRIPTION
+                "Added support for pprAtXem2CQ1."
+            REVISION "201704260000Z"
+            DESCRIPTION
+                "Rename AT-FAN05 to AT-FAN08."
+            REVISION "201703310000Z"
+            DESCRIPTION
+                "Remove '_' in the MIB object names to comply with ASN.1.
+                The object names are slightly changed to make it more readable."
+            REVISION "201702010000Z"
+            DESCRIPTION
+                "Added board ID for GS970 products."
+            REVISION "201701180000Z"
+            DESCRIPTION
+                "Added board ID for GS970PS products."
+            REVISION "201610030000Z"
+            DESCRIPTION
+                "Added board ID for x550 products."
+            REVISION "201605060000Z"
+            DESCRIPTION
+                "Added board ID for AT-GS900M Next Generatin products."
+            REVISION "201601080000Z"
+            DESCRIPTION
+                "Added board ID for AT-FS980M products."
+            REVISION "201601060000Z"
+            DESCRIPTION
+                "Added board IDs for additional SBx8100 power supplies"
+            REVISION "201512170000Z"
+            DESCRIPTION
+                "Added board ID for SBx81XLEM and expansion modules."
+            REVISION "201511100000Z"
+            DESCRIPTION
+                "Added new SwitchBlade x908G2/3 products"
+            REVISION "201508090000Z"
+            DESCRIPTION
+                "Added board ID for AT-x9EM/XT4."
+            REVISION "201508050000Z"
+            DESCRIPTION
+                "Added board ID for AT-XS900MX products."
+            REVISION "201507270000Z"
+            DESCRIPTION
+                "Added board ID for SecureHUB products."
+            REVISION "201507220000Z"
+            DESCRIPTION
+                "Add the Virtual Appliance (VAA, 442) board ID."
+            REVISION "201506300000Z"
+            DESCRIPTION
+                "Place AT-AR2050V and AT-AR2010V in the right order."
+            REVISION "201506190000Z"
+            DESCRIPTION
+                "Added board ID for AT-AR2010V."
+            REVISION "201505060000Z"
+            DESCRIPTION
+                "Added board ID for AT-AR2050V."
+            REVISION "201504030000Z"
+            DESCRIPTION
+                "Change the product name from x230-10GPT to x350-10GPT."
+            REVISION "201503160000Z"
+            DESCRIPTION
+                "Correct the board ID for PWR150 and Stack-QS"
+            REVISION "201503120000Z"
+            DESCRIPTION
+                "Corrected the board IDs for AtGS924MX(443), AtGS924MPX(444), AtGS948MX(445) and AtGS948MPX(446)."
+            REVISION "201502190000Z"
+            DESCRIPTION
+                "Corrected the board IDs for x51028GTXR(436) and x51052GTXR(437)."
+            REVISION "201501140000Z"
+            DESCRIPTION
+                "Add board ID for PWR150 power supply for x930."
+            REVISION "201411190000Z"
+            DESCRIPTION
+                "Add board IDs and chip IDs for IE300 product family."
+            REVISION "201411180000Z"
+            DESCRIPTION
+                "Added board IDs for AT-AR3050S and AT-AR4050S."
+            REVISION "201410220000Z"
+            DESCRIPTION
+                "Renaming Ix510 to IE510."
+            REVISION "201409230000Z"
+            DESCRIPTION
+                "Added board IDs for AT-GS924MX, AT-GS924MPX, AT-GS948MX and AT-GS948MPX."
+            REVISION "201408280000Z"
+            DESCRIPTION
+                "Added board IDs for x510L Products."
+            REVISION "201408200000Z"
+            DESCRIPTION
+                "Renaming AT-IE500-Product Family to IE200"
+            REVISION "201407300000Z"
+            DESCRIPTION
+                "Added board ID for pprx51028GTXR and pprx51052GTXR"
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added board ID for pprx510DP28GTX"
+            REVISION "201406030000Z"
+            DESCRIPTION
+                "Add board and chip IDs for AT-IE500-Product Family. Added Board IDs for x51028GSXDC and Ix51028GSX."
+            REVISION "201405160000Z"
+            DESCRIPTION
+                "Added dc2500xs (ID 414)"
+            REVISION "201403250000Z"
+            DESCRIPTION
+                "Added AT-STACKQS (ID 418) and corrected AT-x930-28GSTX (ID 390) name"
+            REVISION "201308010000Z"
+            DESCRIPTION
+                "Added x930s (IDs 388-392), x310s (IDs 393-400) and
+                 x230s (IDs 401-409)"
+            REVISION "201307090000Z"
+            DESCRIPTION
+                "Added board ID for pprx510DP52GTX, pprIX528GPX, pprPWR100R and
+                 pprPWR250DCR"
+            REVISION "201206070000Z"
+            DESCRIPTION
+                "Correct a typo for the name from pprXumStk to pprXemStk"
+            REVISION "201205210000Z"
+            DESCRIPTION
+                "Added pprAtSBx81XZ4 for the SBx8112"
+            REVISION "201205150000Z"
+            DESCRIPTION
+                "Changed the board name from pprAtSBx81XZ6 to pprAtSBx81XS6 and
+                 pprAtSBx81GS24 to pprAtSBx81GS24a"
+            REVISION "201203160000Z"
+            DESCRIPTION
+                "Added board ID for x510 series."
+            REVISION "201112180500Z"
+            DESCRIPTION
+                "Added pprSBx81CFC960, pprSBx81GT24a, pprSBx81GP24a,
+                pprSBx81GT40 and pprSBx81XS16boards for the SBx8112"
+            REVISION "201110250000Z"
+            DESCRIPTION
+                "Added AT-SBx81FAN06"
+            REVISION "201109200000Z"
+            DESCRIPTION
+                "Added SBx8100 card products."
+            REVISION "201109150000Z"
+            DESCRIPTION
+                "Added AT-SBx8106 product."
+            REVISION "201109140000Z"
+            DESCRIPTION
+                "Added AT-SBx8112 product."
+            REVISION "201109050000Z"
+            DESCRIPTION
+                "Added board ID for x210-9GT, x210-16GT, x210-24GT."
+            REVISION "201105100000Z"
+            DESCRIPTION
+                "Added board ID for pprXem2XS, pprXem24T, pprXem12Tv2, pprXem12Sv2."
+            REVISION "201104280000Z"
+            DESCRIPTION
+                "Added pics AR030 AR031"
+            REVISION "201104040000Z"
+            DESCRIPTION
+                "Added Rapier 48x product"
+            REVISION "201103080000Z"
+            DESCRIPTION
+                "Corrected syntax problems."
+            REVISION "201012010000Z"
+            DESCRIPTION
+                "Added board ID for pprPWR250DC."
+            REVISION "201010120000Z"
+            DESCRIPTION
+                "Added pprx200GE52T and pprx200GE28T"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201008190000Z"
+            DESCRIPTION
+                "Added board 330 pprAR560"
+            REVISION "201007220000Z"
+            DESCRIPTION
+                "Renamed boardID pprx60024TSPOE220WPSU to pprx60024TSPOEPLUS"
+            REVISION "201006140445Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201005190000Z"
+            DESCRIPTION
+                "x610 product range, added pprx61048TsPOEPlus,
+                pprx61024TsXPOEPlus, pprx61024TsPOEPlus, pprPWR800, pprPWR1200,
+                pprPWR250, pprx61048TsX, pprx61048Ts, pprx61024TsX, pprx61024Ts, and
+                pprx61024SPX"
+            REVISION "200905150000Z"
+            DESCRIPTION
+                "Added boardID for pprx60024TSPOE and pprx60024TSPOE220WPSU."
+            REVISION "200812110000Z"
+            DESCRIPTION
+                "Added boardID for pprXum100M, pprAtPWR05AC, pprAtPWR05DC and
+                pprXem2XT."
+            REVISION "200811240000Z"
+            DESCRIPTION
+                "Added boardID for x60024TS,x60024TSXP,x60048TS and x60048TSXP."
             REVISION "200803031500Z"
             DESCRIPTION
                 "Change
                 Added boards 271,272,282,284-286,288.
                 Added boards 290-297,
                 Added boards 300,304-311."
-            REVISION "200811240000Z"
+            REVISION "200703210000Z"
             DESCRIPTION
-                "Added boardID for x60024TS,x60024TSXP,x60048TS and x60048TSXP."
-            REVISION "200812110000Z"
+                "Added boardID for x900-48FS."
+            REVISION "200702070000Z"
             DESCRIPTION
-                "Added boardID for pprXum100M, pprAtPWR05AC, pprAtPWR05DC and
-                pprXem2XT."
-            REVISION "200905150000Z"
+                "Added boardID for AT-8824R."
+            REVISION "200606140000Z"
             DESCRIPTION
-                "Added boardID for pprx60024TSPOE and pprx60024TSPOE220WPSU."
-            REVISION "201006140445Z"
-            DESCRIPTION
-                "MIB revision history dates in descriptions updated."
-            REVISION "201007220000Z"
-            DESCRIPTION
-                "Renamed boardID pprx60024TSPOE220WPSU to pprx60024TSPOEPLUS"
-            REVISION "201008190000Z"
-            DESCRIPTION
-                "Added board 330 pprAR560"
-            REVISION "201009070000Z"
-            DESCRIPTION
-                "Generic syntax tidy up"
-			REVISION "201009280000Z"
-			DESCRIPTION
-				"Added boardID 344 for AT=8824R-DC."
+                "Initial version of this MIB module."
+
             ::= { objects 1 }
 
 
@@ -317,10 +575,10 @@
         ppr8748XLDC OBJECT IDENTIFIER ::= { boards 142 }
 
 
-        pprRapier24iDC_NEBS OBJECT IDENTIFIER ::= { boards 144 }
+        pprRapier24iDcNEBS OBJECT IDENTIFIER ::= { boards 144 }
 
 
-        pprAt8724XLDC_NEBS OBJECT IDENTIFIER ::= { boards 146 }
+        pprAt8724XLDcNEBS OBJECT IDENTIFIER ::= { boards 146 }
 
 
         pprAt8848DC OBJECT IDENTIFIER ::= { boards 147 }
@@ -635,7 +893,7 @@
         pprAt8324XLCR OBJECT IDENTIFIER ::= { boards 285 }
 
 
-        pprXumStk OBJECT IDENTIFIER ::= { boards 286 }
+        pprXemStk OBJECT IDENTIFIER ::= { boards 286 }
 
 
         pprAt8824R OBJECT IDENTIFIER ::= { boards 287 }
@@ -713,6 +971,25 @@
         pprAt8624POECR OBJECT IDENTIFIER ::= { boards 311 }
 
 
+        pprAtSBx8112 OBJECT IDENTIFIER ::= { boards 316 }
+
+
+        pprAtSBx81CFC400 OBJECT IDENTIFIER ::= { boards 317 }
+
+
+        pprAtSBx81GP24 OBJECT IDENTIFIER ::= { boards 318 }
+
+        pprAtSBx81XZ4 OBJECT IDENTIFIER ::= { boards 319 }
+
+        pprAtSBx8161SYSAC OBJECT IDENTIFIER ::= { boards 320 }
+
+
+        pprAtSBx8165POEAC OBJECT IDENTIFIER ::= { boards 321 }
+
+
+        pprAtSBx81FAN OBJECT IDENTIFIER ::= { boards 322 }
+
+
         pprAtPWR05DC OBJECT IDENTIFIER ::= { boards 323 }
 
 
@@ -764,8 +1041,297 @@
         pprx61024SPX OBJECT IDENTIFIER ::= { boards 343 }
 
 
-		pprAt8824RDC OBJECT IDENTIFIER ::= { boards 344 }
+        pprRapier48xDC OBJECT IDENTIFIER ::= { boards 345 }
 
+
+        pprAR030  OBJECT IDENTIFIER ::= { boards 347 }
+
+
+        pprx200GE52T OBJECT IDENTIFIER ::= { boards 348 }
+
+
+        pprx200GE28T OBJECT IDENTIFIER ::= { boards 349 }
+
+
+        pprXem2XS OBJECT IDENTIFIER ::= { boards 350 }
+
+
+        pprPWR250DC OBJECT IDENTIFIER ::= { boards 351 }
+
+
+        pprAtSBx81GT24 OBJECT IDENTIFIER ::= { boards 352 }
+
+
+        pprAtSBx81GS24a OBJECT IDENTIFIER ::= { boards 353 }
+
+
+        pprAtSBx81XS6 OBJECT IDENTIFIER ::= { boards 354 }
+
+
+        pprXem24T OBJECT IDENTIFIER ::= { boards 356 }
+
+
+        pprAR031 OBJECT IDENTIFIER ::= { boards 357 }
+
+
+        pprXem12Tv2 OBJECT IDENTIFIER ::= { boards 358 }
+
+
+        pprXem12Sv2 OBJECT IDENTIFIER ::= { boards 359 }
+
+
+        pprx2109GT OBJECT IDENTIFIER ::= { boards 367 }
+
+
+        pprx21016GT OBJECT IDENTIFIER ::= { boards 368 }
+
+
+        pprx21024GT OBJECT IDENTIFIER ::= { boards 369 }
+
+
+        pprx51028GTX OBJECT IDENTIFIER ::= { boards 370 }
+
+
+        pprx51028GPX OBJECT IDENTIFIER ::= { boards 371 }
+
+
+        pprx51028GSX OBJECT IDENTIFIER ::= { boards 372 }
+
+
+        pprx51052GTX OBJECT IDENTIFIER ::= { boards 373 }
+
+
+        pprx51052GPX OBJECT IDENTIFIER ::= { boards 374 }
+
+
+        pprAtSBx8106 OBJECT IDENTIFIER ::= { boards 375 }
+
+        pprAtSBx81FAN06  OBJECT IDENTIFIER ::= { boards 376 }
+        pprSBx81CFC960  OBJECT IDENTIFIER ::= { boards 377 }
+        pprSBx81GT24a  OBJECT IDENTIFIER ::= { boards 378 }
+        pprSBx81GP24a  OBJECT IDENTIFIER ::= { boards 379 }
+        pprSBx81CFC960v2  OBJECT IDENTIFIER ::= { boards 380 }
+        pprSBx81GT40  OBJECT IDENTIFIER ::= { boards 381 }
+        pprSBx81XS16  OBJECT IDENTIFIER ::= { boards 382 }
+
+        pprAtSBxPWRSYS1DC OBJECT IDENTIFIER ::= { boards 383 }
+
+        pprPWR100R  OBJECT IDENTIFIER ::= { boards 384 }
+        pprPWR250DCR  OBJECT IDENTIFIER ::= { boards 385 }
+
+        pprx510DP52GTX OBJECT IDENTIFIER ::= { boards 386 }
+        pprIX528GPX OBJECT IDENTIFIER ::= { boards 387 }
+
+        pprx93028GTX OBJECT IDENTIFIER ::= { boards 388 }
+        pprx93028GPX OBJECT IDENTIFIER ::= { boards 389 }
+        pprx93028GSTX OBJECT IDENTIFIER ::= { boards 390 }
+        pprx93052GTX OBJECT IDENTIFIER ::= { boards 391 }
+        pprx93052GPX OBJECT IDENTIFIER ::= { boards 392 }
+
+        pprx31026FT OBJECT IDENTIFIER ::= { boards 393 }
+        pprx31050FT OBJECT IDENTIFIER ::= { boards 394 }
+        pprx31026FP OBJECT IDENTIFIER ::= { boards 395 }
+        pprx31050FP OBJECT IDENTIFIER ::= { boards 396 }
+        pprx31026GT OBJECT IDENTIFIER ::= { boards 397 }
+        pprx31050GT OBJECT IDENTIFIER ::= { boards 398 }
+        pprx31026GP OBJECT IDENTIFIER ::= { boards 399 }
+        pprx31050GP OBJECT IDENTIFIER ::= { boards 400 }
+
+        pprx23010GT OBJECT IDENTIFIER ::= { boards 401 }
+        pprx23018GT OBJECT IDENTIFIER ::= { boards 402 }
+        pprx23028GT OBJECT IDENTIFIER ::= { boards 403 }
+        pprx23052GT OBJECT IDENTIFIER ::= { boards 404 }
+        pprx23010GP OBJECT IDENTIFIER ::= { boards 405 }
+        pprx23018GP OBJECT IDENTIFIER ::= { boards 406 }
+        pprx23028GP OBJECT IDENTIFIER ::= { boards 407 }
+        pprx23052GP OBJECT IDENTIFIER ::= { boards 408 }
+
+        pprx35010GPT OBJECT IDENTIFIER ::= { boards 409 }
+
+        pprIE2006GT OBJECT IDENTIFIER ::= { boards 410 }
+        pprIE2006GP OBJECT IDENTIFIER ::= { boards 411 }
+        pprIE2006GPW OBJECT IDENTIFIER ::= { boards 412 }
+
+        pprdc2552xs OBJECT IDENTIFIER ::= { boards 414 }
+
+        pprATStackQS OBJECT IDENTIFIER ::= { boards 419 }
+        pprATx9emXT4 OBJECT IDENTIFIER ::= { boards 420 }
+
+        pprx51028GSXDC OBJECT IDENTIFIER ::= { boards 421 }
+
+        pprIE51028GSX OBJECT IDENTIFIER ::= { boards 422 }
+
+        pprAR3050S OBJECT IDENTIFIER ::= { boards 423 }
+        pprAR4050S OBJECT IDENTIFIER ::= { boards 426 }
+
+        pprIE2006FT OBJECT IDENTIFIER ::= { boards 429 }
+        pprIE2006FP OBJECT IDENTIFIER ::= { boards 430 }
+
+        pprx510DP28GTX OBJECT IDENTIFIER ::= { boards 431 }
+
+        pprx510L28GT OBJECT IDENTIFIER ::= { boards 432 }
+        pprx510L52GT OBJECT IDENTIFIER ::= { boards 433 }
+        pprx510L28GP OBJECT IDENTIFIER ::= { boards 434 }
+        pprx510L52GP OBJECT IDENTIFIER ::= { boards 435 }
+
+        pprx51028GTXR OBJECT IDENTIFIER ::= { boards 436 }
+        pprx51052GTXR OBJECT IDENTIFIER ::= { boards 437 }
+
+        pprIE30012GT OBJECT IDENTIFIER ::= { boards 438 }
+        pprIE30012GP OBJECT IDENTIFIER ::= { boards 439 }
+        pprIE30012GS OBJECT IDENTIFIER ::= { boards 440 }
+        pprIE30020GST OBJECT IDENTIFIER ::= { boards 441 }
+
+        pprVAA OBJECT IDENTIFIER ::= { boards 442 }
+
+        pprAtGS924MX OBJECT IDENTIFIER ::= { boards 443 }
+        pprAtGS924MPX OBJECT IDENTIFIER ::= { boards 444 }
+        pprAtGS948MX OBJECT IDENTIFIER ::= { boards 445 }
+        pprAtGS948MPX OBJECT IDENTIFIER ::= { boards 446 }
+
+        pprAtSBx81XLEM OBJECT IDENTIFIER ::= { boards 447 }
+        pprAtSBx81XLEMemXS8 OBJECT IDENTIFIER ::= { boards 448 }
+        pprAtSBx81XLEMemQ2 OBJECT IDENTIFIER ::= { boards 449 }
+        pprAtSBx81XLEMemXT4 OBJECT IDENTIFIER ::= { boards 450 }
+        pprAtSBx81XLEMemGT8 OBJECT IDENTIFIER ::= { boards 451 }
+
+        pprAtSBxPWRSYS2AC OBJECT IDENTIFIER ::= { boards 452 }
+
+        pprPWR150 OBJECT IDENTIFIER ::= { boards 453 }
+        pprAR2050V OBJECT IDENTIFIER ::= { boards 454 }
+        pprAR2010V OBJECT IDENTIFIER ::= { boards 455 }
+
+        pprAtXS916MXT OBJECT IDENTIFIER ::= { boards 456 }
+        pprAtXS916MXS OBJECT IDENTIFIER ::= { boards 457 }
+        pprAtXS916MXP OBJECT IDENTIFIER ::= { boards 458 }
+
+        pprSH51028GTX OBJECT IDENTIFIER ::= { boards 459 }
+        pprSH51052GTX OBJECT IDENTIFIER ::= { boards 460 }
+        pprSH51028GPX OBJECT IDENTIFIER ::= { boards 461 }
+        pprSH51052GPX OBJECT IDENTIFIER ::= { boards 462 }
+        pprSH23010GP OBJECT IDENTIFIER ::= { boards 463 }
+        pprSH23018GP OBJECT IDENTIFIER ::= { boards 464 }
+        pprSH23028GP OBJECT IDENTIFIER ::= { boards 465 }
+        pprSH2109GT OBJECT IDENTIFIER ::= { boards 466 }
+        pprSH21016GT OBJECT IDENTIFIER ::= { boards 467 }
+        pprSH21024GT OBJECT IDENTIFIER ::= { boards 468 }
+        pprSH31026FT OBJECT IDENTIFIER ::= { boards 469 }
+        pprSH31050FT OBJECT IDENTIFIER ::= { boards 470 }
+        pprSH31026FP OBJECT IDENTIFIER ::= { boards 471 }
+        pprSH31050FP OBJECT IDENTIFIER ::= { boards 472 }
+        pprSH23010GT OBJECT IDENTIFIER ::= { boards 473 }
+        pprSH23018GT OBJECT IDENTIFIER ::= { boards 474 }
+        pprSH23028GT OBJECT IDENTIFIER ::= { boards 475 }
+
+        pprAtFS980M9 OBJECT IDENTIFIER ::= { boards 476 }
+        pprAtFS980M9PS OBJECT IDENTIFIER ::= { boards 477 }
+        pprAtFS980M18 OBJECT IDENTIFIER ::= { boards 478 }
+        pprAtFS980M18PS OBJECT IDENTIFIER ::= { boards 479 }
+        pprAtFS980M28 OBJECT IDENTIFIER ::= { boards 480 }
+        pprAtFS980M28PS OBJECT IDENTIFIER ::= { boards 481 }
+        pprAtFS980M52 OBJECT IDENTIFIER ::= { boards 482 }
+        pprAtFS980M52PS OBJECT IDENTIFIER ::= { boards 483 }
+
+        pprSBx908G2 OBJECT IDENTIFIER ::= { boards 484 }
+        pprSBx908G3 OBJECT IDENTIFIER ::= { boards 485 }
+        pprAtFan08 OBJECT IDENTIFIER ::= { boards 486 }
+        pprAtXem2QS4 OBJECT IDENTIFIER ::= { boards 487 }
+        pprAtXem2XS12 OBJECT IDENTIFIER ::= { boards 488 }
+        pprAtXem2XT12 OBJECT IDENTIFIER ::= { boards 489 }
+        pprAtXem3QS8 OBJECT IDENTIFIER ::= { boards 490 }
+
+        pprx55018XTQ OBJECT IDENTIFIER ::= { boards 491 }
+        pprx55018XSQ OBJECT IDENTIFIER ::= { boards 492 }
+        pprx55018XSPQm OBJECT IDENTIFIER ::= { boards 493 }
+        pprAtXem2CQ1 OBJECT IDENTIFIER ::= { boards 494 }
+
+        pprAtGS910M OBJECT IDENTIFIER ::= { boards 496 }
+        pprAtGS910MP OBJECT IDENTIFIER ::= { boards 497 }
+        pprAtGS918M OBJECT IDENTIFIER ::= { boards 498 }
+        pprAtGS918MP OBJECT IDENTIFIER ::= { boards 499 }
+        pprAtGS928M OBJECT IDENTIFIER ::= { boards 500 }
+        pprAtGS928MP OBJECT IDENTIFIER ::= { boards 501 }
+        pprAtGS952M OBJECT IDENTIFIER ::= { boards 502 }
+        pprAtGS952MP OBJECT IDENTIFIER ::= { boards 503 }
+
+        pprx22052GT OBJECT IDENTIFIER ::= { boards 505 }
+        pprx22052GP OBJECT IDENTIFIER ::= { boards 506 }
+        pprx22028GS OBJECT IDENTIFIER ::= { boards 509 }
+        pprAtGS980M52 OBJECT IDENTIFIER ::= { boards 515 }
+        pprAtGS980M52PS OBJECT IDENTIFIER ::= { boards 516 }
+
+        pprx53028GTXm OBJECT IDENTIFIER ::= { boards 523 }
+        pprx53028GPXm OBJECT IDENTIFIER ::= { boards 524 }
+        pprx530DP28GHXm OBJECT IDENTIFIER ::= { boards 526 }
+        pprx53052GTXm OBJECT IDENTIFIER ::= { boards 527 }
+        pprx53052GPXm OBJECT IDENTIFIER ::= { boards 528 }
+        pprx530DP52GHXm OBJECT IDENTIFIER ::= { boards 529 }
+        pprAtGS980MX28 OBJECT IDENTIFIER ::= { boards 530 }
+        pprAtGS980MX28PSm OBJECT IDENTIFIER ::= { boards 531 }
+        pprAtGS980MX52 OBJECT IDENTIFIER ::= { boards 532 }
+        pprAtGS980MX52PSm OBJECT IDENTIFIER ::= { boards 533 }
+
+        pprAtGS970M28PS OBJECT IDENTIFIER ::= { boards 534 }
+        pprAtGS970M18PS OBJECT IDENTIFIER ::= { boards 535 }
+        pprAtGS970M10PS OBJECT IDENTIFIER ::= { boards 536 }
+
+        pprAtGS970M28 OBJECT IDENTIFIER ::= { boards 537 }
+        pprAtGS970M18 OBJECT IDENTIFIER ::= { boards 538 }
+        pprAtGS970M10 OBJECT IDENTIFIER ::= { boards 539 }
+        pprAtIE34012GP OBJECT IDENTIFIER ::= { boards 540 }
+        pprAtIE340L18GP OBJECT IDENTIFIER ::= { boards 541 }
+        pprAtIE34012GT OBJECT IDENTIFIER ::= { boards 542 }
+        pprAtIE34020GP OBJECT IDENTIFIER ::= { boards 543 }
+
+        pprIE21010GP OBJECT IDENTIFIER ::= { boards 544 }
+        pprIE21018GP OBJECT IDENTIFIER ::= { boards 545 }
+
+        pprAtXem2XTm12 OBJECT IDENTIFIER ::= { boards 546 }
+        pprAtXem2XSTm8 OBJECT IDENTIFIER ::= { boards 547 }
+
+        pprx95028XTQm OBJECT IDENTIFIER ::= { boards 548 }
+        pprx95028XSQ OBJECT IDENTIFIER ::= { boards 549 }
+
+        pprx230L17GT OBJECT IDENTIFIER ::= { boards 556 }
+        pprx230L26GT OBJECT IDENTIFIER ::= { boards 557 }
+
+        pprx32010GH OBJECT IDENTIFIER ::= { boards 558 }
+        pprx32011GPT OBJECT IDENTIFIER ::= { boards 559 }
+
+        pprAtXem2XS12V2 OBJECT IDENTIFIER ::= { boards 560 }
+        pprAR1050V OBJECT IDENTIFIER ::= { boards 561 }
+
+        pprAtSBx81GC40 OBJECT IDENTIFIER ::= { boards 562 }
+
+        pprx55018XSQV2 OBJECT IDENTIFIER ::= { boards 563 }
+
+        pprx530L28GTX OBJECT IDENTIFIER ::= { boards 568 }
+        pprx530L28GPX OBJECT IDENTIFIER ::= { boards 569 }
+        pprx530L52GTX OBJECT IDENTIFIER ::= { boards 570 }
+        pprx530L52GPX OBJECT IDENTIFIER ::= { boards 571 }
+
+        pprAtFS980M28DP OBJECT IDENTIFIER ::= { boards 573 }
+
+        pprAtSBx81FAN12v2 OBJECT IDENTIFIER ::= { boards 575 }
+
+        pprx95052XTQm OBJECT IDENTIFIER ::= { boards 576 }
+        pprx95052XSQ OBJECT IDENTIFIER ::= { boards 577 }
+        pprAtGS980EM10H OBJECT IDENTIFIER ::= { boards 578 }
+        pprAtGS980EM11PT OBJECT IDENTIFIER ::= { boards 579 }
+
+        pprAtSBx81GP24v2 OBJECT IDENTIFIER ::= { boards 581 }
+
+        pprx530L10GHXm OBJECT IDENTIFIER ::= { boards 582 }
+
+        pprx53010GHXm OBJECT IDENTIFIER ::= { boards 584 }
+        pprx53018GHXm OBJECT IDENTIFIER ::= { boards 585 }
+        pprAtGS980MX10HSm OBJECT IDENTIFIER ::= { boards 586 }
+
+        pprSBx81CFC960v2a OBJECT IDENTIFIER ::= { boards 588 }
+
+        pprAR4050S5G OBJECT IDENTIFIER ::= { boards 599 }
+
+        pprvFW OBJECT IDENTIFIER ::= { boards 601 }
 
         release OBJECT IDENTIFIER ::= { objects 2 }
 
@@ -810,6 +1376,9 @@
 
 
         chip860TCpu OBJECT IDENTIFIER ::= { chips 5 }
+
+
+        chipMips4kcCpu OBJECT IDENTIFIER ::= { chips 6 }
 
 
         chipRtc1 OBJECT IDENTIFIER ::= { chips 21 }

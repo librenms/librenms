@@ -1,0 +1,394 @@
+
+CISCOSB-IPSTDACL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      IP Standard ACL
+-- Version:    7.50.00.00
+-- Date:       22-Dec-2010
+-- 22-Nov-2011 MIB label changed from CISCOSB-ipatdacl-MIB into CISCOSB-IPSTDACL-MIB
+-- 			   20-Jun-2011  Added MODULE-IDENTITY
+--
+
+IMPORTS
+    TruthValue, TEXTUAL-CONVENTION, TimeStamp,
+    DisplayString, DateAndTime, RowStatus                FROM SNMPv2-TC
+    TimeTicks, IpAddress, NOTIFICATION-TYPE,
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32             FROM SNMPv2-SMI
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetVersion, InetZoneIndex                           FROM INET-ADDRESS-MIB
+    switch001                                            FROM CISCOSB-MIB;
+
+rlIpStdAcl	MODULE-IDENTITY
+        LAST-UPDATED "201106200000Z"
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for IP Standard ACL."
+        REVISION "201105300000Z"
+        DESCRIPTION
+             "Initial revision."
+        ::= { switch001 207 }
+
+
+RlIpStdAclActionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "ACE action type. Drop action prevents packet forwarding.
+         Permit action allows packet forwarding."
+    SYNTAX  INTEGER {
+        drop(1),
+        permit(2)
+}
+
+RlIpStdAclStdClassificationType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Classification type is used to create ACL rule. ANY type means match all.
+         IPv4 or IPv6 types mean match specified in rlIpStdAclIpAddr field address."
+    SYNTAX  INTEGER {
+        any(1),
+        ipv4(2),
+        ipv6any(3),
+        ipv6(4)
+
+}
+
+
+
+rlIpStdAclTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlIpStdAclEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IP Standard ACL table."
+    ::= {  rlIpStdAcl 1 }
+
+rlIpStdAclEntry OBJECT-TYPE
+    SYNTAX      RlIpStdAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIpStdAclTable."
+    INDEX  { rlIpStdAclAclName, rlIpStdAclAceIndex }
+    ::= { rlIpStdAclTable 1 }
+
+RlIpStdAclEntry::= SEQUENCE {
+   rlIpStdAclAclName                                  DisplayString,
+   rlIpStdAclAceIndex                                 INTEGER,
+   rlIpStdAclSrcClassificationType                    RlIpStdAclStdClassificationType,
+   rlIpStdAclSrcIpAddrType                            InetAddressType,
+   rlIpStdAclSrcIpAddr                                InetAddress,
+   rlIpStdAclSrcPrefLen                               InetAddressPrefixLength,
+   rlIpStdAclDstClassificationType                    RlIpStdAclStdClassificationType,
+   rlIpStdAclDstIpAddrType                            InetAddressType,
+   rlIpStdAclDstIpAddr                                InetAddress,
+   rlIpStdAclDstPrefLen                               InetAddressPrefixLength,
+   rlIpStdAclAction                                   RlIpStdAclActionType,
+   rlIpStdAclRowStatus                                RowStatus
+
+}
+
+
+rlIpStdAclAclName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACL Name."
+    ::= { rlIpStdAclEntry 1 }
+
+rlIpStdAclAceIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACE index."
+    ::= { rlIpStdAclEntry 2 }
+
+
+rlIpStdAclSrcClassificationType OBJECT-TYPE
+    SYNTAX     RlIpStdAclStdClassificationType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Classification type."
+    ::= { rlIpStdAclEntry 3 }
+
+
+rlIpStdAclSrcIpAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpStdAclIpAddr."
+    ::= { rlIpStdAclEntry 4 }
+
+
+rlIpStdAclSrcIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { rlIpStdAclEntry 5 }
+
+
+rlIpStdAclSrcPrefLen OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 32 }
+    ::= { rlIpStdAclEntry 6 }
+
+
+rlIpStdAclDstClassificationType OBJECT-TYPE
+    SYNTAX     RlIpStdAclStdClassificationType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Classification type."
+    ::= { rlIpStdAclEntry 7 }
+
+
+rlIpStdAclDstIpAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpStdAclIpAddr."
+    ::= { rlIpStdAclEntry 8 }
+
+
+rlIpStdAclDstIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { rlIpStdAclEntry 9 }
+
+
+rlIpStdAclDstPrefLen OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 32 }
+    ::= { rlIpStdAclEntry 10 }
+
+
+rlIpStdAclAction OBJECT-TYPE
+    SYNTAX      RlIpStdAclActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Permit or deny action."
+    DEFVAL{ permit }
+    ::= { rlIpStdAclEntry 11 }
+
+
+rlIpStdAclRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rlIpStdAclEntry 12 }
+
+
+
+
+
+-------------------------------------------------------------------------------
+rlIpStdAclFreeAceIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns free ACE index which could be used in order to create new ACE entry."
+    ::= { rlIpStdAcl 2 }
+
+
+
+rlIpStdAclNameToIndexTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlIpStdAclNameToIndexEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IP Standard ACL name to index convert table."
+    ::= {  rlIpStdAcl 3 }
+
+rlIpStdAclNameToIndexEntry OBJECT-TYPE
+    SYNTAX      RlIpStdAclNameToIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIpStdAclNameToIndexTable."
+    INDEX  { rlIpStdAclNameToIndexName }
+    ::= { rlIpStdAclNameToIndexTable 1 }
+
+RlIpStdAclNameToIndexEntry::= SEQUENCE {
+   rlIpStdAclNameToIndexName                DisplayString,
+   rlIpStdAclNameToIndexIndex               INTEGER
+}
+
+
+rlIpStdAclNameToIndexName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACL Name."
+    ::= { rlIpStdAclNameToIndexEntry 1 }
+
+rlIpStdAclNameToIndexIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ACL index."
+    ::= { rlIpStdAclNameToIndexEntry 2 }
+
+
+----------------------------------------------------------------------------
+-- Pair ACL
+----------------------------------------------------------------------------
+
+rlIpStdPairAclTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlIpStdPairAclEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IP Standard Pair ACL table."
+    ::= {  rlIpStdAcl 4 }
+
+rlIpStdPairAclEntry OBJECT-TYPE
+    SYNTAX      RlIpStdPairAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIpStdPairAclTable."
+    INDEX  { rlIpStdPairAclAclName, rlIpStdPairAclAceIndex }
+    ::= { rlIpStdPairAclTable 1 }
+
+RlIpStdPairAclEntry::= SEQUENCE {
+   rlIpStdPairAclAclName                                  DisplayString,
+   rlIpStdPairAclAceIndex                                 INTEGER,
+   rlIpStdPairAclSrcIpAddrType                            InetAddressType,
+   rlIpStdPairAclSrcIpAddr                                InetAddress,
+   rlIpStdPairAclSrcPrefLen                               InetAddressPrefixLength,
+   rlIpStdPairAclDstIpAddrType                            InetAddressType,
+   rlIpStdPairAclDstIpAddr                                InetAddress,
+   rlIpStdPairAclDstPrefLen                               InetAddressPrefixLength,
+   rlIpStdPairAclAction                                   RlIpStdAclActionType,
+   rlIpStdPairAclRowStatus                                RowStatus
+
+}
+
+
+rlIpStdPairAclAclName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACL Name."
+    ::= { rlIpStdPairAclEntry 1 }
+
+rlIpStdPairAclAceIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ACE index."
+    ::= { rlIpStdPairAclEntry 2 }
+
+rlIpStdPairAclSrcIpAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpStdAclIpAddr."
+    ::= { rlIpStdPairAclEntry 3 }
+
+
+rlIpStdPairAclSrcIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { rlIpStdPairAclEntry 4 }
+
+
+rlIpStdPairAclSrcPrefLen OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 32 }
+    ::= { rlIpStdPairAclEntry 5 }
+
+rlIpStdPairAclDstIpAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpStdAclIpAddr."
+    ::= { rlIpStdPairAclEntry 6 }
+
+
+rlIpStdPairAclDstIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { rlIpStdPairAclEntry 7 }
+
+
+rlIpStdPairAclDstPrefLen OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 32 }
+    ::= { rlIpStdPairAclEntry 8 }
+
+
+rlIpStdPairAclAction OBJECT-TYPE
+    SYNTAX      RlIpStdAclActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Permit or deny action."
+    DEFVAL{ permit }
+    ::= { rlIpStdPairAclEntry 9 }
+
+
+rlIpStdPairAclRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rlIpStdPairAclEntry 10 }
+
+
+
+
+
+END
+

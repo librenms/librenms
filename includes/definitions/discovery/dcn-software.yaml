@@ -1,5 +1,19 @@
 mib: DCN-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: DCN-MIB::switchMemorySize
+                used: DCN-MIB::switchMemoryBusy
+                descr: 'Memory Usage'
+    os:
+        hardware:
+            - DCN-MIB::ntpEntSoftwareName.0
+            - DCN-MIB::sysHardwareVersion.0
+        version:
+            - DCN-MIB::ntpEntSoftwareVersion.0
+            - DCN-MIB::sysSoftwareVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     processors:
         data:
             -

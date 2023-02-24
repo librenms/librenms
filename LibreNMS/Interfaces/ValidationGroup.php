@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,29 +32,21 @@ interface ValidationGroup
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
-     *
-     * @param Validator $validator
      */
-    public function validate(Validator $validator);
+    public function validate(Validator $validator): void;
 
     /**
      * Returns if this test should be run by default or not.
-     *
-     * @return bool
      */
-    public function isDefault();
+    public function isDefault(): bool;
 
     /**
      * Returns true if this group has been run
-     *
-     * @return bool
      */
-    public function isCompleted();
+    public function isCompleted(): bool;
 
     /**
      * Mark this group as completed
-     *
-     * @return void
      */
-    public function markCompleted();
+    public function markCompleted(): void;
 }

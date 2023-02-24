@@ -2,8 +2,8 @@
 
 @section('form')
     <div class="form-group">
-        <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
-        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
+        <label for="device_group-{{ $id }}" class="control-label">{{ __('Device group') }}</label>
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="{{ __('All Devices') }}">
             @if($device_group)
                 <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
             @endif

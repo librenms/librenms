@@ -1,0 +1,4 @@
+modules:
+  os:
+    hardware: CAMBIUM-MIB::cambiumAPHWType.0
+    serial: CAMBIUM-MIB::cambiumAPSerialNum.0

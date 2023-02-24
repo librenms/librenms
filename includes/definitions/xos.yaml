@@ -3,8 +3,7 @@ text: 'Extreme XOS'
 type: network
 ifname: true
 icon: extreme
-mib_dir:
-    - extreme
+mib_dir: extreme
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -13,7 +12,3 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.1916.2.
-        sysObjectID_except:
-            - .1.3.6.1.4.1.1916.2.302 #exclude VSP-7432CQ from xos and identify as "voss" OS
-            - .1.3.6.1.4.1.1916.2.324 #exclude VSP-4900-48P from xos and identify as "voss" OS
-            - .1.3.6.1.4.1.1916.2.325 #exclude VSP-7400-48Y-8C from xos and identify as "voss" OS

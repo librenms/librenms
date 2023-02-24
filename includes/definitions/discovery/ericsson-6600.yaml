@@ -1,0 +1,52 @@
+mib: XF-RADIOLINK-PTP-RADIO-MIB:XF-RADIOLINK-RLT-MIB:ENTITY-MIB:IF-MIB
+modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalDescr.1
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalName
+                        - ifName
+        temperature:
+            data:
+                -
+                    oid: XfRAUEntry
+                    value: xfRAUTemperature
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.3.1.1.1.8.{{ $index }}
+                    descr: 'RAU: {{ $entPhysicalName }}'
+        runtime:
+            data:
+                -
+                    oid: xfPMTimeElapsed
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.1.{{ $index }}
+                    index: 'xfPMTimeElapsed.{{ $index }}'
+                    descr: 'Current Error Period: {{ $ifName }}'                    
+                -
+                    oid: xfPMCurrentES
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.2.{{ $index }}
+                    index: 'xfPMCurrentES.{{ $index }}'
+                    descr: 'Errored Seconds: {{ $ifName }}'                    
+                -
+                    oid: xfPMCurrentSES
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.3.{{ $index }}
+                    index: 'xfPMCurrentSES.{{ $index }}'
+                    descr: 'Severly Errored Seconds: {{ $ifName }}'
+                -
+                    oid: xfPMCurrentUAS
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.5.{{ $index }}
+                    index: 'xfPMCurrentUAS.{{ $index }}'
+                    descr: 'Unavailable Seconds: {{ $ifName }}'
+        count:
+            data:
+                -
+                    oid: xfPMCurrentBBE
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.4.{{ $index }}
+                    index: 'xfPMCurrentBBE.{{ $index }}'
+                    descr: 'Background Block Errors: {{ $ifName }}'
+                -
+                    oid: xfPMCurrentBB 
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.6.{{ $index }}
+                    index: 'xfPMCurrentBB.{{ $index }}'
+                    descr: 'Background blocks: {{ $ifName }}'

@@ -1,0 +1,75 @@
+name: Report a device issue
+description: Device issues only, no requests!
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue form is for reporting device ***_BUGS_*** only!
+
+        * [Add Device request here](https://community.librenms.org/c/device-requests/12)        
+        * [I have a question or need support](https://www.librenms.org/#support)
+        
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: The problem
+      description: >-
+        Describe the issue you are experiencing here to communicate to the
+        maintainers. Tell us what you were trying to do and what happened.
+
+        Provide a clear and concise description of what the problem is.
+  - type: markdown
+    attributes:
+      value: |
+        ## Environment
+        
+  - type: textarea
+    validations:
+      required: true  
+    attributes:
+      label: Output of ./validate.php
+      description: |
+        Please post the output of running: /opt/librenms/validate.php
+      render: txt
+      
+  - type: input
+    attributes:
+      label: What was the last working version of LibreNMS?
+      placeholder: 21.7.0
+      description: >
+        If known, otherwise leave blank.
+        
+  - type: input
+    validations:
+      required: true  
+    attributes:
+      label: Device info
+      placeholder: Juniper SRX1500
+      description: >
+        The Brand and model of the device
+ 
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+        
+  - type: textarea
+    validations:
+      required: true  
+    attributes:
+      label: Discovery output
+      description: |
+        Paste the result of:
+        ./discovery.php -d -h HOSTNAME
+      render: txt
+      
+  - type: textarea
+    validations:
+      required: true  
+    attributes:
+      label: Poller output
+      description: |
+        Paste the result of:
+        ./poller.php -r -f -p -d -h HOSTNAME
+      render: txt

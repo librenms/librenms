@@ -1,0 +1,415 @@
+-- ============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Port Extender (PEX) information MIB
+-- Reference:
+-- Version: V1.2
+-- History:
+--   V1.0 2012-11-12 Initial version by Yang Fan
+--   V1.1 2014-03-31 Changed MIB node name to PEX by zushuzhi
+--   V1.2 2015-10-15 Added hh3cPexDeviceInfoTable and hh3cPexTopoTable
+--                   by zushuzhi
+-- ============================================================================
+HH3C-PEX-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    entPhysicalIndex, entPhysicalDescr
+        FROM ENTITY-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC;
+
+hh3cPex MODULE-IDENTITY
+    LAST-UPDATED "201510151129Z"        -- 15th October, 2015 at 11:29 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Haidian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB is used to manage Port Extender (PEX)
+         information.  This MIB is applicable to products that support PEX."
+    REVISION "201510151129Z"
+    DESCRIPTION
+        "Added hh3cPexDeviceInfoTable and hh3cPexTopoTable."
+    REVISION "201211121129Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 129 }
+
+-- PEX Specification Information
+
+hh3cPexSpecInfo OBJECT IDENTIFIER ::= { hh3cPex 1 }
+
+hh3cPexPortMinId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lowest PEX port ID that can be used to uniquely identify a PEX port."
+    ::= { hh3cPexSpecInfo 1 }
+
+hh3cPexPortMaxId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest PEX port ID that can be used to uniquely identify a PEX port."
+    ::= { hh3cPexSpecInfo 2 }
+
+hh3cPexMinAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lowest ID that can be assigned to a port extender (PEX)."
+    ::= { hh3cPexSpecInfo 3 }
+
+hh3cPexMaxAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Highest ID that can be assigned to a PEX."
+    ::= { hh3cPexSpecInfo 4 }
+
+hh3cPexMaxPortPerPexPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of ports that can be bound to a PEX port."
+    ::= { hh3cPexSpecInfo 5 }
+
+-- PEX Information
+
+hh3cPexTable OBJECT IDENTIFIER ::= { hh3cPex 2 }
+
+hh3cPexPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects used to configure the PEX ports."
+    ::= { hh3cPexTable 1 }
+
+hh3cPexPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX."
+    INDEX
+        {
+            hh3cPexPortId
+        }
+    ::= { hh3cPexPortTable 1 }
+
+Hh3cPexPortEntry ::= SEQUENCE
+    {
+        hh3cPexPortId               Integer32,
+        hh3cPexPortAssociateId      Integer32,
+        hh3cPexPortEntPhysicalIndex Integer32,
+        hh3cPexPortDescr            DisplayString,
+        hh3cPexPortStatus           INTEGER,
+        hh3cPexPortRowStatus        RowStatus
+    }
+
+hh3cPexPortId OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID that can be used to uniquely identify a PEX port.  The value range
+        is hh3cPexPortMinId to hh3cPexPortMaxId."
+    ::= { hh3cPexPortEntry 1 }
+
+hh3cPexPortAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "ID assigned to a PEX.  The
+        value range is hh3cPexMinAssociateId to hh3cPexMaxAssociateId.
+        The value is 0xffff if the PEX is not assigned an ID.
+        For a successful configuration, the ID should not be used by any
+        other PEX."
+    DEFVAL { 65535 }
+    ::= { hh3cPexPortEntry 2 }
+
+hh3cPexPortEntPhysicalIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Entity index of a PEX in the IRF.  A value of zero
+         indicates that the PEX is not online."
+    DEFVAL { 0 }
+    ::= { hh3cPexPortEntry 3 }
+
+hh3cPexPortDescr OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..79))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Description for the PEX port.  The default value is
+        'pex-port XXXX', where 'XXXX' is hh3cPexPortId.
+        Writing a zero-length string to this object resets the value to the
+        default."
+    ::= { hh3cPexPortEntry 4 }
+
+hh3cPexPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            offline(1),
+            loading(2),
+            online(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the PEX.
+        offline: The PEX is absent or its configuration is incomplete.
+        loading: The PEX is loading software.
+        online: The PEX is operating correctly."
+    DEFVAL { offline }
+    ::= { hh3cPexPortEntry 5 }
+
+hh3cPexPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The control that allows creation and deletion of entries.
+        Values include createAndGo, active, and destroy.
+        If the row to be created or modified already exists,
+        an error message is returned.  If the row to be deleted does not exist,
+        a success message is returned."
+    ::= { hh3cPexPortEntry 6 }
+
+
+-- PEX PhyPort Information
+
+hh3cPexPhyPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexPhyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects used to manage physical ports
+        that can be bound or are already bound to a PEX port."
+    ::= { hh3cPexTable 2 }
+
+hh3cPexPhyPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexPhyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a physical port that can be bound to or
+        has been bound to a PEX port."
+    INDEX
+        {
+            entPhysicalIndex
+        }
+    ::= { hh3cPexPhyPortTable 1 }
+
+Hh3cPexPhyPortEntry ::= SEQUENCE
+    {
+        hh3cPexPhyPortStatus           INTEGER,
+        hh3cPexPhyPortBelongToPexPort  Integer32,
+        hh3cPexPhyPortNeighborEntIndex Integer32
+    }
+
+hh3cPexPhyPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            unknown(1),
+            down(2),
+            blocked(3),
+            forwarding(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the physical port that is bound to a PEX port.
+        The following are status values:
+        unknown: The physical port is not bound to any PEX port.
+        down: The physical port is link down.
+        blocked: The physical port is blocked and cannot forward traffic.
+        forwarding: The physical port can forwarding traffic."
+    DEFVAL { unknown }
+    ::= { hh3cPexPhyPortEntry 1 }
+
+hh3cPexPhyPortBelongToPexPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ID of the PEX port to which the physical port belongs.  The value
+        range is hh3cPexPortMinId to hh3cPexPortMaxId.  A value of zero
+        indicates that the port doesn't belong to any PEX port."
+    DEFVAL { 0 }
+    ::= { hh3cPexPhyPortEntry 2 }
+
+hh3cPexPhyPortNeighborEntIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Entity index of a physical port that connects the PEX to the parent
+        device.  This value is identical to entPhysicalIndex in ENTITY-MIB.
+        A value of zero indicates that the physical port is not bound to any
+        PEX port or is not up."
+    ::= { hh3cPexPhyPortEntry 3 }
+
+-- PEX Topology Information
+hh3cPexDeviceInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains online PEXs in the IRF system."
+    ::= { hh3cPexTable 3 }
+
+hh3cPexDeviceInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX in the IRF system.  The index is the PEX
+        entity index."
+    INDEX
+        {
+            entPhysicalIndex
+        }
+    ::= { hh3cPexDeviceInfoTable 1 }
+
+Hh3cPexDeviceInfoEntry ::= SEQUENCE
+    {
+        hh3cPexDeviceStatus           INTEGER,
+        hh3cPexDeviceAssociateId      Integer32
+    }
+
+hh3cPexDeviceStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(1),
+            faulty(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the PEX.
+        normal: The PEX is operating correctly.
+        faulty: The PEX is faulty."
+    ::= { hh3cPexDeviceInfoEntry 1 }
+
+hh3cPexDeviceAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ID assigned to the PEX."
+    ::= { hh3cPexDeviceInfoEntry 2 }
+
+hh3cPexTopoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexTopoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the PEX physical ports and
+        neighbor ports on PEXs."
+    ::= { hh3cPexTable 4 }
+
+hh3cPexTopoEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexTopoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX link."
+    INDEX
+        {
+            entPhysicalIndex
+        }
+    ::= { hh3cPexTopoTable 1 }
+
+Hh3cPexTopoEntry ::= SEQUENCE
+    {
+        hh3cPexNeighborEntIndex Integer32
+    }
+
+hh3cPexNeighborEntIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Entity index of a PEX in the IRF system."
+    ::= { hh3cPexTopoEntry 1 }
+
+-- PEX Traps
+
+hh3cPexTraps OBJECT IDENTIFIER ::= { hh3cPex 3 }
+
+hh3cPexTrapPrefix OBJECT IDENTIFIER ::= { hh3cPexTraps 0 }
+
+hh3cPexPortOnline  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cPexPortId,
+            hh3cPexPortDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "An hh3cPexPortOnline trap is sent when the PEX transitions to
+        online state."
+    ::= { hh3cPexTrapPrefix 1 }
+
+hh3cPexPortOffline  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cPexPortId,
+            hh3cPexPortDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "An hh3cPexPortOnline trap is sent when the PEX transitions to
+        offline state."
+    ::= { hh3cPexTrapPrefix 2 }
+
+hh3cPexPhyPortForwarding  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cPexEntPhysicalIndexBind,
+            entPhysicalDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "An hh3cPexPhyPortForwarding trap is sent when the PEX physical port
+        transitions to forwarding state."
+    ::= { hh3cPexTrapPrefix 3 }
+
+hh3cPexPhyPortBlocked  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cPexEntPhysicalIndexBind,
+            entPhysicalDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "An hh3cPexPhyPortBlocked trap is sent when the PEX physical port
+        transitions from forwarding state to blocked state."
+    ::= { hh3cPexTrapPrefix 4 }
+
+hh3cPexTrapObjects OBJECT IDENTIFIER ::= { hh3cPex 4 }
+
+hh3cPexEntPhysicalIndexBind OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This index is identical to entPhysicalIndex in ENTITY-MIB."
+    ::= { hh3cPexTrapObjects 1 }
+END

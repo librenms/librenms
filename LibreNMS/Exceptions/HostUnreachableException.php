@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,7 +27,7 @@ namespace LibreNMS\Exceptions;
 
 class HostUnreachableException extends \Exception
 {
-    protected $reasons = array();
+    protected $reasons = [];
 
     public function __toString()
     {
@@ -35,20 +35,33 @@ class HostUnreachableException extends \Exception
         foreach ($this->reasons as $reason) {
             $string .= "  $reason\n";
         }
+
         return $string;
     }
 
     /**
      * Add additional reasons
-     * @param $message
+     *
+     * @param  string  $snmpVersion
+     * @param  string  $credentials
      */
-    public function addReason($message)
+    public function addReason(string $snmpVersion, string $credentials)
     {
-        $this->reasons[] = $message;
+        $vars = [
+            'version' => $snmpVersion,
+            'credentials' => $credentials,
+        ];
+
+        if ($snmpVersion == 'v3') {
+            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_credentials', $vars);
+        } else {
+            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_community', $vars);
+        }
     }
 
     /**
      * Get the reasons
+     *
      * @return array
      */
     public function getReasons()

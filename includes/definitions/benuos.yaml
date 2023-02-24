@@ -2,8 +2,7 @@ os: benuos
 text: Benu
 type: network
 icon: benuos
-mib_dir:
-    - benuos
+mib_dir: benuos
 discovery:
     -
         sysObjectID:

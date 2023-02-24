@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @copyright  2017 Yacine Benamsili <https://github.com/yac01/librenms.git>
  * @author     Tony Murray <murraytony@gmail.com>
@@ -26,14 +26,14 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class OpenTSDB extends BaseDatastore
 {
-    /** @var \Socket\Raw\Socket $connection */
+    /** @var \Socket\Raw\Socket */
     protected $connection;
 
     public function __construct(\Socket\Raw\Factory $socketFactory)
@@ -42,7 +42,9 @@ class OpenTSDB extends BaseDatastore
         $host = Config::get('opentsdb.host');
         $port = Config::get('opentsdb.port', 2181);
         try {
-            $this->connection = $socketFactory->createClient("$host:$port");
+            if (self::isEnabled() && $host && $port) {
+                $this->connection = $socketFactory->createClient("$host:$port");
+            }
         } catch (\Socket\Raw\Exception $e) {
             Log::debug('OpenTSDB Error: ' . $e->getMessage());
         }
@@ -68,27 +70,28 @@ class OpenTSDB extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param array $device
-     * @param string $measurement Name of this measurement
-     * @param array $tags tags for the data (or to control rrdtool)
-     * @param array|mixed $fields The data to update in an associative array, the order must be consistent with rrd_def,
-     *                            single values are allowed and will be paired with $measurement
+     * @param  array  $device
+     * @param  string  $measurement  Name of this measurement
+     * @param  array  $tags  tags for the data (or to control rrdtool)
+     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
+     *                               single values are allowed and will be paired with $measurement
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             Log::error("OpenTSDB Error: not connected\n");
+
             return;
         }
 
         $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
-        $tmp_tags = "hostname=".$device['hostname'];
+        $tmp_tags = 'hostname=' . $device['hostname'];
 
         foreach ($tags as $k => $v) {
-            $v = str_replace(array(' ',',','='), '_', $v);
-            if (!empty($v)) {
-                $tmp_tags = $tmp_tags ." ". $k ."=".$v;
+            $v = str_replace([' ', ',', '='], '_', $v);
+            if (! empty($v)) {
+                $tmp_tags = $tmp_tags . ' ' . $k . '=' . $v;
             }
         }
 
@@ -96,10 +99,10 @@ class OpenTSDB extends BaseDatastore
             foreach ($fields as $k => $v) {
                 $measurement = $k;
                 if ($flag == true) {
-                    $measurement = $measurement.".".$device['co'];
+                    $measurement = $measurement . '.' . $device['co'];
                 }
 
-                $this->putData('port.'.$measurement, $timestamp, $v, $tmp_tags);
+                $this->putData('port.' . $measurement, $timestamp, $v, $tmp_tags);
             }
         } else {
             if ($flag == true) {
@@ -107,7 +110,7 @@ class OpenTSDB extends BaseDatastore
             }
 
             foreach ($fields as $k => $v) {
-                $tmp_tags_key = $tmp_tags . " " . "key" . "=" . $k;
+                $tmp_tags_key = $tmp_tags . ' ' . 'key' . '=' . $k;
                 $this->putData($measurement, $timestamp, $v, $tmp_tags_key);
             }
         }
@@ -136,7 +139,7 @@ class OpenTSDB extends BaseDatastore
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
-     * @return boolean
+     * @return bool
      */
     public function wantsRrdTags()
     {

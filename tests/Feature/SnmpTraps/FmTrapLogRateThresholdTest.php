@@ -13,43 +13,35 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Unit tests for Fortigate FmTrapLogRateThreshold.php
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
-
 class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
 {
-    public function testAvOversize()
+    public function testAvOversize(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
 SNMPv2-MIB::sysName.0 $device->hostname
 FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRate.0 315
-FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRateThreshold.0 260";
-
-        $message = "Recommended log rate exceeded. Current Rate: 315 Recommended Rate: 260";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fmTrapLogRateThreshold trap');
+FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRateThreshold.0 260
+TRAP,
+            'Recommended log rate exceeded. Current Rate: 315 Recommended Rate: 260',
+            'Could not handle fmTrapLogRateThreshold trap',
+            [3],
+        );
     }
 }

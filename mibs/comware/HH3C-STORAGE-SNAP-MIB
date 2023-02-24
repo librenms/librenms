@@ -1,0 +1,1856 @@
+-- ===========================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: The MIB is designed to manage the snap of storage device.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2007-09-14 created by yangqi
+-- =================================================================
+HH3C-STORAGE-SNAP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        Counter32, Integer32,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TruthValue, DateAndTime, RowStatus
+    FROM SNMPv2-TC
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        entPhysicalIndex
+    FROM ENTITY-MIB
+        Hh3cStorageOnlineState, Hh3cStorageEnableState, Hh3cStorageActionType,
+        Hh3cLvIDType, Hh3cRaidIDType, Hh3cExtendSelectPolicy, hh3cStorageRef
+    FROM HH3C-STORAGE-REF-MIB;
+
+hh3cStorageSnap MODULE-IDENTITY
+    LAST-UPDATED "200709141452Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB describes the general information about snap of storage device."
+    ::= { hh3cStorageRef 2 }
+
+hh3cSnapMibObjects OBJECT IDENTIFIER ::= { hh3cStorageSnap 1 }
+
+hh3cGlobalSnapSettingsObject  OBJECT IDENTIFIER ::= { hh3cSnapMibObjects 1 }
+hh3cAddtionalSpaceMaxSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "TB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal size of snapshot resource, safecache, 
+        and Continued replication Resource ."
+    ::= { hh3cGlobalSnapSettingsObject 1 }
+
+-- Snap Resource Config Table
+-- This table described how to config a snap on a special logic volume.
+hh3cSnapConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSnapConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config the snapshot resources for special logic
+        volumes."
+    ::= { hh3cSnapMibObjects 2 }
+
+hh3cSnapConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cSnapConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing configuration about the snapshot resource."
+    INDEX
+        {
+            hh3cSnapLvIndex
+        }
+
+    ::= { hh3cSnapConfigTable 1 }
+
+Hh3cSnapConfigEntry ::= SEQUENCE
+    {
+        hh3cSnapLvIndex             Hh3cLvIDType,
+        hh3cSnapAreaId              Hh3cLvIDType,
+        hh3cSnapAreaAutoExpand      Hh3cStorageEnableState,
+        hh3cSnapAreaThreshold       Integer32,
+        hh3cSnapAreaIncSize         Integer32,
+        hh3cSnapAreaMaxSize         Integer32,
+        hh3cSnapAreaFullDeleteTM    INTEGER,
+        hh3cSnapAreaNotify          Hh3cStorageEnableState,
+        hh3cSnapAreaStatus          Hh3cStorageOnlineState,
+        hh3cSnapRaidUuid            Hh3cRaidIDType,
+        hh3cSnapRaidSize            Integer32,
+        hh3cSnapRaidSelectPolicy    Hh3cExtendSelectPolicy,
+        hh3cSnapAreaTotalSize       Integer32,
+        hh3cSnapAreaFreeSize        Integer32,
+        hh3cSnapExtendTimes         Integer32,
+        hh3cSnapRowStatus           RowStatus
+    }
+
+hh3cSnapLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index of hh3cSnapConfigTable. The object
+        identified by this index is the same object as identified by the
+        same value of hh3cLvIndex."
+    ::= { hh3cSnapConfigEntry 1 }
+
+hh3cSnapAreaId OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the snapshot resource of the logic volume."
+    ::= { hh3cSnapConfigEntry 2 }
+
+hh3cSnapAreaAutoExpand OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes if the space of snapshot resource can be expanded
+        automatically."
+    DEFVAL { disable }
+    ::= { hh3cSnapConfigEntry 3 }
+
+hh3cSnapAreaThreshold OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If hh3cSnapAreaAutoExpand is selected, the 'hh3cSnapAreaThreshold' means 
+        the threshold of the snapshot resource."
+    ::= { hh3cSnapConfigEntry 4 }
+
+hh3cSnapAreaIncSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If hh3cSnapAreaAutoExpand is selected, the 'hh3cSnapAreaIncSize' means 
+        the amount of space to be allocated for each expansion."
+    ::= { hh3cSnapConfigEntry 5 }
+
+
+hh3cSnapAreaMaxSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If hh3cSnapAreaAutoExpand is selected, the 'hh3cSnapAreaIncSize' means the
+        max size of snapshot resource."
+    ::= { hh3cSnapConfigEntry 6 }
+
+hh3cSnapAreaFullDeleteTM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            rotative(1),
+            none(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the snapshot resource is out of space and expand 
+        failed, if the system delete the old timemark until enough space or not."        
+    DEFVAL { none }
+    ::= { hh3cSnapConfigEntry 7 }
+
+hh3cSnapAreaNotify OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes if a snapshot notification should be send to the client when the
+        system create a timemark."
+    ::= { hh3cSnapConfigEntry 8 }
+
+hh3cSnapAreaStatus OBJECT-TYPE
+    SYNTAX      Hh3cStorageOnlineState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the state of the snapshot resource."
+    ::= { hh3cSnapConfigEntry 9 }
+
+hh3cSnapRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the raid where the snapshot resource is created."
+    ::= { hh3cSnapConfigEntry 10 }
+
+
+
+hh3cSnapRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size designated when the snapshot resource
+        is created."
+    ::= { hh3cSnapConfigEntry 11 }
+
+
+hh3cSnapRaidSelectPolicy OBJECT-TYPE
+    SYNTAX      Hh3cExtendSelectPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the policy when the snapshot resource is created
+        automatically.             
+        Note that the value can not be 'none' when the value of associated
+        hh3cSnapRaidUuid object is equal to null."
+    DEFVAL { none }
+    ::= { hh3cSnapConfigEntry 12 }
+
+
+hh3cSnapAreaTotalSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the current total size of the snapshot resource."
+    ::= { hh3cSnapConfigEntry 13 }
+
+hh3cSnapAreaFreeSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the free size of the snapshot resource."
+    ::= { hh3cSnapConfigEntry 14 }
+
+
+hh3cSnapExtendTimes OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the times the snapshot resource extended."
+    ::= { hh3cSnapConfigEntry 15 }
+    
+hh3cSnapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action of snapshot resource.
+        Note that the assocai snapshot resource can not be delete when a snapshot copy is
+        processing or the TimeMark is enabled, or the replication is enabled."
+    ::= { hh3cSnapConfigEntry 16 }
+
+
+-- Snap Resource Expand Table
+-- This table described how to expand a snapshot resource.
+hh3cSnapExpandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSnapExpandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to expand a snapshot resource."
+    ::= { hh3cSnapMibObjects 3 }
+
+hh3cSnapExpandEntry OBJECT-TYPE
+    SYNTAX      Hh3cSnapExpandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing expand information applicable to the snapshot resource."
+    INDEX
+        {
+            hh3cSnapLvIndex,
+            hh3cSAExpRaidUuid
+        }
+
+    ::= { hh3cSnapExpandTable 1 }
+
+Hh3cSnapExpandEntry ::= SEQUENCE
+    {
+        hh3cSAExpRaidUuid        Hh3cRaidIDType,
+        hh3cSAExpSize            Integer32,
+        hh3cSAExpRaidSize        Integer32,
+        hh3cSnapAreaExpRowStatus RowStatus
+    }
+
+hh3cSAExpRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cRaidUuid in HH3C-RAID-MIB."
+    ::= { hh3cSnapExpandEntry 1 }
+
+hh3cSAExpSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the increased size for snapshot resource when
+        expanded. The units is million bytes. The value is always equal to
+        zero when read."
+    ::= { hh3cSnapExpandEntry 2 }
+
+
+hh3cSAExpRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size for snapshot resource on the raid.
+        The units is million bytes. The value is always equal to
+        zero when read."
+    ::= { hh3cSnapExpandEntry 3 }
+
+hh3cSnapAreaExpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to expand the size for snap."
+    ::= { hh3cSnapExpandEntry 4 }
+
+
+-- Snap Resource Copy Table
+-- This table described how to take a snapshot copy.
+hh3cSnapCopyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSnapCopyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity about snapshot copy."
+    ::= { hh3cSnapMibObjects 4 }
+
+hh3cSnapCopyEntry OBJECT-TYPE
+    SYNTAX      Hh3cSnapCopyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing snapshot copy information applicable."
+    INDEX
+        {
+            hh3cSnapLvIndex
+        }
+
+    ::= { hh3cSnapCopyTable 1 }
+
+Hh3cSnapCopyEntry ::= SEQUENCE
+    {
+        hh3cSnapCopyLvIndex       Hh3cLvIDType,
+        hh3cSnapCopyPercentage    Integer32,
+        hh3cSnapCopyStartTime     DateAndTime,
+        hh3cSnapCopySwitch        INTEGER
+    }
+
+hh3cSnapCopyLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index of destination logic volume for
+        snapshot copy."
+    ::= { hh3cSnapCopyEntry 1 }
+
+hh3cSnapCopyPercentage OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the percentage of snapshot copy. The value
+        is equal to zero if the snapshot copy has not started. When finished,
+        the value is always equal to '100'."
+    ::= { hh3cSnapCopyEntry 2 }
+
+hh3cSnapCopyStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the time to start the snapshot copy."
+    ::= { hh3cSnapCopyEntry 3 }
+
+hh3cSnapCopySwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            start(1),
+            stop(2),
+            none(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to start or stop the snapshot copy.
+        When read, the value of 'none' will be get.
+        Note that if the snapshot resource of source logic volume has not been
+        created, the action of snapshot copy will be refused by agent."
+    ::= { hh3cSnapCopyEntry 4 }
+
+
+-- TimeMark Resource Config Table
+-- This table described how to config a TimeMark resource on a special logic
+-- volume.
+hh3cTimeMarkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTimeMarkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config a TimeMark on a special logic
+        volume."
+    ::= { hh3cSnapMibObjects 5 }
+
+hh3cTimeMarkConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cTimeMarkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing config information applicable to the TimeMark."
+    INDEX
+        {
+            hh3cSnapLvIndex
+        }
+
+    ::= { hh3cTimeMarkConfigTable 1 }
+
+Hh3cTimeMarkConfigEntry ::= SEQUENCE
+    {
+        hh3cTimeMarkCounts            Integer32,
+        hh3cTimeMarkInitializeTime    DateAndTime,
+        hh3cTimeMarkInterval          Integer32,
+        hh3cTimeMarkLastTime          DateAndTime,
+        hh3cTimeMarkTotal             Integer32,
+        hh3cTimeMarkSwitch            Hh3cStorageEnableState
+    }
+
+
+hh3cTimeMarkCounts OBJECT-TYPE
+    SYNTAX      Integer32(1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the max num of TimeMark which can be configed."
+    ::= { hh3cTimeMarkConfigEntry 1 }
+
+hh3cTimeMarkInitializeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the date and time when the first TimeMark
+        is created on the logic volume."
+    ::= { hh3cTimeMarkConfigEntry 2 }
+
+hh3cTimeMarkInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the interval when the TimeMark is created
+        automatically if the value of this object is not equal to zero.
+        The units is second. the min value is 10 seconds."
+    ::= { hh3cTimeMarkConfigEntry 3 }
+
+hh3cTimeMarkLastTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the date and time when the latest TimeMark
+        is created on the logic volume."
+    ::= { hh3cTimeMarkConfigEntry 4 }
+
+hh3cTimeMarkTotal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the current num of TimeMark."
+    ::= { hh3cTimeMarkConfigEntry 5 }
+
+hh3cTimeMarkSwitch OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes enable or disable TimeMark."
+    ::= { hh3cTimeMarkConfigEntry 6 }
+
+
+-- TimeMark Resource Create Table
+-- This table described how to create a TimeMark on a special logic
+-- volume.
+hh3cTimeMarkCreateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTimeMarkCreateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to create a TimeMark on a special logic
+        volume."
+    ::= { hh3cSnapMibObjects 6 }
+
+hh3cTimeMarkCreateEntry OBJECT-TYPE
+    SYNTAX      Hh3cTimeMarkCreateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing create information applicable to the TimeMark."
+    INDEX
+        {
+            hh3cSnapLvIndex,
+            hh3cTimeMarkStamp
+        }
+
+    ::= { hh3cTimeMarkCreateTable 1 }
+
+Hh3cTimeMarkCreateEntry ::= SEQUENCE
+    {
+        hh3cTimeMarkStamp        DateAndTime,
+        hh3cTimeMarkComment      OCTET STRING,
+        hh3cTimeMarkSize         Integer32,
+        hh3cTimeMarkRowStatus    RowStatus
+    }
+
+hh3cTimeMarkStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the date and time the TimeMark is created."
+    ::= { hh3cTimeMarkCreateEntry 1 }
+
+hh3cTimeMarkComment OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the comment of the TimeMark."
+    ::= { hh3cTimeMarkCreateEntry 2 }
+
+hh3cTimeMarkSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "KB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the current size of the TimeMark."
+    ::= { hh3cTimeMarkCreateEntry 3 }
+
+hh3cTimeMarkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create or delete the TimeMark.
+        Note that the TimeMark can not be deleted if it is using."
+    ::= { hh3cTimeMarkCreateEntry 4 }
+
+
+-- TimeMark Copy Table
+-- This table described how to do a TimeMark copy.
+hh3cTimeMarkCopyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTimeMarkCopyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity about a TimeMark copy."
+    ::= { hh3cSnapMibObjects 7 }
+
+hh3cTimeMarkCopyEntry OBJECT-TYPE
+    SYNTAX      Hh3cTimeMarkCopyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing config information applicable to the TimeMark copy."
+    INDEX
+        {
+            hh3cSnapLvIndex,
+            hh3cTimeMarkStamp
+        }
+
+    ::= { hh3cTimeMarkCopyTable 1 }
+
+Hh3cTimeMarkCopyEntry ::= SEQUENCE
+    {
+        hh3cTMCopyDestLvId      Hh3cLvIDType,
+        hh3cTMCopyPercentage    Integer32,
+        hh3cTMCopyStartTime     DateAndTime,
+        hh3cTMCopySwitch        INTEGER
+    }
+
+
+hh3cTMCopyDestLvId OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index of destination logic volume for
+        TimeMark copy."
+    ::= { hh3cTimeMarkCopyEntry 1 }
+
+hh3cTMCopyPercentage OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the percentage of TimeMark copy. The value
+        is equal to zero if the TimeMark copy has not started. When finished,
+        the value is always equal to '100'."
+    ::= { hh3cTimeMarkCopyEntry 2 }
+
+
+hh3cTMCopyStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the time to start the TimeMark copy."
+    ::= { hh3cTimeMarkCopyEntry 3 }
+
+hh3cTMCopySwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            start(1),
+            stop(2),
+            none(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to start or stop the TimeMark copy.
+        When read, the value of 'none' will be get."
+    ::= { hh3cTimeMarkCopyEntry 4 }
+
+
+-- TimeMark Rollback Table
+-- This table described how to use a TimeMark to rollback the logic volume.
+hh3cTimeMarkRollbackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTimeMarkRollbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to use a TimeMark to rollback the logic volume."
+    ::= { hh3cSnapMibObjects 8 }
+
+hh3cTimeMarkRollbackEntry OBJECT-TYPE
+    SYNTAX      Hh3cTimeMarkRollbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing config information applicable to use a TimeMark to rollback the logic volume."
+    INDEX
+        {
+            hh3cSnapLvIndex,
+            hh3cTimeMarkStamp
+        }
+
+    ::= { hh3cTimeMarkRollbackTable 1 }
+
+Hh3cTimeMarkRollbackEntry ::= SEQUENCE
+    {
+        hh3cTMRollbackPercentage    Integer32,
+        hh3cTMRollbackStartTime     DateAndTime,
+        hh3cTMRollbackSwitch        Hh3cStorageActionType
+    }
+
+hh3cTMRollbackPercentage OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the percentage of rollback."
+    ::= { hh3cTimeMarkRollbackEntry 1 }
+
+hh3cTMRollbackStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the time to start the rollback."
+    ::= { hh3cTimeMarkRollbackEntry 2 }
+
+hh3cTMRollbackSwitch OBJECT-TYPE
+    SYNTAX      Hh3cStorageActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to use a TimeMark to rollback the logic volume.
+        Note that once you roll back, you cannot roll forward, all the later TimeMark behind it
+        will be deleted."
+    ::= { hh3cTimeMarkRollbackEntry 3 }
+
+
+-- Time View Table
+-- This table described how to config TimeView on a special TimeMark
+-- mark.
+hh3cTimeViewTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTimeViewEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config a TimeView on a special
+        TimeMark."
+    ::= { hh3cSnapMibObjects 9 }
+
+hh3cTimeViewEntry OBJECT-TYPE
+    SYNTAX      Hh3cTimeViewEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing config information applicable to the TimeView."
+    INDEX
+        {
+            hh3cSnapLvIndex,
+            hh3cTimeViewStamp
+        }
+
+    ::= { hh3cTimeViewTable 1 }
+
+Hh3cTimeViewEntry ::= SEQUENCE
+    {
+        hh3cTimeViewStamp     DateAndTime,
+        hh3cTimeViewID        Hh3cLvIDType,
+        hh3cTimeViewName      OCTET STRING,
+        hh3cTimeViewRowStatus RowStatus
+    }
+    
+hh3cTimeViewStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the TimeView. The object identified by this
+        index is the same object as identified by the same value of 
+        hh3cTimeMarkStamp."
+    ::= { hh3cTimeViewEntry 1 }
+    
+hh3cTimeViewID OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the TimeView. "
+    ::= { hh3cTimeViewEntry 2 }
+
+hh3cTimeViewName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of the TimeView."
+    ::= { hh3cTimeViewEntry 3 }
+
+hh3cTimeViewRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the actions to create or delete the TimeView."
+    ::= { hh3cTimeViewEntry 4 }
+
+
+-- Logic Volume Replica Config Table
+-- This table described how to config logic volume replica.
+hh3cReplicaConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cReplicaConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config replication for a logic volume."
+    ::= { hh3cSnapMibObjects 10 }
+
+hh3cReplicaConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cReplicaConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing config information applicable to the replication for a logic volume."
+    INDEX
+        {
+            hh3cRepLocalLvIndex
+        }
+
+    ::= { hh3cReplicaConfigTable 1 }
+
+Hh3cReplicaConfigEntry ::= SEQUENCE
+    {
+        hh3cRepLocalLvIndex  	    	Hh3cLvIDType,
+        hh3cLvRepLocalWay            	INTEGER,
+        hh3cRepLocalServerIP          	InetAddress,
+        hh3cRepLocalServerIPType      	InetAddressType,
+        hh3cRepLocalServerName        	OCTET STRING,
+        hh3cRepLocalServerUsername    	OCTET STRING,
+        hh3cRepLocalServerPassword    	OCTET STRING,
+        hh3cRepRemoteServerIP          	InetAddress,
+        hh3cRepRemoteServerIPType      	InetAddressType,
+        hh3cRepRemoteServerName        	OCTET STRING,
+        hh3cRepRemoteServerUsername    	OCTET STRING,
+        hh3cRepRemoteServerPassword    	OCTET STRING,
+        hh3cRepRemoteLvIndex         	Hh3cLvIDType,
+        hh3cReplicaMode              	INTEGER,
+        hh3cReplicaWatermark         	Integer32,
+        hh3cReplicaWatermarkRetry    	Integer32,
+        hh3cReplicaInitializeTime    	DateAndTime,
+        hh3cReplicaInterval          	Integer32,
+        hh3cReplicaEncrypt           	Hh3cStorageEnableState,
+        hh3cReplicaCompress          	Hh3cStorageEnableState,
+        hh3cReplicaUseExistTM        	Hh3cStorageEnableState,
+        hh3cReplicaProtocol          	INTEGER,
+        hh3cReplicaScanDiff          	TruthValue,
+        hh3cReplicaStatSwitch        	INTEGER,
+        hh3cReplicaRowStatus         	RowStatus
+    }
+
+
+hh3cRepLocalLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the local logic volume that is related with 
+        replication. The object identified by this index is the same object 
+        as identified by the same value of hh3cSnapLvIndex."
+    ::= { hh3cReplicaConfigEntry 1 }
+
+hh3cLvRepLocalWay OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            outgoing(1),
+            incoming(2)            
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of 'outgoing' means the hh3cRepLocalLvIndex is the primary logic 
+        volume of replication, and the hh3cRepRemoteLvIndex is the replica logic volume.
+        The value of 'incoming' means the hh3cRepLocalLvIndex is the replica logic 
+        volume of replication. , and the hh3cRepRemoteLvIndex is the primary logic volume."
+    ::= { hh3cReplicaConfigEntry 2 }
+
+hh3cRepLocalServerIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ip address of local server."
+    ::= { hh3cReplicaConfigEntry 3 }
+
+hh3cRepLocalServerIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ip address type of local server."
+    ::= { hh3cReplicaConfigEntry 4 }
+
+hh3cRepLocalServerName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of local server."
+    ::= { hh3cReplicaConfigEntry 5 }
+
+hh3cRepLocalServerUsername OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the username of local server."
+    ::= { hh3cReplicaConfigEntry 6 }
+
+hh3cRepLocalServerPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..127))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the password of local server."
+    ::= { hh3cReplicaConfigEntry 7 }
+
+hh3cRepRemoteServerIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ip address of remote server."
+    ::= { hh3cReplicaConfigEntry 8 }
+
+hh3cRepRemoteServerIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the ip address type of remote server."
+    ::= { hh3cReplicaConfigEntry 9 }
+
+hh3cRepRemoteServerName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of remote server."
+    ::= { hh3cReplicaConfigEntry 10 }
+
+hh3cRepRemoteServerUsername OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the username of remote server."
+    ::= { hh3cReplicaConfigEntry 11 }
+
+hh3cRepRemoteServerPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..127))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the password of remote server."
+    ::= { hh3cReplicaConfigEntry 12 }
+
+hh3cRepRemoteLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the logic volume of remote server."
+    ::= { hh3cReplicaConfigEntry 13 }
+
+hh3cReplicaMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            adaptive(1),
+            remote(2),
+            none(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the replication mode:
+        The value of 'adaptive' means that data from the primary resource is 
+        continuously replicated to a replica resource unless the system determines 
+        it is not practical or possible.
+        The value of 'remote' means that a snapshot is taken of the primary resource at 
+        prescribed intervals based on the criteria you set (schedule and/or watermark 
+        value).
+        Note that the associated Continuous Replication Resource can not be created
+        if the value of this boject is not equal to 'adaptive'."
+    ::= { hh3cReplicaConfigEntry 14 }
+
+hh3cReplicaWatermark OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the size of watermark which means a replication is scheduled."
+    ::= { hh3cReplicaConfigEntry 15 }
+
+hh3cReplicaWatermarkRetry OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the 'hh3cReplicaWatermark' is set, This object identifies the interval time to 
+        retry if the last replication is failed. 
+        The units is minute."
+    ::= { hh3cReplicaConfigEntry 16 }
+
+hh3cReplicaInitializeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the time to start an initial replication."
+    ::= { hh3cReplicaConfigEntry 17 }
+
+hh3cReplicaInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies how often the replication should be repeated after initial 
+        replication. The units is minute."
+    ::= { hh3cReplicaConfigEntry 18 }
+
+hh3cReplicaEncrypt OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the encrypt option is enable or diable."
+    DEFVAL { disable }
+    ::= { hh3cReplicaConfigEntry 19 }
+
+hh3cReplicaCompress OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the compress option is enable or diable."
+    DEFVAL { disable }
+    ::= { hh3cReplicaConfigEntry 20 }
+
+hh3cReplicaUseExistTM OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if using the exist TimeMark to replicate or not."
+    DEFVAL { disable }
+    ::= { hh3cReplicaConfigEntry 21 }
+
+hh3cReplicaProtocol OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            tcp(1),
+            rudp(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the protocol about replication. The value 'tcp' means
+        Transmission Control Protocol, and 'rudp' means Reliable User Datagram Protocol."
+    ::= { hh3cReplicaConfigEntry 22 }
+
+hh3cReplicaScanDiff OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the system to scan both the primary and replica resource 
+        to determine how much data needs to be synchronized."
+    ::= { hh3cReplicaConfigEntry 23 }
+
+hh3cReplicaStatSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            promte(1),
+            sync(2),
+            scan(3),
+            reversal(4),
+            stop(5),
+            suspend(6),
+            resume(7),
+            none(8)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action how to operate the replica.
+        When read , a value of 'none' will be get.
+        The value of 'promte' means remove the replication relation and promote 
+        the remote copy on the target server.
+        The value of 'sync' means synchronize mannually (force a replication that 
+        is not scheduled.)        
+        The value of 'scan' means scan the delta data between primary resource and 
+        replica resource.
+        The value of 'reversal' means switch the roles of the primary resource and 
+        replica resource. The replication configuration is maintained. The primary 
+        and replica must be synchronized in order to reverse a replica. 
+        The value of 'stop' means stop a replication that is currently in progress.
+        The value of 'suspend' means suspend future replications from automatically 
+        being triggered by replication policies (watermark, interval, time). This will 
+        not stop a replication that is currently in progress.
+        The value of 'resume' means resume the replication status from suspended to 
+        normal.
+        Note that if the action of 'upgrade' is executed successfully, this replica
+        resource will become a normal logic volume, and this entry will be deleted
+        automatically.
+        Note that if the action of 'reversal' is executed successfully, Clients will 
+        be disconnected from the former primary resource."
+    ::= { hh3cReplicaConfigEntry 24 }
+
+hh3cReplicaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to enable or disable the replication."
+    ::= { hh3cReplicaConfigEntry 25 }
+
+-- Logic Volume Replication State Table
+-- This table described the replication state.
+hh3cReplicaStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cReplicaStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to show replication state."
+    ::= { hh3cSnapMibObjects 11 }
+
+hh3cReplicaStateEntry OBJECT-TYPE
+    SYNTAX      Hh3cReplicaStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing show information applicable to the replication state."
+    INDEX
+        {
+            hh3cRepLocalLvIndex
+        }
+
+    ::= { hh3cReplicaStateTable 1 }
+
+Hh3cReplicaStateEntry ::= SEQUENCE
+    {
+        hh3cReplicaDelta              Integer32,
+        hh3cReplicaLastSyncTime       DateAndTime,
+        hh3cReplicaNextSyncTime       DateAndTime,
+        hh3cReplicaSyncTotalSize      Integer32,
+        hh3cReplicaSyncCurPercentage  Integer32,
+        hh3cReplicaSyncPerformance    Integer32,
+        hh3cReplicaRunStatus          INTEGER
+    }
+
+hh3cReplicaDelta OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the size of delta data after last sync."
+    ::= { hh3cReplicaStateEntry 1 }
+
+hh3cReplicaLastSyncTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the date and time when last sync is taken."
+    ::= { hh3cReplicaStateEntry 2 }
+
+hh3cReplicaNextSyncTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the date and time when next sync will be
+        taken."
+    ::= { hh3cReplicaStateEntry 3 }
+
+hh3cReplicaSyncTotalSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies how much data need to be synchronized to 
+        the replica resource for current replication."
+    ::= { hh3cReplicaStateEntry 4 }
+
+hh3cReplicaSyncCurPercentage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies how much data has been synchronized to the 
+        replica resource for current replication."
+    ::= { hh3cReplicaStateEntry 5 }
+
+hh3cReplicaSyncPerformance OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the performance of the synchronize. The unit is MB/s."
+    ::= { hh3cReplicaStateEntry 6 }
+
+hh3cReplicaRunStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            suspend(1),
+            idle(2),
+            stop(3),
+            sync(4),
+            scan(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the replica."
+    ::= { hh3cReplicaStateEntry 7 }
+
+
+
+-- Continued replication Resource Config Table
+-- This table described how to config Continuous Replication Resource for a adaptive replication.
+hh3cCDRConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCDRConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config Continuous Replication Resource."
+    ::= { hh3cSnapMibObjects 12 }
+
+hh3cCDRConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cCDRConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to Continuous Replication 
+        Resource of the logic volume."
+    INDEX
+        {
+            hh3cCDRLvIndex
+        }
+
+    ::= { hh3cCDRConfigTable 1 }
+
+Hh3cCDRConfigEntry ::= SEQUENCE
+    {
+        hh3cCDRLvIndex         Hh3cLvIDType,
+        hh3cCDRID              Integer32,
+        hh3cCDRStatus          Hh3cStorageOnlineState,
+        hh3cCDRTotalSize       Integer32,
+        hh3cCDRFreeSize        Integer32,
+        hh3cCDRSelectPolicy    Hh3cExtendSelectPolicy,
+        hh3cCDRRowStatus       RowStatus
+    }
+
+hh3cCDRLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the source logic volume of the Continuous Replication 
+        Resource. The object identified by this index is the same object as identified 
+        by the same value of hh3cRepLocalLvIndex.
+        Note that an entry of hh3cCDRConfigTable can be created only when the associated 
+        hh3cCDRDistributeTable's objects is ready or the associated select policy is not 
+        equal to 'none'.
+        If an entry is deleted, the associated hh3cCDRDistributeTable objects should be 
+        deleted automatically."
+    ::= { hh3cCDRConfigEntry 1 }
+
+hh3cCDRID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the Continuous Replication Resource."
+    ::= { hh3cCDRConfigEntry 2 }
+
+hh3cCDRStatus OBJECT-TYPE
+    SYNTAX      Hh3cStorageOnlineState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the Continuous Replication Resource."
+    ::= { hh3cCDRConfigEntry 3 }
+
+hh3cCDRTotalSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the total size of the Continuous Replication Resource."
+    ::= { hh3cCDRConfigEntry 4 }
+
+hh3cCDRFreeSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the free size of the Continuous Replication Resource."
+    ::= { hh3cCDRConfigEntry 5 }
+
+hh3cCDRSelectPolicy OBJECT-TYPE
+    SYNTAX      Hh3cExtendSelectPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the policy about allocating the space for Continuous 
+        Replication Resource."
+    DEFVAL { none }
+    ::= { hh3cCDRConfigEntry 6 }
+
+hh3cCDRRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create or delete the Continuous Replication 
+        Resource."
+    ::= { hh3cCDRConfigEntry 7 }
+
+
+-- Continuous Replication Resource Distributing Table
+-- This table described how to config the distribution of Continuous Replication Resource.
+hh3cCDRDistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCDRDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config the distribution of Continuous Replication 
+        Resource."
+    ::= { hh3cSnapMibObjects 13 }
+
+hh3cCDRDistributeEntry OBJECT-TYPE
+    SYNTAX      Hh3cCDRDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to the distribution of Continuous 
+        Replication Resource."
+    INDEX
+        {
+            hh3cCDRDistLvIndex,
+            hh3cCDRRaidUuid
+        }
+
+    ::= { hh3cCDRDistributeTable 1 }
+
+Hh3cCDRDistributeEntry ::= SEQUENCE
+    {
+        hh3cCDRDistLvIndex     Hh3cLvIDType,
+        hh3cCDRRaidUuid        Hh3cRaidIDType,
+        hh3cCDRRaidSize        Integer32,
+        hh3cCDRExtRowStatus    RowStatus
+    }
+
+hh3cCDRDistLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cLvIndex in HH3C-LOGIC-VOLUME-MIB."
+    ::= { hh3cCDRDistributeEntry 1 }
+
+hh3cCDRRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cRaidUuid in HH3C-RAID-MIB."
+    ::= { hh3cCDRDistributeEntry 2 }
+
+hh3cCDRRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the size on the special raid distributed
+        for the Continuous Replication Resource."
+    ::= { hh3cCDRDistributeEntry 3 }
+
+hh3cCDRExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create the distribution
+        for the Continuous Replication Resource."
+    ::= { hh3cCDRDistributeEntry 4 }
+
+
+-- SafeCache Config Table
+-- This table described how to config SafeCache of logic volume.
+hh3cSafeCacheConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSafeCacheConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config SafeCache."
+    ::= { hh3cSnapMibObjects 14 }
+
+hh3cSafeCacheConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cSafeCacheConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to SafeCache of
+        the logic volume."
+    INDEX
+        {
+            hh3cSafeCacheLvIndex
+        }
+
+    ::= { hh3cSafeCacheConfigTable 1 }
+
+Hh3cSafeCacheConfigEntry ::= SEQUENCE
+    {
+        hh3cSafeCacheLvIndex         Hh3cLvIDType,
+        hh3cSafeCacheID              Integer32,
+        hh3cSafeCacheStatus          Hh3cStorageOnlineState,
+        hh3cSafeCacheTotalSize       Integer32,
+        hh3cSafeCacheFreeSize        Integer32,
+        hh3cSafeCacheSelectPolicy    Hh3cExtendSelectPolicy,
+        hh3cSafeCacheThreshold       Integer32,
+        hh3cSafeCacheFlushTime       Integer32,
+        hh3cSafeCacheFlushCommand    Integer32,
+        hh3cSafeCacheSkipDupWrite    INTEGER,
+        hh3cSafeCacheRunStatus       INTEGER,
+        hh3cSafeCacheSwitch          INTEGER,
+        hh3cSafeCacheRowStatus       RowStatus
+    }
+
+hh3cSafeCacheLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the source logic volume of the SafeCache.
+        The object identified by this index is the same object as identified
+        by the same value of hh3cLvindex.
+        Note that an entry of hh3cSafeCacheConfigTable can be created only when
+        the associated hh3cSafeCacheDistributeTable's objects is ready or the associated
+        select policy is not equal to 'none'.
+        If an entry is deleted, the associated hh3cSafeCacheDistributeTable
+        objects should be deleted automatically."
+    ::= { hh3cSafeCacheConfigEntry 1 }
+
+hh3cSafeCacheID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies a SafeCache."
+    ::= { hh3cSafeCacheConfigEntry 2 }
+
+
+hh3cSafeCacheStatus OBJECT-TYPE
+    SYNTAX      Hh3cStorageOnlineState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the SafeCache."
+    ::= { hh3cSafeCacheConfigEntry 3 }
+
+hh3cSafeCacheTotalSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the total size of the SafeCache.
+        The units is million bytes."
+    ::= { hh3cSafeCacheConfigEntry 4 }
+
+hh3cSafeCacheFreeSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the free size of the SafeCache.
+        The units is million bytes."
+    ::= { hh3cSafeCacheConfigEntry 5 }
+
+hh3cSafeCacheSelectPolicy OBJECT-TYPE
+    SYNTAX      Hh3cExtendSelectPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the policy about allocating the space for SafeCache."
+    DEFVAL { none }
+    ::= { hh3cSafeCacheConfigEntry 6 }
+
+hh3cSafeCacheThreshold OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the maximal percentage of date changed
+        before data flushing."
+    ::= { hh3cSafeCacheConfigEntry 7 }
+
+
+hh3cSafeCacheFlushTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the period during which the date can stay
+        in cache before data flushing.
+        The units is second."
+    ::= { hh3cSafeCacheConfigEntry 8 }
+
+
+hh3cSafeCacheFlushCommand OBJECT-TYPE
+    SYNTAX      Integer32(1..64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the number of commands when data flushing."
+    ::= { hh3cSafeCacheConfigEntry 9 }
+
+hh3cSafeCacheSkipDupWrite OBJECT-TYPE
+    SYNTAX      INTEGER
+	{
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies skip duplicate write commands or not."
+    ::= { hh3cSafeCacheConfigEntry 10 }
+
+hh3cSafeCacheRunStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            run(1),
+            suspend(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the run state of the SafeCache."
+    ::= { hh3cSafeCacheConfigEntry 11 }
+
+hh3cSafeCacheSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            suspend(1),
+            resume(2),
+            none(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action of the SafeCache.
+        The value 'suspend' means suspend the SafeCache.
+        The value 'resume' means resume the SafeCache."
+    ::= { hh3cSafeCacheConfigEntry 12 }
+
+hh3cSafeCacheRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create or delete the SafeCache."
+    ::= { hh3cSafeCacheConfigEntry 13 }
+
+
+-- SafeCache Resource Distributing Table
+-- This table described how to config SafeCache resource of logic volume.
+hh3cSafeCacheDistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSafeCacheDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config the SafeCache resource."
+    ::= { hh3cSnapMibObjects 15 }
+
+hh3cSafeCacheDistributeEntry OBJECT-TYPE
+    SYNTAX      Hh3cSafeCacheDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to SafeCache
+        resource of the logic volume."
+    INDEX
+        {
+            hh3cSafeCacheDistLvIndex,
+            hh3cSafeCacheRaidUuid
+        }
+
+    ::= { hh3cSafeCacheDistributeTable 1 }
+
+Hh3cSafeCacheDistributeEntry ::= SEQUENCE
+    {
+        hh3cSafeCacheDistLvIndex     Hh3cLvIDType,
+        hh3cSafeCacheRaidUuid        Hh3cRaidIDType,
+        hh3cSafeCacheRaidSize        Integer32,
+        hh3cSafeCacheExtRowStatus    RowStatus
+    }
+
+
+hh3cSafeCacheDistLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cLvIndex in HH3C-LOGIC-VOLUME-MIB."
+    ::= { hh3cSafeCacheDistributeEntry 1 }
+
+hh3cSafeCacheRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cRaidUuid in HH3C-RAID-MIB."
+    ::= { hh3cSafeCacheDistributeEntry 2 }
+
+
+hh3cSafeCacheRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the size on the special raid distributed
+        for the SafeCache resource."
+    ::= { hh3cSafeCacheDistributeEntry 3 }
+
+hh3cSafeCacheExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create the distribution
+        for the SafeCache resource."
+    ::= { hh3cSafeCacheDistributeEntry 4 }
+
+
+
+
+-- Logic Volume Mirror Config Table
+-- This table described how to config mirror for a logic volume.
+hh3cMirrorConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirrorConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config mirror."
+    ::= { hh3cSnapMibObjects 16 }
+
+hh3cMirrorConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirrorConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to mirror for
+        the logic volume."
+    INDEX
+        {
+            hh3cMirrorLvIndex
+        }
+
+    ::= { hh3cMirrorConfigTable 1 }
+
+Hh3cMirrorConfigEntry ::= SEQUENCE
+    {
+        hh3cMirrorLvIndex            Hh3cLvIDType,
+        hh3cMirrorType               INTEGER,
+        hh3cMirrorStatus             Hh3cStorageOnlineState,
+        hh3cMirrorName               OCTET STRING,
+        hh3cMirrorSyncPercentage     Integer32,
+        hh3cMirrorSyncPerformance    Integer32,
+        hh3cMirrorDelta              Integer32,
+        hh3cMirrorRaidType           INTEGER,
+        hh3cMirrorSelectPolicy       Hh3cExtendSelectPolicy,
+        hh3cMirrorSwitch             INTEGER,
+        hh3cMirrorExtendRaidUuid     Hh3cRaidIDType,
+        hh3cMirrorRowStatus          RowStatus
+    }
+
+hh3cMirrorLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the source logic volume of the mirror.
+        The object identified by this index is the same object as identified
+        by the same value of hh3cLvindex.
+        Note that an entry of hh3cMirrorConfigTable can be created only when
+        the associated hh3cMirrorDistributeTable's objects is ready or the associated
+        select policy is not equal to 'none'.
+        If an entry is deleted, the associated hh3cMirrorDistributeTable
+        objects should be deleted automatically."
+    ::= { hh3cMirrorConfigEntry 1 }
+
+hh3cMirrorType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            sync(1),
+            async(2),
+            none(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the type of the mirror."
+    ::= { hh3cMirrorConfigEntry 2 }
+
+hh3cMirrorStatus OBJECT-TYPE
+    SYNTAX      Hh3cStorageOnlineState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the mirror resource."
+    ::= { hh3cMirrorConfigEntry 3 }
+
+hh3cMirrorName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the name of the mirror resource. it is used when 
+        promote mirror resource."
+    ::= { hh3cMirrorConfigEntry 4 }
+
+hh3cMirrorSyncPercentage OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the percentage of the mirror sync."
+    ::= { hh3cMirrorConfigEntry 5 }
+
+hh3cMirrorSyncPerformance OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the performance of the mirror sync. The unit is MB/S"
+    ::= { hh3cMirrorConfigEntry 6 }
+
+
+hh3cMirrorDelta OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies size of delta data after the last
+        mirror sync."
+    ::= { hh3cMirrorConfigEntry 7 }
+
+
+hh3cMirrorRaidType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            virtual(1),
+            serviceEnable(2),
+            none(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the raid type of the mirror resource."
+    ::= { hh3cMirrorConfigEntry 8 }
+
+
+hh3cMirrorSelectPolicy OBJECT-TYPE
+    SYNTAX      Hh3cExtendSelectPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object describes the policy about allocating the space 
+        for mirror resource."
+    DEFVAL { none }
+    ::= { hh3cMirrorConfigEntry 9 }
+
+hh3cMirrorSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            sync(1),
+            swap(2),
+            promote(3),
+            none(4)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of the mirror.
+        The value of 'sync' means synchronize mannually.        
+        The value of 'swap' means switch the roles of the primary resource and 
+        mirror resource. 
+        The value of 'promte' means break the mirrored pair and convert the mirror 
+        resource into an independent logic volume. The new logic volume will have 
+        all of the properties of a regular logic volume.
+        Note that if the action of 'promte' is executed successfully, this mirror
+        resource will become a primary logic volume, and this entry will be deleted
+        automatically."
+    ::= { hh3cMirrorConfigEntry 10 }
+    
+hh3cMirrorExtendRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the raid of the mirror resource when the primary
+        logic volume resource is extended."
+    ::= { hh3cMirrorConfigEntry 11 }
+
+hh3cMirrorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create or delete the mirror resource."
+    ::= { hh3cMirrorConfigEntry 12 }
+
+
+-- Logic Volume Mirror Resource Distributing Table
+-- This table described how to config mirror resource for logic volume.
+hh3cMirrorDistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMirrorDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity to config the mirror resource."
+    ::= { hh3cSnapMibObjects 17 }
+
+hh3cMirrorDistributeEntry OBJECT-TYPE
+    SYNTAX      Hh3cMirrorDistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing some information applicable to mirror
+        resource for the logic volume."
+    INDEX
+        {
+            hh3cMirrorDistLvIndex,
+            hh3cMirrorRaidUuid
+        }
+
+    ::= { hh3cMirrorDistributeTable 1 }
+
+Hh3cMirrorDistributeEntry ::= SEQUENCE
+    {
+        hh3cMirrorDistLvIndex     Hh3cLvIDType,
+        hh3cMirrorRaidUuid        Hh3cRaidIDType,
+        hh3cMirrorRaidSize        Integer32,
+        hh3cMirrorExtRowStatus    RowStatus
+    }
+
+
+hh3cMirrorDistLvIndex OBJECT-TYPE
+    SYNTAX      Hh3cLvIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cLvIndex in HH3C-LOGIC-VOLUME-MIB."
+    ::= { hh3cMirrorDistributeEntry 1 }
+
+hh3cMirrorRaidUuid OBJECT-TYPE
+    SYNTAX      Hh3cRaidIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is identical to hh3cRaidUuid in HH3C-RAID-MIB."
+    ::= { hh3cMirrorDistributeEntry 2 }
+
+hh3cMirrorRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the size on the special raid distributed
+        for the mirror resource."
+    ::= { hh3cMirrorDistributeEntry 3 }
+
+hh3cMirrorExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the action to create or delete the distribution
+        for the mirror resource."
+    ::= { hh3cMirrorDistributeEntry 4 }
+END

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,13 +29,18 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 use Log;
 
 class CommonTrapTest extends SnmpTrapTestCase
 {
-    public function testGarbage()
+    use RequiresDatabase;
+    use DatabaseTransactions;
+
+    public function testGarbage(): void
     {
         $trapText = "Garbage\n";
 
@@ -43,157 +48,153 @@ class CommonTrapTest extends SnmpTrapTestCase
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
     }
 
-    public function testFindByIp()
+    public function testFindByIp(): void
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make();
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(); /** @var Port $port */
         $device->ports()->save($port);
-        $ipv4 = factory(Ipv4Address::class)->make(); // test ipv4 lookup of device
+        // test ipv4 lookup of device
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $port->ipv4()->save($ipv4);
 
         $trapText = "something
 UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
-        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
-        Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
-            return $e_message == 'SNMP trap received: ' &&
-                $device->is($e_device) &&
-                $e_type == 'trap';
-        });
+        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+
+        // check that eventlog was logged
+        $eventlog = Eventlog::latest('event_id')->first();
+        $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
+        $this->assertEquals('', $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('trap', $eventlog->type, 'Trap eventlog type incorrect');
+        $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testGenericTrap()
+    public function testGenericTrap(): void
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
-        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', [ 'device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
-        Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
-            return $e_message == 'SNMP trap received: SNMPv2-MIB::someOid' &&
-                $device->is($e_device) &&
-                $e_type == 'trap';
-        });
+        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap));
+
+        // check that eventlog was logged
+        $eventlog = Eventlog::latest('event_id')->first();
+        $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
+        $this->assertEquals('SNMPv2-MIB::someOid', $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('trap', $eventlog->type, 'Trap eventlog type incorrect');
+        $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testAuthorization()
+    public function testAuthorization(): void
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
 
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Authentication Failure: ' . $device->displayName(), $device->device_id, 'auth', 3);
-
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap));
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+
+        // check that eventlog was logged
+        $eventlog = Eventlog::latest('event_id')->first();
+        $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
+        $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->displayName(), $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('auth', $eventlog->type, 'Trap eventlog type incorrect');
+        $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testBridgeNewRoot()
+    public function testBridgeNewRoot(): void
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
 SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
 
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $device->device_id, 'stp', 3);
-
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap));
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+
+        // check that eventlog was logged
+        $eventlog = Eventlog::latest('event_id')->first();
+        $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
+        $this->assertEquals('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('stp', $eventlog->type, 'Trap eventlog type incorrect');
+        $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testBridgeTopologyChanged()
+    public function testBridgeTopologyChanged(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
-SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange";
-
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Topology of Spanning Tree Instance on device ' . $device->displayName() . ' was changed', $device->device_id, 'stp', 3);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap));
-
-        // check that the device was found
-        $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange
+TRAP,
+            'SNMP Trap: Topology of Spanning Tree Instance on device {{ hostname }} was changed', // assertTrapLogsMessage sets display to hostname
+            'Failed to handle BRIDGE-MIB::topologyChange',
+            [3, 'stp'],
+        );
     }
 
-    public function testColdStart()
+    public function testColdStart(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:1:12.7
-SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart";
-
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' cold booted', $device->device_id, 'reboot', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap));
-
-        // check that the device was found
-        $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart
+TRAP,
+            'SNMP Trap: Device {{ hostname }} cold booted',
+            'Failed to handle SNMPv2-MIB::coldStart',
+            [4, 'reboot'],
+        );
     }
 
-    public function testWarmStart()
+    public function testWarmStart(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:2:12.7
-SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart";
-
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' warm booted', $device->device_id, 'reboot', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap));
-
-        // check that the device was found
-        $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart
+TRAP,
+            'SNMP Trap: Device {{ hostname }} warm booted',
+            'Failed to handle SNMPv2-MIB::warmStart',
+            [4, 'reboot'],
+        );
     }
 
-    public function testEntityDatabaseChanged()
+    public function testEntityDatabaseChanged(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
-SNMPv2-MIB::snmpTrapOID.0 ENTITY-MIB::entConfigChange";
-
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Configuration of Entity Database on device ' . $device->displayName() . ' was changed', $device->device_id, 'system', 3);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap));
-
-        // check that the device was found
-        $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+SNMPv2-MIB::snmpTrapOID.0 ENTITY-MIB::entConfigChange
+TRAP,
+            'SNMP Trap: Configuration of Entity Database on device {{ hostname }} was changed',
+            'Failed to handle ENTITY-MIB::entConfigChange',
+            [3, 'system'],
+        );
     }
 }

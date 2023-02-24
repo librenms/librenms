@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'routeros_pppoe_sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'routeros_pppoe_sessions');
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -12,7 +12,6 @@ $colour_line = '00cc00';
 $colour_area_max = '99cc99';
 $scale_min = '0';
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'PPPoE Sessions';
 

@@ -15,13 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Sets the LibreNMS alert level based on ruckusSZEventSeverity in the
  * trap.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -30,28 +30,13 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 class RuckusSzSeverity
 {
-    public static function getSeverity($severity)
+    public static function getSeverity(string $severity): int
     {
-        switch ($severity) {
-            case 'Critical':
-                $severityNum = 5;
-                break;
-            case 'Major':
-                $severityNum = 4;
-                break;
-            case 'Minor':
-                $severityNum = 4;
-                break;
-            case 'Warning':
-                $severityNum = 3;
-                break;
-            case 'Informational':
-                $severityNum = 2;
-                break;
-            default:
-                $severityNum = 2;
-                break;
-        }
-        return $severityNum;
+        return match ($severity) {
+            'Critical' => 5,
+            'Major', 'Minor' => 4,
+            'Warning' => 3,
+            default => 2 // Informational
+        };
     }
 }

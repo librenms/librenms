@@ -14,13 +14,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Tests vmwVmPoweredOff, vmwVmPoweredOn, and vmwVmSuspended traps from VMWare ESXi hosts.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -29,18 +29,22 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Vminfo;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\PowerState;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class VmwPowerStateTest extends SnmpTrapTestCase
 {
-    public function testVmwVmPoweredOffTrap()
-    {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+    use RequiresDatabase;
+    use DatabaseTransactions;
 
-        $trapText = "$device->hostname
+    public function testVmwVmPoweredOffTrap(): void
+    {
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */
+        $device->vminfo()->save($guest);
+
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
 SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmPoweredOff
@@ -48,21 +52,23 @@ VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/v
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->vmwVmDisplayName
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
+SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX",
+            "Guest $guest->vmwVmDisplayName was powered off",
+            'Could not handle VmwVmPoweredOffTrap',
+            device: $device,
+        );
 
-        $trap = new Trap($trapText);
-        $message = "Guest $guest->vmwVmDisplayName was powered off";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmPoweredOffTrap');
+        $guest->refresh();
+        $this->assertEquals(PowerState::OFF, $guest->vmwVmState);
     }
 
-    public function testVmwVmPoweredONTrap()
+    public function testVmwVmPoweredONTrap(): void
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */
+        $device->vminfo()->save($guest);
 
-        $trapText = "$device->hostname
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
 SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmPoweredOn
@@ -70,34 +76,37 @@ VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/v
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->vmwVmDisplayName
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
+SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX",
+            "Guest $guest->vmwVmDisplayName was powered on",
+            'Could not handle VmwVmPoweredOnTrap',
+            device: $device,
+        );
 
-        $trap = new Trap($trapText);
-        $message = "Guest $guest->vmwVmDisplayName was powered on";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmPoweredOnTrap');
+        $guest->refresh();
+        $this->assertEquals(PowerState::ON, $guest->vmwVmState);
     }
 
-    public function testVmwVmSuspendedTrap()
+    public function testVmwVmSuspendedTrap(): void
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */
+        $device->vminfo()->save($guest);
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:28386->[10.10.10.100]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
 SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmSuspended
 VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->vmwVmDisplayName/$guest->vmwVmDisplayName.vmx
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->vmwVmDisplayName
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
+SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX",
+            "Guest $guest->vmwVmDisplayName has been suspended",
+            'Could not handle VmwVmSuspendedTrap',
+            device: $device,
+        );
 
-        $trap = new Trap($trapText);
-        $message = "Guest $guest->vmwVmDisplayName has been suspended";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmSuspendedTrap');
+        $guest->refresh();
+        $this->assertEquals(PowerState::SUSPENDED, $guest->vmwVmState);
     }
 }

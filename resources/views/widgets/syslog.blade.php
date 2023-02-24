@@ -1,14 +1,14 @@
 <div class="table-responsive">
-    <table id="syslog" class="table table-hover table-condensed table-striped">
+    <table id="syslog" class="table table-hover table-condensed table-striped" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="label"></th>
-            <th data-column-id="timestamp" data-order="desc">@lang('Timestamp')</th>
-            <th data-column-id="level">@lang('Level')</th>
-            <th data-column-id="device_id">@lang('Hostname')</th>
-            <th data-column-id="program">@lang('Program')</th>
-            <th data-column-id="msg">@lang('Message')</th>
-            <th data-column-id="priority">@lang('Priority')</th>
+            <th data-column-id="timestamp" data-order="desc">{{ __('Timestamp') }}</th>
+            <th data-column-id="level">{{ __('Level') }}</th>
+            <th data-column-id="device_id">{{ __('Hostname') }}</th>
+            <th data-column-id="program">{{ __('Program') }}</th>
+            <th data-column-id="msg">{{ __('Message') }}</th>
+            <th data-column-id="priority">{{ __('Priority') }}</th>
         </tr>
         </thead>
     </table>
@@ -22,7 +22,8 @@
         {
             return {
                 device: '{{ $device ?: '' }}',
-                device_group: '{{ $device_group }}'
+                device_group: '{{ $device_group }}',
+                level: '{{ $level }}'
             };
         },
         url: "{{ url('/ajax/table/syslog') }}"

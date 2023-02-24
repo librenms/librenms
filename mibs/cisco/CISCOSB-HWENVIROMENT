@@ -1,12 +1,12 @@
 CISCOSB-HWENVIROMENT DEFINITIONS ::= BEGIN
 
 IMPORTS
-    switch001                                   FROM CISCOSB-MIB
-    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, DisplayString           FROM SNMPv2-TC;
+    switch001                                       FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,TruthValue    FROM SNMPv2-TC;
 
 rlEnv MODULE-IDENTITY
-        LAST-UPDATED "200309210000Z"
+        LAST-UPDATED "200309210001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -58,8 +58,12 @@ RlEnvMonState ::= TEXTUAL-CONVENTION
                         critical(3),
                         shutdown(4),
                         notPresent(5),
-                        notFunctioning(6)
+                        notFunctioning(6),
+                        notAvailable(7),
+                        backingUp(8),
+                        readingFailed(9)
                 }
+
 
 RlEnvMonDirection ::= TEXTUAL-CONVENTION
         STATUS  current
@@ -251,7 +255,7 @@ rlEnvMonSupplyFanDirection OBJECT-TYPE
         DESCRIPTION
                 "The direction of the power supply's fan."
         ::= { rlEnvMonSupplyStatusEntry 5 }
-        
+
 rlEnvFanData OBJECT IDENTIFIER ::= { rlEnv 5 }
 
 rlEnvFanDataTable OBJECT-TYPE
@@ -328,6 +332,80 @@ rlEnvFanDataDirection OBJECT-TYPE
         DESCRIPTION
                 "The direction of the system's fan."
         ::= { rlEnvFanDataEntry 6 }
+
+
+-- ************ Redundant Fan ************** --
+
+RlEnvRedundantFanStatus ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the status of a redundant fan.
+                                Valid values are:
+                                Ready(1):        fan is ready and not active (all fans are O.K)
+                                Active(2):        fan is active (one or more fan failed)
+                                Failure(3): fan failure "
+
+        SYNTAX  INTEGER {
+                        ready(1),
+                        active(2),
+                        failure(3),
+                        notPresent(4)
+        }
+
+rlEnvRedundantFanTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RlEnvRedundantFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Table of redundant fan status"
+        ::= { rlEnv 6 }
+
+rlEnvRedundantFanEntry OBJECT-TYPE
+        SYNTAX     RlEnvRedundantFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the redundant fan status table, representing the status of the associated fan "
+        INDEX   { rlEnvRedundantFanUnitId, rlEnvRedundantFanIndex }
+        ::= { rlEnvRedundantFanTable 1 }
+
+RlEnvRedundantFanEntry ::=
+        SEQUENCE {
+            rlEnvRedundantFanUnitId     Unsigned32,
+            rlEnvRedundantFanIndex      INTEGER,
+            rlEnvRedundantFanStatus     RlEnvRedundantFanStatus
+        }
+
+rlEnvRedundantFanUnitId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the stack unit"
+    ::= { rlEnvRedundantFanEntry 1 }
+
+rlEnvRedundantFanIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fan index"
+    ::= { rlEnvRedundantFanEntry 2 }
+
+rlEnvRedundantFanStatus OBJECT-TYPE
+    SYNTAX      RlEnvRedundantFanStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fan status"
+    ::= { rlEnvRedundantFanEntry 3 }
+
+rlEnvRedundantFanSupported  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Defines whether Redundant Fan feature is supported"
+    ::= { rlEnv 7 }
 
 END
 

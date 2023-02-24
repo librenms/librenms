@@ -1,0 +1,122 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Private MIB File For SSL VPN
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0  2017-07-05 Initial Version created by wuqingchun 11459.
+-- ==========================================================================
+HH3C-SSLVPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI         -- [RFC2578]
+    DisplayString
+        FROM SNMPv2-TC;         -- [RFC2578]
+
+hh3cSslvpn MODULE-IDENTITY
+    LAST-UPDATED "201707051920Z"  -- July 05, 2017 at 19:20 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The private MIB file includes the SSL VPN information of
+         a device."
+    REVISION      "201707051920Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { hh3cCommon 170 }
+
+
+--
+-- Node definitions
+--
+hh3cSslvpnMibObjects OBJECT IDENTIFIER ::= { hh3cSslvpn 1 }
+
+hh3cSslvpnInfomation OBJECT IDENTIFIER ::= { hh3cSslvpnMibObjects 1 }
+
+--
+-- SSL VPN context IP-access packet statistics table definitions
+--
+hh3cSslvpnCtxIpacStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSslvpnCtxIpacStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains SSL VPN context configuration."
+    ::= { hh3cSslvpnInfomation 1 }
+
+hh3cSslvpnCtxIpacStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cSslvpnCtxIpacStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry (conceptual row) in the SSL VPN context IP-access packet
+             statistics table."
+    INDEX   { hh3cSslvpnCtxName }
+    ::= { hh3cSslvpnCtxIpacStatTable 1 }
+
+Hh3cSslvpnCtxIpacStatEntry ::=
+    SEQUENCE {
+        hh3cSslvpnCtxName                DisplayString,
+        hh3cSslvpnCtxIpacClientInBytes   Counter64,
+        hh3cSslvpnCtxIpacClientOutBytes  Counter64,
+        hh3cSslvpnCtxIpacServerInBytes   Counter64,
+        hh3cSslvpnCtxIpacServerOutBytes  Counter64
+    }
+
+hh3cSslvpnCtxName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Name of the SSL VPN context, which is case insensitive and
+             must be unique.  The string can contain only letters, digits, and
+             underscores (_)."
+    ::= { hh3cSslvpnCtxIpacStatEntry 1 }
+
+hh3cSslvpnCtxIpacClientInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IP-access packet bytes that the SSL VPN context
+             received from client."
+    ::= { hh3cSslvpnCtxIpacStatEntry 2 }
+
+hh3cSslvpnCtxIpacClientOutBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IP-access packet bytes that the SSL VPN context
+             sent to client."
+    ::= { hh3cSslvpnCtxIpacStatEntry 3 }
+
+hh3cSslvpnCtxIpacServerInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IP-access packet bytes that the SSL VPN context
+             received from server."
+    ::= { hh3cSslvpnCtxIpacStatEntry 4 }
+
+hh3cSslvpnCtxIpacServerOutBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IP-access packet bytes that the SSL VPN
+             context sent to server."
+    ::= { hh3cSslvpnCtxIpacStatEntry 5 }
+
+END

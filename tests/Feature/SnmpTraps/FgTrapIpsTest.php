@@ -13,12 +13,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Unit tests for Fortigate IPS SNMP trap handlers (FgTrapIps*)
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -28,18 +28,18 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class FgTrapIpsTest extends SnmpTrapTestCase
 {
-    public function testIpsAnomaly()
-    {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
+    use RequiresDatabase;
+    use DatabaseTransactions;
 
-        $trapText = "$device->hostname
+    public function testIpsAnomaly(): void
+    {
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapIpsAnomaly
@@ -47,52 +47,46 @@ FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
 SNMPv2-MIB::sysName.0 $device->hostname
 FORTINET-FORTIGATE-MIB::fgIpsTrapSigId.0 2
 FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp.0 $ipv4->ipv4_address
-FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 tcp_src_session";
-
-        $message = "DDoS prevention triggered. Source: $ipv4->ipv4_address Protocol: tcp_src_session";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fgTrapIpsAnomaly trap');
+FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 tcp_src_session",
+            "DDoS prevention triggered. Source: $ipv4->ipv4_address Protocol: tcp_src_session",
+            'Could not handle fgTrapIpsAnomaly trap',
+            [4],
+            $device,
+        );
     }
 
-    public function testIpsPkgUdate()
+    public function testIpsPkgUdate(): void
     {
-        $device = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
+        $device = Device::factory()->create(); /** @var Device $device */
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapIpsPkgUpdate
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
-SNMPv2-MIB::sysName.0 $device->hostname";
-
-        $message = "IPS package updated on $device->hostname";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fgTrapIpsPkgUpdate trap');
+SNMPv2-MIB::sysName.0 $device->hostname",
+            "IPS package updated on $device->hostname",
+            'Could not handle fgTrapIpsPkgUpdate trap',
+            device: $device,
+        );
     }
 
-    public function testIpsSignature()
+    public function testIpsSignature(): void
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapIpsSignature
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
 SNMPv2-MIB::sysName.0 $device->hostname
 FORTINET-FORTIGATE-MIB::fgIpsTrapSigId.0 47173
 FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp.0 $ipv4->ipv4_address
-FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 UPnP.SSDP.M.Search.Anomaly";
-
-        $message = "IPS signature UPnP.SSDP.M.Search.Anomaly detected from $ipv4->ipv4_address with Fortiguard ID 47173";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fgTrapIpsSignature trap');
+FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 UPnP.SSDP.M.Search.Anomaly",
+            "IPS signature UPnP.SSDP.M.Search.Anomaly detected from $ipv4->ipv4_address with Fortiguard ID 47173",
+            'Could not handle fgTrapIpsSignature trap',
+            [4],
+            $device,
+        );
     }
 }

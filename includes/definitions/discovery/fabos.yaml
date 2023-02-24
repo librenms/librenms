@@ -1,8 +1,65 @@
 mib: SW-MIB
 modules:
+    mempools:
+        data:
+            -
+                percent_used: SW-MIB::swMemUsage
     processors:
         data:
             -
                 oid: swCpuUsage
                 num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.26.1.{{ $index }}'
                 index: 1
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorValue
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                    descr: swSensorInfo
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: swSensorType
+                            op: '!='
+                            value: 1
+        fanspeed:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorValue
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                    descr: swSensorInfo
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: swSensorType
+                            op: '!='
+                            value: 2
+        state:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorStatus
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{{ $index }}'
+                    descr: swSensorInfo
+                    state_name: swSensorStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'unknown' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'faulty' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'below-min' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'nominal' }
+                        - { value: 5, generic: 1, graph: 1, descr: 'above-max' }
+                        - { value: 6, generic: 1, graph: 1, descr: 'absent' }
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648

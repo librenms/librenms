@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateProxmoxPortsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,7 @@ class CreateProxmoxPortsTable extends Migration
             $table->integer('vm_id');
             $table->string('port', 10);
             $table->timestamp('last_seen')->useCurrent();
-            $table->unique(['vm_id','port']);
+            $table->unique(['vm_id', 'port']);
         });
     }
 

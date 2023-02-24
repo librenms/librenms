@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,9 +28,11 @@ namespace LibreNMS\Tests;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\Fping;
+use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Fping;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -79,30 +81,27 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $os base os
-     * @param string $variant optional variant
-     * @param array $modules modules to test for this os
+     *
+     * @param  string  $os  base os
+     * @param  string  $variant  optional variant
+     * @param  array  $modules  modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {
         $this->requireSnmpsim();  // require snmpsim for tests
-        // stub out Log::event and Fping->ping, we don't need to store them for these tests
+        // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
 
         try {
-            set_debug(false); // avoid all undefined index errors in the legacy code
+            Debug::set(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
-            return;
-        } catch (InvalidModuleException $e) {
-            $this->fail($e->getMessage());
-            return;
         }
 
         if (is_null($results)) {
@@ -110,17 +109,17 @@ class OSModulesTest extends DBTestCase
         }
 
         // output all discovery and poller output if debug mode is enabled for phpunit
-        $debug = in_array('--debug', $_SERVER['argv'], true);
+        $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $expected_data[$module]['discovery'] ?? [];
+            $actual = $results[$module]['discovery'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($debug ? null : $module)
+                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
@@ -132,15 +131,15 @@ class OSModulesTest extends DBTestCase
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $expected_data[$module]['poller'] ?? [];
             }
-            $actual = $results[$module]['poller'];
+            $actual = $results[$module]['poller'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($debug ? null : $module)
+                . $helper->getPollerOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
@@ -150,7 +149,7 @@ class OSModulesTest extends DBTestCase
 
     public function dumpedDataProvider()
     {
-        $modules = array();
+        $modules = [];
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));
@@ -166,23 +165,16 @@ class OSModulesTest extends DBTestCase
 
     private function stubClasses(): void
     {
-        $this->app->bind('log', function ($app) {
-            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
-                ->shouldReceive('event');
+        $this->app->bind(\App\Models\Eventlog::class, function ($app) {
+            $mock = \Mockery::mock(\App\Models\Eventlog::class);
+            $mock->shouldReceive('_log');
+
+            return $mock;
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock('\LibreNMS\Fping');
-            $mock->shouldReceive('ping')->andReturn([
-                "xmt" => 3,
-                "rcv" => 3,
-                "loss" => 0,
-                "min" => 0.62,
-                "max" => 0.93,
-                "avg" => 0.71,
-                "dup" => 0,
-                "exitcode" => 0,
-            ]);
+            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+            $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;
         });

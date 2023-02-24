@@ -1,0 +1,4 @@
+modules:
+  os:
+    version: .1.3.6.1.2.1.47.1.1.1.1.9.1
+    sysDescr_regex: '/(?<hardware>.*)/'

@@ -2,9 +2,8 @@ os: bluecatnetworks
 text: 'Bluecat Networks'
 type: appliance
 icon: bcn
-nobulk: true
-mib_dir:
-    - bluecatnetworks
+snmp_bulk: false
+mib_dir: bluecatnetworks
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

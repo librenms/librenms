@@ -1,0 +1,805 @@
+-- =================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:This MIB file is used for management of userlog
+--             information.
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0
+--   31st Mar 2003
+--   tianli, initial version
+--   V1.1 2005-07-05
+--     Modify value range of hh3cUserlogNatAclNumber and hh3cUserlogFlowAclNumber
+--     by tanbo02122.
+--     Update file format by gaolong.
+-- =================================================================
+HH3C-USERLOG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            hh3cRhw
+                    FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE
+                    FROM SNMPv2-CONF
+            IpAddress, Integer32, Counter32, OBJECT-TYPE,
+            MODULE-IDENTITY
+                    FROM SNMPv2-SMI;
+
+
+    hh3cUserLogMIB MODULE-IDENTITY
+            LAST-UPDATED "200304100000Z"          -- April 10, 2003 at 00:00 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                    "The HH3C-USERLOG-MIB contains objects to
+                    Manage configuration and Monitor running state
+                    for userlog feature."
+            ::= { hh3cRhw 18 }
+
+
+    hh3cUserlogObjects OBJECT IDENTIFIER ::= { hh3cUserLogMIB 1 }
+
+
+    hh3cUserlogNatObjects OBJECT IDENTIFIER ::= { hh3cUserlogObjects 1 }
+
+
+    hh3cUserlogNatVersion OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "NAT LOG version. Currently only version 1 is developed."
+            ::= { hh3cUserlogNatObjects 1 }
+
+
+    hh3cUserlogNatSyslog OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    NAT LOG format.
+                    If 1, LOG format is sysLog.
+                    If 0, LOG format is UDP packet.
+                    UDP packet is the default format, and is recommended.
+                    "
+            ::= { hh3cUserlogNatObjects 2 }
+
+
+    hh3cUserlogNatSourceIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The Source IP address of NAT LOG UDP packet."
+            ::= { hh3cUserlogNatObjects 3 }
+
+
+    hh3cUserlogNatFlowBegin OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Log the NAT flow when it is created.
+                    If 1, this function is enabled.
+                    If 0, this function is disabled.
+                    This function will be used when real-time monitor required.
+                    "
+            ::= { hh3cUserlogNatObjects 4 }
+
+
+    hh3cUserlogNatActiveTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    The active time for long-time existed NAT flow.
+                    Unit: minute. Range: 10 minutes ~ 120 minutes.
+                    When setting it, NAT flow can be logged after an interval of
+                    active time.
+                    This function will be used when real-time monitor required.
+                    The default value 0 means real-time monitor function is disabled.
+                    "
+            ::= { hh3cUserlogNatObjects 5 }
+
+
+    hh3cUserlogNatSlotCfgInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogNatSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of NAT LOG configuration information for the
+                    specified slot."
+            ::= { hh3cUserlogNatObjects 6 }
+
+
+    hh3cUserlogNatSlotCfgInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogNatSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "NAT LOG Configuration Information Entry for a slot."
+            INDEX { hh3cUserlogNatCfgSlotNumber }
+            ::= { hh3cUserlogNatSlotCfgInfoTable 1 }
+
+
+    Hh3cUserlogNatSlotCfgInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogNatCfgSlotNumber
+                            Integer32,
+                    hh3cUserlogNatEnable
+                            Integer32,
+                    hh3cUserlogNatAclNumber
+                            Integer32,
+                    hh3cUserlogNatHostAddress
+                            IpAddress,
+                    hh3cUserlogNatUdpPort
+                            Integer32
+             }
+
+    hh3cUserlogNatCfgSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify which slot is configured with NAT LOG. "
+            ::= { hh3cUserlogNatSlotCfgInfoEntry 1 }
+
+
+    hh3cUserlogNatEnable OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    The NAT LOG feature Enable status.
+                    If 1, NAT LOG is enbled.
+                    If 0, NAT LOG is disabled.
+                    "
+            ::= { hh3cUserlogNatSlotCfgInfoEntry 2 }
+
+
+    hh3cUserlogNatAclNumber OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Access-list number.
+                    The value 0 means no ACL is specified.
+                    Only when NAT LOG is enabled, can ACL be configured.
+                    Only NAT flow which match the ACL will be logged.
+                    "
+            ::= { hh3cUserlogNatSlotCfgInfoEntry 3 }
+
+
+    hh3cUserlogNatHostAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The IP address of NAT LOG server. "
+            ::= { hh3cUserlogNatSlotCfgInfoEntry 4 }
+
+
+    hh3cUserlogNatUdpPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The UDP Port Number of NAT LOG UDP packet."
+            ::= { hh3cUserlogNatSlotCfgInfoEntry 5 }
+
+
+    hh3cUserlogNatSlotRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogNatSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of NAT LOG running information for the specified slot."
+            ::= { hh3cUserlogNatObjects 7 }
+
+
+    hh3cUserlogNatSlotRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogNatSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "NAT LOG Running Information Entry for a slot."
+            INDEX { hh3cUserlogNatRunSlotNumber }
+            ::= { hh3cUserlogNatSlotRunInfoTable 1 }
+
+
+    Hh3cUserlogNatSlotRunInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogNatRunSlotNumber
+                            Integer32,
+                    hh3cUserlogNatTotalEntries
+                            Counter32,
+                    hh3cUserlogNatTotalPackets
+                            Counter32,
+                    hh3cUserlogNatFailedEntries
+                            Counter32,
+                    hh3cUserlogNatFailedPackets
+                            Counter32,
+                    hh3cUserlogNatClearRunStat
+                            Integer32
+             }
+
+    hh3cUserlogNatRunSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify on which slot the NAT LOG statistics
+                    displayed."
+            ::= { hh3cUserlogNatSlotRunInfoEntry 1 }
+
+
+    hh3cUserlogNatTotalEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of NAT flow entries which are logged."
+            ::= { hh3cUserlogNatSlotRunInfoEntry 2 }
+
+
+    hh3cUserlogNatTotalPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of NAT LOG UDP packets generated by the router."
+            ::= { hh3cUserlogNatSlotRunInfoEntry 3 }
+
+
+    hh3cUserlogNatFailedEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of NAT flow entries failed in outputting."
+            ::= { hh3cUserlogNatSlotRunInfoEntry 4 }
+
+
+    hh3cUserlogNatFailedPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of NAT LOG UDP packets failed in outputting."
+            ::= { hh3cUserlogNatSlotRunInfoEntry 5 }
+
+
+    hh3cUserlogNatClearRunStat OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Clear the running statistics for NAT LOG. Write-only.
+                    If 1, the running statistics for NAT LOG is resetted.
+                    Other value is invalid.
+                    "
+            ::= { hh3cUserlogNatSlotRunInfoEntry 6 }
+
+
+    hh3cUserlogFlowObjects OBJECT IDENTIFIER ::= { hh3cUserlogObjects 2 }
+
+
+    hh3cUserlogFlowVersion OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "BAS FLOW LOG version. Currently only version 1 is developed."
+            ::= { hh3cUserlogFlowObjects 1 }
+
+
+    hh3cUserlogFlowSyslog OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    BAS FLOW LOG format.
+                    If 1, LOG format is sysLog.
+                    If 0, LOG format is UDP packet.
+                    UDP packet is the default format, and is recommended.
+                    "
+            ::= { hh3cUserlogFlowObjects 2 }
+
+
+    hh3cUserlogFlowSourceIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The Source IP address of BAS FLOW LOG UDP packet."
+            ::= { hh3cUserlogFlowObjects 3 }
+
+
+    hh3cUserlogFlowFlowBegin OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Log the BAS flow when it is created.
+                    If 1, this function is enabled.
+                    If 0, this function is disabled.
+                    This function will be used when real-time monitor required.
+                    "
+            ::= { hh3cUserlogFlowObjects 4 }
+
+
+    hh3cUserlogFlowActiveTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    The active time for long-time existed BAS flow.
+                    Unit: minute. Range: 10 minutes ~ 120 minutes.
+                    When setting it, BAS flow can be logged after an internal of
+                    active time.
+                    This function will be used when real-time monitor required.
+                    The default value 0 means real-time monitor function is disabled.
+                    "
+            ::= { hh3cUserlogFlowObjects 5 }
+
+
+    hh3cUserlogFlowSlotCfgInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogFlowSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of BAS FLOW LOG configuration information for the
+                    specified slot."
+            ::= { hh3cUserlogFlowObjects 6 }
+
+
+    hh3cUserlogFlowSlotCfgInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogFlowSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "BAS FLOW LOG Configuration Information Entry for a slot."
+            INDEX { hh3cUserlogFlowCfgSlotNumber }
+            ::= { hh3cUserlogFlowSlotCfgInfoTable 1 }
+
+
+    Hh3cUserlogFlowSlotCfgInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogFlowCfgSlotNumber
+                            Integer32,
+                    hh3cUserlogFlowEnable
+                            Integer32,
+                    hh3cUserlogFlowAclNumber
+                            Integer32,
+                    hh3cUserlogFlowHostAddress
+                            IpAddress,
+                    hh3cUserlogFlowUdpPort
+                            Integer32
+             }
+
+    hh3cUserlogFlowCfgSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify which slot is configured with BAS FLOW LOG."
+            ::= { hh3cUserlogFlowSlotCfgInfoEntry 1 }
+
+
+    hh3cUserlogFlowEnable OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    The BAS FLOW LOG feature Enable status.
+                    If 1, BAS FLOW LOG is enbled.
+                    If 0, BAS FLOW LOG is disabled.
+                    "
+            ::= { hh3cUserlogFlowSlotCfgInfoEntry 2 }
+
+
+    hh3cUserlogFlowAclNumber OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Access-list number.
+                    The value 0 means no ACL is specified.
+                    Only when BAS FLOW LOG is enabled, can ACL be configured.
+                    Only BAS flow which match the ACL will be logged.
+                    "
+            ::= { hh3cUserlogFlowSlotCfgInfoEntry 3 }
+
+
+    hh3cUserlogFlowHostAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The IP address of BAS FLOW LOG server. "
+            ::= { hh3cUserlogFlowSlotCfgInfoEntry 4 }
+
+
+    hh3cUserlogFlowUdpPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The UDP Port Number of BAS FLOW LOG UDP packet."
+            ::= { hh3cUserlogFlowSlotCfgInfoEntry 5 }
+
+
+    hh3cUserlogFlowSlotRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogFlowSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of BAS FLOW LOG running information for the specified slot."
+            ::= { hh3cUserlogFlowObjects 7 }
+
+
+    hh3cUserlogFlowSlotRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogFlowSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "Running Information Entry for a slot."
+            INDEX { hh3cUserlogFlowRunSlotNumber }
+            ::= { hh3cUserlogFlowSlotRunInfoTable 1 }
+
+
+    Hh3cUserlogFlowSlotRunInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogFlowRunSlotNumber
+                            Integer32,
+                    hh3cUserlogFlowTotalEntries
+                            Counter32,
+                    hh3cUserlogFlowTotalPackets
+                            Counter32,
+                    hh3cUserlogFlowFailedEntries
+                            Counter32,
+                    hh3cUserlogFlowFailedPackets
+                            Counter32,
+                    hh3cUserlogFlowClearRunStat
+                            Integer32
+             }
+
+    hh3cUserlogFlowRunSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify on which slot the BAS FLOW LOG
+                    statistics displayed."
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 1 }
+
+
+    hh3cUserlogFlowTotalEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS FLOW Entries which are logged."
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 2 }
+
+
+    hh3cUserlogFlowTotalPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of FLOW LOG UDP packet generated by the router."
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 3 }
+
+
+    hh3cUserlogFlowFailedEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS FLOW  entries failed in outputting. "
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 4 }
+
+
+    hh3cUserlogFlowFailedPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS FLOW LOG UDP packet failed in outputting."
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 5 }
+
+
+    hh3cUserlogFlowClearRunStat OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Clear the running statistics for FLOW LOG. Write-only.
+                    If 1, the running statistics for FLOW LOG is resetted.
+                    Other value is invalid.
+                    "
+            ::= { hh3cUserlogFlowSlotRunInfoEntry 6 }
+
+
+    hh3cUserlogAccessObjects OBJECT IDENTIFIER ::= { hh3cUserlogObjects 3 }
+
+
+    hh3cUserlogAccessVersion OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "BAS ACCESS LOG version. Currently only version 1 is developed."
+            ::= { hh3cUserlogAccessObjects 1 }
+
+
+    hh3cUserlogAccessSyslog OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    BAS ACCESS LOG format.
+                    If 1, LOG format is sysLog;
+                    If 0, LOG format is UDP packet.
+                    UDP packet is the default format, and is recommended.
+                    "
+            ::= { hh3cUserlogAccessObjects 2 }
+
+
+    hh3cUserlogAccessSourceIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The Source IP address of BAS ACCESS LOG UDP packet."
+            ::= { hh3cUserlogAccessObjects 3 }
+
+
+    hh3cUserlogAccessSlotCfgInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogAccessSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of BAS ACCESS LOG configuration information for the specified slot."
+            ::= { hh3cUserlogAccessObjects 4 }
+
+
+    hh3cUserlogAccessSlotCfgInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogAccessSlotCfgInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "BAS ACCESS LOG Configuration Information Entry for a slot."
+            INDEX { hh3cUserlogAccessCfgSlotNumber }
+            ::= { hh3cUserlogAccessSlotCfgInfoTable 1 }
+
+
+    Hh3cUserlogAccessSlotCfgInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogAccessCfgSlotNumber
+                            Integer32,
+                    hh3cUserlogAccessEnable
+                            Integer32,
+                    hh3cUserlogAccessHostAddress
+                            IpAddress,
+                    hh3cUserlogAccessUdpPort
+                            Integer32
+             }
+
+    hh3cUserlogAccessCfgSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify which slot is configured with BAS ACCESS LOG."
+            ::= { hh3cUserlogAccessSlotCfgInfoEntry 1 }
+
+
+    hh3cUserlogAccessEnable OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    The BAS ACCESS LOG feature Enable status.
+                    If 1, BAS ACCESS LOG is enbled.
+                    If 0, BAS ACCESS LOG is disabled.
+                    "
+            ::= { hh3cUserlogAccessSlotCfgInfoEntry 2 }
+
+
+    hh3cUserlogAccessHostAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The IP address of BAS ACCESS LOG server."
+            ::= { hh3cUserlogAccessSlotCfgInfoEntry 3 }
+
+
+    hh3cUserlogAccessUdpPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "The UDP Port Number of BAS ACCESS LOG UDP packet."
+            ::= { hh3cUserlogAccessSlotCfgInfoEntry 4 }
+
+
+    hh3cUserlogAccessSlotRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cUserlogAccessSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "A table of BAS ACCESS LOG running information for the specified slot."
+            ::= { hh3cUserlogAccessObjects 5 }
+
+
+    hh3cUserlogAccessSlotRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cUserlogAccessSlotRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "Running Information Entry for a slot."
+            INDEX { hh3cUserlogAccessRunSlotNumber }
+            ::= { hh3cUserlogAccessSlotRunInfoTable 1 }
+
+
+    Hh3cUserlogAccessSlotRunInfoEntry ::=
+            SEQUENCE {
+                    hh3cUserlogAccessRunSlotNumber
+                            Integer32,
+                    hh3cUserlogAccessTotalEntries
+                            Counter32,
+                    hh3cUserlogAccessTotalPackets
+                            Counter32,
+                    hh3cUserlogAccessFailedEntries
+                            Counter32,
+                    hh3cUserlogAccessFailedPackets
+                            Counter32,
+                    hh3cUserlogAccessClearRunStat
+                            Integer32
+             }
+
+    hh3cUserlogAccessRunSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "Slot number. Specify on which slot the BAS ACCESS LOG statistics displayed."
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 1 }
+
+
+    hh3cUserlogAccessTotalEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS ACCESS Records which are logged."
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 2 }
+
+
+    hh3cUserlogAccessTotalPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of ACCESS LOG UDP packet generated by the router."
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 3 }
+
+
+    hh3cUserlogAccessFailedEntries OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS ACCESS entries failed in outputting."
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 4 }
+
+
+    hh3cUserlogAccessFailedPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                    "The total number of BAS ACCESS LOG UDP packet failed in outputting."
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 5 }
+
+
+    hh3cUserlogAccessClearRunStat OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                    "
+                    Clear the running statistics for ACCESS LOG. Write-only.
+                    If 1, the running statistics for ACCESS LOG is resetted.
+                    Other value is invalid.
+                    "
+            ::= { hh3cUserlogAccessSlotRunInfoEntry 6 }
+
+
+    hh3cUserlogNotifications OBJECT IDENTIFIER ::= { hh3cUserLogMIB 2 }
+
+
+    hh3cUserlogConformance OBJECT IDENTIFIER ::= { hh3cUserLogMIB 3 }
+
+
+    hh3cUserlogCompliances OBJECT IDENTIFIER ::= { hh3cUserlogConformance 1 }
+
+
+    hh3cUserlogCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                    "The compliance statement for entities which implement the
+                    Userlog mib."
+            MODULE -- this module
+                    MANDATORY-GROUPS { hh3cUserlogMandatoryGroup }
+            ::= { hh3cUserlogCompliances 1 }
+
+
+    hh3cUserlogGroups OBJECT IDENTIFIER ::= { hh3cUserlogConformance 2 }
+
+
+    hh3cUserlogMandatoryGroup OBJECT-GROUP
+            OBJECTS { hh3cUserlogNatEnable, hh3cUserlogNatHostAddress, hh3cUserlogNatUdpPort,
+                      hh3cUserlogFlowEnable, hh3cUserlogFlowHostAddress, hh3cUserlogFlowUdpPort,
+                      hh3cUserlogAccessEnable, hh3cUserlogAccessHostAddress, hh3cUserlogAccessUdpPort
+                    }
+            STATUS current
+            DESCRIPTION
+                    "A collection of objects providing mandatory Userlog information."
+            ::= { hh3cUserlogGroups 1 }
+
+
+    hh3cUserlogConfigGroup OBJECT-GROUP
+            OBJECTS { hh3cUserlogNatVersion, hh3cUserlogNatSyslog, hh3cUserlogNatSourceIP,
+                      hh3cUserlogNatFlowBegin, hh3cUserlogNatActiveTime, hh3cUserlogNatCfgSlotNumber,
+                      hh3cUserlogNatEnable, hh3cUserlogNatAclNumber, hh3cUserlogNatHostAddress,
+                      hh3cUserlogNatUdpPort, hh3cUserlogFlowVersion, hh3cUserlogFlowSyslog,
+                      hh3cUserlogFlowSourceIP, hh3cUserlogFlowFlowBegin, hh3cUserlogFlowActiveTime,
+                      hh3cUserlogFlowCfgSlotNumber, hh3cUserlogFlowEnable, hh3cUserlogFlowAclNumber,
+                      hh3cUserlogFlowHostAddress, hh3cUserlogFlowUdpPort, hh3cUserlogAccessVersion,
+                      hh3cUserlogAccessSyslog, hh3cUserlogAccessSourceIP, hh3cUserlogAccessCfgSlotNumber,
+                      hh3cUserlogAccessEnable, hh3cUserlogAccessHostAddress, hh3cUserlogAccessUdpPort
+                    }
+            STATUS current
+            DESCRIPTION
+                    "All configurable parameters of Userlog feature."
+            ::= { hh3cUserlogGroups 2 }
+
+
+    hh3cUserlogInfoGroup OBJECT-GROUP
+            OBJECTS { hh3cUserlogNatTotalEntries, hh3cUserlogNatTotalPackets,
+                      hh3cUserlogNatFailedEntries, hh3cUserlogNatFailedPackets,
+                      hh3cUserlogFlowTotalEntries, hh3cUserlogFlowTotalPackets,
+                      hh3cUserlogFlowFailedEntries, hh3cUserlogFlowFailedPackets,
+                      hh3cUserlogAccessTotalEntries, hh3cUserlogAccessTotalPackets,
+                      hh3cUserlogAccessFailedEntries, hh3cUserlogAccessFailedPackets
+                    }
+            STATUS current
+            DESCRIPTION
+                    "All running information of Userlog feature."
+            ::= { hh3cUserlogGroups 3 }
+
+END

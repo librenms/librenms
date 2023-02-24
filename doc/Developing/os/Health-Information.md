@@ -1,12 +1,9 @@
-source: Developing/os/Health-Information.md
-path: blob/master/doc/
-
 #### Sensors
 
 This document will guide you through adding health / sensor
 information for your new device.
 
-Currently we have support for the following health metrics along with
+Currently, we have support for the following health metrics along with
 the values we expect to see the data in:
 
 | Class                           | Measurement                 |
@@ -36,8 +33,11 @@ the values we expect to see the data in:
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
+| tv_signal                       | dBmV                        |
+| bitrate                         | bps                         |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
+| percent                         | %                           |
 
 #### Simple health discovery
 
@@ -50,9 +50,9 @@ files so that you don't need to know how to write PHP.
 All yaml files are located in
 `includes/definitions/discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
-sensible with the MIBs they generate. Only snmp walks are supported
+sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
-all of the data you need. We will use netbotz as an example here.
+all the data you need. We will use netbotz as an example here.
 
 `includes/definitions/discovery/netbotz.yaml`
 
@@ -62,7 +62,7 @@ modules:
     sensors:
         airflow:
             options:
-                skip_values_lt: 0
+                skip_value_lt: 0
             data:
                 -
                     oid: airFlowSensorTable
@@ -83,12 +83,13 @@ For `data:` you have the following options:
 The only sensor we have defined here is airflow. The available options
 are as follows:
 
-- `oid` (required): This is the name of the table you want to do the snmp walk on.
+- `oid` (required): This is the name of the table you want to snmp walk for data.
 - `value` (optional): This is the key within the table that contains
-  the value. If not provided willuse `oid`
-- `num_oid` (required): This is the numerical OID that contains
-  `value`. This should always include `{{ $index }}`.  snmptranslate
-  -On can help figure out the number.
+  the value. If not provided will use `oid`
+- `num_oid` (required for PullRequests): If not provided, this parameter should be computed
+  automatically by discovery process. This parameter is still required to
+  submit a pull request. This is the numerical OID that contains
+  `value`. This should usually include `{{ $index }}`.
   In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
@@ -123,6 +124,14 @@ are as follows:
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)
+- `snmp_flags` (optional): this sets the flags to be sent to snmpwalk, it 
+  overrides flags set on the sensor type and os.  The default is `'-OQUb'`.
+  A common issue is dealing with string indexes, setting `'-OQUsbe'` will change them to 
+  numeric oids. Setting `['-OQUsbe', '-Pu']` will also allow _ in oid names. You can find more
+  in the [Man Page](https://linux.die.net/man/1/snmpcmd)
+- `rrd_type` (optional): You can change the type of the RRD file that will be created to
+  store the data. By default, type GAUGE is used. More details can be found here:
+  https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
 
 For `options:` you have the following available:
 
@@ -132,15 +141,20 @@ For `options:` you have the following available:
 - `skip_value_lt`: If sensor value is less than this, skip the discovery.
 - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
-Multiple variables can be used in the sensors definition. The syntax
+Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+When referencing an oid in another table the full index will be used to match the other table.
+If this is undesirable, you may use a single sub index by appending the sub index after a colon to
+the variable name.  Example `{{ $ifName:2 }}`
+
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
 > from the OID, unless a target index is appended to the OID.
+> Additionally, you may check fields from the device.
 > Comparisons behave on a logical OR basis when chained, so only
 > one of them needs to be matched for that particular sensor
 > to be skipped during discovery. An example of this is below:
@@ -155,15 +169,19 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       oid: sensConfig.0
                       op: '!='
                       value: 1
+                    -
+                      device: hardware
+                      op: 'contains'
+                      value: 'rev2'
 ```
 
-> ``` op ``` can be any of the following operators :
->
+`op` can be any of the following operators :
+
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array, exists
->
-> Example:
+
+Example:
 
 ```yaml
                     skip_values:
@@ -181,18 +199,35 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
                       value: false
 ```
 
+```yaml
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+```
+
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
 #### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
-the discovery code in php.
+the discovery code in php. If it is possible to create via yaml, php discovery
+will likely be rejected due to the much higher chance of later problems,
+so it is highly suggested to use yaml.
 
 The directory structure for sensor information is
-`includes/discovery/sensors/$class/$os.inc.php`. The format of all of
-the sensors follows the same code format which is to collect sensor information
-via SNMP and then call the `discover_sensor()` function; with the exception of state 
+`includes/discovery/sensors/$class/$os.inc.php`. The format of all the
+sensors follows the same code format which is to collect sensor information
+via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
 well. Sensor information is first collected by
@@ -209,12 +244,12 @@ then passed to `discover_sensor()`.
 - $oid = Required. This must be the numerical OID for where the data
   can be found, i.e .1.2.3.4.5.6.7.0
 - $index = Required. This must be unique for this sensor class, device
-  and type. Typically it's the index from the table being walked or it
+  and type. Typically it's the index from the table being walked, or it
   could be the name of the OID if it's a single value.
-- $type = Required. This should be the OS name, i.e pulse.
+- $type = Required. This should be the OS name, i.e. pulse.
 - $descr = Required. This is a descriptive value for the sensor. Some
   devices will provide names to use.
-- $divisor = Defaults to 1. This is used to divided the returned value.
+- $divisor = Defaults to 1. This is used to divide the returned value.
 - $multiplier = Defaults to 1. This is used to multiply the returned value.
 - $low_limit = Defaults to null. Sets the low threshold limit for the
   sensor, used in alerting to report out range sensors.
@@ -237,6 +272,9 @@ then passed to `discover_sensor()`.
   to celsius use `fahrenheit_to_celsius`)
 - $group = Defaults to null. Groups sensors together under in the
   webui, displaying this text.
+- $rrd_type = Default to 'GAUGE'. Allows to change the type of the RRD
+  file created for this sensor. More details can be found here in the
+  RRD documentation: https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
 
 For the majority of devices, this is all that's required to add
 support for a sensor. Polling is done based on the data gathered using
@@ -302,7 +340,7 @@ line walks the cmEntityObject table to get information about the chassis and lin
 this information we extract the model type which will identify which tables in the CM-Facility-Mib
 the ports are populated in. The program then reads the appropriate table into the `$pre_cache`
 array `adva_fsp150_ports`. This array will have OID indexies for each port, which we will use
-later to identify our sensor OIDs. 
+later to identify our sensor OIDs.
 
 ```
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
@@ -446,6 +484,8 @@ Signal:
 State:
 Count:
 Temperature: ..
+Tv_signal:
+Bitrate:
 Voltage: .
 Snr:
 Pressure:
@@ -456,6 +496,7 @@ Chromatic_dispersion:
 Ber:
 Eer:
 Waterflow:
+Percent:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

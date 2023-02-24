@@ -21,5 +21,5 @@
     </table>
 </div>
 @else
-    <h4>@lang('No devices found within interval.')</h4>
+    <h4>{{ __('No devices found within interval.') }}</h4>
 @endif

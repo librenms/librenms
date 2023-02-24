@@ -1,5 +1,21 @@
 mib: GEPON-OLT-COMMON-MIB
 modules:
+    mempools:
+        data:
+            -
+                oid: GEPON-OLT-COMMON-MIB::mgrCardInfoTable
+                percent_used: GEPON-OLT-COMMON-MIB::mgrCardMemUtil
+                total: 268435456
+                descr: 'Hswa {{ $index }} Memory'
+                skip_values:
+                    -
+                        oid: GEPON-OLT-COMMON-MIB::mgrCardWorkStatus
+                        op: '!='
+                        value: 1
+    os:
+        sysDescr_regex: '/(?<hardware>.*)/'
+        version: GEPON-OLT-COMMON-MIB::sysSoftVersion.0
+        features: GEPON-OLT-COMMON-MIB::sysHardVersion.0
     processors:
         data:
             -

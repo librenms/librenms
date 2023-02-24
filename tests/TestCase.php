@@ -24,6 +24,7 @@ abstract class TestCase extends BaseTestCase
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
     }
+
     public function dbTearDown()
     {
         if (getenv('DBTEST')) {
@@ -33,5 +34,14 @@ abstract class TestCase extends BaseTestCase
                 $this->fail("Exception when rolling back transaction.\n" . $e->getTraceAsString());
             }
         }
+    }
+
+    protected function tearDown(): void
+    {
+        $this->beforeApplicationDestroyed(function () {
+            $this->getConnection()->disconnect();
+        });
+
+        parent::tearDown();
     }
 }

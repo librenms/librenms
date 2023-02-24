@@ -6,8 +6,6 @@ IMPORTS
     Counter32                          FROM SNMPv2-SMI
     RowStatus                          FROM SNMPv2-TC
 
-
-
     MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
     InterfaceIndexOrZero               FROM IF-MIB
     ip                                 FROM IP-MIB
@@ -55,9 +53,6 @@ ipForward MODULE-IDENTITY
             Adding a new conformance statement to support the
             implementation of the IP Forwarding MIB in a
             read-only mode.
-
-
-
 
             The inetCidrRouteTable replaces the IPv4-specific
             ipCidrRouteTable, its related objects, and related
@@ -107,9 +102,6 @@ inetCidrRouteTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-
-
-
            "This entity's IP Routing table."
     REFERENCE
            "RFC 1213 Section 6.6, The IP Group"
@@ -158,9 +150,6 @@ InetCidrRouteEntry ::= SEQUENCE {
         inetCidrRouteMetric1      Integer32,
         inetCidrRouteMetric2      Integer32,
         inetCidrRouteMetric3      Integer32,
-
-
-
         inetCidrRouteMetric4      Integer32,
         inetCidrRouteMetric5      Integer32,
         inetCidrRouteStatus       RowStatus
@@ -198,7 +187,6 @@ inetCidrRouteDest OBJECT-TYPE
             equal to x.  If not, then the index pair is not
             consistent and an inconsistentName error must be
             returned on SET or CREATE requests."
-
     ::= { inetCidrRouteEntry 2 }
 
 inetCidrRoutePfxLen OBJECT-TYPE
@@ -209,8 +197,6 @@ inetCidrRoutePfxLen OBJECT-TYPE
            "Indicates the number of leading one bits that form the
             mask to be logical-ANDed with the destination address
             before being compared to the value in the
-
-
 
             inetCidrRouteDest field.
 
@@ -223,7 +209,6 @@ inetCidrRoutePfxLen OBJECT-TYPE
             equal to x.  If not, then the index pair is not
             consistent and an inconsistentName error must be
             returned on SET or CREATE requests."
-
     ::= { inetCidrRouteEntry 3 }
 
 inetCidrRoutePolicy OBJECT-TYPE
@@ -260,8 +245,6 @@ inetCidrRouteNextHop OBJECT-TYPE
     STATUS     current
     DESCRIPTION
            "On remote routes, the address of the next system en
-
-
 
             route.  For non-remote routes, a zero length string.
 
@@ -312,9 +295,6 @@ inetCidrRouteType OBJECT-TYPE
             discards the message silently."
     ::= { inetCidrRouteEntry 8 }
 
-
-
-
 inetCidrRouteProto OBJECT-TYPE
     SYNTAX     IANAipRouteProtocol
     MAX-ACCESS read-only
@@ -362,9 +342,6 @@ inetCidrRouteMetric1 OBJECT-TYPE
             value.  If this metric is not used, its value should be
             set to -1."
     DEFVAL { -1 }
-
-
-
     ::= { inetCidrRouteEntry 12 }
 
 inetCidrRouteMetric2 OBJECT-TYPE
@@ -413,8 +390,6 @@ inetCidrRouteMetric5 OBJECT-TYPE
     DESCRIPTION
            "An alternate routing metric for this route.  The
             semantics of this metric are determined by the routing-
-
-
 
             protocol specified in the route's inetCidrRouteProto
             value.  If this metric is not used, its value should be
@@ -465,8 +440,6 @@ ipForwardFullCompliance MODULE-COMPLIANCE
             --     This MIB requires support for global and
             --     non-global ipv4 and ipv6 addresses.
 
-
-
             --
             -- OBJECT      inetCidrRouteDest
             -- SYNTAX      InetAddress (SIZE (4 | 8 | 16 | 20))
@@ -497,7 +470,6 @@ ipForwardFullCompliance MODULE-COMPLIANCE
    WRITE-SYNTAX  RowStatus { active(1), notInService (2),
                              createAndGo(4), destroy(6) }
    DESCRIPTION  "Support for createAndWait is not required."
-
    ::= { ipForwardCompliances 3 }
 
 ipForwardReadOnlyCompliance MODULE-COMPLIANCE
@@ -515,9 +487,6 @@ ipForwardReadOnlyCompliance MODULE-COMPLIANCE
       "Write access is not required."
 
    OBJECT      inetCidrRouteType
-
-
-
    MIN-ACCESS  read-only
    DESCRIPTION
       "Write access is not required."
@@ -557,7 +526,6 @@ ipForwardReadOnlyCompliance MODULE-COMPLIANCE
    MIN-ACCESS  read-only
    DESCRIPTION
       "Write access is not required."
-
    ::= { ipForwardCompliances 4 }
 
 -- units of conformance
@@ -566,9 +534,6 @@ inetForwardCidrRouteGroup OBJECT-GROUP
     OBJECTS { inetCidrRouteDiscards,
               inetCidrRouteIfIndex, inetCidrRouteType,
               inetCidrRouteProto, inetCidrRouteAge,
-
-
-
               inetCidrRouteNextHopAS, inetCidrRouteMetric1,
               inetCidrRouteMetric2, inetCidrRouteMetric3,
               inetCidrRouteMetric4, inetCidrRouteMetric5,
@@ -618,8 +583,6 @@ ipCidrRouteEntry OBJECT-TYPE
     DESCRIPTION
            "A particular route to a particular destination, under a
 
-
-
             particular policy."
     INDEX {
         ipCidrRouteDest,
@@ -668,9 +631,6 @@ ipCidrRouteDest OBJECT-TYPE
 ipCidrRouteMask OBJECT-TYPE
     SYNTAX     IpAddress
     MAX-ACCESS read-only
-
-
-
     STATUS     deprecated
     DESCRIPTION
            "Indicate the mask to be logical-ANDed with the
@@ -719,8 +679,6 @@ ipCidrRouteTos OBJECT-TYPE
                0 1 1 0  ==>  12      0 1 1 1  ==>  14
                1 0 0 0  ==>  16      1 0 0 1  ==>  18
                1 0 1 0  ==>  20      1 0 1 1  ==>  22
-
-
 
                1 1 0 0  ==>  24      1 1 0 1  ==>  26
                1 1 1 0  ==>  28      1 1 1 1  ==>  30"
@@ -771,9 +729,6 @@ ipCidrRouteType OBJECT-TYPE
             routes."
     ::= { ipCidrRouteEntry 6 }
 
-
-
-
 ipCidrRouteProto OBJECT-TYPE
     SYNTAX     INTEGER {
                 other     (1),  -- not specified
@@ -821,9 +776,6 @@ ipCidrRouteAge OBJECT-TYPE
 ipCidrRouteInfo OBJECT-TYPE
     SYNTAX     OBJECT IDENTIFIER
     MAX-ACCESS read-create
-
-
-
     STATUS     deprecated
     DESCRIPTION
            "A reference to MIB definitions specific to the
@@ -873,8 +825,6 @@ ipCidrRouteMetric2 OBJECT-TYPE
             protocol specified in the route's ipCidrRouteProto
             value.  If this metric is not used, its value should be
 
-
-
             set to -1."
     DEFVAL { -1 }
     ::= { ipCidrRouteEntry 12 }
@@ -923,9 +873,6 @@ ipCidrRouteStatus OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     deprecated
     DESCRIPTION
-
-
-
            "The row status variable, used according to row
             installation and removal conventions."
     ::= { ipCidrRouteEntry 16 }
@@ -944,7 +891,6 @@ ipForwardCompliance MODULE-COMPLIANCE
 
    MODULE  -- this module
    MANDATORY-GROUPS { ipForwardCidrRouteGroup }
-
    ::= { ipForwardCompliances 1 }
 
 -- units of conformance
@@ -974,9 +920,6 @@ ipForwardNumber OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     obsolete
     DESCRIPTION
-
-
-
            "The number of current ipForwardTable entries that are
             not invalid."
     ::= { ipForward 1 }
@@ -1025,9 +968,6 @@ IpForwardEntry ::= SEQUENCE {
         ipForwardInfo       OBJECT IDENTIFIER,
         ipForwardNextHopAS  Integer32,
         ipForwardMetric1    Integer32,
-
-
-
         ipForwardMetric2    Integer32,
         ipForwardMetric3    Integer32,
         ipForwardMetric4    Integer32,
@@ -1077,8 +1017,6 @@ ipForwardMask OBJECT-TYPE
 -- and the Router Requirements documents disagree on the width
 -- of the TOS field.  This mapping describes the Router
 
-
-
 -- Requirements mapping, and leaves room to widen the TOS field
 -- without impact to fielded systems.
 
@@ -1105,8 +1043,6 @@ ipForwardPolicy OBJECT-TYPE
             |                 |                       |     |
             +-----+-----+-----+-----+-----+-----+-----+-----+
 
-
-
                          IP TOS                IP TOS
                Field     Policy      Field     Policy
                Contents    Code      Contents    Code
@@ -1127,9 +1063,6 @@ ipForwardPolicy OBJECT-TYPE
     ::= { ipForwardEntry 3 }
 
 ipForwardNextHop OBJECT-TYPE
-
-
-
     SYNTAX     IpAddress
     MAX-ACCESS read-only
     STATUS     obsolete
@@ -1179,9 +1112,6 @@ ipForwardType OBJECT-TYPE
     DEFVAL { invalid }
     ::= { ipForwardEntry 6 }
 
-
-
-
 ipForwardProto OBJECT-TYPE
     SYNTAX     INTEGER {
                 other     (1),  -- not specified
@@ -1229,9 +1159,6 @@ ipForwardInfo OBJECT-TYPE
     SYNTAX     OBJECT IDENTIFIER
     MAX-ACCESS read-create
     STATUS     obsolete
-
-
-
     DESCRIPTION
            "A reference to MIB definitions specific to the
             particular routing protocol that is responsible for
@@ -1281,9 +1208,6 @@ ipForwardMetric2 OBJECT-TYPE
     DEFVAL { -1 }
     ::= { ipForwardEntry 12 }
 
-
-
-
 ipForwardMetric3 OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-create
@@ -1332,12 +1256,8 @@ ipForwardOldCompliance MODULE-COMPLIANCE
            "The compliance statement for SNMP entities that
             implement the ipForward MIB."
 
-
-
-
    MODULE  -- this module
    MANDATORY-GROUPS { ipForwardMultiPathGroup }
-
    ::= { ipForwardCompliances 2 }
 
 ipForwardMultiPathGroup OBJECT-GROUP

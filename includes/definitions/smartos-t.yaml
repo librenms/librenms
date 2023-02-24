@@ -3,6 +3,7 @@ text: 'SmartOptics T-Series'
 type: network
 icon: smartoptics
 group: smartoptics
+mib_dir: smartoptics
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

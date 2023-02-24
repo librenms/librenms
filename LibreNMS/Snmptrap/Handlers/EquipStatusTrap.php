@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
  */
@@ -28,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class EquipStatusTrap implements SnmptrapHandler
 {
@@ -36,32 +35,26 @@ class EquipStatusTrap implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $state = $trap->getOidData('EQUIPMENT-MIB::equipStatus.0');
 
         $severity = $this->getSeverity($state);
-        Log::event('SNMP Trap: Equipment Status  ' . $state, $device->device_id, 'state', $severity);
+        $trap->log('SNMP Trap: Equipment Status  ' . $state, $severity, 'state');
     }
 
-    private function getSeverity($state)
+    private function getSeverity(string $state): int
     {
-        $severity_map = [
-            'warning' => 4,
-            'major' => 4,
-            '5' => 4,
-            '3' => 4,
-            'critical' => 5,
-            '4' => 5,
-            'minor' => 3,
-            '2' => 3,
-            'nonAlarmed' => 1,
-            '1' => 1,
-        ];
-        return $severity_map[$state] ?? 0;
+        return match ($state) {
+            'warning', '3', 'major', '5' => 4,
+            'critical', '4' => 5,
+            'minor', '2' => 3,
+            'nonAlarmed', '1' => 1,
+            default => 0,
+        };
     }
 }

@@ -1,27 +1,25 @@
-source: Extensions/Dispatcher-Service.md
-path: blob/master/doc/
-
 # Dispatcher Service
 
 > Status: Release Candidate
 
 The LibreNMS dispatcher service (`librenms-service.py`) is a new method
-of running the poller service at set times. It does not replace the php scripts, 
+of running the poller service at set times. It does not replace the php scripts,
 just the cron entries running them.
 
-# External Requirements
+## External Requirements
 
-## A recent version of Python
+### A recent version of Python
 
 The LibreNMS service requires Python 3 and some features require
 behaviour only found in Python3.4+.
 
-## Python modules
+### Python modules
 
 - PyMySQL is recommended as it requires no C compiler to
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
 - redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
@@ -29,7 +27,7 @@ These can be obtained from your OS package manager, or from PyPI with the below 
 pip3 install -r requirements.txt
 ```
 
-## Redis (distributed polling)
+### Redis (distributed polling)
 
 If you want to use distributed polling, you'll need a Redis instance
 to coordinate the nodes. It's recommended that you do not share the
@@ -42,23 +40,26 @@ systems, and use redis-sentinel.
 You should not rely on the password for the security of your
 system. See <https://redis.io/topics/security>
 
-## Memcached (distributed polling)
+### Memcached (distributed polling)
 
-LibreNMS still uses memcached for locking daily update processes when using
-distributed polling.  So you will still need to configure memcached
+LibreNMS can still use memcached as a locking mechanism when using
+distributed polling.  So you can configure memcached for this purpose
 unless you have updates disabled.
 
-## MySQL
+See `Locking Mechanisms` at
+<https://docs.librenms.org/Extensions/Distributed-Poller/>
+
+### MySQL
 
 You should already have this, but the pollers do need access to the
 SQL database. The LibreNMS service runs faster and more aggressively
 than the standard poller, so keep an eye on the number of open
 connections and other important health metrics.
 
-# Configuration
+## Configuration
 
 Connection settings are required in `.env`. The `.env` file is
-generated after composer install and APP_KEY and NODE_ID are set.
+generated after composer install and `APP_KEY` and `NODE_ID` are set.
 Remember that the APP_KEY value must be the same on all your pollers.
 
 ```dotenv
@@ -71,9 +72,9 @@ DB_USERNAME=librenms
 DB_PASSWORD=
 ```
 
-## Distributed Polling Configuration
+### Distributed Polling Configuration
 
-Once you have your Redis database set up, configure it in the .env file on each node.
+Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
 ```dotenv
 REDIS_HOST=127.0.0.1
@@ -85,9 +86,11 @@ REDIS_SENTINEL_SERVICE=myservice
 REDIS_DB=0
 #REDIS_PASSWORD=
 #REDIS_TIMEOUT=60
+
+CACHE_DRIVER=redis
 ```
 
-## Basic Configuration
+### Basic Configuration
 
 Additional configuration settings can be set in `config.php` or
 directly into the database.
@@ -127,7 +130,7 @@ $config['distributed_poller_group']              = 0;               # Which grou
 ```
 ### Tuning the number of workers
 
-See https://your_librenms_install/poller 
+See https://your_librenms_install/poller
 
 You want to keep Consumed Worker Seconds comfortably below Maximum Worker Seconds. The closer the values are to each other, the flatter the CPU graph of the poller machine. Meaning that you are utilizing your CPU resources well. As long as Consumed WS stays below Maximum WS and Devices Pending is 0, you should be ok.
 
@@ -135,7 +138,7 @@ If Consumed WS is below Maximum WS and Devices Pending is > 0, your hardware is 
 
 Maximum WS equals the number of workers multiplied with the number of seconds in the polling period. (default 300)
 
-# Fast Ping
+## Fast Ping
 
 The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.
 You can enable it by setting the following:
@@ -144,7 +147,7 @@ You can enable it by setting the following:
 $config['service_ping_enabled'] = true;
 ```
 
-# Watchdog
+## Watchdog
 
 The watchdog scheduler is disabled by default. You can enable it by setting the following:
 
@@ -154,26 +157,46 @@ $config['service_watchdog_enabled'] = true;
 
 The watchdog scheduler will check that the poller log file has been written to within the last poll period. If there is no change to the log file since, the watchdog will restart the polling service. The poller log file is set by `$config['log_file']` and defaults to `./logs/librenms.log`
 
-# Cron Scripts
+## Cron Scripts
 
-Once the LibreNMS service is installed, the cron scripts used by
-LibreNMS are no longer required and must be removed.
+Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled. The only cron task enabled after switching to the dispatcher service should be the following:
+```
+*    *    * * *   librenms    cd /opt/librenms/ && php artisan schedule:run >> /dev/null 2>&1
+```
 
-# Service Installation
+## Service Installation
 
-A systemd unit file is provided - the sysv and upstart init scripts
-could also be used with a little modification.
+A systemd unit file is provided - You must adapt `ExecStart` and `WorkingDirectory` if you did not install librenms in `/opt/librenms`
 
-## systemd
+The sysv and upstart init scripts could also be used with a little modification.
+
+### systemd service
 
 A systemd unit file can be found in `misc/librenms.service`. To
-install run `cp /opt/librenms/misc/librenms.service
-/etc/systemd/system/librenms.service && systemctl enable --now
-librenms.service`
+install run:
+```bash
+cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
-## OS-Specific Instructions
 
-### RHEL/CentOS
+
+### systemd service with watchdog
+
+This service file is an alternative to the above service file. It uses the systemd WatchdogSec= option to restart the service if it does not receive a keep-alive from the running process.
+
+A systemd unit file can be found in `misc/librenms-watchdog.service`. To
+install run:
+```bash
+cp /opt/librenms/misc/librenms-watchdog.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
+
+This requires: python3-systemd (or python-systemd on older systems)
+or https://pypi.org/project/systemd-python/
+If you run this systemd service without python3-systemd it will restart every 30 seconds.
+
+### OS-Specific Instructions
+
+#### RHEL/CentOS
 
 To get the LibreNMS service running under python3.4+ on
 RHEL-derivatives with minimal fuss, you can use the software
@@ -181,13 +204,13 @@ collections build:
 
 First, enable SCL's on your system:
 
-#### CentOS 7
+##### CentOS 7
 
 ```
 # yum install centos-release-scl
 ```
 
-#### RHEL 7
+##### RHEL 7
 
 ```
 # subscription-manager repos --enable rhel-server-rhscl-7-rpms
@@ -196,7 +219,7 @@ First, enable SCL's on your system:
 Then install and configure the runtime and service:
 
 ```
-# yum install rh-python36 epel-release
+# yum install gcc rh-python36 rh-python36-python-devel epel-release
 # yum --enablerepo=remi install redis
 # vi /opt/librenms/config.php
 # vi /etc/redis.conf
@@ -212,18 +235,19 @@ If you want to use another version of python 3, change `rh-python36`
 in the unit file and the commands above to match the name of the
 replacement scl.
 
-### Debian/Ubuntu
+#### Debian/Ubuntu
 
-#### Debian 9 (stretch)
+##### Debian 11 (Bullseye)
 
-install python3 and python-mysqldb. python-dotenv is not yet
-available, but the testing package is working fine, you can grab it on
-<https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
-package may be updated and have a new version number).
+Warning: Bullseye provide PHP 7.4 that is too old to run LibreNMS.
 
+##### Debian 12 (Bookworm)
+
+Warning: Bookworm is not available as stable yet (as 2022 november).
+
+Install dependancies
 ```
-apt install python3 python-mysqldb
-cd /tmp
-wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
-dpkg -i python3-dotenv_0.9.1-1_all.deb
+apt install python3 python3-mysqldb python3-dotenv
 ```
+
+Add the `python3-systemd` package for service with watchdog.

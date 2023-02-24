@@ -34,8 +34,7 @@
         } else {
             $message = 'Ok';
             $status = '';
-        }
-        ?>
+        } ?>
         <tr>
             <td><?php echo $wide_id; ?></td>
             <td><?php echo $array['label']; ?></td>
@@ -54,13 +53,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_gtm_allpool_requests';
+        $graph_array['type'] = 'device_bigip_gtm_allpool_requests';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -72,13 +71,13 @@
     </div>
     <div class="panel-body">
         <?php
-        $graph_array = array();
+        $graph_array = [];
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
-        $graph_array['width']  = '215';
+        $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['type']   = 'device_bigip_gtm_allpool_dropped';
+        $graph_array['type'] = 'device_bigip_gtm_allpool_dropped';
         require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
@@ -90,7 +89,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, array('type' => 'gtm_pool', 'subtype' => 'gtm_pool_det')); ?>gtmpoolid='+row['gtmpoolid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'gtm_pool', 'subtype' => 'gtm_pool_det']); ?>gtmpoolid='+row['gtmpoolid'];
             window.location.href = link;
         });
     </script>

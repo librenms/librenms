@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,47 +26,39 @@
 namespace LibreNMS\Snmptrap;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Snmptrap\Handlers\Fallback;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Util\IP;
-use Log;
 
 class Trap
 {
-    protected $raw;
-    protected $hostname;
-    protected $ip;
-
-    protected $device;
-
-    /** @var Collection $oid_data */
-    protected $oid_data;
+    public readonly string $raw;
+    public readonly string $hostname;
+    public readonly ?string $ip;
+    protected Collection $oid_data;
+    protected ?Device $device = null;
 
     /**
      * Construct a trap from raw trap text
-     * @param $trap
      */
-    public function __construct($trap)
+    public function __construct(string $trap)
     {
         $this->raw = $trap;
-        $this->parse();
-    }
 
-    protected function parse()
-    {
-        $lines = explode(PHP_EOL, trim($this->raw));
+        $lines = explode(PHP_EOL, trim($trap));
 
         $this->hostname = array_shift($lines);
 
         $line = array_shift($lines);
-        if (preg_match('/\[([0-9.:a-fA-F]+)\]/', $line, $matches)) {
-            $this->ip = $matches[1];
-        };
+        preg_match('/\[([0-9.:a-fA-F]+)]/', $line, $matches);
+        $this->ip = $matches[1] ?? '';
 
         // parse the oid data
-        $this->oid_data = collect($lines)->mapWithKeys(function ($line) {
-            list($oid, $data) = explode(' ', $line, 2);
+        $this->oid_data = (new Collection($lines))->mapWithKeys(function ($line) {
+            [$oid, $data] = explode(' ', $line, 2);
+
             return [$oid => trim($data, '"')];
         });
     }
@@ -74,37 +66,35 @@ class Trap
     /**
      * Find the first in this trap by substring
      *
-     * @param $search
+     * @param  string|string[]  $search
      * @return string
      */
-    public function findOid($search)
+    public function findOid(array|string $search): string
     {
         return $this->oid_data->keys()->first(function ($oid) use ($search) {
             return Str::contains($oid, $search);
-        });
+        }, '');
     }
 
     /**
      * Find all oids that match the given string
-     * @param $search
+     *
+     * @param  string|string[]  $search
      * @return array
      */
-    public function findOids($search)
+    public function findOids(array|string $search): array
     {
         return $this->oid_data->keys()->filter(function ($oid) use ($search) {
             return Str::contains($oid, $search);
         })->all();
     }
 
-    public function getOidData($oid)
+    public function getOidData(string $oid): string
     {
-        return $this->oid_data->get($oid);
+        return $this->oid_data->get($oid, '');
     }
 
-    /**
-     * @return Device|null
-     */
-    public function getDevice()
+    public function getDevice(): ?Device
     {
         if (is_null($this->device) && IP::isValid($this->ip)) {
             $this->device = Device::findByHostname($this->hostname) ?: Device::findByIp($this->ip);
@@ -113,35 +103,33 @@ class Trap
         return $this->device;
     }
 
-    /**
-     * @return string
-     */
-    public function getHostname()
-    {
-        return $this->hostname;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIp()
-    {
-        return $this->ip;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTrapOid()
+    public function getTrapOid(): string
     {
         return $this->getOidData('SNMPv2-MIB::snmpTrapOID.0');
     }
 
     /**
+     * Render the Trap for debugging purpose
+     *
+     * @param  bool  $detailed
      * @return string
      */
-    public function getRaw()
+    public function toString(bool $detailed = false): string
     {
-        return $this->raw;
+        if ($detailed) {
+            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) {
+                return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
+            })->all());
+        }
+
+        return $this->getTrapOid();
+    }
+
+    /**
+     * Log this trap in the eventlog with the given message
+     */
+    public function log(string $message, int $severity = Alert::INFO, string $type = 'trap', int|null|string $reference = null): void
+    {
+        Eventlog::log($message, $this->getDevice(), $type, $severity, $reference);
     }
 }

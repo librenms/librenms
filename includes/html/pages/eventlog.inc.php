@@ -8,7 +8,7 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
@@ -17,7 +17,7 @@ use App\Models\Device;
 
 $no_refresh = true;
 $param = [];
-if ($device_id = (int)Request::get('device')) {
+if ($device_id = (int) Request::get('device')) {
     $device = Device::find($device_id);
 }
 
@@ -41,7 +41,7 @@ $pagetitle[] = 'Eventlog';
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
         '<?php echo csrf_field() ?>' +
         <?php
-        if (!isset($vars['fromdevice'])) {
+        if (! isset($vars['fromdevice'])) {
             ?>
         '<div class="form-group">' +
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
@@ -50,8 +50,7 @@ $pagetitle[] = 'Eventlog';
             <?php
             if ($device instanceof Device) {
                 echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
-            }
-            ?>
+            } ?>
         '</select>' +
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
             <?php
@@ -75,7 +74,7 @@ $pagetitle[] = 'Eventlog';
         '</div>'
     );
 
-    <?php if (!isset($vars['fromdevice'])) { ?>
+    <?php if (! isset($vars['fromdevice'])) { ?>
     $("#device").select2({
         theme: 'bootstrap',
         dropdownAutoWidth : true,

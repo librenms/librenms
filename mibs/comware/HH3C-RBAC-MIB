@@ -1,0 +1,606 @@
+-- =================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB is to provide the definition of the RBAC
+--              (Role Based Access Control) system.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2014-08-08 Initial version, created by Xu Yang
+-- =================================================================
+
+HH3C-RBAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus, StorageType, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+hh3cRbac MODULE-IDENTITY
+    LAST-UPDATED "201408081547Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB is to provide the definition of the RBAC
+        (Role Based Access Control) system."
+    REVISION "201408081547Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 158 }
+
+-- Top-level structure of MIB
+hh3cRbacNotifications  OBJECT IDENTIFIER ::= { hh3cRbac 0 }
+hh3cRbacObjects  OBJECT IDENTIFIER ::= { hh3cRbac 1 }
+
+hh3cRbacInfo  OBJECT IDENTIFIER
+    ::= { hh3cRbacObjects 1 }
+
+hh3cRbacConfig  OBJECT IDENTIFIER
+    ::= { hh3cRbacObjects 2 }
+
+
+-- definition of textual conventions
+
+Hh3cResourceType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A User can be restricted from accessing resources by RBAC resource
+        access policies.  There are four types of resource access policies as
+        below:
+        vlan(0)
+                Bit value of 0 indicates that the user has access
+                to no VLANs.
+                Bit value of 1 indicates that the user has access
+                to all VLANs.
+                A user can be selectively assigned access to VLANs
+                by configuring entries in the 'hh3cRbacPolicyTable'.
+        interface(1)
+                Bit value of 0 indicates that the user has access
+                to no interfaces.
+                Bit value of 1 indicates that the user has access
+                to all interfaces.
+                A user can be selectively assigned access to interfaces
+                by configuring entries in the 'hh3cRbacPolicyTable'.
+        vrf(2)
+                Bit value of 0 indicates that the user has access
+                to no VRFs.
+                Bit value of 1 indicates that the user has access
+                to all VRFs.
+                A user can be selectively assigned access to VRFs
+                by configuring entries in the 'hh3cRbacPolicyTable'.
+        seczone(3)
+                Bit value of 0 indicates that the user has access
+                to no security zones.
+                Bit value of 1 indicates that the user has access
+                to all security zones.
+                A user can be selectively assigned access to security zones
+                by configuring entries in the 'hh3cRbacPolicyTable'."
+    SYNTAX BITS
+        {
+            vlan(0),
+            interface(1),
+            vrf(2),
+            seczone(3)
+        }
+
+Hh3cRuleType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "There are two types of rules.  List as below:
+        system: pre-defined by system and isn't editable.
+        user: defined by user and is editable.
+        "
+    SYNTAX INTEGER
+        {
+            system(1),
+            user(2)
+        }
+
+Hh3cRuleOperation ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Privileges of a rule.
+        exec  - execute operation
+        read  - Read operation
+        write - Write operation
+        Note that if an operation is not supported by an entity,
+        the operation does not apply to the entity."
+    SYNTAX BITS
+        {
+            exec(0),
+            read(1),
+            write(2)
+        }
+
+Hh3cRuleAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This indicates the action of a rule that defines the access privileges.
+        permit  - permit the privileges
+        deny    - deny the privileges
+        "
+    SYNTAX INTEGER
+        {
+            permit(1),
+            deny(2)
+        }
+
+Hh3cEntityType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This indicates the type of the entity in a rule."
+    SYNTAX INTEGER
+        {
+            unknown(1),
+            command(2),
+            feature(3),
+            featuregroup(4),
+            webmenu(5),
+            xmlelement(6),
+            oid(7)
+        }
+
+
+--
+-- nodes defined
+--
+
+hh3cRbacRoleDefaultEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object controls if an authenticated user can access the system
+        when he or she isn't authorized any user roles.
+        The default value is false."
+    DEFVAL { false }
+    ::= { hh3cRbacConfig 1 }
+
+hh3cRbacRoleDefaultRoleName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If hh3cRbacRoleDefaultEnable is true, this object specifies
+        the user role applied to the user when he or she accesses
+        the system without any authorized user roles.
+        If this object is not configured, the default user role
+        applied is listed as below:
+        network-operator - When login to the default MDC or default Context.
+        mdc-operator     - When login to the non-default MDC.
+        context-operator - When login to a non-default Context.
+        "
+    ::= { hh3cRbacConfig 2 }
+
+--
+-- definition of hh3cRbacRoleTable
+--
+
+hh3cRbacRoleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacRoleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the basic configuration information
+        about all user roles."
+    ::= { hh3cRbacConfig 3 }
+
+hh3cRbacRoleEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacRoleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacRoleTable.
+        One entry per role defined on the device."
+    INDEX { hh3cRbacRoleName }
+    ::= { hh3cRbacRoleTable 1 }
+
+Hh3cRbacRoleEntry ::=
+    SEQUENCE {
+        hh3cRbacRoleName            OCTET STRING,
+        hh3cRbacRoleDescription     OCTET STRING,
+        hh3cRbacRoleResourceAccess  Hh3cResourceType,
+        hh3cRbacRoleStorageType     StorageType,
+        hh3cRbacRoleRowStatus       RowStatus
+    }
+
+hh3cRbacRoleName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The name of a role."
+    ::= { hh3cRbacRoleEntry 1 }
+
+hh3cRbacRoleDescription OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Description of the role."
+    ::= { hh3cRbacRoleEntry 2 }
+
+hh3cRbacRoleResourceAccess OBJECT-TYPE
+    SYNTAX Hh3cResourceType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Defines the default access to the resources to which access can be
+        controlled.  For example a role which has access to all VLANs,
+        all Interfaces, no VRF and no security zone will be 0011."
+    ::= { hh3cRbacRoleEntry 3 }
+
+hh3cRbacRoleStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Storage type of this row."
+    ::= { hh3cRbacRoleEntry 4 }
+
+hh3cRbacRoleRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Status of this row."
+    ::= { hh3cRbacRoleEntry 5 }
+
+--
+-- definition of hh3cRbacRuleTable
+--
+
+hh3cRbacRuleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the configuration information about rules
+        in all user roles."
+    ::= { hh3cRbacConfig 4 }
+
+
+hh3cRbacRuleEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacRuleTable.
+        One entry indicates one rule in a role."
+    INDEX {
+        hh3cRbacRoleName,
+        hh3cRbacRuleType,
+        hh3cRbacRuleNumber
+    }
+    ::= { hh3cRbacRuleTable 1 }
+
+Hh3cRbacRuleEntry ::=
+    SEQUENCE {
+        hh3cRbacRuleType            Hh3cRuleType,
+        hh3cRbacRuleNumber          Unsigned32,
+        hh3cRbacRuleAction          Hh3cRuleAction,
+        hh3cRbacRuleOperation       Hh3cRuleOperation,
+        hh3cRbacRuleEntityType      Hh3cEntityType,
+        hh3cRbacRuleEntity          OCTET STRING,
+        hh3cRbacRuleRowStatus       RowStatus
+    }
+
+
+hh3cRbacRuleType OBJECT-TYPE
+    SYNTAX Hh3cRuleType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of a rule."
+    ::= { hh3cRbacRuleEntry 1 }
+
+hh3cRbacRuleNumber OBJECT-TYPE
+    SYNTAX Unsigned32 (1..256)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of rules in one role.  There are two kinds of rules in a role.
+        One is system defined, the other is user defined.  The total numbers
+        of user defined rules is 1024.
+        In one role, the user defined rules will be applied first and then
+        the system defined rules.
+        For the rules of same type, the following guidelines will be applied:
+        Non-OID: If two rules of the same entity type conflict,
+        the rule with the higher index takes effect.
+        OID: If the MIB node specified in a rule is a child node of
+        the MIB nodes specified in other rules, only this rule takes effect.
+        If the same OID is specified in multiple rules, the rule with
+        the higher index takes effect."
+    ::= { hh3cRbacRuleEntry 2 }
+
+hh3cRbacRuleAction OBJECT-TYPE
+    SYNTAX Hh3cRuleAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The action of a rule."
+    ::= { hh3cRbacRuleEntry 3 }
+
+hh3cRbacRuleOperation OBJECT-TYPE
+    SYNTAX Hh3cRuleOperation
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Privileges of a rule."
+    ::= { hh3cRbacRuleEntry 4 }
+
+hh3cRbacRuleEntityType OBJECT-TYPE
+    SYNTAX Hh3cEntityType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This indicates the type of the entity in a rule.
+        There are seven types of entity as below:
+        unknown: invalid.
+        command: a command or a set of commands that match a regular expression.
+        feature: a feature which contains a set of commands.
+        featuregroup: a group of features.
+        webmenu: web menus.
+        xmlelement: XML elements.
+        oid: the specified MIB node and its child nodes."
+    ::= { hh3cRbacRuleEntry 5 }
+
+hh3cRbacRuleEntity OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This indicates the entity that the privileges of rule apply to.
+        It is may be a regular expression of commands, feature name,
+        feature group name, web menu, xml element or oid.
+        If the type of entity is feature or webmenu or xmlelement and the
+        entity is a zero length string, then this rules applies to all
+        the features or web menus or xml elements."
+    ::= { hh3cRbacRuleEntry 6 }
+
+hh3cRbacRuleRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Status of this rule."
+    ::= { hh3cRbacRuleEntry 7 }
+
+--
+-- definition of hh3cRbacPolicyTable
+--
+
+hh3cRbacPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the configuration information about resource
+        access policies in all user roles.  A role may be restricted
+        from accessing various resources of a device.  This table
+        lists the resources that a role can access."
+    ::= { hh3cRbacConfig 5 }
+
+
+hh3cRbacPolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacPolicyTable.
+        One entry indicates an accessible resource.
+        If a role named 'R' can access VLAN1 to VLAN10,
+        then there will be 10 entries in this table.
+        There are two objects to specify the resource
+        in this table.
+        If the value of 'hh3cRbacPolicyType' is 'vlan' or
+        'interface', the column 'hh3cRbacPolicyValue' is a
+        four octets value which means vlan ID or IfIndex.
+        If the value of 'hh3cRbacPolicyType' is 'vrf' or 'seczone',
+        the column 'hh3cRbacPolicyValue' is a string indicating
+        the name of the VRF or security zone."
+    INDEX {
+        hh3cRbacRoleName,
+        hh3cRbacPolicyType,
+        hh3cRbacPolicyValue
+    }
+    ::= { hh3cRbacPolicyTable 1 }
+
+Hh3cRbacPolicyEntry ::=
+    SEQUENCE {
+        hh3cRbacPolicyType            INTEGER,
+        hh3cRbacPolicyValue           OCTET STRING,
+        hh3cRbacPolicyRowStatus       RowStatus
+    }
+
+hh3cRbacPolicyType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            vlan(1),
+            interface(2),
+            vrf(3),
+            seczone(4)
+        }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the type of the resource
+        access policy of this entry."
+    ::= { hh3cRbacPolicyEntry 1 }
+
+hh3cRbacPolicyValue OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the resource this role can access.
+        If the value of 'hh3cRbacPolicyType' is 'vlan' or
+        'interface', the column 'hh3cRbacPolicyValue' is a
+        four-octet-value which means vlan ID or IfIndex.
+        If the value of 'hh3cRbacPolicyType' is 'vrf' or 'seczone',
+        the column 'hh3cRbacPolicyValue' is a string indicating
+        the name of the VRF or security zone."
+    ::= { hh3cRbacPolicyEntry 2 }
+
+hh3cRbacPolicyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Status of this row."
+    ::= { hh3cRbacPolicyEntry 3 }
+
+--
+-- definition of hh3cRbacFeatureGroupTable
+--
+
+hh3cRbacFeatureGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacFeatureGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the configuration information about
+        feature groups on a device."
+    ::= { hh3cRbacConfig 6 }
+
+
+hh3cRbacFeatureGroupEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacFeatureGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacFeatureGroupTable.
+        One entry indicates a feature in particular group."
+    INDEX {
+        hh3cRbacFeatureGroupName
+    }
+    ::= { hh3cRbacFeatureGroupTable 1 }
+
+Hh3cRbacFeatureGroupEntry ::=
+    SEQUENCE {
+        hh3cRbacFeatureGroupName            OCTET STRING,
+        hh3cRbacFeatureGroupRowStatus       RowStatus
+    }
+
+hh3cRbacFeatureGroupName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..31))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of a feature group."
+    ::= { hh3cRbacFeatureGroupEntry 1 }
+
+hh3cRbacFeatureGroupRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Status of this row."
+    ::= { hh3cRbacFeatureGroupEntry 2 }
+
+--
+-- definition of hh3cRbacFeaturesInGroupTable
+--
+
+hh3cRbacFeatureInGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacFeatureInGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the configuration information about
+        features in feature groups on a device."
+    ::= { hh3cRbacConfig 7 }
+
+
+hh3cRbacFeatureInGroupEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacFeatureInGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacFeaturesInGroupTable.
+        One entry indicates a feature in a particular group.
+        If a newly created feature group doesn't contain any
+        feature, there's no entry appearing in this table."
+    INDEX {
+        hh3cRbacFeatureGroupName,
+        hh3cRbacFeatureNameInGroup
+    }
+    ::= { hh3cRbacFeatureInGroupTable 1 }
+
+Hh3cRbacFeatureInGroupEntry ::=
+    SEQUENCE {
+        hh3cRbacFeatureNameInGroup            OCTET STRING,
+        hh3cRbacFeatureInGroupRowStatus       RowStatus
+    }
+
+hh3cRbacFeatureNameInGroup OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..15))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of a feature in the feature group."
+    ::= { hh3cRbacFeatureInGroupEntry 1 }
+
+hh3cRbacFeatureInGroupRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Status of this row."
+    ::= { hh3cRbacFeatureInGroupEntry 2 }
+
+--
+-- definition of hh3cRbacFeatureTable
+--
+
+hh3cRbacFeatureTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRbacFeatureEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows the information about features on a device."
+    ::= { hh3cRbacInfo 1 }
+
+hh3cRbacFeatureEntry OBJECT-TYPE
+    SYNTAX Hh3cRbacFeatureEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the hh3cRbacFeatureTable.
+        One entry indicates information about a feature on a device."
+    INDEX {
+        hh3cRbacFeatureName
+    }
+    ::= { hh3cRbacFeatureTable 1 }
+
+Hh3cRbacFeatureEntry ::=
+    SEQUENCE {
+        hh3cRbacFeatureName            OCTET STRING,
+        hh3cRbacFeatureDescription     OCTET STRING
+    }
+
+hh3cRbacFeatureName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..15))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of a feature."
+    ::= { hh3cRbacFeatureEntry 1 }
+
+hh3cRbacFeatureDescription OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..63))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the introduction of the feature."
+    ::= { hh3cRbacFeatureEntry 2 }
+
+END

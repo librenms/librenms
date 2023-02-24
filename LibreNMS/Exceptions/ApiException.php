@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * ApiException.php
  *
  * -Description-
@@ -19,24 +19,36 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2019 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Http\JsonResponse;
+
 class ApiException extends \Exception
 {
-    private $output;
-
-    public function __construct($message = "", $output = [])
+    /**
+     * @param  string  $message
+     * @param  int  $code
+     * @param  \Throwable|null  $previous
+     */
+    public function __construct($message = '', $code = 400, $previous = null)
     {
-        parent::__construct($message, 0, null);
-        $this->output = $output;
+        parent::__construct($message, $code, $previous);
     }
 
-    public function getOutput()
+    /**
+     * Render the exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function render($request): JsonResponse
     {
-        return $this->output;
+        return response()->json([
+            'status'  => 'error',
+            'message' => $this->getMessage(),
+        ], $this->getCode(), [], JSON_PRETTY_PRINT);
     }
 }

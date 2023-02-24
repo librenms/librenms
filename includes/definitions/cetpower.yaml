@@ -1,0 +1,16 @@
+os: cetpower
+text: 'CET TSI Controller'
+type: power
+icon: cet
+snmp_bulk: false
+over:
+    - { graph: device_current, text: Load }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_power, text: Power }
+discovery:
+    - sysObjectID:
+            - .1.3.6.1.4.1.12551.4.0
+    - sysDescr:
+            - T2S-ETH supervisor for TSI SNMP V1.0
+mib_dir: cet

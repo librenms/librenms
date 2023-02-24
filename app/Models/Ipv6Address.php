@@ -15,12 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace App\Models;
@@ -29,4 +30,13 @@ class Ipv6Address extends PortRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
+    protected $fillable = [
+        'ipv6_address',
+        'ipv6_compressed',
+        'ipv6_prefixlen',
+        'ipv6_origin',
+        'ipv6_network_id',
+        'port_id',
+        'context_name',
+    ];
 }

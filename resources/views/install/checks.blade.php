@@ -7,14 +7,14 @@
                 <div class="card-body">
                     <div class="row bg-light check-row">
                         <div class="col-7">
-                            PHP <small>(@lang('install.checks.php_required', ['version' => $php_required]))</small>
+                            PHP <small>({{ __('install.checks.php_required', ['version' => $php_required]) }})</small>
                         </div>
                         <div class="col-5 text-right text-nowrap @if($php_ok) text-success @else text-danger @endif">
                             {{ $php_version }}
                             @if($php_ok)
-                                <i class="fa fa-lg fa-check-square-o text-success align-middle"></i>
+                                <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o text-danger align-middle"></i>
+                                <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>
                             @endif
 
                         </div>
@@ -27,9 +27,9 @@
                         </div>
                         <div class="col-5 text-right">
                             @if($module['status'])
-                                <i class="fa fa-lg fa-check-square-o text-success align-middle"></i>
+                                <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o text-danger align-middle"></i>
+                                <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>
                             @endif
                         </div>
                     </div>

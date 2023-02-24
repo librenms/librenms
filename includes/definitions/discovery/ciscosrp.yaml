@@ -1,0 +1,9 @@
+modules:
+  os:
+    hardware:
+      - ENTITY-MIB::entPhysicalModelName.1
+      - ENTITY-MIB::entPhysicalModelName.1001
+      - ENTITY-MIB::entPhysicalName.1
+    hardware_mib: CISCO-PRODUCTS-MIB
+    version: ENTITY-MIB::entPhysicalSoftwareRev.1
+    serial: ENTITY-MIB::entPhysicalSerialNum.1

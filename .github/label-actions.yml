@@ -1,21 +1,14 @@
-issues:
-    actions:
-        support-request:
-            comment: >
-                :wave: @{issue-author} sorry but this is not the place to ask for help.
+support-request:
+  comment: >
+    :wave: @{issue-author} sorry but this is not the place to ask for help.
 
+    For help please use our [Discord server](https://discord.gg/librenms) or the [community site](https://community.librenms.org/c/help): https://docs.librenms.org/Support
+    
+  close: true
 
-                This issue has been closed as it isn't classed as a new device request.
+'Needs Tests :unicorn:':
+  prs:
+    comment: >
+      Please add test data so we can ensure your change is not broken in the future.
 
-
-                For help please use our [Discord server](https://discord.gg/librenms) or the [community site](https://community.librenms.org/c/help): https://docs.librenms.org/Support
-            close: true
-
-pulls:
-    actions:
-        'Needs Tests :unicorn:':
-            comment: >
-                Please add test data so we can ensure your change is not broken in the future.
-
-
-                Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units
+      Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units

@@ -1,0 +1,16 @@
+os: westmountainradio
+text: 'West Mountain RMCU'
+type: power
+mib_dir: westmountainradio
+icon: westmountainradio
+snmp_bulk: false
+bad_snmpEngineTime: true
+bad_hrSystemUptime: true
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_state, text: 'Power Status' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.15117.1

@@ -1,0 +1,416 @@
+-- ====================================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: MS(Media Switch Server) Configuration management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version 2007-04-13 created by zhoujianming
+--- ===================================================================
+HH3C-MS-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    PhysicalIndex
+        FROM ENTITY-MIB
+    hh3cSurveillanceMIB
+        FROM HH3C-OID-MIB;
+
+hh3cMSMan MODULE-IDENTITY
+    LAST-UPDATED "200708130000Z"  -- August 13, 2007  GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB is defined to manage MS components
+        according to specific capability."
+    ::= { hh3cSurveillanceMIB 3 }
+
+--
+-- Node definitions
+--
+
+hh3cMSManMIBObjects OBJECT IDENTIFIER ::= { hh3cMSMan 1 }
+--
+-- statistical period
+--
+hh3cMSStatisticalPeriod OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The statistical period of this entity, which unit is
+        second and default value is 300 seconds."
+    ::= { hh3cMSManMIBObjects 1 }
+
+hh3cMSManMIBTables OBJECT IDENTIFIER ::= { hh3cMSMan 2 }
+--
+-- forward table
+--
+hh3cMSForwardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMSForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MS Forward table, used to get the forwarding information
+         of the entity. "
+    ::= { hh3cMSManMIBTables 1 }
+
+hh3cMSForwardEntry OBJECT-TYPE
+    SYNTAX      Hh3cMSForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "hh3cMSForward table entry."
+    INDEX { hh3cMSForwardIndex }
+    ::= { hh3cMSForwardTable 1 }
+
+Hh3cMSForwardEntry ::=
+    SEQUENCE {
+        hh3cMSForwardIndex                   PhysicalIndex,
+        hh3cMSForwardMaxConnection           Unsigned32,
+        hh3cMSForwardConnectionThreshold     Unsigned32,
+        hh3cMSCurrentForwardConnection       Unsigned32,
+        hh3cMSPeriodForwardConnection        Unsigned32,
+        hh3cMSForwardTotalTime               Unsigned32,
+        hh3cMSForwardTotalConn               Unsigned32
+     }
+hh3cMSForwardIndex OBJECT-TYPE
+    SYNTAX PhysicalIndex
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value of this object is the entity index, which
+         depends on the implementation of ENTITY-MIB. "
+    ::= { hh3cMSForwardEntry 1 }
+
+
+hh3cMSForwardMaxConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of forward connections the entity can
+        support."
+    ::= { hh3cMSForwardEntry 2 }
+
+hh3cMSForwardConnectionThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of forward connections."
+    ::= { hh3cMSForwardEntry 3 }
+
+hh3cMSCurrentForwardConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of forward connections the entity provided
+        in this time."
+    ::= { hh3cMSForwardEntry 4 }
+
+hh3cMSPeriodForwardConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of forward connections within the
+        last statistical period."
+    ::= { hh3cMSForwardEntry 5 }
+
+hh3cMSForwardTotalTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total forward connection time the entity has
+        serviced since its startup."
+    ::= { hh3cMSForwardEntry 6 }
+
+hh3cMSForwardTotalConn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total forward connection numbers the entity has
+        serviced since its startup."
+    ::= { hh3cMSForwardEntry 7 }
+
+--
+-- VOD table
+--
+hh3cMSVODTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMSVODEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MS VOD(video on demand) table, used to get the VOD
+        information of the entity."
+    ::= { hh3cMSManMIBTables 2 }
+
+    hh3cMSVODEntry OBJECT-TYPE
+    SYNTAX      Hh3cMSVODEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "hh3cMSVOD table entry."
+    INDEX { hh3cMSVODIndex }
+    ::= { hh3cMSVODTable 1 }
+
+Hh3cMSVODEntry ::=
+    SEQUENCE {
+        hh3cMSVODIndex                   PhysicalIndex,
+        hh3cMSVODMaxConnection           Unsigned32,
+        hh3cMSVODConnectionThreshold     Unsigned32,
+        hh3cMSCurrentVODConnection       Unsigned32,
+        hh3cMSPeriodVODMaxConnection     Unsigned32,
+        hh3cMSVODTotalTime               Unsigned32,
+        hh3cMSVODTotalConn               Unsigned32
+     }
+hh3cMSVODIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of this object is the entity index, which
+        depends on the implementation of ENTITY-MIB. "
+    ::= { hh3cMSVODEntry 1 }
+
+hh3cMSVODMaxConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of VOD connections the entity
+        can support."
+    ::= { hh3cMSVODEntry 2 }
+
+hh3cMSVODConnectionThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of VOD connections."
+    ::= { hh3cMSVODEntry 3 }
+
+hh3cMSCurrentVODConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of VOD connections the entity provided
+        in this time."
+    ::= { hh3cMSVODEntry 4 }
+
+hh3cMSPeriodVODMaxConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of VOD connections within the last
+        statistical period."
+    ::= { hh3cMSVODEntry 5 }
+
+hh3cMSVODTotalTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total VOD connection time the entity has serviced
+        since its startup."
+    ::= { hh3cMSVODEntry 6 }
+
+hh3cMSVODTotalConn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total VOD connection numbers the entity has serviced
+        since its startup."
+    ::= { hh3cMSVODEntry 7 }
+
+--
+-- Record table
+--
+hh3cMSRecordTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMSRecordEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MS Record table, used to get the record information of
+        the entity."
+    ::= { hh3cMSManMIBTables 3 }
+
+hh3cMSRecordEntry OBJECT-TYPE
+    SYNTAX      Hh3cMSRecordEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "hh3cMSRecord table entry."
+    INDEX { hh3cMSRecordIndex }
+    ::= { hh3cMSRecordTable 1 }
+
+Hh3cMSRecordEntry ::=
+    SEQUENCE {
+        hh3cMSRecordIndex                    PhysicalIndex,
+        hh3cMSRecordMaxConnection            Unsigned32,
+        hh3cMSRecordConnectionThreshold      Unsigned32,
+        hh3cMSCurrentRecordConnection        Unsigned32,
+        hh3cMSPeriodRecordMaxConnection      Unsigned32,
+        hh3cMSRecordTotalTime                Unsigned32,
+        hh3cMSRecordTotalConn                Unsigned32
+     }
+hh3cMSRecordIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of this object is the entity index, which
+        depends on the implementation of ENTITY-MIB. "
+    ::= { hh3cMSRecordEntry 1 }
+
+hh3cMSRecordMaxConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of record connections the entity can
+        support."
+    ::= { hh3cMSRecordEntry 2 }
+
+hh3cMSRecordConnectionThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of record connections ."
+    ::= { hh3cMSRecordEntry 3 }
+
+hh3cMSCurrentRecordConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of record connections the entity provided in
+        this time."
+    ::= { hh3cMSRecordEntry 4 }
+
+hh3cMSPeriodRecordMaxConnection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maxium number of record connections within the
+        last statistical period."
+    ::= { hh3cMSRecordEntry 5 }
+
+hh3cMSRecordTotalTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total record connection time the entity has
+        serviced since its startup."
+    ::= { hh3cMSRecordEntry 6 }
+
+hh3cMSRecordTotalConn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total record connection numbers the entity
+        has serviced since its startup."
+    ::= { hh3cMSRecordEntry 7 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cMSManMIBTrap OBJECT IDENTIFIER ::= { hh3cMSMan 3 }
+
+-- All trap definitions should be placed under this object.
+hh3cMSManTrapPrex OBJECT IDENTIFIER ::= { hh3cMSManMIBTrap 0 }
+
+hh3cMSManVODConnectionThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSVODIndex,
+        hh3cMSCurrentVODConnection,
+        hh3cMSVODConnectionThreshold
+    }
+    STATUS     current
+    DESCRIPTION
+        "Current VOD connection exceeds the threshold."
+    ::= { hh3cMSManTrapPrex 1 }
+
+hh3cMSManVODConnectionRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSVODIndex,
+        hh3cMSCurrentVODConnection,
+        hh3cMSVODConnectionThreshold
+    }
+    STATUS    current
+    DESCRIPTION
+        "Current VOD connection recovers under the threshold."
+    ::= { hh3cMSManTrapPrex 2 }
+
+hh3cMSManForwardConnectionThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSForwardIndex,
+        hh3cMSCurrentForwardConnection,
+        hh3cMSForwardConnectionThreshold
+    }
+    STATUS     current
+    DESCRIPTION
+        "Current forward connection exceeds the threshold."
+    ::= { hh3cMSManTrapPrex 3 }
+
+hh3cMSManForwardConnectionRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSForwardIndex,
+        hh3cMSCurrentForwardConnection,
+        hh3cMSForwardConnectionThreshold
+    }
+    STATUS     current
+    DESCRIPTION
+        "Current forward connection recovers under the threshold."
+    ::= { hh3cMSManTrapPrex 4 }
+
+hh3cMSManRecordConnectionThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSRecordIndex,
+        hh3cMSCurrentRecordConnection,
+        hh3cMSRecordConnectionThreshold
+    }
+    STATUS     current
+    DESCRIPTION
+        "Current record connection exceeds the threshold."
+    ::= { hh3cMSManTrapPrex 5 }
+
+hh3cMSManRecordConnectionRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMSRecordIndex,
+        hh3cMSCurrentRecordConnection,
+        hh3cMSRecordConnectionThreshold
+    }
+    STATUS     current
+    DESCRIPTION
+        "Current record connection recovers under the threshold."
+    ::= { hh3cMSManTrapPrex 6 }
+
+
+END

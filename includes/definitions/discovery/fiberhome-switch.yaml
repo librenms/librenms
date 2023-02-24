@@ -1,5 +1,16 @@
 mib: WRI-CPU-MIB:WRI-TEMPERATURE-MIB:WRI-VOLTAGE-MIB:FAN-MIB:WRI-POWER-MIB:WRI-DEVICE-MIB
 modules:
+    mempools:
+        data:
+            -
+                oid: WRI-MEMORY-MIB::memoryPoolTable
+                total: WRI-MEMORY-MIB::memoryPoolTotalBytes
+                used: WRI-MEMORY-MIB::memoryPoolAllocBytesNum
+                descr: WRI-MEMORY-MIB::memoryPoolIndexDescr
+    os:
+        sysDescr_regex: '/(?<hardware>.*) \(R\) Software, Version (?<version>[^ ,]+),Hw Version (?<features>[^ ,]+)/'
+#        version: WRI-DEVICE-MIB::msppDevSwVersion.0
+#        features: WRI-DEVICE-MIB::msppDevHwVersion.0
     processors:
         data:
             -

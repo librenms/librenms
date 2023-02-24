@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'topvision_cmoffline');
+$rrd_filename = Rrd::name($device['hostname'], 'topvision_cmoffline');
 
 $ds = 'cmoffline';
 
@@ -11,7 +11,6 @@ $colour_area_max = '9999cc';
 $scale_min = '0';
 
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'CM Offline';
 

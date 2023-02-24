@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: HALON-SP-MIB::serialNumber.0
+    sysDescr_regex: '/Halon (?<version>.*)/'

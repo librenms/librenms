@@ -16,7 +16,7 @@ IMPORTS
 
 
 rlSecuritySuiteMib MODULE-IDENTITY
-        LAST-UPDATED "200604080000Z"
+        LAST-UPDATED "200604080001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -44,7 +44,8 @@ RlsecuritySuiteGlobalEnableType ::= TEXTUAL-CONVENTION
     SYNTAX INTEGER {
         enable-global-rules-only(1),
         enable-all-rules-types(2),
-        disable(3)
+        disable(3),
+        enable-interface-rules-only(4)
     }
 
 RlSecuritySuiteKnownDosAttackType ::= TEXTUAL-CONVENTION

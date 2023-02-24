@@ -1,0 +1,1002 @@
+NORTEL-OPTICAL-PM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       nnOpticalGenericMIBs FROM NORTEL-OPTICAL-GENERIC-MIB
+
+       TEXTUAL-CONVENTION,
+       DateAndTime          FROM SNMPv2-TC
+
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY,
+       OBJECT-TYPE,
+       Integer32            FROM SNMPv2-SMI
+
+       SnmpAdminString      FROM SNMP-FRAMEWORK-MIB;
+
+nnOpticalPmMIB MODULE-IDENTITY
+        LAST-UPDATED "201907050000Z"
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "This Module contains objects for Nortel Optical PMs"
+
+        --Revision history
+        REVISION "200508160000Z"
+        DESCRIPTION "Initial Version - created for CPL R2.0 & OME R1.5"
+        REVISION "200604120000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for OME R2.5"
+        REVISION "200607120000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for CPL R3.0"
+        REVISION "200705210000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for OME R5.0"
+        REVISION "200802070000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for OME R5.1"
+        REVISION "200803250000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for CPL R3.2"
+        REVISION "200804020000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values for OME R5.11"
+        REVISION "200808270000Z"
+        DESCRIPTION "Added additional NnOpticalPmMonType values
+	             and  pS (pico seconds) Units for OME R5.2"
+        REVISION "200903180000Z"
+	DESCRIPTION "Added additional NnOpticalPmMonType values for OME R5.90"
+	REVISION     "200906150000Z"
+	DESCRIPTION  "MIB description enhancement"
+	REVISION     "201006180000Z"
+	DESCRIPTION  "Added new monTypes from 137 to 144"
+	REVISION     "201012310000Z"
+	DESCRIPTION  "Added new monTypes for Colorless OCLD and OTM Far End PM for OME R8.0"
+	REVISION     "201101180000Z"
+	DESCRIPTION  "Added one new monType(154) for OCn type facility for OME R8.0"
+	REVISION     "201206260000Z"
+	DESCRIPTION  "Added one new span loss monTypes (155 to 158) for OME R9.5"
+	REVISION     "201210180000Z"
+	DESCRIPTION  "Added new QMIN, QMAX, QAVG, QSTDEV monTypes (159 to 162) for OME R9.2"
+	REVISION     "201211060000Z"
+	DESCRIPTION  "Added new monTypes, for OSC facility on RAMAN cards SRA, SAM and ESAM, (162 to 169) for OME R9.3"
+	REVISION     "201302260000Z"
+	DESCRIPTION  "Added ORLIN-OTS and ORLOUT-OTS monTypes (170 to 177) for RAMAN facility  for OME R9.3"
+        REVISION     "201306230000Z"
+	DESCRIPTION  "Added DMMIN-ODU, DMMAX-ODU and DMAVG-ODU monTypes (178 to 180) for OTM2 facility  for OME R9.3"
+        REVISION     "201403140000Z"
+	DESCRIPTION  "Added PSCW-E, PSCP-E, PSD-E, REMOTEINFRAMES-E, REMOTEINFRAMESERR-E, REMOTEFCSERR-E, REMOTEOUTFRAMES-E and REMOTEOUTFRAMESDISCDS-E monTypes (181 to 188) for ETH facility  for OME R10.1"
+        REVISION     "201405140000Z"
+	DESCRIPTION  "Added UNCFECBLK-OTU montype (189) for OME R10.1"
+        REVISION     "201511240000Z"
+	DESCRIPTION  "Added IAE-OTU montypes (190 to 191) for OME R11.1"
+        REVISION     "201512030000Z"
+	DESCRIPTION  "Added ES-W, SES-W, UAS-W and OUTFRAMESERR-W montypes (192 to 195) for OME R11.1"
+        REVISION     "201601050000Z"
+	DESCRIPTION  "Added montypes (196 to 200) for ODU4 and montypes (200 to 218) for ETH100G and montype (219) for OTM4 facility for OME R11.2"
+        REVISION     "201701310000Z"
+	DESCRIPTION  "Added montype (220) for ETTP and montypes (221 to 244) for PTP facility for OME R12.1"
+        REVISION     "201708160000Z"
+	DESCRIPTION  "Added montypes (245 to 247) for OSC facility for OME R12.1"
+        REVISION     "201804050000Z"
+	DESCRIPTION  "Added montypes  (248 to 253) for CBRTTP and montypes (254 to 265) for PTP facility for OME R12.3"
+        REVISION     "201906110000Z"
+	DESCRIPTION  "Added montypes  (266 to 270) for PTP facility for OME R12.6"
+        REVISION     "201907050000Z"
+	DESCRIPTION  "Added montypes  (271 to 276) for PTP facility for OME R12.6"
+
+        ::= { nnOpticalGenericMIBs 1 }
+
+nnOpticalPmObjects OBJECT IDENTIFIER ::= { nnOpticalPmMIB 1 }
+
+-- Nortel Optical PM Textual Conventions
+
+NnOpticalPmMonType ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+           "Nortel Optical PM Monitoring Type"
+   SYNTAX        INTEGER
+         {
+          cvSectionRxNe (1),
+          esSectionRxNe (2),
+          sesSectionRxNe (3),
+          sefsSectionRxNe (4),
+          cvSectionTxNe (5),
+          esSectionTxNe (6),
+          sesSectionTxNe (7),
+          cvLineRxNe (8),
+          esLineRxNe (9),
+          sesLineRxNe (10),
+          uasLineRxNe (11),
+          fcLineRxNe (12),
+          cvLineTxNe (13),
+          esLineTxNe (14),
+          sesLineTxNe (15),
+          uasLineTxNe (16),
+          fcLineTxNe (17),
+          inframesEthRxNe (18),
+          fcserrEthRxNe (19),
+          frtoolongsEthRxNe (20),
+          frtooshortsEthRxNe (21),
+          outframesEthTxNe (22),
+          fcserrEthTxNe (23),
+          cvPCSRxNe (24),
+          esPCSRxNe (25),
+          sesPCSRxNe (26),
+          uasPCSRxNe (27),
+          cvPCSTxNe (28),
+          esPCSTxNe (29),
+          sesPCSTxNe (30),
+          uasPCSTxNe (31),
+          oprOCHRxNe (32),
+          oprnOCHRxNe (33),
+          optOCHTxNe (34),
+          optnOCHTxNe (35),
+          cvOTURxNe (36),
+          esOTURxNe (37),
+          sesOTURxNe (38),
+          sefsOTURxNe (39),
+          fecOTURxNe (40),
+          hccsOTURxNe (41),
+          pfbereOTURxNe (42),
+          prfberOTURxNe (43),
+          cvODURxNe (44),
+          esODURxNe (45),
+          sesODURxNe (46),
+          uasODURxNe (47),
+          fcODURxNe (48),
+          oprOTSRxNe (49),
+          optOTSTxNe (50),
+          orlOTSNaNe (51),
+          opinOTSNaNe (52),
+          grpopinOTSNaNe (53),
+          grpgainOTSNaNe (54),
+          opoutOTSNaNe (55),
+          grpoptOTSTxNe (56),
+          grpopoutOTSNaNe (57),
+          esEthRxNe (58),
+          sesEthRxNe (59),
+          uasEthRxNe (60),
+          dfrEthRxNe (61),
+          inframeserrEthRxNe (62),
+          inframesdiscdsEthRxNe (63),
+          esEthTxNe (64),
+          sesEthTxNe (65),
+          uasEthTxNe (66),
+          dfrEthTxNe (67),
+          outframeserrEthTxNe (68),
+          outframesdiscdsEthTxNe (69),
+          esWanRxNe (70),
+          sesWanRxNe (71),
+          uasWanRxNe (72),
+          inframesWanRxNe (73),
+          inframeserrWanRxNe (74),
+          outframesWanTxNe (75),
+          oprMinOTSRxNe (76),
+          oprMaxOTSRxNe (77),
+          oprAvgOTSRxNe (78),
+          optMinOTSTxNe (79),
+          optMaxOTSTxNe (80),
+          optAvgOTSTxNe (81),
+          orlMinOTSNaNe (82),
+          orlMaxOTSNaNe (83),
+          orlAvgOTSNaNe (84),
+          opinMinOTSNaNe (85),
+          opinMaxOTSNaNe (86),
+          opinAvgOTSNaNe (87),
+          grpopinMinOTSNaNe (88),
+          grpopinMaxOTSNaNe (89),
+          grpopinAvgOTSNaNe (90),
+          grpgainMinOTSNaNe (91),
+          grpgainMaxOTSNaNe (92),
+          grpgainAvgOTSNaNe (93),
+          opoutMinOTSNaNe (94),
+          opoutMaxOTSNaNe (95),
+          opoutAvgOTSNaNe (96),
+          grpoptMinOTSTxNe (97),
+          grpoptMaxOTSTxNe (98),
+          grpoptAvgOTSTxNe (99),
+          grpopoutMinOTSNaNe (100),
+          grpopoutMaxOTSNaNe (101),
+          grpopoutAvgOTSNaNe (102),
+          dfrWanRxNe (103),
+          pscwODURxNe (104),
+          pscpODURxNe (105),
+          psdODURxNe (106),
+          cvLineRxFe (107),
+          esLineRxFe (108),
+          sesLineRxFe (109),
+          uasLineRxFe (110),
+          fcLineRxFe (111),
+          cvOTUTxNe (112),
+          esOTUTxNe (113),
+          sesOTUTxNe (114),
+          cvODUTxNe (115),
+          esODUTxNe (116),
+          sesODUTxNe (117),
+          uasODUTxNe (118),
+          fcODUTxNe (119),
+          oproscOTSNaNe (120),
+          oproscMinOTSNaNe (121),
+          oproscMaxOTSNaNe (122),
+          oproscAvgOTSNaNe (123),
+          pscwLineRxNe (124),
+          pscpLineRxNe (125),
+          psdLineRxNe (126),
+          dropgainOTSNaNe (127),
+          dropgainMinOTSNaNe (128),
+          dropgainMaxOTSNaNe (129),
+          dropgainAvgOTSNaNe (130),
+          dgdMaxOCHRxNe (131),
+          dgdAvgOCHRxNe (132),
+	  optMinOCHTxNe (133),
+	  optMaxOCHTxNe (134),
+          optAvgOCHTxNe (135),
+          prfBerMaxOTURxNe (136),
+          oprLowOCHRxNe (137),
+          oprHighOCHRxNe (138),
+          oprnLowOCHRxNe (139),
+          oprnHighOCHRxNe (140),
+          optLowOCHTxNe  (141),
+          optHighOCHTxNe (142),
+          optnLowOCHTxNe (143),
+          optnHighOCHTxNe (144),
+          cvOTURxFe (145),
+          esOTURxFe (146),
+          sesOTURxFe (147),
+          cvODURxFe (148),
+          esODURxFe (149),
+          sesODURxFe (150),
+          uasODURxFe (151),
+          fcODURxFe (152),
+          oprnOTSRxNe (153),
+          sefsSectionTxNe (154),
+          spanLossOCH (155),
+          spanLossMinOCH (156),
+          spanLossMaxOCH (157),
+          spanLossAvgOCH (158),
+          qMinOTU(159),
+          qMaxOTU(160),
+          qAvgOTU(161),
+          qStdevOTU(162),
+          oprMinOCHRxNe(163),
+          oprMaxOCHRxNe(164),
+          oprAvgOCHRxNe(165),
+          optOCHRxNe(166),
+          optMinOCHRxNe(167),
+          optMaxOCHRxNe(168),
+          optAvgOCHRxNe(169),
+          orlInOTSNaNe (170),
+          orlInMinOTSNaNe (171),
+          orlInMaxOTSNaNe (172),
+          orlInAvgOTSNaNe (173),
+          orlOutOTSNaNe (174),
+          orlOutMinOTSNaNe (175),
+          orlOutMaxOTSNaNe (176),
+          orlOutAvgOTSNaNe (177),
+          dmMinODURxNe (178),
+          dmMaxODURxNe (179),
+          dmAvgODURxNe (180),
+          pscwEthRxNe (181),
+          pscpEthRxNe (182),
+          psdEthRxNe (183),
+          remoteInframesEthRxNe (184),
+          remoteInframesErrEthRxNe (185),
+          remoteFcsErrEthRxNe (186),
+          remoteOutframesEthTxNe (187),
+          remoteOutframesDiscdsEthTxNe (188),
+          uncfecblkOtuRxNe (189),
+          iaeOtuRxNe (190),
+          iaeOtuRxFe (191),
+          esWanTxNe (192),
+          sesWanTxNe (193),
+          uasWanTxNe (194),
+          outframeserrWanTxNe (195),
+          cvODUTxFe (196),
+          esODUTxFe (197),
+          sesODUTxFe (198),
+          uasODUTxFe (199),
+          fcODUTxFe (200),
+          fecPMARxNe (201),
+          fecccwPMARxNe (202),
+          fecunccwPMARxNe (203),
+          hccsPMARxNe (204),
+          prfberAvgPMARxNe (205),
+          prfberMaxPMARxNe (206),
+          fecLane0PMARxNe (207),
+          prfberAvgLane0PMARxNe (208),
+          prfberMaxLane0cPMARxNe (209),
+          fecLane1PMARxNe (210),
+          prfberAvgLane1PMARxNe (211),
+          prfberMaxLane1cPMARxNe (212),
+          fecLane2PMARxNe (213),
+          prfberAvgLane2PMARxNe (214),
+          prfberMaxLane2PMARxNe (215),
+          fecLane3PMARxNe (216),
+          prfberAvgLane3PMARxNe (217),
+          prfberMaxLane3PMARxNe (218),
+          dgdMinOCHRxNe (219),
+          prfberPMARxNe (220),
+          oprOTSIRxNe (221),
+          optOTSITxNe (222),
+          oprnOTSIRxNe (223),
+          optnOTSITxNe (224),
+          oprAvgOTSIRxNe (225),
+          oprMinOTSIRxNe (226),
+          oprMaxOTSIRxNe (227),
+          optAvgOTSITxNe (228),
+          optMinOTSITxNe (229),
+          optMaxOTSITxNe (230),
+          dgdAvgOTSIRxNe (231),
+          dgdMaxOTSIRxNe (232),
+          pdlAvgOTSIRxNe (233),
+          pdlMaxOTSIRxNe (234),
+          hccsOTSIRxNe (235),
+          fecOTSIRxNe (236),
+          prfberOTSIRxNe (237),
+          prfbereOTSIRxNe (238),
+          prfberMaxOTSIRxNe (239),
+          qMinOTSIRxNe (240),
+          qMaxOTSIRxNe (241),
+          qAvgOTSIRxNe (242),
+          qstdevOTSIRxNe (243),
+          uncfecblkOTSIRxNe (244),
+          dmMinLRxNe        (245),
+          dmMaxLRxNe        (246),
+          dmAvgLRxNe        (247),
+          hccsPCSRxNe       (248),
+          prfBerPCSRxNe     (249),
+          prfBerMaxPCSRxNe  (250),
+          fecPCSRxNe        (251),
+          fecCcuPCSRxNe     (252),
+          fecUnCcuPCSRxNe   (253),
+          osnrAvgOTSIRxNe   (254),
+          osnrMinOTSIRxNe   (255),
+          osnrMaxOTSIRxNe   (256),
+          esnrAvgOTSIRxNe   (257),
+          esnrMinOTSIRxNe   (258),
+          esnrMaxOTSIRxNe   (259),
+          cdAvgOTSIRxNe     (260),
+          cdMinOTSIRxNe     (261),
+          cdMaxOTSIRxNe     (262),
+          pscwOTSRxNe       (263),
+          pscpOTSRxNe       (264),
+          psdOTSRxNe        (265),
+          pdlAvgOCHRxNe     (266),
+          pdlMaxOCHRxNe     (267),
+          cdAvgOCHRxNe      (268),
+          cdMinOCHRxNe      (269),
+          cdMaxOCHRxNe      (270),
+          csiMinOTSIRxNe    (271),
+          csiMaxOTSIRxNe    (272),
+          csiAvgOTSIRxNe    (273),
+          snrExtMinOTSIRxNe (274),
+          snrExtMaxOTSIRxNe (275),
+          snrExtAvgOTSIRxNe (276)
+         }
+
+NnOpticalPmUnits ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+          "Nortel Optical PM Units Indicator"
+  SYNTAX        INTEGER
+        {
+         none (1),
+         dB (2),
+         dBm (3),
+         percent (4),
+         ber (5),
+         pS (6)
+        }
+
+-- Nortel Optical PM Units & Format
+-- none:    Unsigned integer value
+-- dB:      Signed float value with 2 decimal digits
+-- dBm:     Signed float value with 2 decimal digits
+-- percent: Signed integer value
+-- ber:     Unsigned integer value (dd of 1E-dd -3<=dd<=-37)
+-- pS:      pico seconds (10E-12)
+
+
+NnOpticalPmValidity ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+           "Nortel Optical PM Validity Indicator"
+   SYNTAX        INTEGER
+         {
+          notApplicable(1),
+          complete (2),
+          partial (3),
+          adjusted (4)
+         }
+
+-- Nortel Optical Recent PM Table
+-- (Current & Previous 15 Minute, Current & Previous Day PMs)
+
+nnOpticalPmRecent OBJECT IDENTIFIER ::= { nnOpticalPmObjects 1}
+
+nnOpticalPmRecentTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF NnOpticalPmRecentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Table"
+   ::={ nnOpticalPmRecent 1 }
+
+nnOpticalPmRecentEntry OBJECT-TYPE
+   SYNTAX        NnOpticalPmRecentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Table Entry"
+   INDEX { nnOpticalPmRecentIfIndex, nnOpticalPmRecentMonType }
+   ::={ nnOpticalPmRecentTable 1 }
+
+NnOpticalPmRecentEntry ::= SEQUENCE {
+    nnOpticalPmRecentIfIndex         Integer32,
+    nnOpticalPmRecentMonType         NnOpticalPmMonType,
+    nnOpticalPmRecentIfIndexDescr    SnmpAdminString,
+    nnOpticalPmRecentMonTypeDescr    SnmpAdminString,
+    nnOpticalPmRecentUnits           NnOpticalPmUnits,
+    nnOpticalPmCurr15MinValue        SnmpAdminString,
+    nnOpticalPmCurr15MinValidity     NnOpticalPmValidity,
+    nnOpticalPmCurr15MinDateAndTime  DateAndTime,
+    nnOpticalPmPrev15MinValue        SnmpAdminString,
+    nnOpticalPmPrev15MinValidity     NnOpticalPmValidity,
+    nnOpticalPmPrev15MinDateAndTime  DateAndTime,
+    nnOpticalPmCurrDayValue          SnmpAdminString,
+    nnOpticalPmCurrDayValidity       NnOpticalPmValidity,
+    nnOpticalPmCurrDayDateAndTime    DateAndTime,
+    nnOpticalPmPrevDayValue          SnmpAdminString,
+    nnOpticalPmPrevDayValidity       NnOpticalPmValidity,
+    nnOpticalPmPrevDayDateAndTime    DateAndTime
+    }
+
+nnOpticalPmRecentIfIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Interface Index"
+   ::={ nnOpticalPmRecentEntry 1 }
+
+nnOpticalPmRecentMonType OBJECT-TYPE
+   SYNTAX        NnOpticalPmMonType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Monitoring Type"
+   ::={ nnOpticalPmRecentEntry 2}
+
+nnOpticalPmRecentIfIndexDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Interface Index Description"
+   ::={ nnOpticalPmRecentEntry 3}
+
+nnOpticalPmRecentMonTypeDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Monitoring Type Description"
+   ::={ nnOpticalPmRecentEntry 4}
+
+nnOpticalPmRecentUnits OBJECT-TYPE
+   SYNTAX        NnOpticalPmUnits
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Recent PM Units"
+   ::={ nnOpticalPmRecentEntry 5 }
+
+nnOpticalPmCurr15MinValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current 15 Min PM Monitored Value"
+   ::={ nnOpticalPmRecentEntry 6 }
+
+nnOpticalPmCurr15MinValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current 15 Min PM Validity Indicator"
+   ::={ nnOpticalPmRecentEntry 7 }
+
+nnOpticalPmCurr15MinDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current 15 Min PM Date & Time"
+   ::={ nnOpticalPmRecentEntry 8 }
+
+nnOpticalPmPrev15MinValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous 15 Min PM Monitored Value"
+   ::={ nnOpticalPmRecentEntry 9 }
+
+nnOpticalPmPrev15MinValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous 15 Min PM Validity Indicator"
+   ::={ nnOpticalPmRecentEntry 10 }
+
+nnOpticalPmPrev15MinDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous 15 Min PM Date & Time"
+   ::={ nnOpticalPmRecentEntry 11 }
+
+nnOpticalPmCurrDayValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current Day Monitored Value"
+   ::={ nnOpticalPmRecentEntry 12 }
+
+nnOpticalPmCurrDayValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current Day PM Validity Indicator"
+   ::={ nnOpticalPmRecentEntry 13 }
+
+nnOpticalPmCurrDayDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Current Day PM Date & Time"
+   ::={ nnOpticalPmRecentEntry 14 }
+
+nnOpticalPmPrevDayValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous Day PM Monitored Value"
+   ::={ nnOpticalPmRecentEntry 15 }
+
+nnOpticalPmPrevDayValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous Day PM Validity Indicator"
+   ::={ nnOpticalPmRecentEntry 16 }
+
+nnOpticalPmPrevDayDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Previous Day PM Date & Time"
+   ::={ nnOpticalPmRecentEntry 17 }
+
+-- Nortel Optical Untimed PM Table
+
+nnOpticalPmUntimed OBJECT IDENTIFIER ::= { nnOpticalPmObjects 2 }
+
+nnOpticalPmUntTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF NnOpticalPmUntEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Table"
+   ::= { nnOpticalPmUntimed 1 }
+
+nnOpticalPmUntEntry OBJECT-TYPE
+   SYNTAX        NnOpticalPmUntEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Table Entry"
+   INDEX { nnOpticalPmUntIfIndex, nnOpticalPmUntMonType }
+   ::= { nnOpticalPmUntTable 1 }
+
+NnOpticalPmUntEntry ::= SEQUENCE {
+    nnOpticalPmUntIfIndex         Integer32,
+    nnOpticalPmUntMonType         NnOpticalPmMonType,
+    nnOpticalPmUntIfIndexDescr    SnmpAdminString,
+    nnOpticalPmUntMonTypeDescr    SnmpAdminString,
+    nnOpticalPmUntUnits           NnOpticalPmUnits,
+    nnOpticalPmUntValue           SnmpAdminString,
+    nnOpticalPmUntValidity        NnOpticalPmValidity,
+    nnOpticalPmUntDateAndTime     DateAndTime
+   }
+
+nnOpticalPmUntIfIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Interface Index"
+   ::={ nnOpticalPmUntEntry 1 }
+
+nnOpticalPmUntMonType OBJECT-TYPE
+   SYNTAX        NnOpticalPmMonType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Monitoring Type"
+   ::={ nnOpticalPmUntEntry 2}
+
+nnOpticalPmUntIfIndexDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Interface Index Description"
+   ::={ nnOpticalPmUntEntry 3 }
+
+nnOpticalPmUntMonTypeDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM MonType Description"
+   ::={ nnOpticalPmUntEntry 4 }
+
+nnOpticalPmUntUnits OBJECT-TYPE
+   SYNTAX        NnOpticalPmUnits
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Units"
+   ::={ nnOpticalPmUntEntry 5 }
+
+nnOpticalPmUntValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Monitored Value"
+   ::={ nnOpticalPmUntEntry 6 }
+
+nnOpticalPmUntValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Validity Indicator"
+   ::={ nnOpticalPmUntEntry 7 }
+
+nnOpticalPmUntDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Untimed PM Monitoring Date & Time"
+   ::={ nnOpticalPmUntEntry 8 }
+
+-- Nortel Optical Baseline PM Table
+
+nnOpticalPmBaseline OBJECT IDENTIFIER ::= { nnOpticalPmObjects 3 }
+
+nnOpticalPmBaslnTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF NnOpticalPmBaslnEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Table"
+   ::= { nnOpticalPmBaseline 1 }
+
+nnOpticalPmBaslnEntry OBJECT-TYPE
+   SYNTAX        NnOpticalPmBaslnEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Table Entry"
+   INDEX { nnOpticalPmBaslnIfIndex, nnOpticalPmBaslnMonType }
+   ::= { nnOpticalPmBaslnTable 1 }
+
+NnOpticalPmBaslnEntry ::= SEQUENCE {
+    nnOpticalPmBaslnIfIndex         Integer32,
+    nnOpticalPmBaslnMonType         NnOpticalPmMonType,
+    nnOpticalPmBaslnIfIndexDescr    SnmpAdminString,
+    nnOpticalPmBaslnMonTypeDescr    SnmpAdminString,
+    nnOpticalPmBaslnUnits           NnOpticalPmUnits,
+    nnOpticalPmBaslnValue           SnmpAdminString,
+    nnOpticalPmBaslnValidity        NnOpticalPmValidity,
+    nnOpticalPmBaslnDateAndTime     DateAndTime
+   }
+
+nnOpticalPmBaslnIfIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Interface Index"
+   ::={ nnOpticalPmBaslnEntry 1 }
+
+nnOpticalPmBaslnMonType OBJECT-TYPE
+   SYNTAX        NnOpticalPmMonType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Monitoring Type"
+   ::={ nnOpticalPmBaslnEntry 2}
+
+nnOpticalPmBaslnIfIndexDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Interface Index Description "
+   ::={ nnOpticalPmBaslnEntry 3 }
+
+nnOpticalPmBaslnMonTypeDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Monitoring Type Description "
+   ::={ nnOpticalPmBaslnEntry 4 }
+
+nnOpticalPmBaslnUnits OBJECT-TYPE
+   SYNTAX        NnOpticalPmUnits
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Units"
+   ::={ nnOpticalPmBaslnEntry 5 }
+
+nnOpticalPmBaslnValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Monitored Value"
+   ::={ nnOpticalPmBaslnEntry 6 }
+
+nnOpticalPmBaslnValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Validity Indicator"
+   ::={ nnOpticalPmBaslnEntry 7 }
+
+nnOpticalPmBaslnDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Baseline PM Monitoring Date & Time"
+   ::={ nnOpticalPmBaslnEntry 8 }
+
+-- Nortel Optical Timed PM Tables (15 Minute & Day PMs )
+
+nnOpticalPmTimed OBJECT IDENTIFIER ::= { nnOpticalPmObjects 4 }
+
+nnOpticalPm15Min OBJECT IDENTIFIER ::= { nnOpticalPmTimed 1}
+
+nnOpticalPm15MinTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF NnOpticalPm15MinEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Table"
+   ::= { nnOpticalPm15Min 1 }
+
+nnOpticalPm15MinEntry OBJECT-TYPE
+   SYNTAX        NnOpticalPm15MinEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Table Entry"
+   INDEX { nnOpticalPm15MinIfIndex, nnOpticalPm15MinIntIndex,
+           nnOpticalPm15MinMonType }
+   ::= { nnOpticalPm15MinTable 1 }
+
+NnOpticalPm15MinEntry ::= SEQUENCE {
+    nnOpticalPm15MinIfIndex         Integer32,
+    nnOpticalPm15MinIntIndex        Integer32,
+    nnOpticalPm15MinMonType         NnOpticalPmMonType,
+    nnOpticalPm15MinIfIndexDescr    SnmpAdminString,
+    nnOpticalPm15MinMonTypeDescr    SnmpAdminString,
+    nnOpticalPm15MinUnits           NnOpticalPmUnits,
+    nnOpticalPm15MinValue           SnmpAdminString,
+    nnOpticalPm15MinValidity        NnOpticalPmValidity,
+    nnOpticalPm15MinDateAndTime     DateAndTime
+   }
+
+nnOpticalPm15MinIfIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Interface Index"
+   ::={ nnOpticalPm15MinEntry 1 }
+
+nnOpticalPm15MinIntIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Interval Index.
+       Valid index values are 0-32 with 0 being
+       the current 15 minute interval and 1-32
+       being the previous 15 minute intervals."
+   ::={ nnOpticalPm15MinEntry 2}
+
+nnOpticalPm15MinMonType OBJECT-TYPE
+   SYNTAX        NnOpticalPmMonType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Monitoring Type"
+   ::={ nnOpticalPm15MinEntry 3}
+
+nnOpticalPm15MinIfIndexDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Interface Index Description"
+   ::={ nnOpticalPm15MinEntry 4 }
+
+nnOpticalPm15MinMonTypeDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Monitoring Type Description"
+   ::={ nnOpticalPm15MinEntry 5 }
+
+nnOpticalPm15MinUnits OBJECT-TYPE
+   SYNTAX        NnOpticalPmUnits
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Units"
+   ::={ nnOpticalPm15MinEntry 6 }
+
+nnOpticalPm15MinValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Monitored Value"
+   ::={ nnOpticalPm15MinEntry 7 }
+
+nnOpticalPm15MinValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Validity Indicator"
+   ::={ nnOpticalPm15MinEntry 8 }
+
+nnOpticalPm15MinDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical 15 Minute PM Monitoring Date & Time"
+   ::={ nnOpticalPm15MinEntry 9 }
+
+nnOpticalPmDay OBJECT IDENTIFIER ::= { nnOpticalPmTimed 2 }
+
+nnOpticalPmDayTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF NnOpticalPmDayEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Table"
+   ::= { nnOpticalPmDay 1 }
+
+nnOpticalPmDayEntry OBJECT-TYPE
+   SYNTAX        NnOpticalPmDayEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Table Entry"
+   INDEX { nnOpticalPmDayIfIndex, nnOpticalPmDayIntIndex,
+           nnOpticalPmDayMonType }
+   ::= { nnOpticalPmDayTable 1 }
+
+NnOpticalPmDayEntry ::= SEQUENCE {
+    nnOpticalPmDayIfIndex         Integer32,
+    nnOpticalPmDayIntIndex        Integer32,
+    nnOpticalPmDayMonType         NnOpticalPmMonType,
+    nnOpticalPmDayIfIndexDescr    SnmpAdminString,
+    nnOpticalPmDayMonTypeDescr    SnmpAdminString,
+    nnOpticalPmDayUnits           NnOpticalPmUnits,
+    nnOpticalPmDayValue           SnmpAdminString,
+    nnOpticalPmDayValidity        NnOpticalPmValidity,
+    nnOpticalPmDayDateAndTime     DateAndTime
+   }
+
+nnOpticalPmDayIfIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Interface Index"
+   ::={ nnOpticalPmDayEntry 1 }
+
+nnOpticalPmDayIntIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Interval Index.
+       Valid index values are 0-1 with 0 being
+       the current day interval and 1 being the
+       previous day interval"
+   ::={ nnOpticalPmDayEntry 2}
+
+nnOpticalPmDayMonType OBJECT-TYPE
+   SYNTAX        NnOpticalPmMonType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical PM Monitoring Type"
+   ::={ nnOpticalPmDayEntry 3}
+
+nnOpticalPmDayIfIndexDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Interface Index Description"
+   ::={ nnOpticalPmDayEntry 4 }
+
+nnOpticalPmDayMonTypeDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Monitoring Type Description"
+   ::={ nnOpticalPmDayEntry 5 }
+
+nnOpticalPmDayUnits OBJECT-TYPE
+   SYNTAX        NnOpticalPmUnits
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Units"
+   ::={ nnOpticalPmDayEntry 6 }
+
+nnOpticalPmDayValue OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Monitored Value"
+   ::={ nnOpticalPmDayEntry 7 }
+
+nnOpticalPmDayValidity OBJECT-TYPE
+   SYNTAX        NnOpticalPmValidity
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Validity Indicator"
+   ::={ nnOpticalPmDayEntry 8 }
+
+nnOpticalPmDayDateAndTime OBJECT-TYPE
+   SYNTAX        DateAndTime
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "Nortel Optical Day PM Monitoring Date & Time"
+   ::={ nnOpticalPmDayEntry 9 }
+
+END

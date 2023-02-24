@@ -14,10 +14,10 @@
   - GNU General Public License for more details.
   -
   - You should have received a copy of the GNU General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -
   - @package    LibreNMS
-  - @link       http://librenms.org
+  - @link       https://www.librenms.org
   - @copyright  2019 Tony Murray
   - @author     Tony Murray <murraytony@gmail.com>
   -->
@@ -32,7 +32,7 @@
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <span class="input-group-btn" style="width:0;"></span>
+            <span class="input-group-btn" style=" width:0;"></span>
             <select class="form-control" @change="updateLevel(group, $event.target.value)">
                 <option value="1" :selected="data.level === 1">{{ $t('Normal') }}</option>
                 <option value="5" :selected="data.level === 5">{{ $t('Global Read') }}</option>
@@ -60,16 +60,17 @@
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting";
+import BaseSetting from "./BaseSetting";
 
-    export default {
+export default {
         name: "SettingLdapGroups",
         mixins: [BaseSetting],
         data() {
             return {
-                localList: this.value,
+                localList: Array.isArray(this.value) ? {} : this.value,
                 newItem: "",
-                newItemLevel: 1
+                newItemLevel: 1,
+                lock: false
             }
         },
         methods: {
@@ -94,7 +95,16 @@
         },
         watch: {
             localList() {
-                this.$emit('input', this.localList)
+                if (! this.lock) {
+                    this.$emit('input', this.localList)
+                } else {
+                    // release the lock
+                    this.lock = false;
+                }
+            },
+            value() {
+                this.lock = true // prevent loop
+                this.localList = Array.isArray(this.value) ? {} : this.value;
             }
         }
     }

@@ -1,0 +1,1424 @@
+-- =================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: flash management mib
+-- Reference:
+-- Version: V3.3
+-- History:
+--     V1.0 initial version 2002-12-20
+--     V1.1 2004-6-15 add delete(4) to hh3cFlhOperType
+--     V1.2 2004-7-15 add some Hh3cFlashOperationStatus types:
+--          opAuthFail(17),
+--          opTimeout(18),
+--          opDeleteFileOpenError(20),
+--          opDeleteInvalidDevice(21),
+--          opDeleteInvalidFunction(22),
+--          opDeleteOperationError(23),
+--          opDeleteInvalidFileName(24),
+--          opDeleteDeviceBusy(25),
+--          opDeleteParaError(26),
+--          opDeleteInvalidPath(27)
+--     V1.21 2004-8-19 modify the DESCRIPTION of hh3cFlhMinPartitionSize
+--         by fanxiaoxun
+--     V2.0 2004-10-12 updated by gaolong
+--         Fix hh3cFlhMIBCompliance MODULE name to HH3C-FLASH-MAN-MIB
+--     V2.1 2004-11-22 modify the SYNTAX of hh3cFlhSupportNum and hh3cFlhIndex
+--         by wangpengju
+--     V2.2 2005-01-11 updated by gaolong and weixinzhe
+--         File description updated
+--     V2.3 2005-01-11 add 'rename' operation type for hh3cFlhOperType,
+--         by wangpengju
+--     V2.4 2005-06-06 add enum value in SYNTAX of hh3cFlhOperProtocol
+--         by jinyongfeng. Adjust file format by gaolong
+--     V2.5 2005-08-18 change the value range of hh3cFlhFileIndex
+--         from (1..32) to (1..2147483647), by wangpengju
+--     V2.6 2006-03-03 updated by yangjianfeng
+--         correct some error words which are obvious clerical error.
+--     V2.7 2009-05-05 Add hh3cFlhOperServerPort by jinyi
+--     V2.8 2010-06-05 add hh3cFlhOperFailReason by shuaixiaojuan
+--                     add hh3cFlhKbyteSize by jinyi
+--     V2.9 2010-10-30 Deprecated hh3cFlhOperServerAddress,
+--                     added enum in Hh3cFlashOperationStatus,
+--                     added hh3cFlhOperSrvAddrType, hh3cFlhOperSrvAddrRev and
+--                     hh3cFlhOperSrvVPNName by songhao.
+--     V3.0 2011-10-13 Modify syntax of hh3cFlhName and hh3cFlhPartName
+--                     by shuaixiaojuan.
+--     V3.1 2012-06-26 Add hh3cFlhPartBootable and hh3cFlhPartPathForGlobalOpt
+--                     by lisong.
+--     V3.2 2013-05-23 Add hh3cFlhHCSize, hh3cFlhPartHCSpace,
+--                     hh3cFlhPartHCSpaceFree and hh3cFlhFileHCSize to replace
+--                     hh3cFlhSize, hh3cFlhPartSpace, hh3cFlhPartSpaceFree
+--                     and hh3cFlhFileSize by lisong.
+--     V3.3 2014-08-11 Added mkdir(6), rmdir(7) to hh3cFlhOperType, added hh3cFlhFileType
+--                     to hh3cFlhFileEntry, modified description of
+--                     hh3cFlhFileName, hh3cFlhOperProtocol, hh3cFlhOperSourceFile
+--                     and Hh3cFlashOperationStatus to support directory operation
+--                     by SongHao.
+--          2015-01-20 Added copy(8) to hh3cFlhOperType by SongHao.
+-- =================================================================
+HH3C-FLASH-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    PhysicalIndex
+        FROM ENTITY-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TimeTicks, IpAddress, Integer32, Gauge32, Counter32,
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    DisplayString, TimeStamp, TruthValue, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC;
+
+
+hh3cFlash MODULE-IDENTITY
+    LAST-UPDATED "201501200808Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB contains objects to manage flash cards and flash
+        card operations.
+        There are no constraints on this MIB."
+    REVISION "201501200808Z"
+    DESCRIPTION
+        "Added copy(8) to hh3cFlhOperType."
+    REVISION "201408110303Z"
+    DESCRIPTION
+        "Added mkdir(6), rmdir(7) to hh3cFlhOperType, added hh3cFlhFileType
+        to hh3cFlhFileEntry, modified description of
+        hh3cFlhFileName, hh3cFlhOperProtocol, hh3cFlhOperSourceFile
+        and Hh3cFlashOperationStatus to support directory operation."
+    REVISION "201305230000Z"
+    DESCRIPTION
+        "Add hh3cFlhHCSize, hh3cFlhPartHCSpace, hh3cFlhPartHCSpaceFree and
+        hh3cFlhFileHCSize to replace hh3cFlhSize, hh3cFlhPartSpace,
+        hh3cFlhPartSpaceFree and hh3cFlhFileSize."
+    REVISION "201206260000Z"
+    DESCRIPTION
+        "Add hh3cFlhPartBootable and hh3cFlhPartPathForGlobalOpt."
+    REVISION "201110130000Z"
+    DESCRIPTION
+        "Modify syntax of hh3cFlhName and hh3cFlhPartName."
+    REVISION "201010300000Z"
+    DESCRIPTION
+        "Deprecated hh3cFlhOperServerAddress, added enum in
+        Hh3cFlashOperationStatus, added hh3cFlhOperSrvAddrType,
+        hh3cFlhOperSrvAddrRev and hh3cFlhOperSrvVPNName."
+    REVISION "201006050000Z"
+    DESCRIPTION
+        "Add hh3cFlhOperFailReason and hh3cFlhKbyteSize."
+    REVISION "200905050000Z"
+    DESCRIPTION
+        "Add hh3cFlhOperServerPort."
+    REVISION "200603030000Z"
+    DESCRIPTION
+        "Correct some error words which are obvious clerical error."
+    REVISION "200508180000Z"
+    DESCRIPTION
+        "Change the value range of hh3cFlhFileIndex from (1..32)
+        to (1..2147483647)."
+    REVISION "200506060000Z"
+    DESCRIPTION
+        "Add enum value in SYNTAX of hh3cFlhOperProtocol.
+         Adjust file format."
+    REVISION "200501110800Z"
+    DESCRIPTION
+        "Add 'rename' operation type for hh3cFlhOperType."
+    REVISION "200501110000Z"
+    DESCRIPTION
+        "File description updated."
+    REVISION "200411220000Z"
+    DESCRIPTION
+        "Modify the SYNTAX of hh3cFlhSupportNum and hh3cFlhIndex."
+    REVISION "200410120000Z"
+    DESCRIPTION
+        "Fix hh3cFlhMIBCompliance MODULE name to HH3C-FLASH-MAN-MIB."
+    REVISION "200408190000Z"
+    DESCRIPTION
+        "Modify the DESCRIPTION of hh3cFlhMinPartitionSize."
+    REVISION "200407150000Z"
+    DESCRIPTION
+        "Add some Hh3cFlashOperationStatus types:
+        opAuthFail(17),
+        opTimeout(18),
+        opDeleteFileOpenError(20),
+        opDeleteInvalidDevice(21),
+        opDeleteInvalidFunction(22),
+        opDeleteOperationError(23),
+        opDeleteInvalidFileName(24),
+        opDeleteDeviceBusy(25),
+        opDeleteParaError(26),
+        opDeleteInvalidPath(27)"
+    REVISION "200406150000Z"
+    DESCRIPTION
+        "add delete(4) to hh3cFlhOperType."
+    REVISION "200212200000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 5 }
+
+
+--
+-- Textual conventions
+--
+
+Hh3cFlashOperationStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The status of the specified operation can be one of
+        the following.
+
+        opInProgress : The operation is in process.
+        opSuccess : The operation has been completed successfully.
+        opInvalid : The command is invalid or command-protocol-device
+                    combination is unsupported by the system.
+        opInvalidProtocol : Invalid protocol is specified.
+        opInvalidSourceName : Invalid source name is specified.
+        opInvalidDestName : Invalid target name is specified.
+        opInvalidServerAddress : Invalid server address is specified.
+        opDeviceBusy : The device is in use and locked by another process.
+        opDeviceOpenError : Invalid device name is specified.
+        opDeviceError : Device read, write or erase error.
+        opDeviceNotProgrammable : Device is read-only but a write or
+                                  erase operation was specified.
+        opDeviceFull : Device is filled to capacity.
+        opFileOpenError : Invalid file/directory name,
+                          file/directory not found in partition.
+        opFileTransferError : File transfer was unsuccessful.
+        opFileChecksumError : File checksum in Flash is invalid.
+        opNoMemory : System is running in low on memory.
+        opUnknownFailure : Failure which is unknown.
+        opDeleteFileOpenError : File/Directory is in used by another process.
+        opDeleteInvalidDevice : Invalid device name is specified.
+        opDeleteInvalidFunction : Deleted operation is unsupported
+                                  by the device.
+        opDeleteOperationError : Operation is in a low error.
+        opDeleteInvalidFileName : Invalid name is specified.
+        opDeleteDeviceBusy : The device is in use and locked
+                            by another process.
+        opDeleteParaError : The parameters are invalid.
+        opDeleteInvalidPath : The path is invalid.
+        opDeleteFileNotExistInSlave : Failed to delete file, because the file
+                                      does not exist in the slave.
+        opDeleteFileFailedInSlave : Operation failed when deleting file in the slave.
+        opSlaveFull : Operation failed because the slave doesn't have enough space.
+        opCopyToSlaveFailure : Operation failed when copying file to the slave.
+        "
+    SYNTAX INTEGER
+        {
+            opInProgress(1),
+            opSuccess(2),
+            opInvalid(3),
+            opInvalidProtocol(4),
+            opInvalidSourceName(5),
+            opInvalidDestName(6),
+            opInvalidServerAddress(7),
+            opDeviceBusy(8),
+            opDeviceOpenError(9),
+            opDeviceError(10),
+            opDeviceNotProgrammable(11),
+            opDeviceFull(12),
+            opFileOpenError(13),
+            opFileTransferError(14),
+            opFileChecksumError(15),
+            opNoMemory(16),
+            opAuthFail(17),
+            opTimeout(18),
+            opUnknownFailure(19),
+            opDeleteFileOpenError(20),
+            opDeleteInvalidDevice(21),
+            opDeleteInvalidFunction(22),
+            opDeleteOperationError(23),
+            opDeleteInvalidFileName(24),
+            opDeleteDeviceBusy(25),
+            opDeleteParaError(26),
+            opDeleteInvalidPath(27),
+            opDeleteFileNotExistInSlave(28),
+            opDeleteFileFailedInSlave(29),
+            opSlaveFull(30),
+            opCopyToSlaveFailure(31)
+        }
+
+Hh3cFlashPartitionUpgradeMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "
+        Flash partition upgrade method, i.e., method by which
+        new files can be downloaded into the partition.
+        FLH stands for Flash Load Helper, a feature provided
+        on run-from-Flash systems for upgrading Flash.  This
+        feature uses the bootstrap code in ROMs to help in
+        automatic download.
+        This object should be retrieved if the partition
+        status is runFromFlash(2).
+        If the partition status is readOnly(1), the upgrade
+        method would depend on the reason for the readOnly
+        status.  For example, it may simply be a matter of installing
+        the programming jumper, or it may require execution of a
+        later version of software that supports the Flash chips.
+
+        unknown      -  the current system image does not know
+                how Flash can be programmed.  A possible
+                method would be to reload the ROM image
+                and perform the upgrade manually.
+        rxbootFLH    -  the Flash Load Helper is available to
+                download files to Flash.  A copy-to-flash
+                command can be used and this system image
+                will automatically reload the Rxboot image
+                in ROM and direct it to carry out the
+                download request.
+        direct       -  will be done directly by this image.
+        "
+    SYNTAX INTEGER
+        {
+            unknown(1),
+            rxbootFLH(2),
+            direct(3)
+        }
+
+Hh3cFlashPartitionStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "If device is not programmable the value of it will be
+        'readOnly'; If the current image is running from
+        this partition the value of it will be 'runFromFlash'
+        If device is programmable the value of it will be 'readWrite'.
+        "
+    SYNTAX INTEGER
+        {
+            readOnly(1),
+            runFromFlash(2),
+            readWrite(3)
+        }
+
+
+--
+-- Node definitions
+--
+hh3cFlashManMIBObjects OBJECT IDENTIFIER ::= { hh3cFlash 1 }
+
+
+-- The flash device information.
+hh3cFlashDevice OBJECT IDENTIFIER ::= { hh3cFlashManMIBObjects 1 }
+
+
+hh3cFlhSupportNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the total number of flash which the
+        system supported.
+
+        The MIB should not be loaded if there is no flash
+        in the system and so the value here will be a
+        minimum of 1.
+        "
+    ::= { hh3cFlashDevice 1 }
+
+
+hh3cFlashTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlashEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        This table gives the properties of all the flashes on
+        the system.
+        "
+    ::= { hh3cFlashDevice 2 }
+
+
+hh3cFlashEntry OBJECT-TYPE
+    SYNTAX Hh3cFlashEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cFlashTable."
+    INDEX { hh3cFlhIndex }
+    ::= { hh3cFlashTable 1 }
+
+
+Hh3cFlashEntry ::=
+    SEQUENCE {
+        hh3cFlhIndex                 Integer32,
+        hh3cFlhSize                  Integer32,
+        hh3cFlhPos                   PhysicalIndex,
+        hh3cFlhName                  DisplayString,
+        hh3cFlhChipNum               Integer32,
+        hh3cFlhDescr                 DisplayString,
+        hh3cFlhInitTime              TimeStamp,
+        hh3cFlhRemovable             TruthValue,
+        hh3cFlhPartitionBool         TruthValue,
+        hh3cFlhMinPartitionSize      Integer32,
+        hh3cFlhMaxPartitions         Integer32,
+        hh3cFlhPartitionNum          Integer32,
+        hh3cFlhKbyteSize             Integer32,
+        hh3cFlhHCSize                CounterBasedGauge64
+     }
+
+hh3cFlhIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The index of hh3cFlashTable.  There are two parts for this index
+        depicted as follows:
+        31                  15                  0
+        +++++++++++++++++++++++++++++++++++++++++
+        +   entity index    +    random index   +
+        +   ( bit 16..31 )       ( bit 0..15 )  +
+        +++++++++++++++++++++++++++++++++++++++++
+
+        From bit0 to bit15 (two bytes), it has a minimum value of 1, and
+        maximum value of the same as the value of hh3cFlhSupportNum.
+
+        From bit16 to bit31 (two bytes), it is the physical index the same as the
+        entPhysicalIndex specified in ENTITY-MIB.
+        "
+    ::= { hh3cFlashEntry 1 }
+
+
+hh3cFlhSize OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "
+        Specifies the total size of the flash indexed by hh3cFlhIndex.
+        The value should be zero if the flash is removed for a removable
+        device.
+        If the total size of the flash exceeds 2,147,483,647 bytes,
+        hh3cFlhHCSize specifies the actual size.
+        "
+    ::= { hh3cFlashEntry 2 }
+
+
+hh3cFlhPos OBJECT-TYPE
+    SYNTAX PhysicalIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The position of the flash device in system.  This object is
+        an index of entPhysicalTable in ENTITY-MIB.
+        If the value of this object is 0,
+        the main processor is indicated.
+        "
+    ::= { hh3cFlashEntry 3 }
+
+
+hh3cFlhName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The flash name within the system."
+    ::= { hh3cFlashEntry 4 }
+
+
+hh3cFlhChipNum OBJECT-TYPE
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The chip numbers in the flash."
+    ::= { hh3cFlashEntry 5 }
+
+
+hh3cFlhDescr OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description of the purpose of the flash in the system."
+    ::= { hh3cFlashEntry 6 }
+
+
+hh3cFlhInitTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The initialization time for the flash component or partition,
+        recorded using the system time.  This will be the boot time for
+        a fixed device.  For a removable component or a partition,
+        it will be the initialization time.
+        "
+    ::= { hh3cFlashEntry 8 }
+
+
+hh3cFlhRemovable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The value indicates whether the flash indexed can be removed
+        or not.
+        The true(1) value indicates the flash device CAN be removed.
+        "
+    ::= { hh3cFlashEntry 9 }
+
+
+hh3cFlhPartitionBool OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        The value indicates whether the flash indexed can be partitioned
+        or not.
+        The true(1) value indicates the flash CAN be partitioned.
+        "
+    ::= { hh3cFlashEntry 11 }
+
+
+hh3cFlhMinPartitionSize OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Minimum partition size supported.
+        If hh3cFlhDevicePartitionBool is false, the value
+        of this object is the same as hh3cFlhSize.
+        "
+    ::= { hh3cFlashEntry 12 }
+
+
+hh3cFlhMaxPartitions OBJECT-TYPE
+    SYNTAX Integer32 (1..8)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The maximum count of partitions which the system supports
+        for this flash.  If hh3cFlhPartitionBool is false,
+        the object value is 1.
+        "
+    ::= { hh3cFlashEntry 13 }
+
+
+hh3cFlhPartitionNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The actual number of partitions supported by the system for
+        this flash.  If hh3cFlhPartitionBool is false, this value is 1.
+        "
+    ::= { hh3cFlashEntry 14 }
+
+hh3cFlhKbyteSize OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "kbytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the total size of the flash device indexed
+        by hh3cFlhIndex.  The value should be zero if the flash is
+        removed for a removable device.
+        "
+    ::= { hh3cFlashEntry 15 }
+
+hh3cFlhHCSize OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the total size of the flash indexed by hh3cFlhIndex.
+        This node is a 64-bit substitute for hh3cFlhSize.
+        "
+    ::= { hh3cFlashEntry 16 }
+
+hh3cFlashChips OBJECT IDENTIFIER ::= { hh3cFlashDevice 3 }
+
+
+hh3cFlhChipTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlhChipEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        Table of properties for all flash chips.
+        Used mainly for diagnostics.
+        "
+    ::= { hh3cFlashChips 1 }
+
+
+hh3cFlhChipEntry OBJECT-TYPE
+    SYNTAX Hh3cFlhChipEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cFlhChipTable"
+    INDEX { hh3cFlhIndex, hh3cFlhChipSerialNo }
+    ::= { hh3cFlhChipTable 1 }
+
+
+Hh3cFlhChipEntry ::=
+    SEQUENCE {
+        hh3cFlhChipSerialNo              Integer32,
+        hh3cFlhChipID                    DisplayString,
+        hh3cFlhChipDescr                 DisplayString,
+        hh3cFlhChipWriteTimesLimit       Integer32,
+        hh3cFlhChipWriteTimes            Counter32,
+        hh3cFlhChipEraseTimesLimit       Integer32,
+        hh3cFlhChipEraseTimes            Counter32
+     }
+
+hh3cFlhChipSerialNo OBJECT-TYPE
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of hh3cFlhChipTable."
+    ::= { hh3cFlhChipEntry 1 }
+
+
+hh3cFlhChipID OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..5))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The manufacturer code (the upper byte) and
+        device code (the lower byte) for a chip.
+        Unknown chip code is presented as 00:00.
+        "
+    ::= { hh3cFlhChipEntry 2 }
+
+
+hh3cFlhChipDescr OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The description of the flash chip.
+        "
+    ::= { hh3cFlhChipEntry 3 }
+
+
+hh3cFlhChipWriteTimesLimit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The limit for the number of write times (retries)
+        for a flash chip.  If the limit
+        is exceeded an error should be reported by the management
+        station.
+        "
+    ::= { hh3cFlhChipEntry 4 }
+
+
+hh3cFlhChipWriteTimes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        A count of write times (retries) for the flash chip since
+        initialization.
+        A count of 25 or more for a single chip indicates a write error.
+        Management stations should note the value of this MIB before and
+        after a write operation,
+        and report any errors accordingly.
+        "
+    ::= { hh3cFlhChipEntry 5 }
+
+
+hh3cFlhChipEraseTimesLimit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The limit for the number of erase times (retries) for a flash
+        chip.
+        If the limit is exceeded an error should be reported by the
+        management station.
+        "
+    ::= { hh3cFlhChipEntry 6 }
+
+
+hh3cFlhChipEraseTimes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        A count of erase times (retries) for the flash chip since
+        initialization.
+        A count of 2000 or more for a single chip indicates a write
+        error.
+        Management stations should note the value of this MIB before and
+        after an erase operation, and report any errors accordingly.
+        "
+    ::= { hh3cFlhChipEntry 7 }
+
+
+hh3cFlashPartitions OBJECT IDENTIFIER ::= { hh3cFlashDevice 4 }
+
+
+hh3cFlhPartitionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlhPartitionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        Properties for the flash partitions.  Minimum of one entry in
+        this table.
+        "
+    ::= { hh3cFlashPartitions 1 }
+
+
+hh3cFlhPartitionEntry OBJECT-TYPE
+    SYNTAX Hh3cFlhPartitionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An entry of the hh3cFlhPartitionTable.Indexed by flash
+        number and partition number.
+        "
+    INDEX { hh3cFlhIndex, hh3cFlhPartIndex }
+    ::= { hh3cFlhPartitionTable 1 }
+
+
+Hh3cFlhPartitionEntry ::=
+SEQUENCE {
+    hh3cFlhPartIndex                 Integer32,
+    hh3cFlhPartFirstChip             Integer32,
+    hh3cFlhPartLastChip              Integer32,
+    hh3cFlhPartSpace                 Integer32,
+    hh3cFlhPartSpaceFree             Gauge32,
+    hh3cFlhPartFileNum               Integer32,
+    hh3cFlhPartChecksumMethod        INTEGER,
+    hh3cFlhPartStatus                Hh3cFlashPartitionStatus,
+    hh3cFlhPartUpgradeMode           Hh3cFlashPartitionUpgradeMode,
+    hh3cFlhPartName                  DisplayString,
+    hh3cFlhPartRequireErase          TruthValue,
+    hh3cFlhPartFileNameLen           Integer32,
+    hh3cFlhPartBootable              TruthValue,
+    hh3cFlhPartPathForGlobalOpt      TruthValue,
+    hh3cFlhPartHCSpace               CounterBasedGauge64,
+    hh3cFlhPartHCSpaceFree           CounterBasedGauge64
+ }
+
+hh3cFlhPartIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An index which specifies a sequenced partition in the system.
+        "
+    ::= { hh3cFlhPartitionEntry 1 }
+
+
+hh3cFlhPartFirstChip OBJECT-TYPE
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The first chip's sequence number in the
+        partition, by which a chip can be indexed in
+        chip table.
+        "
+    ::= { hh3cFlhPartitionEntry 2 }
+
+
+hh3cFlhPartLastChip OBJECT-TYPE
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The last chip's sequence number in the
+        partition, by which a chip can be indexed in
+        chip table.
+        "
+    ::= { hh3cFlhPartitionEntry 3 }
+
+
+hh3cFlhPartSpace OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "
+        The total space of the flash partition.
+        The following should be satisfied:
+        hh3cFlhPartSpace = n*hh3cFlhMinPartitionSize
+        If the total size of the flash partition exceeds 2,147,483,647 bytes,
+        hh3cFlhPartHCSpace specifies the actual size.
+        "
+    ::= { hh3cFlhPartitionEntry 4 }
+
+
+hh3cFlhPartSpaceFree OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "
+        The flash partition's free space.
+        If the free space of the flash partition exceeds 2,147,483,647 bytes,
+        hh3cFlhPartHCSpaceFree specifies the actual free space.
+        "
+    ::= { hh3cFlhPartitionEntry 5 }
+
+
+hh3cFlhPartFileNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of all the files in the flash partition."
+    ::= { hh3cFlhPartitionEntry 6 }
+
+
+hh3cFlhPartChecksumMethod OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            simpleChecksum(1),
+            undefined(2),
+            simpleCRC(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Checksum method which the file system uses."
+    ::= { hh3cFlhPartitionEntry 7 }
+
+
+hh3cFlhPartStatus OBJECT-TYPE
+    SYNTAX Hh3cFlashPartitionStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The flash partition status."
+    ::= { hh3cFlhPartitionEntry 8 }
+
+
+hh3cFlhPartUpgradeMode OBJECT-TYPE
+    SYNTAX Hh3cFlashPartitionUpgradeMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The upgrade mode of the Flash partition"
+    ::= { hh3cFlhPartitionEntry 9 }
+
+
+hh3cFlhPartName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the flash partition given by the system."
+    ::= { hh3cFlhPartitionEntry 10 }
+
+
+hh3cFlhPartRequireErase OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Shows whether a write operation is conditional on partition
+        erase.
+        "
+    ::= { hh3cFlhPartitionEntry 11 }
+
+
+hh3cFlhPartFileNameLen OBJECT-TYPE
+    SYNTAX Integer32 (1..256)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum length of file name supported in the system."
+    ::= { hh3cFlhPartitionEntry 12 }
+
+hh3cFlhPartBootable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value indicates whether the partition is a bootable partition.
+         The true(1) value indicates a bootable partition.
+        "
+    ::= { hh3cFlhPartitionEntry 13 }
+
+hh3cFlhPartPathForGlobalOpt OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value indicates whether the partition is used in a global file
+         operation.  The true(1) value indicates that in one global file
+         operation files will be copied to or deleted from this partition.
+         When hh3cFlhPartPathForGlobalOpt in one entry is set to true(1),
+         hh3cFlhPartPathForGlobalOpt in other entries with the same entity
+         index will be set to false(0).
+        "
+    ::= { hh3cFlhPartitionEntry 14 }
+
+hh3cFlhPartHCSpace OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total space of the flash partition.
+        This node is a 64-bit substitute for hh3cFlhPartSpace.
+        "
+    ::= { hh3cFlhPartitionEntry 15 }
+
+
+hh3cFlhPartHCSpaceFree OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The flash partition's free space.
+        This node is a 64-bit substitue for hh3cFlhPartSpace.
+        "
+    ::= { hh3cFlhPartitionEntry 16 }
+
+
+
+hh3cFlhFiles OBJECT IDENTIFIER ::= { hh3cFlashPartitions 2 }
+
+
+hh3cFlhFileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlhFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of file information."
+    ::= { hh3cFlhFiles 1 }
+
+
+hh3cFlhFileEntry OBJECT-TYPE
+    SYNTAX Hh3cFlhFileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        An entry representing a file.  Indexed using flash number,
+        partition number, and file number.
+        "
+    INDEX { hh3cFlhIndex, hh3cFlhPartIndex, hh3cFlhFileIndex }
+    ::= { hh3cFlhFileTable 1 }
+
+
+Hh3cFlhFileEntry ::=
+    SEQUENCE {
+        hh3cFlhFileIndex         Integer32,
+        hh3cFlhFileName          DisplayString,
+        hh3cFlhFileSize          Integer32,
+        hh3cFlhFileStatus        INTEGER,
+        hh3cFlhFileChecksum      OCTET STRING,
+        hh3cFlhFileHCSize        CounterBasedGauge64,
+        hh3cFlhFileType          INTEGER
+        }
+
+hh3cFlhFileIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the table, whose range is from 1 to 2147483647"
+    ::= { hh3cFlhFileEntry 1 }
+
+
+hh3cFlhFileName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A valid file/directory name supported by the file system."
+    ::= { hh3cFlhFileEntry 2 }
+
+
+hh3cFlhFileSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "
+        The file size in bytes excluding the file
+        header of file system.  The value should be greater than zero.
+        If the file size exceeds 2,147,483,647 bytes, hh3cFlhFileHCSize
+        specifies the actual size.
+        "
+    ::= { hh3cFlhFileEntry 3 }
+
+
+hh3cFlhFileStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            deleted(1),
+            invalidChecksum(2),
+            valid(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The status should be as follows:
+        deleted(1):  The file is in recycle bin.
+        invalidChecksum(2):  The checksum of file is invalid;
+        valid(3):  A valid file.
+        "
+    ::= { hh3cFlhFileEntry 4 }
+
+
+hh3cFlhFileChecksum OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The file checksum in the header of file."
+    ::= { hh3cFlhFileEntry 5 }
+
+
+hh3cFlhFileHCSize OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The file size in bytes.
+        This node is a 64-bit substitue for hh3cFlhFileSize.
+        "
+    ::= { hh3cFlhFileEntry 6 }
+
+hh3cFlhFileType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            file(1),
+            directory(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether it is a file or directory."
+    ::= { hh3cFlhFileEntry 7 }
+
+
+-- The operation on the flash.
+hh3cFlashOperate OBJECT IDENTIFIER ::= { hh3cFlashManMIBObjects 2 }
+
+
+hh3cFlhOpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlhOpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table used to operate flash."
+    ::= { hh3cFlashOperate 1 }
+
+
+hh3cFlhOpEntry OBJECT-TYPE
+    SYNTAX Hh3cFlhOpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        Note an operation cannot be stopped until it is finished.
+
+        If notification is configured, NMS will receive a notification
+        at the end of the operation.
+
+        Entries in the table will be removed automatically in 5 minutes.
+        It can also be deleted by NMS directly.
+        "
+    INDEX { hh3cFlhOperIndex }
+    ::= { hh3cFlhOpTable 1 }
+
+
+Hh3cFlhOpEntry ::=
+    SEQUENCE {
+        hh3cFlhOperIndex                 Integer32,
+        hh3cFlhOperType                  INTEGER,
+        hh3cFlhOperProtocol              INTEGER,
+        hh3cFlhOperServerAddress         IpAddress,
+        hh3cFlhOperServerUser            DisplayString,
+        hh3cFlhOperPassword              DisplayString,
+        hh3cFlhOperSourceFile            DisplayString,
+        hh3cFlhOperDestinationFile       DisplayString,
+        hh3cFlhOperStatus                Hh3cFlashOperationStatus,
+        hh3cFlhOperEndNotification       TruthValue,
+        hh3cFlhOperProgress              TimeTicks,
+        hh3cFlhOperRowStatus             RowStatus,
+        hh3cFlhOperServerPort            Integer32,
+        hh3cFlhOperFailReason            DisplayString,
+        hh3cFlhOperSrvAddrType           InetAddressType,
+        hh3cFlhOperSrvAddrRev            InetAddress,
+        hh3cFlhOperSrvVPNName            DisplayString
+        }
+
+hh3cFlhOperIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the index of an entry.  It is a
+        random value when creating an entry.
+        "
+    ::= { hh3cFlhOpEntry 1 }
+
+
+hh3cFlhOperType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            net2FlashWithErase(1),
+            net2FlashWithoutErase(2),
+            flash2Net(3),
+            delete(4),
+            rename(5),
+            mkdir(6),
+            rmdir(7),
+            copy(8)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the operation to be executed.
+
+        net2FlashWithErase  Copy a file to flash; erase flash beforehand.
+        net2FlashWithoutErase   Copy a file to flash; do not erase flash
+                                  beforehand.
+        flash2Net       Copy a file from flash.
+        delete          Delete a file that is specified by
+                          hh3cFlhOperSourceFile.
+        rename          Change a file's name.
+        mkdir           Create a directory that is specified by
+                          hh3cFlhOperSourceFile.
+        rmdir           Delete a directory that is specified by
+                          hh3cFlhOperSourceFile.
+        copy            Copy a file.
+        "
+    ::= { hh3cFlhOpEntry 2 }
+
+
+hh3cFlhOperProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            ftp(1),
+            tftp(2),
+            clusterftp(3),
+            clustertftp(4),
+            sftp(5)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the protocol used to transfer a file.
+        The default protocol is ftp.
+
+        A directory cannot be transferred.
+
+        when 'clusterftp' or 'clustertftp' is selected,
+        the hh3cFlhOperServerAddress needn't be set,
+        the server address can be acquired automatically, the value of
+        hh3cFlhOperServerAddress is uncertain during operation.
+        Both member switch and commander switch can use them if they
+        support HGMP v2.
+        "
+    DEFVAL { ftp }
+    ::= { hh3cFlhOpEntry 3 }
+
+
+hh3cFlhOperServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS deprecated
+    DESCRIPTION
+        "
+        The address of remote host acting as server for operation.
+
+        The default value is 255.255.255.255
+
+        This object is replaced by hh3cFlhOperSrvAddrRev for it only support IPv4.
+        "
+    DEFVAL { 'FFFFFFFF'h }
+    ::= { hh3cFlhOpEntry 4 }
+
+
+hh3cFlhOperServerUser OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        When using ftp to transfer files, the user name must be
+        specified through this node.
+        "
+    ::= { hh3cFlhOpEntry 5 }
+
+
+hh3cFlhOperPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Remote user password for copying via ftp protocol.  Optionally,
+        This object may be ignored for protocols other than ftp. "
+    ::= { hh3cFlhOpEntry 6 }
+
+
+hh3cFlhOperSourceFile OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the source file/directory name for this operation
+        that is specified by hh3cFlhOperType.
+
+        It may be located on flash or remote server.
+        It may include the file path if it is applicable.
+        It must be specified.
+        "
+    ::= { hh3cFlhOpEntry 7 }
+
+
+hh3cFlhOperDestinationFile OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the destination file name.
+        It may be located on flash or remote server.
+        It may include the file path if it is applicable.
+        If it is not specified, the destination file name
+        is the same as source file name for application.
+        "
+    ::= { hh3cFlhOpEntry 8 }
+
+
+hh3cFlhOperStatus OBJECT-TYPE
+    SYNTAX Hh3cFlashOperationStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of operation."
+    ::= { hh3cFlhOpEntry 9 }
+
+
+hh3cFlhOperEndNotification OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "
+        If the value of it is specified 'true', a notification
+        will be generated at the end of the operation.
+        Else no notification will be generated.
+        "
+    DEFVAL { false }
+    ::= { hh3cFlhOpEntry 10 }
+
+
+hh3cFlhOperProgress OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The progress described as the time taken for the operation.
+        "
+    ::= { hh3cFlhOpEntry 11 }
+
+
+hh3cFlhOperRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { hh3cFlhOpEntry 12 }
+
+hh3cFlhOperServerPort OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The port of remote host acting as server for operation.
+         If the value of this object is not specified, the server
+         port is the known protocol port."
+    ::= { hh3cFlhOpEntry 13 }
+
+hh3cFlhOperFailReason OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The failure reasons of operation."
+    ::= { hh3cFlhOpEntry 14 }
+
+hh3cFlhOperSrvAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The type of IP address for hh3cFlhOperSrvAddrRev."
+    ::= { hh3cFlhOpEntry 15 }
+
+hh3cFlhOperSrvAddrRev OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The address of remote host acting as server for operation."
+    ::= { hh3cFlhOpEntry 16 }
+
+hh3cFlhOperSrvVPNName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN instance of this operation uses."
+    ::= { hh3cFlhOpEntry 17 }
+
+hh3cFlashNotification OBJECT IDENTIFIER ::= { hh3cFlashManMIBObjects 3 }
+
+
+hh3cFlhOperNotification NOTIFICATION-TYPE
+    OBJECTS { hh3cFlhOperStatus }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cFlhOperNotification is sent at the completion of a flash
+        copy operation if hh3cFlhOperEndNotification is true.
+        "
+    ::= { hh3cFlashNotification 1 }
+
+
+hh3cFlashMIBConformance OBJECT IDENTIFIER ::= { hh3cFlash 2 }
+
+
+hh3cFlhMIBCompliances OBJECT IDENTIFIER ::= { hh3cFlashMIBConformance 1 }
+
+
+hh3cFlhMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "
+        The statement of compliance for those implementing this MIB.
+        "
+    MODULE HH3C-FLASH-MAN-MIB
+    MANDATORY-GROUPS { hh3cFlhGroup, hh3cFlhPartitionGroup,
+      hh3cFlhFileGroup, hh3cFlhOperationGroup, hh3cFlhNotificationGroup
+         }
+    GROUP hh3cFlhChipGroup
+    DESCRIPTION
+        " "
+    ::= { hh3cFlhMIBCompliances 1 }
+
+
+hh3cFlashMIBGroups OBJECT IDENTIFIER ::= { hh3cFlashMIBConformance 2 }
+
+
+hh3cFlhGroup OBJECT-GROUP
+    OBJECTS { hh3cFlhSupportNum, hh3cFlhSize, hh3cFlhPos, hh3cFlhName,
+        hh3cFlhChipNum, hh3cFlhDescr, hh3cFlhInitTime, hh3cFlhRemovable,
+        hh3cFlhPartitionBool, hh3cFlhMinPartitionSize,
+        hh3cFlhMaxPartitions, hh3cFlhPartitionNum, hh3cFlhIndex, hh3cFlhKbyteSize }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects on Flash level information."
+    ::= { hh3cFlashMIBGroups 1 }
+
+
+hh3cFlhChipGroup OBJECT-GROUP
+    OBJECTS { hh3cFlhChipID, hh3cFlhChipDescr, hh3cFlhChipWriteTimesLimit,
+        hh3cFlhChipWriteTimes, hh3cFlhChipEraseTimesLimit,
+        hh3cFlhChipEraseTimes }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects on chip level information."
+    ::= { hh3cFlashMIBGroups 3 }
+
+
+hh3cFlhPartitionGroup OBJECT-GROUP
+    OBJECTS { hh3cFlhPartFirstChip, hh3cFlhPartLastChip, hh3cFlhPartSpace,
+        hh3cFlhPartSpaceFree, hh3cFlhPartFileNum,
+        hh3cFlhPartChecksumMethod, hh3cFlhPartStatus,
+        hh3cFlhPartUpgradeMode, hh3cFlhPartName, hh3cFlhPartRequireErase,
+        hh3cFlhPartFileNameLen, hh3cFlhPartBootable,
+        hh3cFlhPartPathForGlobalOpt}
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing on partition
+        level information."
+    ::= { hh3cFlashMIBGroups 4 }
+
+
+hh3cFlhFileGroup OBJECT-GROUP
+    OBJECTS { hh3cFlhFileName, hh3cFlhFileSize, hh3cFlhFileStatus,
+        hh3cFlhFileChecksum }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects on file level information."
+    ::= { hh3cFlashMIBGroups 5 }
+
+
+hh3cFlhOperationGroup OBJECT-GROUP
+    OBJECTS { hh3cFlhOperType, hh3cFlhOperProtocol,
+        hh3cFlhOperServerAddress, hh3cFlhOperServerUser,
+        hh3cFlhOperPassword, hh3cFlhOperSourceFile,
+        hh3cFlhOperDestinationFile, hh3cFlhOperStatus,
+        hh3cFlhOperEndNotification, hh3cFlhOperProgress,
+        hh3cFlhOperRowStatus, hh3cFlhOperServerPort,
+        hh3cFlhOperFailReason }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects of flash operations."
+    ::= { hh3cFlashMIBGroups 6 }
+
+
+hh3cFlhNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hh3cFlhOperNotification }
+    STATUS current
+    DESCRIPTION
+        "The collection of notifications in the module"
+    ::= { hh3cFlashMIBGroups 7 }
+
+END

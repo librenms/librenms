@@ -10,12 +10,12 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
-if (!isset($vars['section'])) {
+if (! isset($vars['section'])) {
     $vars['section'] = 'eventlog';
 }
 
@@ -28,7 +28,7 @@ if ($vars['section'] == 'outages') {
     echo '<span class="pagemenu-selected">';
 }
 
-echo generate_link('Outages', $vars, array('section' => 'outages'));
+echo generate_link('Outages', $vars, ['section' => 'outages']);
 if ($vars['section'] == 'outages') {
     echo '</span>';
 }
@@ -39,7 +39,7 @@ if ($vars['section'] == 'eventlog') {
     echo '<span class="pagemenu-selected">';
 }
 
-echo generate_link('Event Log', $vars, array('section' => 'eventlog'));
+echo generate_link('Event Log', $vars, ['section' => 'eventlog']);
 if ($vars['section'] == 'eventlog') {
     echo '</span>';
 }
@@ -51,7 +51,7 @@ if (\LibreNMS\Config::get('enable_syslog') == 1) {
         echo '<span class="pagemenu-selected">';
     }
 
-    echo generate_link('Syslog', $vars, array('section' => 'syslog'));
+    echo generate_link('Syslog', $vars, ['section' => 'syslog']);
     if ($vars['section'] == 'syslog') {
         echo '</span>';
     }
@@ -62,7 +62,7 @@ if (\LibreNMS\Config::get('graylog.port')) {
     if ($vars['section'] == 'graylog') {
         echo '<span class="pagemenu-selected">';
     }
-    echo generate_link('Graylog', $vars, array('section' => 'graylog'));
+    echo generate_link('Graylog', $vars, ['section' => 'graylog']);
     if ($vars['section'] == 'graylog') {
         echo '</span>';
     }
@@ -81,7 +81,7 @@ switch ($vars['section']) {
         include 'includes/html/pages/eventlog.inc.php';
         break;
     case 'graylog':
-        include 'includes/html/pages/device/logs/'.$vars['section'].'.inc.php';
+        include 'includes/html/pages/device/logs/' . $vars['section'] . '.inc.php';
         break;
     case 'outages':
         $vars['fromdevice'] = true;
@@ -90,7 +90,7 @@ switch ($vars['section']) {
 
     default:
         echo '</div>';
-        echo report_this('Unknown section '.$vars['section']);
+        echo report_this('Unknown section ' . $vars['section']);
         break;
 }
 

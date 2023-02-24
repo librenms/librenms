@@ -1,0 +1,120 @@
+-- ============================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB is used for configuration of SECP (security policies).
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 created by xuedeng.
+-- ============================================================================
+HH3C-SECP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI;
+
+--
+-- Node definitions
+--
+
+hh3cSecp MODULE-IDENTITY
+    LAST-UPDATED "201612191605Z"        -- Dec 19, 2016 at 16:05 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "Security policies management information base for managing devices
+        that support security policies.
+        "
+    REVISION "201612191605Z"            -- Dec 19, 2016 at 16:05 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 166 }
+
+--
+-- Nodes of hh3cSecpObjects
+--
+hh3cSecpObjects OBJECT IDENTIFIER ::= { hh3cSecp 1 }
+
+--
+-- Nodes of hh3cSecpRunningInfoTable
+--
+hh3cSecpRunningInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSecpRunningInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Security policies running information base."
+    ::= { hh3cSecpObjects 1 }
+
+hh3cSecpRunningInfoEntry OBJECT-TYPE
+    SYNTAX Hh3cSecpRunningInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Security policies running information entry."
+    INDEX
+    {
+        hh3cSecpIPVersion,
+        hh3cSecpRuleID
+    }
+    ::= { hh3cSecpRunningInfoTable 1 }
+
+Hh3cSecpRunningInfoEntry ::=
+    SEQUENCE
+    {
+        hh3cSecpIPVersion
+            INTEGER,
+        hh3cSecpRuleID
+            Unsigned32,
+        hh3cSecpMatchPacketCount
+            Counter64,
+        hh3cSecpLastMatchTime
+            Unsigned32
+    }
+
+hh3cSecpIPVersion OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        ipv4(1),
+        ipv6(2)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IP protocol version."
+    ::= { hh3cSecpRunningInfoEntry 1 }
+
+hh3cSecpRuleID OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65534)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Rule ID of security policies."
+    ::= { hh3cSecpRunningInfoEntry 2 }
+
+hh3cSecpMatchPacketCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of packets matching the rule."
+    ::= { hh3cSecpRunningInfoEntry 3 }
+
+hh3cSecpLastMatchTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interval in seconds between the last match and 1970/1/1 00:00:00."
+    ::= { hh3cSecpRunningInfoEntry 4 }
+
+END

@@ -1,0 +1,223 @@
+-- ============================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description:  This MIB file is used for configuration of L2TP(Layer 2
+--               Tunneling Protocol).
+--               include :1.L2TP statistics information
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0 2013-07-05 created by yanbotao
+-- V1.1 2019-04-12 add hh3cL2tpStatTemporarySessions and hh3cL2tpTunnelTable by zhouduan
+-- V1.2 2019-11-21 add hh3cL2tpRemoteIpAddress ,hh3cL2tpRemoteTunnelID, hh3cL2tpRemotePort
+--                 add hh3cL2tpRemoteName, hh3cL2tpTunnelState by zhouduan
+-- V1.3 2020-09-05 add hh3cL2tpStatsMaxSessions by tanjidong
+-- ============================================================================
+HH3C-L2TP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, Counter32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+hh3cL2tp MODULE-IDENTITY
+    LAST-UPDATED "202009050000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The latest baseline."
+    REVISION "202009050000Z"
+    DESCRIPTION
+        "Add the objects of hh3cL2tpStatsMaxSessions."
+    REVISION "201911211452Z"                -- November 21, 2019 at 14:52 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 139 }
+
+--
+-- Node definitions
+--
+--
+-- Definitions of significant branches
+--
+hh3cL2tpObjects         OBJECT IDENTIFIER  ::= { hh3cL2tp 1 }
+hh3cL2tpScalar          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 1 }
+hh3cL2tpStats           OBJECT IDENTIFIER  ::= { hh3cL2tpScalar 1 }
+
+--
+-- The L2TP Scalar Status and Statistics Group
+--
+
+hh3cL2tpStatsTotalTunnels OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of tunnels at the time of querying."
+    ::= { hh3cL2tpStats 1 }
+
+hh3cL2tpStatsTotalSessions OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of sessions at the time of querying."
+    ::= { hh3cL2tpStats 2 }
+
+hh3cL2tpSessionRate  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of sessions that were created in the previous second."
+    ::= { hh3cL2tpStats 3 }
+
+hh3cL2tpStatsTemporarySessions  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of temporary sessions at the time of querying."
+    ::= { hh3cL2tpStats 4 }
+
+hh3cL2tpStatsMaxSessions OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The max number of sessions."
+    ::= { hh3cL2tpStats 5 }
+
+hh3cL2tpTunnel          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 2 }
+
+--
+-- The hh3cL2tpTunnelTable table
+--
+
+hh3cL2tpTunnelTable  OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cL2tpTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table containing L2tp tunnel specific variables
+        for this L2TP implementation."
+    ::= { hh3cL2tpTunnel 1 }
+
+hh3cL2tpTunnelEntry  OBJECT-TYPE
+    SYNTAX        Hh3cL2tpTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Basic information about a particular L2tp tunnel."
+    INDEX     { hh3cL2tpTunnelType, hh3cL2tpLocalIpAddress, hh3cL2tpLocalTunnelID }
+    ::= { hh3cL2tpTunnelTable 1 }
+
+Hh3cL2tpTunnelEntry ::= SEQUENCE {
+    hh3cL2tpTunnelType
+        INTEGER,
+    hh3cL2tpLocalIpAddress
+        IpAddress,
+    hh3cL2tpLocalTunnelID
+        Unsigned32,
+    hh3cL2tpSessions
+        Unsigned32,
+    hh3cL2tpRemoteIpAddress
+        IpAddress,
+    hh3cL2tpRemoteTunnelID
+        Unsigned32,
+    hh3cL2tpRemotePort
+        Unsigned32,
+    hh3cL2tpRemoteName
+        DisplayString,
+    hh3cL2tpTunnelState
+        INTEGER
+    }
+
+hh3cL2tpTunnelType  OBJECT-TYPE
+    SYNTAX        INTEGER {
+        global(1),
+        instance(2)
+    }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The tunnel type, (1) global (2) instance."
+    ::= { hh3cL2tpTunnelEntry 1 }
+
+hh3cL2tpLocalIpAddress  OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The local tunnel IP address."
+    ::= { hh3cL2tpTunnelEntry 2 }
+
+hh3cL2tpLocalTunnelID  OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The local tunnel ID."
+    ::= { hh3cL2tpTunnelEntry 3 }
+
+hh3cL2tpSessions  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of sessions at the time of querying."
+    ::= { hh3cL2tpTunnelEntry 4 }
+
+hh3cL2tpRemoteIpAddress  OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote tunnel IP address."
+    ::= { hh3cL2tpTunnelEntry 5 }
+
+hh3cL2tpRemoteTunnelID  OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote tunnel ID."
+    ::= { hh3cL2tpTunnelEntry 6 }
+
+hh3cL2tpRemotePort  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote tunnel port."
+    ::= { hh3cL2tpTunnelEntry 7 }
+
+hh3cL2tpRemoteName  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote tunnel name."
+    ::= { hh3cL2tpTunnelEntry 8 }
+
+hh3cL2tpTunnelState  OBJECT-TYPE
+    SYNTAX        INTEGER {
+        idle(0),
+        waitReply(1),
+        established(2),
+        stopping(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current tunnel state, (0) idle (1) waitReply (2) established (3) stopping."
+    ::= { hh3cL2tpTunnelEntry 9 }
+
+END

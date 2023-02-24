@@ -13,9 +13,6 @@
  */
 
 ?>
-
-<h3>Processor settings</h3>
-
 <div class="table-responsive">
     <table id="processor" class="table table-hover table-condensed processor">
         <thead>
@@ -50,7 +47,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".processor").blur(function(event) {
+        grid.find(".processor").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var processor_id = $(this).data("processor_id");

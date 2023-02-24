@@ -1,0 +1,209 @@
+-- ============================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The HH3C-CUSP-MIB is a statistical MIB of CUSP module
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2020.07.20 The initial version, created by yizhigao.
+-- V1.1 2020-09-11 updated by yizhigao
+-- ============================================================================
+HH3C-CUSP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
+
+-- ----------------------------------------------------------------------
+-- Node definitions
+-- ----------------------------------------------------------------------
+hh3cCusp MODULE-IDENTITY
+    LAST-UPDATED "202009111300Z"        -- Sep 11, 2020 at 13:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains information about the control-/user-plane separation trap"
+    REVISION "202009111300Z"
+    DESCRIPTION
+        "Modified the objects description information of hh3cCuspServerDisconnectReason,
+         hh3cCuspLocalIPaddressType, hh3cCuspRemoteIPaddressType,
+         hh3cCuspServerDisconnect and hh3cCuspClientDisconnect."
+    REVISION "202007201300Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 190 }
+
+-- ----------------------------------------------------------------------
+-- nodes defined
+-- ----------------------------------------------------------------------
+-- ----------------------------------------------------------------------
+-- hh3cCuspMibTrapOid Table
+-- ----------------------------------------------------------------------
+hh3cCuspMibTrap OBJECT IDENTIFIER ::= { hh3cCusp 1 }
+
+hh3cCuspMibTrapOid OBJECT IDENTIFIER ::= { hh3cCuspMibTrap 1 }
+
+hh3cCuspServerDisconnectReason OBJECT-TYPE
+    SYNTAX Integer32 (0..14)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Reason why this instance is disconnected from a controller
+             0: Connection became abnormal.
+             1: An SSL connection became abnormal.
+             2: BFD timed out.
+             3: Version negotiation failed.
+             4: Protocol disabled.
+             5: Connection became abnormal when messages were being sent.
+             6: Connection recovery failed.
+             7: Received invalid packets or incorrectly processed received packets.
+             8: Connection became abnormal when messages were being received.
+             9: VPN instance deleted.
+             10: A TCP connection became abnormal.
+             11: Heartbeat packets sending failed.
+             12: Heartbeat packets timed out.
+             13: Configuration changes.
+             14: Not enough memory."
+    ::= { hh3cCuspMibTrapOid 1 }
+
+hh3cCuspClientDisconnectReason OBJECT-TYPE
+    SYNTAX Integer32 (0..10)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Reason why this instance is disconnected from a controller
+             0: Connection became abnormal.
+             1: Configuration changes.
+             2: Heartbeat packets timed out.
+             3: Version negotiation failed.
+             4: Receiving Hello packets timed out.
+             5: A TCP connection became abnormal.
+             6: VPN instance deleted.
+             7: VRF service disabled.
+             8: Resource request failed.
+             9: BFD timed out.
+             10: Not enough memory."
+    ::= { hh3cCuspMibTrapOid 2 }
+
+hh3cCuspVpnInstanceName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..31))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "VPN name for a CUSP connection."
+    ::= { hh3cCuspMibTrapOid 3 }
+
+hh3cCuspLocalIPaddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "IP addresses type of the CUSP connection local IP address."
+    ::= { hh3cCuspMibTrapOid 4 }
+
+hh3cCuspLocalIPaddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "CUSP connection local IP address.
+         The type of this address is determined by the value of
+         hh3cCuspLocalIPaddressType.
+        "
+    ::= { hh3cCuspMibTrapOid 5 }
+
+hh3cCuspRemoteIPaddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "IP addresses type of the CUSP connection remote IP address."
+    ::= { hh3cCuspMibTrapOid 6 }
+
+hh3cCuspRemoteIPaddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "CUSP connection remote IP address.
+         The type of this address is determined by the value of
+         hh3cCuspRemoteIPaddressType.
+        "
+    ::= { hh3cCuspMibTrapOid 7 }
+
+-- ----------------------------------------------------------------------
+-- hh3cCuspTraps Table
+-- ----------------------------------------------------------------------
+hh3cCuspTraps      OBJECT IDENTIFIER ::= { hh3cCuspMibTrap 2 }
+hh3cCuspTrapsPrefix      OBJECT IDENTIFIER ::= { hh3cCuspTraps 0 }
+
+hh3cCuspServerDisconnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cCuspLocalIPaddressType,
+                hh3cCuspLocalIPaddress,
+                hh3cCuspRemoteIPaddressType,
+                hh3cCuspRemoteIPaddress,
+                hh3cCuspVpnInstanceName,
+                hh3cCuspServerDisconnectReason
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the controller is disconnected
+         from the agent. The disconnection reason is
+         hh3cCuspServerDisconnectReason."
+    ::= { hh3cCuspTrapsPrefix 1 }
+
+hh3cCuspServerConnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cCuspLocalIPaddressType,
+                hh3cCuspLocalIPaddress,
+                hh3cCuspRemoteIPaddressType,
+                hh3cCuspRemoteIPaddress,
+                hh3cCuspVpnInstanceName
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the controller is connected
+         to the agent."
+    ::= { hh3cCuspTrapsPrefix 2 }
+
+hh3cCuspClientDisconnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cCuspLocalIPaddressType,
+                hh3cCuspLocalIPaddress,
+                hh3cCuspRemoteIPaddressType,
+                hh3cCuspRemoteIPaddress,
+                hh3cCuspVpnInstanceName,
+                hh3cCuspClientDisconnectReason
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the agent is disconnected
+         from the controller. The disconnection reason is
+         hh3cCuspClientDisconnectReason."
+    ::= { hh3cCuspTrapsPrefix 3 }
+
+hh3cCuspClientConnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cCuspLocalIPaddressType,
+                hh3cCuspLocalIPaddress,
+                hh3cCuspRemoteIPaddressType,
+                hh3cCuspRemoteIPaddress,
+                hh3cCuspVpnInstanceName
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the agent is connected
+         to the controller."
+    ::= { hh3cCuspTrapsPrefix 4 }
+END

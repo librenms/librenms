@@ -2,6 +2,7 @@ os: ddnos
 text: 'DDN Storage'
 type: storage
 icon: ddn
+mib_dir: ddn
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

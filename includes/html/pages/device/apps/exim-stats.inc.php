@@ -11,30 +11,30 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
-$graphs = array(
+$graphs = [
     'exim-stats_frozen' => 'Frozen',
-    'exim-stats_queue' => 'Queue'
-);
+    'exim-stats_queue' => 'Queue',
+];
 
 foreach ($graphs as $key => $text) {
-    $graph_type            = $key;
+    $graph_type = $key;
     $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
+    $graph_array['width'] = '215';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
+    $graph_array['id'] = $app['app_id'];
+    $graph_array['type'] = 'application_' . $key;
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
+        <h3 class="panel-title">' . $text . '</h3>
     </div>
     <div class="panel-body">
     <div class="row">';

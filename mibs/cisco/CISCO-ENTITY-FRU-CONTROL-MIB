@@ -3,8 +3,10 @@
 --   
 -- October 2002, Srini Kode
 --   
+-- %DNP% October 2003, Wen Xu
+-- %DNP% November 2003, Vasanta Kottapalli
 --   
--- Copyright (c) 1998-2008, 2010-2011 by cisco Systems Inc.
+-- Copyright (c) 1998-2018 by cisco Systems Inc.
 -- All rights reserved.
 -- ****************************************************************
 
@@ -43,7 +45,7 @@ IMPORTS
 
 
 ciscoEntityFRUControlMIB MODULE-IDENTITY
-    LAST-UPDATED    "201103180000Z"
+    LAST-UPDATED    "201811050000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Postal: Cisco Systems, Inc.
@@ -63,6 +65,37 @@ ciscoEntityFRUControlMIB MODULE-IDENTITY
 
         FRUs include assemblies such as power supplies, fans, 
         processor modules, interface modules, etc."
+    REVISION        "201811050000Z"
+    DESCRIPTION
+        "Corrected MAX-ACCESS of cefcFRUActualInputCurrent
+        and cefcFRUActualOutputCurrent."
+    REVISION        "201808200000Z"
+    DESCRIPTION
+        "Added CefcVmModuleOperType Textual Convention.
+
+        Added following OBJECT-GROUP
+        - cefcVmModuleGroup
+        - cefcVmModuleNotifsGroup
+
+        Added cefcMIBPowerCompliance10"
+    REVISION        "201807250000Z"
+    DESCRIPTION
+        "Added following OBJECT-GROUP
+        - cefcPowerSupplyActualGroup"
+    REVISION        "201712060000Z"
+    DESCRIPTION
+        "Added following OBJECT-GROUP
+        - cefcFanDirectionGroup
+        - cefcFanSpeedGroup"
+    REVISION        "201308190000Z"
+    DESCRIPTION
+        "Added fwMismatchFound(25), fwDownloadSuccess(26)
+        and fwDownloadFailure(27) to the
+        Textual Convention ModuleOperType"
+    REVISION        "201112220000Z"
+    DESCRIPTION
+        "Added new enumeration value mdr(24) to
+        ModuleOperType Textual Convention."
     REVISION        "201103180000Z"
     DESCRIPTION
         "Added FRUCoolingUnit Textual Convention.
@@ -463,7 +496,8 @@ ModuleOperType ::= TEXTUAL-CONVENTION
                               This state can be cleared by plugging
                               in the appropriate module.
 
-        mismatchConfig(10)     Module is not compatible with the current
+        mismatchConfig(10)     Module is not compatible with the
+        current
                               configuration. Module was correctly
                               provisioned earlier, however the module
                               was replaced by an incompatible module.
@@ -471,7 +505,8 @@ ModuleOperType ::= TEXTUAL-CONVENTION
                               the configuration, or replacing with the
                               appropriate module.
 
-        diagFailed(11)         Module diagnostic test failed due to some
+        diagFailed(11)         Module diagnostic test failed due to
+        some
                               hardware failure.
 
         dormant(12)            Module is waiting for an external or
@@ -523,7 +558,20 @@ ModuleOperType ::= TEXTUAL-CONVENTION
         upgrading(22)         Module is upgrading.
 
         okButAuthFailed(23)   Module is operational but did not pass 
-                              hardware integrity verification."
+                              hardware integrity verification.
+
+        mdr(24)               Module is undergoing a Minimum 
+                              Disruptive Restart (MDR) upgrade.
+
+         firmware download states:
+
+        fwMismatchFound(25)   Mistmatch found between current firmware 
+                              version and the firmware version in the 
+                              system image.
+
+        fwDownloadSuccess(26) Module firmware download succeeded.
+
+        fwDownloadFailure(27) Module firmware download failed."
     SYNTAX          INTEGER  {
                         unknown(1),
                         ok(2),
@@ -547,7 +595,11 @@ ModuleOperType ::= TEXTUAL-CONVENTION
                         okButPowerOverCritical(20),
                         syncInProgress(21),
                         upgrading(22),
-                        okButAuthFailed(23)
+                        okButAuthFailed(23),
+                        mdr(24),
+                        fwMismatchFound(25),
+                        fwDownloadSuccess(26),
+                        fwDownloadFailure(27)
                     }
 
 ModuleResetReasonType ::= TEXTUAL-CONVENTION
@@ -660,13 +712,36 @@ FRUCoolingUnit ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The unit for the cooling capacity and requirement.
 
-          cfm(1)    Cubic feet per minute
-          watts(2)  Watts"
+        cfm(1)    Cubic feet per minute
+        watts(2)  Watts"
     SYNTAX          INTEGER  {
                         cfm(1),
                         watts(2)
-    }
+                    }
 
+CefcPercentOrMinusOne ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "An integer that is in the range of a percent value.
+        A value of -1 means that the percentage is not available."
+    SYNTAX          Integer32 (-1 | 0..100)
+
+CefcVmModuleOperType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational VM module states.  Valid values are :
+
+        down(1)        module is down.
+        up(2)          module is operational.
+        unknown(3)     module is unknown.
+        goingDown(4)   module is goingDown from Up."
+    SYNTAX          INTEGER  {
+                        down(1),
+                        up(2),
+                        unknown(3),
+                        goingDown(4)
+                    }
 -- MIB variables
 
 cefcFRUPower  OBJECT IDENTIFIER
@@ -883,11 +958,11 @@ cefcFRUCurrent OBJECT-TYPE
         "Current supplied by the FRU (positive values)
         or current required to operate the FRU (negative values)." 
     ::= { cefcFRUPowerStatusEntry 3 }
- 
+
 cefcFRUPowerCapability OBJECT-TYPE
     SYNTAX          BITS {
-        realTimeCurrent(0)
-    }
+                        realTimeCurrent(0)
+                    }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -895,7 +970,7 @@ cefcFRUPowerCapability OBJECT-TYPE
         of the FRU.
 
         realTimeCurrent(0) -
-            cefcFRURealTimeCurrent is supported by the FRU."
+            cefcFRURealTimeCurrent is supported by the FRU." 
     ::= { cefcFRUPowerStatusEntry 4 }
 
 cefcFRURealTimeCurrent OBJECT-TYPE
@@ -905,8 +980,10 @@ cefcFRURealTimeCurrent OBJECT-TYPE
     DESCRIPTION
         "This object indicates the realtime value of current supplied
         by the FRU (positive values) or the realtime value of current
-        drawn by the FRU (negative values)."
+        drawn by the FRU (negative values)." 
     ::= { cefcFRUPowerStatusEntry 5 }
+ 
+
 
 -- cefcMaxDefaultInLinePower
 
@@ -929,7 +1006,6 @@ cefcMaxDefaultInLinePower OBJECT-TYPE
         the actual maximum default inline power."
     DEFVAL          { 12500 } 
     ::= { cefcFRUPower 3 }
-
 -- cefcFRUPowerSupplyValueTable
 
 cefcFRUPowerSupplyValueTable OBJECT-TYPE
@@ -972,10 +1048,12 @@ cefcFRUPowerSupplyValueEntry OBJECT-TYPE
     ::= { cefcFRUPowerSupplyValueTable 1 }
 
 CefcFRUPowerSupplyValueEntry ::= SEQUENCE {
-        cefcFRUTotalSystemCurrent FRUCurrentType,
-        cefcFRUDrawnSystemCurrent FRUCurrentType,
-        cefcFRUTotalInlineCurrent FRUCurrentType,
-        cefcFRUDrawnInlineCurrent FRUCurrentType
+        cefcFRUTotalSystemCurrent  FRUCurrentType,
+        cefcFRUDrawnSystemCurrent  FRUCurrentType,
+        cefcFRUTotalInlineCurrent  FRUCurrentType,
+        cefcFRUDrawnInlineCurrent  FRUCurrentType,
+        cefcFRUActualInputCurrent  FRUCurrentType,
+        cefcFRUActualOutputCurrent FRUCurrentType
 }
 
 cefcFRUTotalSystemCurrent OBJECT-TYPE
@@ -1013,6 +1091,22 @@ cefcFRUDrawnInlineCurrent OBJECT-TYPE
         "Amount of current that is being drawn from this FRU for inline
         operation." 
     ::= { cefcFRUPowerSupplyValueEntry 4 }
+
+cefcFRUActualInputCurrent OBJECT-TYPE
+    SYNTAX          FRUCurrentType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Amount of actual input current of this power supply." 
+    ::= { cefcFRUPowerSupplyValueEntry 5 }
+
+cefcFRUActualOutputCurrent OBJECT-TYPE
+    SYNTAX          FRUCurrentType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Amount of actual output current of this power supply." 
+    ::= { cefcFRUPowerSupplyValueEntry 6 }
  
 
 
@@ -1067,7 +1161,9 @@ CefcModuleEntry ::= SEQUENCE {
         cefcModuleLastClearConfigTime    TimeStamp,
         cefcModuleResetReasonDescription DisplayString,
         cefcModuleStateChangeReasonDescr DisplayString,
-        cefcModuleUpTime                 FRUTimeSeconds
+        cefcModuleUpTime                 FRUTimeSeconds,
+        cefcVmModuleOperStatus           CefcVmModuleOperType,
+        cefcVmModuleStatusLastChangeTime TimeStamp
 }
 
 cefcModuleAdminStatus OBJECT-TYPE
@@ -1166,6 +1262,23 @@ cefcModuleUpTime OBJECT-TYPE
         This object is not persistent; if a module reset,
         restart, power off, the up time starts from zero." 
     ::= { cefcModuleEntry 8 }
+
+cefcVmModuleOperStatus OBJECT-TYPE
+    SYNTAX          CefcVmModuleOperType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the VM module's operational state." 
+    ::= { cefcModuleEntry 9 }
+
+cefcVmModuleStatusLastChangeTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime at the time the cefcVmModuleOperStatus
+        is changed." 
+    ::= { cefcModuleEntry 10 }
  
 
 -- cefcIntelliModuleTable
@@ -1237,6 +1350,8 @@ cefcIntelliModuleIPAddr OBJECT-TYPE
         determined by the value of the object 
         cefcIntelliModuleIPAddrType." 
     ::= { cefcIntelliModuleEntry 2 }
+ 
+
 
 cefcModuleLocalSwitchingTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CefcModuleLocalSwitchingEntry 
@@ -1292,6 +1407,7 @@ cefcModuleLocalSwitchingMode OBJECT-TYPE
         disabled(2) - local switching is disabled." 
     ::= { cefcModuleLocalSwitchingEntry 1 }
  
+
 -- cefcFanTrayStatusTable
 
 cefcFanTrayStatusTable OBJECT-TYPE
@@ -1329,7 +1445,8 @@ cefcFanTrayStatusEntry OBJECT-TYPE
     ::= { cefcFanTrayStatusTable 1 }
 
 CefcFanTrayStatusEntry ::= SEQUENCE {
-        cefcFanTrayOperStatus INTEGER
+        cefcFanTrayOperStatus INTEGER,
+        cefcFanTrayDirection  INTEGER
 }
 
 cefcFanTrayOperStatus OBJECT-TYPE
@@ -1349,6 +1466,75 @@ cefcFanTrayOperStatus OBJECT-TYPE
         warning(4) - partial failure, needs replacement 
                      as soon as possible." 
     ::= { cefcFanTrayStatusEntry 1 }
+
+cefcFanTrayDirection OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        frontToBack(2),
+                        backToFront(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The air flow direction of the fan or fan tray.
+        unknown(1) - unknown.
+        frontToBack(2) - air flow from front to back
+        backToFront(3) - air flow from back to front" 
+    ::= { cefcFanTrayStatusEntry 2 }
+ 
+
+-- cefcFanTable
+
+cefcFanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CefcFanEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains a list of fan information
+        for all the fans that have entPhysicalTable
+        entries with 'fan' in the entPhysicalClass
+        and capable of providing management information
+        defined in this table."
+    ::= { cefcFRUFan 2 }
+
+cefcFanEntry OBJECT-TYPE
+    SYNTAX          CefcFanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing management information
+        applicable to a particular fan unit.
+
+        Entries are created by the agent at system power-up or 
+        fan or fan tray insertion.  Entries are deleted 
+        by the agent at the fan or fan tray removal."
+    INDEX           { entPhysicalIndex } 
+    ::= { cefcFanTable 1 }
+
+CefcFanEntry ::= SEQUENCE {
+        cefcFanSpeed        Unsigned32,
+        cefcFanSpeedPercent CefcPercentOrMinusOne
+}
+
+cefcFanSpeed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "rpm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The speed of the fan." 
+    ::= { cefcFanEntry 1 }
+
+cefcFanSpeedPercent OBJECT-TYPE
+    SYNTAX          CefcPercentOrMinusOne
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The percent of speed relative to the maximum
+        speed of the fan." 
+    ::= { cefcFanEntry 2 }
+ 
 
 -- cefcPhysicalTable
 
@@ -1591,19 +1777,21 @@ cefcChassisPerSlotCoolingCap OBJECT-TYPE
     DESCRIPTION
         "The maximum cooling capacity that could be provided
         for any slot in this chassis.
-        
+
         The default unit of the cooling capacity is 'cfm', if
-        cefcChassisPerSlotCoolingUnit is not supported."
+        cefcChassisPerSlotCoolingUnit is not supported." 
     ::= { cefcChassisCoolingEntry 1 }
- 
+
 cefcChassisPerSlotCoolingUnit OBJECT-TYPE
     SYNTAX          FRUCoolingUnit
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
         "The unit of the maximum cooling capacity for any slot
-        in this chassis."
+        in this chassis." 
     ::= { cefcChassisCoolingEntry 2 }
+ 
+
 
 cefcFanCoolingTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CefcFanCoolingEntry 
@@ -1647,7 +1835,7 @@ cefcFanCoolingCapacity OBJECT-TYPE
         "The cooling capacity that is provided by this fan.
 
         The default unit of the fan cooling capacity is 'cfm',
-        if cefcFanCoolingCapacityUnit is not supported."
+        if cefcFanCoolingCapacityUnit is not supported." 
     ::= { cefcFanCoolingEntry 1 }
 
 cefcFanCoolingCapacityUnit OBJECT-TYPE
@@ -1655,8 +1843,10 @@ cefcFanCoolingCapacityUnit OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The unit of the fan cooling capacity."
+        "The unit of the fan cooling capacity." 
     ::= { cefcFanCoolingEntry 2 }
+ 
+
 
 cefcModuleCoolingTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CefcModuleCoolingEntry 
@@ -1699,17 +1889,18 @@ cefcModuleCooling OBJECT-TYPE
         cards.
 
         The default unit of the module cooling requirement is
-        'cfm', if cefcModuleCoolingUnit is not supported."
+        'cfm', if cefcModuleCoolingUnit is not supported." 
     ::= { cefcModuleCoolingEntry 1 }
- 
+
 cefcModuleCoolingUnit OBJECT-TYPE
     SYNTAX          FRUCoolingUnit
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
         "The unit of the cooling requirement of the module and its
-        daughter cards."
+        daughter cards." 
     ::= { cefcModuleCoolingEntry 2 }
+ 
 
 
 cefcFanCoolingCapTable OBJECT-TYPE
@@ -1781,7 +1972,7 @@ cefcFanCoolingCapCapacity OBJECT-TYPE
         when the fan is operating in this mode.
 
         The default unit of the cooling capacity is 'cfm',
-        if cefcFanCoolingCapCapacityUnit is not supported."
+        if cefcFanCoolingCapCapacityUnit is not supported." 
     ::= { cefcFanCoolingCapEntry 3 }
 
 cefcFanCoolingCapCurrent OBJECT-TYPE
@@ -1799,8 +1990,9 @@ cefcFanCoolingCapCapacityUnit OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "The unit of the fan cooling capacity when operating
-        in this mode."
+        in this mode." 
     ::= { cefcFanCoolingCapEntry 5 }
+ 
 
 -- Connector rating management
 
@@ -1888,6 +2080,7 @@ cefcModulePowerConsumption OBJECT-TYPE
         "The combined power consumption to operate the module
         and its submodule(s) and inline-power device(s)." 
     ::= { cefcModulePowerConsumptionEntry 1 }
+ 
 
 
 -- notifications
@@ -1901,7 +2094,8 @@ cefcMIBEnableStatusNotification OBJECT-TYPE
         produces the following notifications:
         cefcModuleStatusChange, cefcPowerStatusChange, 
         cefcFRUInserted, cefcFRURemoved, 
-        cefcUnrecognizedFRU and cefcFanTrayStatusChange.
+        cefcUnrecognizedFRU, cefcFanTrayStatusChange
+        and cefcVmModuleStatusChangeNotif.
 
         A false value will prevent these notifications
         from being generated."
@@ -1920,7 +2114,6 @@ cefcEnablePSOutputChangeNotif OBJECT-TYPE
         will prevent this notification to generated."
     DEFVAL          { false } 
     ::= { cefcMIBNotificationEnables 2 }
-
 cefcMIBNotifications  OBJECT IDENTIFIER
     ::= { cefcFRUMIBNotificationPrefix 0 }
 
@@ -2015,6 +2208,18 @@ cefcPowerSupplyOutputChange NOTIFICATION-TYPE
         has transitioned from 'false' to 'true'."
    ::= { cefcMIBNotifications 7 }
 
+cefcVmModuleStatusChangeNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        cefcVmModuleOperStatus,
+                        cefcVmModuleStatusLastChangeTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the value of
+        cefcVmModuleOperStatus changes. It can be utilized by 
+        an NMS to update the status of the module it is
+        managing."
+   ::= { cefcMIBNotifications 8 }
 -- conformance information
 
 cefcMIBCompliances  OBJECT IDENTIFIER
@@ -2633,7 +2838,7 @@ cefcMIBPowerCompliance8 MODULE-COMPLIANCE
     ::= { cefcMIBCompliances 8 }
 
 cefcMIBPowerCompliance9 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An Entity-MIB implementation can implement this group to
         provide FRU power status and control."
@@ -2819,6 +3024,220 @@ cefcMIBPowerCompliance9 MODULE-COMPLIANCE
         "An implementation is only required to
         support IPv4 addresses."
     ::= { cefcMIBCompliances 9 }
+
+cefcMIBPowerCompliance10 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "An Entity-MIB implementation can implement this group to
+        provide FRU power status and control."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cefcMIBPowerModeGroup,
+                        cefcMgmtNotificationsGroup
+                    }
+
+    GROUP           cefcMIBPowerFRUControlGroup
+    DESCRIPTION
+        "The cefcMIBPowerFRUControlGroup must be implemented
+        for FRUs that have power control"
+
+    GROUP           cefcMIBModuleGroup
+    DESCRIPTION
+        "The cefcMIBModuleGroup must be implemented for
+        FRUs that are of module type."
+
+    GROUP           cefcMIBInLinePowerControlGroupRev1
+    DESCRIPTION
+        "The cefcMIBInLinePowerControlGroup must be
+        implemented for FRUs that have inline power control"
+
+    GROUP           cefcMIBNotificationEnablesGroup
+    DESCRIPTION
+        "The cefcMIBNotificationEnablesGroup must be
+        implemented for FRUs that have notification"
+
+    GROUP           cefcModuleGroupRev1
+    DESCRIPTION
+        "The cefcModuleGroupRev1 is not mandatory for
+        agents with FRUs that are of module type."
+
+    GROUP           cefcMIBPowerFRUValueGroup
+    DESCRIPTION
+        "The cefcMIBPowerFRUValueGroup must be implemented for
+        power supply FRUs that have variable output"
+
+    GROUP           cefcMIBFanTrayStatusGroup
+    DESCRIPTION
+        "The cefcMIBFanTrayStatusGroup must be implemented
+        in all systems which can detect the status of Fan
+        Tray FRUs."
+
+    GROUP           cefcMIBPhysicalGroup
+    DESCRIPTION
+        "The collection of objects which show information of
+        the Physical Entity."
+
+    GROUP           cefcMgmtNotificationsGroup2
+    DESCRIPTION
+        "The implementation of this group of notifications
+        is optional."
+
+    GROUP           cefcMIBPowerOperModeGroup
+    DESCRIPTION
+        "The cefcMIBPowerOperModeGroup must be
+        implemented for the device which supports
+        power supply operational modes."
+
+    GROUP           cefcModuleExtGroup
+    DESCRIPTION
+        "Implementation of cefcModuleExtGroup is
+        optional."
+
+    GROUP           cefcIntelliModuleGroup
+    DESCRIPTION
+        "Implementation of cefcModuleAddrGroup is
+        optional."
+
+    GROUP           cefcPowerCapacityGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        have the capability to populate power capacity
+        information."
+
+    GROUP           cefcConnectorRatingGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        have the capability to populate power
+        connector rating and module power total
+        consumption information."
+
+    GROUP           cefcMIBNotificationEnablesGroup2
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the SNMP notification to notify
+        the power supply output capacity changes."
+
+    GROUP           cefcMgmtNotificationsGroup3
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the SNMP notification to notify
+        the power supply output capacity changes."
+
+    GROUP           cefcMIBInLinePowerCurrentGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        have the capability to populate inline power
+        usage information."
+
+    GROUP           cefcMIBPowerRedundancyInfoGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        have the capability to populate the reason
+        why the redundancy of the power supplies cannot
+        be achived."
+
+    GROUP           cefcFanCoolingCapGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        can provide the cooling capacity modes 
+        and properties of the fans in the system."
+
+    GROUP           cefcMIBModuleLocalSwitchingGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support modules with local switching
+        functionality."
+
+    GROUP           cefcFRUPowerRealTimeStatusGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support power related realtime status."
+
+    GROUP           cefcFRUPowerCapabilityGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support power related capability information."
+
+    GROUP           cefcFRUCoolingUnitGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the cooling unit information."
+
+    GROUP           cefcFRUFanCoolingUnitGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the fan capacity cooling unit information."
+
+    GROUP           cefcCoolingGroup2
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the chassis cooling capacity and module
+        cooling requirement."
+
+    GROUP           cefcFanCoolingGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support the fan cooling capacity information."
+
+    GROUP           cefcFanDirectionGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support fan direction."
+
+    GROUP           cefcFanSpeedGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support fan speed."
+
+    GROUP           cefcPowerSupplyActualGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support actual input and output current of
+        a power supply."
+
+    GROUP           cefcVmModuleGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support VM module status."
+
+    GROUP           cefcVmModuleNotifsGroup
+    DESCRIPTION
+        "This group is mandatory for devices which
+        support VM module status notifications."
+
+    OBJECT          cefcFRUTotalSystemCurrent
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cefcFRUDrawnSystemCurrent
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cefcFRUTotalInlineCurrent
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cefcFRUDrawnInlineCurrent
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cefcModuleLocalSwitchingMode
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cefcIntelliModuleIPAddrType
+    SYNTAX          INTEGER  {
+                        ipv4(1)
+                    }
+    DESCRIPTION
+        "An implementation is only required to
+        support IPv4 addresses."
+    ::= { cefcMIBCompliances 10 }
 
 -- units of conformance
 
@@ -3065,9 +3484,7 @@ cefcFanCoolingCapGroup OBJECT-GROUP
     ::= { cefcMIBGroups 23 }
 
 cefcMIBModuleLocalSwitchingGroup OBJECT-GROUP
-    OBJECTS         {
-                        cefcModuleLocalSwitchingMode
-                    }
+    OBJECTS         { cefcModuleLocalSwitchingMode }
     STATUS          current
     DESCRIPTION
         "The collection of objects which show information of the
@@ -3075,9 +3492,7 @@ cefcMIBModuleLocalSwitchingGroup OBJECT-GROUP
     ::= { cefcMIBGroups 24 }
 
 cefcFRUPowerRealTimeStatusGroup OBJECT-GROUP
-    OBJECTS         {
-                        cefcFRURealTimeCurrent
-                    }
+    OBJECTS         { cefcFRURealTimeCurrent }
     STATUS          current
     DESCRIPTION
         "The collection of objects provide the power-related
@@ -3085,9 +3500,7 @@ cefcFRUPowerRealTimeStatusGroup OBJECT-GROUP
     ::= { cefcMIBGroups 25 }
 
 cefcFRUPowerCapabilityGroup OBJECT-GROUP
-    OBJECTS         {
-                        cefcFRUPowerCapability
-                    }
+    OBJECTS         { cefcFRUPowerCapability }
     STATUS          current
     DESCRIPTION
         "The collection of objects provide the power-related
@@ -3128,18 +3541,61 @@ cefcCoolingGroup2 OBJECT-GROUP
     ::= { cefcMIBGroups 29 }
 
 cefcFanCoolingGroup OBJECT-GROUP
-    OBJECTS         {
-                        cefcFanCoolingCapacity
-                    }
+    OBJECTS         { cefcFanCoolingCapacity }
     STATUS          current
     DESCRIPTION
         "The collection of objects provide the cooling
         capacity modes and properties of the fans."
     ::= { cefcMIBGroups 30 }
 
+cefcFanDirectionGroup OBJECT-GROUP
+    OBJECTS         { cefcFanTrayDirection }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects provide the direction
+        information of the manageable fan entities."
+    ::= { cefcMIBGroups 31 }
+
+cefcFanSpeedGroup OBJECT-GROUP
+    OBJECTS         {
+                        cefcFanSpeed,
+                        cefcFanSpeedPercent
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects provide the speed
+        information of the manageable fan entities."
+    ::= { cefcMIBGroups 32 }
+
+cefcPowerSupplyActualGroup OBJECT-GROUP
+    OBJECTS         {
+                        cefcFRUActualInputCurrent,
+                        cefcFRUActualOutputCurrent
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which are used to retrieve
+        the actual input and output current of a power supply."
+    ::= { cefcMIBGroups 33 }
+
+cefcVmModuleGroup OBJECT-GROUP
+    OBJECTS         {
+                        cefcVmModuleOperStatus,
+                        cefcVmModuleStatusLastChangeTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which povide the VM
+        module opertional status information."
+    ::= { cefcMIBGroups 34 }
+
+cefcVmModuleNotifsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { cefcVmModuleStatusChangeNotif }
+    STATUS          current
+    DESCRIPTION
+        "A collection of notifications for VM module
+        status change."
+    ::= { cefcMIBGroups 35 }
+
 END
-
-
-
-
 

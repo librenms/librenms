@@ -14,7 +14,7 @@
 $oids = snmp_walk($device, 'eqlMemberHealthStatus', '-OQne', 'EQLMEMBER-MIB', 'equallogic');
 
 d_echo('Health oids:');
-d_echo($oids."\n");
+d_echo($oids . "\n");
 
 /*
 eqlMemberHealthStatus
@@ -36,8 +36,8 @@ The LibreNMS generic states is derived from Nagios:
 
 */
 
-if (!empty($oids)) {
-    $descr='Health';
+if (! empty($oids)) {
+    $descr = 'Health';
 
     $state_name = 'eqlMemberHealthStatus';
     $states = [
@@ -50,13 +50,13 @@ if (!empty($oids)) {
 
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
-        if (!empty($data)) {
-            list($oid,$current) = explode(' = ', $data, 2);
-            $split_oid        = explode('.', $oid);
-            $num_index        = $split_oid[(count($split_oid) - 1)];
-            $index            = (int)$num_index+0;
-            $low_limit        = 0.5;
-            $high_limit       = 2.5;
+        if (! empty($data)) {
+            [$oid,$current] = explode(' = ', $data, 2);
+            $split_oid = explode('.', $oid);
+            $num_index = $split_oid[(count($split_oid) - 1)];
+            $index = (int) cast_number($num_index);
+            $low_limit = 0.5;
+            $high_limit = 2.5;
             discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $current, 'snmp', $index);
             create_sensor_to_state_index($device, $state_name, $index);
         }
@@ -66,24 +66,24 @@ if (!empty($oids)) {
 $oids1 = snmp_walk($device, 'eqlMemberHealthDetailsPowerSupplyName', '-OQn', 'EQLMEMBER-MIB', 'equallogic');
 
 d_echo('PowerSupplyName oids:');
-d_echo($oids1."\n");
+d_echo($oids1 . "\n");
 
 /*
     .1.3.6.1.4.1.12740.2.1.8.1.2.1.329840783.1 = Power Cooling Module 0
     .1.3.6.1.4.1.12740.2.1.8.1.2.1.329840783.2 = Power Cooling Module 1
 **/
 
-$base_oid         = '.1.3.6.1.4.1.12740.2.1.8.1.3.1.'; // eqlMemberHealthDetailsPowerSupplyCurrentState
+$base_oid = '.1.3.6.1.4.1.12740.2.1.8.1.3.1.'; // eqlMemberHealthDetailsPowerSupplyCurrentState
 
-if (!empty($oids1)) {
-/*
-eqlMemberHealthDetailsPowerSupplyCurrentState
-    INTEGER {
-            on-and-operating    (1),
-            no-ac-power         (2),
-            failed-or-no-data   (3) -- has ac but no dc out or we have no data
-    }
-*/
+if (! empty($oids1)) {
+    /*
+    eqlMemberHealthDetailsPowerSupplyCurrentState
+        INTEGER {
+                on-and-operating    (1),
+                no-ac-power         (2),
+                failed-or-no-data   (3) -- has ac but no dc out or we have no data
+        }
+    */
     $state_name = 'eqlMemberPowerSupplyCurrentState';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'on-and-operating'],
@@ -94,21 +94,21 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
 
     foreach (explode("\n", $oids1) as $data) {
         $data = trim($data);
-        if (!empty($data)) {
-            list($oid,$descr) = explode(' = ', $data, 2);
-            $split_oid        = explode('.', $oid);
-            $num_index        = $split_oid[(count($split_oid) - 1)];
-            $index            = (int)$num_index+0;
-            $member_id        = $split_oid[(count($split_oid) - 2)];
-            $num_index        = $member_id.'.'.$num_index;
-            $oid              = $base_oid.$num_index;
-            $extra            = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
+        if (! empty($data)) {
+            [$oid,$descr] = explode(' = ', $data, 2);
+            $split_oid = explode('.', $oid);
+            $num_index = $split_oid[(count($split_oid) - 1)];
+            $index = (int) cast_number($num_index);
+            $member_id = $split_oid[(count($split_oid) - 2)];
+            $num_index = $member_id . '.' . $num_index;
+            $oid = $base_oid . $num_index;
+            $extra = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
             d_echo($extra);
-            if (!empty($extra)) {
-                list($foid,$pstatus) = explode(' = ', $extra, 2);
-                $index        = (100 + $index);
-                $low_limit    = 0.5;
-                $high_limit   = 1.5;
+            if (! empty($extra)) {
+                [$foid,$pstatus] = explode(' = ', $extra, 2);
+                $index = (100 + $index);
+                $low_limit = 0.5;
+                $high_limit = 1.5;
                 discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
                 create_sensor_to_state_index($device, $state_name, $index);
             }
@@ -116,15 +116,14 @@ eqlMemberHealthDetailsPowerSupplyCurrentState
     }//end foreach
 }//end if empty oids
 
-
 $oids_disks = snmp_walk($device, 'eqlDiskSerialNumber', '-OQn', 'EQLDISK-MIB', 'equallogic');
 
 d_echo('Disk Serials oids:' . PHP_EOL);
-d_echo($oids_disks."\n");
+d_echo($oids_disks . "\n");
 
-$disks_base_oid         = '.1.3.6.1.4.1.12740.3.1.1.1.8.1.'; // eqlDiskStatus
+$disks_base_oid = '.1.3.6.1.4.1.12740.3.1.1.1.8.1.'; // eqlDiskStatus
 
-if (!empty($oids_disks)) {
+if (! empty($oids_disks)) {
     $state_name = 'eqlDiskStatus';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'on-line'],
@@ -140,20 +139,20 @@ if (!empty($oids_disks)) {
 
     foreach (explode("\n", $oids_disks) as $data) {
         $data = trim($data);
-        if (!empty($data)) {
-            list($oid,$descr) = explode(' = ', $data, 2);
-            $split_oid        = explode('.', $oid);
-            $disk_index        = $split_oid[(count($split_oid) - 1)];
-            $member_id        = $split_oid[(count($split_oid) - 2)];
-            $num_index        = $member_id.'.'.$disk_index;
-            $oid              = $disks_base_oid.$num_index;
-            $extra            = snmp_get($device, $oid, '-OQne', 'EQLDISK-MIB', 'equallogic');
+        if (! empty($data)) {
+            [$oid,$descr] = explode(' = ', $data, 2);
+            $split_oid = explode('.', $oid);
+            $disk_index = $split_oid[(count($split_oid) - 1)];
+            $member_id = $split_oid[(count($split_oid) - 2)];
+            $num_index = $member_id . '.' . $disk_index;
+            $oid = $disks_base_oid . $num_index;
+            $extra = snmp_get($device, $oid, '-OQne', 'EQLDISK-MIB', 'equallogic');
             d_echo($extra);
-            if (!empty($extra)) {
-                list($foid,$pstatus) = explode(' = ', $extra, 2);
-                $index        = 'eqlDiskStatus.'.$disk_index;
-                $low_limit    = 0.5;
-                $high_limit   = 1.5;
+            if (! empty($extra)) {
+                [$foid,$pstatus] = explode(' = ', $extra, 2);
+                $index = 'eqlDiskStatus.' . $disk_index;
+                $low_limit = 0.5;
+                $high_limit = 1.5;
                 discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, "Disk $disk_index - $descr", 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
                 create_sensor_to_state_index($device, $state_name, $index);
                 unset(

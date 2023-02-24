@@ -1,16 +1,16 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], array('arubaap', $ap['name'].$ap['radio_number']));
+$rrd_filename = Rrd::name($device['hostname'], ['arubaap', $ap['name'] . $ap['radio_number']]);
 
 $rrd_list[0]['filename'] = $rrd_filename;
-$rrd_list[0]['descr']    = 'Interference';
-$rrd_list[0]['ds']       = 'interference';
+$rrd_list[0]['descr'] = 'Interference';
+$rrd_list[0]['ds'] = 'interference';
 
 $unit_text = 'Int';
 
-$units       = '';
+$units = '';
 $total_units = '';
-$colours     = 'mixed';
+$colours = 'mixed';
 
 $scale_min = '0';
 

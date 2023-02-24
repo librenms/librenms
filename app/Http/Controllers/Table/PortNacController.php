@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -48,6 +48,7 @@ class PortNacController extends TableController
         return [
             'port_id',
             'mac_address',
+            'mac_oui',
             'ip_address',
             'vlan',
             'domain',
@@ -59,26 +60,34 @@ class PortNacController extends TableController
             'time_left',
             'authc_status',
             'authz_status',
-            'method'
+            'method',
         ];
     }
 
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
     {
-        return PortsNac::where('device_id', $request->device_id)->hasAccess($request->user())->with('port');
+        return PortsNac::select('port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+            ->where('device_id', $request->device_id)
+            ->hasAccess($request->user())
+            ->with('port');
     }
 
+    /**
+     * @param  PortsNac  $nac
+     */
     public function formatItem($nac)
     {
         $item = $nac->toArray();
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
+        $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
         $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
+        $item['port'] = null; //free some unused data to be sent to the browser
 
         return $item;
     }

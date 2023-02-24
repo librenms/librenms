@@ -1,20 +1,15 @@
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
 <div class="table-responsive">
-    <table id="alerts_{{ $id }}" class="table table-hover table-condensed alerts">
+    <table id="alerts_{{ $id }}" class="table table-hover table-condensed alerts" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="severity"></th>
-            <th data-column-id="timestamp">Timestamp</th>
-            <th data-column-id="rule">Rule</th>
+            <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
+            <th data-column-id="rule">{{ __('Rule') }}</th>
             <th data-column-id="details" data-sortable="false"></th>
-            <th data-column-id="hostname">Hostname</th>
-            <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">Location</th>
-            <th data-column-id="ack_ico" data-sortable="false">ACK</th>
-            <th data-column-id="notes" data-sortable="false">Notes</th>
+            <th data-column-id="hostname">{{ __('Hostname') }}</th>
+            <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">{{ __('Location') }}</th>
+            <th data-column-id="ack_ico" data-sortable="false">{{ __('ACK') }}</th>
+            <th data-column-id="notes" data-sortable="false">{{ __('Notes') }}</th>
             <th data-column-id="proc" data-sortable="false" data-visible="{{ $proc ? 'true' : 'false' }}">URL</th>
         </tr>
         </thead>
@@ -23,18 +18,23 @@
 <script>
     var alerts_grid = $("#alerts_{{ $id }}").bootgrid({
         ajax: true,
-        post: function ()
-        {
-            return {
-                id: "alerts",
-                acknowledged: '{{ $acknowledged }}',
-                fired: '{{ $fired }}',
-                min_severity: '{{ $min_severity }}',
-                group: '{{ $device_group }}',
-                proc: '{{ $proc }}',
-                sort: '{{ $sort }}',
-                device_id: '{{ $device }}'
-            }
+        requestHandler: request => ({
+            ...request,
+            id: "alerts",
+            acknowledged: '{{ $acknowledged }}',
+            unreachable: '{{ $unreachable }}',
+            fired: '{{ $fired }}',
+            min_severity: '{{ $min_severity }}',
+            group: '{{ $device_group }}',
+            proc: '{{ $proc }}',
+            sort: '{{ $sort }}',
+            uncollapse_key_count: '{{ $uncollapse_key_count }}',
+            device_id: '{{ $device }}'
+        }),
+        responseHandler: response => {
+            $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
+
+            return response
         },
         url: "ajax_table.php",
         navigation: ! {{ $hidenavigation }},

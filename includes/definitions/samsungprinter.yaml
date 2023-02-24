@@ -10,7 +10,9 @@ discovery:
             - 'Samsung C'
             - 'Samsung S'
             - 'Samsung ML'
+            - 'Samsung M4080FX'
+            - 'Samsung X'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

@@ -1,5 +1,34 @@
 mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NETSWITCH-MIB::hpLocalMemTotalBytes
+                free: NETSWITCH-MIB::hpLocalMemFreeBytes
+                used: NETSWITCH-MIB::hpLocalMemAllocBytes
+                descr: 'Local Memory {{ $index }}'
+                type: hpLocal
+            -
+                total: NETSWITCH-MIB::hpGlobalMemTotalBytes
+                free: NETSWITCH-MIB::hpGlobalMemFreeBytes
+                used: NETSWITCH-MIB::hpGlobalMemAllocBytes
+                descr: 'Global Memory {{ $index }}'
+                type: hpGlobal
+    os:
+        sysDescr_regex:
+            - '/^(Aruba|ProCurve|HP) (?<hardware>[^,]+), revision (?<version>[^ ,]+)/'
+            - '/^(HPE OfficeConnect Switch|HP ProCurve|HP) (?<hardware>[^,]*), (?<version>P\S[0-9\.]+)/'
+            - '/^Aruba Instant On (?<hardware>[^,]+), InstantOn_\d+_(?<version>[0-9\.]+)/'
+            - '/^PROCURVE (?<hardware>.*) - (?<version>.*)$/'
+            - '/^(?<hardware>GbE2c)/'
+        version:
+            - NETSWITCH-MIB::hpSwitchOsVersion.0
+            - HP-SN-AGENT-MIB::snAgImgVer.0
+        serial: SEMI-MIB::hpHttpMgSerialNumber.0
+        hardware_replace:
+            - ['  ', ' ']
+            - ' Switch'
+            - ' Stack'
     processors:
         data:
             -

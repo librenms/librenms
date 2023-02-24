@@ -6,13 +6,16 @@
     <div class="container-fluid">
         <x-panel id="manage-device-groups-panel">
             <x-slot name="title">
-                <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Device Groups')
+                <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Device Groups') }}
             </x-slot>
 
             <div class="row">
                 <div class="col-md-12">
                     <a type="button" class="btn btn-primary" href="{{ route('device-groups.create') }}">
-                        <i class="fa fa-plus"></i> @lang('New Device Group')
+                        <i class="fa fa-plus"></i> {{ __('New Device Group') }}
+                    </a>
+                    <a type="button" class="btn btn-default" href="{{ url('devices/group=none')  }}">
+                        <i class="fas fa-border-none"></i> {{ __('View Ungrouped Devices') }}
                     </a>
                 </div>
             </div>
@@ -20,12 +23,13 @@
                 <table id="manage-device-groups-table" class="table table-condensed table-hover">
                     <thead>
                     <tr>
-                        <th>@lang('Name')</th>
-                        <th>@lang('Description')</th>
-                        <th>@lang('Type')</th>
-                        <th>@lang('Devices')</th>
-                        <th>@lang('Pattern')</th>
-                        <th>@lang('Actions')</th>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('Description') }}</th>
+                        <th>{{ __('Type') }}</th>
+                        <th>{{ __('Devices') }}</th>
+                        <th>{{ __('Ports') }}</th>
+                        <th>{{ __('Pattern') }}</th>
+                        <th>{{ __('Actions') }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -37,45 +41,23 @@
                             <td>
                                 <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
                             </td>
+                            <td>
+                                <a href="{{ url("/ports/devicegroup=$device_group->id") }}">View</a>
+                            </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>
-                                <button type="button" title="@lang('Rediscover all Devices of Device Group')" class="btn btn-warning btn-sm" aria-label="@lang('Rediscover Group')"
+                                <button type="button" title="{{ __('Rediscover all Devices of Device Group') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Rediscover Group') }}"
                                         onclick="discover_dg(this, '{{ $device_group->id }}')">
                                     <i
                                         class="fa fa-retweet" aria-hidden="true"></i></button>
-                                <a type="button" title="@lang('edit Device Group')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
+                                <a type="button" title="{{ __('edit Device Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('device-groups.edit', $device_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                <button type="button" class="btn btn-danger btn-sm" title="@lang('delete Device Group')" aria-label="@lang('Delete')"
+                                <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
                                         onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-groups.destroy', $device_group->id) }}')">
                                     <i
                                         class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-panel>
-
-        <x-panel id="unmanaged-devices-panel" title="{{ __('Ungrouped Devices') }} ({{ $ungrouped_devices->count() }})">
-            <div class="table-responsive">
-                <table id="ungrouped-devices-table" class="table table-condensed table-hover">
-                    <thead>
-                    <tr>
-                        <th style="width:32px">@lang('Vendor')</th>
-                        <th>@lang('Device')</th>
-                        <th>@lang('Platform')</th>
-                        <th>@lang('Operating System')</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($ungrouped_devices as $device)
-                        <tr id="row_{{ $device->device_id }}">
-                            <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
-                            <td>@deviceLink($device)<br />{{ $device->sysName }}</td>
-                            <td>{{ $device->hardware }}</td>
-                            <td>{{ $device->os }} {{ $device->version }} @if($device->features) ({{ $device->features }}) @endif </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -90,7 +72,7 @@
         function delete_dg(button, name, url) {
             var index = button.parentNode.parentNode.rowIndex;
 
-            if (confirm('@lang('Are you sure you want to delete ')' + name + '?')) {
+            if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -99,7 +81,7 @@
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('@lang('The device group could not be deleted')');
+                        toastr.error('{{ __('The device group could not be deleted') }}');
                     }
                 });
             }

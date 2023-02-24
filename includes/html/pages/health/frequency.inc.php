@@ -10,13 +10,13 @@
  *
  * @package    LibreNMS
  * @subpackage webui
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 LibreNMS
  * @author     LibreNMS Contributors
 */
 
 $graph_type = 'sensor_frequency';
-$class      = 'frequency';
-$unit       = 'Hz';
+$class = 'frequency';
+$unit = 'Hz';
 
 require 'includes/html/pages/health/sensors.inc.php';

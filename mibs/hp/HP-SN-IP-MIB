@@ -1,0 +1,4820 @@
+HP-SN-IP-MIB DEFINITIONS ::= BEGIN
+
+
+-- Foundry SnRouter Group MIB Release 1.0.0
+-- Revision 0 1/7/97
+
+-- Copyright 1996-97 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base 
+-- Specification embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Imports
+
+IMPORTS
+	IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE             
+		FROM RFC-1212
+
+	InterfaceIndex 
+		FROM IF-MIB
+		
+	snIp, snRip, snDvmrp, snFsrp, snGblRt, snPim, snLoopbackIf
+		FROM HP-SN-ROOT-MIB;
+
+	-- textual conventions
+
+         DisplayString ::= OCTET STRING
+
+	--  RtrStatus Values
+
+	     RtrStatus ::= INTEGER { disabled(0), enabled (1) }
+
+	--  Clear Status Values
+
+	     ClearStatus ::= INTEGER { normal(0), clear(1) }
+
+	--  Row Creation/Deletion Values
+
+	     RowSts ::= INTEGER { other(1),
+						valid(2),
+						delete(3),
+						create(4)
+						}
+
+	--  Port index
+
+	     PortIndex ::= INTEGER (1..3900)
+		-- The port index.
+		-- For FastIron/NetIron products, port index value is from 1 to 42
+		-- For BigIron products, port index is an encoded number:
+		-- The bit 0 to bit 7: port number.
+		-- The bit 8 to bit 11: slot number.
+		-- For virtual router interface, slot number is 15,
+		-- port number is the virtual router port from 1 to 60.
+		-- Therefore, port index value for BigIron is from 257 to 3900.
+
+	--  Action 
+
+		Action ::= INTEGER { deny(0), permit(1) }
+
+	  PhysAddress ::=
+	      OCTET STRING
+	  -- This data type is used to model media addresses.  For many
+	  -- types of media, this will be in a binary representation.
+	  -- For example, an ethernet address would be represented as
+	  -- a string of 6 octets.
+
+     --  The OSPF Metric is defined as an unsigned value in the range
+
+             Metric    ::= INTEGER (0..65535)
+
+	  PortMask ::=
+		  INTEGER
+	  -- This data type is used to model port bitmask.  The 
+	  -- maximum of ports are 32.  
+
+
+-- SECTION 2: MIB 
+
+-- Global Router MIB
+-- This section contains global MIB object definitions applicable to the
+-- switching router. These objects should be independent to any routing
+-- protocol.
+
+snGblRtGeneral              OBJECT IDENTIFIER ::= { snGblRt 1 }
+
+snGblRtRouteOnly        OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"If this object is 'enabled', this switching router will only
+		route packets. If this object is 'disabled', this switching
+		router will first route packets. If route cannot perform,
+		it will switch packets."
+	::= { snGblRtGeneral 1 }
+
+-- Router IP MIB
+-- This section contains IP specific router MIB object definitions.
+
+-- IP general group
+
+snRtIpGeneral               OBJECT IDENTIFIER ::= { snIp 1 }
+		
+snRtClearArpCache       OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear arp cache table."
+	::= { snRtIpGeneral 1 }
+
+snRtClearIpCache                OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear ip route cache table."
+	::= { snRtIpGeneral 2 }
+
+snRtClearIpRoute                OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear ip route table."
+	::= { snRtIpGeneral 3 }
+
+snRtBootpServer                 OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"IP address of bootp server to
+		which bootp packet need to be relayed."
+	::= { snRtIpGeneral 4 }
+
+snRtBootpRelayMax               OBJECT-TYPE
+	SYNTAX  INTEGER (1..15)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Maximum number of hop the bootp packet 
+		should travel."
+	::= { snRtIpGeneral 5 } 
+
+snRtArpAge                      OBJECT-TYPE
+	SYNTAX  INTEGER (0..240)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The time in minutes an ARP entry can
+		be valid without relearning. 
+		0 - Don't not age."
+	::= { snRtIpGeneral 6 }
+
+snRtIpIrdpEnable                OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Perform router advertisement on this box."
+	::= { snRtIpGeneral 7 }
+
+snRtIpLoadShare         OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"If more than one route available,
+		use them to share load."
+	::= { snRtIpGeneral 8 }
+
+snRtIpProxyArp          OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable proxy arp function 
+		in the box."
+	::= { snRtIpGeneral 9 }
+
+snRtIpRarp                      OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable RARP server."
+	::= { snRtIpGeneral 10 }
+
+snRtIpTtl                       OBJECT-TYPE
+	SYNTAX  INTEGER (1..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The time to live value to be used
+		in IP header of IP packet generated
+		by the box."
+	::= { snRtIpGeneral 11 }
+
+snRtIpSetAllPortConfig          OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object is an index number of a
+		snRtIpPortConfigTable row (i.e. snRtIpPortConfigPortIndex),
+		which is the selected row to copy all of its read-writable
+		data (i.e. snRtIpPortMtu and snRtIpPortEncap) to the rest
+		of the rows in snRtIpPortConfigTable.
+		Note: prior setting this object, all the intended data of
+		the given row of the table must be set. Otherwise, the
+		current data of the row will be used to set the entire ip
+		interface configuration table. The previous setting will
+		be overwritten by the new one."
+	::= { snRtIpGeneral 12 }
+
+snRtIpFwdCacheMaxEntries        OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of ip forwarding table entries."
+	::= { snRtIpGeneral 13 }
+
+snRtIpFwdCacheCurEntries        OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current number of ip forwarding table entries."
+	::= { snRtIpGeneral 14 }
+
+snRtIpMaxStaticRouteEntries     OBJECT-TYPE
+	SYNTAX  INTEGER 
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of static route entries in the static route table."
+	::= { snRtIpGeneral 15 }
+
+snRtIpDirBcastFwd               OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/Disable directed broadcast forwarding."
+    DEFVAL  { enabled }
+	::= { snRtIpGeneral 16 }
+
+snRtIpLoadShareNumOfPaths	OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of routes are used to share load."
+	::= { snRtIpGeneral 17 }
+
+snRtIpLoadShareMaxPaths	OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Maximum number of routes can be configured to share load."
+	::= { snRtIpGeneral 18 }
+
+snRtIpLoadShareMinPaths	OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Minimum number of routes can be configured to share load."
+	::= { snRtIpGeneral 19 }
+
+snRtIpProtocolRouterId OBJECT-TYPE
+    SYNTAX   IpAddress
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "Router Id for all IP Protocols."
+    ::= { snRtIpGeneral 20 }
+
+snRtIpSourceRoute OBJECT-TYPE
+    SYNTAX   RtrStatus
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "Enable/Disable source routing support, ability to drop the
+        source routing packets."
+    DEFVAL { enabled }
+    ::= { snRtIpGeneral 21 }
+
+
+-- IP static route table
+
+snRtIpStaticRouteTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpStaticRouteEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP static/default route table."
+	::= { snIp 2 }
+
+snRtIpStaticRouteEntry  OBJECT-TYPE
+	SYNTAX  SnRtIpStaticRouteEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP static route table."
+	INDEX   { snRtIpStaticRouteIndex }
+	::= { snRtIpStaticRouteTable 1 }
+
+SnRtIpStaticRouteEntry ::= SEQUENCE {
+	snRtIpStaticRouteIndex
+		INTEGER,
+	snRtIpStaticRouteDest
+		IpAddress,
+	snRtIpStaticRouteMask
+		IpAddress,
+	snRtIpStaticRouteNextHop
+		IpAddress,
+	snRtIpStaticRouteMetric
+		INTEGER,
+	snRtIpStaticRouteRowStatus
+		RowSts,
+	snRtIpStaticRouteDistance
+		INTEGER
+	}
+
+snRtIpStaticRouteIndex  OBJECT-TYPE
+	SYNTAX  INTEGER 
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a static route entry."
+	::= { snRtIpStaticRouteEntry 1 }
+
+snRtIpStaticRouteDest           OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination IP address.
+		0.0.0.0 for default route."
+	::= { snRtIpStaticRouteEntry 2 }
+
+snRtIpStaticRouteMask           OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Subnet mask associated with 
+		the destination IP address.
+		0.0.0.0 for default route mask."
+	::= { snRtIpStaticRouteEntry 3 }
+
+snRtIpStaticRouteNextHop        OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IP address of next hop router that
+		is located on one of the directly
+		attached IP subnet."
+	::= { snRtIpStaticRouteEntry 4 }
+
+snRtIpStaticRouteMetric         OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The metrics to next hop router."
+	::= { snRtIpStaticRouteEntry 5 }
+
+snRtIpStaticRouteRowStatus      OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a static route
+		entry."
+	::= { snRtIpStaticRouteEntry 6 }
+
+snRtIpStaticRouteDistance		OBJECT-TYPE
+	SYNTAX  INTEGER (1..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Administration distance."
+	::= { snRtIpStaticRouteEntry 7 }
+
+-- ip filter table
+
+snRtIpFilterTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP filter table."
+	::= { snIp 3 }
+
+snRtIpFilterEntry       OBJECT-TYPE
+	SYNTAX  SnRtIpFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP filter table."
+	INDEX   { snRtIpFilterIndex }
+	::= { snRtIpFilterTable 1 }
+
+SnRtIpFilterEntry ::= SEQUENCE {
+	snRtIpFilterIndex
+		INTEGER,
+	snRtIpFilterAction              
+		INTEGER,
+	snRtIpFilterProtocol            
+		INTEGER,
+	snRtIpFilterSourceIp
+		IpAddress,
+	snRtIpFilterSourceMask
+		IpAddress,
+	snRtIpFilterDestIp
+		IpAddress,
+	snRtIpFilterDestMask
+		IpAddress,
+	snRtIpFilterOperator
+		INTEGER,
+	snRtIpFilterOperand
+		INTEGER,
+	snRtIpFilterRowStatus
+		RowSts,
+	snRtIpFilterEstablished
+		RtrStatus,
+	snRtIpFilterQosPriority
+		INTEGER
+	}
+
+snRtIpFilterIndex       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a filter entry."
+	::= { snRtIpFilterEntry 1 }
+
+snRtIpFilterAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1), qosEnabled(2) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ip packet match
+		with this filter."
+	::= { snRtIpFilterEntry 2 }
+
+snRtIpFilterProtocol    OBJECT-TYPE
+	SYNTAX  INTEGER (0..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Transport protocol. 0 means don't care"
+	::= { snRtIpFilterEntry 3 }
+
+snRtIpFilterSourceIp    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source IP address."
+	::= { snRtIpFilterEntry 4 }
+
+snRtIpFilterSourceMask  OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source IP subnet mask."
+	::= { snRtIpFilterEntry 5 }
+
+snRtIpFilterDestIp      OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination IP address."
+	::= { snRtIpFilterEntry 6 }
+
+snRtIpFilterDestMask    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination IP subnet mask."
+	::= { snRtIpFilterEntry 7 }
+
+snRtIpFilterOperator    OBJECT-TYPE
+	SYNTAX  INTEGER { greater(1), equal(2), less(3), notEqual(4) }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Type of comparison to perform.
+		for now, this only applys to tcp or udp
+		to compare the port number"
+	::= { snRtIpFilterEntry 8 }
+
+snRtIpFilterOperand     OBJECT-TYPE
+	SYNTAX  INTEGER(0..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"For now this only refers to transport 
+		protocol port number. 0 means NA"
+	::= { snRtIpFilterEntry 9 }
+
+snRtIpFilterRowStatus   OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a filter
+		entry."
+	::= { snRtIpFilterEntry 10 }
+
+snRtIpFilterEstablished OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/Disable the filtering of established TCP
+		packets of which the ACK or RESET flag is on. This
+		additional filter only applies to TCP transport
+		protocol."
+	::= { snRtIpFilterEntry 11 }
+
+snRtIpFilterQosPriority OBJECT-TYPE
+	SYNTAX  INTEGER {
+		level0(0),
+		level1(1),
+		level2(2),
+		level3(3),
+		level4(4),
+		level5(5),
+		level6(6),
+		level7(7)
+		}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The router L4 Qos Priority values are:
+		 low(0)   -- low prority
+		 high(1) -- high prority.
+		 The Priority values are:
+		level0(0), level1(1), level2(2), level3(3),
+		level4(4), level5(5), level6(6), level7(7) "
+	::= { snRtIpFilterEntry 12 }
+
+-- RARP table
+
+snRtIpRarpTable         OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpRarpEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP RARP table."
+	::= { snIp 4 }
+
+snRtIpRarpEntry         OBJECT-TYPE
+	SYNTAX  SnRtIpRarpEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Rarp table."
+	INDEX   { snRtIpRarpIndex }
+	::= { snRtIpRarpTable 1 }
+
+SnRtIpRarpEntry ::= SEQUENCE {
+	snRtIpRarpIndex
+		INTEGER,
+	snRtIpRarpMac
+		OCTET STRING,
+	snRtIpRarpIp
+		IpAddress,
+	snRtIpRarpRowStatus
+		RowSts
+	}
+
+snRtIpRarpIndex                 OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a Rarp entry."
+	::= { snRtIpRarpEntry 1 }
+
+snRtIpRarpMac           OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (6))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The Mac address for a Rarp entry."
+	::= { snRtIpRarpEntry 2 }
+
+snRtIpRarpIp            OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address for a Rarp entry."
+	::= { snRtIpRarpEntry 3 }
+
+snRtIpRarpRowStatus     OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a Rarp
+		entry."
+	::= { snRtIpRarpEntry 4 }
+
+-- Static ARP table
+
+snRtStaticArpTable              OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtStaticArpEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP static arp table."
+	::= { snIp 5 }
+
+snRtStaticArpEntry              OBJECT-TYPE
+	SYNTAX  SnRtStaticArpEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP static arp table."
+	INDEX   { snRtStaticArpIndex }
+	::= { snRtStaticArpTable 1 }
+
+SnRtStaticArpEntry ::= SEQUENCE {
+	snRtStaticArpIndex
+		INTEGER,
+	snRtStaticArpIp
+		IpAddress,
+	snRtStaticArpMac
+		OCTET STRING,
+	snRtStaticArpPort
+		PortIndex,
+	snRtStaticArpRowStatus
+		RowSts
+	}
+
+snRtStaticArpIndex              OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a static arp entry."
+	::= { snRtStaticArpEntry 1 }
+
+snRtStaticArpIp                 OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address for a static arp entry."
+	::= { snRtStaticArpEntry 2 }
+
+snRtStaticArpMac                OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (6))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The Mac address for a static arp entry."
+	::= { snRtStaticArpEntry 3 }
+
+snRtStaticArpPort               OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for a static arp entry."
+	::= { snRtStaticArpEntry 4 }
+
+snRtStaticArpRowStatus  OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a Static Arp
+		entry."
+	::= { snRtStaticArpEntry 5 }
+
+-- ip interface address table
+-- this table was replaced by the snRtIpPortIfAddrTable,
+-- of which the index was changed to ifIndex, not another
+-- indexing method used by this table
+
+snRtIpPortAddrTable             OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortAddrEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"IP port address table."
+	::= { snIp 6 }
+
+snRtIpPortAddrEntry             OBJECT-TYPE
+	SYNTAX  SnRtIpPortAddrEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"An entry in the IP Port Address table."
+	INDEX   { snRtIpPortAddrPortIndex, snRtIpPortAddress }
+	::= { snRtIpPortAddrTable 1 }
+
+SnRtIpPortAddrEntry ::= SEQUENCE {
+	snRtIpPortAddrPortIndex
+		PortIndex,
+	snRtIpPortAddress
+		IpAddress,
+	snRtIpPortSubnetMask
+		IpAddress,
+	snRtIpPortAddrType
+		INTEGER,
+	snRtIpPortRowStatus
+		RowSts
+	}
+
+
+snRtIpPortAddrPortIndex                 OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The port index for port address entry."
+	::= { snRtIpPortAddrEntry 1 }
+
+snRtIpPortAddress               OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The port IP address."
+	::= { snRtIpPortAddrEntry 2 }
+
+snRtIpPortSubnetMask            OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"The port IP address subnet mask."
+	::= { snRtIpPortAddrEntry 3 }
+
+snRtIpPortAddrType              OBJECT-TYPE
+	SYNTAX  INTEGER { primary(1), secondary(2) }
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"The port IP address type."
+    DEFVAL  { primary }
+	::= { snRtIpPortAddrEntry 4 }
+
+snRtIpPortRowStatus     OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"To create or delete a port address
+		entry."
+	::= { snRtIpPortAddrEntry 5 }
+
+-- ip interface access table
+-- this table was replaced by the snRtIpPortIfAccessTable,
+-- of which the index was changed to ifIndex, not another
+-- indexing method used by this table
+
+snRtIpPortAccessTable           OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortAccessEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"IP port access table."
+	::= { snIp 7 }
+
+snRtIpPortAccessEntry           OBJECT-TYPE
+	SYNTAX  SnRtIpPortAccessEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"An entry in the IP Port access table."
+	INDEX   { snRtIpPortAccessPortIndex, snRtIpPortAccessDirection }
+	::= { snRtIpPortAccessTable 1 }
+
+SnRtIpPortAccessEntry ::= SEQUENCE {
+	snRtIpPortAccessPortIndex
+		PortIndex,
+	snRtIpPortAccessDirection
+		INTEGER,
+	snRtIpPortAccessFilters
+		OCTET STRING,
+	snRtIpPortAccessRowStatus
+		RowSts
+	}
+
+snRtIpPortAccessPortIndex               OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The port index for port access entry."
+	::= { snRtIpPortAccessEntry 1 }
+
+snRtIpPortAccessDirection               OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The incoming or outgoing check
+		for port access."
+	::= { snRtIpPortAccessEntry 2 }
+
+snRtIpPortAccessFilters                 OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"1st octet correspond to 1st  filter 
+		number and so on."
+	::= { snRtIpPortAccessEntry 3 }
+
+snRtIpPortAccessRowStatus       OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"To create or delete a port access
+		entry."
+	::= { snRtIpPortAccessEntry 4 }
+
+-- ip interface configuration table
+-- this table was replaced by the snRtIpPortIfConfigTable,
+-- of which the index was changed to ifIndex, not another
+-- indexing method used by this table
+
+snRtIpPortConfigTable           OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortConfigEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"IP port Config table."
+	::= { snIp 8 }
+
+snRtIpPortConfigEntry           OBJECT-TYPE
+	SYNTAX  SnRtIpPortConfigEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"An entry in the IP Port Config table."
+	INDEX   { snRtIpPortConfigPortIndex }
+	::= { snRtIpPortConfigTable 1 }
+
+SnRtIpPortConfigEntry ::= SEQUENCE {
+	snRtIpPortConfigPortIndex
+		PortIndex,
+	snRtIpPortMtu
+		INTEGER,
+	snRtIpPortEncap
+		INTEGER,
+	snRtIpPortMetric
+		INTEGER,
+	snRtIpPortDirBcastFwd
+		RtrStatus
+	}
+
+snRtIpPortConfigPortIndex       OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The port index for port config entry."
+	::= { snRtIpPortConfigEntry 1 }
+
+snRtIpPortMtu                   OBJECT-TYPE
+	SYNTAX  INTEGER (576..4470)
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"The maximun transfer unit."
+	::= { snRtIpPortConfigEntry 2 }
+
+snRtIpPortEncap                 OBJECT-TYPE
+	SYNTAX  INTEGER { 
+					 ethernet(1),
+					 snap(2),
+					 hdlc(3),
+					 ppp(4)
+					}
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"Data link encapsulation to be used
+		on the IP frame transmitted on the
+		port."
+	::= { snRtIpPortConfigEntry 3 }
+
+snRtIpPortMetric                OBJECT-TYPE
+	SYNTAX  INTEGER (1..15)
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"The metric."
+    DEFVAL  { 1 }
+	::= { snRtIpPortConfigEntry 4 }
+
+snRtIpPortDirBcastFwd           OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"Enable/Disable directed broadcast forwarding on the port."
+    DEFVAL  { enabled }
+	::= { snRtIpPortConfigEntry 5 }
+
+-- ip interface address table, PortIndex is changed to ifIndex
+
+snRtIpPortIfAddrTable             OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortIfAddrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP port If address table."
+	::= { snIp 18 }
+
+snRtIpPortIfAddrEntry             OBJECT-TYPE
+	SYNTAX  SnRtIpPortIfAddrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Port Address table."
+	INDEX   { snRtIpPortIfAddrInterfaceIndex, snRtIpPortIfAddress }
+	::= { snRtIpPortIfAddrTable 1 }
+
+SnRtIpPortIfAddrEntry ::= SEQUENCE {
+	snRtIpPortIfAddrInterfaceIndex
+		InterfaceIndex,
+	snRtIpPortIfAddress
+		IpAddress,
+	snRtIpPortIfSubnetMask
+		IpAddress,
+	snRtIpPortIfAddrType
+		INTEGER,
+	snRtIpPortIfRowStatus
+		RowSts
+	}
+
+
+snRtIpPortIfAddrInterfaceIndex                 OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The InterfaceIndex for port address entry."
+	::= { snRtIpPortIfAddrEntry 1 }
+
+snRtIpPortIfAddress               OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port IP address."
+	::= { snRtIpPortIfAddrEntry 2 }
+
+snRtIpPortIfSubnetMask            OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The port IP address subnet mask."
+	::= { snRtIpPortIfAddrEntry 3 }
+
+snRtIpPortIfAddrType              OBJECT-TYPE
+	SYNTAX  INTEGER { primary(1), secondary(2) }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The port IP address type."
+    DEFVAL  { primary }
+	::= { snRtIpPortIfAddrEntry 4 }
+
+snRtIpPortIfRowStatus     OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a port address
+		entry."
+	::= { snRtIpPortIfAddrEntry 5 }
+
+-- ip interface access table, PortIndex is changed to ifIndex
+
+snRtIpPortIfAccessTable           OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortIfAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP port If access table."
+	::= { snIp 19 }
+
+snRtIpPortIfAccessEntry           OBJECT-TYPE
+	SYNTAX  SnRtIpPortIfAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Port access table."
+	INDEX   { snRtIpPortIfAccessInterfaceIndex, snRtIpPortIfAccessDirection }
+	::= { snRtIpPortIfAccessTable 1 }
+
+SnRtIpPortIfAccessEntry ::= SEQUENCE {
+	snRtIpPortIfAccessInterfaceIndex
+		InterfaceIndex,
+	snRtIpPortIfAccessDirection
+		INTEGER,
+	snRtIpPortIfAccessFilters
+		OCTET STRING,
+	snRtIpPortIfAccessRowStatus
+		RowSts
+	}
+
+snRtIpPortIfAccessInterfaceIndex               OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The InterfaceIndex for port access entry."
+	::= { snRtIpPortIfAccessEntry 1 }
+
+snRtIpPortIfAccessDirection               OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The incoming or outgoing check
+		for port access."
+	::= { snRtIpPortIfAccessEntry 2 }
+
+snRtIpPortIfAccessFilters                 OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"1st octet correspond to 1st  filter 
+		number and so on."
+	::= { snRtIpPortIfAccessEntry 3 }
+
+snRtIpPortIfAccessRowStatus       OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a port access
+		entry."
+	::= { snRtIpPortIfAccessEntry 4 }
+
+-- ip interface configuration table, PortIndex is changed to ifIndex
+
+snRtIpPortIfConfigTable           OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpPortIfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP port If Config table."
+	::= { snIp 20 }
+
+snRtIpPortIfConfigEntry           OBJECT-TYPE
+	SYNTAX  SnRtIpPortIfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Port Config table."
+	INDEX   { snRtIpPortIfConfigInterfaceIndex }
+	::= { snRtIpPortIfConfigTable 1 }
+
+SnRtIpPortIfConfigEntry ::= SEQUENCE {
+	snRtIpPortIfConfigInterfaceIndex
+		InterfaceIndex,
+	snRtIpPortIfMtu
+		INTEGER,
+	snRtIpPortIfEncap
+		INTEGER,
+	snRtIpPortIfMetric
+		INTEGER,
+	snRtIpPortIfDirBcastFwd
+		RtrStatus
+	}
+
+snRtIpPortIfConfigInterfaceIndex      OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The If index for port config entry."
+	::= { snRtIpPortIfConfigEntry 1 }
+
+snRtIpPortIfMtu                   OBJECT-TYPE
+	SYNTAX  INTEGER (576..4470)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximun transfer unit."
+	::= { snRtIpPortIfConfigEntry 2 }
+
+snRtIpPortIfEncap                 OBJECT-TYPE
+	SYNTAX  INTEGER { 
+					 ethernet(1),
+					 snap(2),
+					 hdlc(3),
+					 ppp(4),
+					 other(5)
+					}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Data link encapsulation to be used
+		on the IP frame transmitted on the
+		port."
+	::= { snRtIpPortIfConfigEntry 3 }
+
+snRtIpPortIfMetric                OBJECT-TYPE
+	SYNTAX  INTEGER (1..15)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric."
+    DEFVAL  { 1 }
+	::= { snRtIpPortIfConfigEntry 4 }
+
+snRtIpPortIfDirBcastFwd           OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/Disable directed broadcast forwarding on the port."
+    DEFVAL  { enabled }
+	::= { snRtIpPortIfConfigEntry 5 }
+
+
+-- Broadcast forwarding group
+
+snRtBcastFwd                OBJECT IDENTIFIER ::= { snIp 9 }
+snRtBcastFwdGeneral         OBJECT IDENTIFIER ::= { snRtBcastFwd 1 }
+snRtUdpBcastFwdPort         OBJECT IDENTIFIER ::= { snRtBcastFwd 2 }
+snRtUdpHelper               OBJECT IDENTIFIER ::= { snRtBcastFwd 3 }
+
+-- General UDP broadcast forwarding group
+
+snRtUdpBcastFwdEnable         OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable or disable UDP broadcast forwarding service.
+		When UDP broadcast forwarding is enabled, default
+		entries are added to the UDP broadcast forwarding
+		port table. When it is disabled, UDP broadcast
+		forwarding port table is flushed to empty."
+    DEFVAL     { enabled }
+	::= { snRtBcastFwdGeneral 1 }
+
+-- UDP broadcast forwarding port table
+
+snRtUdpBcastFwdPortTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtUdpBcastFwdPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"This table contains a list of UDP port numbers
+		for which forwarding UDP broadcast is enabled."
+	::= { snRtUdpBcastFwdPort 1 }
+
+snRtUdpBcastFwdPortEntry  OBJECT-TYPE
+	SYNTAX  SnRtUdpBcastFwdPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the UDP broadcast forwarding
+		port table."
+	INDEX   { snRtUdpBcastFwdPortIndex }
+	::= { snRtUdpBcastFwdPortTable 1 }
+
+SnRtUdpBcastFwdPortEntry ::= SEQUENCE {
+	snRtUdpBcastFwdPortIndex
+		INTEGER,
+	snRtUdpBcastFwdPortNumber
+		INTEGER,
+	snRtUdpBcastFwdPortRowStatus
+		RowSts
+	}
+
+snRtUdpBcastFwdPortIndex      OBJECT-TYPE
+	SYNTAX  INTEGER (1..20)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a UDP broadcast forwarding
+		port entry."
+	::= { snRtUdpBcastFwdPortEntry 1 }
+
+snRtUdpBcastFwdPortNumber     OBJECT-TYPE
+	SYNTAX  INTEGER (1..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"UDP port number for which UDP broadcast forwarding
+		is enabled."
+	::= { snRtUdpBcastFwdPortEntry 2 }
+
+snRtUdpBcastFwdPortRowStatus  OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a UDP broadcast forwarding
+		port entry."
+	::= { snRtUdpBcastFwdPortEntry 3 }
+
+-- UDP helper table
+
+snRtUdpHelperTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtUdpHelperEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"UDP helper table."
+	::= { snRtUdpHelper 1 }
+
+snRtUdpHelperEntry  OBJECT-TYPE
+	SYNTAX  SnRtUdpHelperEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the UDP helper table."
+	INDEX   { snRtUdpHelperPortIndex, snRtUdpHelperIndex }
+	::= { snRtUdpHelperTable 1 }
+
+SnRtUdpHelperEntry ::= SEQUENCE {
+	snRtUdpHelperPortIndex
+		PortIndex,
+	snRtUdpHelperIndex
+		INTEGER,
+	snRtUdpHelperAddr
+		IpAddress,
+	snRtUdpHelperRowStatus
+		RowSts
+	}
+
+snRtUdpHelperPortIndex  OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for a UDP helper entry."
+	::= { snRtUdpHelperEntry 1 }
+
+snRtUdpHelperIndex      OBJECT-TYPE
+	SYNTAX  INTEGER (1..4)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a UDP helper entry."
+	::= { snRtUdpHelperEntry 2 }
+
+snRtUdpHelperAddr       OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The UDP helper address. This is the address that
+		UDP packets will be forwarded. It can be a helper
+		address or a subnet broadcast address. But it
+		cannot be 255.255.255.255 or 0.0.0.0."
+	::= { snRtUdpHelperEntry 3 }
+
+snRtUdpHelperRowStatus  OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a UDP helper entry."
+	::= { snRtUdpHelperEntry 4 }
+
+-- Trace route group
+-- This group uses the following method to detect routes used to reach
+-- a destination address. The originating router sends a probe packet
+-- (a UDP packet) to the destination address with TTL of 1. The first
+-- router that receives this packet decrements the TTL, then drops the
+-- packet and returns a ICMP packet to the originator. The originating
+-- router records the route in snRtIpTraceRouteResultTable. The ori-
+-- ginating router sends a probe packet (a UDP packet) to the des-
+-- tination address with TTL of 2. The second router that receives
+-- this packet decrements the TTL, then drops the packet and returns
+-- a ICMP packet to the originator. The originating router records the
+-- route in snRtIpTraceRouteResultTable. This procedure is repeated
+-- until the destination is reached, or the maximum TTL is reached.
+
+snRtIpTraceRoute            OBJECT IDENTIFIER ::= { snIp 10 }
+snRtIpTraceRouteGeneral     OBJECT IDENTIFIER ::= { snRtIpTraceRoute 1 }
+snRtIpTraceRouteResult      OBJECT IDENTIFIER ::= { snRtIpTraceRoute 2 }
+
+-- General trace route group
+
+snRtIpTraceRouteTargetAddr  OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Target IP address of which trace route is performed."
+	::= { snRtIpTraceRouteGeneral 1 }
+
+snRtIpTraceRouteMinTtl      OBJECT-TYPE
+	SYNTAX  INTEGER (1..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Minimum TTL value carried in the first probe packet."
+    DEFVAL { 1 }
+	::= { snRtIpTraceRouteGeneral 2 }
+
+snRtIpTraceRouteMaxTtl      OBJECT-TYPE
+	SYNTAX  INTEGER (1..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Maximum TTL value carried in the last probe packet."
+    DEFVAL { 30 }
+	::= { snRtIpTraceRouteGeneral 3 }
+
+snRtIpTraceRouteTimeOut     OBJECT-TYPE
+	SYNTAX  INTEGER (1..120)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Time out period (in seconds) to wait for the response
+		from the probe packet (i,e, the ICMP packet)."
+    DEFVAL { 2 }
+	::= { snRtIpTraceRouteGeneral 4 }
+
+snRtIpTraceRouteControl     OBJECT-TYPE
+	SYNTAX  INTEGER {
+				start(1),
+				abort(2),
+				success(3),
+				failure(4),
+				inProgress(5)
+			}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Only 'start' and 'abort' are writable values; 'success',
+		'failure' and 'inProgress' are readeable (or returned)
+		values.
+		
+		Writing 'start' to this object to initiate the trace route
+		operation. snRtIpTraceRouteDestAddr must have been init-
+		ialized before 'start' is writen.
+
+		This object will return 'inProgress' after trace route
+		operation has started. During the 'inProgress' state,
+		writing 'abort' to this object will stop the current
+		trace route operation.
+
+		If the destination address is reached, this object
+		returned 'success'. snRtIpTraceRouteResultTable
+		contains the routes (and the target address) to
+		reach the destination address. If the destination
+		address does not reach, timeout, or ending TTL
+		reached, 'failure' is returned."
+	::= { snRtIpTraceRouteGeneral 5 }
+
+-- Trace route result table
+
+snRtIpTraceRouteResultTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpTraceRouteResultEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Trace route result table."
+	::= { snRtIpTraceRouteResult 1 }
+
+snRtIpTraceRouteResultEntry  OBJECT-TYPE
+	SYNTAX  SnRtIpTraceRouteResultEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the trace route result table."
+	INDEX   { snRtIpTraceRouteResultIndex }
+	::= { snRtIpTraceRouteResultTable 1 }
+
+SnRtIpTraceRouteResultEntry ::= SEQUENCE {
+	snRtIpTraceRouteResultIndex
+		INTEGER,
+	snRtIpTraceRouteResultAddr
+		IpAddress,
+	snRtIpTraceRouteResultRoundTripTime1
+		TimeTicks,
+	snRtIpTraceRouteResultRoundTripTime2
+		TimeTicks
+	}
+
+snRtIpTraceRouteResultIndex          OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a trace route result entry."
+	::= { snRtIpTraceRouteResultEntry 1 }
+
+snRtIpTraceRouteResultAddr           OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The router or the target address of which forms
+		part of the route to reach the destination address."
+	::= { snRtIpTraceRouteResultEntry 2 }
+
+snRtIpTraceRouteResultRoundTripTime1 OBJECT-TYPE
+	SYNTAX  TimeTicks
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The round trip time between the first probe packet
+		transmitted and the reponse ICMP packet received."
+	::= { snRtIpTraceRouteResultEntry 3 }
+
+snRtIpTraceRouteResultRoundTripTime2 OBJECT-TYPE
+	SYNTAX  TimeTicks
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The round trip time between the second probe packet
+		transmitted and the reponse ICMP packet received."
+	::= { snRtIpTraceRouteResultEntry 4 }
+
+-- IP forwarding cache table
+
+snRtIpFwdCacheTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpFwdCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP forwarding cache table."
+	::= { snIp 11 }
+
+snRtIpFwdCacheEntry  OBJECT-TYPE
+	SYNTAX  SnRtIpFwdCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP forwarding cache table."
+	INDEX   { snRtIpFwdCacheIndex }
+	::= { snRtIpFwdCacheTable 1 }
+
+SnRtIpFwdCacheEntry ::= SEQUENCE {
+	snRtIpFwdCacheIndex
+		INTEGER,
+	snRtIpFwdCacheIp
+		IpAddress,
+	snRtIpFwdCacheMac
+		OCTET STRING,
+	snRtIpFwdCacheNextHopIp
+		IpAddress,
+	snRtIpFwdCacheOutgoingPort
+		INTEGER,
+	snRtIpFwdCacheType
+		INTEGER,
+	snRtIpFwdCacheAction
+		INTEGER,
+	snRtIpFwdCacheFragCheck
+		INTEGER,
+	snRtIpFwdCacheSnapHdr
+		INTEGER,
+	snRtIpFwdCacheVLanId
+		INTEGER
+	}
+
+snRtIpFwdCacheIndex         OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a ip forwarding cache table entry."
+	::= { snRtIpFwdCacheEntry 1 }
+
+snRtIpFwdCacheIp            OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address of a station."
+	::= { snRtIpFwdCacheEntry 2 }
+
+snRtIpFwdCacheMac           OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (6))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Mac address of an IP station."
+	::= { snRtIpFwdCacheEntry 3 }
+
+snRtIpFwdCacheNextHopIp     OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The next hop router IP address."
+	::= { snRtIpFwdCacheEntry 4 }
+
+snRtIpFwdCacheOutgoingPort  OBJECT-TYPE
+	SYNTAX  INTEGER (0..3900)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The outgoing port of which packets will forward to.
+		Return port value of zero to indicate no outgoing port
+		associated to this entry. Non-zero value has the
+		following meanings:
+		The bit 0 to bit 7: port number.
+		The bit 8 to bit 11: slot number.
+		For virtual router interface, slot number is 15,
+		port number is the virtual router port from 1 to 60."
+	::= { snRtIpFwdCacheEntry 5 }
+
+snRtIpFwdCacheType          OBJECT-TYPE
+	SYNTAX  INTEGER { dynamic(1), permanent(2) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 'dynamic' or 'permanent' type for a ip forwarding
+		cache table entry."
+	::= { snRtIpFwdCacheEntry 6 }
+
+snRtIpFwdCacheAction        OBJECT-TYPE
+	SYNTAX  INTEGER {
+			other(1),
+			forward(2),
+			forUs(3),
+			waitForArp(4),
+			complexFilter(5),
+			icmpDeny(6),
+			dropPacket(7)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The action to take."
+	::= { snRtIpFwdCacheEntry 7 }
+
+snRtIpFwdCacheFragCheck     OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), enabled(1) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Check for fragmentation."
+	::= { snRtIpFwdCacheEntry 8 }
+
+snRtIpFwdCacheSnapHdr       OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), enabled(1) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Apply SNAP encapsulation."
+	::= { snRtIpFwdCacheEntry 9 }
+
+snRtIpFwdCacheVLanId        OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The VLAN ID for a ip forwarding cache table entry.
+		Return VLAN ID value of zero to indicate no VLAN
+		associated to this entry."
+	::= { snRtIpFwdCacheEntry 10 }
+
+
+-- Ip AS-Path Access List table
+
+snIpAsPathAccessListTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnIpAsPathAccessListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip As-Path Access List table."
+	::= { snIp 12 }
+
+snIpAsPathAccessListEntry       OBJECT-TYPE
+	SYNTAX  SnIpAsPathAccessListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Ip As-Path Access List table."
+	INDEX   { snIpAsPathAccessListIndex,  snIpAsPathAccessListSequence}
+	::= { snIpAsPathAccessListTable 1 }
+
+SnIpAsPathAccessListEntry ::= SEQUENCE {
+	snIpAsPathAccessListIndex
+		INTEGER,
+	snIpAsPathAccessListSequence
+		INTEGER,
+	snIpAsPathAccessListAction              
+		INTEGER,
+	snIpAsPathAccessListRegExpression
+		OCTET STRING,
+	snIpAsPathAccessListRowStatus
+		INTEGER
+	}
+
+snIpAsPathAccessListIndex       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a filter entry."
+	::= { snIpAsPathAccessListEntry 1 }
+
+snIpAsPathAccessListSequence       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table sequence index for a filter entry."
+	::= { snIpAsPathAccessListEntry 2 }
+
+snIpAsPathAccessListAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the bgp address match
+		with this filter."
+	::= { snIpAsPathAccessListEntry 3 }
+
+snIpAsPathAccessListRegExpression    OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..256))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Autonomous system in the filter using a regular expression.
+		Each character of the regular expression string is represented
+		by one octet."
+	::= { snIpAsPathAccessListEntry 4 }
+
+snIpAsPathAccessListRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpAsPathAccessListEntry 5 }
+
+
+-- Ip Community List table
+
+snIpCommunityListTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnIpCommunityListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip Community List table."
+	::= { snIp 13 }
+
+snIpCommunityListEntry       OBJECT-TYPE
+	SYNTAX  SnIpCommunityListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Ip Community List table."
+	INDEX   { snIpCommunityListIndex,  snIpCommunityListSequence}
+	::= { snIpCommunityListTable 1 }
+
+SnIpCommunityListEntry ::= SEQUENCE {
+	snIpCommunityListIndex
+		INTEGER,
+	snIpCommunityListSequence
+		INTEGER,
+	snIpCommunityListAction              
+		INTEGER,
+	snIpCommunityListCommNum
+		OCTET STRING,
+	snIpCommunityListInternet
+		INTEGER,
+	snIpCommunityListNoAdvertise
+		INTEGER,
+	snIpCommunityListNoExport
+		INTEGER,
+	snIpCommunityListRowStatus
+		INTEGER,
+	snIpCommunityListLocalAs
+		INTEGER
+	}
+
+snIpCommunityListIndex       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a filter entry."
+	::= { snIpCommunityListEntry 1 }
+
+snIpCommunityListSequence       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table sequence index for a filter entry."
+	::= { snIpCommunityListEntry 2 }
+
+snIpCommunityListAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the bgp address match
+		with this filter."
+	::= { snIpCommunityListEntry 3 }
+
+snIpCommunityListCommNum    OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..80))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"A number from 1 to 0xFFFFFFFF. There are 20 of them.  
+		This integer number is represented by 4 OCTETs."
+	::= { snIpCommunityListEntry 4 }
+
+snIpCommunityListInternet OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), enabled(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Disabled/Enabled the Internet Community."
+	::= { snIpCommunityListEntry 5 }
+
+snIpCommunityListNoAdvertise OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Do not advertise this route to any peer (internal or external)."
+	::= { snIpCommunityListEntry 6 }
+
+snIpCommunityListNoExport OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Do not advertise this route to an EBGP peer."
+	::= { snIpCommunityListEntry 7 }
+
+snIpCommunityListRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpCommunityListEntry 8 }
+
+snIpCommunityListLocalAs OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Send this route to peers in other sub-autonomous systems within
+		the local confederation. Do not advertise this route to an 
+		external system."
+	::= { snIpCommunityListEntry 9 }
+
+
+-- Ip Prefix List table
+
+snIpPrefixListTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnIpPrefixListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip Prefix List table."
+	::= { snIp 14 }
+
+snIpPrefixListEntry       OBJECT-TYPE
+	SYNTAX  SnIpPrefixListEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Ip As-Path Access List table."
+	INDEX   { snIpPrefixListName,  snIpPrefixListSequence}
+	::= { snIpPrefixListTable 1 }
+
+SnIpPrefixListEntry ::= SEQUENCE {
+	snIpPrefixListName
+		OCTET STRING,
+	snIpPrefixListSequence
+		INTEGER,
+	snIpPrefixListDesc
+		OCTET STRING,
+	snIpPrefixListAction              
+		INTEGER,
+	snIpPrefixListAddr
+		IpAddress,
+	snIpPrefixListMask
+		IpAddress, 
+	snIpPrefixListGeValue
+		INTEGER,
+	snIpPrefixListLeValue
+		INTEGER,
+	snIpPrefixListRowStatus
+		INTEGER
+	}
+
+snIpPrefixListName    OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..32))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+        "An octet string of the ip prefix list name, each character of the name
+         is represented by one octet."
+	::= { snIpPrefixListEntry 1 }
+
+snIpPrefixListSequence       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table sequence index for a filter entry."
+	::= { snIpPrefixListEntry 2 }
+
+snIpPrefixListDesc    OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..80))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+        "An octet string of the ip prefix list description, each character of the name
+         is represented by one octet."
+	::= { snIpPrefixListEntry 3 }
+
+snIpPrefixListAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ip prefix match
+		with this filter."
+	::= { snIpPrefixListEntry 4 }
+
+snIpPrefixListAddr    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Prefix IP address."
+	::= { snIpPrefixListEntry 5 }
+
+snIpPrefixListMask    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Prefix IP mask."
+	::= { snIpPrefixListEntry 6 }
+
+snIpPrefixListGeValue OBJECT-TYPE
+         SYNTAX   INTEGER (0..32)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Greater than value."
+	::= { snIpPrefixListEntry 7 }
+
+snIpPrefixListLeValue OBJECT-TYPE
+         SYNTAX   INTEGER (0..32)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Less than value."
+	::= { snIpPrefixListEntry 8 }
+
+snIpPrefixListRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpPrefixListEntry 9 }
+
+
+-- ################################ new 2 tables ###################################
+-- Ip AS-Path Access List table
+
+snIpAsPathAccessListStringTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnIpAsPathAccessListStringEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip As-Path Access List table, string version."
+	::= { snIp 16 }
+
+snIpAsPathAccessListStringEntry       OBJECT-TYPE
+	SYNTAX  SnIpAsPathAccessListStringEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Ip As-Path Access List table."
+	INDEX   { snIpAsPathAccessListStringName,  snIpAsPathAccessListStringSequence}
+	::= { snIpAsPathAccessListStringTable 1 }
+
+SnIpAsPathAccessListStringEntry ::= SEQUENCE {
+	snIpAsPathAccessListStringName
+		DisplayString,
+	snIpAsPathAccessListStringSequence
+		INTEGER,
+	snIpAsPathAccessListStringAction              
+		INTEGER,
+	snIpAsPathAccessListStringRegExpression
+		DisplayString,
+	snIpAsPathAccessListStringRowStatus
+		INTEGER
+	}
+
+snIpAsPathAccessListStringName      OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(0..32))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a filter entry, string version."
+	::= { snIpAsPathAccessListStringEntry 1 }
+
+snIpAsPathAccessListStringSequence       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table sequence index for a filter entry."
+	::= { snIpAsPathAccessListStringEntry 2 }
+
+snIpAsPathAccessListStringAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the bgp address match
+		with this filter."
+	::= { snIpAsPathAccessListStringEntry 3 }
+
+snIpAsPathAccessListStringRegExpression    OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(0..256))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Autonomous system in the filter using a regular expression.
+		Each character of the regular expression string is represented
+		by one octet."
+	::= { snIpAsPathAccessListStringEntry 4 }
+
+snIpAsPathAccessListStringRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpAsPathAccessListStringEntry 5 }
+
+
+-- Ip Community ListString table
+
+snIpCommunityListStringTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnIpCommunityListStringEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip Community ListString table, string version."
+	::= { snIp 17 }
+
+snIpCommunityListStringEntry       OBJECT-TYPE
+	SYNTAX  SnIpCommunityListStringEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Ip Community ListString table."
+	INDEX   { snIpCommunityListStringName,  snIpCommunityListStringSequence}
+	::= { snIpCommunityListStringTable 1 }
+
+SnIpCommunityListStringEntry ::= SEQUENCE {
+	snIpCommunityListStringName
+		DisplayString,
+	snIpCommunityListStringSequence
+		INTEGER,
+	snIpCommunityListStringAction              
+		INTEGER,
+	snIpCommunityListStringCommNum
+		OCTET STRING,
+	snIpCommunityListStringInternet
+		INTEGER,
+	snIpCommunityListStringNoAdvertise
+		INTEGER,
+	snIpCommunityListStringNoExport
+		INTEGER,
+	snIpCommunityListStringRowStatus
+		INTEGER,
+	snIpCommunityListStringLocalAs
+		INTEGER
+	}
+
+snIpCommunityListStringName       OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(0..32))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a filter entry."
+	::= { snIpCommunityListStringEntry 1 }
+
+snIpCommunityListStringSequence       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table sequence index for a filter entry."
+	::= { snIpCommunityListStringEntry 2 }
+
+snIpCommunityListStringAction      OBJECT-TYPE
+	SYNTAX  INTEGER { deny(0), permit(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the bgp address match
+		with this filter."
+	::= { snIpCommunityListStringEntry 3 }
+
+snIpCommunityListStringCommNum    OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE(0..80))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"A number from 1 to 0xFFFFFFFF. There are 20 of them.  
+		This integer number is represented by 4 OCTETs."
+	::= { snIpCommunityListStringEntry 4 }
+
+snIpCommunityListStringInternet OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), enabled(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Disabled/Enabled the Internet Community."
+	::= { snIpCommunityListStringEntry 5 }
+
+snIpCommunityListStringNoAdvertise OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Do not advertise this route to any peer (internal or external)."
+	::= { snIpCommunityListStringEntry 6 }
+
+snIpCommunityListStringNoExport OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Do not advertise this route to an EBGP peer."
+	::= { snIpCommunityListStringEntry 7 }
+
+snIpCommunityListStringRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpCommunityListStringEntry 8 }
+
+snIpCommunityListStringLocalAs OBJECT-TYPE
+	SYNTAX  INTEGER { false(0), true(1) } 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Send this route to peers in other sub-autonomous systems within
+		the local confederation. Do not advertise this route to an 
+		external system."
+	::= { snIpCommunityListStringEntry 9 }
+
+
+
+
+-- SECTION 2: MIB 
+
+-- Router IP RIP MIB
+
+snRtIpRipGeneral                        OBJECT IDENTIFIER ::= { snRip 1 }
+
+-- IP RIP general group
+
+snRtIpRipEnable                 OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable ip rip routing."
+	::= { snRtIpRipGeneral 1 }
+
+snRtIpRipUpdateTime             OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Ip rip update interval in seconds."
+	::= { snRtIpRipGeneral 2 }
+
+snRtIpRipRedisEnable            OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable redistribution to rip."
+	::= { snRtIpRipGeneral 3 }
+
+snRtIpRipRedisDefMetric         OBJECT-TYPE
+	SYNTAX  INTEGER (1..15)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Default metric to be used when redistribute route to rip."
+	::= { snRtIpRipGeneral 4 }
+
+snRtIpRipSetAllPortConfig       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object is an index number of a
+		snRtIpRipPortConfigTable row (i.e. snRtIpRipPortConfigPortIndex),
+		which is the selected row to copy all of its read-writable data
+		(i.e. snRtIpRipPortVersion and snRtIpRipPortPoisonReverse) to the
+		rest of the rows in snRtIpRipPortConfigTable.
+		Note: prior setting this object, all the intended data of the
+		given row of the table must be set. Otherwise, the current data
+		of the row will be used to set the entire ip rip port configuration
+		table. The previous setting will be overwritten by the new one."
+	::= { snRtIpRipGeneral 5 }
+
+snRtIpRipGblFiltList            OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(1..64))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An ip rip global filter list, of which each octet contains a
+		filter ID number that forms a group of filters. A valid entry
+		in the snRtIpRipRouteFilterTable with the corresponding filter
+		ID number (i.e. snRtIpRipRouteFilterId) must have been created
+		before a filter list is initialized."
+	::= { snRtIpRipGeneral 6 }
+
+snRtIpRipFiltOnAllPort          OBJECT-TYPE
+	SYNTAX	INTEGER {
+	    valid(1),
+	    deleteAllInBound(2),
+	    deleteAllOutBound(3),
+	    addAllInBound(4),
+	    addAllOutBound(5)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Apply the ip rip global filter list snRtIpRipGblFiltList to
+		all interfaces. This object is used to add all rip filter
+		lists and delete all rip filter lists to/from all interfaces.
+		Prior to sending this command, snRtIpRipGblFiltList must have
+		been set to a proper filter list.
+
+		The values that can be written are:
+		deleteAllInBound(2)...delete all in-bound filter lists from all ports.
+		deleteAllOutBound(3)..delete all out-bound filter lists from all ports.
+		addAllInBound(4)......add all in-bound filter lists to all ports.
+		addAllOutBound(5).....add all out-bound filter lists to all ports.
+
+		If set operation failed, then a SET with value of (2) or (3)
+		returns error code 'GenError'. If succeed, entries in the
+		filter list are deleted immediately.
+
+		The following values can be returned on reads:
+		valid(1)....set operation is done and is valid."
+	::= { snRtIpRipGeneral 7 }
+
+snRtIpRipDistance         OBJECT-TYPE
+	SYNTAX  INTEGER (1..255)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Administration distance."
+	::= { snRtIpRipGeneral 8 }
+
+-- IP RIP port configuration table
+-- this table was replaced by the snRtIpRipPortIfConfigTable,
+-- of which the index was changed to ifIndex, not another
+-- indexing method used by this table
+
+snRtIpRipPortConfigTable        OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpRipPortConfigEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"IP Rip port Config table."
+	::= { snRip 2 }
+
+snRtIpRipPortConfigEntry        OBJECT-TYPE
+	SYNTAX  SnRtIpRipPortConfigEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"An entry in the IP Rip Port Config table."
+	INDEX   { snRtIpRipPortConfigPortIndex }
+	::= { snRtIpRipPortConfigTable 1 }
+
+SnRtIpRipPortConfigEntry ::= SEQUENCE {
+	snRtIpRipPortConfigPortIndex
+		PortIndex,
+	snRtIpRipPortVersion
+		INTEGER,
+	snRtIpRipPortPoisonReverse
+		RtrStatus,
+	snRtIpRipPortLearnDefault
+		INTEGER
+	}
+
+snRtIpRipPortConfigPortIndex    OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The port index for ip rip port config entry."
+	::= { snRtIpRipPortConfigEntry 1 }
+
+snRtIpRipPortVersion            OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), v1Only(1), v2Only(2), v1CompatibleV2(3) }
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"The ip rip version on this port."
+	::= { snRtIpRipPortConfigEntry 2 }
+
+snRtIpRipPortPoisonReverse      OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"Enable/disable poison reverse."
+	::= { snRtIpRipPortConfigEntry 3 }
+
+snRtIpRipPortLearnDefault          OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(0),             
+		enabled(1)
+	}
+	ACCESS	read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"Apply the RIP router protocol learn-default option to the
+		interface.  The values that can be written are:
+		disabled(0)...deleted the learn default option.
+		enabled(1)....enabled the learn default option."
+	::= { snRtIpRipPortConfigEntry 4 }
+
+-- redistribution table
+
+snRtIpRipRedisTable             OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpRipRedisEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP Rip Redistribution table."
+	::= { snRip 3 }
+
+snRtIpRipRedisEntry             OBJECT-TYPE
+	SYNTAX  SnRtIpRipRedisEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Rip Redistribution table."
+	INDEX   { snRtIpRipRedisIndex }
+	::= { snRtIpRipRedisTable 1 }
+
+SnRtIpRipRedisEntry ::= SEQUENCE {
+	snRtIpRipRedisIndex
+		INTEGER,        
+	snRtIpRipRedisAction
+		Action,
+	snRtIpRipRedisProtocol
+		INTEGER,
+	snRtIpRipRedisIp
+		IpAddress,
+	snRtIpRipRedisMask
+		IpAddress,
+	snRtIpRipRedisMatchMetric
+		Metric,
+	snRtIpRipRedisSetMetric
+		INTEGER,
+	snRtIpRipRedisRowStatus
+		RowSts
+	}
+			
+snRtIpRipRedisIndex             OBJECT-TYPE
+	SYNTAX  INTEGER (1..64)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a IP Rip Redistribution entry."
+	::= { snRtIpRipRedisEntry 1 }
+
+snRtIpRipRedisAction            OBJECT-TYPE
+	SYNTAX  Action
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The action to take when match this 
+		IP Rip Redistribution entry."
+	::= { snRtIpRipRedisEntry 2 }
+
+snRtIpRipRedisProtocol          OBJECT-TYPE
+	SYNTAX  INTEGER { other(1), all(2), static(3), ospf(4), bgp(5), isis(6) }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The protocol to be distributed. other(1) cannot be 
+                 used for SNMP-SET." 
+	::= { snRtIpRipRedisEntry 3 }
+
+snRtIpRipRedisIp        OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The ip address of the ip route to be distributed.
+		0.0.0.0 - all routes" 
+	::= { snRtIpRipRedisEntry 4 }
+
+		
+snRtIpRipRedisMask              OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The ip subnet mask of the ip route to be distributed." 
+	::= { snRtIpRipRedisEntry 5 }
+
+snRtIpRipRedisMatchMetric       OBJECT-TYPE
+	SYNTAX  Metric
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric of the route to be matched
+		to determine the redistribution.
+		0 - any metric value" 
+	::= { snRtIpRipRedisEntry 6 }
+
+snRtIpRipRedisSetMetric         OBJECT-TYPE
+	SYNTAX  INTEGER (0..15)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The new metric of the route to be advertised.
+		0 - use the default metric." 
+	::= { snRtIpRipRedisEntry 7 }
+
+snRtIpRipRedisRowStatus         OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a Redistribution entry."
+	::= { snRtIpRipRedisEntry 8 }
+
+-- IP RIP route filter table
+
+snRtIpRipRouteFilterTable	  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnRtIpRipRouteFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"ip rip route filter table."
+	::= { snRip 4 }
+
+snRtIpRipRouteFilterEntry	  OBJECT-TYPE
+	SYNTAX	SnRtIpRipRouteFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the ip rip route filter table."
+	INDEX	{ snRtIpRipRouteFilterId }
+	::= { snRtIpRipRouteFilterTable 1 }
+
+SnRtIpRipRouteFilterEntry ::= SEQUENCE {
+	snRtIpRipRouteFilterId
+		INTEGER,
+	snRtIpRipRouteFilterAction
+		Action,
+	snRtIpRipRouteFilterIpAddr
+		IpAddress,
+	snRtIpRipRouteFilterSubnetMask
+		IpAddress,
+	snRtIpRipRouteFilterRowStatus
+		INTEGER
+	}
+
+snRtIpRipRouteFilterId         OBJECT-TYPE
+	SYNTAX	INTEGER (1..64)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The filter ID to identify a filter entry."
+	::= { snRtIpRipRouteFilterEntry 1 }
+
+snRtIpRipRouteFilterAction	   OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ip rip packet matched
+		with this filter."
+	::= { snRtIpRipRouteFilterEntry 2 }
+
+snRtIpRipRouteFilterIpAddr     OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Route IP address to compare with any route IP addresses
+		in a ip rip packet. IP address 0.0.0.0 always compare
+		equals to any route IP addresses in any ip rip packets."
+	::= { snRtIpRipRouteFilterEntry 3 }
+
+snRtIpRipRouteFilterSubnetMask OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Subnet mask to apply to the route IP address in a ip rip
+		packet, the result is compared to snRtIpRipRouteFilterIpAddr.
+		If snRtIpRipRouteFilterIpAddr is 0.0.0.0, this subnet mask
+		value is ignored."
+	::= { snRtIpRipRouteFilterEntry 4 }
+
+snRtIpRipRouteFilterRowStatus  OBJECT-TYPE
+	SYNTAX	INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+		"This object is used to create and
+		delete row in the table and control
+		if they are used. The values
+		that can be written are:
+		delete(3)...deletes the row
+		create(4)...creates a new row
+		modify(5)...modifies an exsisting row
+
+		If the row exists, then a SET with
+		value of create(4) returns error
+		'badValue'. Deleted rows go away
+		immediately. The following values
+		can be returned on reads:
+		invalid(1)...Setting it to 'invalid' has the effect of
+		             rendering it inoperative.
+		valid(2).....the row exists and is valid"
+	::= { snRtIpRipRouteFilterEntry 5 }
+
+-- IP RIP neighbor filter table
+
+snRtIpRipNbrFilterTable	     OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnRtIpRipNbrFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"ip rip neighbor filter table."
+	::= { snRip 5 }
+
+snRtIpRipNbrFilterEntry	     OBJECT-TYPE
+	SYNTAX	SnRtIpRipNbrFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the ip rip neighbor filter table."
+	INDEX	{ snRtIpRipNbrFilterId }
+	::= { snRtIpRipNbrFilterTable 1 }
+
+SnRtIpRipNbrFilterEntry ::= SEQUENCE {
+	snRtIpRipNbrFilterId
+		INTEGER,
+	snRtIpRipNbrFilterAction
+		Action,
+	snRtIpRipNbrFilterSourceIp
+		IpAddress,
+	snRtIpRipNbrFilterRowStatus
+		INTEGER
+	}
+
+snRtIpRipNbrFilterId         OBJECT-TYPE
+	SYNTAX	INTEGER (1..64)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The filter ID to identify a filter entry."
+	::= { snRtIpRipNbrFilterEntry 1 }
+
+snRtIpRipNbrFilterAction	 OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ip rip packet source IP
+		address compares equal to the source IP address
+		in this filter."
+	::= { snRtIpRipNbrFilterEntry 2 }
+
+snRtIpRipNbrFilterSourceIp   OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source IP address to compare with the source IP
+		address in a ip rip packet. IP address 0.0.0.0
+		always compares equal to any source IP addresses
+		in any ip rip packets."
+	::= { snRtIpRipNbrFilterEntry 3 }
+
+snRtIpRipNbrFilterRowStatus  OBJECT-TYPE
+	SYNTAX	INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+		"This object is used to create and
+		delete row in the table and control
+		if they are used. The values
+		that can be written are:
+		delete(3)...deletes the row
+		create(4)...creates a new row
+		modify(5)...modifies an exsisting row
+
+		If the row exists, then a SET with
+		value of create(4) returns error
+		'badValue'. Deleted rows go away
+		immediately. The following values
+		can be returned on reads:
+		invalid(1)...Setting it to 'invalid' has the effect of
+		             rendering it inoperative.
+		valid(2).....the row exists and is valid"
+	::= { snRtIpRipNbrFilterEntry 4 }
+
+-- IP RIP port access table
+-- this table was replaced by the snRtIpRipPortIfAccessTable,
+-- of which the index was changed to ifIndex, not another
+-- indexing method used by this table
+
+snRtIpRipPortAccessTable	     OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnRtIpRipPortAccessEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"ip interface rip access table."
+	::= { snRip 6 }
+
+snRtIpRipPortAccessEntry	     OBJECT-TYPE
+	SYNTAX	SnRtIpRipPortAccessEntry
+	ACCESS  not-accessible
+	STATUS  deprecated
+	DESCRIPTION
+		"An entry of the ip interface rip access table."
+	INDEX	{ snRtIpRipPortAccessPort, snRtIpRipPortAccessDir }
+	::= { snRtIpRipPortAccessTable 1 }
+
+SnRtIpRipPortAccessEntry ::= SEQUENCE {
+	snRtIpRipPortAccessPort
+		PortIndex,
+	snRtIpRipPortAccessDir
+		INTEGER,
+	snRtIpRipPortAccessFilterList
+		OCTET STRING,
+	snRtIpRipPortAccessRowStatus
+		INTEGER
+	}
+
+snRtIpRipPortAccessPort	     OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The ip interface to which the rip filter applies."
+	::= { snRtIpRipPortAccessEntry 1 }
+
+snRtIpRipPortAccessDir	     OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"The access direction of incoming packet filter
+		or outgoing packet filter."
+	::= { snRtIpRipPortAccessEntry 2 }
+
+snRtIpRipPortAccessFilterList  OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(1..64))
+	ACCESS  read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"An ip rip filter list, of which each octet contains
+		a filter ID number that forms a group of filters. A
+		valid entry in the snRtIpRipRouteFilterTable with the
+		corresponding filter ID number (i.e. snRtIpRipRouteFilterId)
+		must have been created before a filter list is initialized."
+	::= { snRtIpRipPortAccessEntry 3 }
+
+snRtIpRipPortAccessRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	read-write
+	STATUS  deprecated
+	DESCRIPTION
+		"This object is used to create and
+		delete row in the table and control
+		if they are used. The values
+		that can be written are:
+		delete(3)...deletes the row
+		create(4)...creates a new row
+		modify(5)...modifies an exsisting row
+
+		If the row exists, then a SET with
+		value of create(4) returns error
+		'badValue'. Deleted rows go away
+		immediately. The following values
+		can be returned on reads:
+		invalid(1)...Setting it to 'invalid' has the effect of
+		             rendering it inoperative.
+		valid(2).....the row exists and is valid"
+	::= { snRtIpRipPortAccessEntry 4 }
+
+-- IP RIP port configuration table, PortIndex is changed to ifIndex
+
+snRtIpRipPortIfConfigTable        OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtIpRipPortIfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IP Rip port If Config table."
+	::= { snRip 7 }
+
+snRtIpRipPortIfConfigEntry        OBJECT-TYPE
+	SYNTAX  SnRtIpRipPortIfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP Rip Port If Config table."
+	INDEX   { snRtIpRipPortIfConfigInterfaceIndex }
+	::= { snRtIpRipPortIfConfigTable 1 }
+
+SnRtIpRipPortIfConfigEntry ::= SEQUENCE {
+	snRtIpRipPortIfConfigInterfaceIndex
+		InterfaceIndex,
+	snRtIpRipPortIfVersion
+		INTEGER,
+	snRtIpRipPortIfPoisonReverse
+		RtrStatus,
+	snRtIpRipPortIfLearnDefault
+		INTEGER
+	}
+
+snRtIpRipPortIfConfigInterfaceIndex    OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The If index for ip rip port config entry."
+	::= { snRtIpRipPortIfConfigEntry 1 }
+
+snRtIpRipPortIfVersion            OBJECT-TYPE
+	SYNTAX  INTEGER { disabled(0), v1Only(1), v2Only(2), v1CompatibleV2(3) }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The ip rip version on this port."
+	::= { snRtIpRipPortIfConfigEntry 2 }
+
+snRtIpRipPortIfPoisonReverse      OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable poison reverse."
+	::= { snRtIpRipPortIfConfigEntry 3 }
+
+snRtIpRipPortIfLearnDefault          OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(0),             
+		enabled(1)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Apply the RIP router protocol learn-default option to the
+		interface.  The values that can be written are:
+		disabled(0)...deleted the learn default option.
+		enabled(1)....enabled the learn default option."
+	::= { snRtIpRipPortIfConfigEntry 4 }
+
+-- IP RIP port access table, PortIndex is changed to ifIndex
+
+snRtIpRipPortIfAccessTable	     OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnRtIpRipPortIfAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"ip interface rip access table."
+	::= { snRip 8 }
+
+snRtIpRipPortIfAccessEntry	     OBJECT-TYPE
+	SYNTAX	SnRtIpRipPortIfAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry of the ip interface rip access table."
+	INDEX	{ snRtIpRipPortIfAccessPort, snRtIpRipPortIfAccessDir }
+	::= { snRtIpRipPortIfAccessTable 1 }
+
+SnRtIpRipPortIfAccessEntry ::= SEQUENCE {
+	snRtIpRipPortIfAccessPort
+		InterfaceIndex,
+	snRtIpRipPortIfAccessDir
+		INTEGER,
+	snRtIpRipPortIfAccessFilterList
+		OCTET STRING,
+	snRtIpRipPortIfAccessRowStatus
+		INTEGER
+	}
+
+snRtIpRipPortIfAccessPort	     OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The ip interface to which the rip filter applies."
+	::= { snRtIpRipPortIfAccessEntry 1 }
+
+snRtIpRipPortIfAccessDir	     OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The access direction of incoming packet filter
+		or outgoing packet filter."
+	::= { snRtIpRipPortIfAccessEntry 2 }
+
+snRtIpRipPortIfAccessFilterList  OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(1..64))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An ip rip filter list, of which each octet contains
+		a filter ID number that forms a group of filters. A
+		valid entry in the snRtIpRipRouteFilterTable with the
+		corresponding filter ID number (i.e. snRtIpRipRouteFilterId)
+		must have been created before a filter list is initialized."
+	::= { snRtIpRipPortIfAccessEntry 3 }
+
+snRtIpRipPortIfAccessRowStatus   OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+		"This object is used to create and
+		delete row in the table and control
+		if they are used. The values
+		that can be written are:
+		delete(3)...deletes the row
+		create(4)...creates a new row
+		modify(5)...modifies an exsisting row
+
+		If the row exists, then a SET with
+		value of create(4) returns error
+		'badValue'. Deleted rows go away
+		immediately. The following values
+		can be returned on reads:
+		invalid(1)...Setting it to 'invalid' has the effect of
+		             rendering it inoperative.
+		valid(2).....the row exists and is valid"
+	::= { snRtIpRipPortIfAccessEntry 4 }
+
+-- DVMRP MIB
+
+snDvmrpMIBObjects OBJECT IDENTIFIER ::= { snDvmrp 1 }
+
+snDvmrpVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The router's DVMRP version information."
+    ::= { snDvmrpMIBObjects 1 }
+
+snDvmrpEnable OBJECT-TYPE
+    SYNTAX     RtrStatus
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Enable or disable DVMRP on this router."
+    DEFVAL     { disabled }
+    ::= { snDvmrpMIBObjects 2 }
+
+snDvmrpGenerationId OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The generation identifier for the routing process.  This is
+            used by neighboring routers to detect whether pruning
+            information should be resent."
+    ::= { snDvmrpMIBObjects 3 }
+
+snDvmrpProbeInterval OBJECT-TYPE
+    SYNTAX     INTEGER (5..30)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval at which the router sends out
+            probe messages to discover neighbour routers. Value is
+            in number of seconds. snDvmrpEnable must be 'enabled'
+            before this object is writen."
+    DEFVAL     { 10 }
+    ::= { snDvmrpMIBObjects 4 }
+
+snDvmrpReportInterval OBJECT-TYPE
+    SYNTAX     INTEGER (10..2000)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval at which the router sends out
+            full report messages. Value is in number of seconds.
+            snDvmrpEnable must be 'enabled' before this object is
+            writen."
+    DEFVAL     { 60 }
+    ::= { snDvmrpMIBObjects 5 }
+
+snDvmrpTriggerInterval OBJECT-TYPE
+    SYNTAX     INTEGER (5..30)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval at which triggered updates are
+            sent out. Value is in number of seconds. snDvmrpEnable must
+            be 'enabled' before this object is writen."
+    DEFVAL     { 5 }
+    ::= { snDvmrpMIBObjects 6 }
+
+snDvmrpNeighborRouterTimeout OBJECT-TYPE
+    SYNTAX     INTEGER (60..8000)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which the neighbour router
+            is considered down. Value is in number of seconds. snDvmrpEnable
+            must be 'enabled' before this object is writen."
+    DEFVAL     { 180 }
+    ::= { snDvmrpMIBObjects 7 }
+
+snDvmrpRouteExpireTime OBJECT-TYPE
+    SYNTAX     INTEGER (20..4000)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which the route expires
+            and becomes unreachable. Value is in number of seconds.
+            snDvmrpEnable must be 'enabled' before this object is writen."
+    DEFVAL     { 200 }
+    ::= { snDvmrpMIBObjects 8 }
+
+snDvmrpRouteDiscardTime OBJECT-TYPE
+    SYNTAX     INTEGER (40..8000)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which a route is discarded
+            from the route table. Value is in number of seconds.
+            snDvmrpEnable must be 'enabled' before this object is writen."
+    DEFVAL     { 340 }
+    ::= { snDvmrpMIBObjects 9 }
+
+snDvmrpPruneAge OBJECT-TYPE
+    SYNTAX     INTEGER (20..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the duration of time for which the prune state
+            is stored. Value is in number of seconds. snDvmrpEnable
+            must be 'enabled' before this object is writen."
+    DEFVAL     { 180 }
+    ::= { snDvmrpMIBObjects 10 }
+
+snDvmrpGraftRetransmitTime OBJECT-TYPE
+    SYNTAX     INTEGER (5..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which a graft message will
+            be retransmitted if graft acknowledge message has not been
+            received. Value is in number of seconds. snDvmrpEnable must
+            be 'enabled' before this object is writen."
+    DEFVAL     { 10 }
+    ::= { snDvmrpMIBObjects 11 }
+
+snDvmrpDefaultRoute OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the IP address of a router that is connected to one
+            of the directly attached subnet. If a multicast route is not
+            present on the local router, this default route will be used
+            for multicast forwarding. snDvmrpEnable must be 'enabled'
+            before this object is writen."
+    ::= { snDvmrpMIBObjects 12 }
+
+-- The DVMRP Virtual Interface Table
+
+snDvmrpVInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnDvmrpVInterfaceEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's DVMRP virtual
+            interfaces. snDvmrpEnable must be 'enabled' before this
+            table is read or writen."
+    ::= { snDvmrpMIBObjects 13 }
+
+snDvmrpVInterfaceEntry OBJECT-TYPE
+    SYNTAX     SnDvmrpVInterfaceEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snDvmrpVInterfaceTable.
+            This row augments ipMRouteInterfaceEntry in the IP
+            Multicast MIB, where the threshold object resides."
+    INDEX      { snDvmrpVInterfaceVifIndex }
+    ::= { snDvmrpVInterfaceTable 1 }
+
+SnDvmrpVInterfaceEntry ::= SEQUENCE {
+    snDvmrpVInterfaceVifIndex              INTEGER,
+    snDvmrpVInterfaceType                  INTEGER,
+    snDvmrpVInterfaceOperState             INTEGER,
+    snDvmrpVInterfaceLocalAddress          IpAddress,
+    snDvmrpVInterfaceRemoteAddress         IpAddress,
+    snDvmrpVInterfaceRemoteSubnetMask      IpAddress,
+    snDvmrpVInterfaceMetric                INTEGER,
+    snDvmrpVInterfaceTtlThreshold          INTEGER,
+    snDvmrpVInterfaceAdvertiseLocal        RtrStatus,
+    snDvmrpVInterfaceEncapsulation         RtrStatus,
+    snDvmrpVInterfaceStatus                INTEGER }
+
+snDvmrpVInterfaceVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER (1..48)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ifIndex value of this DVMRP virtual interface."
+    ::= { snDvmrpVInterfaceEntry 1 }
+
+snDvmrpVInterfaceType OBJECT-TYPE
+    SYNTAX     INTEGER { tunnel(1), querier(2), subnet(3) }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The type of this DVMRP virtual interface, whether it uses
+            a tunnel, a physical interface for which we are a querier,
+            or a physical interface for which we are not a querier.
+			For write operation, this object can only accept tunnel(1)
+			to configure a tunnel interface or subnet(3) to configure
+			a physical interface."
+    ::= { snDvmrpVInterfaceEntry 2 }
+
+snDvmrpVInterfaceOperState OBJECT-TYPE
+    SYNTAX     INTEGER { up(1), down(2) }
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The current operational state of this DVMRP virtual
+            interface."
+    ::= { snDvmrpVInterfaceEntry 3 }
+
+snDvmrpVInterfaceLocalAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the local end of this DVMRP virtual
+            interface."
+    ::= { snDvmrpVInterfaceEntry 4 }
+
+snDvmrpVInterfaceRemoteAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the remote end of this DVMRP virtual
+            interface.  For a tunnel, this is the IP address of the
+            neighboring router.  For a subnet, this is the subnet
+            address."
+    ::= { snDvmrpVInterfaceEntry 5 }
+
+snDvmrpVInterfaceRemoteSubnetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The subnet mask for a directly connected subnet.  For
+            a tunnel, this should be 0.0.0.0."
+    ::= { snDvmrpVInterfaceEntry 6 }
+
+snDvmrpVInterfaceMetric OBJECT-TYPE
+    SYNTAX     INTEGER (1..31)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The distance metric for this DVMRP virtual interface which
+            is used to calculate distance vectors."
+    DEFVAL     { 1 }
+    ::= { snDvmrpVInterfaceEntry 7 }
+
+snDvmrpVInterfaceTtlThreshold OBJECT-TYPE
+    SYNTAX     INTEGER (1..254)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the minimum time-to-live value to forward the packets
+            out of this virtual interface."
+    DEFVAL     { 1 }
+    ::= { snDvmrpVInterfaceEntry 8 }
+
+snDvmrpVInterfaceAdvertiseLocal OBJECT-TYPE
+    SYNTAX     RtrStatus
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Enable or disable the advertising of this local route."
+    DEFVAL     { enabled }
+    ::= { snDvmrpVInterfaceEntry 9 }
+
+snDvmrpVInterfaceEncapsulation OBJECT-TYPE
+    SYNTAX     RtrStatus
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Enable or disable the encapsulation of the DVMRP control
+            packets when using IPINIP encapsulation."
+    DEFVAL     { disabled }
+    ::= { snDvmrpVInterfaceEntry 10 }
+
+
+snDvmrpVInterfaceStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    invalid(1),
+                    valid(2),
+                    delete(3),
+                    create(4),
+                    modify(5)
+               }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+		 	"This object is used to create and
+		     delete row in the table and control
+			 if they are used. The values
+		     that can be written are:
+		     delete(3)...deletes the row
+		     create(4)...creates a new row
+		     modify(5)...modifies an exsisting row
+
+		     If the row exists, then a SET with
+		     value of create(4) returns error
+		     'badValue'. Deleted rows go away
+		     immediately. The following values
+		     can be returned on reads:
+		     invalid(1)...Setting it to 'invalid' has the effect of
+                          rendering it inoperative.
+		     valid(2)....Setting it to 'valid' has the effect of
+                         changing the row to operative."
+    ::= { snDvmrpVInterfaceEntry 11 }
+
+
+-- The DVMRP Neighbor Table
+
+snDvmrpNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnDvmrpNeighborEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's DVMRP
+            neighbors, as discovered by receiving Neighbor Probe
+            messages. snDvmrpEnable must be 'enabled' before this
+            table is read."
+    ::= { snDvmrpMIBObjects 14 }
+
+snDvmrpNeighborEntry OBJECT-TYPE
+    SYNTAX     SnDvmrpNeighborEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snDvmrpNeighborTable."
+    INDEX      { snDvmrpNeighborEntryIndex }
+    ::= { snDvmrpNeighborTable 1 }
+
+SnDvmrpNeighborEntry ::= SEQUENCE {
+    snDvmrpNeighborEntryIndex      INTEGER,
+    snDvmrpNeighborVifIndex        INTEGER,
+    snDvmrpNeighborAddress         IpAddress,
+    snDvmrpNeighborUpTime          TimeTicks,
+    snDvmrpNeighborExpiryTime      TimeTicks,
+    snDvmrpNeighborGenerationId    INTEGER,
+    snDvmrpNeighborMajorVersion    INTEGER,
+    snDvmrpNeighborMinorVersion    INTEGER,
+    snDvmrpNeighborCapabilities    INTEGER }
+
+snDvmrpNeighborEntryIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The table entry index."
+    ::= { snDvmrpNeighborEntry 1 }
+
+snDvmrpNeighborVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The value of VifIndex for the virtual interface used to
+            reach this DVMRP neighbor."
+    ::= { snDvmrpNeighborEntry 2 }
+
+snDvmrpNeighborAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the DVMRP neighbor for which this entry
+            contains information."
+    ::= { snDvmrpNeighborEntry 3 }
+
+snDvmrpNeighborUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The time since this DVMRP neighbor (last) became a neighbor
+            of the local router."
+    ::= { snDvmrpNeighborEntry 4 }
+
+snDvmrpNeighborExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The minimum time remaining before this DVMRP neighbor will
+            be aged out."
+    ::= { snDvmrpNeighborEntry 5 }
+
+snDvmrpNeighborGenerationId OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The neighboring router's generation identifier."
+    ::= { snDvmrpNeighborEntry 6 }
+
+snDvmrpNeighborMajorVersion OBJECT-TYPE
+    SYNTAX     INTEGER (0..255)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The neighboring router's major DVMRP version number."
+    ::= { snDvmrpNeighborEntry 7 }
+
+snDvmrpNeighborMinorVersion OBJECT-TYPE
+    SYNTAX     INTEGER (0..255)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The neighboring router's minor DVMRP version number."
+    ::= { snDvmrpNeighborEntry 8 }
+
+snDvmrpNeighborCapabilities OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "This object describes the neighboring router's
+             capabilities.  The following shows the position
+             of each bit:
+
+             bit position  meaning
+             -----------   ------
+                 3         mtrace bit
+                 2         generationID bit
+                 1         prune bit
+                 0         leaf bit
+
+             The leaf bit indicates that the neighbor has only
+             one interface with neighbors.  The prune bit indicates
+             that the neighbor supports pruning.  The generationID bit
+             indicates that the neighbor sends its generationID in Probe
+             messages.  The mtrace bit indicates that the neighbor can
+             handle mtrace requests."
+    ::= { snDvmrpNeighborEntry 9 }
+
+
+-- The DVMRP Route Table
+
+snDvmrpRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnDvmrpRouteEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The routing table used by DVMRP in place of the unicast
+            routing table. snDvmrpEnable must be 'enabled' before this
+            table is read."
+    ::= { snDvmrpMIBObjects 15 }
+
+snDvmrpRouteEntry OBJECT-TYPE
+    SYNTAX     SnDvmrpRouteEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast routing
+            information used by DVMRP in place of the unicast routing
+            information."
+    INDEX      { snDvmrpRouteEntryIndex }
+    ::= { snDvmrpRouteTable 1 }
+
+SnDvmrpRouteEntry ::= SEQUENCE {
+    snDvmrpRouteEntryIndex         INTEGER,
+    snDvmrpRouteSource             IpAddress,
+    snDvmrpRouteSourceMask         IpAddress,
+    snDvmrpRouteUpstreamNeighbor   IpAddress,
+    snDvmrpRouteVifIndex           INTEGER,
+    snDvmrpRouteMetric             INTEGER,
+    snDvmrpRouteExpiryTime         TimeTicks }
+
+snDvmrpRouteEntryIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The table entry index."
+    ::= { snDvmrpRouteEntry 1 }
+
+snDvmrpRouteSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The network address which when combined with the
+            corresponding value of snDvmrpRouteSourceMask identifies the
+            sources for which this entry contains multicast routing
+            information."
+    ::= { snDvmrpRouteEntry 2 }
+
+snDvmrpRouteSourceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The network mask which when combined with the corresponding
+            value of snDvmrpRouteSource identifies the sources for which
+            this entry contains multicast routing information."
+    ::= { snDvmrpRouteEntry 3 }
+
+snDvmrpRouteUpstreamNeighbor OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The address of the upstream neighbor (e.g., RPF neighbor)
+            from which IP datagrams from these sources are received."
+    ::= { snDvmrpRouteEntry 4 }
+
+snDvmrpRouteVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The value of snDvmrpVInterfaceVifIndex for the virtual
+            interface on which IP datagrams sent by these sources are
+            received."
+    ::= { snDvmrpRouteEntry 5 }
+
+snDvmrpRouteMetric OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The distance in hops to the source subnet."
+    ::= { snDvmrpRouteEntry 6 }
+
+snDvmrpRouteExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only			  
+    STATUS     mandatory
+    DESCRIPTION
+            "The minimum amount of time remaining before this entry will
+            be aged out."
+    ::= { snDvmrpRouteEntry 7 }
+
+-- The DVMRP Routing Next Hop Table
+
+snDvmrpRouteNextHopTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnDvmrpRouteNextHopEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table containing information on the next
+            hops on outgoing interfaces for routing IP multicast
+            datagrams. snDvmrpEnable must be 'enabled' before this
+            table is read."
+    ::= { snDvmrpMIBObjects 16 }
+
+snDvmrpRouteNextHopEntry OBJECT-TYPE
+    SYNTAX     SnDvmrpRouteNextHopEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the list of next hops on
+            outgoing interfaces to which IP multicast datagrams from
+            particular sources are routed."
+    INDEX      { snDvmrpRouteNextHopSource, snDvmrpRouteNextHopSourceMask,
+                 snDvmrpRouteNextHopVifIndex }
+    ::= { snDvmrpRouteNextHopTable 1 }
+
+SnDvmrpRouteNextHopEntry ::= SEQUENCE {
+    snDvmrpRouteNextHopSource             IpAddress,
+    snDvmrpRouteNextHopSourceMask         IpAddress,
+    snDvmrpRouteNextHopVifIndex           INTEGER,
+    snDvmrpRouteNextHopType               INTEGER }
+
+snDvmrpRouteNextHopSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The network address which when combined with the
+            corresponding value of snDvmrpRouteNextHopSourceMask
+            identifies the sources for which this entry specifies
+            a next hop on an outgoing interface."
+    ::= { snDvmrpRouteNextHopEntry 1 }
+
+snDvmrpRouteNextHopSourceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The network mask which when combined with the corresponding
+            value of snDvmrpRouteNextHopSource identifies the sources for
+            which this entry specifies a next hop on an outgoing
+            interface."
+    ::= { snDvmrpRouteNextHopEntry 2 }
+
+snDvmrpRouteNextHopVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The snDvmrpVInterfaceVifIndex value of the virtual interface
+            for the outgoing interface for this next hop."
+    ::= { snDvmrpRouteNextHopEntry 3 }
+
+snDvmrpRouteNextHopType OBJECT-TYPE
+    SYNTAX     INTEGER { leaf(1), branch(2) }
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "Type is leaf if no neighbors exist on the outgoing virtual
+            interface.  Otherwise, type is branch."
+    ::= { snDvmrpRouteNextHopEntry 4 }
+
+-- The DVMRP Virtual Interface Statistics Table
+
+snDvmrpVIfStatTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnDvmrpVIfStatEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's DVMRP virtual interface
+            statistical counters. snDvmrpEnable must be 'enabled' before this
+            table is read."
+    ::= { snDvmrpMIBObjects 17 }
+
+snDvmrpVIfStatEntry OBJECT-TYPE
+    SYNTAX     SnDvmrpVIfStatEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snDvmrpVIfStatTable."
+    INDEX      { snDvmrpVIfStatVifIndex }
+    ::= { snDvmrpVIfStatTable 1 }
+
+SnDvmrpVIfStatEntry ::= SEQUENCE {
+    snDvmrpVIfStatVifIndex              INTEGER,
+    snDvmrpVIfStatInPkts                Counter,
+    snDvmrpVIfStatOutPkts               Counter,
+    snDvmrpVIfStatInOctets              Counter,
+    snDvmrpVIfStatOutOctets             Counter,
+    snDvmrpVIfStatInProbePkts           Counter,
+    snDvmrpVIfStatOutProbePkts          Counter,
+    snDvmrpVIfStatDiscardProbePkts      Counter,
+    snDvmrpVIfStatInRtUpdatePkts        Counter,
+    snDvmrpVIfStatOutRtUpdatePkts       Counter,
+    snDvmrpVIfStatDiscardRtUpdatePkts   Counter,
+    snDvmrpVIfStatInGraftPkts           Counter,
+    snDvmrpVIfStatOutGraftPkts          Counter,
+    snDvmrpVIfStatDiscardGraftPkts      Counter,
+    snDvmrpVIfStatInGraftAckPkts        Counter,
+    snDvmrpVIfStatOutGraftAckPkts       Counter,
+    snDvmrpVIfStatDiscardGraftAckPkts   Counter,
+    snDvmrpVIfStatInPrunePkts           Counter,
+    snDvmrpVIfStatOutPrunePkts          Counter,
+    snDvmrpVIfStatDiscardPrunePkts      Counter }
+
+snDvmrpVIfStatVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ifIndex value of this DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 1 }
+
+snDvmrpVIfStatInPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of packets that have arrived on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 2 }
+
+snDvmrpVIfStatOutPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of packets that have been sent on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 3 }
+
+snDvmrpVIfStatInOctets OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of octets that have arrived on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 4 }
+
+snDvmrpVIfStatOutOctets OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of octets that have been sent on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 5 }
+
+snDvmrpVIfStatInProbePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of probe packets that have arrived
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 6 }
+
+snDvmrpVIfStatOutProbePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of probe packets that have been sent
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 7 }
+
+snDvmrpVIfStatDiscardProbePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of probe packets that have been discarded
+            by the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 8 }
+
+snDvmrpVIfStatInRtUpdatePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of route update packets that have arrived
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 9 }
+
+snDvmrpVIfStatOutRtUpdatePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of route update packets that have been sent
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 10 }
+
+snDvmrpVIfStatDiscardRtUpdatePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of route update packets that have been
+            discarded by the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 11 }
+
+snDvmrpVIfStatInGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have arrived
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 12 }
+
+snDvmrpVIfStatOutGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have been sent
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 13 }
+
+snDvmrpVIfStatDiscardGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have been discarded
+            by the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 14 }
+
+snDvmrpVIfStatInGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have arrived
+            on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 15 }
+
+snDvmrpVIfStatOutGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have been
+            sent on the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 16 }
+
+snDvmrpVIfStatDiscardGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have been
+            discarded by the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 17 }
+
+snDvmrpVIfStatInPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have arrived on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 18 }
+
+snDvmrpVIfStatOutPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have been sent on the DVMRP
+            virtual interface."
+    ::= { snDvmrpVIfStatEntry 19 }
+
+snDvmrpVIfStatDiscardPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have been discarded
+            by the DVMRP virtual interface."
+    ::= { snDvmrpVIfStatEntry 20 }
+
+
+-- FSRP MIB
+
+snFsrpGlobal 	OBJECT IDENTIFIER ::= { snFsrp 1 }
+snFsrpIntf 		OBJECT IDENTIFIER ::= { snFsrp 2 }
+
+--  Section 1:	FSRP Global Variables
+
+snFsrpGroupOperMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+		disabled(0),             
+		enabled(1)
+		}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The FSRP is configured on this system
+		 either enabled or disabled and the
+		 default is disabled mode.
+		 disabled(0)..........disable FSRP   
+		 enabled(1)...........activate FSRP"
+	::= { snFsrpGlobal 1 }
+
+snFsrpIfStateChangeTrap OBJECT-TYPE
+	SYNTAX	INTEGER { disabled(0), enabled(1) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether the SNMP agent process is
+		permitted to generate FSRP interface state change
+		traps."
+    DEFVAL { enabled }
+	::= { snFsrpGlobal 2 }
+
+
+--  Section 2: FSRP Interface Configuration Table
+
+--      The FSRP (Foundry Standby Routing Protocol) Interface Table augments 
+--		the ifTable with FSRP specific information.
+
+
+     snFsrpIfTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF SnFsrpIfEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The FSRP Interface Table describes the interfaces from
+            the viewpoint of FSRP."
+         ::= { snFsrpIntf 1 }
+
+     snFsrpIfEntry OBJECT-TYPE
+         SYNTAX   SnFsrpIfEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The FSRP Interface Entry describes one interface from
+            the viewpoint of FSRP."
+         INDEX { snFsrpIfPort, snFsrpIfIpAddress }
+         ::= { snFsrpIfTable 1 }
+
+     SnFsrpIfEntry ::=
+         SEQUENCE {
+             snFsrpIfPort
+			     INTEGER,
+             snFsrpIfIpAddress
+                 IpAddress,
+             snFsrpIfVirRtrIpAddr
+                 IpAddress,
+             snFsrpIfOtherRtrIpAddr
+                 IpAddress,
+             snFsrpIfPreferLevel
+                 INTEGER,
+             snFsrpIfTrackPortMask
+                 PortMask,
+			 snFsrpIfRowStatus 
+				 INTEGER,
+			 snFsrpIfState
+				 INTEGER,
+			 snFsrpIfKeepAliveTime 
+				 INTEGER,
+			 snFsrpIfRouterDeadTime 
+				 INTEGER,
+             snFsrpIfChassisTrackPortMask
+                 OCTET STRING,
+             snFsrpIfTrackPortList
+                 OCTET STRING
+         }
+
+
+    snFsrpIfPort OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The physical router port of this FSRP interface."
+         ::= { snFsrpIfEntry 1 }
+
+     snFsrpIfIpAddress OBJECT-TYPE
+         SYNTAX   IpAddress
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The IP Address of the physical router port of this
+            interface."
+         ::= { snFsrpIfEntry 2 }
+
+     snFsrpIfVirRtrIpAddr OBJECT-TYPE
+         SYNTAX   IpAddress
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The IP Address of the Virtual Router for the interface.
+            The Virtual Router IP address need to be configured on 
+            the interface before Redundant Router Function can operate
+            on the interface.  This address has to be same on all the
+            routers that going to participate in the Redundant Router
+            Function on a given subnet."
+         ::= { snFsrpIfEntry 3 }
+
+     snFsrpIfOtherRtrIpAddr OBJECT-TYPE
+         SYNTAX   IpAddress
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The IP Address of the Other Router on this ip subnet
+            that operates FSRP and to whom the Keep Alive message
+            need to be sent by this router.  This object must be
+            configured for FSRP to work correctly"
+         ::= { snFsrpIfEntry 4 }
+
+     snFsrpIfPreferLevel OBJECT-TYPE
+         SYNTAX   INTEGER (1..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The higher the number the higher the priority is.
+            This parameter decides which router should becomes
+            the Active Router for the interface.  A Router with
+            higher priority selected to becomes the Active Router."
+         DEFVAL { 100 }
+         ::= { snFsrpIfEntry 5 }
+
+     snFsrpIfTrackPortMask OBJECT-TYPE
+         SYNTAX   PortMask
+         ACCESS   read-write
+         STATUS   deprecated
+         DESCRIPTION
+            "This object specifies the identity of the physical port 
+			whose state is to be monitored.  Each bit is a port of
+			the system. Default value is 0.  If this object is configured
+			then the Preference Level of this interface will be adjusted
+			dynamically depending on the state of the Track Port.
+            The interface's Preference Level is reduced by value of 
+            Preference Level parameter when the Track Port states first
+            changes from UP to DOWN.  When the Track Port next comes up
+            the interface's Preference Level is increased by the amount
+            specified by the Preference Level.
+            The Standalone router FSRP Track port membership (Not used for Chassis Product)"
+         DEFVAL { 0 }
+         ::= { snFsrpIfEntry 6 }
+
+     snFsrpIfRowStatus OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					invalid(1),
+					valid(2),
+					delete(3),
+					create(4),
+					modify(5)
+				  }
+		 ACCESS   read-write
+	     STATUS   mandatory
+		 DESCRIPTION
+		 	"This object is used to create and
+		     delete row in the table and control
+			 if they are used. The values
+		     that can be written are:
+		     delete(3)...deletes the row
+		     create(4)...creates a new row
+		     modify(5)...modifies an exsisting row
+
+		     If the row exists, then a SET with
+		     value of create(4) returns error
+		     'badValue'. Deleted rows go away
+		     immediately. The following values
+		     can be returned on reads:
+		     noSuch(0)...no such row
+		     invalid(1)...Setting it to 'invalid' has the effect of
+                          rendering it inoperative..
+		     valid(2)....the row exists and is valid"
+	     ::= { snFsrpIfEntry 7 }
+
+     snFsrpIfState OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					init(0),
+					negotiating(1),
+					standby(2),
+					active(3)
+				  }
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "This object specifies the FSRP Router's interface state as:
+            init(0)...initialization state.
+            negotiating(1)...negotiating state.
+            standby(2)...standby state.
+            active(3)...active state." 
+         ::= { snFsrpIfEntry 8 }
+
+     snFsrpIfKeepAliveTime OBJECT-TYPE
+	     SYNTAX   INTEGER (1..120)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The heart-beat is from 1 to 120 seconds." 
+         DEFVAL { 3 }
+         ::= { snFsrpIfEntry 9 }
+
+     snFsrpIfRouterDeadTime OBJECT-TYPE
+	     SYNTAX   INTEGER (3..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The hold time of the Fsrp router is from 3 to 255 seconds." 
+         DEFVAL { 9 }
+         ::= { snFsrpIfEntry 10 }
+
+     snFsrpIfChassisTrackPortMask OBJECT-TYPE
+		 SYNTAX  OCTET STRING (SIZE(32))
+         ACCESS   read-write
+         STATUS   deprecated
+         DESCRIPTION
+            "This object specifies the identity of the physical port 
+			whose state is to be monitored.  Each bit is a port of
+			the system. Default value is 0.  If this object is configured
+			then the Preference Level of this interface will be adjusted
+			dynamically depending on the state of the Track Port.
+            The interface's Preference Level is reduced by value of 
+            Preference Level parameter when the Track Port states first
+            changes from UP to DOWN.  When the Track Port next comes up
+            the interface's Preference Level is increased by the amount
+            specified by the Preference Level.
+            The Chassis router FSRP Track port membership.
+            (It was obsoleted after release 07100, replaced by snFsrpIfTrackPortList)"
+         ::= { snFsrpIfEntry 11 }
+
+     snFsrpIfTrackPortList OBJECT-TYPE
+		 SYNTAX  OCTET STRING
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "This object specifies the identity of the physical port 
+			whose state is to be monitored.  Each port index is a
+			16-bit integer in big endian order. 8-bit is the slot
+			number, the other 8-bit is the port number. Default value
+			is 0 length octet string.  If this object is configured
+			then the Preference Level of this interface will be adjusted
+			dynamically depending on the state of the Track Port.
+            The interface's Preference Level is reduced by value of 
+            Preference Level parameter when the Track Port states first
+            changes from UP to DOWN.  When the Track Port next comes up
+            the interface's Preference Level is increased by the amount
+            specified by the Preference Level.
+            The router FSRP physical track port membership."
+         ::= { snFsrpIfEntry 12 }
+
+-- PIM MIB
+
+snPimMIBObjects OBJECT IDENTIFIER ::= { snPim 1 }
+snPimSMMIBObjects OBJECT IDENTIFIER ::= { snPim 2 }
+
+snPimEnable OBJECT-TYPE
+    SYNTAX     RtrStatus
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Enable or disable PIM on this router."
+    DEFVAL     { disabled }
+    ::= { snPimMIBObjects 1 }
+
+snPimNeighborRouterTimeout OBJECT-TYPE
+    SYNTAX     INTEGER (60..8000)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which the neighbour router
+            is considered down. Value is in number of seconds. snPimEnable
+            must be 'enabled' before this object is writen."
+    DEFVAL     { 180 }
+    ::= { snPimMIBObjects 2 }
+
+snPimHelloTime OBJECT-TYPE
+    SYNTAX     INTEGER (10..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the interval at which hello message is sent out
+            an interface to the neighbouring router. This is used to
+            detect the presence or abscense of a neighbouring router.
+            Value is in number of seconds. snPimEnable must be 'enabled'
+            before this object is writen."
+    DEFVAL     { 60 }
+    ::= { snPimMIBObjects 3 }
+
+snPimPruneTime OBJECT-TYPE
+    SYNTAX     INTEGER (10..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the duration of time for which the prune state
+            is stored. Value is in number of seconds. snPimEnable
+            must be 'enabled' before this object is writen."
+    DEFVAL     { 60 }
+    ::= { snPimMIBObjects 4 }
+
+snPimGraftRetransmitTime OBJECT-TYPE
+    SYNTAX     INTEGER (10..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the time interval after which a graft message will
+            be retransmitted if graft acknowledge message has not been
+            received. Value is in number of seconds. snPimEnable must
+            be 'enabled' before this object is writen."
+    DEFVAL     { 180 }
+    ::= { snPimMIBObjects 5 }
+
+snPimInactivityTime OBJECT-TYPE
+    SYNTAX     INTEGER (10..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the interval after which the forwarding entry is
+            deleted. When a packet is received for a group entry, this
+            time is reset. This is used to only keep the forwarding
+            entries for the active sessions. Value is in number of
+            seconds. snPimEnable must be 'enabled' before this object
+            is writen."
+    DEFVAL     { 180 }
+    ::= { snPimMIBObjects 6 }
+
+-- The PIM Virtual Interface Table
+
+snPimVInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimVInterfaceEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM virtual
+            interfaces. snPimEnable must be 'enabled' before this
+            table is read or writen."
+    ::= { snPimMIBObjects 7 }
+
+snPimVInterfaceEntry OBJECT-TYPE
+    SYNTAX     SnPimVInterfaceEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimVInterfaceTable."
+    INDEX      { snPimVInterfaceVifIndex }
+    ::= { snPimVInterfaceTable 1 }
+
+SnPimVInterfaceEntry ::= SEQUENCE {
+    snPimVInterfaceVifIndex              INTEGER,
+    snPimVInterfaceType                  INTEGER,
+    snPimVInterfaceLocalAddress          IpAddress,
+    snPimVInterfaceLocalSubnetMask       IpAddress,
+    snPimVInterfaceRemoteAddress         IpAddress,
+    snPimVInterfaceDR                    IpAddress,
+    snPimVInterfaceTtlThreshold          INTEGER,
+    snPimVInterfaceStatus                INTEGER,
+    snPimVInterfaceMode                  INTEGER }
+
+snPimVInterfaceVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER (1..48)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ifIndex value of this PIM virtual interface."
+    ::= { snPimVInterfaceEntry 1 }
+
+snPimVInterfaceType OBJECT-TYPE
+    SYNTAX     INTEGER { tunnel(1), subnet(2) }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The type of PIM virtual interface, whether it uses
+            a tunnel or a physical interface."
+    ::= { snPimVInterfaceEntry 2 }
+
+snPimVInterfaceLocalAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the local end of this PIM virtual
+            interface."
+    ::= { snPimVInterfaceEntry 3 }
+
+snPimVInterfaceLocalSubnetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The network mask for the IP address of the PIM
+            virtual interface. For a tunnel, this should be
+            0.0.0.0."
+    ::= { snPimVInterfaceEntry 4 }
+
+snPimVInterfaceRemoteAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the remote end of this PIM virtual
+            interface."
+    ::= { snPimVInterfaceEntry 5 }
+
+snPimVInterfaceDR OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The Designated Router on this PIM virtual interface.
+            For point-to-point interfaces, this object has the
+            value 0.0.0.0."
+    ::= { snPimVInterfaceEntry 6 }
+
+snPimVInterfaceTtlThreshold OBJECT-TYPE
+    SYNTAX     INTEGER (1..31)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This is the minimum time-to-live value to forward the packets
+            out of this interface."
+    DEFVAL     { 1 }
+    ::= { snPimVInterfaceEntry 7 }
+
+snPimVInterfaceStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    invalid(1),
+                    valid(2),
+                    delete(3),
+                    create(4),
+                    modify(5)
+               }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+		 	"This object is used to create and
+		     delete row in the table and control
+			 if they are used. The values
+		     that can be written are:
+		     delete(3)...deletes the row
+		     create(4)...creates a new row
+		     modify(5)...modifies an exsisting row
+
+		     If the row exists, then a SET with
+		     value of create(4) returns error
+		     'badValue'. Deleted rows go away
+		     immediately. The following values
+		     can be returned on reads:
+		     invalid(1)...Setting it to 'invalid' has the effect of
+                          rendering it inoperative.
+		     valid(2)....Setting it to 'valid' has the effect of
+                         changing the row to operative."
+    ::= { snPimVInterfaceEntry 8 }
+
+snPimVInterfaceMode OBJECT-TYPE
+    SYNTAX     INTEGER { dense(1), sparse(2) }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The configured mode of this PIM interface."
+    DEFVAL     { dense }
+    ::= { snPimVInterfaceEntry 9 }
+
+-- The PIM Neighbor Table
+
+snPimNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimNeighborEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM
+            neighbors. snPimEnable must be 'enabled' before this
+            table is read."
+    ::= { snPimMIBObjects 8 }
+
+snPimNeighborEntry OBJECT-TYPE
+    SYNTAX     SnPimNeighborEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimNeighborTable."
+    INDEX      { snPimNeighborEntryIndex }
+    ::= { snPimNeighborTable 1 }
+
+SnPimNeighborEntry ::= SEQUENCE {
+    snPimNeighborEntryIndex      INTEGER,
+    snPimNeighborVifIndex        INTEGER,
+    snPimNeighborAddress         IpAddress,
+    snPimNeighborUpTime          TimeTicks,
+    snPimNeighborExpiryTime      TimeTicks }
+
+snPimNeighborEntryIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The table entry index."
+    ::= { snPimNeighborEntry 1 }
+
+snPimNeighborVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The value of VifIndex for the virtual interface used to
+            reach this PIM neighbor."
+    ::= { snPimNeighborEntry 2 }
+
+snPimNeighborAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the PIM neighbor for which this entry
+            contains information."
+    ::= { snPimNeighborEntry 3 }
+
+snPimNeighborUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The time since this PIM neighbor (last) became a neighbor
+            of the local router."
+    ::= { snPimNeighborEntry 4 }
+
+snPimNeighborExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The minimum time remaining before this PIM neighbor will
+            be aged out."
+    ::= { snPimNeighborEntry 5 }
+
+-- The PIM Virtual Interface Statistics Table
+
+snPimVIfStatTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimVIfStatEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the router's PIM virtual
+            interface statistical counters. snPimEnable must be
+            'enabled' before this table is read."
+    ::= { snPimMIBObjects 9 }
+
+snPimVIfStatEntry OBJECT-TYPE
+    SYNTAX     SnPimVIfStatEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimVIfStatTable."
+    INDEX      { snPimVIfStatVifIndex }
+    ::= { snPimVIfStatTable 1 }
+
+SnPimVIfStatEntry ::= SEQUENCE {
+    snPimVIfStatVifIndex              INTEGER,
+    snPimVIfStatInJoinPkts            Counter,
+    snPimVIfStatOutJoinPkts           Counter,
+    snPimVIfStatDiscardJoinPkts       Counter,
+    snPimVIfStatInPrunePkts           Counter,
+    snPimVIfStatOutPrunePkts          Counter,
+    snPimVIfStatDiscardPrunePkts      Counter,
+    snPimVIfStatInAssertPkts          Counter,
+    snPimVIfStatOutAssertPkts         Counter,
+    snPimVIfStatDiscardAssertPkts     Counter,
+    snPimVIfStatInHelloPkts           Counter,
+    snPimVIfStatOutHelloPkts          Counter,
+    snPimVIfStatDiscardHelloPkts      Counter,
+    snPimVIfStatInGraftPkts           Counter,
+    snPimVIfStatOutGraftPkts          Counter,
+    snPimVIfStatDiscardGraftPkts      Counter,
+    snPimVIfStatInGraftAckPkts        Counter,
+    snPimVIfStatOutGraftAckPkts       Counter,
+    snPimVIfStatDiscardGraftAckPkts   Counter }
+
+snPimVIfStatVifIndex OBJECT-TYPE
+    SYNTAX     INTEGER (1..32)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ifIndex value of this PIM virtual interface."
+    ::= { snPimVIfStatEntry 1 }
+
+snPimVIfStatInJoinPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of join packets that have arrived
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 2 }
+
+snPimVIfStatOutJoinPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of join packets that have been sent
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 3 }
+
+snPimVIfStatDiscardJoinPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of join packets that have been discarded
+            by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 4 }
+
+snPimVIfStatInPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have arrived on the PIM
+            virtual interface."
+    ::= { snPimVIfStatEntry 5 }
+
+snPimVIfStatOutPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have been sent on the PIM
+            virtual interface."
+    ::= { snPimVIfStatEntry 6 }
+
+snPimVIfStatDiscardPrunePkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of prune packets that have been discarded
+            by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 7 }
+
+snPimVIfStatInAssertPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of assert packets that have arrived
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 8 }
+
+snPimVIfStatOutAssertPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of assert packets that have been sent
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 9 }
+
+snPimVIfStatDiscardAssertPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of assert packets that have been
+            discarded by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 10 }
+
+snPimVIfStatInHelloPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of hello packets that have arrived on the PIM
+            virtual interface."
+    ::= { snPimVIfStatEntry 11 }
+
+snPimVIfStatOutHelloPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of hello packets that have been sent on the PIM
+            virtual interface."
+    ::= { snPimVIfStatEntry 12 }
+
+snPimVIfStatDiscardHelloPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of hello packets that have been discarded
+            by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 13 }
+
+snPimVIfStatInGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have arrived
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 14 }
+
+snPimVIfStatOutGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have been sent
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 15 }
+
+snPimVIfStatDiscardGraftPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft packets that have been discarded
+            by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 16 }
+
+snPimVIfStatInGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have arrived
+            on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 17 }
+
+snPimVIfStatOutGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have been
+            sent on the PIM virtual interface."
+    ::= { snPimVIfStatEntry 18 }
+
+snPimVIfStatDiscardGraftAckPkts OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of graft acknowledge packets that have been
+            discarded by the PIM virtual interface."
+    ::= { snPimVIfStatEntry 19 }
+
+
+-- PIM-SM MIB
+
+snPimJoinPruneInterval OBJECT-TYPE
+    SYNTAX     INTEGER (10..3600)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The default interval in seconds at which periodic 
+			PIM-SM Join/Prune messages are to be sent. snPimEnable must 
+            be 'enabled' before this table is read or writen."
+    ::= { snPimSMMIBObjects 1 }
+
+-- PIM Candidate-BSR Table
+
+snPimCandidateBSRTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimCandidateBSR
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "Candidate Bootstrap Router information."
+    ::= { snPimSMMIBObjects 2 }
+
+snPimCandidateBSREntry OBJECT-TYPE
+    SYNTAX     SnPimCandidateBSR
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimCandidateBSRTable."
+    INDEX      { snPimCandidateBSRPortID }
+    ::= { snPimCandidateBSRTable 1 }
+
+SnPimCandidateBSR ::= SEQUENCE {
+    snPimCandidateBSRPortID        INTEGER,
+    snPimCandidateBSRIPAddress     IpAddress,
+    snPimCandidateBSRHashMaskLen   INTEGER,
+    snPimCandidateBSRPreference    INTEGER
+}
+
+snPimCandidateBSRPortID OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the PIM interface.
+         The bit 0 to bit 7: port number. 
+         The bit 8 to bit 11: slot number."
+    ::= { snPimCandidateBSREntry 1 }
+
+snPimCandidateBSRIPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The (unicast) address of the Candidate BSR."
+    ::= { snPimCandidateBSREntry 2 }
+
+snPimCandidateBSRHashMaskLen OBJECT-TYPE
+    SYNTAX     INTEGER (1..32)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The hash mask value for this router as a candidate
+            bootstrap router."
+    ::= { snPimCandidateBSREntry 3 }
+
+snPimCandidateBSRPreference OBJECT-TYPE
+    SYNTAX     INTEGER (0..255)
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The preference value for this router as a candidate
+            bootstrap router."
+    DEFVAL     { 100 }
+    ::= { snPimCandidateBSREntry 4 }
+
+
+
+-- The PIM RP-Set Table
+
+snPimRPSetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimRPSetEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing PIM information for
+            candidate Rendezvous Points (RPs) for IP multicast groups.
+            When the local router is the BSR, this information is
+            obtained from received Candidate-RP-Advertisements.  When
+            the local router is not the BSR, this information is
+            obtained from received RP-Set messages.
+             snPimEnable must be 'enabled' before this
+            table is read or writen."
+    ::= { snPimSMMIBObjects 3 }
+
+snPimRPSetEntry OBJECT-TYPE
+    SYNTAX     SnPimRPSetEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimRPSetTable."
+    INDEX    { snPimRPSetGroupAddress, snPimRPSetMask, snPimRPSetIPAddress }
+    ::= { snPimRPSetTable 1 }
+
+SnPimRPSetEntry ::= SEQUENCE {
+    snPimRPSetGroupAddress    IpAddress,
+    snPimRPSetMask            IpAddress,
+    snPimRPSetIPAddress       IpAddress,
+    snPimRPSetHoldTime        INTEGER
+}
+
+snPimRPSetGroupAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP multicast group address which, when combined with
+            snPimRPSetGroupMask, gives the group prefix for which this
+            entry contains information about the Candidate-RP."
+    ::= { snPimRPSetEntry 1 }
+
+snPimRPSetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The multicast group address mask which, when combined with
+            snPimRPSetGroupAddress, gives the group prefix for which this
+            entry contains information about the Candidate-RP."
+    ::= { snPimRPSetEntry 2 }
+
+snPimRPSetIPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP address of the Candidate-RP."
+    ::= { snPimRPSetEntry 3 }
+
+snPimRPSetHoldTime OBJECT-TYPE
+    SYNTAX     INTEGER (0..255)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The holdtime, in seconds, of a Candidate-RP.  If the 
+            local router is not the BSR, this value is 0."
+    ::= { snPimRPSetEntry 4 }
+
+
+-- The PIM Candidate-RP Table
+
+snPimCandidateRPTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnPimCandidateRPEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+            which the local router is to advertise itself as a
+            Candidate-RP. If this table is empty, then the local router
+            will advertise itself as a Candidate-RP for all groups
+             snPimEnable must be 'enabled' before this
+            table is read or writen."
+    ::= { snPimSMMIBObjects 4 }
+
+snPimCandidateRPEntry OBJECT-TYPE
+    SYNTAX     SnPimCandidateRPEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "An entry (conceptual row) in the snPimCandidateRPTable."
+    INDEX      { snPimCandidateRPGroupAddress,
+                 snPimCandidateRPMask }
+    ::= { snPimCandidateRPTable 1 }
+
+SnPimCandidateRPEntry ::= SEQUENCE {
+    snPimCandidateRPGroupAddress    IpAddress,
+    snPimCandidateRPMask            IpAddress,
+    snPimCandidateRPIPAddress       IpAddress,
+    snPimCandidateRPRowStatus       INTEGER
+}
+
+snPimCandidateRPGroupAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The IP multicast group address which, when combined with
+            snPimCandidateRPGroupMask, identifies a group prefix for which
+            the local router will advertise itself as a Candidate-RP."
+    ::= { snPimCandidateRPEntry 1 }
+
+snPimCandidateRPMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The multicast group address mask which, when combined with
+            snPimCandidateRPGroupMask, identifies a group prefix for which
+            the local router will advertise itself as a Candidate-RP."
+    ::= { snPimCandidateRPEntry 2 }
+
+snPimCandidateRPIPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The (unicast) address of the interface which will be
+            advertised as a Candidate-RP."
+    ::= { snPimCandidateRPEntry 3 }
+
+snPimCandidateRPRowStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noSuch(0),
+		other(1),
+		valid(2),
+		delete(3),
+		create(4),
+		modify(5)
+		}
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The status of this row, by which new entries may be
+            created, or old entries deleted from this table.
+              This object is used to create and delete row in the 
+            table and control if they are used. The values that 
+            can be written are:
+              delete(3)...deletes the row
+              create(4)...creates a new row
+              modify(5)...modifies an exsisting row
+            If the row exists, then a SET with value of create(4) 
+            returns error 'badValue'. Deleted rows go away
+            immediately. The following values can be returned on reads:
+              noSuch(0)...no such row
+              other(1)....some other case
+              valid(2)....the row exists and is valid"			
+    ::= { snPimCandidateRPEntry 4 }
+
+
+-- Loopback Interface configuration table
+
+snLoopbackIntfConfigTable           OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnLoopbackIntfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Loopback Interface Config table."
+	::= { snLoopbackIf 1 }
+
+snLoopbackIntfConfigEntry           OBJECT-TYPE
+	SYNTAX  SnLoopbackIntfConfigEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the Loopback Interface Config table."
+	INDEX   { snLoopbackIntfConfigPortIndex }
+	::= { snLoopbackIntfConfigTable 1 }
+
+SnLoopbackIntfConfigEntry ::= SEQUENCE {
+	snLoopbackIntfConfigPortIndex
+		INTEGER,
+	snLoopbackIntfMode		
+		INTEGER,
+	snLoopbackIntfRowStatus
+		INTEGER
+	}
+
+snLoopbackIntfConfigPortIndex       OBJECT-TYPE
+	SYNTAX  INTEGER (1..8)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for Loopback Interface config entry."
+	::= { snLoopbackIntfConfigEntry 1 }
+
+snLoopbackIntfMode                   OBJECT-TYPE
+    SYNTAX  INTEGER { disabled(0), enabled(1) }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The Loopback Interface mode."
+	::= { snLoopbackIntfConfigEntry 2 }
+
+snLoopbackIntfRowStatus   			OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snLoopbackIntfConfigEntry 3 }
+
+
+END

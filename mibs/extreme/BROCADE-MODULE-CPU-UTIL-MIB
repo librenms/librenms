@@ -1,0 +1,140 @@
+-- MIB File: BROCADE-MODULE-CPU-UTIL-MIB.mib
+-- *********************************************************************
+
+-- BROCADE-MODULE-CPU-UTIL-MIB.mib: Extreme module CPU utilization MIB
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+
+-- *********************************************************************
+
+BROCADE-MODULE-CPU-UTIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Integer32, Gauge32
+        FROM SNMPv2-SMI
+    bcsiModules
+        FROM Brocade-REG-MIB;
+		
+brocadeModuleCpuUtilMIB  MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+      "This MIB module supports the per module CPU utilization."
+	  
+    REVISION	    "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201611250000Z" -- 25 November 2016
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 12 }
+
+bcsiModuleCpuUtilNotifications  OBJECT IDENTIFIER
+    ::=  { brocadeModuleCpuUtilMIB 0 }
+bcsiModuleCpuUtilObjects OBJECT IDENTIFIER
+    ::=  { brocadeModuleCpuUtilMIB 1 }
+bcsiModuleCpuUtilConformance OBJECT IDENTIFIER
+    ::=  { brocadeModuleCpuUtilMIB 2 }
+
+		
+bcsiModuleCpuUtilTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BcsiModuleCpuUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table to list per module CPU utilization in the device."
+    ::= { bcsiModuleCpuUtilObjects 1 }
+
+bcsiModuleCpuUtilEntry OBJECT-TYPE
+    SYNTAX  BcsiModuleCpuUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the CPU utilization table."
+    INDEX   {
+        bcsiModuleCpuUtilSlotNum,
+        bcsiModuleCpuUtilInterval
+    }
+    ::= { bcsiModuleCpuUtilTable 1 }
+
+BcsiModuleCpuUtilEntry ::= SEQUENCE {
+    bcsiModuleCpuUtilSlotNum
+        Integer32,
+    bcsiModuleCpuUtilInterval
+        Integer32,
+    bcsiModuleCpuUtil100thPercent
+        Gauge32
+    }
+
+bcsiModuleCpuUtilSlotNum   OBJECT-TYPE
+    SYNTAX Integer32
+	MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The slot number of the module which contains the CPU.
+        Slot number in SLX are: MM1 = 1, MM2 = 2, LC1 = 3, LC2 =4 and so on."
+    ::= { bcsiModuleCpuUtilEntry 1 }
+
+bcsiModuleCpuUtilInterval  OBJECT-TYPE
+    SYNTAX   Integer32
+	MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The value, in seconds, for this utilization. It supports
+        utilization for the last 60 sec, 300 sec and 900 sec interval."
+    ::= { bcsiModuleCpuUtilEntry 2 }
+
+bcsiModuleCpuUtil100thPercent OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The statistical CPU utilization in units of one-hundredth
+         of a percent. For example-a value of 200 indicates 2 percent utilization."
+    ::= { bcsiModuleCpuUtilEntry 3 }
+
+--
+-- Conformance
+--
+
+bcsiModuleCpuUtilCompliances OBJECT IDENTIFIER
+                             ::= { bcsiModuleCpuUtilConformance 1 }
+bcsiModuleCpuUtilGroups       OBJECT IDENTIFIER
+                             ::= { bcsiModuleCpuUtilConformance 2 }
+
+bcsiModuleCpuUtilCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-MODULE-CPU-UTIL-MIB."
+    MODULE MANDATORY-GROUPS { bcsiModuleCpuUtilizationGroup }
+    ::= { bcsiModuleCpuUtilCompliances 1 }
+
+--
+-- Units of Conformance
+--
+
+bcsiModuleCpuUtilizationGroup  OBJECT-GROUP
+    OBJECTS {
+    bcsiModuleCpuUtilSlotNum,
+    bcsiModuleCpuUtilInterval,
+    bcsiModuleCpuUtil100thPercent
+    }
+    STATUS         current
+    DESCRIPTION
+        "A collection of objects for per module CPU utilization value."
+    ::= { bcsiModuleCpuUtilGroups 1 }
+
+END
+
+-- ========================================================================================
+
+

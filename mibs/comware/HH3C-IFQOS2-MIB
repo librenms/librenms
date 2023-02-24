@@ -1,0 +1,5174 @@
+-- ============================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Interface QoS Management Information Base.
+-- Reference: RFC 3291
+-- Version: 1.12
+-- History:
+-- V1.0 created by tangshun.
+-- V1.1 2006/02/24 modified by changhuifeng
+--  Add  object hh3cIfQoSWFQType in hh3cIfQoSWFQTable.
+--  Add hh3cIfQoSL3PlusObjects and hh3cIfQoSPortBindingTable.
+--  Modify property of hh3cIfQoSPortWredPreID to "not-accessible".
+--  Add the  enumeration ipall to hh3cIfQoSPQClassRuleType in hh3cIfQoSPQClassRuleTable.
+--  Modify some text errors in this file.
+-- V1.2 2006/03/29 modified by xialei
+--  Modify the ipv4acl value in description of hh3cIfQoSPQClassRuleValue and hh3cIfQoSCQClassRuleValue
+--  Add the enumeration mpls to hh3cIfQoSPQClassRuleType in hh3cIfQoSPQClassRuleTable.
+--  Add the enumeration ipall, mpls to hh3cIfQoSCQClassRuleType in hh3cIfQoSCQClassRuleTable.
+-- V1.3 2006/05/24 add by cuichuanjin
+--  Add hh3cIfQoSCarlTable
+-- V1.4 2007/11/12 modified by mouxuanli
+--  Modify the description of the object hh3cIfQoSPassPackets.
+--  Add 18 objects in hh3cIfQoSHardwareQueueRunInfoTable.
+--  Add hh3cIfQoSHQueueTcpRunInfoTable.
+-- V1.5 2008/9/25 modified by yueting
+--  Add hh3cQoSIfTraStaConfigInfoTable.
+--  Add hh3cQoSIfTraStaRunInfoTable.
+-- V1.6 2011/12/14 modified by mouxuanli
+--  Add the enumeration byteCountWrr, byteCountWfq to hh3cIfQoSQSMode in hh3cIfQoSQSModeTable.
+--  Add hh3cIfQoSQSMinBandwidth in hh3cIfQoSQSWeightTable.
+--  Add hh3cIfQoSLRPir in hh3cIfQoSLRConfigTable.
+-- V1.7 2012/04/28 modified by mouxuanli
+--  Add the enumeration ipPrecedence, dot11e, auto to hh3cIfQoSPortPriorityTrustTrustType.
+--  Add the enumeration overcast to hh3cIfQoSPortPriorityTrustOvercastType.
+--  Add hh3cIfQoSPrePriMapTable.
+-- V1.8 2013/10/25 modified by mouxuanli
+--  Add the enumeration gmb to hh3cIfQoSQSMode.
+--  Add hh3cIfQoSQSMinBandwidthPercent in hh3cIfQoSQSWeightTable.
+--  Add hh3cIfQoSLRUnit in hh3cIfQoSLRConfigTable.
+--  Add hh3cQoSGlobalPriorityObject.
+-- V1.9 2014/11/25 modified by zhaixiaoxiang & xunzhi
+--  Modify the name of CarAction to Hh3cIfCarAction.
+--  Add the enumeration remarkLocalPreContinue, remarkLocalPrePass, remarkDropPreContinue
+--  and remarkDropPrePass to Hh3cIfCarAction and modify the related descriptions.
+--  Add the enumeration hierarchy to hh3cIfQoSAggregativeCarType.
+--  Add hh3cIfQoSTricolorCarUnitType in hh3cIfQoSTricolorCarConfigTable.
+--  Add hh3cIfQoSGTSPir and hh3cIfQoSGTSUnitType in hh3cIfQoSGTSConfigTable.
+--  Add hh3cIfQoSProcessingStatus node.
+-- V1.10 2016/10/25 modified by gaomengfei
+--  Add the enumeration group3 and group4 to hh3cIfQoSQueueGroupType
+--  2017/05/20 modified by gaomengfei
+--  Add the hh3cIfQoSQueueName in hh3cIfQoSHardwareQueueRunInfoEntry
+--  Add hh3cIfQoSHardwareQueueTotalRunInfoTable
+--  2018/02/28 modified by hulifang
+--  Add hh3cIfQoSCoppFlowStatTable
+-- V1.11 2018/12/12 modified by meixixue
+--  2018/12/12 modified by meixixue
+--  Add the hh3cIfQoSDropPPS and hh3cIfQoSDropBPS in hh3cIfQoSHardwareQueueRunInfoEntry
+-- V1.12 2019/06/20 modified by wangqian
+--  2019/06/20 modified by wangqian
+--  Add the hh3cIfQoSPeakPassPPS and hh3cIfQoSPeakPassBPS in hh3cIfQoSHardwareQueueRunInfoEntry
+-- ============================================================================
+HH3C-IFQOS2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter64, Unsigned32, IpAddress
+                FROM SNMPv2-SMI
+            ifIndex
+                FROM IF-MIB
+            InetAddressIPv6, InetAddressPrefixLength
+                FROM INET-ADDRESS-MIB
+            RowStatus, TruthValue, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+--
+-- Nodes definitions
+--
+
+        hh3cIfQos2 MODULE-IDENTITY
+            LAST-UPDATED "201906200000Z"
+            ORGANIZATION
+                "New H3C Technologies Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Technologies Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "Add the hh3cIfQoSPeakPassPPS and hh3cIfQoSPeakPassBPS in hh3cIfQoSHardwareQueueRunInfoEntry."
+            REVISION "201906200000Z"        --June 20, 2019 at 00:00 GMT
+            DESCRIPTION
+                "Add the hh3cIfQoSDropPPS and hh3cIfQoSDropBPS in hh3cIfQoSHardwareQueueRunInfoEntry."
+            REVISION "201812120000Z"        --December 12, 2018 at 00:00 GMT
+            DESCRIPTION
+                "Interface QoS management information base."
+            REVISION "201802280000Z"        --February 28, 2018 at 00:00 GMT
+            DESCRIPTION
+                "Add hh3cIfQoSCoppFlowStatTable."
+            REVISION "201705200000Z"        --May 20, 2017 at 00:00 GMT
+            DESCRIPTION
+                "Add the hh3cIfQoSQueueName in hh3cIfQoSHardwareQueueRunInfoEntry and
+                add hh3cIfQoSHardwareQueueTotalRunInfoTable."
+            REVISION "201610250000Z"        --October 25, 2016 at 00:00 GMT
+            DESCRIPTION
+                "Add the enumeration group3 and group4 to hh3cIfQoSQueueGroupType."
+            REVISION "201411250000Z"        --November 25, 2014 at 00:00 GMT
+            DESCRIPTION
+                "Add the unit type node in hh3cIfQoSTricolorCarConfigTable and
+                hh3cIfQoSGTSConfigTable, and add object hh3cIfQoSProcessingStatus."
+            REVISION "201311280000Z"        --November 28, 2013 at 00:00 GMT
+            DESCRIPTION
+                "Interface QoS management information base."
+            ::= { hh3cQos2 1 }
+
+        hh3cQos2     OBJECT IDENTIFIER ::= { hh3cCommon 65 }
+
+-- IfCar Action
+        Hh3cIfCarAction ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "The actions taken when packets conforming or exceeding the configured CIR."
+            SYNTAX  INTEGER
+            {
+                invalid(0),
+                pass(1),
+                continue(2),
+                discard(3),
+                remark(4),
+                remark-ip-continue(5),
+                remark-ip-pass(6),
+                remark-mplsexp-continue(7),
+                remark-mplsexp-pass(8),
+                remark-dscp-continue(9),
+                remark-dscp-pass(10),
+                remark-dot1p-continue(11),
+                remark-dot1p-pass(12),
+                remark-atm-clp-continue(13),
+                remark-atm-clp-pass(14),
+                remark-fr-de-continue(15),
+                remark-fr-de-pass(16),
+                remarkLocalPreContinue(17),
+                remarkLocalPrePass(18),
+                remarkDropPreContinue(19),
+                remarkDropPrePass(20)
+            }
+
+--
+-- priority queue
+--
+        PriorityQueue ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "The type of priority queue."
+            SYNTAX INTEGER
+            {
+                top(1),
+                middle(2),
+                normal(3),
+                bottom(4)
+            }
+--
+-- direction
+--
+        Direction ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Inbound or outbound."
+            SYNTAX INTEGER
+            {
+                inbound(1),
+                outbound(2)
+            }
+--
+-- node of hh3cIfQoSHardwareQueueObjects
+--
+        hh3cIfQoSHardwareQueueObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 1 }
+--
+-- nodes of hh3cIfQoSHardwareQueueConfigGroup
+--
+        hh3cIfQoSHardwareQueueConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSHardwareQueueObjects 1 }
+
+        hh3cIfQoSQSModeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSQSModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue schedule mode information."
+            ::= { hh3cIfQoSHardwareQueueConfigGroup 1 }
+
+        hh3cIfQoSQSModeEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSQSModeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue schedule mode information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSQSModeTable 1 }
+
+        Hh3cIfQoSQSModeEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSQSMode
+                    INTEGER
+            }
+
+        hh3cIfQoSQSMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                sp(1),
+                sp0(2),
+                sp1(3),
+                sp2(4),
+                wrr(5),
+                hh3cfq(6),
+                wrr-sp(7),
+                byteCountWrr(8),
+                byteCountWfq(9),
+                gmb(10)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The mode of schedule."
+            ::= { hh3cIfQoSQSModeEntry 1 }
+
+--
+-- notes of hh3cIfQoSQSWeightTable
+--
+        hh3cIfQoSQSWeightTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSQSWeightEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue schedule weight configuration information."
+            ::= { hh3cIfQoSHardwareQueueConfigGroup 2 }
+
+        hh3cIfQoSQSWeightEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSQSWeightEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue schedule weight configuration information entry."
+            INDEX { ifIndex, hh3cIfQoSQueueID }
+            ::= { hh3cIfQoSQSWeightTable 1 }
+
+        Hh3cIfQoSQSWeightEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSQueueID
+                    Integer32,
+                hh3cIfQoSQueueGroupType
+                    INTEGER,
+                hh3cIfQoSQSType
+                    INTEGER,
+                hh3cIfQoSQSValue
+                    Integer32,
+                hh3cIfQoSQSMaxDelay
+                    Integer32,
+                hh3cIfQoSQSMinBandwidth
+                    Integer32,
+                hh3cIfQoSQSMinBandwidthPercent
+                    Unsigned32
+            }
+
+        hh3cIfQoSQueueID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue ID"
+            ::= { hh3cIfQoSQSWeightEntry 1 }
+
+        hh3cIfQoSQueueGroupType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                group0(1),
+                group1(2),
+                group2(3),
+                group3(4),
+                group4(5)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Group type of WRR and WFQ."
+            ::= { hh3cIfQoSQSWeightEntry 2 }
+
+        hh3cIfQoSQSType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                weight(1),
+                byte-count(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Schedule type."
+            ::= { hh3cIfQoSQSWeightEntry 3 }
+
+        hh3cIfQoSQSValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Schedule value."
+            ::= { hh3cIfQoSQSWeightEntry 4 }
+
+        hh3cIfQoSQSMaxDelay OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Max delay."
+            DEFVAL { 9 }
+            ::= { hh3cIfQoSQSWeightEntry 5 }
+
+        hh3cIfQoSQSMinBandwidth OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Min bandwidth.  Unit: kbps."
+            ::= { hh3cIfQoSQSWeightEntry 6 }
+
+        hh3cIfQoSQSMinBandwidthPercent OBJECT-TYPE
+            SYNTAX Unsigned32  (0..100 | 255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Percent of min bandwidth.  Unit: %.
+                 The value is 255 when the schedule mode of the queue is strict queuing.
+                "
+            ::= { hh3cIfQoSQSWeightEntry 7 }
+
+--
+-- nodes of hh3cIfQoSHardwareQueueRunInfoGroup
+--
+        hh3cIfQoSHardwareQueueRunInfoGroup OBJECT IDENTIFIER ::= { hh3cIfQoSHardwareQueueObjects 2 }
+
+        hh3cIfQoSHardwareQueueRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSHardwareQueueRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue statistic information."
+            ::= { hh3cIfQoSHardwareQueueRunInfoGroup 1 }
+
+        hh3cIfQoSHardwareQueueRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSHardwareQueueRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue statistic information entry."
+            INDEX { ifIndex, hh3cIfQoSQueueID }
+            ::= { hh3cIfQoSHardwareQueueRunInfoTable 1 }
+
+        Hh3cIfQoSHardwareQueueRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPassPackets
+                    Counter64,
+                hh3cIfQoSDropPackets
+                    Counter64,
+                hh3cIfQoSPassBytes
+                    Counter64,
+                hh3cIfQoSPassPPS
+                    Unsigned32,
+                hh3cIfQoSPassBPS
+                    Unsigned32,
+                hh3cIfQoSDropBytes
+                    Counter64,
+                hh3cIfQoSQueueLengthInPkts
+                    Unsigned32,
+                hh3cIfQoSQueueLengthInBytes
+                    Unsigned32,
+                hh3cIfQoSCurQueuePkts
+                    Unsigned32,
+                hh3cIfQoSCurQueueBytes
+                    Unsigned32,
+                hh3cIfQoSCurQueuePPS
+                    Unsigned32,
+                hh3cIfQoSCurQueueBPS
+                    Unsigned32,
+                hh3cIfQoSTailDropPkts
+                    Counter64,
+                hh3cIfQoSTailDropBytes
+                    Counter64,
+                hh3cIfQoSTailDropPPS
+                    Unsigned32,
+                hh3cIfQoSTailDropBPS
+                    Unsigned32,
+                hh3cIfQoSWredDropPkts
+                    Counter64,
+                hh3cIfQoSWredDropBytes
+                    Counter64,
+                hh3cIfQoSWredDropPPS
+                    Unsigned32,
+                hh3cIfQoSWredDropBPS
+                    Unsigned32,
+                hh3cIfQoSQueueName
+                    OCTET STRING,
+                hh3cIfQoSDropPPS
+                    Unsigned32,
+                hh3cIfQoSDropBPS
+                    Unsigned32,
+                hh3cIfQoSPeakPassPPS
+                    Unsigned32,
+                hh3cIfQoSPeakPassBPS
+                    Unsigned32
+            }
+
+        hh3cIfQoSPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of forwarded packets."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 1 }
+
+        hh3cIfQoSDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of dropped packets."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 2 }
+
+        hh3cIfQoSPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of forwarded packets."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 3 }
+
+        hh3cIfQoSPassPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of forwarded packets.  PPS: packets per second."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 4 }
+
+        hh3cIfQoSPassBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of forwarded packets.  BPS: bytes per second."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 5 }
+
+        hh3cIfQoSDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of dropped packets."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 6 }
+
+        hh3cIfQoSQueueLengthInPkts OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max number of packets which the queue can hold."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 7 }
+
+        hh3cIfQoSQueueLengthInBytes OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max bytes of packets which the queue can hold."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 8 }
+
+        hh3cIfQoSCurQueuePkts OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in the current queue."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 9 }
+
+        hh3cIfQoSCurQueueBytes OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of packets in the current queue."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 10 }
+
+        hh3cIfQoSCurQueuePPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of packets in the current queue."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 11 }
+
+        hh3cIfQoSCurQueueBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of packets in the current queue."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 12 }
+
+        hh3cIfQoSTailDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets dropped by tail dropping."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 13 }
+
+        hh3cIfQoSTailDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of packets dropped by tail dropping."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 14 }
+
+        hh3cIfQoSTailDropPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of packets dropped by tail dropping."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 15 }
+
+        hh3cIfQoSTailDropBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of packets dropped by tail dropping."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 16 }
+
+        hh3cIfQoSWredDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets dropped by WRED."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 17 }
+
+        hh3cIfQoSWredDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of packets dropped by WRED."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 18 }
+
+        hh3cIfQoSWredDropPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of packets dropped by WRED."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 19 }
+
+        hh3cIfQoSWredDropBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of packets dropped by WRED."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 20 }
+
+        hh3cIfQoSQueueName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(2..3))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Name of Queue."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 21 }
+
+        hh3cIfQoSDropPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of dropped packets.  PPS: packets per second."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 22 }
+
+        hh3cIfQoSDropBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of dropped packets.  BPS: bytes per second."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 23 }
+
+        hh3cIfQoSPeakPassPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max rate of forwarded packets in bytes per second (pps)
+                 during the period from the time when the reset command was executed
+                 to the current time."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 24 }
+
+        hh3cIfQoSPeakPassBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max rate of forwarded packets in bytes per second (Bps)
+                 during the period from the time when the reset command was executed
+                 to the current time."
+            ::= { hh3cIfQoSHardwareQueueRunInfoEntry 25 }
+
+--
+-- nodes of hh3cIfQoSHQueueTcpRunInfoTable
+--
+
+        hh3cIfQoSHQueueTcpRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSHQueueTcpRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue statistic information
+                 about TCP and non-TCP packets."
+            ::= { hh3cIfQoSHardwareQueueRunInfoGroup 2 }
+
+        hh3cIfQoSHQueueTcpRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSHQueueTcpRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue statistic information entry
+                 about TCP and non-TCP packets."
+            INDEX { ifIndex, hh3cIfQoSQueueID }
+            ::= { hh3cIfQoSHQueueTcpRunInfoTable 1 }
+
+        Hh3cIfQoSHQueueTcpRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWredDropLPreNTcpPkts
+                    Counter64,
+                hh3cIfQoSWredDropLPreNTcpBytes
+                    Counter64,
+                hh3cIfQoSWredDropLPreNTcpPPS
+                    Unsigned32,
+                hh3cIfQoSWredDropLPreNTcpBPS
+                    Unsigned32,
+                hh3cIfQoSWredDropLPreTcpPkts
+                    Counter64,
+                hh3cIfQoSWredDropLPreTcpBytes
+                    Counter64,
+                hh3cIfQoSWredDropLPreTcpPPS
+                    Unsigned32,
+                hh3cIfQoSWredDropLPreTcpBPS
+                    Unsigned32,
+                hh3cIfQoSWredDropHPreNTcpPkts
+                    Counter64,
+                hh3cIfQoSWredDropHPreNTcpBytes
+                    Counter64,
+                hh3cIfQoSWredDropHPreNTcpPPS
+                    Unsigned32,
+                hh3cIfQoSWredDropHPreNTcpBPS
+                    Unsigned32,
+                hh3cIfQoSWredDropHPreTcpPkts
+                    Counter64,
+                hh3cIfQoSWredDropHPreTcpBytes
+                    Counter64,
+                hh3cIfQoSWredDropHPreTcpPPS
+                    Unsigned32,
+                hh3cIfQoSWredDropHPreTcpBPS
+                    Unsigned32
+            }
+
+        hh3cIfQoSWredDropLPreNTcpPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of low-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 1 }
+
+        hh3cIfQoSWredDropLPreNTcpBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of low-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 2 }
+
+        hh3cIfQoSWredDropLPreNTcpPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of low-precedence non-TCP packets dropped by WRED.
+                 PPS: packets per second."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 3 }
+
+        hh3cIfQoSWredDropLPreNTcpBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of low-precedence non-TCP packets dropped by WRED.
+                 BPS: bytes per second."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 4 }
+
+        hh3cIfQoSWredDropLPreTcpPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of low-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 5 }
+
+        hh3cIfQoSWredDropLPreTcpBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of low-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 6 }
+
+        hh3cIfQoSWredDropLPreTcpPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of low-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 7 }
+
+        hh3cIfQoSWredDropLPreTcpBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of low-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 8 }
+
+        hh3cIfQoSWredDropHPreNTcpPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of high-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 9 }
+
+        hh3cIfQoSWredDropHPreNTcpBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of high-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 10 }
+
+        hh3cIfQoSWredDropHPreNTcpPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of high-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 11 }
+
+        hh3cIfQoSWredDropHPreNTcpBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of high-precedence non-TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 12 }
+
+        hh3cIfQoSWredDropHPreTcpPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of high-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 13 }
+
+        hh3cIfQoSWredDropHPreTcpBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes of high-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 14 }
+
+        hh3cIfQoSWredDropHPreTcpPPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PPS of high-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 15 }
+
+        hh3cIfQoSWredDropHPreTcpBPS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BPS of high-precedence TCP packets dropped by WRED."
+            ::= { hh3cIfQoSHQueueTcpRunInfoEntry 16 }
+
+--
+-- nodes of hh3cIfQoSHardwareQueueTotalRunInfoTable
+--
+
+        hh3cIfQoSHardwareQueueTotalRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSHardwareQueueTotalRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue statistic total information."
+            ::= { hh3cIfQoSHardwareQueueRunInfoGroup 3 }
+
+        hh3cIfQoSHardwareQueueTotalRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSHardwareQueueTotalRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue statistic information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSHardwareQueueTotalRunInfoTable 1 }
+
+        Hh3cIfQoSHardwareQueueTotalRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSQueueLength
+                    Unsigned32,
+                hh3cIfQoSPeakQueueBytes
+                    Unsigned32
+            }
+
+        hh3cIfQoSQueueLength OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The length of queues."
+            ::= { hh3cIfQoSHardwareQueueTotalRunInfoEntry 1 }
+
+        hh3cIfQoSPeakQueueBytes OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max bytes of packets in the current queues in the last 10 seconds."
+            ::= { hh3cIfQoSHardwareQueueTotalRunInfoEntry 2 }
+
+--
+-- nodes of hh3cIfQoSSoftwareQueueObjects
+--
+        hh3cIfQoSSoftwareQueueObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 2 }
+
+--
+-- nodes of hh3cIfQoSFIFOObject
+--
+        hh3cIfQoSFIFOObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 1 }
+
+        hh3cIfQoSFIFOConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSFIFOConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of FIFO queue information."
+            ::= { hh3cIfQoSFIFOObject 1 }
+
+        hh3cIfQoSFIFOConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSFIFOConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "FIFO queue information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSFIFOConfigTable 1 }
+
+        Hh3cIfQoSFIFOConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSFIFOMaxQueueLen
+                    Integer32
+            }
+
+        hh3cIfQoSFIFOMaxQueueLen OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The maximum length of FIFO queue."
+            ::= { hh3cIfQoSFIFOConfigEntry 1 }
+
+--
+-- nodes of hh3cIfQoSFifoRunfoTable
+--
+
+        hh3cIfQoSFIFORunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSFIFORunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of FIFO queue statistic information."
+            ::= { hh3cIfQoSFIFOObject 2 }
+
+        hh3cIfQoSFIFORunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSFIFORunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "FIFO queue statistic information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSFIFORunInfoTable 1 }
+
+        Hh3cIfQoSFIFORunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSFIFOSize
+                    Integer32,
+                hh3cIfQoSFIFODiscardPackets
+                    Counter64
+            }
+
+        hh3cIfQoSFIFOSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packet in FIFO queue."
+            ::= { hh3cIfQoSFIFORunInfoEntry 1 }
+
+        hh3cIfQoSFIFODiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discard packet."
+            ::= { hh3cIfQoSFIFORunInfoEntry 2 }
+
+--
+-- nodes of
+--
+        hh3cIfQoSPQObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 2 }
+
+        hh3cIfQoSPQConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSPQObject 1 }
+
+        hh3cIfQoSPQDefaultTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPQDefaultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of priority queue default configuration information."
+            ::= { hh3cIfQoSPQConfigGroup 1 }
+
+        hh3cIfQoSPQDefaultEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPQDefaultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority queue default configuration information entry."
+            INDEX { hh3cIfQoSPQListNumber }
+            ::= { hh3cIfQoSPQDefaultTable 1 }
+
+        Hh3cIfQoSPQDefaultEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPQListNumber
+                    Integer32,
+                hh3cIfQoSPQDefaultQueueType
+                    PriorityQueue
+            }
+
+        hh3cIfQoSPQListNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority queue list number."
+            ::= { hh3cIfQoSPQDefaultEntry 1 }
+
+        hh3cIfQoSPQDefaultQueueType OBJECT-TYPE
+            SYNTAX PriorityQueue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specify priority queue that packets put into by default."
+            ::= { hh3cIfQoSPQDefaultEntry 2 }
+--
+-- nods of hh3cIfQoSPQQueueLengthTable
+--
+        hh3cIfQoSPQQueueLengthTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPQQueueLengthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue length of priority queue configuration information."
+            ::= { hh3cIfQoSPQConfigGroup 2 }
+
+        hh3cIfQoSPQQueueLengthEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPQQueueLengthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue length of priority queue configuration information entry."
+            INDEX { hh3cIfQoSPQListNumber, hh3cIfQoSPQQueueLengthType }
+            ::= { hh3cIfQoSPQQueueLengthTable 1 }
+
+        Hh3cIfQoSPQQueueLengthEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPQQueueLengthType
+                    PriorityQueue,
+                hh3cIfQoSPQQueueLengthValue
+                    Integer32
+            }
+
+        hh3cIfQoSPQQueueLengthType OBJECT-TYPE
+            SYNTAX PriorityQueue
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of priority queue."
+            ::= { hh3cIfQoSPQQueueLengthEntry 1 }
+
+        hh3cIfQoSPQQueueLengthValue OBJECT-TYPE
+            SYNTAX Integer32 (1..1024)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The size of priority queue."
+            ::= { hh3cIfQoSPQQueueLengthEntry 2 }
+
+--
+-- nodes of hh3cIfQoSPQClassRuleTable
+--
+        hh3cIfQoSPQClassRuleTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPQClassRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of class rule of priority queue information."
+            ::= { hh3cIfQoSPQConfigGroup 3 }
+
+        hh3cIfQoSPQClassRuleEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPQClassRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of class rule of priority queue information."
+            INDEX { hh3cIfQoSPQListNumber,
+                    hh3cIfQoSPQClassRuleType,
+                    hh3cIfQoSPQClassRuleValue }
+            ::= { hh3cIfQoSPQClassRuleTable 1 }
+
+        Hh3cIfQoSPQClassRuleEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPQClassRuleType
+                    INTEGER,
+                hh3cIfQoSPQClassRuleValue
+                    Integer32,
+                hh3cIfQoSPQClassRuleQueueType
+                    PriorityQueue,
+                hh3cIfQoSPQClassRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPQClassRuleType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                interface(1),
+                ipv4acl(2),
+                ipv6acl(3),
+                fragments(4),
+                greater-than(5),
+                less-than(6),
+                tcp(7),
+                udp(8),
+                ipall(9),
+                mpls(10)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of class rule.
+                'ipall' means all ip packets."
+            ::= { hh3cIfQoSPQClassRuleEntry 1 }
+
+        hh3cIfQoSPQClassRuleValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Value of class rule.
+                 interface : ifIndex
+                 ipv4acl : 2000..3999
+                 ipv6acl : 2000..3999, 10000..42767
+                 greater-than : 0..65535
+                 less-than : 0..65535
+                 tcp : 0..65535
+                 udp : 0..65535
+                 mpls(exp-mask) : 1..255
+                 other types: 0
+                "
+            ::= { hh3cIfQoSPQClassRuleEntry 2 }
+
+        hh3cIfQoSPQClassRuleQueueType OBJECT-TYPE
+            SYNTAX PriorityQueue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify the queue for matched packets."
+            ::= { hh3cIfQoSPQClassRuleEntry 3 }
+
+        hh3cIfQoSPQClassRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPQClassRuleEntry 4 }
+--
+-- nodes of hh3cIfQoSPQApplyTable
+--
+        hh3cIfQoSPQApplyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPQApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of priority queue instance."
+            ::= { hh3cIfQoSPQConfigGroup 4 }
+
+        hh3cIfQoSPQApplyEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPQApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority queue instance information."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSPQApplyTable 1 }
+
+        Hh3cIfQoSPQApplyEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPQApplyListNumber
+                    Integer32,
+                hh3cIfQoSPQApplyRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPQApplyListNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Priority queue list number."
+            ::= { hh3cIfQoSPQApplyEntry 1 }
+
+        hh3cIfQoSPQApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPQApplyEntry 2 }
+
+--
+-- Nodes of hh3cIfQoSPQRunInfoGroup
+--
+        hh3cIfQoSPQRunInfoGroup OBJECT IDENTIFIER ::= { hh3cIfQoSPQObject 2 }
+--
+-- nodes of hh3cIfQoSPQRunInfoTable
+--
+        hh3cIfQoSPQRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of priority queue statistic information."
+            ::= { hh3cIfQoSPQRunInfoGroup 1 }
+
+        hh3cIfQoSPQRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority queue statistic information entry."
+            INDEX { ifIndex, hh3cIfQoSPQType }
+            ::= { hh3cIfQoSPQRunInfoTable 1 }
+
+        Hh3cIfQoSPQRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPQType
+                    PriorityQueue,
+                hh3cIfQoSPQSize
+                    Integer32,
+                hh3cIfQoSPQLength
+                    Integer32,
+                hh3cIfQoSPQDiscardPackets
+                    Counter64
+            }
+
+        hh3cIfQoSPQType OBJECT-TYPE
+            SYNTAX PriorityQueue
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of priority queue."
+            ::= { hh3cIfQoSPQRunInfoEntry 1 }
+
+        hh3cIfQoSPQSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in the priority queue."
+            ::= { hh3cIfQoSPQRunInfoEntry 2 }
+
+        hh3cIfQoSPQLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum length of priority queue."
+            ::= { hh3cIfQoSPQRunInfoEntry 3 }
+
+        hh3cIfQoSPQDiscardPackets    OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packet number of priority queue discard."
+            ::= { hh3cIfQoSPQRunInfoEntry 4 }
+--
+-- nodes of hh3cIfQoSCQObject
+
+        hh3cIfQoSCQObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 3 }
+
+        hh3cIfQoSCQConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSCQObject 1 }
+
+--
+-- nodes of hh3cIfQoSCQDefaultTable
+--
+        hh3cIfQoSCQDefaultTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCQDefaultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of custom queue default configuration information."
+            ::= { hh3cIfQoSCQConfigGroup 1 }
+
+        hh3cIfQoSCQDefaultEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCQDefaultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Custom queue default configuration information entry."
+            INDEX { hh3cIfQoSCQListNumber }
+            ::= { hh3cIfQoSCQDefaultTable 1 }
+
+        Hh3cIfQoSCQDefaultEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCQListNumber
+                    Integer32,
+                hh3cIfQoSCQDefaultQueueID
+                    Integer32
+            }
+
+        hh3cIfQoSCQListNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Custom queue list number."
+            ::= { hh3cIfQoSCQDefaultEntry 1 }
+
+        hh3cIfQoSCQDefaultQueueID OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Default queue ID."
+            DEFVAL { 1 }
+            ::= { hh3cIfQoSCQDefaultEntry 2 }
+--
+-- nods of hh3cIfQoSCQQueueLengthTable
+--
+        hh3cIfQoSCQQueueLengthTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCQQueueLengthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of queue length of custom queue configuration information."
+            ::= { hh3cIfQoSCQConfigGroup 2 }
+
+        hh3cIfQoSCQQueueLengthEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCQQueueLengthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Queue length of custom queue configuration information entry."
+            INDEX { hh3cIfQoSCQListNumber, hh3cIfQoSCQQueueID }
+            ::= { hh3cIfQoSCQQueueLengthTable 1 }
+
+        Hh3cIfQoSCQQueueLengthEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCQQueueID
+                    Integer32,
+                hh3cIfQoSCQQueueLength
+                    Integer32,
+                hh3cIfQoSCQQueueServing
+                    Integer32
+            }
+
+        hh3cIfQoSCQQueueID OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Custom queue index."
+            ::= { hh3cIfQoSCQQueueLengthEntry 1 }
+
+        hh3cIfQoSCQQueueLength OBJECT-TYPE
+            SYNTAX Integer32 (1..1024)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The size of custom queue."
+            DEFVAL { 20 }
+            ::= { hh3cIfQoSCQQueueLengthEntry 2 }
+
+        hh3cIfQoSCQQueueServing OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The maximum bytes that the specified queue can transmit in each turn."
+            DEFVAL { 1500 }
+            ::= { hh3cIfQoSCQQueueLengthEntry 3 }
+
+--
+-- nodes of hh3cIfQoSCQClassRuleTable
+--
+        hh3cIfQoSCQClassRuleTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCQClassRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of class rule of custom queue information."
+            ::= { hh3cIfQoSCQConfigGroup 3 }
+
+        hh3cIfQoSCQClassRuleEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCQClassRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of class rule of custom queue information."
+            INDEX { hh3cIfQoSCQListNumber,
+                    hh3cIfQoSCQClassRuleType,
+                    hh3cIfQoSCQClassRuleValue }
+            ::= { hh3cIfQoSCQClassRuleTable 1 }
+
+        Hh3cIfQoSCQClassRuleEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCQClassRuleType
+                    INTEGER,
+                hh3cIfQoSCQClassRuleValue
+                    Integer32,
+                hh3cIfQoSCQClassRuleQueueID
+                    Integer32,
+                hh3cIfQoSCQClassRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSCQClassRuleType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                interface(1),
+                ipv4acl(2),
+                ipv6acl(3),
+                fragments(4),
+                greater-than(5),
+                less-than(6),
+                tcp(7),
+                udp(8),
+                ipall(9),
+                mpls(10)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of class rule.
+                'ipall' means all ip packets."
+            ::= { hh3cIfQoSCQClassRuleEntry 1 }
+
+        hh3cIfQoSCQClassRuleValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Value of class rule.
+                 interface : ifIndex
+                 ipv4acl : 2000..3999
+                 ipv6acl : 2000..42767
+                 greater-than : 0..65535
+                 less-than : 0..65535
+                 tcp : 0..65535
+                 udp : 0..65535
+                 mpls(exp-mask) : 1..255
+                 other types: 0.
+                "
+            ::= { hh3cIfQoSCQClassRuleEntry 2 }
+
+        hh3cIfQoSCQClassRuleQueueID OBJECT-TYPE
+            SYNTAX Integer32( 1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify the queue for matched packets."
+            ::= { hh3cIfQoSCQClassRuleEntry 3 }
+
+        hh3cIfQoSCQClassRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSCQClassRuleEntry 4 }
+--
+-- nodes of hh3cIfQoSCQApplyTable
+--
+
+        hh3cIfQoSCQApplyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCQApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of custom queue instance."
+            ::= { hh3cIfQoSCQConfigGroup 4 }
+
+        hh3cIfQoSCQApplyEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCQApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Custom queue instance information."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSCQApplyTable 1 }
+
+        Hh3cIfQoSCQApplyEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCQApplyListNumber
+                    Integer32,
+                hh3cIfQoSCQApplyRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSCQApplyListNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Custom queue list number."
+            ::= { hh3cIfQoSCQApplyEntry 1 }
+
+        hh3cIfQoSCQApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSCQApplyEntry 2 }
+--
+-- Nodes of hh3cIfQoSCQRunInfoGroup
+--
+        hh3cIfQoSCQRunInfoGroup OBJECT IDENTIFIER ::= { hh3cIfQoSCQObject 2 }
+
+        hh3cIfQoSCQRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of custom queue statistic information."
+            ::= { hh3cIfQoSCQRunInfoGroup 1 }
+
+        hh3cIfQoSCQRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Custom queue statistic information entry."
+            INDEX { ifIndex,
+                    hh3cIfQoSCQQueueID }
+            ::= { hh3cIfQoSCQRunInfoTable 1 }
+
+        Hh3cIfQoSCQRunInfoEntry    ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCQRunInfoSize
+                    Integer32,
+                hh3cIfQoSCQRunInfoLength
+                    Integer32,
+                hh3cIfQoSCQRunInfoDiscardPackets
+                    Counter64
+            }
+
+        hh3cIfQoSCQRunInfoSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in the custom queue."
+            ::= { hh3cIfQoSCQRunInfoEntry 1 }
+
+        hh3cIfQoSCQRunInfoLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum length of custom queue."
+            ::= { hh3cIfQoSCQRunInfoEntry 2 }
+
+        hh3cIfQoSCQRunInfoDiscardPackets    OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packet number of custom queue discard."
+            ::= { hh3cIfQoSCQRunInfoEntry 3 }
+--
+-- nodes of hh3cIfQoSWFQObject
+--
+        hh3cIfQoSWFQObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 4 }
+
+        hh3cIfQoSWFQConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSWFQObject 1 }
+
+        hh3cIfQoSWFQTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWFQEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of weighted fair queue information."
+            ::= { hh3cIfQoSWFQConfigGroup 1 }
+
+        hh3cIfQoSWFQEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWFQEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Weighted fair queue information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSWFQTable 1 }
+
+        Hh3cIfQoSWFQEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWFQQueueLength
+                    Integer32,
+                hh3cIfQoSWFQQueueNumber
+                    INTEGER,
+                hh3cIfQoSWFQRowStatus
+                    RowStatus,
+                hh3cIfQoSWFQType
+                    INTEGER
+            }
+
+        hh3cIfQoSWFQQueueLength OBJECT-TYPE
+            SYNTAX Integer32 (1..1024)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The length of weighted fair queue."
+            DEFVAL { 64 }
+            ::= { hh3cIfQoSWFQEntry 1 }
+
+        hh3cIfQoSWFQQueueNumber OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                size16(1),
+                size32(2),
+                size64(3),
+                size128(4),
+                size256(5),
+                size512(6),
+                size1024(7),
+                size2048(8),
+                size4096(9)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of weighted fair queue."
+            DEFVAL { 5 }
+            ::= { hh3cIfQoSWFQEntry 2 }
+
+        hh3cIfQoSWFQRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSWFQEntry 3 }
+
+        hh3cIfQoSWFQType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ip-precedence(1),
+                dscp(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of weighted fair queue."
+            DEFVAL { 1 }
+            ::= { hh3cIfQoSWFQEntry 4 }
+--
+-- nodes of hh3cIfQoSWFQRunInfoGroup
+--
+        hh3cIfQoSWFQRunInfoGroup OBJECT IDENTIFIER ::= { hh3cIfQoSWFQObject 2 }
+
+        hh3cIfQoSWFQRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWFQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of weighted fair queue statistic information."
+            ::= { hh3cIfQoSWFQRunInfoGroup 1 }
+
+        hh3cIfQoSWFQRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWFQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Weighted fair queue statistic information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSWFQRunInfoTable 1 }
+
+        Hh3cIfQoSWFQRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWFQSize
+                    Integer32,
+                hh3cIfQoSWFQLength
+                    Integer32,
+                hh3cIfQoSWFQDiscardPackets
+                    Counter64,
+                hh3cIfQoSWFQHashedActiveQueues
+                    Integer32,
+                hh3cIfQoSWFQHashedMaxActiveQueues
+                    Integer32,
+                hh3cIfQosWFQhashedTotalQueues
+                    Integer32
+            }
+
+        hh3cIfQoSWFQSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in all the queues"
+            ::= { hh3cIfQoSWFQRunInfoEntry 1 }
+
+        hh3cIfQoSWFQLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The length of weighted fair queue."
+            ::= { hh3cIfQoSWFQRunInfoEntry 2 }
+
+        hh3cIfQoSWFQDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded packets in all the queues."
+            ::= { hh3cIfQoSWFQRunInfoEntry 3 }
+
+        hh3cIfQoSWFQHashedActiveQueues OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of active queues."
+            ::= { hh3cIfQoSWFQRunInfoEntry 4 }
+
+        hh3cIfQoSWFQHashedMaxActiveQueues OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of maximum active queues."
+            ::= { hh3cIfQoSWFQRunInfoEntry 5 }
+
+        hh3cIfQosWFQhashedTotalQueues   OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of queues."
+            ::= { hh3cIfQoSWFQRunInfoEntry 6 }
+--
+-- nodes of hh3cIfQoSBandwidthGroup
+--
+        hh3cIfQoSBandwidthGroup OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 5 }
+
+        hh3cIfQoSBandwidthTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of bandwidth of interface information."
+            ::= { hh3cIfQoSBandwidthGroup 1 }
+
+        hh3cIfQoSBandwidthEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Bandwidth information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSBandwidthTable 1 }
+
+        Hh3cIfQoSBandwidthEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSMaxBandwidth
+                    Integer32,
+                hh3cIfQoSReservedBandwidthPct
+                    Integer32,
+                hh3cIfQoSBandwidthRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSMaxBandwidth OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The maximum bandwidth of interface.  Unit : Kbps"
+            ::= { hh3cIfQoSBandwidthEntry 1 }
+
+        hh3cIfQoSReservedBandwidthPct OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Max reserved bandwidth of the interface for QoS."
+            DEFVAL { 75 }
+            ::= { hh3cIfQoSBandwidthEntry 2 }
+
+        hh3cIfQoSBandwidthRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSBandwidthEntry 3 }
+--
+-- nodes of hh3cIfQoSQmtokenGroup
+--
+        hh3cIfQoSQmtokenGroup OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 6 }
+
+        hh3cIfQoSQmtokenTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSQmtokenEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of qmtoken information."
+            ::= { hh3cIfQoSQmtokenGroup 1 }
+
+        hh3cIfQoSQmtokenEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSQmtokenEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Qmtoken information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSQmtokenTable 1 }
+
+        Hh3cIfQoSQmtokenEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSQmtokenNumber
+                    Integer32,
+                hh3cIfQoSQmtokenRosStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSQmtokenNumber OBJECT-TYPE
+            SYNTAX Integer32 (1..50)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of tokens."
+            ::= { hh3cIfQoSQmtokenEntry 1 }
+
+        hh3cIfQoSQmtokenRosStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus"
+            ::= { hh3cIfQoSQmtokenEntry 2 }
+
+--
+-- nodes of hh3cIfQoSRTPQObject
+--
+        hh3cIfQoSRTPQObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 7 }
+
+        hh3cIfQoSRTPQConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSRTPQObject 1 }
+
+        hh3cIfQoSRTPQConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSRTPQConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of Real-time protocol queue information."
+            ::= { hh3cIfQoSRTPQConfigGroup 1 }
+
+        hh3cIfQoSRTPQConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSRTPQConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of Real-time protocol queue entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSRTPQConfigTable 1 }
+
+        Hh3cIfQoSRTPQConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSRTPQStartPort
+                    Integer32,
+                hh3cIfQoSRTPQEndPort
+                    Integer32,
+                hh3cIfQoSRTPQReservedBandwidth
+                    Integer32,
+                hh3cIfQoSRTPQCbs
+                    Unsigned32,
+                hh3cIfQoSRTPQRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSRTPQStartPort OBJECT-TYPE
+            SYNTAX Integer32 (2000..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Minimum threshold of UDP destination port."
+            ::= { hh3cIfQoSRTPQConfigEntry 1 }
+
+        hh3cIfQoSRTPQEndPort OBJECT-TYPE
+            SYNTAX Integer32 (2000..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Maximum threshold of UDP destination port."
+            ::= { hh3cIfQoSRTPQConfigEntry 2 }
+
+        hh3cIfQoSRTPQReservedBandwidth OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Maximum bandwidth.  unit : kbps"
+            ::= { hh3cIfQoSRTPQConfigEntry 3 }
+
+        hh3cIfQoSRTPQCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Burst Size. Unit: byte"
+            ::= { hh3cIfQoSRTPQConfigEntry 4 }
+
+        hh3cIfQoSRTPQRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSRTPQConfigEntry 5 }
+--
+-- nodes of hh3cIfQoSRTPQRunInfoGroup
+--
+        hh3cIfQoSRTPQRunInfoGroup OBJECT IDENTIFIER ::= { hh3cIfQoSRTPQObject 2 }
+
+        hh3cIfQoSRTPQRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSRTPQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of statistic information of Real-time protocol information."
+            ::= { hh3cIfQoSRTPQRunInfoGroup 1 }
+
+        hh3cIfQoSRTPQRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSRTPQRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Statistic information of Real-time protocol information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSRTPQRunInfoTable 1 }
+
+        Hh3cIfQoSRTPQRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSRTPQPacketNumber
+                    Integer32,
+                hh3cIfQoSRTPQPacketSize
+                    Integer32,
+                hh3cIfQoSRTPQOutputPackets
+                    Counter64,
+                hh3cIfQoSRTPQDiscardPackets
+                    Counter64
+            }
+
+        hh3cIfQoSRTPQPacketNumber OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in the Real-time protocol queue."
+            ::= { hh3cIfQoSRTPQRunInfoEntry 1 }
+
+        hh3cIfQoSRTPQPacketSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The size of Real-time protocol queue."
+            ::= { hh3cIfQoSRTPQRunInfoEntry 2 }
+
+        hh3cIfQoSRTPQOutputPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of output packets."
+            ::= { hh3cIfQoSRTPQRunInfoEntry 3 }
+
+        hh3cIfQoSRTPQDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discard packets."
+            ::= { hh3cIfQoSRTPQRunInfoEntry 4 }
+
+--
+-- nodes of hh3cIfQoSCarListObject
+--
+       hh3cIfQoSCarListObject OBJECT IDENTIFIER ::= { hh3cIfQoSSoftwareQueueObjects 8 }
+
+       hh3cIfQoCarListGroup OBJECT IDENTIFIER ::= { hh3cIfQoSCarListObject 1 }
+
+       hh3cIfQoSCarlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCarlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                   "Committed Access Rate List(CARL) table."
+            ::= { hh3cIfQoCarListGroup 1 }
+
+        hh3cIfQoSCarlEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCarlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "CARL configuration information."
+            INDEX { hh3cIfQoSCarlListNum }
+            ::= { hh3cIfQoSCarlTable 1 }
+
+        Hh3cIfQoSCarlEntry ::=
+            SEQUENCE {
+                         hh3cIfQoSCarlListNum
+                             Integer32,
+                         hh3cIfQoSCarlParaType
+                             INTEGER,
+                         hh3cIfQoSCarlParaValue
+                             OCTET STRING,
+                         hh3cIfQoSCarlRowStatus
+                             RowStatus
+                     }
+
+        hh3cIfQoSCarlListNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                    "The index of the table, which is the CARL number."
+            ::= { hh3cIfQoSCarlEntry 1 }
+
+        hh3cIfQoSCarlParaType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                        macAddress(1),
+                        precMask(2),
+                        dscpMask(3)
+                    }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                    "Parameter type of the CARL number."
+            ::= { hh3cIfQoSCarlEntry 2 }
+
+        hh3cIfQoSCarlParaValue OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                    "Parameter value of the CARL table."
+            ::= { hh3cIfQoSCarlEntry 3 }
+
+        hh3cIfQoSCarlRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "RowStatus."
+            ::= { hh3cIfQoSCarlEntry 4 }
+
+--
+-- nodes of hh3cIfQoSLineRateObject
+--
+        hh3cIfQoSLineRateObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 3 }
+
+        hh3cIfQoSLRConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSLRConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of line rate configuration information."
+            ::= { hh3cIfQoSLineRateObjects 1 }
+
+        hh3cIfQoSLRConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSLRConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Line rate configuration information entry."
+            INDEX { ifIndex, hh3cIfQoSLRDirection }
+            ::= { hh3cIfQoSLRConfigTable 1 }
+
+        Hh3cIfQoSLRConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSLRDirection
+                    Direction,
+                hh3cIfQoSLRCir
+                    Unsigned32,
+                hh3cIfQoSLRCbs
+                    Unsigned32,
+                hh3cIfQoSLREbs
+                    Unsigned32,
+                hh3cIfQoSRowStatus
+                    RowStatus,
+                hh3cIfQoSLRPir
+                    Unsigned32,
+                hh3cIfQoSLRUnit
+                    INTEGER
+            }
+
+        hh3cIfQoSLRDirection OBJECT-TYPE
+            SYNTAX Direction
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Line rate on the inbound or outbound of data stream."
+            ::= { hh3cIfQoSLRConfigEntry 1 }
+
+        hh3cIfQoSLRCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Information Rate."
+            ::= { hh3cIfQoSLRConfigEntry 2 }
+
+        hh3cIfQoSLRCbs  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Burst Size."
+            ::= { hh3cIfQoSLRConfigEntry 3 }
+
+        hh3cIfQoSLREbs  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Excess Burst Size."
+            ::= { hh3cIfQoSLRConfigEntry 4 }
+
+        hh3cIfQoSRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSLRConfigEntry 5 }
+
+        hh3cIfQoSLRPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak Information Rate."
+            ::= { hh3cIfQoSLRConfigEntry 6 }
+
+        hh3cIfQoSLRUnit OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                unitAbsolute(1),
+                unitPercent(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "LR Unit:
+                 Absolute, Unit Kbps (1)
+                 Percent, Unit % (2)
+                "
+            DEFVAL { unitAbsolute }
+            ::= { hh3cIfQoSLRConfigEntry 7 }
+
+--
+-- nodes of hh3cIfQoSLRRunInfoTable
+--
+        hh3cIfQoSLRRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSLRRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of line rate run info information."
+            ::= { hh3cIfQoSLineRateObjects 2 }
+
+        hh3cIfQoSLRRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSLRRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Line rate run info information entry."
+            INDEX { ifIndex, hh3cIfQoSLRDirection }
+            ::= { hh3cIfQoSLRRunInfoTable 1 }
+
+        Hh3cIfQoSLRRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSLRRunInfoPassedPackets
+                    Counter64,
+                hh3cIfQoSLRRunInfoPassedBytes
+                    Counter64,
+                hh3cIfQoSLRRunInfoDelayedPackets
+                    Counter64,
+                hh3cIfQoSLRRunInfoDelayedBytes
+                    Counter64,
+                hh3cIfQoSLRRunInfoActiveShaping
+                    INTEGER
+            }
+
+        hh3cIfQoSLRRunInfoPassedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed packets."
+            ::= { hh3cIfQoSLRRunInfoEntry 1 }
+
+        hh3cIfQoSLRRunInfoPassedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed bytes."
+            ::= { hh3cIfQoSLRRunInfoEntry 2 }
+
+        hh3cIfQoSLRRunInfoDelayedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of delayed packets."
+            ::= { hh3cIfQoSLRRunInfoEntry 3 }
+
+        hh3cIfQoSLRRunInfoDelayedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of delayed bytes."
+            ::= { hh3cIfQoSLRRunInfoEntry 4 }
+
+        hh3cIfQoSLRRunInfoActiveShaping OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                active(1),
+                inactive(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flag of shaping."
+            ::= { hh3cIfQoSLRRunInfoEntry 5 }
+
+--
+-- nodes of car group
+--
+        hh3cIfQoSCARObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 4 }
+--
+-- nodes of hh3cIfQoSAggregativeCarGroup
+--
+        hh3cIfQoSAggregativeCarGroup OBJECT IDENTIFIER ::= { hh3cIfQoSCARObjects 1 }
+--
+-- nodes of hh3cIfQoSAggregativeCarConfigTable
+--
+        hh3cIfQoSAggregativeCarNextIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object contains an appropriate value to be used for hh3cIfQoSAggregativeCarIndex
+                 when creating rows in the hh3cIfQoSAggregativeCarConfigTable.
+                 Begin with 1.
+                "
+            ::= { hh3cIfQoSAggregativeCarGroup 1 }
+
+        hh3cIfQoSAggregativeCarConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSAggregativeCarConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of aggregative car information."
+            ::= { hh3cIfQoSAggregativeCarGroup 2 }
+
+        hh3cIfQoSAggregativeCarConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSAggregativeCarConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Aggregative car information."
+            INDEX { hh3cIfQoSAggregativeCarIndex }
+            ::= { hh3cIfQoSAggregativeCarConfigTable 1 }
+
+        Hh3cIfQoSAggregativeCarConfigEntry     ::=
+            SEQUENCE
+            {
+                hh3cIfQoSAggregativeCarIndex
+                    Integer32,
+                hh3cIfQoSAggregativeCarName
+                    OCTET STRING,
+                hh3cIfQoSAggregativeCarCir
+                    Unsigned32,
+                hh3cIfQoSAggregativeCarCbs
+                    Unsigned32,
+                hh3cIfQoSAggregativeCarEbs
+                    Unsigned32,
+                hh3cIfQoSAggregativeCarPir
+                    Unsigned32,
+                hh3cIfQoSAggregativeCarGreenActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSAggregativeCarGreenActionValue
+                    Integer32,
+                hh3cIfQoSAggregativeCarYellowActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSAggregativeCarYellowActionValue
+                    Integer32,
+                hh3cIfQoSAggregativeCarRedActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSAggregativeCarRedActionValue
+                    Integer32,
+                hh3cIfQoSAggregativeCarType
+                    INTEGER,
+                hh3cIfQoSAggregativeCarRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSAggregativeCarIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65534)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of aggregative car."
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 1 }
+
+        hh3cIfQoSAggregativeCarName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of aggregative car."
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 2 }
+
+        hh3cIfQoSAggregativeCarCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed-information-rate.  Unit : kbps"
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 3 }
+
+        hh3cIfQoSAggregativeCarCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed-burst-size.  Unit : byte"
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 4 }
+
+        hh3cIfQoSAggregativeCarEbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Excess-burst-size.  Unit : byte"
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 5 }
+
+        hh3cIfQoSAggregativeCarPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak-information-rate.  Unit : kbps"
+            DEFVAL { 4294967295 }
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 6 }
+
+        hh3cIfQoSAggregativeCarGreenActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Supported green action:
+                 invalid(0),
+                 pass(1),
+                 discard(3),
+                 remark(4),
+                 remark-ip-pass(6),
+                 remark-mplsexp-pass(8),
+                 remark-dscp-pass(10),
+                 remark-dot1p-pass(12),
+                 remark-atm-clp-pass(14),
+                 remark-fr-de-pass(16),
+                 remarkLocalPrePass(18),
+                 remarkDropPrePass(20).
+                 Hardware QoS : pass, discard, remark.
+                 Software QoS : pass, discard, remark-ip-pass(6),
+                 remark-mplsexp-pass(8), remark-dscp-pass(10).
+                 'invalid' is returned when getting value from software QoS.
+                 "
+            DEFVAL { pass }
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 7 }
+
+        hh3cIfQoSAggregativeCarGreenActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark When green action is remarking.
+                 For remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-pass, remark-mplsexp-pass, remark-dot1p-pass and
+                 remarkLocalPrePass, the range is 0 to 7;
+                 For remark-fr-de-pass and remark-atm-clp-pass, the range is 0 to 1;
+                 For remarkDropPrePass, the range is 0 to 2.
+                 Only software QoS support this node.
+                 255 is returned only when getting value from hardware QoS or
+                 when action being pass, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 8 }
+
+        hh3cIfQoSAggregativeCarYellowActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Supported yellow action:
+                 invalid(0),
+                 pass(1),
+                 discard(3),
+                 remark(4),
+                 remark-ip-pass(6),
+                 remark-mplsexp-pass(8),
+                 remark-dscp-pass(10),
+                 remark-dot1p-pass(12),
+                 remark-atm-clp-pass(14),
+                 remark-fr-de-pass(16),
+                 remarkLocalPrePass(18),
+                 remarkDropPrePass(20).
+                 Hardware QoS : pass, discard, remark.
+                 Software QoS : pass, discard, remark-ip-pass(6),
+                 remark-mplsexp-pass(8), remark-dscp-pass(10).
+                 'invalid' is returned when getting value from software QoS.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 9 }
+
+        hh3cIfQoSAggregativeCarYellowActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark When yellow action is remarking.
+                 For remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-pass, remark-mplsexp-pass, remark-dot1p-pass and
+                 remarkLocalPrePass, the range is 0 to 7;
+                 For remark-fr-de-pass and remark-atm-clp-pass, the range is 0 to 1;
+                 For remarkDropPrePass, the range is 0 to 2.
+                 Only software QoS support this node.
+                 255 is returned only when getting value from hardware QoS or
+                 when action being pass, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 10 }
+
+        hh3cIfQoSAggregativeCarRedActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Supported red action:
+                 invalid(0),
+                 pass(1),
+                 discard(3),
+                 remark(4),
+                 remark-ip-pass(6),
+                 remark-mplsexp-pass(8),
+                 remark-dscp-pass(10),
+                 remark-dot1p-pass(12),
+                 remark-atm-clp-pass(14),
+                 remark-fr-de-pass(16),
+                 remarkLocalPrePass(18),
+                 remarkDropPrePass(20).
+                 Hardware QoS : pass, discard, remark.
+                 Software QoS : pass, discard, remark-ip-pass(6),
+                 remark-mplsexp-pass(8), remark-dscp-pass(10).
+                 'invalid' is returned when getting value from software QoS.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 11 }
+
+        hh3cIfQoSAggregativeCarRedActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark When red action is remarking.
+                 For remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-pass, remark-mplsexp-pass, remark-dot1p-pass and
+                 remarkLocalPrePass, the range is 0 to 7;
+                 For remark-fr-de-pass and remark-atm-clp-pass, the range is 0 to 1;
+                 For remarkDropPrePass, the range is 0 to 2.
+                 Only software QoS support this node.
+                 255 is returned only when getting value from hardware QoS or
+                 when action being pass, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 12 }
+
+        hh3cIfQoSAggregativeCarType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                aggregative(1),
+                notAggregative(2),
+                hierarchy(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of aggregative CAR.
+                 The enumeration 'aggregative' indicates that the ports
+                 with a same aggregative CAR use one token bulk.
+
+                 The enumeration 'notAggregative' indicates that each port
+                 uses one token bulk.
+
+                 The enumeration 'hierarchy' indicates that each object uses one
+                 token bulk after processed first by some other token bulk.
+                "
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 13 }
+
+        hh3cIfQoSAggregativeCarRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSAggregativeCarConfigEntry 14 }
+--
+-- nodes of hh3cIfQoSAggregativeCarApplyGroup
+--
+        hh3cIfQoSAggregativeCarApplyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSAggregativeCarApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of aggregative car instance."
+            ::= { hh3cIfQoSAggregativeCarGroup 3 }
+
+        hh3cIfQoSAggregativeCarApplyEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSAggregativeCarApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Aggregative car instance information."
+            INDEX { ifIndex,
+                    hh3cIfQoSAggregativeCarApplyDirection,
+                    hh3cIfQoSAggregativeCarApplyRuleType,
+                    hh3cIfQoSAggregativeCarApplyRuleValue
+                  }
+            ::= { hh3cIfQoSAggregativeCarApplyTable 1 }
+
+        Hh3cIfQoSAggregativeCarApplyEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSAggregativeCarApplyDirection
+                    Direction,
+                hh3cIfQoSAggregativeCarApplyRuleType
+                    INTEGER,
+                hh3cIfQoSAggregativeCarApplyRuleValue
+                    Integer32,
+                hh3cIfQoSAggregativeCarApplyCarIndex
+                    Integer32,
+                hh3cIfQoSAggregativeCarApplyRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSAggregativeCarApplyDirection OBJECT-TYPE
+            SYNTAX Direction
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Direction."
+            ::= { hh3cIfQoSAggregativeCarApplyEntry 1 }
+
+        hh3cIfQoSAggregativeCarApplyRuleType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipv4acl(1),
+                ipv6acl(2),
+                carl(3),
+                any(4)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of class rule."
+            ::= { hh3cIfQoSAggregativeCarApplyEntry 2 }
+
+        hh3cIfQoSAggregativeCarApplyRuleValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The number of class rule.
+                 ipv4acl : 2000..5999
+                 ipv6acl : 2000..42767
+                 carl : 1..199
+                 other types: 0.
+                "
+            ::= { hh3cIfQoSAggregativeCarApplyEntry 3 }
+
+        hh3cIfQoSAggregativeCarApplyCarIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65534)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The index of aggregative car."
+            ::= { hh3cIfQoSAggregativeCarApplyEntry 4 }
+
+        hh3cIfQoSAggregativeCarApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSAggregativeCarApplyEntry 5 }
+--
+-- nodes of hh3cIfQoSAggregativeCarRunInfoTable
+--
+        hh3cIfQoSAggregativeCarRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSAggregativeCarRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of aggregative car statistic information."
+            ::= { hh3cIfQoSAggregativeCarGroup 4 }
+
+        hh3cIfQoSAggregativeCarRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSAggregativeCarRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Aggregative car statistic information."
+            INDEX { hh3cIfQoSAggregativeCarIndex }
+            ::= { hh3cIfQoSAggregativeCarRunInfoTable 1 }
+
+        Hh3cIfQoSAggregativeCarRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSAggregativeCarGreenPackets
+                    Counter64,
+                hh3cIfQoSAggregativeCarGreenBytes
+                    Counter64,
+                hh3cIfQoSAggregativeCarYellowPackets
+                    Counter64,
+                hh3cIfQoSAggregativeCarYellowBytes
+                    Counter64,
+                hh3cIfQoSAggregativeCarRedPackets
+                    Counter64,
+                hh3cIfQoSAggregativeCarRedBytes
+                    Counter64
+            }
+
+        hh3cIfQoSAggregativeCarGreenPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets conforming CIR."
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 1 }
+
+        hh3cIfQoSAggregativeCarGreenBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes conforming CIR"
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 2 }
+
+        hh3cIfQoSAggregativeCarYellowPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of yellow packets."
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 3 }
+
+        hh3cIfQoSAggregativeCarYellowBytes  OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of yellow bytes."
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 4 }
+
+        hh3cIfQoSAggregativeCarRedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets exceeding CIR."
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 5 }
+
+        hh3cIfQoSAggregativeCarRedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes exceeding CIR."
+            ::= { hh3cIfQoSAggregativeCarRunInfoEntry 6 }
+
+--
+-- nodes of hh3cIfQoSTricolorCARGroup
+--
+        hh3cIfQoSTricolorCarGroup OBJECT IDENTIFIER ::= { hh3cIfQoSCARObjects 2 }
+--
+-- nodes of
+
+        hh3cIfQoSTricolorCarConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSTricolorCarConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of tricolor car configuration information."
+            ::= { hh3cIfQoSTricolorCarGroup 1 }
+
+        hh3cIfQoSTricolorCarConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSTricolorCarConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Tricolor car configuration information entry."
+            INDEX { ifIndex,
+                    hh3cIfQoSTricolorCarDirection,
+                    hh3cIfQoSTricolorCarType,
+                    hh3cIfQoSTricolorCarValue
+                  }
+            ::= { hh3cIfQoSTricolorCarConfigTable 1 }
+
+        Hh3cIfQoSTricolorCarConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSTricolorCarDirection
+                    Direction,
+                hh3cIfQoSTricolorCarType
+                    INTEGER,
+                hh3cIfQoSTricolorCarValue
+                    Integer32,
+                hh3cIfQoSTricolorCarCir
+                    Unsigned32,
+                hh3cIfQoSTricolorCarCbs
+                    Unsigned32,
+                hh3cIfQoSTricolorCarEbs
+                    Unsigned32,
+                hh3cIfQoSTricolorCarPir
+                    Unsigned32,
+                hh3cIfQoSTricolorCarGreenActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSTricolorCarGreenActionValue
+                    Integer32,
+                hh3cIfQoSTricolorCarYellowActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSTricolorCarYellowActionValue
+                    Integer32,
+                hh3cIfQoSTricolorCarRedActionType
+                    Hh3cIfCarAction,
+                hh3cIfQoSTricolorCarRedActionValue
+                    Integer32,
+                hh3cIfQoSTricolorCarRowStatus
+                    RowStatus,
+                hh3cIfQoSTricolorCarUnitType
+                    INTEGER
+            }
+
+        hh3cIfQoSTricolorCarDirection OBJECT-TYPE
+            SYNTAX Direction
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Direction."
+            ::= { hh3cIfQoSTricolorCarConfigEntry 1 }
+
+        hh3cIfQoSTricolorCarType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipv4acl(1),
+                ipv6acl(2),
+                carl(3),
+                any(4)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the table, which is the matching type for the
+                 packets on interface: ipv4acl, ipv6acl, carl, any."
+            ::= { hh3cIfQoSTricolorCarConfigEntry 2 }
+
+        hh3cIfQoSTricolorCarValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the table.
+                 ipv4acl: the number is ipv4 acl number;
+                 ipv6acl: the number is ipv6 acl number;
+                 carl: the number is CARL number;
+                 any: the number is 0;
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 3 }
+
+        hh3cIfQoSTricolorCarCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Information Rate.  The unit of this parameter depends
+                on the hh3cIfQoSTricolorCarUnitType node.
+                +-----------+----------+------------+
+                | Unit type | absolute | percent    |
+                +-----------+----------+------------+
+                | CIR unit  | kbps     | percentage |
+                +-----------+----------+------------+
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 4 }
+
+        hh3cIfQoSTricolorCarCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Burst Size.  The unit of this parameter depends
+                on the hh3cIfQoSTricolorCarUnitType node.
+                +-----------+----------+--------------+
+                | Unit type | absolute | percent      |
+                +-----------+----------+--------------+
+                | CBS unit  | bytes    | milliseconds |
+                +-----------+----------+--------------+
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 5 }
+
+        hh3cIfQoSTricolorCarEbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Excess Burst Size.  The unit of this parameter depends
+                on the hh3cIfQoSTricolorCarUnitType node.
+                +-----------+----------+--------------+
+                | Unit type | absolute | percent      |
+                +-----------+----------+--------------+
+                | EBS unit  | bytes    | milliseconds |
+                +-----------+----------+--------------+
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 6 }
+
+        hh3cIfQoSTricolorCarPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak Information Rate.  The unit of this parameter depends
+                on the hh3cIfQoSTricolorCarUnitType node.
+                +-----------+----------+------------+
+                | Unit type | absolute | percent    |
+                +-----------+----------+------------+
+                | PIR unit  | kbps     | percentage |
+                +-----------+----------+------------+
+                "
+            DEFVAL { 4294967295 }
+            ::= { hh3cIfQoSTricolorCarConfigEntry 7 }
+
+        hh3cIfQoSTricolorCarGreenActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Green Action."
+            DEFVAL { pass }
+            ::= { hh3cIfQoSTricolorCarConfigEntry 8 }
+
+        hh3cIfQoSTricolorCarGreenActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark when green action is remarking.
+                 For remark-dscp-continue and remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-continue and remark-ip-pass and
+                 remark-mplsexp-continue and remark-mplsexp-pass and
+                 remark-dot1p-continue and remark-dot1p-pass, the range is 0 to 7;
+                 For remark-fr-de-continue and remark-fr-de-pass and
+                 remark-atm-clp-continue and remark-atm-clp-pass, the range is 0 and 1.
+                 255 is returned only when getting value from hardware QoS
+                 or when action being pass, continue, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 9 }
+
+        hh3cIfQoSTricolorCarYellowActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Yellow Action."
+            DEFVAL { pass }
+            ::= { hh3cIfQoSTricolorCarConfigEntry 10 }
+
+        hh3cIfQoSTricolorCarYellowActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark when yellow action is remarking.
+                 For remark-dscp-continue and remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-continue and remark-ip-pass and
+                 remark-mplsexp-continue and remark-mplsexp-pass and
+                 remark-dot1p-continue and remark-dot1p-pass, the range is 0 to 7;
+                 For remark-fr-de-continue and remark-fr-de-pass and
+                 remark-atm-clp-continue and remark-atm-clp-pass, the range is 0 and 1.
+                 255 is returned only when getting value from hardware QoS
+                 or when action being pass, continue, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 11 }
+
+        hh3cIfQoSTricolorCarRedActionType OBJECT-TYPE
+            SYNTAX Hh3cIfCarAction
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Red Action"
+            DEFVAL { discard }
+            ::= { hh3cIfQoSTricolorCarConfigEntry 12 }
+
+        hh3cIfQoSTricolorCarRedActionValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is to remark when red action is remarking.
+                 For remark-dscp-continue and remark-dscp-pass, the range is 0 to 63;
+                 For remark-ip-continue and remark-ip-pass and
+                 remark-mplsexp-continue and remark-mplsexp-pass and
+                 remark-dot1p-continue and remark-dot1p-pass, the range is 0 to 7;
+                 For remark-fr-de-continue and remark-fr-de-pass and
+                 remark-atm-clp-continue and remark-atm-clp-pass, the range is 0 and 1.
+                 255 is returned only when getting value from hardware QoS
+                 or when action being pass, continue, discard of software QoS.
+                 255 can't be set.
+                "
+            ::= { hh3cIfQoSTricolorCarConfigEntry 13 }
+
+        hh3cIfQoSTricolorCarRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSTricolorCarConfigEntry 14 }
+
+        hh3cIfQoSTricolorCarUnitType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                unitAbsolute(1),
+                unitPercent(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Unit of token parameters.  If it is unitAbsolute, the token
+                parameters are in kbps and bytes, and if it is unitPercent,
+                the token parameters are in percentage and milliseconds."
+            DEFVAL { unitAbsolute }
+            ::= { hh3cIfQoSTricolorCarConfigEntry 15 }
+
+
+--
+-- nodes of hh3cIfQoSTricolorCarRunInfoTable
+--
+        hh3cIfQoSTricolorCarRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSTricolorCarRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of tricolor car statistic information."
+            ::= { hh3cIfQoSTricolorCarGroup 2 }
+
+        hh3cIfQoSTricolorCarRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSTricolorCarRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Tricolor car statistic information entry."
+            INDEX { ifIndex,
+                    hh3cIfQoSTricolorCarDirection,
+                    hh3cIfQoSTricolorCarType,
+                    hh3cIfQoSTricolorCarValue
+                  }
+            ::= { hh3cIfQoSTricolorCarRunInfoTable 1 }
+
+        Hh3cIfQoSTricolorCarRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSTricolorCarGreenPackets
+                    Counter64,
+                hh3cIfQoSTricolorCarGreenBytes
+                    Counter64,
+                hh3cIfQoSTricolorCarYellowPackets
+                    Counter64,
+                hh3cIfQoSTricolorCarYellowBytes
+                    Counter64,
+                hh3cIfQoSTricolorCarRedPackets
+                    Counter64,
+                hh3cIfQoSTricolorCarRedBytes
+                    Counter64
+            }
+
+        hh3cIfQoSTricolorCarGreenPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of green packets."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 1 }
+
+        hh3cIfQoSTricolorCarGreenBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of green bytes."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 2 }
+
+        hh3cIfQoSTricolorCarYellowPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of yellow packets."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 3 }
+
+        hh3cIfQoSTricolorCarYellowBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of yellow bytes."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 4 }
+
+        hh3cIfQoSTricolorCarRedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of red packets."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 5 }
+
+        hh3cIfQoSTricolorCarRedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of red bytes."
+            ::= { hh3cIfQoSTricolorCarRunInfoEntry 6 }
+--
+-- nodes of hh3cIfQoSGTSObject
+--
+        hh3cIfQoSGTSObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 5 }
+
+        hh3cIfQoSGTSConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSGTSConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of generic traffic shaping information."
+            ::= { hh3cIfQoSGTSObjects 1 }
+
+        hh3cIfQoSGTSConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSGTSConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Generic traffic shaping information entry."
+            INDEX { ifIndex,
+                    hh3cIfQoSGTSClassRuleType,
+                    hh3cIfQoSGTSClassRuleValue
+                  }
+            ::= { hh3cIfQoSGTSConfigTable 1 }
+
+        Hh3cIfQoSGTSConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSGTSClassRuleType
+                    INTEGER,
+                hh3cIfQoSGTSClassRuleValue
+                    Integer32,
+                hh3cIfQoSGTSCir
+                    Unsigned32,
+                hh3cIfQoSGTSCbs
+                    Unsigned32,
+                hh3cIfQoSGTSEbs
+                    Unsigned32,
+                hh3cIfQoSGTSQueueLength
+                    Integer32,
+                hh3cIfQoSGTSConfigRowStatus
+                    RowStatus,
+                hh3cIfQoSGTSPir
+                    Unsigned32,
+                hh3cIfQoSGTSUnitType
+                    INTEGER
+            }
+
+        hh3cIfQoSGTSClassRuleType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                any(1),
+                ipv4acl(2),
+                ipv6acl(3),
+                queue(4)
+            }
+
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the table,
+                 which is the matching type for the packets on interface:
+                 ipv4acl, ipv6acl, any, queue.
+                "
+            ::= { hh3cIfQoSGTSConfigEntry 1 }
+
+        hh3cIfQoSGTSClassRuleValue OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Value of type.
+                 ipv4acl : 2000..5999
+                 ipv6acl : 2000..42767
+                 any : 0
+                 queue : 0..7
+                 "
+            ::= { hh3cIfQoSGTSConfigEntry 2 }
+
+        hh3cIfQoSGTSCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Information Rate.  The unit of this parameter depends
+                on the hh3cIfQoSGTSUnitType node.
+                +-----------+----------+------------+
+                | Unit type | absolute | percent    |
+                +-----------+----------+------------+
+                | CIR unit  | kbps     | percentage |
+                +-----------+----------+------------+
+                "
+            ::= { hh3cIfQoSGTSConfigEntry 3 }
+
+        hh3cIfQoSGTSCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Committed Burst Size.  The unit of this parameter depends
+                on the hh3cIfQoSGTSUnitType node.
+                +-----------+----------+--------------+
+                | Unit type | absolute | percent      |
+                +-----------+----------+--------------+
+                | CBS unit  | bytes    | milliseconds |
+                +-----------+----------+--------------+
+                "
+            ::= { hh3cIfQoSGTSConfigEntry 4 }
+
+        hh3cIfQoSGTSEbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Excess Burst Size.  The unit of this parameter depends
+                on the hh3cIfQoSGTSUnitType node.
+                +-----------+----------+--------------+
+                | Unit type | absolute | percent      |
+                +-----------+----------+--------------+
+                | EBS unit  | bytes    | milliseconds |
+                +-----------+----------+--------------+
+                "
+            ::= { hh3cIfQoSGTSConfigEntry 5 }
+
+        hh3cIfQoSGTSQueueLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The length of queue."
+            ::= { hh3cIfQoSGTSConfigEntry 6 }
+
+        hh3cIfQoSGTSConfigRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSGTSConfigEntry 7 }
+
+        hh3cIfQoSGTSPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Peak information rate.  The unit of this parameter depends
+                on the hh3cIfQoSGTSUnitType node.
+                +-----------+----------+------------+
+                | Unit type | absolute | percent    |
+                +-----------+----------+------------+
+                | PIR unit  | kbps     | percentage |
+                +-----------+----------+------------+
+                "
+            DEFVAL { 4294967295 }
+            ::= { hh3cIfQoSGTSConfigEntry 8 }
+
+        hh3cIfQoSGTSUnitType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                unitAbsolute(1),
+                unitPercent(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Unit of token parameters.  If it is unitAbsolute, the token
+                parameters are in kbps and bytes, and if it is unitPercent,
+                the token parameters are in percentage and milliseconds."
+            DEFVAL { unitAbsolute }
+            ::= { hh3cIfQoSGTSConfigEntry 9 }
+
+--
+-- nodes of hh3cIfQoSGTSRunInfoTable
+--
+        hh3cIfQoSGTSRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSGTSRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of  generic traffic shaping's statistic information."
+            ::= { hh3cIfQoSGTSObjects 2 }
+
+        hh3cIfQoSGTSRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSGTSRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Generic traffic shaping's statistic information entry."
+            INDEX { ifIndex,
+                    hh3cIfQoSGTSClassRuleType,
+                    hh3cIfQoSGTSClassRuleValue
+                  }
+            ::= { hh3cIfQoSGTSRunInfoTable 1 }
+
+        Hh3cIfQoSGTSRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSGTSQueueSize
+                    Integer32,
+                hh3cIfQoSGTSPassedPackets
+                    Counter64,
+                hh3cIfQoSGTSPassedBytes
+                    Counter64,
+                hh3cIfQoSGTSDiscardPackets
+                    Counter64,
+                hh3cIfQoSGTSDiscardBytes
+                    Counter64,
+                hh3cIfQoSGTSDelayedPackets
+                    Counter64,
+                hh3cIfQoSGTSDelayedBytes
+                    Counter64
+            }
+
+        hh3cIfQoSGTSQueueSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets in the queue."
+            ::= { hh3cIfQoSGTSRunInfoEntry 1 }
+
+        hh3cIfQoSGTSPassedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed packets."
+            ::= { hh3cIfQoSGTSRunInfoEntry 2 }
+
+        hh3cIfQoSGTSPassedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed bytes."
+            ::= { hh3cIfQoSGTSRunInfoEntry 3 }
+
+        hh3cIfQoSGTSDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discard packets."
+            ::= { hh3cIfQoSGTSRunInfoEntry 4 }
+
+        hh3cIfQoSGTSDiscardBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discard bytes."
+            ::= { hh3cIfQoSGTSRunInfoEntry 5 }
+
+        hh3cIfQoSGTSDelayedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of delayed packets."
+            ::= { hh3cIfQoSGTSRunInfoEntry 6 }
+
+        hh3cIfQoSGTSDelayedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of delayed bytes."
+            ::= { hh3cIfQoSGTSRunInfoEntry 7 }
+--
+-- nodes of hh3cIfQoSWREDObject
+--
+        hh3cIfQoSWREDObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 6 }
+--
+-- nodes of WRED group
+--
+        hh3cIfQoSWredGroupGroup OBJECT IDENTIFIER ::= { hh3cIfQoSWREDObjects 1 }
+
+        hh3cIfQoSWredGroupNextIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object contains an appropriate value to be used for hh3cIfQoSWredGroupIndex
+                 when creating rows in the hh3cIfQoSWredGroupTable.
+                 Begin with 0.
+                "
+            ::= { hh3cIfQoSWredGroupGroup 1 }
+--
+-- nodes of hh3cIfQoSWredGroupTable
+--
+        hh3cIfQoSWredGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWredGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of WRED group information."
+            ::= { hh3cIfQoSWredGroupGroup 2 }
+
+        hh3cIfQoSWredGroupEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWredGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WRED group information."
+            INDEX { hh3cIfQoSWredGroupIndex }
+            ::= { hh3cIfQoSWredGroupTable 1 }
+
+        Hh3cIfQoSWredGroupEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWredGroupIndex
+                    Integer32,
+                hh3cIfQoSWredGroupName
+                    OCTET STRING,
+                hh3cIfQoSWredGroupType
+                    INTEGER,
+                hh3cIfQoSWredGroupWeightingConstant
+                    Integer32,
+                hh3cIfQoSWredGroupRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSWredGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..256)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WRED group index."
+            ::= { hh3cIfQoSWredGroupEntry 1 }
+
+        hh3cIfQoSWredGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED group name."
+            ::= { hh3cIfQoSWredGroupEntry 2 }
+
+        hh3cIfQoSWredGroupType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                userdefined(0),
+                dot1p(1),
+                ippre(2),
+                dscp(3),
+                localpre(4),
+                atmclp(5),
+                frde(6),
+                exp(7),
+                queue(8),
+                dropLevel(9)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of WRED group."
+            ::= { hh3cIfQoSWredGroupEntry 3 }
+
+        hh3cIfQoSWredGroupWeightingConstant OBJECT-TYPE
+            SYNTAX Integer32 (1..15)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Exponent for WRED calculates the average length of queue.
+                 If 'hh3cIfQoSWredGroupType' is 'queue', the object is ineffective.
+                 So, it must use the object, which is 'hh3cIfQoSWredGroupExponent' of
+                 hh3cIfQoSWredGroupContentTable, to indicate the exponent of
+                 each queue of the queue WRED group."
+            DEFVAL { 9 }
+            ::= { hh3cIfQoSWredGroupEntry 4 }
+
+        hh3cIfQoSWredGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSWredGroupEntry 6 }
+
+--
+-- nodes of hh3cIfQoSWredGroupContentTable
+--
+        hh3cIfQoSWredGroupContentTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWredGroupContentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of priority WRED information."
+            ::= { hh3cIfQoSWredGroupGroup 3 }
+
+        hh3cIfQoSWredGroupContentEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWredGroupContentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority WRED information entry."
+            INDEX { hh3cIfQoSWredGroupIndex,
+                    hh3cIfQoSWredGroupContentIndex,
+                    hh3cIfQoSWredGroupContentSubIndex  }
+            ::= { hh3cIfQoSWredGroupContentTable 1 }
+
+        Hh3cIfQoSWredGroupContentEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWredGroupContentIndex
+                    Integer32,
+                hh3cIfQoSWredGroupContentSubIndex
+                    Integer32,
+                hh3cIfQoSWredLowLimit
+                    Integer32,
+                hh3cIfQoSWredHighLimit
+                    Integer32,
+                hh3cIfQoSWredDiscardProb
+                    Integer32,
+                hh3cIfQoSWredGroupExponent
+                    Integer32,
+                hh3cIfQoSWredRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSWredGroupContentIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The priority of a packet.
+                 Different type of packet has different priority.
+                 Type of priority    Range of priority
+                 dot1p              0..7
+                 ippre              0..7
+                 dscp               0..63
+                 atmclp             0..1
+                 frde               0..1
+                 exp                0..7
+                 queue              0..7 ( defined by product )
+                 dropLevel          0..2
+                 "
+            ::= { hh3cIfQoSWredGroupContentEntry 1 }
+
+        hh3cIfQoSWredGroupContentSubIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The sub index.
+                 Different type of packet has different value.
+                 Type of priority    Range of value
+                 queue              0..2
+                 other types : 0
+                 "
+            ::= { hh3cIfQoSWredGroupContentEntry 2 }
+
+        hh3cIfQoSWredLowLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Discard low limit."
+            ::= { hh3cIfQoSWredGroupContentEntry 3 }
+
+        hh3cIfQoSWredHighLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Discard high limit."
+            ::= { hh3cIfQoSWredGroupContentEntry 4 }
+
+        hh3cIfQoSWredDiscardProb OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Discard probability."
+            ::= { hh3cIfQoSWredGroupContentEntry 5 }
+
+        hh3cIfQoSWredGroupExponent OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Exponent for WRED calculates the average length of queue.
+                 Only 'hh3cIfQoSWredGroupType' is 'queue', the object is effective.
+                 This object is designed to indicate the exponent of
+                 each queue of the queue WRED group.
+                "
+            DEFVAL { 9 }
+            ::= { hh3cIfQoSWredGroupContentEntry 6 }
+
+        hh3cIfQoSWredRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSWredGroupContentEntry 7 }
+--
+-- nodes of hh3cIfQoSWredApplyIfTable
+--
+        hh3cIfQoSWredGroupApplyIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWredGroupApplyIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of WRED group applied interface information."
+            ::= { hh3cIfQoSWredGroupGroup 4 }
+
+        hh3cIfQoSWredGroupApplyIfEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWredGroupApplyIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WRED group applied interface information."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSWredGroupApplyIfTable 1 }
+
+        Hh3cIfQoSWredGroupApplyIfEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWredGroupApplyIndex
+                    Integer32,
+                hh3cIfQoSWredGroupApplyName
+                    OCTET STRING,
+                hh3cIfQoSWredGroupIfRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSWredGroupApplyIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..256)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "WRED group index."
+            ::= { hh3cIfQoSWredGroupApplyIfEntry 1 }
+
+        hh3cIfQoSWredGroupApplyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "WRED group name."
+            ::= { hh3cIfQoSWredGroupApplyIfEntry 2 }
+
+        hh3cIfQoSWredGroupIfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSWredGroupApplyIfEntry 3 }
+--
+-- nodes of hh3cIfQoSWredApplyIfStatisticTable
+--
+        hh3cIfQoSWredApplyIfRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSWredApplyIfRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of WRED statistic information."
+            ::= { hh3cIfQoSWredGroupGroup 5 }
+
+        hh3cIfQoSWredApplyIfRunInfoEntry  OBJECT-TYPE
+            SYNTAX Hh3cIfQoSWredApplyIfRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WRED statistic information."
+            INDEX { ifIndex,
+                    hh3cIfQoSWredGroupIndex,
+                    hh3cIfQoSWredGroupContentIndex,
+                    hh3cIfQoSWredGroupContentSubIndex
+                  }
+            ::= { hh3cIfQoSWredApplyIfRunInfoTable 1 }
+
+        Hh3cIfQoSWredApplyIfRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWredPreRandomDropNum
+                    Counter64,
+                hh3cIfQoSWredPreTailDropNum
+                    Counter64
+            }
+
+        hh3cIfQoSWredPreRandomDropNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of random drop."
+            ::= { hh3cIfQoSWredApplyIfRunInfoEntry 1 }
+
+        hh3cIfQoSWredPreTailDropNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of tail drop."
+            ::= { hh3cIfQoSWredApplyIfRunInfoEntry 2 }
+--
+-- nodes of hh3cIfQoSPortWREDGroup
+--
+        hh3cIfQoSPortWredGroup OBJECT IDENTIFIER ::= { hh3cIfQoSWREDObjects 2 }
+
+        hh3cIfQoSPortWredWeightConstantTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortWREDWeightConstantEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of port WRED configuration information."
+            ::= { hh3cIfQoSPortWredGroup 1 }
+
+        hh3cIfQoSPortWredWeightConstantEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortWREDWeightConstantEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port WRED configuration information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSPortWredWeightConstantTable 1 }
+
+        Hh3cIfQoSPortWREDWeightConstantEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPortWredEnable
+                    TruthValue,
+                hh3cIfQoSPortWredWeightConstant
+                    Integer32,
+                hh3cIfQoSPortWredWeightConstantRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPortWredEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object is used to enable or disable WRED function of the port.
+                 true: Enable WRED function of a port.
+                 false: Disable WRED function of a port.
+                "
+            ::= { hh3cIfQoSPortWredWeightConstantEntry 1 }
+
+        hh3cIfQoSPortWredWeightConstant OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Weight constant."
+            ::= { hh3cIfQoSPortWredWeightConstantEntry 2 }
+
+        hh3cIfQoSPortWredWeightConstantRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPortWredWeightConstantEntry 3 }
+--
+-- notes of hh3cIfQoSPortWredPreConfigTable
+--
+        hh3cIfQoSPortWredPreConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortWREDPreConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of weighted random early detect precedence configuration information."
+            ::= { hh3cIfQoSPortWredGroup 2 }
+
+        hh3cIfQoSPortWredPreConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortWREDPreConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Weighted random early detect precedence configuration information entry."
+            INDEX { ifIndex, hh3cIfQoSPortWredPreID }
+            ::= { hh3cIfQoSPortWredPreConfigTable 1 }
+
+        Hh3cIfQoSPortWREDPreConfigEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPortWredPreID
+                    Integer32,
+                hh3cIfQoSPortWredPreLowLimit
+                    Integer32,
+                hh3cIfQoSPortWredPreHighLimit
+                    Integer32,
+                hh3cIfQoSPortWredPreDiscardProbability
+                    Integer32,
+                hh3cIfQoSPortWredPreRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPortWredPreID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IP precedence, from 0 to 7."
+            ::= { hh3cIfQoSPortWredPreConfigEntry 1 }
+
+        hh3cIfQoSPortWredPreLowLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Low Limit(number of packets)"
+            ::= { hh3cIfQoSPortWredPreConfigEntry 2 }
+
+        hh3cIfQoSPortWredPreHighLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "High limit(number of packets)"
+            ::= { hh3cIfQoSPortWredPreConfigEntry 3 }
+
+        hh3cIfQoSPortWredPreDiscardProbability OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Discard probability denominator"
+            ::= { hh3cIfQoSPortWredPreConfigEntry 4 }
+
+        hh3cIfQoSPortWredPreRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPortWredPreConfigEntry 5 }
+
+--
+-- nodes of hh3cIfQoSPortWredRunInfoTable
+--
+        hh3cIfQoSPortWredRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortWREDRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of WRED statistic information."
+            ::= { hh3cIfQoSPortWredGroup 3 }
+
+        hh3cIfQoSPortWredRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortWREDRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "WRED statistic information entry."
+            INDEX { ifIndex, hh3cIfQoSPortWredPreID }
+            ::= { hh3cIfQoSPortWredRunInfoTable 1 }
+
+        Hh3cIfQoSPortWREDRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSWREDTailDropNum
+                    Counter64,
+                hh3cIfQoSWREDRandomDropNum
+                    Counter64
+            }
+
+        hh3cIfQoSWREDTailDropNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of tail drop."
+            ::= { hh3cIfQoSPortWredRunInfoEntry 1 }
+
+        hh3cIfQoSWREDRandomDropNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of random drop."
+            ::= { hh3cIfQoSPortWredRunInfoEntry 2 }
+
+--
+-- nodes of hh3cIfQoSPortPriorityObject
+--
+
+        hh3cIfQoSPortPriorityObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 7 }
+
+        hh3cIfQoSPortPriorityConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSPortPriorityObjects 1 }
+
+        hh3cIfQoSPortPriorityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of port priority information."
+            ::= { hh3cIfQoSPortPriorityConfigGroup 1 }
+
+        hh3cIfQoSPortPriorityEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port priority information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSPortPriorityTable 1 }
+
+        Hh3cIfQoSPortPriorityEntry    ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPortPriorityValue
+                    Integer32
+            }
+
+        hh3cIfQoSPortPriorityValue OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The priority of a port."
+            DEFVAL { 0 }
+            ::= { hh3cIfQoSPortPriorityEntry 1 }
+--
+-- nodes of hh3cIfQoSPortPirorityTrustTable
+--
+        hh3cIfQoSPortPirorityTrustTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortPirorityTrustEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of each port's trusted priority information."
+            ::= { hh3cIfQoSPortPriorityConfigGroup 2 }
+
+        hh3cIfQoSPortPirorityTrustEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortPirorityTrustEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Per-port trusted priority information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSPortPirorityTrustTable 1 }
+
+        Hh3cIfQoSPortPirorityTrustEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPortPriorityTrustTrustType
+                    INTEGER,
+                hh3cIfQoSPortPriorityTrustOvercastType
+                    INTEGER
+            }
+
+        hh3cIfQoSPortPriorityTrustTrustType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                untrust(1),
+                dot1p(2),
+                dscp(3),
+                exp(4),
+                ipPrecedence(5),
+                dot11e(6),
+                auto(7)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Trusted priority type of a port."
+            DEFVAL { untrust }
+            ::= { hh3cIfQoSPortPirorityTrustEntry 1 }
+
+        hh3cIfQoSPortPriorityTrustOvercastType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                noOvercast(1),
+                overcastDSCP(2),
+                overcastCOS(3),
+                overcast(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The overcast type."
+            DEFVAL { noOvercast }
+            ::= { hh3cIfQoSPortPirorityTrustEntry 2 }
+--
+-- nodes of map object
+--
+        hh3cIfQoSMapObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 9 }
+--
+-- nodes of hh3cIfQoSMapConfigGroup
+--
+        hh3cIfQoSPriMapConfigGroup OBJECT IDENTIFIER ::= { hh3cIfQoSMapObjects 1 }
+
+        hh3cIfQoSPriMapGroupNextIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object contains an appropriate value to be used for hh3cIfQoSPriMapGroupIndex
+                 when creating rows in the hh3cIfQoSPriMapGroupTable.
+                 Begin with 64.
+                "
+            ::= { hh3cIfQoSPriMapConfigGroup 1 }
+--
+-- nodes of hh3cIfQoSPriMapConfigTable
+--
+        hh3cIfQoSPriMapGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPriMapGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of map group information."
+            ::= { hh3cIfQoSPriMapConfigGroup 2 }
+
+        hh3cIfQoSPriMapGroupEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPriMapGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Map group information entry."
+            INDEX { hh3cIfQoSPriMapGroupIndex  }
+            ::= { hh3cIfQoSPriMapGroupTable 1 }
+
+        Hh3cIfQoSPriMapGroupEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPriMapGroupIndex
+                    Integer32,
+                hh3cIfQoSPriMapGroupType
+                    INTEGER,
+                hh3cIfQoSPriMapGroupName
+                    OCTET STRING,
+                hh3cIfQoSPriMapGroupRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPriMapGroupIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of map, which are defined by system and user.
+                 The index of system defined map is 1 to 9.
+                 System defined map-name/map-index pairs like this:
+                 Map-index    Map-name
+                 1            dot1p-dp
+                 2            dot1p-dscp
+                 3            dot1p-lp
+                 4            dscp-dot1p
+                 5            dscp-dp
+                 6            dscp-dscp
+                 7            dscp-lp
+                 8            exp-dp
+                 9            exp-lp
+                "
+            ::= { hh3cIfQoSPriMapGroupEntry 1 }
+
+        hh3cIfQoSPriMapGroupType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                userdefined(1),
+                dot1p-dp(2),
+                dot1p-dscp(3),
+                dot1p-lp(4),
+                dscp-dot1p(5),
+                dscp-dp(6),
+                dscp-dscp(7),
+                dscp-lp(8),
+                exp-dp(9),
+                exp-lp(10)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of map group."
+            ::= { hh3cIfQoSPriMapGroupEntry 2 }
+
+        hh3cIfQoSPriMapGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of map group."
+            ::= { hh3cIfQoSPriMapGroupEntry 3 }
+
+        hh3cIfQoSPriMapGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPriMapGroupEntry 4 }
+
+--
+-- nodes of hh3cIfQoSPriMapContentTable
+--
+        hh3cIfQoSPriMapContentTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPriMapContentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of priority map configuration information."
+            ::= { hh3cIfQoSPriMapConfigGroup 3 }
+
+        hh3cIfQoSPriMapContentEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPriMapContentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority map configuration information entry."
+            INDEX { hh3cIfQoSPriMapGroupIndex, hh3cIfQoSPriMapGroupImportValue }
+            ::= { hh3cIfQoSPriMapContentTable 1 }
+
+        Hh3cIfQoSPriMapContentEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPriMapGroupImportValue
+                    Integer32,
+                hh3cIfQoSPriMapGroupExportValue
+                    Integer32,
+                hh3cIfQoSPriMapContentRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSPriMapGroupImportValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Priority map table import value list.
+                 Different map has different hh3cIfQoSPriMapConfigImportValue.
+                 Map-name       Range of hh3cIfQoSPriMapConfigImportValue
+                 dot1p-dp       (0..7)
+                 dot1p-dscp     (0..7)
+                 dot1p-lp       (0..7)
+                 dscp-dot1p     (0..63)
+                 dscp-dp        (0..63)
+                 dscp-dscp      (0..63)
+                 dscp-lp(7)     (0..63)
+                 exp-dp(8)      (0..7)
+                 exp-lp         (0..7)
+                "
+            ::= { hh3cIfQoSPriMapContentEntry 1 }
+
+        hh3cIfQoSPriMapGroupExportValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Priority map table output.
+                 Different map has different hh3cIfQoSPriMapGroupExportValue.
+                 dot1p-dp:   0..7
+                 dot1p-dscp: 0..63
+                 dot1p-lp:   0..7
+                 dscp-dot1p: 0..7
+                 dscp-dp:    0..7
+                 dscp-dscp:  0..63
+                 dscp-lp:    0..7
+                 exp-dp:     0..7
+                 exp-lp:     0..7
+                "
+            ::= { hh3cIfQoSPriMapContentEntry 2 }
+
+        hh3cIfQoSPriMapContentRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cIfQoSPriMapContentEntry 3 }
+
+--
+-- nodes of hh3cIfQoSPrePriMapTable
+--
+        hh3cIfQoSPrePriMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPrePriMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Pre-defined priority mapping table information."
+            ::= { hh3cIfQoSPriMapConfigGroup 4 }
+
+        hh3cIfQoSPrePriMapEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPrePriMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Pre-defined priority mapping table entry."
+            INDEX
+            {
+                hh3cIfQoSPrePriMapTableType,
+                hh3cIfQoSPrePriMapTableColor,
+                hh3cIfQoSPrePriMapTableDirection,
+                hh3cIfQoSPrePriMapTableImportValue
+            }
+            ::= { hh3cIfQoSPrePriMapTable 1 }
+
+        Hh3cIfQoSPrePriMapEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSPrePriMapTableType
+                    INTEGER,
+                hh3cIfQoSPrePriMapTableColor
+                    INTEGER,
+                hh3cIfQoSPrePriMapTableDirection
+                    INTEGER,
+                hh3cIfQoSPrePriMapTableImportValue
+                    Integer32,
+                hh3cIfQoSPrePriMapTableExportValue
+                    Integer32
+            }
+
+        hh3cIfQoSPrePriMapTableType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                dot1pToLp(1),
+                dot1pToDp(2),
+                expToLp(3),
+                dscpToLp(4),
+                expToDp(5),
+                dscpToDp(6),
+                dscpToDot1p(7),
+                dot1pToDscp(8),
+                dscpToDscp(9),
+                dscpToExp(10),
+                expToDscp(11),
+                expToDot1p(12),
+                expToExp(13),
+                lpToDot1p(14),
+                dot1pToRpr(15),
+                dscpToRpr(16),
+                expToRpr(17),
+                ippreToRpr(18),
+                upToDot1p(19),
+                upToDscp(20),
+                upToExp(21),
+                upToDp(22),
+                upToLp(23),
+                upToRpr(24),
+                upToFc(25),
+                lpTodscp(26),
+                dot11eToLp(27),
+                lpToDot11e(28),
+                lpToLp(29),
+                dot1pToExp(30),
+                lpToExp(31),
+                lpToDp(32),
+                upToUp(33),
+                dot1pToDot1p(34)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of pre-defined priority mapping table."
+            ::= { hh3cIfQoSPrePriMapEntry 1 }
+
+        hh3cIfQoSPrePriMapTableColor OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                noColor(1),
+                green(2),
+                yellow(3),
+                red(4)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The color of pre-defined priority mapping table."
+            ::= { hh3cIfQoSPrePriMapEntry 2 }
+
+        hh3cIfQoSPrePriMapTableDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                noDirection(1),
+                inbound(2),
+                outbound(3)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The direction of pre-defined priority mapping table."
+            ::= { hh3cIfQoSPrePriMapEntry 3 }
+
+        hh3cIfQoSPrePriMapTableImportValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Input value of priority mapping table.
+                 Different priority has different hh3cIfQoSPrePriMapTableImportValue.
+                 Priority-type  Range of hh3cIfQoSPrePriMapTableImportValue
+                 dot1p          (0..7)
+                 dscp           (0..63)
+                 lp             (0..7)
+                 exp            (0..7)
+                 ipPrecedence   (0..7)
+                 up             (0..7)
+                 dot11e         (0..7)
+                "
+            ::= { hh3cIfQoSPrePriMapEntry 4 }
+
+        hh3cIfQoSPrePriMapTableExportValue OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Output value of priority mapping table.
+                 Different priority has different hh3cIfQoSPrePriMapTableExportValue.
+                 Priority-type  Range of hh3cIfQoSPrePriMapTableExportValue
+                 dot1p          (0..7)
+                 dscp           (0..63)
+                 lp             (0..7)
+                 exp            (0..7)
+                 ipPrecedence   (0..7)
+                 up             (0..7)
+                 dp             (0..2)
+                 fc             (0..7)
+                 rpr            (0..2)
+                "
+            ::= { hh3cIfQoSPrePriMapEntry 5 }
+
+--
+-- nodes of L3 plus object
+--
+        hh3cIfQoSL3PlusObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 10 }
+--
+-- nodes of hh3cIfQoSPortBindingGroup
+--
+        hh3cIfQoSPortBindingGroup OBJECT IDENTIFIER ::= { hh3cIfQoSL3PlusObjects 1 }
+
+        hh3cIfQoSPortBindingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSPortBindingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of EACL sub-interface binding information
+                 for L3+ board ."
+            ::= { hh3cIfQoSPortBindingGroup 1 }
+
+        hh3cIfQoSPortBindingEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSPortBindingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Binding information entry."
+            INDEX { ifIndex }
+            ::= { hh3cIfQoSPortBindingTable 1 }
+
+        Hh3cIfQoSPortBindingEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSBindingIf
+                    Integer32,
+                hh3cIfQoSBindingRowStatus
+                    RowStatus
+            }
+
+        hh3cIfQoSBindingIf OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The binding interface."
+            ::= { hh3cIfQoSPortBindingEntry 1 }
+
+        hh3cIfQoSBindingRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus"
+            ::= { hh3cIfQoSPortBindingEntry 2 }
+
+--
+-- node of hh3cQoSTraStaObjects
+--
+        hh3cQoSTraStaObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 11 }
+--
+-- nodes of hh3cQoSTraStaConfigGroup
+--
+        hh3cQoSTraStaConfigGroup OBJECT IDENTIFIER ::= { hh3cQoSTraStaObjects 1 }
+
+        hh3cQoSIfTraStaConfigInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSIfTraStaConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of traffic statistics configuration information."
+            ::= { hh3cQoSTraStaConfigGroup 1 }
+
+        hh3cQoSIfTraStaConfigInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSIfTraStaConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of interface traffic statistics configuration information."
+            INDEX { ifIndex, hh3cQoSIfTraStaConfigDirection }
+            ::= { hh3cQoSIfTraStaConfigInfoTable 1 }
+
+        Hh3cQoSIfTraStaConfigInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSIfTraStaConfigDirection
+                    Direction,
+                hh3cQoSIfTraStaConfigQueue
+                    OCTET STRING,
+                hh3cQoSIfTraStaConfigDot1p
+                    OCTET STRING,
+                hh3cQoSIfTraStaConfigDscp
+                    OCTET STRING,
+                hh3cQoSIfTraStaConfigVlan
+                    OCTET STRING,
+                hh3cQoSIfTraStaConfigStatus
+                    RowStatus
+            }
+
+        hh3cQoSIfTraStaConfigDirection OBJECT-TYPE
+            SYNTAX Direction
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The direction of the traffic statistics."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 1 }
+
+        hh3cQoSIfTraStaConfigQueue OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "The bitmap of Queue ID.
+                        The octet specifies queues 0 through 7.  If a bit has
+                        a value of '1', the corresponding queue is configured
+                        in the set of Queues; if a bit has a value of '0',
+                        the corresponding queue is not configured."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 2 }
+
+        hh3cQoSIfTraStaConfigDot1p OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "The bitmap of Dot1p value.
+                        The octet specifies Dot1p values 0 through 7.  If a bit
+                        has a value of '1', the corresponding Dot1p value is
+                        configured in the set of Dot1p values; if a bit has a
+                        value of '0', the corresponding Dot1p value is not
+                        configured."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 3 }
+
+        hh3cQoSIfTraStaConfigDscp OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (8))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "The bitmap of Dscp value.
+                        Each octet within this value specifies a set of
+                        eight Dscp values, with the first octet specifying
+                        Dscp values 0 through 7, the second octet specifying
+                        Dscp values 8 through 15, etc.  If a bit has a value
+                        of '1', the corresponding Dscp value is configured
+                        in the set of Dscp values; if a bit has a value of
+                        '0', the corresponding Dscp value is not configured."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 4 }
+
+        hh3cQoSIfTraStaConfigVlan OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (512))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "The bitmap of VLAN ID.
+                        Each octet within this value specifies a set of
+                        eight VLANs, with the first octet specifying
+                        VLANs 0 through 7, the second octet specifying VLANs
+                        8 through 15, etc.  If a bit has a value of '1', the
+                        corresponding VLAN is configured in the set of VLANs;
+                        if a bit has a value of '0', the corresponding VLAN
+                        is not configured."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 5 }
+
+        hh3cQoSIfTraStaConfigStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "The row status of this table entry."
+            ::= { hh3cQoSIfTraStaConfigInfoEntry 6 }
+
+
+--
+-- nodes of hh3cQoSTraStaRunGroup
+--
+        hh3cQoSTraStaRunGroup OBJECT IDENTIFIER ::= { hh3cQoSTraStaObjects 2 }
+
+        hh3cQoSIfTraStaRunInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSIfTraStaRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of traffic statistics running information."
+            ::= { hh3cQoSTraStaRunGroup 1 }
+
+        hh3cQoSIfTraStaRunInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSIfTraStaRunInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of interface traffic statistics running information."
+            INDEX { ifIndex,
+                    hh3cQoSIfTraStaRunObjectType,
+                    hh3cQoSIfTraStaRunObjectValue,
+                    hh3cQoSIfTraStaRunDirection }
+            ::= { hh3cQoSIfTraStaRunInfoTable 1 }
+
+        Hh3cQoSIfTraStaRunInfoEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSIfTraStaRunObjectType
+                    INTEGER,
+                hh3cQoSIfTraStaRunObjectValue
+                    Integer32,
+                hh3cQoSIfTraStaRunDirection
+                    Direction,
+                hh3cQoSIfTraStaRunPassPackets
+                    Counter64,
+                hh3cQoSIfTraStaRunDropPackets
+                    Counter64,
+                hh3cQoSIfTraStaRunPassBytes
+                    Counter64,
+                hh3cQoSIfTraStaRunDropBytes
+                    Counter64,
+                hh3cQoSIfTraStaRunPassPPS
+                    Counter64,
+                hh3cQoSIfTraStaRunPassBPS
+                    Counter64
+            }
+
+        hh3cQoSIfTraStaRunObjectType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                queue(1),
+                dot1p(2),
+                dscp(3),
+                vlanID(4)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of statistics object."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 1 }
+
+        hh3cQoSIfTraStaRunObjectValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Value range for the object type:
+                 for Queue: 0~7
+                 for Dot1p: 0~7
+                 for Dscp: 0~63
+                 for VlanID: 1~4094
+                 "
+            ::= { hh3cQoSIfTraStaRunInfoEntry 2 }
+
+        hh3cQoSIfTraStaRunDirection OBJECT-TYPE
+            SYNTAX Direction
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The direction of the traffic statistics."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 3 }
+
+        hh3cQoSIfTraStaRunPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed packets."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 4 }
+
+        hh3cQoSIfTraStaRunDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of dropped packets."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 5 }
+
+        hh3cQoSIfTraStaRunPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed bytes."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 6 }
+
+        hh3cQoSIfTraStaRunDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of dropped bytes."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 7 }
+
+        hh3cQoSIfTraStaRunPassPPS OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "PPS (packets per second) of passed packets."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 8 }
+
+        hh3cQoSIfTraStaRunPassBPS OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "BPS (bytes per second) of passed packets."
+            ::= { hh3cQoSIfTraStaRunInfoEntry 9 }
+
+--
+-- nodes of hh3cQoSGlobalPriorityObject
+--
+        hh3cQoSGlobalPriorityObject OBJECT IDENTIFIER ::= { hh3cIfQos2 12 }
+
+        hh3cQoSRemarkTcpPortPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkTcpPortPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking TCP port priority information.
+                 The priority field of all packets with the specified
+                 TCP port will be remarked to the configured value.
+                "
+            ::= { hh3cQoSGlobalPriorityObject 1 }
+
+        hh3cQoSRemarkTcpPortPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkTcpPortPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking TCP port priority information entry."
+            INDEX { hh3cQoSRemarkTcpPortStart }
+            ::= { hh3cQoSRemarkTcpPortPriTable 1 }
+
+        Hh3cQoSRemarkTcpPortPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkTcpPortStart
+                    Integer32,
+                hh3cQoSRemarkTcpPortEnd
+                    Integer32,
+                hh3cQoSRemarkTcpPortType
+                    INTEGER,
+                hh3cQoSRemarkTcpPortDot1p
+                    Unsigned32,
+                hh3cQoSRemarkTcpPortDscp
+                    Unsigned32,
+                hh3cQoSRemarkTcpPortRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkTcpPortStart OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Start value of TCP port range."
+            ::= { hh3cQoSRemarkTcpPortPriEntry 1 }
+
+        hh3cQoSRemarkTcpPortEnd OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End value of TCP port range.
+                 It cannot be less than start value.
+                "
+            ::= { hh3cQoSRemarkTcpPortPriEntry 2 }
+
+        hh3cQoSRemarkTcpPortType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipAll(1),
+                ipv4(2),
+                ipv6(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IPv4 packet, IPv6 packet, or all IP packet."
+            DEFVAL { ipAll }
+            ::= { hh3cQoSRemarkTcpPortPriEntry 3 }
+
+        hh3cQoSRemarkTcpPortDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkTcpPortPriEntry 4 }
+
+        hh3cQoSRemarkTcpPortDscp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DSCP value."
+            ::= { hh3cQoSRemarkTcpPortPriEntry 5 }
+
+        hh3cQoSRemarkTcpPortRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkTcpPortPriEntry 6 }
+
+--hh3cQoSRemarkUdpPortPriTable
+
+        hh3cQoSRemarkUdpPortPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkUdpPortPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking UDP port priority information.
+                 The priority field of all packets with the specified
+                 UDP port will be remarked to the configured value.
+                "
+            ::= { hh3cQoSGlobalPriorityObject 2 }
+
+        hh3cQoSRemarkUdpPortPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkUdpPortPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking UDP port priority information entry."
+            INDEX { hh3cQoSRemarkUdpPortStart }
+            ::= { hh3cQoSRemarkUdpPortPriTable 1 }
+
+        Hh3cQoSRemarkUdpPortPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkUdpPortStart
+                    Integer32,
+                hh3cQoSRemarkUdpPortEnd
+                    Integer32,
+                hh3cQoSRemarkUdpPortType
+                    INTEGER,
+                hh3cQoSRemarkUdpPortDot1p
+                    Unsigned32,
+                hh3cQoSRemarkUdpPortDscp
+                    Unsigned32,
+                hh3cQoSRemarkUdpPortRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkUdpPortStart OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Start value of UDP port range."
+            ::= { hh3cQoSRemarkUdpPortPriEntry 1 }
+
+        hh3cQoSRemarkUdpPortEnd OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End value of UDP port range.
+                 It cannot be less than start value.
+                "
+            ::= { hh3cQoSRemarkUdpPortPriEntry 2 }
+
+        hh3cQoSRemarkUdpPortType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipAll(1),
+                ipv4(2),
+                ipv6(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IPv4 packet, IPv6 packet, or all IP packet."
+            DEFVAL { ipAll }
+            ::= { hh3cQoSRemarkUdpPortPriEntry 3 }
+
+        hh3cQoSRemarkUdpPortDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkUdpPortPriEntry 4 }
+
+        hh3cQoSRemarkUdpPortDscp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DSCP value."
+            ::= { hh3cQoSRemarkUdpPortPriEntry 5 }
+
+        hh3cQoSRemarkUdpPortRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkUdpPortPriEntry 6 }
+
+--hh3cQoSRemarkIPv4AddrPriTable
+        hh3cQoSRemarkIPv4AddrPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkIPv4AddrPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking IPv4 address priority information."
+            ::= { hh3cQoSGlobalPriorityObject 3 }
+
+        hh3cQoSRemarkIPv4AddrPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkIPv4AddrPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking IPv4 address priority information entry.
+                 The priority field of all IPv4 packets with the specified
+                 IP address will be remarked to the configured value.
+                "
+            INDEX { hh3cQoSRemarkIPv4AddrValue }
+            ::= { hh3cQoSRemarkIPv4AddrPriTable 1 }
+
+        Hh3cQoSRemarkIPv4AddrPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkIPv4AddrValue
+                    IpAddress,
+                hh3cQoSRemarkIPv4AddrMask
+                    IpAddress,
+                hh3cQoSRemarkIPv4AddrMaskLength
+                    Unsigned32,
+                hh3cQoSRemarkIPv4AddrDot1p
+                    Unsigned32,
+                hh3cQoSRemarkIPv4AddrDscp
+                    Unsigned32,
+                hh3cQoSRemarkIPv4AddrRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkIPv4AddrValue OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IPv4 address."
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 1 }
+
+        hh3cQoSRemarkIPv4AddrMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Mask of IPv4 address."
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 2 }
+
+        hh3cQoSRemarkIPv4AddrMaskLength OBJECT-TYPE
+            SYNTAX Unsigned32 (1..32 |4294967295)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Mask length of IPv4 address."
+            DEFVAL { 32 }
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 3 }
+
+        hh3cQoSRemarkIPv4AddrDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 4 }
+
+        hh3cQoSRemarkIPv4AddrDscp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DSCP value."
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 5 }
+
+        hh3cQoSRemarkIPv4AddrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkIPv4AddrPriEntry 6 }
+
+--hh3cQoSRemarkIPv6AddrPriTable
+        hh3cQoSRemarkIPv6AddrPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkIPv6AddrPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking IPv6 address priority information.
+                 The priority field of all IPv6 packets with the specified
+                 IP address will be remarked to the configured value.
+                "
+            ::= { hh3cQoSGlobalPriorityObject 4 }
+
+        hh3cQoSRemarkIPv6AddrPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkIPv6AddrPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking IPv6 address priority information entry."
+            INDEX { hh3cQoSRemarkIPv6AddrValue }
+            ::= { hh3cQoSRemarkIPv6AddrPriTable 1 }
+
+        Hh3cQoSRemarkIPv6AddrPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkIPv6AddrValue
+                    InetAddressIPv6,
+                hh3cQoSRemarkIPv6AddrPrefixLength
+                    InetAddressPrefixLength,
+                hh3cQoSRemarkIPv6AddrDot1p
+                    Unsigned32,
+                hh3cQoSRemarkIPv6AddrDscp
+                    Unsigned32,
+                hh3cQoSRemarkIPv6AddrRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkIPv6AddrValue OBJECT-TYPE
+            SYNTAX InetAddressIPv6
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IPv6 address."
+            ::= { hh3cQoSRemarkIPv6AddrPriEntry 1 }
+
+        hh3cQoSRemarkIPv6AddrPrefixLength OBJECT-TYPE
+            SYNTAX InetAddressPrefixLength
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Prefix length of IPv6 address."
+            DEFVAL { 128 }
+            ::= { hh3cQoSRemarkIPv6AddrPriEntry 2 }
+
+        hh3cQoSRemarkIPv6AddrDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkIPv6AddrPriEntry 3 }
+
+        hh3cQoSRemarkIPv6AddrDscp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DSCP value."
+            ::= { hh3cQoSRemarkIPv6AddrPriEntry 4 }
+
+        hh3cQoSRemarkIPv6AddrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkIPv6AddrPriEntry 5 }
+
+--hh3cQoSRemarkProtocolPriTable
+        hh3cQoSRemarkProtocolPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkProtocolPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking layer 3 protocol priority information.
+                 The 802.1p priority field of all packets of the specified
+                 protocol will be remarked to the configured value.
+                "
+            ::= { hh3cQoSGlobalPriorityObject 5 }
+
+        hh3cQoSRemarkProtocolPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkProtocolPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking layer 3 protocol priority information entry."
+            INDEX { hh3cQoSRemarkProtocolValue }
+            ::= { hh3cQoSRemarkProtocolPriTable 1 }
+
+        Hh3cQoSRemarkProtocolPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkProtocolValue
+                    INTEGER,
+                hh3cQoSRemarkProtocolDot1p
+                    Unsigned32,
+                hh3cQoSRemarkProtocolRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkProtocolValue OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ip(1),
+                ipx(2),
+                arp(3),
+                appletalk(4),
+                sna(5),
+                netbeui(6)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Layer 3 protocol type."
+            ::= { hh3cQoSRemarkProtocolPriEntry 1 }
+
+        hh3cQoSRemarkProtocolDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkProtocolPriEntry 2 }
+
+        hh3cQoSRemarkProtocolRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkProtocolPriEntry 3 }
+
+--hh3cQoSRemarkVlanPriTable
+
+        hh3cQoSRemarkVlanPriTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQoSRemarkVlanPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of remarking VLAN priority information.
+                 The priority field of all packets of the specified
+                 VLAN will be remarked to the configured value.
+                "
+            ::= { hh3cQoSGlobalPriorityObject 6 }
+
+        hh3cQoSRemarkVlanPriEntry OBJECT-TYPE
+            SYNTAX Hh3cQoSRemarkVlanPriEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Remarking VLAN priority information entry."
+            INDEX { hh3cQoSRemarkVlanStart }
+            ::= { hh3cQoSRemarkVlanPriTable 1 }
+
+        Hh3cQoSRemarkVlanPriEntry ::=
+            SEQUENCE
+            {
+                hh3cQoSRemarkVlanStart
+                    Integer32,
+                hh3cQoSRemarkVlanEnd
+                    Integer32,
+                hh3cQoSRemarkVlanDot1p
+                    Unsigned32,
+                hh3cQoSRemarkVlanDscp
+                    Unsigned32,
+                hh3cQoSRemarkVlanRowStatus
+                    RowStatus
+            }
+
+        hh3cQoSRemarkVlanStart OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Start VLAN ID."
+            ::= { hh3cQoSRemarkVlanPriEntry 1 }
+
+        hh3cQoSRemarkVlanEnd OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End VLAN ID.  It cannot be less than start value."
+            ::= { hh3cQoSRemarkVlanPriEntry 2 }
+
+        hh3cQoSRemarkVlanDot1p OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Dot1p value."
+            ::= { hh3cQoSRemarkVlanPriEntry 3 }
+
+        hh3cQoSRemarkVlanDscp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..63|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DSCP value."
+            ::= { hh3cQoSRemarkVlanPriEntry 4 }
+
+        hh3cQoSRemarkVlanRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row status."
+            ::= { hh3cQoSRemarkVlanPriEntry 5 }
+
+--Type of service node
+        hh3cQoSTypeOfServiceObjects OBJECT IDENTIFIER
+            ::= { hh3cQoSGlobalPriorityObject 7 }
+
+        hh3cQoSTypeOfServiceMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                disabled(1),
+                ipPrecedence(2),
+                dscp(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Global type of service.
+                 The type of service is disabled by default.
+                 When in ip-precedence mode, device uses ip-precedence value to
+                 determine the 802.1p priority of the packet and its outbound queue.
+                 When in DSCP mode, device uses DSCP value to determine
+                 the 802.1p priority of the packet and its outbound queue.
+                "
+            DEFVAL { disabled }
+            ::= { hh3cQoSTypeOfServiceObjects 1 }
+
+--
+-- nodes of hh3cIfQoSProcessingStatusObjects
+--
+        hh3cIfQoSProcessingStatusObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 13 }
+
+-- System status when processing
+
+        hh3cIfQoSProcessingStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                idle(1),
+                busy(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object shows the current running status of the IFQoS module.
+                'busy' means a task is being executed in the IFQoS module.  It is
+                highly recommended not setting or reading IFQoS MIB objects in this state.
+                otherwise, an operation failure might occur.
+                'idle' means no task is being executed in the IFQoS module.  In this
+                state, operations on IFQoS MIB objects will be accepted and executed
+                immediately."
+
+            ::= { hh3cIfQoSProcessingStatusObjects 1 }
+
+--
+-- nodes of hh3cIfQoSCoppObjects
+--
+        hh3cIfQoSCoppObjects OBJECT IDENTIFIER ::= { hh3cIfQos2 14 }
+
+        hh3cIfQoSCoppFlowStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIfQoSCoppFlowStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of display the copp flow stat."
+            ::= { hh3cIfQoSCoppObjects 1 }
+
+        hh3cIfQoSCoppFlowStatEntry OBJECT-TYPE
+            SYNTAX Hh3cIfQoSCoppFlowStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Display the copp flow stat entry."
+            INDEX { hh3cIfQoSCoppFlowStatChassis, hh3cIfQoSCoppFlowStatSlot, hh3cIfQoSCoppFlowStatProType}
+            ::= { hh3cIfQoSCoppFlowStatTable 1 }
+
+    Hh3cIfQoSCoppFlowStatEntry ::=
+            SEQUENCE
+            {
+                hh3cIfQoSCoppFlowStatChassis
+                    Unsigned32,
+                hh3cIfQoSCoppFlowStatSlot
+                    Unsigned32,
+                hh3cIfQoSCoppFlowStatProType
+                    Unsigned32,
+                hh3cIfQoSCoppFlowPassPackets
+                    Counter64,
+                hh3cIfQoSCoppFlowPassBytes
+                    Counter64,
+                hh3cIfQoSCoppFlowDropPackets
+                    Counter64,
+                hh3cIfQoSCoppFlowDropBytes
+                    Counter64
+            }
+
+    hh3cIfQoSCoppFlowStatChassis OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Chassis number."
+            ::= { hh3cIfQoSCoppFlowStatEntry 1 }
+
+    hh3cIfQoSCoppFlowStatSlot OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot number."
+            ::= { hh3cIfQoSCoppFlowStatEntry 2 }
+
+    hh3cIfQoSCoppFlowStatProType OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The protocol type."
+            ::= { hh3cIfQoSCoppFlowStatEntry 3 }
+
+    hh3cIfQoSCoppFlowPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed packets."
+            ::= { hh3cIfQoSCoppFlowStatEntry 4 }
+
+    hh3cIfQoSCoppFlowPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of passed bytes."
+            ::= { hh3cIfQoSCoppFlowStatEntry 5 }
+
+    hh3cIfQoSCoppFlowDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of dropped packets."
+            ::= { hh3cIfQoSCoppFlowStatEntry 6 }
+
+    hh3cIfQoSCoppFlowDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of dropped bytes."
+            ::= { hh3cIfQoSCoppFlowStatEntry 7 }
+
+END

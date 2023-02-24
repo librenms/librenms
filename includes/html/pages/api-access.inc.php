@@ -19,9 +19,7 @@ use LibreNMS\Authentication\LegacyAuth;
 if (Auth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
-    }
-
-    ?>
+    } ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
@@ -61,17 +59,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <select class="form-control" id="user_id" name="user_id">
     <?php
     foreach ($userlist = User::all() as $user) {
-        echo '<option value="' . $user->user_id . '">' . $user->username . ' (' . $user->auth_type . ')</option>';
-    }
-
-    ?>
+        echo '<option value="' . $user->user_id . '">' . htmlentities($user->username) . ' (' . htmlentities($user->auth_type) . ')</option>';
+    } ?>
                 </select>
               </div>
             </div>
             <div class="form-group">
               <label for="token" class="col-sm-2 control-label">Token: </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token']; ?>" readonly>
+                <input type="text" class="form-control" id="token" name="token" value="<?php echo htmlspecialchars($_POST['token']); ?>" readonly>
               </div>
               <div class="col-sm-2">
               </div>
@@ -79,7 +75,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="form-group">
               <label for="description" class="col-sm-2 control-label">Descr: </label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="description" name="description" value="<?php echo $_POST['description']; ?>">
+                <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($_POST['description']); ?>">
               </div>
             </div>
         </div>
@@ -150,14 +146,14 @@ if (Auth::user()->hasGlobalAdmin()) {
         $color = $user_details->auth_type == LegacyAuth::getType() ? '' : 'bgcolor="lightgrey"';
 
         echo '
-        <tr id="'.$api->id.'" ' . $color . '>
-          <td>'.$user_details->username.'</td>
-          <td>'.$user_details->auth_type.'</td>
-          <td>'.$api->token_hash.'</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="'.$api->token_hash.'"><i class="fa fa-qrcode" ></i></button></td>
-          <td>'.$api->description.'</td>
-          <td><input type="checkbox" name="token-status" data-token_id="'.$api->id.'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
-          <td><button type="button" class="btn btn-danger btn-xs" id="'.$api->id.'" data-token_id="'.$api->id.'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
+        <tr id="' . $api->id . '" ' . $color . '>
+          <td>' . $user_details->username . '</td>
+          <td>' . $user_details->auth_type . '</td>
+          <td>' . $api->token_hash . '</td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . $api->token_hash . '"><i class="fa fa-qrcode" ></i></button></td>
+          <td>' . htmlspecialchars($api->description) . '</td>
+          <td><input type="checkbox" name="token-status" data-token_id="' . $api->id . '" data-off-text="No" data-on-text="Yes" data-on-color="danger" ' . $api_disabled . ' data-size="mini"></td>
+          <td><button type="button" class="btn btn-danger btn-xs" id="' . $api->id . '" data-token_id="' . $api->id . '" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
 ';
     }
@@ -167,8 +163,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       <center>
           <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
       </center>
-';
-    ?>
+'; ?>
 <script>
   $("[name='token-status']").bootstrapSwitch('offColor','success');
   $('input[name="token-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
@@ -200,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
      new QRCode(document.getElementById("qrcode"), token_hash);
    });
 
-  $('#token-removal').click('', function(event) {
+  $('#token-removal').on("click", function(event) {
     event.preventDefault();
     token_id = $("#token_id").val();
     $.ajax({
@@ -218,7 +213,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#token-create').click('', function(event) {
+  $('#token-create').on("click", function(event) {
     event.preventDefault();
     $.ajax({
       type: "POST",
@@ -237,7 +232,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#pass-gen').click('', function(event) {
+  $('#pass-gen').on("click", function(event) {
     event.preventDefault();
     token = $.password(32,false);
     $('#token').val(token);
@@ -246,5 +241,5 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     <?php
 } else {
-    include 'includes/html/error-no-perm.inc.php';
-}//end if
+        include 'includes/html/error-no-perm.inc.php';
+    }//end if

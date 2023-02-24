@@ -11,3 +11,7 @@ discovery:
             - .1.3.6.1.4.1.890.1.5.13.7
         sysDescr:
             - IES
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

@@ -1,6 +1,3 @@
-source: Support/Example-Hardware-Setup.md
-path: blob/master/doc/
-
 # Example hardware setups
 
 The information in this document is direct from users, it's a place for people to share their
@@ -163,15 +160,15 @@ Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
 |                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same Server         |
-| OS             | Ubuntu 18.04 LTS    |                     |
-| CPU            | 2 vCore             |                     |
-| Memory         | 1GB                 |                     |
+| OS             | Debian 11           |                     |
+| CPU            | 4 vCore             |                     |
+| Memory         | 4GB                 |                     |
 | Disk Type      | Raid 1, SSD         |                     |
-| Disk Space     | 25 GB               |                     |
-| Devices        | 30                  |                     |
-| Ports          | 196                 |                     |
-| Health sensors | 207                 |                     |
-| Load           | < 3.65              |                     |
+| Disk Space     | 50 GB               |                     |
+| Devices        | 41                  |                     |
+| Ports          | 317                 |                     |
+| Health sensors | 243                 |                     |
+| Load           | < 3.15              |                     |
 
 ## [VVelox](https://github.com/VVelox)
 
@@ -225,3 +222,22 @@ Lab
 | Ports          | 25678               |                     |
 | Health sensors | 2457                |                     |
 | Load           | 10.92               |                     |
+
+## [dagb](https://github.com/dagbdagb)
+
+> Work
+
+Running in VMware.
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | Virtual             | Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 12 Cores Xeon 6130  |                     |
+| Memory         | 8GB                 |                     |
+| Disk Type      | SAN (SSD)           |                     |
+| Disk Space     | 26GB/72GB/7GB       | (logs/RRDs/db)      |
+| Devices        | 650                 |                     |
+| Ports          | 34300               |                     |
+| Health sensors | 10500               |                     |
+| Load           | 5.5 (45%)           |                     |
