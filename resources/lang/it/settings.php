@@ -1,62 +1,62 @@
 <?php
 
 return [
-    'title' => 'Settings',
-    'readonly' => 'Set in config.php, remove from config.php to enable.',
+    'title' => 'Impostazioni',
+    'readonly' => 'Impostato in config.php: rimuovilo dal file per gestirlo da qui.',
     'groups' => [
         'alerting' => 'Avvisi',
         'api' => 'API',
         'auth' => 'Autenticazione',
-        'authorization' => 'Authorization',
-        'external' => 'External',
-        'global' => 'Global',
+        'authorization' => 'Autorizzazioni',
+        'external' => 'Moduli esterni',
+        'global' => 'Globale',
         'os' => 'OS',
         'discovery' => 'Discovery',
-        'graphing' => 'Graphing',
+        'graphing' => 'Grafici',
         'poller' => 'Poller',
-        'system' => 'System',
+        'system' => 'Sistema',
         'webui' => 'Web UI',
     ],
     'sections' => [
         'alerting' => [
-            'general' => ['name' => 'General Alert Settings'],
-            'email' => ['name' => 'Email Options'],
-            'rules' => ['name' => 'Alert Rule Default Settings'],
+            'general' => ['name' => 'Impostazioni generali avvisi'],
+            'email' => ['name' => 'Opzioni e-mail'],
+            'rules' => ['name' => 'Impostazioni predefinite per gli avvisi'],
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
         ],
         'auth' => [
-            'general' => ['name' => 'General Authentication Settings'],
-            'ad' => ['name' => 'Active Directory Settings'],
-            'ldap' => ['name' => 'LDAP Settings'],
+            'general' => ['name' => 'Impostazioni generali di autenticazione'],
+            'ad' => ['name' => 'Impostazioni Active Directory'],
+            'ldap' => ['name' => 'Impostazioni LDAP'],
             'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
-            'device-group' => ['name' => 'Device Group Settings'],
+            'device-group' => ['name' => 'Impostazioni gruppo dispositivo'],
         ],
         'discovery' => [
-            'general' => ['name' => 'General Discovery Settings'],
-            'route' => ['name' => 'Routes Discovery Module'],
-            'discovery_modules' => ['name' => 'Discovery Modules'],
-            'storage' => ['name' => 'Storage Module'],
-            'networks' => ['name' => 'Networks'],
+            'general' => ['name' => 'Impostazioni generali per il discovery'],
+            'route' => ['name' => 'Modulo di discovery delle rotte'],
+            'discovery_modules' => ['name' => 'Moduli di discovery'],
+            'storage' => ['name' => 'Modulo storage'],
+            'networks' => ['name' => 'Network'],
         ],
         'external' => [
-            'binaries' => ['name' => 'Binary Locations'],
-            'location' => ['name' => 'Location Settings'],
-            'graylog' => ['name' => 'Graylog Integration'],
-            'oxidized' => ['name' => 'Oxidized Integration'],
-            'mac_oui' => ['name' => 'Mac OUI Lookup Integration'],
-            'peeringdb' => ['name' => 'PeeringDB Integration'],
-            'nfsen' => ['name' => 'NfSen Integration'],
-            'unix-agent' => ['name' => 'Unix-Agent Integration'],
-            'smokeping' => ['name' => 'Smokeping Integration'],
-            'snmptrapd' => ['name' => 'SNMP Traps Integration'],
+            'binaries' => ['name' => 'Percorso degli eseguibili'],
+            'location' => ['name' => 'Impostazioni di localizzazione'],
+            'graylog' => ['name' => 'Integrazione Graylog'],
+            'oxidized' => ['name' => 'Integrazione Oxidized'],
+            'mac_oui' => ['name' => 'Integrazione ricerca MAC OUI'],
+            'peeringdb' => ['name' => 'Integrazione PeeringDB'],
+            'nfsen' => ['name' => 'Integrazione NfSen'],
+            'unix-agent' => ['name' => 'Integrazione Unix-Agent'],
+            'smokeping' => ['name' => 'Integrazione Smokeping'],
+            'snmptrapd' => ['name' => 'Integrazione Trap SNMP'],
         ],
         'poller' => [
-            'availability' => ['name' => 'Device Availability'],
-            'distributed' => ['name' => 'Distributed Poller'],
+            'availability' => ['name' => 'Disponibilità dispositivo'],
+            'distributed' => ['name' => 'Poller distribuito'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
@@ -64,24 +64,25 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
-            'poller_modules' => ['name' => 'Poller Modules'],
-            'interface_types' => ['name' => 'Interface Type by RFC 7224'],
+            'poller_modules' => ['name' => 'Moduli Poller'],
+            'interface_types' => ['name' => 'Tipi interfacce da RFC 7224'],
         ],
         'system' => [
-            'cleanup' => ['name' => 'Cleanup'],
+            'cleanup' => ['name' => 'Pulizia'],
             'proxy' => ['name' => 'Proxy'],
-            'updates' => ['name' => 'Updates'],
+            'updates' => ['name' => 'Aggiornamenti'],
             'server' => ['name' => 'Server'],
+            'reporting' => ['name' => 'Report'],
         ],
         'webui' => [
-            'availability-map' => ['name' => 'Availability Map Settings'],
-            'graph' => ['name' => 'Graph Settings'],
-            'dashboard' => ['name' => 'Dashboard Settings'],
-            'port-descr' => ['name' => 'Interface Description Parsing'],
-            'search' => ['name' => 'Search Settings'],
-            'style' => ['name' => 'Style'],
-            'device' => ['name' => 'Device Settings'],
-            'worldmap' => ['name' => 'World Map Settings'],
+            'availability-map' => ['name' => 'Impostazioni mappa disponibilità'],
+            'graph' => ['name' => 'Impostazioni grafiche'],
+            'dashboard' => ['name' => 'Impostazioni dashboard'],
+            'port-descr' => ['name' => 'Descrizione interfaccia di analisi'],
+            'search' => ['name' => 'Impostazioni di ricerca'],
+            'style' => ['name' => 'Stile'],
+            'device' => ['name' => 'Impostazioni dispositivo'],
+            'worldmap' => ['name' => 'Impostazioni mappa mondiale'],
         ],
     ],
     'settings' => [
@@ -374,6 +375,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
+        ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636',
@@ -582,9 +587,6 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -599,6 +601,12 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'distributed_poller' => [
@@ -621,6 +629,10 @@ return [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
         ],
+        'email_attach_graphs' => [
+            'description' => 'Attach graph images',
+            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
+        ],
         'email_backend' => [
             'description' => 'How to deliver mail',
             'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',
@@ -639,7 +651,7 @@ return [
             'help' => 'Send HTML emails',
         ],
         'email_sendmail_path' => [
-            'description' => 'Path to sendmail binary',
+            'description' => 'Percorso di sendmail',
         ],
         'email_smtp_auth' => [
             'description' => 'SMTP authentication',
@@ -682,10 +694,10 @@ return [
             'help' => 'Overrides the default favicon.',
         ],
         'fping' => [
-            'description' => 'Path to fping',
+            'description' => 'Percorso di fping',
         ],
         'fping6' => [
-            'description' => 'Path to fping6',
+            'description' => 'Percorso di fping6',
         ],
         'fping_options' => [
             'count' => [
@@ -806,6 +818,10 @@ return [
                 ],
             ],
         ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.',
@@ -878,7 +894,7 @@ return [
             ],
         ],
         'ipmitool' => [
-            'description' => 'Path to ipmtool',
+            'description' => 'Percorso di ipmtool',
         ],
         'login_message' => [
             'description' => 'Logon Message',
@@ -894,7 +910,7 @@ return [
             'description' => 'Monospaced Font',
         ],
         'mtr' => [
-            'description' => 'Path to mtr',
+            'description' => 'Percorso di mtr',
         ],
         'mydomain' => [
             'description' => 'Primary Domain',
@@ -950,7 +966,7 @@ return [
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
         'nmap' => [
-            'description' => 'Path to nmap',
+            'description' => 'Percorso di nmap',
         ],
         'opentsdb' => [
             'enable' => [
@@ -1034,7 +1050,7 @@ return [
             'help' => 'Network Interface Types which should be ignored',
         ],
         'ping' => [
-            'description' => 'Path to ping',
+            'description' => 'Percorso di ping',
         ],
         'ping_rrd_step' => [
             'description' => 'Ping Frequency',
@@ -1082,9 +1098,6 @@ return [
             ],
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
-            ],
-            'toner' => [
-                'description' => 'Toner',
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
@@ -1179,13 +1192,19 @@ return [
             'mpls' => [
                 'description' => 'MPLS',
             ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Elimina le porte',
+            'description' => 'Elimina porte cancellate',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1232,6 +1251,16 @@ return [
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
             ],
         ],
+        'reporting' => [
+            'error' => [
+                'description' => 'Send Error Reports',
+                'help' => 'Sends some errors to LibreNMS for analysis and fixing',
+            ],
+            'usage' => [
+                'description' => 'Send Usage Reports',
+                'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
+            ],
+        ],
         'route_purge' => [
             'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
@@ -1261,7 +1290,7 @@ return [
             'help' => 'Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)',
         ],
         'rrdtool' => [
-            'description' => 'Path to rrdtool',
+            'description' => 'Percorso di rrdtool',
         ],
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
@@ -1356,14 +1385,14 @@ return [
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
         ],
         'sfdp' => [
-            'description' => 'Path to sfdp',
+            'description' => 'Percorso di sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
         ],
         'site_style' => [
-            'description' => 'Set the site css style',
+            'description' => 'Tema predefinito',
             'options' => [
                 'blue' => 'Blue',
                 'dark' => 'Dark',
@@ -1392,6 +1421,10 @@ return [
                 'no_bulk' => [
                     'description' => 'Disable snmp bulk for OIDs',
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
+                'unordered' => [
+                    'description' => 'Allow out of order snmp responses for OIDs',
+                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
             ],
             'port' => [
@@ -1427,16 +1460,16 @@ return [
             ],
         ],
         'snmpbulkwalk' => [
-            'description' => 'Path to snmpbulkwalk',
+            'description' => 'Percorso di snmpbulkwalk',
         ],
         'snmpget' => [
-            'description' => 'Path to snmpget',
+            'description' => 'Percorso di snmpget',
         ],
         'snmpgetnext' => [
-            'description' => 'Path to snmpgetnext',
+            'description' => 'Percorso di snmpgetnext',
         ],
         'snmptranslate' => [
-            'description' => 'Path to snmptranslate',
+            'description' => 'Percorso di snmptranslate',
         ],
         'snmptraps' => [
             'eventlog' => [
@@ -1449,7 +1482,7 @@ return [
             ],
         ],
         'snmpwalk' => [
-            'description' => 'Path to snmpwalk',
+            'description' => 'Percorso di snmpwalk',
         ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
@@ -1463,7 +1496,7 @@ return [
             'help' => 'Overrides the default Title Image.',
         ],
         'traceroute' => [
-            'description' => 'Path to traceroute',
+            'description' => 'Percorso di traceroute',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',
@@ -1489,7 +1522,7 @@ return [
             'description' => 'Enable updates in ./daily.sh',
         ],
         'update_channel' => [
-            'description' => 'Set update Channel',
+            'description' => 'Update Channel',
             'options' => [
                 'master' => 'Daily',
                 'release' => 'Monthly',
@@ -1500,7 +1533,7 @@ return [
             'help' => 'Shows Device as warning if Uptime is below this value. Default 24h',
         ],
         'virsh' => [
-            'description' => 'Path to virsh',
+            'description' => 'Percorso di virsh',
         ],
         'webui' => [
             'availability_map_box_size' => [
@@ -1563,18 +1596,18 @@ return [
             'help' => 'Location Map is shown by default',
         ],
         'whois' => [
-            'description' => 'Path to whois',
+            'description' => 'Percorso di whois',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',
             'help' => 'Enable smokeping integration',
         ],
         'smokeping.dir' => [
-            'description' => 'Path to rrds',
+            'description' => 'Percorso di rrds',
             'help' => 'Full path to Smokeping RRDs',
         ],
         'smokeping.pings' => [
-            'description' => 'Pings',
+            'description' => 'Ping',
             'help' => 'Number of pings configured in Smokeping',
         ],
         'smokeping.url' => [
@@ -1587,20 +1620,21 @@ return [
         'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
     ],
     'units' => [
-        'days' => 'days',
+        'days' => 'giorni',
         'ms' => 'ms',
-        'seconds' => 'seconds',
+        'seconds' => 'secondi',
     ],
     'validate' => [
-        'boolean' => ':value is not a valid boolean',
-        'color' => ':value is not a valid hex color code',
-        'email' => ':value is not a valid email',
-        'integer' => ':value is not an integer',
-        'password' => 'The password is incorrect',
-        'select' => ':value is not an allowed value',
-        'text' => ':value is not allowed',
-        'array' => 'Invalid format',
-        'executable' => ':value is not a valid executable',
-        'directory' => ':value is not a valid directory',
+        'boolean' => ':value non è un booleano valido',
+        'color' => ':value non è un codice colore esadecimale valido',
+        'email' => ':value non è una e-mail valida',
+        'float' => ':value non è un numero in virgola mobile',
+        'integer' => ':value non è un intero',
+        'password' => 'La password non è corretta',
+        'select' => ':value non è un valore ammesso',
+        'text' => ':value non è un ammesso',
+        'array' => 'Formato non valido',
+        'executable' => ':value non è un eseguibile valido',
+        'directory' => ':value non è una directory valida',
     ],
 ];
