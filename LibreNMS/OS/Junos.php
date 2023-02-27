@@ -73,24 +73,24 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     public function discoverSlas()
     {
         $slas = new Collection();
-        $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
+        $sla_table = snmpwalk_group($this->getDeviceArray(), 'pingCtlTable', 'DISMAN-PING-MIB', 2, snmpFlags: '-OQUstX');
 
         if (! empty($sla_table)) {
-            $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'jnxPingResultsRttUs', $sla_table, 'JUNIPER-PING-MIB');
+            $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingResultsRttUs', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            [$owner, $test] = explode('.', $sla_key, 2);
-
-            $slas->push(new Sla([
-                'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
-                'owner' => $owner,
-                'tag' => $test,
-                'rtt_type' => $this->retrieveJuniperType($sla_config['pingCtlType']),
-                'rtt' => isset($sla_config['jnxPingResultsRttUs']) ? $sla_config['jnxPingResultsRttUs'] / 1000 : null,
-                'status' => ($sla_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
-                'opstatus' => ($sla_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
-            ]));
+            foreach ($sla_config as $test_key => $test_config) {
+                $slas->push(new Sla([
+                    'sla_nr' => hexdec(hash('crc32', $sla_key . $test_key)), // indexed by owner+test, convert to int
+                    'owner' => $sla_key,
+                    'tag' => $test_key,
+                    'rtt_type' => $this->retrieveJuniperType($test_config['pingCtlType']),
+                    'rtt' => isset($test_config['jnxPingResultsRttUs']) ? $test_config['jnxPingResultsRttUs'] / 1000 : null,
+                    'status' => ($test_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
+                    'opstatus' => ($test_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+                ]));
+            }
         }
 
         return $slas;
@@ -103,6 +103,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         // Go get some data from the device.
         $data = snmpwalk_group($device, 'pingCtlRowStatus', 'DISMAN-PING-MIB', 2);
         $data = snmpwalk_group($device, 'jnxPingLastTestResultTable', 'JUNIPER-PING-MIB', 2, $data);
+        $data = snmpwalk_group($device, 'jnxPingResultsTable', 'JUNIPER-PING-MIB', 2, $data);
 
         // Get the needed information
         foreach ($slas as $sla) {
@@ -116,8 +117,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
             $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
 
-            $sla->rtt = ($data[$owner][$test]['jnxPingLastTestResultAvgRttUs'] ?? 0) / 1000;
-            $time = Carbon::parse($data[$owner][$test]['jnxPingLastTestResultTime'] ?? null)->toDateTimeString();
+            $sla->rtt = ($data[$owner][$test]['jnxPingResultsAvgRttUs'] ?? 0) / 1000;
+            $time = Carbon::parse($data[$owner][$test]['jnxPingResultsTime'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
@@ -139,9 +140,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 case 'IcmpEcho':
                 case 'IcmpTimeStamp':
                     $icmp = [
-                        'MinRttUs' => ($data[$owner][$test]['jnxPingLastTestResultMinRttUs'] ?? 0) / 1000,
-                        'MaxRttUs' => ($data[$owner][$test]['jnxPingLastTestResultMaxRttUs'] ?? 0) / 1000,
-                        'StdDevRttUs' => ($data[$owner][$test]['jnxPingLastTestResultStdDevRttUs'] ?? 0) / 1000,
+                        'MinRttUs' => ($data[$owner][$test]['jnxPingResultsMinRttUs'] ?? 0) / 1000,
+                        'MaxRttUs' => ($data[$owner][$test]['jnxPingResultsMaxRttUs'] ?? 0) / 1000,
+                        'StdDevRttUs' => ($data[$owner][$test]['jnxPingResultsStdDevRttUs'] ?? 0) / 1000,
                         'ProbeResponses' => $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null,
                         'ProbeLoss' => (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0) - (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0),
                     ];
@@ -166,17 +167,6 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         }
     }
 
-    private function calculateSlaNr($key): int
-    {
-        $sum = 0;
-        $length = strlen($key);
-        for ($i = 0; $i < $length; $i++) {
-            $sum += ord($key[$i]);
-        }
-
-        return $sum;
-    }
-
     /**
      * Retrieve specific Juniper PingCtlType
      */
@@ -195,6 +185,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 return 'NtpQuery';
             case 'enterprises.2636.3.7.2.6':
                 return 'UdpTimestamp';
+            case 'zeroDotZero':
+                return 'twamp';
             default:
                 return str_replace('ping', '', $rtt_type);
         }

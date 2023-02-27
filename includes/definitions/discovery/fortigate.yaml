@@ -31,6 +31,7 @@ modules:
                         - fgVpnTunEntPhase1Name
                         - fgVpnTunEntPhase2Name
                         - fgVpnTunEntRemGwyIp
+                        - fgVdEntName
         state:
             data:
                 -
@@ -143,7 +144,78 @@ modules:
                     descr: 'Monitor Jitter {{ $fgLinkMonitorName }}'
                     group: Link monitor
                     index: 'fgLinkMonitorJitter.{{ $index }}'
-
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsIntrusionsDetected
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.1.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Intrusions Detected'
+                    group: IPS
+                    index: 'fgIpsIntrusionsDetected.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsIntrusionsBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.2.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Intrusions Blocked'
+                    group: IPS
+                    index: 'fgIpsIntrusionsBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsCritSevDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.3.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Severity Critical Detected'
+                    group: IPS
+                    index: 'fgIpsCritSevDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsHighSevDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.4.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Severity High Detected'
+                    group: IPS
+                    index: 'fgIpsHighSevDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsMedSevDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.5.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Severity Medium Detected'
+                    group: IPS
+                    index: 'fgIpsMedSevDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsLowSevDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.6.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Severity Low Detected'
+                    group: IPS
+                    index: 'fgIpsLowSevDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsInfoSevDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.7.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Severity Informational Detected'
+                    group: IPS
+                    index: 'fgIpsInfoSevDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsSignatureDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.8.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Signature Detected'
+                    group: IPS
+                    index: 'fgIpsSignatureDetections.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgIpsStatsTable
+                    value: fgIpsAnomalyDetections
+                    num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.9.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} IPS Anomaly Detected'
+                    group: IPS
+                    index: 'fgIpsAnomalyDetections.{{ $index }}'
+                    rrd_type: COUNTER
         signal:
             data:
                 -
