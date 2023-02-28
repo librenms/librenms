@@ -1,8 +1,8 @@
 os: ftd
+group: cisco
 text: 'Cisco FTD'
 type: firewall
 icon: cisco
-group: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_ping_perf, text: 'ICMP Response' }
@@ -33,3 +33,18 @@ discovery_modules:
     ucd-diskio: false
     services: false
     wireless: false
+poller_modules:
+    applications: false
+    bgp-peers: false
+    cipsec-tunnels: true
+    cisco-asa-firewall: true
+    cisco-ipsec-flow-monitor: true
+    cisco-remote-access-monitor: true
+    hr-mib: false
+    ipSystemStats: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
