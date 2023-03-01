@@ -120,12 +120,12 @@ if ($height > 25) {
     $rrd_options .= ' VDEF:' . $id . '75th=' . $id . ',75,PERCENTNAN';
 
     // displays nan if less than 17 hours
+    $time_diff = $vars['to'] - $vars['from'];
     if ($time_diff >= 61200) {
         $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
     }
 
     // weekly breaks and causes issues if it is less than 8 days
-    $time_diff = $vars['to'] - $vars['from'];
     if ($time_diff >= 691200) {
         $rrd_options .= ' DEF:' . $id . "1w=$filename:$ds:AVERAGE:step=604800";
     }
