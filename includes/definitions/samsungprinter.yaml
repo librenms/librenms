@@ -11,6 +11,7 @@ discovery:
             - 'Samsung S'
             - 'Samsung ML'
             - 'Samsung M4080FX'
+            - 'Samsung X'
 discovery_modules:
     printer-supplies:   true
 poller_modules:

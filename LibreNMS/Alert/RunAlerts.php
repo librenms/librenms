@@ -532,9 +532,9 @@ class RunAlerts
             AlertState::RECOVERED => 'recovery',
             AlertState::ACTIVE => $obj['severity'] . ' alert',
             AlertState::ACKNOWLEDGED => 'acknowledgment',
+            AlertState::WORSE => 'got worse',
+            AlertState::BETTER => 'got better',
         ];
-        $prefix[3] = &$prefix[0];
-        $prefix[4] = &$prefix[0];
 
         if ($obj['state'] == AlertState::RECOVERED) {
             $severity = Alert::OK;

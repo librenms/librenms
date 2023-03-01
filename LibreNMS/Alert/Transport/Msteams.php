@@ -41,10 +41,7 @@ class Msteams extends Transport
         Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-type' => 'application/json',
-            'Expect:',
-        ]);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Expect:']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         if ($this->config['use-json'] === 'on' && $obj['uid'] !== '000') {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);

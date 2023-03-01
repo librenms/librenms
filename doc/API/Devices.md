@@ -1017,6 +1017,7 @@ Input:
   - location_id: serach by locaiton_id
   - hostname: search by hostname
   - sysName: search by sysName
+  - display: search by display name
   - device_id: exact match by device-id
   - type: search by device type
 - query: If searching by, then this will be used as the input.
