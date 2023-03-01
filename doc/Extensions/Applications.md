@@ -403,12 +403,15 @@ Content of an example /etc/snmp/certificate.json . Please edit with your own set
     {"fqdn": "www.mydomain.com"},
     {"fqdn": "some.otherdomain.org",
      "port": 8443},
-    {"fqdn": "personal.domain.net"}
+    {"fqdn": "personal.domain.net"},
+    {"fqdn": "selfsignedcert_host.domain.com",
+     "cert_location": "/etc/pki/tls/certs/localhost.pem"}
 ]
 }
 ```
-Key 'domains' contains a list of domains to check.
-Optional you can define a port. By default it checks on port 443.
+a. (Required): Key 'domains' contains a list of domains to check.
+b. (Optional): You can define a port. By default it checks on port 443.
+c. (Optional): You may define a certificate location for self-signed certificates.
 
 ### SNMP Extend
 1. Copy the shell script to the desired host.
@@ -428,6 +431,34 @@ extend certificate /etc/snmp/certificate.py
 4. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+## CAPEv2
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/cape -O /etc/snmp/cape
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/cape
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend cape /etc/snmp/cape
+```
+
+4. Install the required packages.
+```
+apt-get install libfile-readbackwards-perl libjson-perl libconfig-tiny-perl libdbi-perl libfile-slurp-perl libstatistics-lite-perl
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
 
 ## C.H.I.P
 
@@ -457,30 +488,36 @@ Extend` heading top of page.
 
 ## Docker Stats
 
-It allows you to know which container docker run and their stats.
+It gathers metrics about the docker containers, including:
+- cpu percentage 
+- memory usage 
+- container size
+- uptime 
+- Totals per status
 
-This script require: jq
+This script requires python3 and the pip module python-dateutil 
 
 ### SNMP Extend
 
-1. Install jq
+1. Install pip module
 ```
-sudo apt install jq
+pip3 install python-dateutil
 ```
 
 2. Copy the shell script to the desired host.
+By default, it will only show the status for containers that are running. To include all containers modify the constant in the script at the top of the file and change it to `ONLY_RUNNING_CONTAINERS = False`
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh -O /etc/snmp/docker-stats.sh
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.py -O /etc/snmp/docker-stats.py
 ```
 
 3. Make the script executable
 ```
-chmod +x /etc/snmp/docker-stats.sh
+chmod +x /etc/snmp/docker-stats.py
 ```
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend docker /etc/snmp/docker-stats.sh
+extend docker /etc/snmp/docker-stats.py
 ```
 
 5. If your run Debian, you need to add the Debian-snmp user to the docker group
@@ -1206,7 +1243,28 @@ chmod +x /etc/snmp/nginx
 extend nginx /etc/snmp/nginx
 ```
 
-4. Restart snmpd on your host
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can request /nginx-status:
+```
+cat << EOF > snmpd_nginx.te
+module snmpd_nginx 1.0;
+
+require {
+        type httpd_t;
+        type http_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t http_port_t:tcp_socket name_connect;
+EOF
+checkmodule -M -m -o snmpd_nginx.mod snmpd_nginx.te
+semodule_package -o snmpd_nginx.pp -m snmpd_nginx.mod
+semodule -i snmpd_nginx.pp
+```
+
+5. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -2155,6 +2213,29 @@ chmod +x /etc/snmp/redis.py
 extend redis /etc/snmp/redis.py
 ```
 
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
+```
+cat << EOF > snmpd_redis.te
+module snmpd_redis 1.0;
+
+require {
+        type tmp_t;
+        type redis_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+        class dir { add_name write };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t redis_port_t:tcp_socket name_connect;
+allow snmpd_t tmp_t:dir { write add_name };
+EOF
+checkmodule -M -m -o snmpd_redis.mod snmpd_redis.te
+semodule_package -o snmpd_redis.pp -m snmpd_redis.mod
+semodule -i snmpd_redis.pp
+```
+
 ### Agent
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
@@ -2550,7 +2631,31 @@ extend systemd /etc/snmp/systemd.py
 }
 ```
 
-5. Restart snmpd.
+5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access systemd state:
+```
+cat << EOF > snmpd_systemctl.te
+module snmpd_systemctl 1.0;
+
+require {
+        type snmpd_t;
+        type systemd_systemctl_exec_t;
+        type init_t;
+        class file { execute execute_no_trans map open read };
+        class unix_stream_socket connectto;
+        class system status;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t init_t:system status;
+allow snmpd_t init_t:unix_stream_socket connectto;
+allow snmpd_t systemd_systemctl_exec_t:file { execute execute_no_trans map open read };
+EOF
+checkmodule -M -m -o snmpd_systemctl.mod snmpd_systemctl.te
+semodule_package -o snmpd_systemctl.pp -m snmpd_systemctl.mod
+semodule -i snmpd_systemctl.pp
+```
+
+6. Restart snmpd.
 
 
 ## TinyDNS aka djbdns

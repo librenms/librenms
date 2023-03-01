@@ -29,7 +29,7 @@ if ($device['os_group'] == 'cisco') {
     $ciscoFlashPartitionName = snmpwalk_cache_oid($device, 'ciscoFlashPartitionName', null, 'CISCO-FLASH-MIB');
     $ciscoFlashDeviceName = snmpwalk_cache_oid($device, 'ciscoFlashDeviceName', null, 'CISCO-FLASH-MIB');
     foreach ($ciscoFlashPartitionName as $index => $partitionName) {
-        $name = array_shift($ciscoFlashDeviceName[$index[0]]) . '(' . array_shift($partitionName) . '):';
+        $name = is_array($ciscoFlashDeviceName)? array_shift($ciscoFlashDeviceName[$index[0]]) . '(' . array_shift($partitionName) . '):': array_shift($partitionName);
         $oids = array('ciscoFlashPartitionSize.' . $index, 'ciscoFlashPartitionFreeSpace.' . $index, 'ciscoFlashPartitionSizeExtended.' . $index, 'ciscoFlashPartitionFreeSpaceExtended.' . $index);
         $entry = snmp_get_multi($device, $oids, '-OQUs', 'CISCO-FLASH-MIB');
         $entry = array_shift($entry);

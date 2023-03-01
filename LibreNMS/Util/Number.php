@@ -97,7 +97,7 @@ class Number
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
-            if (! preg_match('/^-?\d+(\.\d+)?/', $number ?? '', $matches)) {
+            if (! preg_match('/^\s*-?\d+(\.\d+)?/', $number ?? '', $matches)) {
                 return 0;
             }
             $number = $matches[0];
@@ -124,5 +124,27 @@ class Number
         }
 
         return round($part / $total * 100, $precision);
+    }
+
+    /**
+     * This converts a memory size containing the unit to bytes. example 1 MiB to 1048576 bytes
+     */
+    public static function convertToBytes(string $from): ?int
+    {
+        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+        $number = floatval(substr($from, 0, -3));
+        $suffix = substr($from, -3);
+
+        //B or no suffix
+        if (is_numeric(substr($suffix, 0, 1))) {
+            return (int) $from;
+        }
+
+        $exponent = array_flip($units)[$suffix] ?? null;
+        if ($exponent === null) {
+            return null;
+        }
+
+        return (int) ($number * (1024 ** $exponent));
     }
 }

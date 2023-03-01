@@ -3736,11 +3736,6 @@ parameters:
 			path: LibreNMS/OS/Ironware.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:calculateSlaNr\\(\\) has parameter \\$key with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Junos.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:discoverSlas\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Junos.php
@@ -4192,16 +4187,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Timos\\:\\:pollMplsTunnelCHops\\(\\) has parameter \\$paths with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Timos.php
-
-		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/OS/Timos.php
-
-		-
-			message: "#^Parameter \\#9 \\$divisor of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Timos.php
 
@@ -5629,41 +5614,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\StringHelpers\\:\\:niceCase\\(\\) has parameter \\$string with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/StringHelpers.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$format with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$interval with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has parameter \\$s with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has parameter \\$description with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\Url\\:\\:escapeBothQuotes\\(\\) has no return type specified\\.$#"

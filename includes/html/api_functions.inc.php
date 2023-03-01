@@ -341,6 +341,18 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = 'a.`ipv6_address`=? OR a.`ipv6_compressed`=?';
         $select .= ',p.* ';
         $param = [$query, $query];
+    } elseif ($type == 'sysName') {
+        $sql = '`d`.`sysName`=?';
+        $param[] = $query;
+    } elseif ($type == 'location_id') {
+        $sql = '`d`.`location_id`=?';
+        $param[] = $query;
+    } elseif ($type == 'type') {
+        $sql = '`d`.`type`=?';
+        $param[] = $query;
+    } elseif ($type == 'display') {
+        $sql = '`d`.`display`=?';
+        $param[] = $query;
     } else {
         $sql = '1';
     }
@@ -1434,7 +1446,8 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
-    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . $hostname . '?format=json'), true);
+    $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
+    $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');
     } else {

@@ -89,7 +89,7 @@ try {
         echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
         header('Content-type: ' . ImageFormat::forGraph()->contentType());
-        echo $output === 'base64' ? base64_encode($image_data) : $image_data;
+        echo (isset($vars['output']) && $vars['output'] === 'base64') ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
     if (\LibreNMS\Util\Debug::isEnabled()) {

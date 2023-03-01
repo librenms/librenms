@@ -223,7 +223,7 @@ class GraphController extends WidgetController
         $data = $settings;
         $data['params'] = $params;
         $data['dimensions'] = $request->get('dimensions');
-        $data['from'] = Carbon::now()->subSeconds(Time::legacyTimeSpecToSecs($settings['graph_range']))->timestamp;
+        $data['from'] = Carbon::now()->subSeconds(Time::legacyTimeSpecToSecs($settings['graph_range'] ?? ''))->timestamp;
         $data['to'] = Carbon::now()->timestamp;
 
         return view('widgets.graph', $data);

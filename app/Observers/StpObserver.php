@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Eventlog;
 use App\Models\Stp;
+use LibreNMS\Util\Time;
 
 class StpObserver
 {
@@ -24,7 +25,7 @@ class StpObserver
         }
 
         if ($stp->isDirty('rootPort')) {
-            $time = \LibreNMS\Util\Time::formatInterval($stp->timeSinceTopologyChange);
+            $time = Time::formatInterval((int) $stp->timeSinceTopologyChange);
             Eventlog::log('STP topology changed after: ' . $time, $stp->device_id, 'stp', 4);
         }
     }

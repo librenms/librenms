@@ -1,0 +1,83 @@
+mib: V1600D
+modules:
+    os:
+        hardware:
+            - V1600D::v1600dOltType.5.0
+        serial:
+            - V1600D::systemInfo.11.0
+        version:
+            - V1600D::sysFirmVersion.0
+        features:
+            - V1600D::sysHardVersion.0
+
+    mempools:
+        data:
+            -
+                percent_used: V1600D::memoryLoad
+                descr: 'Memory Load'
+    processors:
+        data:
+            -
+                oid: v1600dSysCfg
+                value: cpuLoad
+                num_oid: '1.3.6.1.4.1.37950.1.1.5.10.12.3.{{ $index }}'
+                descr: 'CPU Load'
+
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ponTransceiverTable
+                        - v1600dSysCfg
+                        - ponPortDescr
+                        - onuAuthInfoDescription2
+        temperature:
+            data:
+                -
+                    oid: ponTransceiverEntry
+                    value: tempperature
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.2.{{ $index }}'
+                    descr: "{{ $ponPortDescr }} Temperature"
+                -
+                    oid: systemInfo
+                    value: sysTemperature
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.9.{{ $index }}'
+                    descr: "System Temperature"
+                -
+                    oid: opmDiagInfoEntry
+                    value: temperature
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.12.2.1.8.1.3.{{ $index }}'
+                    descr: "{{ $onuAuthInfoDescription2 }}"
+                    group: "ONU"
+
+
+        voltage:
+            data:
+                -
+                    oid: ponTransceiverEntry
+                    value: voltage
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.3.{{ $index }}'
+                    descr: "{{ $ponPortDescr }} Voltage"
+        current:
+            data:
+                -
+                    oid: ponTransceiverEntry
+                    value: biasCurrent
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.4.{{ $index }}'
+                    descr: "{{ $ponPortDescr }} Bias"
+                    divisor: 1000
+        dbm:
+            data:
+                -
+                    oid: ponTransceiverEntry
+                    value: transmitPower
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.5.{{ $index }}'
+                    descr: "{{ $ponPortDescr }} TX-Power"
+                -
+                    oid: opmDiagInfoEntry
+                    value: rxPower
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.12.2.1.8.1.7.{{ $index }}'
+                    descr: "{{ $onuAuthInfoDescription2 }}"
+                    group: "ONU"
+

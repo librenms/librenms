@@ -1482,8 +1482,8 @@ return [
         'update_channel' => [
             'description' => 'Визначити канал оновлень',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [
