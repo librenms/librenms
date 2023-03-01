@@ -186,6 +186,7 @@ unset($oids);
 $oids = snmp_walk($device, 'atsConfigPhaseTableIndex', '-OsqnU', 'PowerNet-MIB');
 if (isset($oids) && $oids) {
     $type = 'apc';
+    $precision = '10';
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {

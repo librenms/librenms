@@ -82,7 +82,7 @@ foreach ($cdp_array as $key => $cdp_if_array) {
 }//end foreach
 echo PHP_EOL;
 
-if (($device['os'] == 'routeros')) {
+if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
