@@ -2352,7 +2352,7 @@ function list_ports_vlans(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (! Auth::user()->hasGlobalRead()) {
         $sql .= ' AND `ports_vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
