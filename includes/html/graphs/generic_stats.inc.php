@@ -121,7 +121,7 @@ if ($height > 25) {
 
     // the if is needed as with out it the group page will case an error
     // devices/group=1/format=graph_poller_perf/from=-24hour/to=now/
-    if ( is_numeric($vars['to']) && is_numeric($vars['from']) ) {
+    if (is_numeric($vars['to']) && is_numeric($vars['from'])) {
         $time_diff = $vars['to'] - $vars['from'];
     } else {
         $time_diff = 1;
