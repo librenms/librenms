@@ -330,7 +330,20 @@ It is up the IdP to provide the relevant details that you will need for configur
     </md:EntityDescriptor>'''
     ```
 
+=== "Azure"
 
+    ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
+    echo "SESSION_SAME_SITE_COOKIE=none" >> .env
+    lnms plugin:add socialiteproviders/saml2
+    lnms config:set auth.socialite.redirect true
+    lnms config:set auth.socialite.register true
+    lnms config:set auth.socialite.configs.saml2.acs https://login.microsoftonline.com/xxxidfromazurexxx/saml2
+    lnms config:set auth.socialite.configs.saml2.entityid https://sts.windows.net/xxxidfromazurexxx/
+    lnms config:set auth.socialite.configs.saml2.certificate xxxcertinonelinexxx
+    lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
+    lnms config:set auth.socialite.configs.saml2.metadata https://nexus.microsoftonline-p.com/federationmetadata/saml20/federationmetadata.xml
+    lnms config:set auth.socialite.configs.saml2.sp_default_binding_method urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    lnms config:clear
 
 #### Using an Identity Provider metadata URL
 
