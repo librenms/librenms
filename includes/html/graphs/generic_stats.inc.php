@@ -119,8 +119,14 @@ if ($height > 25) {
     $rrd_options .= ' VDEF:' . $id . '25th=' . $id . ',25,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '75th=' . $id . ',75,PERCENTNAN';
 
+    // the if is needed as with out it the group page will case an error
+    // devices/group=1/format=graph_poller_perf/from=-24hour/to=now/
+    if (is_numeric($vars['to']) && is_numeric($vars['from'])) {
+        $time_diff = $vars['to'] - $vars['from'];
+    } else {
+        $time_diff = 1;
+    }
     // displays nan if less than 17 hours
-    $time_diff = $vars['to'] - $vars['from'];
     if ($time_diff >= 61200) {
         $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
     }
