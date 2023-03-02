@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -2844,9 +2845,8 @@ function get_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    $data = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`id` = ?', [$location_id]);
-    if (count($data) == 0) {
+    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    if (empty($data)) {
         return api_error(404, 'Location does not exist');
     }
 
