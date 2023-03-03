@@ -11,7 +11,7 @@
                     "hardware": "MPU2032DAC",
                     "features": null,
                     "location": null,
-                    "os": "avocent_mp",
+                    "os": "avocent-mp",
                     "type": "network",
                     "serial": null,
                     "icon": "avocent.svg"
