@@ -1934,6 +1934,55 @@
             ],
             "type": "array"
         },
+        "graph_colours.rainbow": {
+            "default": [
+                "881177",
+                "AA3355",
+                "CC6666",
+                "EE9944",
+                "EEDD00",
+                "99DD55",
+                "44DD88",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_green": {
+            "default": [
+                "99DD55",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_purple": {
+            "default": [
+                "663399",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
         "graph_colours.varied": {
             "default": [
                 "CC0000",
