@@ -15,7 +15,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.11.{{ $index }}'
                     index: 'CORERO-CMS-SEGMENTS-MIB::segmentNtdExternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
-                    descr: "{{ $segmentDevice }} {{ $segmentName }} NTD External Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} {{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NTD External Status"
                     value: CORERO-CMS-SEGMENTS-MIB::segmentNtdExternalInterfaceStatus
                     states:
                         - { value: 0, descr: Up, graph: 0, generic: 0 }
@@ -32,7 +32,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.14.{{ $index }}'
                     index: 'CORERO-CMS-SEGMENTS-MIB::segmentNtdInternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
-                    descr: "{{ $segmentDevice }} {{ $segmentName }} NTD Internal Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} {{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NTD Internal Status"
                     value: CORERO-CMS-SEGMENTS-MIB::segmentNtdInternalInterfaceStatus
                     states:
                         - { value: 0, descr: Up, graph: 0, generic: 0 }
@@ -49,7 +49,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.17.{{ $index }}'
                     index: 'segmentNbaExternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
-                    descr: "{{ $segmentDevice }} {{ $segmentName }} NBA External Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} {{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NBA External Status"
                     value: CORERO-CMS-SEGMENTS-MIB::segmentNbaExternalInterfaceStatus
                     states:
                         - { value: 0, descr: Up, graph: 0, generic: 0 }
@@ -66,7 +66,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.20.{{ $index }}'
                     index: 'CORERO-CMS-SEGMENTS-MIB::segmentNbaInternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
-                    descr: "{{ $segmentDevice }} {{ $segmentName }} NBA Internal Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} {{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NBA Internal Status"
                     value: CORERO-CMS-SEGMENTS-MIB::segmentNbaInternalInterfaceStatus
                     states:
                         - { value: 0, descr: Up, graph: 0, generic: 0 }
