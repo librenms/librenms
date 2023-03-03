@@ -6,7 +6,7 @@ modules:
                     oid: CORERO-CMS-SYSTEM-STATUS-MIB::protection
                     num_oid: '.1.3.6.1.4.1.41036.4.1.6.1.0'
                     descr: Protection Status
-					group: System Status
+                    group: System Status
                     states:
                         - { value: 0, descr: Normal, graph: 0, generic: 0 }
                         - { value: 1, descr: Warning, graph: 0, generic: 1 }
@@ -15,7 +15,7 @@ modules:
                     oid: CORERO-CMS-SYSTEM-STATUS-MIB::analytics
                     num_oid: '.1.3.6.1.4.1.41036.4.1.6.5.0'
                     descr: Analytics Status
-					group: System Status
+                    group: System Status
                     states:
                         - { value: 0, descr: Normal, graph: 0, generic: 0 }
                         - { value: 1, descr: Warning, graph: 0, generic: 1 }
