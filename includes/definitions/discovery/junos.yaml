@@ -1,4 +1,4 @@
-mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-RPM-MIB
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-RPM-MIB:POWER-ETHERNET-MIB
 modules:
     mempools:
         data:
@@ -228,3 +228,24 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: master }
                         - { value: 2, generic: 0, graph: 0, descr: backup }
                         - { value: 3, generic: 0, graph: 0, descr: linecard }
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseOperStatus
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.3.{{ $index }}'
+                    descr: 'PoE Controller {{ $index }} Status'
+                    index: 'pethMainPseOperStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: fault }
+        power:
+            data:
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
+                    descr: 'PoE Controller {{ $index }} Load'
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
+                    low_limit: -1
+                    low_warn_limit: -1
