@@ -56,7 +56,7 @@ class Avocent extends OS implements OSDiscovery
                 $serial = $avocent_tmp["$avocent_oid.4.0"] ?? null;
                 $version = $avocent_tmp["$avocent_oid.7.0"] ?? null;
             } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.10418.18')) {
-                $avocent_tmp = explode(' ', snmp_get($this->getDeviceArray(), 'sysDescr.0', '-OQv'));
+                $avocent_tmp = explode(' ', $device->sysDescr);
                 $hardware = $avocent_tmp[0] ?? null;
                 $version = $avocent_tmp[1] ?? null;
             }
