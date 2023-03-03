@@ -1,17 +1,17 @@
-mib: CORERO-CMS-MIB
 modules:
     sensors:
         state:
             data:
                 -
+                    oid: protection
                     num_oid: '.1.3.6.1.4.1.41036.4.1.6.1'
                     descr: Protection Status
                     states:
-                        - { value: 0, descr: Normal, graph: 1, generic: 0 }
-                        - { value: 1, descr: Warning, graph: 1, generic: 1 }
-                        - { value: 2, descr: Error, graph: 1, generic: 2 }
+                        - { value: 0, descr: Normal, graph: 0, generic: 0 }
+                        - { value: 1, descr: Warning, graph: 0, generic: 1 }
+                        - { value: 2, descr: Error, graph: 0, generic: 2 }
                 -
-                    oid: '.1.3.6.1.4.1.41036.4.1.4.1'
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.11.{{ $index }}'
                     index: 'segmentNtdExternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
@@ -28,7 +28,7 @@ modules:
                         - { value: 7, descr: Down Remote-Fault, graph: 0, generic: 1 }
                         - { value: 8, descr: Down Local-Fault, graph: 0, generic: 2 }
                 -
-                    oid: '.1.3.6.1.4.1.41036.4.1.4.1'
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.14.{{ $index }}'
                     index: 'segmentNtdInternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
@@ -45,7 +45,7 @@ modules:
                         - { value: 7, descr: Down Remote-Fault, graph: 0, generic: 1 }
                         - { value: 8, descr: Down Local-Fault, graph: 0, generic: 2 }
                 -
-                    oid: '.1.3.6.1.4.1.41036.4.1.4.1'
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.17.{{ $index }}'
                     index: 'segmentNbaExternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
@@ -62,7 +62,7 @@ modules:
                         - { value: 7, descr: Down Remote-Fault, graph: 0, generic: 1 }
                         - { value: 8, descr: Down Local-Fault, graph: 0, generic: 2 }
                 -
-                    oid: '.1.3.6.1.4.1.41036.4.1.4.1'
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
                     num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.20.{{ $index }}'
                     index: 'segmentNbaInternalInterfaceStatus.{{ $index }}'
                     group: Segment Interfaces
