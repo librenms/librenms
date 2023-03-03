@@ -99,6 +99,62 @@ modules:
         count:
             data:
                 -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.1.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTP Sessions Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPSBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.2.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTPS Sessions Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPSBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPURLBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.3.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTP URLs Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPURLBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPSURLBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.4.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTPS URLs Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPSURLBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfActiveXBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.5.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} ActiveX Blocked'
+                    group: Webfilter
+                    index: 'fgWfActiveXBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfCookieBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.6.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} Cookies Blocked'
+                    group: Webfilter
+                    index: 'fgWfCookieBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfAppletBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.7.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} Applets Blocked'
+                    group: Webfilter
+                    index: 'fgWfAppletBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
                     oid: fgVpnTunnelUpCount
                     num_oid: '.1.3.6.1.4.1.12356.101.12.1.1.{{ $index }}'
                     index: 'fgVpnTunnelUpCount.{{ $index }}'
