@@ -1,4 +1,4 @@
-mib_dir: corero
+mib: CORERO-CMS-MIB
 modules:
     sensors:
         state:
