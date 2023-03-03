@@ -55,12 +55,7 @@ class Avocent extends OS implements OSDiscovery
                 $hardware = explode(' ', $avocent_tmp["$avocent_oid.2.0"] ?? '', 2)[0] ?: null;
                 $serial = $avocent_tmp["$avocent_oid.4.0"] ?? null;
                 $version = $avocent_tmp["$avocent_oid.7.0"] ?? null;
-            }
-        }
-
-        //For the Avocent MPU, model number and os version are stored in sysDescr OID
-        if (empty($hardware) && empty($version)) {
-            if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.10418.18')) {
+            } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.10418.18')) {
                 $avocent_tmp = explode(' ', snmp_get($this->getDeviceArray(), 'sysDescr.0', '-OQv'));
                 $hardware = $avocent_tmp[0] ?? null;
                 $version = $avocent_tmp[1] ?? null;
