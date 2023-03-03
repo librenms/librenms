@@ -20,33 +20,6 @@
         },
         "poller": "matches discovery"
     },
-    "mempools": {
-        "discovery": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "arubaos",
-                    "mempool_class": "system",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 83,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 4430102528,
-                    "mempool_used_oid": ".1.3.6.1.4.1.14823.2.2.1.1.1.11.1.3.1",
-                    "mempool_free": 878575616,
-                    "mempool_free_oid": null,
-                    "mempool_total": 5308678144,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
     "processors": {
         "discovery": {
             "processors": [
@@ -148,6 +121,33 @@
                     "processor_descr": "Network Processor CPU15",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "arubaos",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory",
+                    "mempool_perc": 83,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 4430102528,
+                    "mempool_used_oid": ".1.3.6.1.4.1.14823.2.2.1.1.1.11.1.3.1",
+                    "mempool_free": 878575616,
+                    "mempool_free_oid": null,
+                    "mempool_total": 5308678144,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         },

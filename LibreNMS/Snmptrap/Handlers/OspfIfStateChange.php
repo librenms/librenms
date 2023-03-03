@@ -85,7 +85,7 @@ class OspfIfStateChange implements SnmptrapHandler
                 break;
         }
 
-        Log::event("OSPF interface $port->ifName is $ospfPort->ospfIfState", $device->device_id, 'trap', $severity);
+        $trap->log("OSPF interface $port->ifName is $ospfPort->ospfIfState", $severity);
 
         $ospfPort->save();
     }

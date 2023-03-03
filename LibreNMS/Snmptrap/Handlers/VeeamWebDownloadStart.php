@@ -5,7 +5,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class VeeamWebDownloadStart implements SnmptrapHandler
 {
@@ -22,6 +21,6 @@ class VeeamWebDownloadStart implements SnmptrapHandler
         $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
 
-        Log::event('SNMP Trap: 1 click FLR job started - ' . $vm_name . ' - ' . $initiator_name, $device->device_id, 'backup', 2);
+        $trap->log('SNMP Trap: 1 click FLR job started - ' . $vm_name . ' - ' . $initiator_name, 2, 'backup');
     }
 }

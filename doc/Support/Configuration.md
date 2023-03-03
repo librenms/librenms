@@ -26,6 +26,38 @@ The LibreNMS uses dot notation for config items:
 
 If you set up bash completion, you can use tab completion to find config settings.
 
+### Getting a list of all current values
+
+To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`.
+
+Example output:
+```
+librenms@librenms:~$ lnms config:get --dump | jq 
+{
+  "install_dir": "/opt/librenms",
+  "active_directory": {
+    "users_purge": 0
+  },
+  "addhost_alwayscheckip": false,
+  "alert": {
+    "ack_until_clear": false,
+    "admins": true,
+    "default_copy": true,
+    "default_if_none": false,
+    "default_mail": false,
+    "default_only": true,
+    "disable": false,
+    "fixed-contacts": true,
+    "globals": true,
+    "syscontact": true,
+    "transports": {
+      "mail": 5
+    },
+    "tolerance_window": 5,
+    "users": false,
+    ...
+```
+
 ### Examples
 
 ```bash
@@ -421,7 +453,7 @@ lnms config:set overview_show_sysDescr true
 Enable or disable the sysDescr output for a device.
 
 ```bash
-lnms config:set device_default_display '{{ $hostname }}'
+lnms config:set device_display_default '{{ $hostname }}'
 ```
 
 This is a simple template to control the display of device names by default.
@@ -729,19 +761,19 @@ there.
 Exact Matching:
 
 ```bash
-lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Matching:
 
 ```bash
-lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Match Substitution:
 
 ```bash
-lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
+lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match

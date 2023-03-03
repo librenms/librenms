@@ -499,7 +499,7 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
     return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
@@ -520,7 +520,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    Log::event($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)

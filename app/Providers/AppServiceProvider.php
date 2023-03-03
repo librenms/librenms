@@ -60,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootCustomBladeDirectives()
     {
-        Blade::if('config', function ($key) {
-            return \LibreNMS\Config::get($key);
+        Blade::if('config', function ($key, $value = true) {
+            return \LibreNMS\Config::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
             return ! \LibreNMS\Config::get($key);
@@ -105,10 +105,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerFacades()
     {
-        // replace log manager so we can add the event function
-        $this->app->singleton('log', function ($app) {
-            return new \App\Facades\LogManager($app);
-        });
     }
 
     private function registerGeocoder()

@@ -5174,26 +5174,77 @@
             "sensors": [
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "dbm",
+                    "sensor_class": "current",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.39976960",
-                    "sensor_index": "rx-1.39976960",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.1.39976960",
+                    "sensor_index": "tx-bias-1.39976960",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/4 RX Power Int-Cal",
+                    "sensor_descr": "1/3/4 Tx Bias",
                     "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_divisor": 500000,
                     "sensor_multiplier": 1,
-                    "sensor_current": -40,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": -3,
-                    "sensor_limit_low": -23.01,
-                    "sensor_limit_low_warn": -19,
+                    "sensor_current": 0.02835,
+                    "sensor_limit": 0.13,
+                    "sensor_limit_warn": 0.125,
+                    "sensor_limit_low": 0.003,
+                    "sensor_limit_low_warn": 0.004,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.39976960",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "mw_to_dbm",
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.1.40108032",
+                    "sensor_index": "tx-bias-1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8 Tx Bias",
+                    "group": null,
+                    "sensor_divisor": 500000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0.01784,
+                    "sensor_limit": 0.065,
+                    "sensor_limit_warn": 0.06,
+                    "sensor_limit_low": 0.01,
+                    "sensor_limit_low_warn": 0.012,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1.40108032",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.39976960",
+                    "sensor_index": "rx-1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4 Rx",
+                    "group": "1/3/4",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -40,
+                    "sensor_limit": 0.99991233544684,
+                    "sensor_limit_warn": -2.9998893767789,
+                    "sensor_limit_low": -23.01029995664,
+                    "sensor_limit_low_warn": -18.996294548824,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1.39976960",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5218,6 +5269,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5227,21 +5279,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.40108032",
                     "sensor_index": "rx-1.40108032",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/8 RX Power Ext-Cal",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/8 Rx",
+                    "group": "1/3/8",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -8.54,
-                    "sensor_limit": 1,
+                    "sensor_limit": 0.99991233544684,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low": -26.99,
-                    "sensor_limit_low_warn": -26.02,
+                    "sensor_limit_low": -26.98970004336,
+                    "sensor_limit_low_warn": -26.02059991328,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.40108032",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5251,21 +5304,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.1.39976960",
                     "sensor_index": "tx-1.39976960",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/4 TX Power",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/4 Tx",
+                    "group": "1/3/4",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.47,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": -1,
-                    "sensor_limit_low": -13.5,
-                    "sensor_limit_low_warn": -9.5,
+                    "sensor_limit": 0.99991233544684,
+                    "sensor_limit_warn": -1.0001543745061,
+                    "sensor_limit_low": -13.496924768681,
+                    "sensor_limit_low_warn": -9.5000714307986,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.39976960",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5290,6 +5344,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5299,21 +5354,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.1.40108032",
                     "sensor_index": "tx-1.40108032",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/8 TX Power",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/8 Tx",
+                    "group": "1/3/8",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -7.19,
-                    "sensor_limit": 1,
+                    "sensor_limit": 0.99991233544684,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low": -13,
-                    "sensor_limit_low_warn": -12,
+                    "sensor_limit_low": -13.001622741328,
+                    "sensor_limit_low_warn": -11.999706407559,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.40108032",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5338,6 +5394,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
@@ -5362,6 +5419,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
@@ -5386,6 +5444,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
@@ -5410,6 +5469,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisOverTempState"
                 },
                 {
@@ -5434,6 +5494,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5458,6 +5519,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5482,6 +5544,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5506,6 +5569,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5530,6 +5594,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5554,6 +5619,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5578,6 +5644,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5602,6 +5669,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5626,6 +5694,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5650,6 +5719,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5674,6 +5744,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5698,6 +5769,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5722,6 +5794,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5746,6 +5819,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5770,6 +5844,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5794,6 +5869,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5818,6 +5894,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5842,6 +5919,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5866,6 +5944,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5890,6 +5969,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5914,6 +5994,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5938,6 +6019,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5962,7 +6044,108 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.39976960",
+                    "sensor_index": "1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 25.2265625,
+                    "sensor_limit": 90,
+                    "sensor_limit_warn": 85,
+                    "sensor_limit_low": -45,
+                    "sensor_limit_low_warn": -40,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40009728",
+                    "sensor_index": "1.40009728",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/5",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 39.8125,
+                    "sensor_limit": 85,
+                    "sensor_limit_warn": 75,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40042496",
+                    "sensor_index": "1.40042496",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/6",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 25.6875,
+                    "sensor_limit": 100,
+                    "sensor_limit_warn": 95,
+                    "sensor_limit_low": -40,
+                    "sensor_limit_low_warn": -35,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40108032",
+                    "sensor_index": "1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 39.125,
+                    "sensor_limit": 100,
+                    "sensor_limit_warn": 95,
+                    "sensor_limit_low": -50,
+                    "sensor_limit_low_warn": -45,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
                 },
                 {
                     "sensor_deleted": 0,
@@ -5986,6 +6169,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6010,6 +6194,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6034,6 +6219,107 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.39976960",
+                    "sensor_index": "1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3384,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 3,
+                    "sensor_limit_low_warn": 3.1,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40009728",
+                    "sensor_index": "1.40009728",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/5",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3016,
+                    "sensor_limit": 3.6,
+                    "sensor_limit_warn": 3.5,
+                    "sensor_limit_low": 2.8,
+                    "sensor_limit_low_warn": 2.9,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40042496",
+                    "sensor_index": "1.40042496",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/6",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.2856,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 2.9,
+                    "sensor_limit_low_warn": 3,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40108032",
+                    "sensor_index": "1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3128,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 2.9,
+                    "sensor_limit_low_warn": 3,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -6289,26 +6575,77 @@
             "sensors": [
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "dbm",
+                    "sensor_class": "current",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.39976960",
-                    "sensor_index": "rx-1.39976960",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.1.39976960",
+                    "sensor_index": "tx-bias-1.39976960",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/4 RX Power Int-Cal",
+                    "sensor_descr": "1/3/4 Tx Bias",
                     "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_divisor": 500000,
                     "sensor_multiplier": 1,
-                    "sensor_current": -40,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": -3,
-                    "sensor_limit_low": -23.01,
-                    "sensor_limit_low_warn": -19,
+                    "sensor_current": 0.02835,
+                    "sensor_limit": 0.13,
+                    "sensor_limit_warn": 0.125,
+                    "sensor_limit_low": 0.003,
+                    "sensor_limit_low_warn": 0.004,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.39976960",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "mw_to_dbm",
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.1.40108032",
+                    "sensor_index": "tx-bias-1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8 Tx Bias",
+                    "group": null,
+                    "sensor_divisor": 500000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0.01784,
+                    "sensor_limit": 0.065,
+                    "sensor_limit_warn": 0.06,
+                    "sensor_limit_low": 0.01,
+                    "sensor_limit_low_warn": 0.012,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1.40108032",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.39976960",
+                    "sensor_index": "rx-1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4 Rx",
+                    "group": "1/3/4",
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -40,
+                    "sensor_limit": 0.99991233544684,
+                    "sensor_limit_warn": -2.9998893767789,
+                    "sensor_limit_low": -23.01029995664,
+                    "sensor_limit_low_warn": -18.996294548824,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1.39976960",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6333,6 +6670,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -33.01,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6342,21 +6680,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.1.40108032",
                     "sensor_index": "rx-1.40108032",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/8 RX Power Ext-Cal",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/8 Rx",
+                    "group": "1/3/8",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -8.5387196432176,
-                    "sensor_limit": 1,
+                    "sensor_limit": 0.99991233544684,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low": -26.99,
-                    "sensor_limit_low_warn": -26.02,
+                    "sensor_limit_low": -26.98970004336,
+                    "sensor_limit_low_warn": -26.02059991328,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.40108032",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -8.54,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6366,21 +6705,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.1.39976960",
                     "sensor_index": "tx-1.39976960",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/4 TX Power",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/4 Tx",
+                    "group": "1/3/4",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.4708854978349,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": -1,
-                    "sensor_limit_low": -13.5,
-                    "sensor_limit_low_warn": -9.5,
+                    "sensor_limit": 0.99991233544684,
+                    "sensor_limit_warn": -1.0001543745061,
+                    "sensor_limit_low": -13.496924768681,
+                    "sensor_limit_low_warn": -9.5000714307986,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.39976960",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.47,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6405,6 +6745,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -30.97,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6414,21 +6755,22 @@
                     "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.1.40108032",
                     "sensor_index": "tx-1.40108032",
                     "sensor_type": "timos",
-                    "sensor_descr": "1/3/8 TX Power",
-                    "group": null,
-                    "sensor_divisor": 10000,
+                    "sensor_descr": "1/3/8 Tx",
+                    "group": "1/3/8",
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -7.1896663275227,
-                    "sensor_limit": 1,
+                    "sensor_limit": 0.99991233544684,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low": -13,
-                    "sensor_limit_low_warn": -12,
+                    "sensor_limit_low": -13.001622741328,
+                    "sensor_limit_low_warn": -11.999706407559,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1.40108032",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -7.19,
-                    "user_func": "mw_to_dbm",
+                    "user_func": "uw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6453,6 +6795,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
@@ -6477,6 +6820,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
@@ -6501,6 +6845,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
@@ -6525,6 +6870,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisOverTempState"
                 },
                 {
@@ -6549,6 +6895,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6573,6 +6920,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6597,6 +6945,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6621,6 +6970,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6645,6 +6995,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6669,6 +7020,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6693,6 +7045,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6717,6 +7070,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6741,6 +7095,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6765,6 +7120,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6789,6 +7145,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6813,6 +7170,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6837,6 +7195,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6861,6 +7220,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6885,6 +7245,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6909,6 +7270,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6933,6 +7295,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6957,6 +7320,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6981,6 +7345,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7005,6 +7370,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7029,6 +7395,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7053,6 +7420,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7077,7 +7445,108 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.39976960",
+                    "sensor_index": "1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 25.2265625,
+                    "sensor_limit": 90,
+                    "sensor_limit_warn": 85,
+                    "sensor_limit_low": -45,
+                    "sensor_limit_low_warn": -40,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40009728",
+                    "sensor_index": "1.40009728",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/5",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 39.8125,
+                    "sensor_limit": 85,
+                    "sensor_limit_warn": 75,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40042496",
+                    "sensor_index": "1.40042496",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/6",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 25.6875,
+                    "sensor_limit": 100,
+                    "sensor_limit_warn": 95,
+                    "sensor_limit_low": -40,
+                    "sensor_limit_low_warn": -35,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.1.40108032",
+                    "sensor_index": "1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8",
+                    "group": null,
+                    "sensor_divisor": 256,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 39.125,
+                    "sensor_limit": 100,
+                    "sensor_limit_warn": 95,
+                    "sensor_limit_low": -50,
+                    "sensor_limit_low_warn": -45,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
                 },
                 {
                     "sensor_deleted": 0,
@@ -7101,6 +7570,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7125,6 +7595,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7149,6 +7620,107 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.39976960",
+                    "sensor_index": "1.39976960",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/4",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3384,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 3,
+                    "sensor_limit_low_warn": 3.1,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40009728",
+                    "sensor_index": "1.40009728",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/5",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3016,
+                    "sensor_limit": 3.6,
+                    "sensor_limit_warn": 3.5,
+                    "sensor_limit_low": 2.8,
+                    "sensor_limit_low_warn": 2.9,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40042496",
+                    "sensor_index": "1.40042496",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/6",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.2856,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 2.9,
+                    "sensor_limit_low_warn": 3,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.1.40108032",
+                    "sensor_index": "1.40108032",
+                    "sensor_type": "timos",
+                    "sensor_descr": "1/3/8",
+                    "group": null,
+                    "sensor_divisor": 10000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.3128,
+                    "sensor_limit": 3.7,
+                    "sensor_limit_warn": 3.6,
+                    "sensor_limit_low": 2.9,
+                    "sensor_limit_low_warn": 3,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -7405,7 +7977,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.15.0.1",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "idle",
@@ -7428,7 +8000,7 @@
                     "vrfLocalAs": 65000
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.18.3.1",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "idle",
@@ -7455,7 +8027,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.15.0.1",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "established",
@@ -7478,7 +8050,7 @@
                     "vrfLocalAs": 65000
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.18.3.1",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "established",

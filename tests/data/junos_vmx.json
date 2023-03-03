@@ -12319,6 +12319,16 @@
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
+                },
+                {
+                    "sla_nr": 2362442542,
+                    "owner": "test-twamp1",
+                    "tag": "twamp",
+                    "rtt_type": "twamp",
+                    "rtt": 27.01,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
                 }
             ]
         },
@@ -12329,7 +12339,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 0,
+                    "rtt": 51.32,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -12339,7 +12349,17 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 0,
+                    "rtt": 24.56,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2362442542,
+                    "owner": "test-twamp1",
+                    "tag": "twamp",
+                    "rtt_type": "twamp",
+                    "rtt": 26.97,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -12372,6 +12392,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12396,6 +12417,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12420,6 +12442,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12444,6 +12467,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12468,6 +12492,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12492,6 +12517,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12516,6 +12542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12540,6 +12567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12564,6 +12592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12588,6 +12617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12612,6 +12642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -12636,6 +12667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 }
             ],
@@ -12778,6 +12810,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 2538860,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12802,6 +12835,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12826,6 +12860,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12850,6 +12885,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 6592546,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12874,6 +12910,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 100000000,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12898,6 +12935,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12922,6 +12960,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12946,6 +12985,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12970,6 +13010,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12994,6 +13035,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -13018,6 +13060,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -13042,6 +13085,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 }
             ],
@@ -13305,7 +13349,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13328,7 +13372,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13405,7 +13449,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",
@@ -13428,7 +13472,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",

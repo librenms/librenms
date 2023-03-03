@@ -28,10 +28,10 @@ foreach ($port_stats as $index => $afport_stats) {
     if ($afport_stats['ifDescr'] == 'eth0') {
         if (isset($airos_stats[0]['afLTUethConnected'])) {
             $port_stats[$index]['ifOperStatus'] = ($airos_stats[0]['afLTUethConnected'] == 'connected' ? 'up' : 'down');
-            $port_stats[$index]['ifHCInOctets'] = $airos_stats[0]['afLTUethRxBytes'];
-            $port_stats[$index]['ifHCOutOctets'] = $airos_stats[0]['afLTUethTxBytes'];
-            $port_stats[$index]['ifHCInUcastPkts'] = $airos_stats[0]['afLTUethRxPps'];
-            $port_stats[$index]['ifHCOutUcastPkts'] = $airos_stats[0]['afLTUethTxPps'];
+            $port_stats[$index]['ifHCInOctets'] = $airos_stats[0]['afLTUethRxBytes'] ?? null;
+            $port_stats[$index]['ifHCOutOctets'] = $airos_stats[0]['afLTUethTxBytes'] ?? null;
+            $port_stats[$index]['ifHCInUcastPkts'] = $airos_stats[0]['afLTUethRxPps'] ?? null;
+            $port_stats[$index]['ifHCOutUcastPkts'] = $airos_stats[0]['afLTUethTxPps'] ?? null;
             $port_stats[$index]['ifHighSpeed'] = '1000';
         } else {
             /**

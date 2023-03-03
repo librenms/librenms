@@ -72,6 +72,7 @@ return [
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
             'server' => ['name' => 'Server'],
+            'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
             'availability-map' => ['name' => 'Availability Map Settings'],
@@ -1250,6 +1251,16 @@ return [
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
             ],
         ],
+        'reporting' => [
+            'error' => [
+                'description' => 'Send Error Reports',
+                'help' => 'Sends some errors to LibreNMS for analysis and fixing',
+            ],
+            'usage' => [
+                'description' => 'Send Usage Reports',
+                'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
+            ],
+        ],
         'route_purge' => [
             'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
@@ -1381,7 +1392,7 @@ return [
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
         ],
         'site_style' => [
-            'description' => 'Set the site css style',
+            'description' => 'Default Theme',
             'options' => [
                 'blue' => 'Blue',
                 'dark' => 'Dark',
@@ -1412,7 +1423,7 @@ return [
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
                 'unordered' => [
-                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'description' => 'Allow out of order snmp responses for OIDs',
                     'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
             ],
@@ -1511,10 +1522,10 @@ return [
             'description' => 'Enable updates in ./daily.sh',
         ],
         'update_channel' => [
-            'description' => 'Set update Channel',
+            'description' => 'Update Channel',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

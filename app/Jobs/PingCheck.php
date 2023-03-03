@@ -38,7 +38,6 @@ use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
-use Log;
 use Symfony\Component\Process\Process;
 
 class PingCheck implements ShouldQueue
@@ -176,7 +175,7 @@ class PingCheck implements ShouldQueue
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
-        $this->deferred = collect();
+        $this->deferred = new Collection();
 
         // start with tier 1 (the root nodes, 0 is standalone)
         $this->current_tier = 1;
@@ -254,7 +253,6 @@ class PingCheck implements ShouldQueue
                 // if changed, update reason
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
-                Log::event('Device status changed to ' . ucfirst($type) . ' from icmp check.', $device->device_id, $type);
             }
 
             $device->save(); // only saves if needed (which is every time because of last_ping)

@@ -27,6 +27,11 @@ if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
 }
 
+//Get loop-telecom line card interfaces
+if ($device['os'] == 'loop-telecom') {
+    require base_path('includes/discovery/ports/loop-telecom.inc.php');
+}
+
 //Change Zynos ports from swp to 1/1
 if ($device['os'] == 'zynos') {
     require base_path('includes/discovery/ports/zynos.inc.php');
@@ -40,6 +45,11 @@ if ($device['os'] == 'airos-af-ltu') {
 //Teleste Luminato ifOperStatus
 if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
+}
+
+//Moxa Etherdevice portName mapping
+if ($device['os'] == 'moxa-etherdevice') {
+    require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
 }
 
 // End Building SNMP Cache Array
@@ -86,7 +96,7 @@ $default_port_group = Config::get('default_port_group');
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
-    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
@@ -95,7 +105,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         port_fill_missing_and_trim($snmp_data, $device);
 
         // Port newly discovered?
-        if (! is_array($ports_db[$port_id])) {
+        if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 
@@ -121,7 +131,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         }
     } else {
         // Port vanished (mark as deleted)
-        if (is_array($ports_db[$port_id])) {
+        if (isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != 1) {
                 dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
                 $ports_db[$port_id]['deleted'] = 1;

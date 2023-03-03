@@ -16,5 +16,5 @@ return [
     'title' => 'Auth',
     'failed' => 'These credentials do not match our records.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-
+    'disabled' => 'Your Account is disabled, please contact Admin.',
 ];

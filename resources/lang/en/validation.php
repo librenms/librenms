@@ -218,7 +218,7 @@ return [
                 'ok' => 'Database Schema is current',
             ],
             'CheckSchemaCollation' => [
-
+                'ok' => 'Database and column collations are correct',
             ],
         ],
         'distributedpoller' => [

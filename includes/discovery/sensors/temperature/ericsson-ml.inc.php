@@ -16,7 +16,8 @@ $index = 0;
 $sensor_type = 'temperatureRadio';
 $descr = 'Internal Temp';
 $divisor = 1;
-$temperature = (snmp_get($device, $oid, '-Oqv', 'PT-MONITOR-MIB') / $divisor);
-if (is_numeric($temperature)) {
+$temperature = (float) snmp_get($device, $oid, '-Oqv', 'PT-MONITOR-MIB');
+
+if ($temperature != 0.0) {
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $temperature);
 }

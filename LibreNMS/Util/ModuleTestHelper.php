@@ -357,7 +357,7 @@ class ModuleTestHelper
     private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->raw) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -529,6 +529,17 @@ class ModuleTestHelper
         global $device;
         Config::set('rrd.enable', false); // disable rrd
         Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
+
+        // don't allow external DNS queries that could fail
+        app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
+            $asn = $parameters['asn'];
+            $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
+                return "AS$asn-MOCK-TEXT";
+            });
+
+            return $mock;
+        });
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");

@@ -32,6 +32,7 @@ use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -69,7 +70,7 @@ class Ospf implements Module
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
-            $ospf_instances = collect();
+            $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
                 if (empty($ospf_entry['ospfRouterId'])) {
                     continue; // skip invalid data

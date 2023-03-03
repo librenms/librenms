@@ -3,7 +3,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "95.43.23.53",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -26,7 +26,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.57",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -53,7 +53,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "95.43.23.53",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -76,7 +76,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.57",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -51169,6 +51169,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -51193,6 +51194,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51217,6 +51219,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51241,6 +51244,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51265,6 +51269,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51289,6 +51294,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51313,6 +51319,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

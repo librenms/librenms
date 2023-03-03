@@ -3,7 +3,7 @@
 --
 -- Calix confidential and proprietary.
 --
--- Copyright (c) 2000-2009 Calix Networks, Inc.
+-- Copyright (c) 2000-2013 Calix Networks, Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -21,7 +21,7 @@ CALIX-PRODUCT-MIB DEFINITIONS ::= BEGIN
 	;
 
     calixProduct MODULE-IDENTITY
-	LAST-UPDATED "200706280000Z"
+	LAST-UPDATED "201604060000Z"
 	ORGANIZATION "Calix Networks, Inc."
 	CONTACT-INFO
 	    "       Calix Networks, Inc.
@@ -38,7 +38,19 @@ CALIX-PRODUCT-MIB DEFINITIONS ::= BEGIN
 	    "This management information module contains the
 	    administrative assignments which are used to
 	    uniquely identify physical components"
-
+	
+	REVISION "201604060000Z"
+	DESCRIPTION
+	    "Renaming E5x216F to E5x16F as was done with other parts of system."
+	REVISION "201603300000Z"
+	DESCRIPTION
+	    "Changed E5 references to AXOS"
+	REVISION "201603240000Z"
+	DESCRIPTION
+	    "Updated to include all MPU and DPU"
+	REVISION "201309030000Z"
+	DESCRIPTION
+	    "Adding EXA based E5 products - E5-520 & E5-308"
 	REVISION "200912100000Z"
 	DESCRIPTION
 	    "Changed E5 references to E7, with comments."
@@ -106,30 +118,89 @@ CALIX-PRODUCT-MIB DEFINITIONS ::= BEGIN
 	    "The E7-20 product."
 	::= { e7Devices 4 }
 
-    e3x48 OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-	    "The E3-48 product."
-	::= { e7Devices 5 }
-
-    e5x48 OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-	    "The E5-48 product."
-	::= { e7Devices 6 }
-
-    e3x8g OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-	    "The E3-8g product."
-	::= { e7Devices 7 }
-
     e5x100 OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 	    "The definitive identifier of the Calix Networks E5-100"
 	::= { calixProducts 3 }
 
+--
+--	Calix AXOS based products
+--
+axosProducts OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The definitive identifier of the Calix Networks AXOS based products"
+	::= { calixProducts 4 }
+
+--
+-- AXOS devices
+-- 
+axosDevices OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the AXOSdevice types. These
+         registrations below this point are the sysObjectID values."
+	::= { axosProducts 1 }
+
+--
+-- E5-520
+--
+e7-2 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E7-2 product."
+	::= { axosDevices 1 }
+
+--
+-- E5-308
+--
+e5x308 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E5-308 product."
+	::= { axosDevices 2 }
+--
+-- E3-16F
+--
+e3x16f OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E3-16F G.fast Sealed (ESAN), 16-G.fast subscriber ports, 1 GPON/GE port or 1 SFP Network."
+	::= { axosDevices 3 }
+--
+-- E5-16F
+--
+e5x16f OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E5-16F 16-Port G.Fast MDU w/integrated GPON/GE optic or 1 SFP network uplink port."
+	::= { axosDevices 4 }
+
+--
+-- E3-2
+--
+e3x2 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E3-2 Remote Optical Line Terminal."
+	::= { axosDevices 5 }
+
+--
+-- E9-2
+--
+e9-2 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "The E9-2 Optical Line Terminal."
+	::= { axosDevices 6 }
+
+axosModules OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the values assigned to AXOS modules with the
+	     MODULE-IDENTITY construct."
+	::= { axosProducts 2 }
 -- 
 -- Calix Entity Registrations
 --

@@ -18,7 +18,7 @@ if ($device['os_group'] == 'cisco') {
             echo 'VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomain['managementDomainName'] . ' ';
             foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan) {
                 d_echo(" $vlan_id");
-                if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+                if (isset($vlans_db[$vtpdomain_id][$vlan_id]) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
                     $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
                     if ($vlan_data['vlan_name'] != $vlan['vtpVlanName']) {
                         $vlan_upd['vlan_name'] = $vlan['vtpVlanName'];
@@ -69,8 +69,8 @@ if ($device['os_group'] == 'cisco') {
                 } else {
                     $vlan_id = $data['vlanTrunkPortNativeVlan'];
                 }
-                $base = $index_to_base[$ifIndex];
-                echo "Vlan: $vlan_id tagged on $base (ifIndex $ifIndex)\n";
+                //$base = $index_to_base[$ifIndex];
+                //echo "Vlan: $vlan_id tagged on $base (ifIndex $ifIndex)\n";
                 $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = 1;
             }
             unset(

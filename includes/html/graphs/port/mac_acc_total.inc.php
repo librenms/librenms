@@ -1,9 +1,9 @@
 <?php
 
-$port = $_GET['id'];
-$stat = $_GET['stat'] ?: 'bits';
-$sort = in_array($_GET['sort'], ['in', 'out', 'both']) ? $_GET['sort'] : 'in';
-$topn = is_numeric($_GET['topn']) ? $_GET['topn'] : '10';
+$port = $vars['id'];
+$stat = $vars['stat'] ?: 'bits';
+$sort = in_array($vars['sort'], ['in', 'out', 'both']) ? $vars['sort'] : 'in';
+$topn = is_numeric($vars['topn']) ? $vars['topn'] : '10';
 
 require 'includes/html/graphs/common.inc.php';
 

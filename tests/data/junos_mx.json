@@ -3,7 +3,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.25",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "idle",
@@ -26,7 +26,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.34",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "idle",
@@ -49,7 +49,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd00:28:1:1::1:5",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "idle",
@@ -294,7 +294,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.25",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "established",
@@ -317,7 +317,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65000-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.34",
                     "bgpPeerRemoteAs": 65000,
                     "bgpPeerState": "established",
@@ -340,7 +340,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd00:28:1:1::1:5",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "active",
