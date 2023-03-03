@@ -1,5 +1,5 @@
 os: avocent_mp
-text: Avocent MergePoint Unity KVM
+text: Avocent MergePoint Unity
 type: network
 icon: avocent
 discovery:
