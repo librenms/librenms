@@ -21,6 +21,7 @@ discovery:
             - .1.3.6.1.4.1.9.1.2483 # { ciscoProducts 2483 } -- Cisco FirePOWER 1010 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2662 # { ciscoProducts 2662 } -- Cisco FirePOWER 1140 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2663 # { ciscoProducts 2663 } -- Cisco FirePOWER 1120 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2991 # { ciscoProducts 2991 } -- Cisco FirePOWER 4112 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2774 # { ciscoProducts 2774 } -- Cisco FirePOWER 4115 Security Module 24
             - .1.3.6.1.4.1.9.1.2775 # { ciscoProducts 2775 } -- Cisco FirePOWER 4125 Security Appliance
 discovery_modules:
