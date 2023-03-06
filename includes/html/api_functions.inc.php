@@ -2930,13 +2930,13 @@ function edit_service_for_host(Illuminate\Http\Request $request)
 function post_syslogsink(Illuminate\Http\Request $request)
 {
     $json = $request->json()->all();
-    
-    if(is_null($json)) {
-        return api_success_noresult(400,"Not valid json");
+
+    if (is_null($json)) {
+        return api_success_noresult(400, 'Not valid json');
     }
 
     $logs = array_is_list($json) ? $json : [$json];
-    
+
     foreach ($logs as $entry) {
         process_syslog($entry, 1);
     }
