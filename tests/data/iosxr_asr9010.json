@@ -21366,6 +21366,123 @@
             ]
         }
     },
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 10,
+                    "owner": "",
+                    "tag": "194.53.124.254:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 11,
+                    "owner": "",
+                    "tag": "194.53.125.33:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 12,
+                    "owner": "",
+                    "tag": "194.53.125.37:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 50,
+                    "owner": "",
+                    "tag": "194.53.124.211:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 51,
+                    "owner": "",
+                    "tag": "194.53.124.212:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 52,
+                    "owner": "",
+                    "tag": "194.53.124.213:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 100,
+                    "owner": "",
+                    "tag": "194.53.124.239",
+                    "rtt_type": "echo",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 190,
+                    "owner": "",
+                    "tag": "194.53.124.222:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 191,
+                    "owner": "",
+                    "tag": "194.53.124.223:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 300,
+                    "owner": "",
+                    "tag": "194.53.124.32:1000",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 1000,
+                    "owner": "",
+                    "tag": "10.30.1.2",
+                    "rtt_type": "echo",
+                    "rtt": 3,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "sensors": {
         "discovery": {
             "sensors": [
@@ -22380,7 +22497,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": -1.9997064075587,
                     "sensor_limit_warn": -3.0016227413275,
                     "sensor_limit_low": -22.218487496164,
@@ -22630,7 +22747,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": -1.9997064075587,
                     "sensor_limit_warn": -3.0016227413275,
                     "sensor_limit_low": -22.218487496164,
@@ -22830,7 +22947,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -22855,7 +22972,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -22880,7 +22997,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -32800,7 +32917,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -33225,7 +33342,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0,
+                    "sensor_current": -60,
                     "sensor_limit": -1.9997064075587,
                     "sensor_limit_warn": -3.0016227413275,
                     "sensor_limit_low": -22.218487496164,
@@ -33275,7 +33392,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -33300,7 +33417,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -33475,7 +33592,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": -60,
                     "sensor_limit": -1.9997064075587,
                     "sensor_limit_warn": -3.0016227413275,
                     "sensor_limit_low": -22.218487496164,
@@ -33650,7 +33767,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0,
+                    "sensor_current": -60,
                     "sensor_limit": -1.9997064075587,
                     "sensor_limit_warn": -3.0016227413275,
                     "sensor_limit_low": -10,
@@ -33675,7 +33792,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -33700,7 +33817,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -33725,7 +33842,7 @@
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -43057,122 +43174,5 @@
                 }
             ]
         }
-    },
-    "slas": {
-        "discovery": {
-            "slas": [
-                {
-                    "sla_nr": 10,
-                    "owner": "",
-                    "tag": "194.53.124.254:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 11,
-                    "owner": "",
-                    "tag": "194.53.125.33:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 12,
-                    "owner": "",
-                    "tag": "194.53.125.37:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 50,
-                    "owner": "",
-                    "tag": "194.53.124.211:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 51,
-                    "owner": "",
-                    "tag": "194.53.124.212:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 52,
-                    "owner": "",
-                    "tag": "194.53.124.213:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 100,
-                    "owner": "",
-                    "tag": "194.53.124.239",
-                    "rtt_type": "echo",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 190,
-                    "owner": "",
-                    "tag": "194.53.124.222:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 191,
-                    "owner": "",
-                    "tag": "194.53.124.223:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 300,
-                    "owner": "",
-                    "tag": "194.53.124.32:1000",
-                    "rtt_type": "jitter",
-                    "rtt": 1,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                },
-                {
-                    "sla_nr": 1000,
-                    "owner": "",
-                    "tag": "10.30.1.2",
-                    "rtt_type": "echo",
-                    "rtt": 3,
-                    "status": 1,
-                    "opstatus": 0,
-                    "deleted": 0
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
