@@ -8323,11 +8323,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "lab01",
+                    "port_descr_descr": "Pe04 Xe",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "0/1/0",
                     "ifDescr": "TenGigE0/0/0/1",
                     "ifName": "TenGigE0/0/0/1",
                     "portName": null,
@@ -8533,11 +8533,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "lab01-pe02",
+                    "port_descr_descr": "Te0/0/27",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Te0/0/27",
                     "ifDescr": "TenGigE0/0/0/3",
                     "ifName": "TenGigE0/0/0/3",
                     "portName": null,
@@ -8743,11 +8743,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "ar1220c-cpe01",
+                    "port_descr_descr": "Gi0/0/9",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Gi0/0/9",
                     "ifDescr": "GigabitEthernet0/0/1/1",
                     "ifName": "GigabitEthernet0/0/1/1",
                     "portName": null,
@@ -10738,11 +10738,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "lab01-p01",
+                    "port_descr_descr": "Te0/0/0/1",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Te0/0/0/1",
                     "ifDescr": "TenGigE0/0/2/0",
                     "ifName": "TenGigE0/0/2/0",
                     "portName": null,
@@ -10948,11 +10948,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "lab01-pe03",
+                    "port_descr_descr": "Te0/0/0/8",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Te0/0/0/8",
                     "ifDescr": "TenGigE0/0/2/2",
                     "ifName": "TenGigE0/0/2/2",
                     "portName": null,
@@ -11263,11 +11263,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "ar1220c-cpe01",
+                    "port_descr_descr": "Gi0/0/9.10",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Gi0/0/9.10",
                     "ifDescr": "GigabitEthernet0/0/1/1.10",
                     "ifName": "GigabitEthernet0/0/1/1.10",
                     "portName": null,
@@ -11368,11 +11368,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "ar1220c-cpe01",
+                    "port_descr_descr": "Gi0/0/10.10",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "Gi0/0/10.10",
                     "ifDescr": "PW-Ether1",
                     "ifName": "PW-Ether1",
                     "portName": null,
@@ -14256,6 +14256,34 @@
         },
         "poller": "matches discovery"
     },
+    "cisco-pw": {
+        "discovery": {
+            "pseudowires": [
+                {
+                    "peer_ldp_id": 10246,
+                    "cpwVcID": 111111,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "l3vpn:VC111111",
+                    "ifIndex": 74
+                },
+                {
+                    "peer_ldp_id": 10246,
+                    "cpwVcID": 123456,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "PBB-EDGE:BD-I-100001",
+                    "ifIndex": null
+                }
+            ]
+        }
+    },
     "vrf": {
         "discovery": {
             "vrfs": [
@@ -14517,7 +14545,7 @@
                     "group": null,
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0.0,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -14592,7 +14620,7 @@
                     "group": null,
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -18806,7 +18834,7 @@
                     "group": null,
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0.0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -18815,7 +18843,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": 0.0,
+                    "sensor_prev": 0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
@@ -18881,7 +18909,7 @@
                     "group": null,
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": -60.0,
+                    "sensor_current": -60,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -18890,7 +18918,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": 0.0,
+                    "sensor_prev": 0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
