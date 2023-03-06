@@ -14592,7 +14592,7 @@
                     "group": null,
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
-                    "sensor_current": 0.0,
+                    "sensor_current": -60.0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -18815,7 +18815,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": -60.0,
+                    "sensor_prev": 0.0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
@@ -18890,7 +18890,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": -60.0,
+                    "sensor_prev": 0.0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
