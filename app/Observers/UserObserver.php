@@ -18,5 +18,6 @@ class UserObserver
         $user->notificationAttribs()->delete();
         $user->preferences()->delete();
         $user->pushSubscriptions()->delete();
+        $user->dashboards()->delete();
     }
 }
