@@ -2927,11 +2927,16 @@ function edit_service_for_host(Illuminate\Http\Request $request)
 /**
  * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
  */
-function put_syslogsink(Illuminate\Http\Request $request)
+function post_syslogsink(Illuminate\Http\Request $request)
 {
-    $json = $request->json();
-    $logs = array_is_list($json) ? $json : [$json];
+    $json = $request->json()->all();
+    
+    if(is_null($json)) {
+        return api_success_noresult(400,"Not valid json");
+    }
 
+    $logs = array_is_list($json) ? $json : [$json];
+    
     foreach ($logs as $entry) {
         process_syslog($entry, 1);
     }
