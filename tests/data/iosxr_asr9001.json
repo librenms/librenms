@@ -14526,7 +14526,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": null,
+                    "sensor_prev": -60.0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
@@ -14601,7 +14601,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "25",
                     "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": null,
+                    "sensor_prev": -60.0,
                     "user_func": "mw_to_dbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
