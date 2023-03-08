@@ -52,7 +52,7 @@ class Jira extends Transport
         $password = $opts['password'];
         $prjkey = $opts['prjkey'];
         $issuetype = $opts['issuetype'];
-        $details = ($obj['title'] != '') ? $obj['title'] : 'Librenms alert for: ' . $obj['hostname'];
+        $details = (!empty($obj['title'])) ? $obj['title'] : 'Librenms alert for: ' . $obj['hostname'];
         $description = $obj['msg'];
         $url = $opts['url'] . '/rest/api/latest/issue';
         $curl = curl_init();
