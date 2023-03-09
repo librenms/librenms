@@ -920,10 +920,8 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 if ($skippedFromYaml === false && is_numeric($value)) {
                     d_echo("Sensor fetched value: $value\n");
 
-                    $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
-                    // if index is a string, we need to convert it to OID
-                    // strlen($index) as first number, and each letter converted to a number, separated by dots
-                    $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode('.', unpack('c*', $index)), $oid);
+                    // replace index in numeric index
+                    $oid = \App\View\SimpleTemplate::parse($data['num_oid'], ['index' => $index]);
 
                     // process the description
                     $descr = trim(YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));

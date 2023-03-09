@@ -14,6 +14,7 @@ use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Oid;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -644,7 +645,7 @@ function update_application($app, $response, $metrics = [], $status = '')
  */
 function json_app_get($device, $extend, $min_version = 1)
 {
-    $output = snmp_get($device, 'nsExtendOutputFull.' . string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+    $output = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     // save for returning if not JSON
     $orig_output = $output;
