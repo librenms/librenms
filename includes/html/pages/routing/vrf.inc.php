@@ -1,7 +1,7 @@
 <?php
 
-use App\Facades\DeviceCache;
 use App\Facades\Config;
+use App\Facades\DeviceCache;
 
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';

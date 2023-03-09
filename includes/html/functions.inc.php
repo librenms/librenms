@@ -10,8 +10,8 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use App\Facades\DeviceCache;
 use App\Facades\Config;
+use App\Facades\DeviceCache;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;

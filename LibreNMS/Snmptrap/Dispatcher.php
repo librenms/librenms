@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Snmptrap;
 
+use App\Facades\Config;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
-use App\Facades\Config;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Snmptrap\Handlers\Fallback;
 use Log;

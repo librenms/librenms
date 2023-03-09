@@ -42,7 +42,7 @@ class Config
 
     public function __construct()
     {
-       // TODO: $this->load();
+        // TODO: $this->load();
     }
 
     /**
@@ -336,6 +336,7 @@ class Config
     public function toJson()
     {
         $this->load(); // TODO
+
         return json_encode($this->config);
     }
 
@@ -347,6 +348,7 @@ class Config
     public function getAll()
     {
         $this->load(); // TODO
+
         return $this->config;
     }
 

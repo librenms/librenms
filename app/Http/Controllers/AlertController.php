@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Facades\Config;
 use App\Models\Alert;
-use Illuminate\Http\Request;
 use App\Models\Eventlog;
+use Illuminate\Http\Request;
 
 class AlertController extends Controller
 {
