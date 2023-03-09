@@ -1,8 +1,8 @@
 <?php
 /**
- * UserFuncHelper.php
+ * UserFunctionExistException.php
  *
- * Helper class for "user_func"
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,28 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  */
 
-namespace LibreNMS\Util;
+namespace LibreNMS\Exceptions;
 
-use LibreNMS\Exceptions\UserFunctionExistException;
-
-class UserFuncHelper
+class UserFunctionExistException extends \Exception
 {
-    public function __construct(
-        public string|int|float $value,
-        public string|int|float|null $value_raw = null,
-        public array $sensor = [],
-    ) {
-    }
-
-    public function __call(string $name, array $arguments): mixed
-    {
-        throw new UserFunctionExistException("Invalid user function: $name");
-    }
-
-    public function dateToDays(): int
-    {
-        return \LibreNMS\Util\Time::dateToDays($this->value_raw);
-    }
 }
