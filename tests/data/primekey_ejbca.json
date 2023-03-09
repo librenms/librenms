@@ -694,7 +694,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "Number::cast",
+                    "user_func": "\\LibreNMS\\Util\\Number::cast",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 }
