@@ -499,7 +499,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "\\LibreNMS\\Util\\Time::dateToDays",
+                    "user_func": "dateToDays",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -998,7 +998,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "\\LibreNMS\\Util\\Time::dateToDays",
+                    "user_func": "dateToDays",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },

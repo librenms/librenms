@@ -117,9 +117,8 @@ class Time
 
     /**
      * Take a date and return the number of days from now
-     * First argument is ignored due to it being used by sensor "user_func"
      */
-    public static function dateToDays(mixed $_ = null, string|int $date, ?array $sensor = null): int
+    public static function dateToDays(string|int $date): int
     {
         $carbon = new Carbon();
 
