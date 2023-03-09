@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Models\Device;

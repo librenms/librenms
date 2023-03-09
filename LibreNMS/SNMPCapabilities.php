@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 

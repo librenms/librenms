@@ -20,6 +20,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;

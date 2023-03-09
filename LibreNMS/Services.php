@@ -25,6 +25,8 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
+
 class Services
 {
     /**

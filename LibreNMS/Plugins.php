@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
 use App\Models\Plugin;
 use LibreNMS\Util\Notifications;
 use Log;

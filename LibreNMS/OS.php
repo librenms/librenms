@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;

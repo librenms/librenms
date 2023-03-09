@@ -42,7 +42,7 @@ class Config
 
     public function __construct()
     {
-        $this->load();
+       // TODO: $this->load();
     }
 
     /**
@@ -134,6 +134,7 @@ class Config
      */
     public function get($key, $default = null)
     {
+        $this->load(); // TODO
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
@@ -219,6 +220,7 @@ class Config
      */
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
+        $this->load(); // TODO
         $global_key = $global_prefix . $key;
 
         if (! isset($this->config['os'][$os][$key])) {
@@ -314,6 +316,7 @@ class Config
      */
     public function has($key)
     {
+        $this->load(); // TODO
         if (isset($this->config[$key])) {
             return true;
         }
@@ -332,6 +335,7 @@ class Config
      */
     public function toJson()
     {
+        $this->load(); // TODO
         return json_encode($this->config);
     }
 
@@ -342,6 +346,7 @@ class Config
      */
     public function getAll()
     {
+        $this->load(); // TODO
         return $this->config;
     }
 
