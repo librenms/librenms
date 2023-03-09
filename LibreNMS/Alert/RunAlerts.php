@@ -32,6 +32,7 @@ namespace LibreNMS\Alert;
 
 use App\Facades\Config;
 use App\Facades\DeviceCache;
+use App\Models\Eventlog;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
