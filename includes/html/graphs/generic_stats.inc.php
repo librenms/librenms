@@ -98,7 +98,7 @@ if (! isset($colour1w)) {
     $iter++;
 }
 
-$graph_stat_percentile_disable = \LibreNMS\Config::get("graph_stat_percentile_disable");
+$graph_stat_percentile_disable = \LibreNMS\Config::get('graph_stat_percentile_disable');
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
 
@@ -157,7 +157,7 @@ if ($height > 25) {
         $rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
     }
 
-    if (!$graph_stat_percentile_disable){
+    if (! $graph_stat_percentile_disable) {
         $rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
         $rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
 
