@@ -98,6 +98,8 @@ if (! isset($colour1w)) {
     $iter++;
 }
 
+$graph_stat_percentile_disable = \LibreNMS\Config::get('graph_stat_percentile_disable');
+
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
 
 if ($height > 25) {
@@ -155,14 +157,16 @@ if ($height > 25) {
         $rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
     }
 
-    $rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
-    $rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
+    if (! $graph_stat_percentile_disable) {
+        $rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
 
-    $rrd_optionsb .= ' HRULE:' . $id . '50th#' . $colour50th . ':50th_Percentile';
-    $rrd_optionsb .= ' GPRINT:' . $id . '50th:%' . $float_precision . 'lf%s\n';
+        $rrd_optionsb .= ' HRULE:' . $id . '50th#' . $colour50th . ':50th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . '50th:%' . $float_precision . 'lf%s\n';
 
-    $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
-    $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
+        $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
+    }
 }
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';

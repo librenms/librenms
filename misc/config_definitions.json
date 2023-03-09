@@ -1776,6 +1776,13 @@
             "default": null,
             "type": "array"
         },
+        "graph_stat_percentile_disable": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 7,
+            "type": "boolean"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
