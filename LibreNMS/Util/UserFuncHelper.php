@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
  */
 
 namespace LibreNMS\Util;
@@ -29,9 +28,10 @@ class UserFuncHelper
         public string|int|float $value,
         public string|int|float|null $value_raw = null,
         public array $sensor = [],
-    ) {}
+    ) {
+    }
 
-    public function __call(string $name ,array $arguments): mixed
+    public function __call(string $name, array $arguments): mixed
     {
         dd("Invalid function: {$name}");
     }
