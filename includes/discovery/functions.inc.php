@@ -968,7 +968,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
-                    // user_func must be applied after divisor/multiplier
+                    //user_func must be applied after divisor/multiplier
                     if (isset($user_function)) {
                         if (is_callable($user_function)) {
                             $value = $user_function($value);

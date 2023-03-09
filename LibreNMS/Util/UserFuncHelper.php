@@ -31,6 +31,11 @@ class UserFuncHelper
         public array $sensor = [],
     ) {}
 
+    public function __call(string $name ,array $arguments): mixed
+    {
+        dd("Invalid function: {$name}");
+    }
+
     public function dateToDays(): int
     {
         return \LibreNMS\Util\Time::dateToDays($this->value_raw);
