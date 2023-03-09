@@ -1580,6 +1580,10 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
             ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Disable Percentile for stats graphs globally',
+                'help' => 'Disables display of the percentile values and lines for graphs that display those',
+            ],
         ],
         'device_display_default' => [
             'description' => 'Default device display name template',
