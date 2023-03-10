@@ -32,6 +32,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
@@ -39,11 +40,6 @@ use Log;
 class Config
 {
     private $config;
-
-    public function __construct()
-    {
-        // TODO: $this->load();
-    }
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -134,7 +130,6 @@ class Config
      */
     public function get($key, $default = null)
     {
-        $this->load(); // TODO
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
@@ -220,7 +215,6 @@ class Config
      */
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
-        $this->load(); // TODO
         $global_key = $global_prefix . $key;
 
         if (! isset($this->config['os'][$os][$key])) {
@@ -264,6 +258,11 @@ class Config
     {
         try {
             Arr::set($this->config, $key, $value);
+
+            if (! Eloquent::isConnected()) {
+                return false;  // can't save it if there is no DB
+            }
+
             \App\Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
@@ -316,7 +315,6 @@ class Config
      */
     public function has($key)
     {
-        $this->load(); // TODO
         if (isset($this->config[$key])) {
             return true;
         }
@@ -335,8 +333,6 @@ class Config
      */
     public function toJson()
     {
-        $this->load(); // TODO
-
         return json_encode($this->config);
     }
 
@@ -347,8 +343,6 @@ class Config
      */
     public function getAll()
     {
-        $this->load(); // TODO
-
         return $this->config;
     }
 
@@ -358,6 +352,10 @@ class Config
      */
     private function loadDB()
     {
+        if (! Eloquent::isConnected()) {
+            return;  // don't even try if no DB
+        }
+
         try {
             \App\Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) {

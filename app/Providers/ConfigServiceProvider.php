@@ -16,7 +16,9 @@ class ConfigServiceProvider extends ServiceProvider implements DeferrableProvide
     public function register()
     {
         $this->app->singleton(Config::class, function ($app) {
-            return new Config();
+            $config = new Config;
+            $config->load();
+            return $config;
         });
     }
 
