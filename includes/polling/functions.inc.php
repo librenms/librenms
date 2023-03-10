@@ -14,6 +14,8 @@ use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\UserFuncHelper;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -81,13 +83,6 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
             } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
-            }
-
-            if (! is_numeric($sensor_value)) {
-                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
-                if (! empty($temp_response[0])) {
-                    $sensor_value = $temp_response[0];
-                }
             }
 
             if ($class == 'state') {
@@ -164,7 +159,7 @@ function record_sensor_data($device, $all_sensors)
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
         $unit = $supported_sensors[$sensor['sensor_class']];
-        $sensor_value = cast_number($sensor['new_value']);
+        $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
@@ -180,8 +175,12 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
-            $sensor_value = $sensor['user_func']($sensor_value);
+        if (isset($sensor['user_func'])) {
+            if (is_callable($sensor['user_func'])) {
+                $sensor_value = $sensor['user_func']($sensor_value);
+            } else {
+                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+            }
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);

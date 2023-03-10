@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 
@@ -112,5 +113,15 @@ class Time
         }
 
         return (int) strtotime($time);
+    }
+
+    /**
+     * Take a date and return the number of days from now
+     */
+    public static function dateToDays(string|int $date): int
+    {
+        $carbon = new Carbon();
+
+        return $carbon->diffInDays($date, false);
     }
 }
