@@ -342,6 +342,11 @@ function poll_device($device, $force_module = false)
                     Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
                     \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
                     report($e);
+
+                    // Re-throw exception if we're in CI
+                    if (getenv('CI') == true) {
+                        throw $e;
+                    }
                 }
 
                 $module_time = microtime(true) - $module_start;
