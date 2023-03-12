@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             return new \LibreNMS\Cache\Device();
         });
         $this->app->singleton('git', function ($app) {
-            return new \LibreNMS\Util\Git();
+            return new \LibreNMS\Util\Git($app->make(\LibreNMS\Config::class));
         });
 
         $this->app->bind(\App\Models\Device::class, function () {

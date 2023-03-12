@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\Version;
 use Log;
 
@@ -87,12 +88,12 @@ class Config
      */
     public function getDefinitions()
     {
-        return json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
+        return json_decode(file_get_contents($this->get('install_dir') . '/misc/config_definitions.json'), true)['config'];
     }
 
     private function loadDefaults()
     {
-        $this->config['install_dir'] = base_path();
+        $this->config['install_dir'] = realpath(__DIR__ . '/..');
         $definitions = $this->getDefinitions();
 
         foreach ($definitions as $path => $def) {
@@ -102,7 +103,7 @@ class Config
         }
 
         // load macros from json
-        $macros = json_decode(file_get_contents(base_path('misc/macros.json')), true);
+        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
         Arr::set($this->config, 'alert.macros.rule', $macros);
 
         $this->processDefaults();
@@ -116,8 +117,9 @@ class Config
     private function loadUserConfigFile(&$config)
     {
         // Load user config file
-        if (is_file(base_path('config.php'))) {
-            @include base_path('config.php');
+        $file = $this->get('install_dir') . '/config.php';
+        if (is_file($file)) {
+            @include $file;
         }
     }
 
@@ -400,7 +402,7 @@ class Config
      */
     private function processDefaults()
     {
-        Arr::set($this->config, 'log_dir', base_path('logs'));
+        Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
         Arr::set($this->config, 'distributed_poller_name', php_uname('n'));
 
         // set base_url from access URL
@@ -484,10 +486,10 @@ class Config
         }
 
         if (! $this->has('rrdtool_version')) {
-            $this->persist('rrdtool_version', Rrd::version());
+            $this->persist('rrdtool_version', Rrd::version($this));
         }
         if (! $this->has('snmp.unescape')) {
-            $this->persist('snmp.unescape', version_compare(Version::get()->netSnmp(), '5.8.0', '<'));
+            $this->persist('snmp.unescape', version_compare((new Version($this, new Git($this)))->netSnmp(), '5.8.0', '<'));
         }
         if (! self::has('reporting.usage')) {
             self::persist('reporting.usage', (bool) Callback::get('enabled'));
@@ -579,6 +581,10 @@ class Config
 
     public function populateLegacyDbCredentials()
     {
+        if (! class_exists('config')) {
+            return;
+        }
+
         $db = config('database.default');
 
         $this->set('db_host', config("database.connections.$db.host", 'localhost'));

@@ -36,13 +36,9 @@ class Git
 {
     use RuntimeClassCache;
 
-    /** @var string */
-    private $install_dir;
-
-    public function __construct(int $cache = 0)
+    public function __construct(private readonly \LibreNMS\Config $config, int $cache = 0)
     {
         $this->runtimeCacheExternalTTL = $cache;
-        $this->install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
     }
 
     public static function make(int $cache = 0): Git
@@ -53,7 +49,11 @@ class Git
 
             return $git;
         } catch (BindingResolutionException $e) {
-            return new static($cache); // no container, just return a regular instance
+            // no container, just return a regular instance for validate.php
+            $config = new \LibreNMS\Config;
+            $config->load();
+
+            return new static($config, $cache);
         }
     }
 
@@ -67,7 +67,7 @@ class Git
     public function repoPresent(): bool
     {
         return $this->cacheGet('repoPresent', function () {
-            return file_exists("$this->install_dir/.git");
+            return file_exists($this->config->get('install_dir') . '/.git');
         });
     }
 
@@ -196,7 +196,7 @@ class Git
         return $this->cacheGet('remoteCommit', function () {
             if ($this->isAvailable()) {
                 try {
-                    return (array) \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master')->json();
+                    return (array) \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($this->config->get('github_api') . 'commits/master')->json();
                 } catch (ConnectionException $e) {
                 }
             }
@@ -216,7 +216,7 @@ class Git
 
             // failed due to permissions issue
             if ($version_process->getExitCode() == 128 && Str::startsWith($version_process->getErrorOutput(), 'fatal: unsafe repository')) {
-                $this->run('config', ['--global', '--add', 'safe.directory', $this->install_dir]); // try to fix
+                $this->run('config', ['--global', '--add', 'safe.directory', $this->config->get('install_dir')]); // try to fix
                 $version_process = $this->run('show', ['--quiet', '--pretty=%H|%ct']); // and try again
             }
 
@@ -226,7 +226,7 @@ class Git
 
     private function run(string $command, array $options): Process
     {
-        $version_process = new Process(array_merge(['git', $command], $options), $this->install_dir);
+        $version_process = new Process(array_merge(['git', $command], $options), $this->config->get('install_dir'));
         $version_process->run();
 
         return $version_process;

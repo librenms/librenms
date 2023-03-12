@@ -32,10 +32,10 @@ use LibreNMS\Util\Laravel;
 trait RuntimeClassCache
 {
     /** @var array */
-    private $runtimeCache = [];
+    private array $runtimeCache = [];
 
     /** @var int Setting this installs the data in the external cache to be shared across instances */
-    protected $runtimeCacheExternalTTL = 0;
+    protected int $runtimeCacheExternalTTL = 0;
 
     /**
      * We want these each runtime, so don't use the global cache

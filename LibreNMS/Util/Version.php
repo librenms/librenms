@@ -36,22 +36,21 @@ class Version
     /** @var string Update this on release */
     public const VERSION = '23.2.0';
 
-    /** @var Git convenience instance */
-    public $git;
-
-    public function __construct()
+    public function __construct(
+        private readonly \LibreNMS\Config $config,
+        public Git $git
+    )
     {
-        $this->git = Git::make();
     }
 
     public static function get(): Version
     {
-        return new static;
+        return new static(app(\LibreNMS\Config::class), app(Git::class));
     }
 
     public function release(): string
     {
-        return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
+        return $this->config->get('update_channel') == 'master' ? 'master' : self::VERSION;
     }
 
     public function date(string $format = 'c'): string
@@ -135,7 +134,7 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $process = new Process([$this->config->get('rrdtool', 'rrdtool'), '--version']);
         $process->run();
         preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
@@ -144,7 +143,7 @@ class Version
 
     public function netSnmp(): string
     {
-        $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([$this->config->get('snmpget', 'snmpget'), '-V']);
 
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
