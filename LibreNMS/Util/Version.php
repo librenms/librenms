@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use App\Facades\Config;
 use DB;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
@@ -39,8 +38,7 @@ class Version
     public function __construct(
         private readonly \LibreNMS\Config $config,
         public Git $git
-    )
-    {
+    ) {
     }
 
     public static function get(): Version
