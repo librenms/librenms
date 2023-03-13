@@ -38,6 +38,7 @@ use LibreNMS\Util\Git;
 use LibreNMS\Util\Version;
 use Log;
 
+/** @deprecated Please use the facade App\Facades\Config instead */
 class Config
 {
     private $config;

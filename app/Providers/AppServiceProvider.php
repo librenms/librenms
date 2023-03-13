@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
             return new \LibreNMS\Cache\Device();
         });
         $this->app->singleton('git', function ($app) {
+            /** @phpstan-ignore-next-line */
             return new \LibreNMS\Util\Git($app->make(\LibreNMS\Config::class));
         });
 

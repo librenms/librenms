@@ -1,5 +1,5 @@
 <?php
-use Librenms\Config;
+use App\Facades\Config;
 
 $no_refresh = true;
 ?>

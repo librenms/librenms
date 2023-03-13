@@ -27,7 +27,7 @@ namespace App\Http\Controllers\Install;
 
 use Exception;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Interfaces\InstallerStep;
 use LibreNMS\Util\EnvHelper;

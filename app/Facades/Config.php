@@ -31,6 +31,7 @@ class Config extends Facade
 {
     protected static function getFacadeAccessor()
     {
+        /** @phpstan-ignore-next-line */
         return \LibreNMS\Config::class;
     }
 }

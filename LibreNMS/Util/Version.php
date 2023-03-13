@@ -35,6 +35,7 @@ class Version
     /** @var string Update this on release */
     public const VERSION = '23.2.0';
 
+    /** @phpstan-ignore-next-line */
     public function __construct(
         private readonly \LibreNMS\Config $config,
         public Git $git
@@ -43,6 +44,7 @@ class Version
 
     public static function get(): Version
     {
+        /** @phpstan-ignore-next-line */
         return new static(app(\LibreNMS\Config::class), app(Git::class));
     }
 

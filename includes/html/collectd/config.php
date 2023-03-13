@@ -3,7 +3,7 @@
  * Configuration file for Collectd graph browser
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (Config::has('rrdgraph_def_text')) {
     Config::set('rrdgraph_def_text', str_replace('  ', ' ', Config::get('rrdgraph_def_text')));

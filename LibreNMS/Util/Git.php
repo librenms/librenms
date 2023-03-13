@@ -35,6 +35,7 @@ class Git
 {
     use RuntimeClassCache;
 
+    /** @phpstan-ignore-next-line */
     public function __construct(private readonly \LibreNMS\Config $config, int $cache = 0)
     {
         $this->runtimeCacheExternalTTL = $cache;
@@ -49,6 +50,7 @@ class Git
             return $git;
         } catch (BindingResolutionException $e) {
             // no container, just return a regular instance for validate.php
+            /** @phpstan-ignore-next-line */
             $config = new \LibreNMS\Config;
             $config->load();
 

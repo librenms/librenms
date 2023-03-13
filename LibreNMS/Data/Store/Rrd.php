@@ -672,9 +672,9 @@ class Rrd extends BaseDatastore
      *
      * @return string
      */
-    public static function version(\LibreNMS\Config $config): ?string
+    public static function version(): ?string
     {
-        $proc = new Process([$config->get('rrdtool', 'rrdtool'), '--version']);
+        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
         $proc->run();
         $parts = explode(' ', $proc->getOutput(), 3);
 
