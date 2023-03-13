@@ -169,13 +169,17 @@ jobs:
         name: Setup SQLite
         run: sqlite3 storage/testing.sqlite ""
       -
+        name: lnms migrate
+        run: |
+          php lnms migrate --no-interaction --force
+      -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
         run: |
           php artisan serve --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
           sleep 5
       -
-        name: Start SNMP
+        name: Start SNMP Simulator
         if: matrix.skip-unit-check != '1'
         run: |
           ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
