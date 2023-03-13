@@ -31,7 +31,6 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Git;
@@ -487,7 +486,7 @@ class Config
         }
 
         if (! $this->has('rrdtool_version')) {
-            $this->persist('rrdtool_version', Rrd::version($this));
+            $this->persist('rrdtool_version', (new Version($this, new Git($this)))->rrdtool());
         }
         if (! $this->has('snmp.unescape')) {
             $this->persist('snmp.unescape', version_compare((new Version($this, new Git($this)))->netSnmp(), '5.8.0', '<'));
