@@ -250,11 +250,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        if (empty($oid)) {
-            return new SnmpResponse('');
-        }
-
-        return $this->exec('snmpget', $this->parseOid($oid));
+        return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
@@ -278,7 +274,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        return $this->exec('snmpgetnext', $this->parseOid($oid));
+        return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
@@ -374,7 +370,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $response = new SnmpResponse('');
 
         foreach ($oids as $oid) {
-            $response = $response->append($this->exec($command, [$oid]));
+            $response = $response->append($this->exec($command, Arr::wrap($oid)));
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
@@ -500,10 +496,20 @@ class NetSnmpQuery implements SnmpQueryInterface
         Log::debug($error);
     }
 
-    /**
-     * @param  array|string  $oid
-     */
-    private function parseOid($oid): array
+    private function limitOids(array $oids): array
+    {
+        // get max oids per query device attrib > os setting > global setting
+        $configured_max = $this->device->getAttrib('snmp_max_oid') ?: Config::getOsSetting($this->device->os, 'snmp_max_oid', Config::get('snmp.max_oid', 10));
+        $max_oids = max($configured_max, 1); // 0 or less would break things.
+
+        if (count($oids) > $max_oids) {
+            return array_chunk($oids, $max_oids);
+        }
+
+        return $oids;
+    }
+
+    private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
     }

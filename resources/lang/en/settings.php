@@ -1413,6 +1413,10 @@ return [
                 'description' => 'Communities (priority)',
                 'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
             ],
+            'max_oid' => [
+                'description' => 'Max OIDs',
+                'help' => 'Maximum OIDs per query.  Can be overriden at OS and device levels.',
+            ],
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',

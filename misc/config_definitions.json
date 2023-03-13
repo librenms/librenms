@@ -5280,6 +5280,13 @@
             "type": "integer",
             "units": "seconds"
         },
+        "snmp.max_oid": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 10
+        },
         "snmp.max_repeaters": {
             "group": "poller",
             "section": "snmp",
