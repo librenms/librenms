@@ -133,7 +133,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                     $days = floor($cputime / 86400);
                     $hours = str_pad(floor(($cputime / 3600) % 24), 2, '0', STR_PAD_LEFT);
                     $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
-                    $seconds = str_pad(($cputime % 60), 2, '0', STR_PAD_LEFT);
+                    $seconds = str_pad($cputime % 60, 2, '0', STR_PAD_LEFT);
                     $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
                     $data[] = ['device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
                 }

@@ -27,7 +27,6 @@ class QueryDebugListener
     public function handle(QueryExecuted $query)
     {
         if (Debug::queryDebugIsEnabled()) {
-
             // collect bindings and make them a little more readable
             $bindings = collect($query->bindings)->map(function ($item) {
                 if ($item instanceof \Carbon\Carbon) {

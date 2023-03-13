@@ -64,6 +64,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      */
     public function testDataIsValid($os, $variant, $modules)
@@ -80,6 +81,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      *
      * @param  string  $os  base os

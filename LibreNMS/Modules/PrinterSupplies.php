@@ -112,7 +112,7 @@ class PrinterSupplies implements Module
                     'toner',
                     Alert::NOTICE,
                     $toner['supply_id']
-                 );
+                );
             }
 
             $toner->supply_current = $tonerperc;

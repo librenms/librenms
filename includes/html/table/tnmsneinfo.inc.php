@@ -54,7 +54,7 @@ if (isset($vars['device_id'])) {
 
     // select only the required rows
     if (isset($current)) {
-        $limit_low = (($current * $rowCount) - ($rowCount));
+        $limit_low = (($current * $rowCount) - $rowCount);
         $limit_high = $rowCount;
     }
     if ($rowCount != -1) {

@@ -347,11 +347,11 @@ class NetSnmpQuery implements SnmpQueryInterface
                 case 'authpriv':
                     array_push($cmd, '-x', $this->device->cryptoalgo);
                     array_push($cmd, '-X', $this->device->cryptopass);
-                // fallthrough
+                    // fallthrough
                 case 'authnopriv':
                     array_push($cmd, '-a', $this->device->authalgo);
                     array_push($cmd, '-A', $this->device->authpass);
-                // fallthrough
+                    // fallthrough
                 case 'noauthnopriv':
                     array_push($cmd, '-u', $this->device->authname ?: 'root');
                     break;
