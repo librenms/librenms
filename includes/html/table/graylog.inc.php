@@ -31,7 +31,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
 }
 
 if (isset($current)) {
-    $offset = ($current * $rowCount) - ($rowCount);
+    $offset = ($current * $rowCount) - $rowCount;
     $limit = $rowCount;
 }
 

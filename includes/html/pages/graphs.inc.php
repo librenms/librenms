@@ -120,7 +120,7 @@ if (! $auth) {
         if ($screen_height > 960) {
             $graph_array['height'] = ($screen_height - ($screen_height / 2));
         } else {
-            $graph_array['height'] = max($graph_array['height'], ($screen_height - ($screen_height / 1.5)));
+            $graph_array['height'] = max($graph_array['height'], $screen_height - ($screen_height / 1.5));
         }
     }
 

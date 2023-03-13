@@ -535,7 +535,7 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value);
-        [$index,] = explode('.', strrev($oid), 2);
+        [$index] = explode('.', strrev($oid), 2);
         if (! strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }

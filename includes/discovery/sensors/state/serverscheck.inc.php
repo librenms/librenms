@@ -34,7 +34,7 @@ $serverscheck_oids = [
 ];
 
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if ((Str::contains($oid_name, 'name')) && (Str::contains($oid_value, ['Flooding', 'Leckage']))) {
+    if (Str::contains($oid_name, 'name') && Str::contains($oid_value, ['Flooding', 'Leckage'])) {
         preg_match("/(\d+)/", $oid_name, $temp_x);
         $tmp_oid = 'sensor' . $temp_x[0] . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];

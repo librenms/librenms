@@ -123,7 +123,7 @@ function get95thagg($bill_id, $datefrom, $dateto)
     $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
     $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-    $measurement_95th = (round(($measurements / 100 * 95)) - 1);
+    $measurement_95th = (round($measurements / 100 * 95) - 1);
 
     $q_95_sql = 'SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
     $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
@@ -138,7 +138,7 @@ function get95thIn($bill_id, $datefrom, $dateto)
     $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
     $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-    $measurement_95th = (round(($measurements / 100 * 95)) - 1);
+    $measurement_95th = (round($measurements / 100 * 95) - 1);
 
     $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
     $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
@@ -153,7 +153,7 @@ function get95thout($bill_id, $datefrom, $dateto)
     $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
     $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
     $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-    $measurement_95th = (round(($measurements / 100 * 95)) - 1);
+    $measurement_95th = (round($measurements / 100 * 95) - 1);
 
     $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
     $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
@@ -293,8 +293,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
             $tot_period += $period;
 
             if (++$iter >= $reducefactor) {
-                $out_data[$i] = round(($iter_out / $iter_period), 2);
-                $in_data[$i] = round(($iter_in / $iter_period), 2);
+                $out_data[$i] = round($iter_out / $iter_period, 2);
+                $in_data[$i] = round($iter_in / $iter_period, 2);
                 $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
                 $ticks[$i] = $timestamp;
                 $i++;
@@ -305,8 +305,8 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
     }//end foreach
 
     if (! empty($iter_in)) {  // Write last element
-        $out_data[$i] = round(($iter_out / $iter_period), 2);
-        $in_data[$i] = round(($iter_in / $iter_period), 2);
+        $out_data[$i] = round($iter_out / $iter_period, 2);
+        $in_data[$i] = round($iter_in / $iter_period, 2);
         $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
         $ticks[$i] = $timestamp;
         $i++;

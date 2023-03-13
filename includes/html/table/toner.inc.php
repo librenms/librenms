@@ -46,7 +46,7 @@ if (empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 

@@ -90,7 +90,6 @@ class Boxcar extends Transport
             default:
                 $title_text = $severity;
                 break;
-
         }
         $data['notification[title]'] = $title_text . ' - ' . $obj['hostname'] . ' - ' . $obj['name'];
         $message_text = 'Timestamp: ' . $obj['timestamp'];

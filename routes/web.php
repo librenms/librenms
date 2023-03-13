@@ -29,7 +29,6 @@ Route::get('graph/{path?}', 'GraphController')
 
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
-
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');

@@ -8,6 +8,6 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-return [
-    'options' => [],
-];
+ return [
+     'options' => [],
+ ];
