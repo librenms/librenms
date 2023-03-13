@@ -70,7 +70,7 @@ foreach ($rrd_list as $rrd) {
 
 if (! $nototal) {
     $strlen = ((strlen($total_text) < $descr_len) ? ($descr_len - strlen($total_text)) : '0');
-    $descr = (isset($total_text) ? \LibreNMS\Data\Store\Rrd::fixedSafeDescr($total_text, ($desc_len + $strlen)) : 'Total');
+    $descr = (isset($total_text) ? \LibreNMS\Data\Store\Rrd::fixedSafeDescr($total_text, $desc_len + $strlen) : 'Total');
     $colour = \App\Facades\Config::get("graph_colours.$colours.$x");
     for ($z = 0; $z < $strlen; $z++) {
         $descr .= ' ';
