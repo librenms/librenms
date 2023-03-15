@@ -359,6 +359,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.sneck.polling_time_diff": {
+            "default": false,
+            "type": "boolean"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
