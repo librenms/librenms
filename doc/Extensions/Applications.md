@@ -2437,18 +2437,18 @@ device ID is going to be irrelevant in that case.
 
 ## Sneck
 
-If you want to replace Nagios/Icinga, especially in regards to NRPE,
-this works great. This allows LibreNMS to query what checks were ran
-on the server and keep track of totals of OK, WARNING, CRITICAL, and
-UNKNOWN statuses. The big advantage over this compared to a NRPE with
-the Services extension is you don't need to know what checks are
-configured on it. Also don't need to wait for the tests to run as
-sneck is meant to be ran via cron and the then return the cache when
-queried via SNMP, meaning a lot faster response time, especially if
-slow checks are being performed.
+This is for replacing Nagios/Icinga or the LibreNMS service
+integratoin regards to NRPE. This allows LibreNMS to query what checks
+were ran on the server and keep track of totals of OK, WARNING,
+CRITICAL, and UNKNOWN statuses. The big advantage over this compared
+to a NRPE with the Services extension is it does not need to know what
+checks are configured on it. Also does not need to wait for the tests
+to run as sneck is meant to be ran via cron and the then return the
+cache when queried via SNMP, meaning a lot faster response time,
+especially if slow checks are being performed.
 
-Included are alert examples. Although if you want to set up your own,
-the metrics below are provided.
+Included are alert examples. Although for setting up custom ones, the
+metrics below are provided.
 
 | Metric | Description |
 |--------|------------|
@@ -2460,11 +2460,11 @@ the metrics below are provided.
 | time_to_polling | Differnce in seconds between when polling data was generated and when polled |
 | time_to_polling_abs | The aboslute value of time_to_polling. |
 
-You can check the exit status of a specific check via the metric
-`check_$CHECK` where $CHECK is equal to the name of the check in
-questions. So if the check is named `foo` you can check the exit
-status by checking `check_foo`. The standard Nagios/Icinga style exit
-codes are used and those are as below.
+Exit status of a specific check via the metric `check_$CHECK` where
+$CHECK is equal to the name of the check in questions. So if the check
+is named `foo`, exit status can be checked via checking
+`check_foo`. The standard Nagios/Icinga style exit codes are used and
+those are as below.
 
 | Exit | Meaning  |
 |------|----------|
@@ -2473,14 +2473,14 @@ codes are used and those are as below.
 | 2    | critical |
 | 3+   | unknown  |
 
-If you wish to use `time_to_polling`, you will need to set in the
-config the item below. The default is false. Unless set to true, this
-value will default to 0. If you plan to enable this, you will want
-to make sure you are using NTP every were or it will alert if it goes
+To use `time_to_polling`, it will need to enabled via setting the
+config item below. The default is false. Unless set to true, this
+value will default to 0. If enabling this, one will want to
+make sure that NTP is in use every were or it will alert if it goes
 over a difference of 540s.
 
 ```
-$config['apps']['sneck']['polling_time_diff'=true;
+lnms config:set app.sneck.polling_time_diff true
 ```
 
 For more information on Sneck, check it out on
@@ -2488,7 +2488,7 @@ For more information on Sneck, check it out on
 [Github](https://github.com/VVelox/Monitoring-Sneck).
 
 For poking systems using Sneck, also check out boop_snoot
-if you want to query those systems via the CLI. Docs on it
+if one wants to query those systems via the CLI. Docs on it
 at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 [Github](https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot).
 
