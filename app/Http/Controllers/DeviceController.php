@@ -201,14 +201,14 @@ class DeviceController extends Controller
         ];
 
         // Mgmt
-        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')){
+        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
                 'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')?->attrib_value,
                 'title' => __('Mgmt'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',
-              ];
+            ];
         }
 
         // SSH
