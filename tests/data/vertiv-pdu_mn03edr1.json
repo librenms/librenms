@@ -14,7 +14,7 @@
                     "os": "vertiv-pdu",
                     "type": "power",
                     "serial": "<private>",
-                    "icon": "vertiv.png"
+                    "icon": "vertiv.svg"
                 }
             ]
         },

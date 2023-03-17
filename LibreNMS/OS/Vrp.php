@@ -467,7 +467,7 @@ class Vrp extends OS implements
             // We have at least 1 SSID, so we can count the total of STA
             $sensors[] = new WirelessSensor(
                 'clients',
-                    $this->getDeviceId(),
+                $this->getDeviceId(),
                 $ssid_total_oid_array,
                 'vrp-clients',
                 'total-all-ssids',

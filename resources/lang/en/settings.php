@@ -1413,6 +1413,10 @@ return [
                 'description' => 'Communities (priority)',
                 'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
             ],
+            'max_oid' => [
+                'description' => 'Max OIDs',
+                'help' => 'Maximum OIDs per query.  Can be overriden at OS and device levels.',
+            ],
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
@@ -1579,6 +1583,10 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Disable Percentile for stats graphs globally',
+                'help' => 'Disables display of the percentile values and lines for graphs that display those',
             ],
         ],
         'device_display_default' => [

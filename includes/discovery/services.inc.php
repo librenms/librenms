@@ -26,7 +26,7 @@ if (Config::get('discover_services')) {
                 [$oid, $tcpstatus] = explode(' ', $data);
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
-                    $tcp_port = $split_oid[(count($split_oid) - 6)];
+                    $tcp_port = $split_oid[count($split_oid) - 6];
                     if ($known_services[$tcp_port]) {
                         discover_service($device, $known_services[$tcp_port]);
                     }

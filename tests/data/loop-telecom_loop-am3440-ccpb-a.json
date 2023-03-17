@@ -1334,7 +1334,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "snmp_hexstring, Number::cast",
+                    "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -1359,7 +1359,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "snmp_hexstring, Number::cast",
+                    "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -2438,7 +2438,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 20,
-                    "user_func": "snmp_hexstring, Number::cast",
+                    "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -2463,7 +2463,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 34,
-                    "user_func": "snmp_hexstring, Number::cast",
+                    "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },

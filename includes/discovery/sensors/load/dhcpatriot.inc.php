@@ -44,7 +44,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
     foreach ($dhcp_networks[$dhcp_networks_base_oid] as $dhcp_type_index => $ignore_this) {
         if (! empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
             foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
-                $description = (explode('[', $entry));
+                $description = explode('[', $entry);
                 $data_array[$array_index]['index'] = $index;
                 if ($dhcp_type_index === intval($auth_dhcp_index)) {
                     $data_array[$array_index]['type'] = 'dhcpatriotAuthDHCP';

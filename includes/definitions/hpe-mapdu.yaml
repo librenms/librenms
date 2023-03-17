@@ -5,9 +5,9 @@ icon: hpe
 group: hpe
 mib_dir: hp
 over:
-    - {graph: device_power, text: Power}  
+    - {graph: device_power, text: Power}
     - {graph: device_current, text: Current}
-snmp_max_oid: '8'
+snmp_max_oid: 8
 discovery:
     -
         sysObjectID:

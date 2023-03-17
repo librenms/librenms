@@ -53,7 +53,7 @@ $height = '40';
 $from = Config::get('time.day');
 
 echo '</td><td width=135>';
-echo \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps') . " <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
+echo \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps') . " <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_bits';
 echo generate_port_link(

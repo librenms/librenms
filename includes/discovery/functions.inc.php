@@ -24,6 +24,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\UserFuncHelper;
 
 function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {
@@ -156,6 +157,11 @@ function discover_device(&$device, $force_module = false)
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
                 report($e);
+
+                // Re-throw exception if we're in CI
+                if (getenv('CI') == true) {
+                    throw $e;
+                }
             }
 
             $module_time = microtime(true) - $module_start;
@@ -943,8 +949,12 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
-                            if (is_numeric($$limit) && isset($user_function) && is_callable($user_function)) {
-                                $$limit = $user_function($$limit);
+                            if (is_numeric($$limit) && isset($user_function)) {
+                                if (is_callable($user_function)) {
+                                    $$limit = $user_function($$limit);
+                                } else {
+                                    $$limit = (new UserFuncHelper($$limit))->{$user_function}();
+                                }
                             }
                         }
                     }
@@ -964,8 +974,12 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     //user_func must be applied after divisor/multiplier
-                    if (isset($user_function) && is_callable($user_function)) {
-                        $value = $user_function($value);
+                    if (isset($user_function)) {
+                        if (is_callable($user_function)) {
+                            $value = $user_function($value);
+                        } else {
+                            $value = (new UserFuncHelper($value, $snmp_data[$data['value']], $data))->{$user_function}();
+                        }
                     }
 
                     $uindex = $index;

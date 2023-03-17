@@ -26,8 +26,8 @@ if (is_array($voss_fan)) {
     foreach ($voss_fan as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
-        $tray_num = $split_oid[(count($split_oid) - 2)];
-        $fan_num = $split_oid[(count($split_oid) - 1)];
+        $tray_num = $split_oid[count($split_oid) - 2];
+        $fan_num = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.101.1.1.4.1.4.$tray_num.$fan_num";
         $descr = "VOSS Tray $tray_num Fan $fan_num";
 
@@ -47,7 +47,7 @@ if (is_array($voss_fan)) {
     foreach ($fan as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.4.7.1.1.2.$index";
         $descr = "VOSS Fan $index";
 
@@ -78,7 +78,7 @@ if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 1];
         $current_oid = ".1.3.6.1.4.1.2272.1.4.8.1.1.2.$index";
         $descr = "VOSS Power Supply $index";
 
