@@ -25,7 +25,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
         if ($data != '') {
             [$oid] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $temperature_id = $split_oid[(count($split_oid) - 2)] . '.' . $split_oid[(count($split_oid) - 1)];
+            $temperature_id = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
 
             $descr_oid = ".1.3.6.1.4.1.232.6.2.6.8.1.3.$temperature_id";
             $descr = snmp_get($device, $descr_oid, '-Oqnv', 'CPQHLTH-MIB', 'hp');
@@ -58,4 +58,4 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     }
 }
 
-include_once Config::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';
+include Config::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';

@@ -1,0 +1,3473 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--    Fortinet, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTIADC-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		DisplayString, TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Gauge32, 
+		IpAddress
+			FROM SNMPv2-SMI
+		ifIndex
+			FROM IF-MIB
+		FnBoolState, FnIndex, fortinet
+			FROM FORTINET-CORE-MIB;
+
+fnFortiADCMib MODULE-IDENTITY
+	LAST-UPDATED "201401010000Z"
+	ORGANIZATION
+		"Fortinet Technologies, Inc."
+	CONTACT-INFO
+		"Technical Support
+		email: support@fortinet.com
+		http://www.fortinet.com
+		"
+	DESCRIPTION
+		"Initial version of FORTINET-ADC-MIB."
+	::= { fortinet 112 }
+
+	--
+	-- Text conventions --
+	--
+
+	FadcHAModeVal ::= TEXTUAL-CONVENTION
+		STATUS      current
+		DESCRIPTION
+			"Enumerated type for HA mode."
+		SYNTAX	INTEGER { standalone	(1),
+				  activePassive	(2),
+				  activeActive	(3),
+				  activeActiveVrrp (4)
+		}
+		
+	FadcVdIndex ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	"d"
+		STATUS	current
+		DESCRIPTION
+		"Data type for virtual domain indexes."
+		SYNTAX	Integer32 (1..2147483647)
+
+	FadcHaState ::= TEXTUAL-CONVENTION
+		STATUS	current
+		DESCRIPTION
+		"Enumerated type for HA cluster member state."
+		SYNTAX	INTEGER {
+			master		(1),
+			backup		(2),
+			standalone	(3),
+			unknown		(4)
+		}
+	--
+	--
+	--
+	fadcTraps				OBJECT IDENTIFIER ::=	{fnFortiADCMib 0}
+	fadcSystem				OBJECT IDENTIFIER ::=	{fnFortiADCMib 1}
+	fadcSysOptions			OBJECT IDENTIFIER ::=	{fadcSystem 101}
+	fadcSysHA				OBJECT IDENTIFIER ::=	{fadcSystem 200}
+	fadcSysAlert				OBJECT IDENTIFIER ::=   {fadcSystem 300}
+	fadcSysCert				OBJECT IDENTIFIER ::=   {fadcSystem 400}
+	fadcMIBConformance		OBJECT IDENTIFIER ::= 	{fnFortiADCMib 600}
+	fadcVirtualDomain		OBJECT IDENTIFIER ::=	{fnFortiADCMib 2}
+	fadcVirtualServer		OBJECT IDENTIFIER ::=	{fnFortiADCMib 3}
+	fadcIntf				OBJECT IDENTIFIER ::=	{fnFortiADCMib 4}
+	fadcAdmin				OBJECT IDENTIFIER ::=	{fnFortiADCMib 5}
+	fadcModel				OBJECT IDENTIFIER ::=	{fnFortiADCMib 100}
+	fadcHardware			OBJECT IDENTIFIER ::=	{fnFortiADCMib 6}
+	fadcCPUInfo				OBJECT IDENTIFIER ::= 	{fadcHardware 1}
+	fadcPSUInfo				OBJECT IDENTIFIER ::= 	{fadcHardware 2}
+	fadcNetworkInfo			OBJECT IDENTIFIER ::= 	{fadcHardware 3}
+	fadcDeviceInfo			OBJECT IDENTIFIER ::= 	{fadcHardware 4}
+	fadcHA					OBJECT IDENTIFIER ::=	{fadcHardware 5}
+	fadcSyncStats			OBJECT IDENTIFIER ::=	{fadcHA 20}
+	fadcDeviceErrCount		OBJECT IDENTIFIER ::=	{fadcHA 21}
+	fadcHAPeerInfo			OBJECT IDENTIFIER ::=	{fadcHA 22}
+	fadcSecurity			OBJECT IDENTIFIER ::=	{fnFortiADCMib 7}
+	fadcApplication			OBJECT IDENTIFIER ::=	{fnFortiADCMib 8}
+	fadcRS					OBJECT IDENTIFIER ::=	{fadcApplication 1}
+	fadcVS					OBJECT IDENTIFIER ::=	{fadcApplication 2}
+	fadcLinkLoadBalance		OBJECT IDENTIFIER ::=	{fadcApplication 3}
+	fadcGlobalLoadBalance	OBJECT IDENTIFIER ::=	{fadcApplication 4}
+	fadcServerLoadBalance	OBJECT IDENTIFIER ::=	{fadcApplication 5}
+
+	--
+	-- fortinet.fnFortiADCMib.fadcModel
+	--
+	
+	-- fadcModel start
+	fadc60F                        OBJECT IDENTIFIER ::=   {fadcModel 63}
+	fadc100F			OBJECT IDENTIFIER ::=	{fadcModel 103}
+	fadc200D			OBJECT IDENTIFIER ::=	{fadcModel 201}
+	fadc200F                        OBJECT IDENTIFIER ::=   {fadcModel 203}
+	fadc300D			OBJECT IDENTIFIER ::=	{fadcModel 301}
+	fadc300E			OBJECT IDENTIFIER ::=	{fadcModel 302}
+	fadc300F                        OBJECT IDENTIFIER ::=   {fadcModel 303}
+	fadc400D			OBJECT IDENTIFIER ::=	{fadcModel 401}
+	fadc400F                        OBJECT IDENTIFIER ::=   {fadcModel 403}
+	fadc700D			OBJECT IDENTIFIER ::=	{fadcModel 701}
+	fadc1500D			OBJECT IDENTIFIER ::=	{fadcModel 1501}
+	fadc2000D			OBJECT IDENTIFIER ::=	{fadcModel 2001}
+	fadc2000F                       OBJECT IDENTIFIER ::=   {fadcModel 2003}
+	fadc2200F                       OBJECT IDENTIFIER ::=   {fadcModel 2203}
+	fadc4000D			OBJECT IDENTIFIER ::=	{fadcModel 4001}
+	fadc4000F                       OBJECT IDENTIFIER ::=   {fadcModel 4003}
+	fadc4200F                       OBJECT IDENTIFIER ::=   {fadcModel 4203}
+	fadc5000F                       OBJECT IDENTIFIER ::=   {fadcModel 5003}
+	fadc100D			OBJECT IDENTIFIER ::=	{fadcModel 101}
+	fadc1000D			OBJECT IDENTIFIER ::=	{fadcModel 1001}
+	fadc1000F                       OBJECT IDENTIFIER ::=   {fadcModel 1003}
+	fadc1200F                       OBJECT IDENTIFIER ::=   {fadcModel 1203}
+	fadcVM				OBJECT IDENTIFIER ::=	{fadcModel 30}
+	fadcDEV				OBJECT IDENTIFIER ::=	{fadcModel 10}
+	fadcKVM				OBJECT IDENTIFIER ::=   {fadcModel 20}
+	fadcUnknown			OBJECT IDENTIFIER ::=	{fadcModel 1}
+
+	-- fadcModel end
+
+	--
+	-- fnFortiADCMib.fadcSystem
+	--
+
+	fadcSysModel          OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "System model string."
+		::= { fadcSystem    1 }
+
+	fadcSysSerial         OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device serial number."
+		::= { fadcSystem    2 }
+
+	fadcSysVersion        OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device firmware version."
+		::= { fadcSystem    3 }
+
+	fadcSysCpuUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous CPU usage."
+		::= { fadcSystem    4 }
+
+	fadcSysMemUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous memory utilization."
+		::= { fadcSystem    5 }
+
+	fadcSysLogDiskUsage   OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous log disk usage."
+		::= { fadcSystem    6 }
+
+	fadcSysLoad       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous system load."
+		::= { fadcSystem    30 }
+
+        fadcSysCpuUsageTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF FadcSysCpuUsageEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "A table of CPU usage status."
+                ::= { fadcSystem 40 }
+
+        fadcSysCpuUsageEntry OBJECT-TYPE
+                SYNTAX      FadcSysCpuUsageEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "An entry containing information applicable to a CPU"
+                INDEX       { fadcCpuIndex }
+                ::= { fadcSysCpuUsageTable 1 }
+
+        FadcSysCpuUsageEntry ::= SEQUENCE {
+                fadcCpuIndex                            FnIndex,
+                fadcCpuName                             DisplayString,
+                fadcCpu2secAvgUsage                     Gauge32,
+                fadcCpu1minAvgUsage                     Gauge32,
+                fadcCpu5minAvgUsage                     Gauge32
+        }
+
+        fadcCpuIndex OBJECT-TYPE
+                SYNTAX      FnIndex
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "CPU index used to uniquely identify rows in this table."
+                ::= { fadcSysCpuUsageEntry 1 }
+
+        fadcCpuName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The name of the CPU"
+                ::= { fadcSysCpuUsageEntry 2 }
+
+        fadcCpu2secAvgUsage OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The average of cpu usage in 2 sec"
+                ::= { fadcSysCpuUsageEntry 3 }
+
+        fadcCpu1minAvgUsage OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The average of cpu usage in 1 min"
+                ::= { fadcSysCpuUsageEntry 4 }
+
+        fadcCpu5minAvgUsage OBJECT-TYPE
+                SYNTAX      Gauge32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The average of cpu usage in 5 min"
+                ::= { fadcSysCpuUsageEntry 5 }
+	--
+	-- fnFortiADCMib.fadcSystem.fadcSysOptions
+	--
+
+	fadcSysOptIdleTimeout OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Idle period after which the administrator
+		                 is automatically logged out off the system."
+		::= { fadcSysOptions  1 }
+
+	--
+	-- fnFortiADCMib.fadcSystem.fadcSysHA
+	--
+
+	fadcHAMode OBJECT-TYPE
+		SYNTAX          FadcHAModeVal
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION    "[Discard] High-availability mode (Standalone, Active-Active, Active-Active-Vrrp or Active-Passive)."
+		::= { fadcSysHA 1 }
+
+	--
+	-- fnFortiADCMib.fadcSystem.fadcSysAlert
+	--
+
+	fadcSysAlertTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcSysAlertEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of alerts infortion"
+		::= { fadcSysAlert 1 }
+
+	fadcSysAlertEntry OBJECT-TYPE
+		SYNTAX      FadcSysAlertEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+                DESCRIPTION
+			"An entry containing information applicable to alert"
+		INDEX       { fadcAlertIndex }
+		::= { fadcSysAlertTable 1 }
+
+	FadcSysAlertEntry ::= SEQUENCE {
+		fadcAlertIndex                            FnIndex,
+		fadcAlertName                             DisplayString,
+		fadcAlertSourceType			  INTEGER,
+		fadcAlertPriority			  INTEGER,
+		fadcAlertComments			  DisplayString,
+		fadcAlertVdomName			  DisplayString
+	}
+
+	fadcAlertIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"Index of alert config."
+		::= { fadcSysAlertEntry 1 }
+
+	fadcAlertName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The name of the alert config"
+		::= { fadcSysAlertEntry 2 }
+
+	fadcAlertSourceType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			event    (1),
+			metric   (2)
+                }
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The source type of alert"
+		::= { fadcSysAlertEntry 3 }
+
+	fadcAlertPriority OBJECT-TYPE
+		SYNTAX  INTEGER {
+			high	(1),
+			middle	(2),
+			low	(3)
+		}
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The priority of alert"
+		::= { fadcSysAlertEntry 4 }
+
+	fadcAlertComments OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The comments of alert"
+		::= { fadcSysAlertEntry 5 }
+
+	fadcAlertVdomName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The vdom of alert"
+		::= { fadcSysAlertEntry 6 }
+
+        --
+        -- fnFortiADCMib.fadcSystem.fadcSysCert.fadcLocalCertTables
+        --
+
+        fadcLocalCertTables OBJECT IDENTIFIER
+            ::= { fadcSysCert 1 }
+
+        fadcLocalCertTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF FadcLocalCertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "A table of Local Cert"
+                ::= { fadcLocalCertTables 1 }
+
+        fadcLocalCertEntry OBJECT-TYPE
+                SYNTAX      FadcLocalCertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "An entry containing information applicable to Local Cert"
+                INDEX       { fadcLocalCertIndex }
+                ::= { fadcLocalCertTable 1 }
+
+        FadcLocalCertEntry ::= SEQUENCE {
+                fadcLocalCertIndex				FnIndex,
+                fadcLocalCertName				DisplayString,
+                fadcLocalCertValidFrom				DisplayString,
+                fadcLocalCertValidTo				DisplayString,
+		fadcLocalCertVdom				DisplayString
+        }
+
+        fadcLocalCertIndex OBJECT-TYPE
+                SYNTAX      FnIndex
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "Index of LocalCert config."
+                ::= { fadcLocalCertEntry 1 }
+
+        fadcLocalCertName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The name of the LocalCert config"
+                ::= { fadcLocalCertEntry 2 }
+
+	fadcLocalCertValidFrom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date From of the LocalCert"
+                ::= { fadcLocalCertEntry 3 }
+
+	fadcLocalCertValidTo OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date To of the LocalCert"
+                ::= { fadcLocalCertEntry 4 }
+
+	fadcLocalCertVdom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Vdom of the LocalCert"
+                ::= { fadcLocalCertEntry 5 }
+
+        --
+        -- fnFortiADCMib.fadcSystem.fadcSysCert.fadcIntermediateCATables
+        --
+
+        fadcIntermediateCATables OBJECT IDENTIFIER
+            ::= { fadcSysCert 2 }
+
+        fadcIntermediateCATable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF FadcIntermediateCAEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "A table of IntermediateCA"
+                ::= { fadcIntermediateCATables 1 }
+
+        fadcIntermediateCAEntry OBJECT-TYPE
+                SYNTAX      FadcIntermediateCAEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "An entry containing information applicable to IntermediateCA"
+                INDEX       { fadcIntermediateCAIndex }
+                ::= { fadcIntermediateCATable 1 }
+
+        FadcIntermediateCAEntry ::= SEQUENCE {
+                fadcIntermediateCAIndex				FnIndex,
+                fadcIntermediateCAName				DisplayString,
+                fadcIntermediateCAValidFrom			DisplayString,
+                fadcIntermediateCAValidTo			DisplayString,
+		fadcIntermediateCAVdom				DisplayString
+        }
+
+        fadcIntermediateCAIndex OBJECT-TYPE
+                SYNTAX      FnIndex
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "Index of IntermediateCA config."
+                ::= { fadcIntermediateCAEntry 1 }
+
+        fadcIntermediateCAName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The name of the IntermediateCA config"
+                ::= { fadcIntermediateCAEntry 2 }
+
+	fadcIntermediateCAValidFrom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date From of the IntermediateCA"
+                ::= { fadcIntermediateCAEntry 3 }
+
+	fadcIntermediateCAValidTo OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date To of the IntermediateCA"
+                ::= { fadcIntermediateCAEntry 4 }
+
+	fadcIntermediateCAVdom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Vdom of the IntermediateCA"
+                ::= { fadcIntermediateCAEntry 5 }
+
+        --
+        -- fnFortiADCMib.fadcSystem.fadcSysCert.fadcCACertTables
+        --
+
+        fadcCACertTables OBJECT IDENTIFIER
+            ::= { fadcSysCert 3 }
+
+        fadcCACertTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF FadcCACertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "A table of CACert"
+                ::= { fadcCACertTables 1 }
+
+        fadcCACertEntry OBJECT-TYPE
+                SYNTAX      FadcCACertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "An entry containing information applicable to CACert"
+                INDEX       { fadcCACertIndex }
+                ::= { fadcCACertTable 1 }
+
+        FadcCACertEntry ::= SEQUENCE {
+                fadcCACertIndex			FnIndex,
+                fadcCACertName			DisplayString,
+                fadcCACertValidFrom		DisplayString,
+                fadcCACertValidTo		DisplayString,
+		fadcCACertVdom			DisplayString
+        }
+
+        fadcCACertIndex OBJECT-TYPE
+                SYNTAX      FnIndex
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "Index of CACert config."
+                ::= { fadcCACertEntry 1 }
+
+        fadcCACertName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The name of the CACert config"
+                ::= { fadcCACertEntry 2 }
+
+	fadcCACertValidFrom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date From of the CACert"
+                ::= { fadcCACertEntry 3 }
+
+	fadcCACertValidTo OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date To of the CACert"
+                ::= { fadcCACertEntry 4 }
+
+	fadcCACertVdom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Vdom of the CACert"
+                ::= { fadcCACertEntry 5 }
+
+        --
+        -- fnFortiADCMib.fadcSystem.fadcSysCert.fadcRemoteCertTables
+        --
+
+        fadcRemoteCertTables OBJECT IDENTIFIER
+            ::= { fadcSysCert 4 }
+
+        fadcRemoteCertTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF FadcRemoteCertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "A table of RemoteCert"
+                ::= { fadcRemoteCertTables 1 }
+
+        fadcRemoteCertEntry OBJECT-TYPE
+                SYNTAX      FadcRemoteCertEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "An entry containing information applicable to RemoteCert"
+                INDEX       { fadcRemoteCertIndex }
+                ::= { fadcRemoteCertTable 1 }
+
+        FadcRemoteCertEntry ::= SEQUENCE {
+                fadcRemoteCertIndex			FnIndex,
+                fadcRemoteCertName			DisplayString,
+                fadcRemoteCertValidFrom			DisplayString,
+                fadcRemoteCertValidTo			DisplayString,
+		fadcRemoteCertVdom			DisplayString
+        }
+
+        fadcRemoteCertIndex OBJECT-TYPE
+                SYNTAX      FnIndex
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                        "Index of RemoteCert config."
+                ::= { fadcRemoteCertEntry 1 }
+
+        fadcRemoteCertName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The name of the RemoteCert config"
+                ::= { fadcRemoteCertEntry 2 }
+
+	fadcRemoteCertValidFrom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date From of the RemoteCert"
+                ::= { fadcRemoteCertEntry 3 }
+
+	fadcRemoteCertValidTo OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Valid Date To of the RemoteCert"
+                ::= { fadcRemoteCertEntry 4 }
+
+	fadcRemoteCertVdom OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Vdom of the RemoteCert"
+                ::= { fadcRemoteCertEntry 5 }
+
+	--
+	-- fnFortiADCMib.fadcTraps
+	--
+
+	fadcTrapCpuHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if CPU usage becomes too high."
+		::=  {  fadcTraps  101  }
+
+	fadcTrapMemLowThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if memory usage becomes too high."
+		::=  {  fadcTraps  102  }
+
+	fadcTrapLogDiskHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Log disk usage becomes too high."
+		::=  {  fadcTraps  103  }
+
+	fadcTrapDosAttackStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if DOS attack start."
+		::=  {  fadcTraps  401  }
+
+	fadcTrapDosAttackStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if DOS attack stop."
+		::=  {  fadcTraps  402  }
+
+	fadcTrapFwConnectionLimit  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if FW connectionhas exceeded the allowed connections."
+		::=  {  fadcTraps  403  }
+
+	fadcTrapFwSnatLimit  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if FW snat pool has exhausted."
+		::=  {  fadcTraps  404  }
+
+	fadcTrapRequestBlocked  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the HTTP request was blocked."
+		::=  {  fadcTraps  405  }
+
+	fadcTrapXSSAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if XSS attack detected by Signature."
+		::=  {  fadcTraps  406  }
+
+	fadcTrapSQLInjectionAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if SQL Injection attack detected by Signature."
+		::=  {  fadcTraps  407  }
+
+	fadcTrapGenericAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Generic attack detected by Signature."
+		::=  {  fadcTraps  408  }
+
+	fadcTrapExploitsAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Know Exploits attack detected by Signature."
+		::=  {  fadcTraps  409  }
+
+	fadcTrapTrojansAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Trojans attack detected by Signature."
+		::=  {  fadcTraps  410  }
+
+	fadcTrapInfoDisclosureAttack  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Information Disclosure attack detected by Signature."
+		::=  {  fadcTraps  411  }
+
+	fadcTrapURLPattenViolate  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if URL Patten violate detected."
+		::=  {  fadcTraps  412  }
+
+	fadcTrapProtocolConstraint  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if HTTP Protocol Constraint violate detected."
+		::=  {  fadcTraps  413  }
+
+	fadcTrapGeoViolateDetected  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Geo violate detected."
+		::=  {  fadcTraps  414  }
+
+	fadcTrapReputaionViolateDetected  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if IP Reputation violate detected."
+		::=  {  fadcTraps  415  }
+
+	fadcTrapBotDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Bot detected"
+		::=  {  fadcTraps  416  }
+
+	fadcTrapFwConnectionDeny NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Connection denied by FW_Policy"
+		::=  {  fadcTraps  417  }
+
+	fadcTrapXmlDetected	NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if XML violate detected"
+		::=  {  fadcTraps  418  }
+
+	fadcTrapJsonDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if JSON violate detected"
+		::=  {  fadcTraps  419  }
+
+	fadcTrapSoapDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if SOAP violate detected"
+		::=  {  fadcTraps  420  }
+
+	fadcTrapDlpDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if WAF DLP is detected from client IP on virtual server"
+		::=  {  fadcTraps  421  }
+
+	fadcTrapHtmlDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if WAF Html validation is detected from client IP on virtual server"
+		::=  {  fadcTraps  422  }
+
+	fadcTrapWpdDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if web page defacement detected"
+		::=  {  fadcTraps  423  }
+
+	fadcTrapCsrfDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if CSRF is detected from client IP on virtual server"
+		::=  {  fadcTraps  424  }
+
+	fadcTrapDdosIpFragmentation NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS IP Fragmentation attack detecked"
+		::=  {  fadcTraps  425  }
+
+	fadcTrapDdosTcpSlowDataAttack NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS TCP slow data attack detecked"
+		::=  {  fadcTraps  426  }
+
+	fadcTrapDdosTcpAccessFlood NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS TCP access flood attack detecked"
+		::=  {  fadcTraps  427  }
+
+	fadcTrapDdosHttpConnectionFlood NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS HTTP connection flood attack detecked"
+		::=  {  fadcTraps  428  }
+
+	fadcTrapDdosHttpRequestFlood NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS HTTP request flood attack detecked"
+		::=  {  fadcTraps  429  }
+
+	fadcTrapDdosHttpAccessLimit NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "DDoS HTTP access limit attack detecked"
+		::=  {  fadcTraps  430  }
+
+	fadcTrapPeriodBlockIP NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Period Block IP"
+		::=  {  fadcTraps  431  }
+
+	fadcTrapCPUTempHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial}
+		STATUS        current
+		DESCRIPTION   "Trap sent if CPU temperature becomes too high."
+		::=  {  fadcTraps  501  }
+
+	fadcTrapCPUTempNormal  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial}
+		STATUS        current
+		DESCRIPTION   "Trap sent if CPU temperature becomes normal."
+		::=  {  fadcTraps  502  }
+
+	fadcTrapDeviceTempHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if device temperature becomes too high."
+		::=  {  fadcTraps  503  }
+
+	fadcTrapDeviceTempNormal  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if device temperature becomes normal."
+		::=  {  fadcTraps  504  }
+
+	fadcTrapPSUTempHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU temperature becomes too high."
+		::=  {  fadcTraps  505  }
+
+	fadcTrapPSUTempNormal  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU temperature becomes normal."
+		::=  {  fadcTraps  506  }
+
+	fadcTrapPSUFanSlow  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU fan speed becomes too slow."
+		::=  {  fadcTraps  507  }
+
+	fadcTrapDeviceFanSlow  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if device fan speed becomes too slow."
+		::=  {  fadcTraps  508  }
+
+	fadcTrapPSUFanBad  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU fan becomes bad."
+		::=  {  fadcTraps  509  }
+
+	fadcTrapPSUFanGood	NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU fan becomes good."
+		::=  {  fadcTraps  510  }
+
+	fadcTrapDeviceFanBad  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if device fan becomes bad."
+		::=  {  fadcTraps  511  }
+
+	fadcTrapDeviceFanGood  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if device fan becomes good."
+		::=  {  fadcTraps  512  }
+
+	fadcTrapVoltageHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if voltage becomes too high."
+		::=  {  fadcTraps  513  }
+
+	fadcTrapPowerSupplyHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if power supply voltage becomes too high."
+		::=  {  fadcTraps  514  }
+
+	fadcTrapPSUVoltageHigh  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU voltage becomes too high."
+		::=  {  fadcTraps  515  }
+
+	fadcTrapVoltageLow  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if voltage becomes too low."
+		::=  {  fadcTraps  516  }
+
+	fadcTrapPowerSupplyLow  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if power supply voltage becomes too low."
+		::=  {  fadcTraps  517  }
+
+	fadcTrapPSUVoltageLow  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU voltage becomes too low."
+		::=  {  fadcTraps  518  }
+
+	fadcTrapPSUFailure  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if PSU becomes failure."
+		::=  {  fadcTraps  519  }
+
+	fadcTrapARPConflict  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if getting ARP conflict."
+		::=  {  fadcTraps  520  }
+
+	fadcTrapExternalLinkChange  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if an external interface link status changes.
+			For a fixed port, this is an occurrence when network cables are 
+			connected or removed, and the network is reconfigured; for a pluggable 
+			port (such as a SFP or XFP port), this happens when the pluggable unit 
+			is plugged in or unplugged, or when a cable is connected or removed 
+			from a plugged port. The possible values are UP, DOWN, DISABLED, 
+			or UNPOPULATED."
+		::=  {  fadcTraps  521  }
+
+	fadcTrapLogDiskCloseThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the disk partition free space is very limited,
+			which is less than a specified limit. By default, the limit is set to 
+			30% of total disk space."
+		::=  {  fadcTraps  522  }
+
+	fadcTrapLogDiskLost  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the log disk cannot mount."
+		::=  {  fadcTraps  523  }
+
+	fadcTrapSsdMwiNearThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the SSD disk wear-out indicator is near its threshold."
+		::=  {  fadcTraps  524  }
+
+	fadcTrapSsdMwiReachedThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the SSD disk wear-out indicator has reached its threshold."
+		::=  {  fadcTraps  525  }
+
+	fadcTrapHAPeerLost  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if it detect peers lost in HA mode."
+		::=  {  fadcTraps  526  }
+
+	fadcTrapHAMasterFailover  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the HA-Master failover to HA-Slave in HA mode."
+		::=  {  fadcTraps  527  }
+
+	fadcTrapPortStatusChange  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the device got monitor port status changing event 
+			include up/down in HA mode."
+		::=  {  fadcTraps  528  }
+
+	fadcTrapDiskStatusChange  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if the device got disk status changing event include
+			bad/fine in HA mode."
+		::=  {  fadcTraps  529  }
+
+	fadcTrapInetPortExhaustion  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if The device has run out of source ports and cannot 
+			open new communications channels with other machines."
+		::=  {  fadcTraps  530  }
+
+	fadcTrapCertExpire  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if One of the SSL certificates configured on the
+			device will expire soon."
+		::=  {  fadcTraps  531  }
+
+	fadcTrapLogicalInterfaceUp  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcIntfName }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going UP."
+		::=  {  fadcTraps  532  }
+
+	fadcTrapLogicalInterfaceDown  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcIntfName }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going DOWN."
+		::=  {  fadcTraps  533  }
+
+	fadcTrapLogicalInterfaceDisabled  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcIntfName }
+		STATUS        current
+		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going DISABLED."
+		::=  {  fadcTraps  534  }
+
+	fadcTrapAlertTrigger NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcAlertName }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a system alert be trigged"
+		::=  {  fadcTraps  535  }
+
+	fadcTrapSysConnMemHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Connection memory usage over Threshold"
+		::=  {  fadcTraps  536  }
+
+	fadcTrapSysLincenseExpiryNotif NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if License expired"
+		::=  {  fadcTraps  537  }
+
+	fadcTrapSysDeviceRebooted NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if System rebooted"
+		::=  {  fadcTraps  538  }
+
+	fadcTrapSysDeviceStarted NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Device started"
+		::=  {  fadcTraps  539  }
+
+	fadcTrapSysUpgeadeComplete NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if System upgrade complete"
+		::=  {  fadcTraps  540  }
+
+	fadcTrapSysUserLogin NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if User login"
+		::=  {  fadcTraps  541  }
+
+	fadcTrapSysUserLogout NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if User logout"
+		::=  {  fadcTraps  542  }
+
+	fadcTrapSysDhcpIpAllocFailure NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if IP address allocation failure"
+		::=  {  fadcTraps  543  }
+
+	fadcTrapSysMetricsDbDiskFull NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Metrics DB Disk full"
+		::=  {  fadcTraps  544  }
+
+	fadcTrapSysStatisticsDbDiskFull NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Statistics DB Disk usage full"
+		::=  {  fadcTraps  545  }
+
+	fadcTrapSysLogFull NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Log disk full"
+		::=  {  fadcTraps  546  }
+
+	fadcTrapSysFwBandwidthLimit NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if traffic dropped due to FW QoS"
+		::=  {  fadcTraps  547  }
+
+	fadcTrapConfigExecute NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Config executed"
+		::=  {  fadcTraps  548  }
+
+	fadcTrapConfigCreate NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Config create"
+		::=  {  fadcTraps  549  }
+
+	fadcTrapConfigDelete NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Config delete"
+		::=  {  fadcTraps  550  }
+
+	fadcTrapConfigUpdate NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION	"Trap sent if Config update"
+		::=  {  fadcTraps  551  }
+
+	fadcTrapSysOcspResponseExpires NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION     "Trap sent if OCSP response expires"
+		::=  {  fadcTraps  552  }
+
+	fadcTrapSysSslCertificateRevoked NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION     "Trap sent if SSL certificate revoked"
+		::=  {  fadcTraps  553  }
+
+	fadcTrapSysCrlExpires NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION     "Trap sent if SYS CRL expires"
+		::=  {  fadcTraps  554  }
+
+	fadcTrapMemberConnRateStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a pool member has exceeded the allowed connection rate."
+		::=  {  fadcTraps  600  }
+
+	fadcTrapVSConnRateStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed connection rate."
+		::=  {  fadcTraps  601  }
+
+	fadcTrapMemberConnLimitStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a pool member has exceeded the allowed connections."
+		::=  {  fadcTraps  602  }
+
+	fadcTrapVSConnLimitStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed connections."
+		::=  {  fadcTraps  603  }
+
+	fadcTrapMemberConnRateStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a pool member has dropping the allowed connection rate."
+		::=  {  fadcTraps  604  }
+
+	fadcTrapVSConnRateStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed connection rate."
+		::=  {  fadcTraps  605  }
+
+	fadcTrapMemberConnLimitStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a pool member has dropping the allowed connections."
+		::=  {  fadcTraps  606  }
+
+	fadcTrapVSConnLimitStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed connections."
+		::=  {  fadcTraps  607  }
+
+	fadcTrapVSTransactionRateStart  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed transaction rate."
+		::=  {  fadcTraps  608  }
+
+	fadcTrapVSTransactionRateStop  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed transaction rate."
+		::=  {  fadcTraps  609  }
+
+	fadcTrapMemberHCDown  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if A pool member has occurring health check down."
+		::=  {  fadcTraps  610  }
+
+	fadcTrapVSHealthChange  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has occurring health status change."
+		::=  {  fadcTraps  611  }
+
+	fadcTrapMemberHCUp  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a pool member has occurring health check up."
+		::=  {  fadcTraps  612  }
+
+	fadcTrapVSAuthFail  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a virtual server has occurring authentication failure."
+		::=  {  fadcTraps  613  }
+
+	fadcTrapVSIPPoolLimit  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if VS ip pool has exhausted."
+		::=  {  fadcTraps  614  }
+
+	adcTrapGatewayHCDown  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has occurring health check down."
+		::=  {  fadcTraps  615  }
+
+	fadcTrapLinkGroupHCDown  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group has occurring health check down."
+		::=  {  fadcTraps  616  }
+
+	fadcTrapGatewayHCUp  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has occurring health check up."
+		::=  {  fadcTraps  617  }
+
+	fadcTrapLinkGroupHCUp  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group has occurring health check up."
+		::=  {  fadcTraps  618  }
+
+	fadcTrapGatewayInboundBandwidth  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has exceeded the 
+			allowed inbound bandwidth."
+		::=  {  fadcTraps  619  }
+
+	fadcTrapGatewayOutboundBandwidth  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has exceeded the 
+			allowed outbound bandwidth."
+		::=  {  fadcTraps  620  }
+
+	fadcTrapGatewayInboundSpillover  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has exceeded the 
+			allowed inbound Spillover."
+		::=  {  fadcTraps  621  }
+
+	fadcTrapGatewayOutboundSpillover  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has exceeded the 
+			allowed outbound Spillover."
+		::=  {  fadcTraps  622  }
+
+	fadcTrapGatewayTotalSpillover  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a link group member has exceeded the 
+			allowed total Spillover"
+		::=  {  fadcTraps  623  }
+
+	fadcTrapGlbServerNotAvail  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a Server is becoming unavailable in global 
+			traffic management module include SLB and generic."
+		::=  {  fadcTraps  624  }
+
+	fadcTrapGlbServerAvail  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a Server is becoming available in global 
+			traffic management module."
+		::=  {  fadcTraps  625  }
+
+	fadcTrapGlbVSNotAvail  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if A Virtual Server is becoming unavailable in global 
+			traffic management module."
+		::=  {  fadcTraps  626  }
+
+	fadcTrapGlbVSAvail  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a Virtual Server is becoming available in global 
+			traffic management module."
+		::=  {  fadcTraps  627  }
+
+--	fadcTrapGlbPoolNotAvail  NOTIFICATION-TYPE
+--		OBJECTS       { fadcSysSerial }
+--		STATUS        current
+--		DESCRIPTION   "Trap sent if a pool is becoming unavailable in global
+--			traffic management module."
+--		::=  {  fadcTraps  628  }
+
+--	fadcTrapGlbPoolAvail  NOTIFICATION-TYPE
+--		OBJECTS       { fadcSysSerial }
+--		STATUS        current
+--		DESCRIPTION   "Trap sent if a pool is becoming available in global
+--			traffic management module."
+--		::=  {  fadcTraps  629  }
+
+--	fadcTrapUnsolicitedRepliesExceededThreshold  NOTIFICATION-TYPE
+--		OBJECTS       { fadcSysSerial }
+--		STATUS        current
+--		DESCRIPTION   "Trap sent if The DNS cache object received unsolicited query
+--			replies exceeding a configured threshold."
+--		::=  {  fadcTraps  630  }
+
+--	fadcTrapGlbKeyGenerationRollover  NOTIFICATION-TYPE
+--		OBJECTS       { fadcSysSerial }
+--		STATUS        current
+--		DESCRIPTION   "Trap sent if DNSSEC Key generation has rolled over."
+--		::=  {  fadcTraps  631  }
+
+--	fadcTrapGlbKeyGenerationExpiration  NOTIFICATION-TYPE
+--		OBJECTS       { fadcSysSerial }
+--		STATUS        current
+--		DESCRIPTION   "Trap sent if DNSSEC Key generation has expired."
+--		::=  {  fadcTraps  632  }
+
+	fadcTrapGlbGWNotAvail NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a Gateway is becoming unavailable in global traffic management module."
+		::=  {  fadcTraps  633  }
+
+	fadcTrapGlbGWAvail NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if a Gateway is becoming available in global traffic management module."
+		::=  {  fadcTraps  634  }
+
+	fadcTrapSlbPoolDown NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Pool is down"
+		::=  {  fadcTraps  635  }
+
+	fadcTrapSlbPoolUp NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Pool is up"
+		::=  {  fadcTraps  636  }
+
+	fadcTrapSlbPoolHealthChange NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Pool health check is chnage"
+		::=  {  fadcTraps  637  }
+
+	fadcTrapSlbServerHealthChange NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Server health check is chnage"
+		::=  {  fadcTraps  638  }
+
+	fadcTrapSlbServerEnabled NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Server enabled"
+		::=  {  fadcTraps  639  }
+
+	fadcTrapSlbServerDisabled NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Server disabled"
+		::=  {  fadcTraps  640  }
+
+	fadcTrapSlbServerMaintain NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Server maintain"
+		::=  {  fadcTraps  641  }
+
+	fadcTrapSlbVirtualServerDown NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Virtual server is down"
+		::=  {  fadcTraps  642  }
+
+	fadcTrapSlbVirtualServerUp NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Virtual server is up"
+		::=  {  fadcTraps  643  }
+
+	fadcTrapSlbVirtualServerEnabled NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Virtual server is enabled"
+		::=  {  fadcTraps  644  }
+
+	fadcTrapSlbVirtualServerDisabled NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Virtual server is disabled"
+		::=  {  fadcTraps  645  }
+
+	fadcTrapSlbVirtualServerMaintain NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if a Virtual server is maintain"
+		::=  {  fadcTraps  646  }
+
+	fadcTrapSlbFlowTblHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if Flow table usage over Threshold"
+		::=  {  fadcTraps  647  }
+
+	fadcTrapSlbPersistTblHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if Persistence table usage over Threshold"
+		::=  {  fadcTraps  648  }
+
+	fadcTrapSlbPktBuffHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if Packet buffer usage over Threshold"
+		::=  {  fadcTraps  649  }
+
+	fadcTrapSlbSynCacheUsageHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if SYN cache usage over Threshold"
+		::=  {  fadcTraps  650  }
+
+	fadcTrapSlbSynTblHigh NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if SYN table usage over Threshold"
+		::=  {  fadcTraps  651  }
+
+	fadcTrapSlbConnDropMaxFlowTbl NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if connection(s) dropped due to flow table limit"
+		::=  {  fadcTraps  652  }
+
+	fadcTrapSlbConnDropMaxPersistTbl NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if connection(s) dropped due to persistence table limit"
+		::=  {  fadcTraps  653  }
+
+	fadcTrapSlbConnDropMaxSysTbl NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if connection(s) dropped due to SYN table limit"
+		::=  {  fadcTraps  654  }
+
+	fadcTrapSlbConnDropNoConnMem NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if connection(s) dropped due to SYN table limit"
+		::=  {  fadcTraps  655  }
+
+	fadcTrapSlbConnDropNoPktBuff NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if connection(s) dropped due to low packet buffer"
+		::=  {  fadcTraps  656  }
+
+	fadcTrapSlbConnDropPoolLBFailure NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if pool load balancing decision(s) failed"
+		::=  {  fadcTraps  657  }
+
+	fadcTrapSlbPktDropNoPktBuff NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if packet(s) dropped due to low packet buffer"
+		::=  {  fadcTraps  658  }
+
+	fadcTrapSlbPktBuffAllocFail NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if packet buffer allocation failure(s)"
+		::=  {  fadcTraps  659  }
+
+	fadcTrapSlbCertExpire NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if SSL certificate expires in"
+		::=  {  fadcTraps  660  }
+
+	fadcTrapSlbCacheOBJAllocFail NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if HTTP cacheable objects dropped due to memory allocation failure"
+		::=  {  fadcTraps  661  }
+
+	fadcTrapLlbVSThroughputLimit NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS      current
+		DESCRIPTION     "Trap sent if packet(s) dropped due to virtual service bandwidth limit"
+		::=  {  fadcTraps  662  }
+
+
+	--
+	-- fnFortiADCMib.fadcVirtualServer
+	--
+
+	fadcVSNumber OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of virtual servers in fadcVirtualServer."
+		::= { fadcVirtualServer 1 }
+
+	fadcVSTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcVSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of virtual servers on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcVirtualServer 2 }
+
+	fadcVSEntry OBJECT-TYPE
+		SYNTAX      FadcVSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular virtual server."
+		INDEX       { fadcVSIndex }
+		::= { fadcVSTable 1 }
+
+	FadcVSEntry ::= SEQUENCE {
+		fadcVSIndex				FnIndex,
+		fadcVSName				DisplayString,
+		fadcVSStatus			DisplayString,
+		fadcVSHealth			DisplayString,
+		fadcVSNewConnections	Integer32,
+		fadcVSConcurrent		Integer32,
+		fadcVSThroughputKbps	Integer32,
+		fadcVSVdom				DisplayString
+	}
+
+	fadcVSIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a virtual server within the fadcVSTable."
+		::= { fadcVSEntry 1 }
+
+	fadcVSName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server name of the specified virtual server."
+		::= { fadcVSEntry 2 }
+
+	fadcVSStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The configuration status of specified virtual server."
+		::= { fadcVSEntry 3 }
+
+	fadcVSHealth OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The health of specified virtual server."
+		::= { fadcVSEntry 4 }
+
+	fadcVSNewConnections OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"New Connections persecond rate for the specified virtual server."
+		::= { fadcVSEntry 5 }
+
+	fadcVSConcurrent OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Concurrent connection rate for the specified virtual server."
+		::= { fadcVSEntry 6 }
+
+	fadcVSThroughputKbps OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Throughput bps rate for the specified virtual server."
+		::= { fadcVSEntry 7 }
+
+	fadcVSVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified virtual server."
+		::= { fadcVSEntry 8 }
+
+	--
+	-- fnFortiADCMib.fadcVirtualDomain.fadcVdInfo
+	--
+
+	fadcVdInfo OBJECT IDENTIFIER
+	    ::= { fadcVirtualDomain 1 }
+
+	fadcVdNumber OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	        "The number of virtual domains in vdTable."
+	    ::= { fadcVdInfo 1 }
+
+	fadcVdMaxVdoms OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	        "The maximum number of virtual domains allowed on the device as allowed by hardware and/or licensing."
+	    ::= { fadcVdInfo 2 }
+
+	fadcVdEnabled OBJECT-TYPE
+	    SYNTAX      FnBoolState
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	        "Whether virtual domains are enabled on this device."
+	    ::= { fadcVdInfo 3 }
+
+	--
+	-- fnFortiADCMib.fadcVirtualDomain.fadcVdTables
+	--
+
+	fadcVdTables OBJECT IDENTIFIER
+	    ::= { fadcVirtualDomain 2 }
+
+	--
+	-- fnFortiADCMib.fadcVirtualDomain.fadcVdTables.fadcVdTable
+	--
+
+	fadcVdTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcVdEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "A table of virtual domains configured on the device."
+	    ::= { fadcVdTables 1 }
+
+	fadcVdEntry OBJECT-TYPE
+	    SYNTAX      FadcVdEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "An entry containing information applicable
+	         to a particular virtual domain."
+	    INDEX       { fadcVdEntIndex }
+	    ::= { fadcVdTable 1 }
+
+	FadcVdEntry ::= SEQUENCE {
+	    fadcVdEntIndex    FadcVdIndex,
+	    fadcVdEntName     DisplayString,
+	    fadcVdEntHaState  FadcHaState
+	}
+
+	fadcVdEntIndex OBJECT-TYPE
+	    SYNTAX      FadcVdIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "Internal virtual domain index used to uniquely identify rows in this table. This index is also used by other tables referencing a virtual domain."
+	    ::= { fadcVdEntry 1 }
+
+	fadcVdEntName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	        "The name of the virtual domain."
+	    ::= { fadcVdEntry 2 }
+
+	fadcVdEntHaState OBJECT-TYPE
+	    SYNTAX      FadcHaState
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	        "HA cluster member state of the virtual domain on this device
+	         (master, backup or standalone)."
+	    ::= { fadcVdEntry 3 }
+
+
+	--
+	-- fnFortiADCMib.fadcIntf
+	--
+
+	fadcIntfTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcIntfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"Fortinet specific extensions to MIB-2 ifTable."
+	    ::= { fadcIntf 1 }
+
+	fadcIntfEntry OBJECT-TYPE
+	    SYNTAX      FadcIntfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"Fortinet specific information about an ifEntry. This table augments the standard ifTable, so the same indexing is used."
+	    INDEX       { fadcIntfIndex }
+	    ::= { fadcIntfTable 1 }
+
+	FadcIntfEntry ::= SEQUENCE {
+		fadcIntfIndex	FnIndex,
+		fadcIntfName   DisplayString,
+		fadcIntfVdom   DisplayString
+	}
+
+	fadcIntfIndex OBJECT-TYPE
+	    SYNTAX      FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "Interface index used to uniquely identify rows in this table. This index is also used by other tables referencing a virtual domain."
+	    ::= { fadcIntfEntry 1 }
+
+	fadcIntfName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The name of interface."
+	    ::= { fadcIntfEntry 2 }
+
+	fadcIntfVdom OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The virtual domain the interface belongs to. This index corresponds to the index used by fadcVdTable."
+	    ::= { fadcIntfEntry 3 }
+
+	--
+	-- fnFortiADCMib.fadcAdmin
+	--
+	
+	fadcAdminTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcAdminEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"A table of administrator accounts on the device."
+	    ::= { fadcAdmin 1 }
+
+	fadcAdminEntry OBJECT-TYPE
+	    SYNTAX      FadcAdminEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular admin account."
+	    INDEX       { fadcAdminIndex }
+	    ::= { fadcAdminTable 1 }
+
+	FadcAdminEntry ::= SEQUENCE {
+		fadcAdminIndex	FnIndex,
+		fadcAdminName     DisplayString,
+		fadcAdminVdom     DisplayString
+	}
+
+	fadcAdminIndex OBJECT-TYPE
+	    SYNTAX      FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "Admin index used to uniquely identify rows in this table. This index is also used by other tables referencing a virtual domain."
+	    ::= { fadcAdminEntry 1 }
+
+	fadcAdminName OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The name of administrator."
+	    ::= { fadcAdminEntry 2 }
+
+	fadcAdminVdom OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The virtual domain the administrator belongs to."
+	    ::= { fadcAdminEntry 3 }
+
+
+	--
+	-- fnFortiADCMib.fadcHardware
+	--
+
+	--
+	-- fnFortiADCMib.fadcHardware.fadcCPUInfo.fadcCPUTable
+	--
+	fadcCPUTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcCPUEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"A table of system related Hardware information on the device."
+	    ::= { fadcCPUInfo 1 }
+
+	fadcCPUEntry OBJECT-TYPE
+	    SYNTAX      FadcCPUEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular CPU."
+	    INDEX       { fadcCPUIndex }
+	    ::= { fadcCPUTable 1 }
+
+	FadcCPUEntry ::= SEQUENCE {
+		fadcCPUIndex	FnIndex,
+		fadcCPUName		DisplayString,
+		fadcCPUTemp		Integer32		
+	}
+
+	fadcCPUIndex OBJECT-TYPE
+	    SYNTAX		FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "CPU index used to uniquely identify rows in this table."
+	    ::= { fadcCPUEntry 1 }
+
+	fadcCPUName		OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The name of the CPU."
+	    ::= { fadcCPUEntry 2 }
+	   
+	fadcCPUTemp		OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The air temperature of the host CPU."
+	    ::= { fadcCPUEntry 3 }
+	    
+	--
+	-- fnFortiADCMib.fadcHardware.fadcPSUInfo.fadcPSUTable
+	--
+	
+	fadcPSUTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcPSUEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"A table of system related Hardware information on the device."
+	    ::= { fadcPSUInfo 1 }
+
+	fadcPSUEntry OBJECT-TYPE
+	    SYNTAX      FadcPSUEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular PSU."
+	    INDEX       { fadcPSUIndex }
+	    ::= { fadcPSUTable 1 }
+
+	FadcPSUEntry ::= SEQUENCE {
+		fadcPSUIndex		FnIndex,
+		fadcPSUName			DisplayString,
+		fadcPSUTemp			Integer32,
+		fadcPSUFanSpeed		Integer32, 
+		fadcPSUFanStatus	DisplayString, 
+		fadcPSUVoltage		Integer32,
+        fadcPSUStatus		DisplayString				
+	}
+	
+	fadcPSUIndex OBJECT-TYPE
+	    SYNTAX		FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "PSU index used to uniquely identify rows in this table."
+	    ::= { fadcPSUEntry 1 }
+
+	fadcPSUName	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The PSU Name."
+	    ::= { fadcPSUEntry 2 }
+	    
+	fadcPSUTemp		OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The PSU temperature."
+	    ::= { fadcPSUEntry 3 }
+
+	fadcPSUFanSpeed	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The PSU Fan speed."
+	    ::= { fadcPSUEntry 4 }
+
+	fadcPSUFanStatus	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+		"The PSU Fan speed status. (Good or N/A)"
+	    ::= { fadcPSUEntry 5 }
+
+	fadcPSUVoltage	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The PSU voltage value."
+	    ::= { fadcPSUEntry 6 }
+
+	fadcPSUStatus	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+		"The PSU status. (Good or Error)"
+	    ::= { fadcPSUEntry 7 }
+
+	--
+	-- fnFortiADCMib.fadcHardware.fadcNetworkInfo.fadcNetworkTable
+	--
+	
+	fadcNetworkTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcNetworkEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"A table of system related Hardware information on the device."
+	    ::= { fadcNetworkInfo 1 }
+
+	fadcNetworkEntry OBJECT-TYPE
+	    SYNTAX      FadcNetworkEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular Network."
+	    INDEX       { fadcNetworkIndex }
+	    ::= { fadcNetworkTable 1 }
+
+	FadcNetworkEntry ::= SEQUENCE {
+		fadcNetworkIndex	FnIndex,
+		fadcPortLinkName	DisplayString,
+		fadcPortLinkStatus	DisplayString
+	}
+	
+	fadcNetworkIndex OBJECT-TYPE
+	    SYNTAX		FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	        "Port Link index used to uniquely identify rows in this table."
+	    ::= { fadcNetworkEntry 1 }
+
+	fadcPortLinkName	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only	   
+		 STATUS      current
+	    DESCRIPTION 
+	    	"The port link name."
+	    ::= { fadcNetworkEntry 2 }           
+
+	fadcPortLinkStatus	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only	   
+		 STATUS      current
+	    DESCRIPTION 
+	    	"The port link status."
+	    ::= { fadcNetworkEntry 3 }
+ 
+ 	--
+	-- fnFortiADCMib.fadcHardware.fadcDeviceInfo.fadcDeviceTempTables
+	--
+	fadcDeviceTempTables OBJECT IDENTIFIER
+	    ::= { fadcDeviceInfo 1 }
+ 
+ 	--
+	-- fnFortiADCMib.fadcHardware.fadcDeviceInfo.fadcDeviceTempTables.fadcDeviceTempTable
+	--          
+	fadcDeviceTempTable	OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcDeviceTempEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Device temperature information."
+	    ::= { fadcDeviceTempTables 1 }
+	    
+	fadcDeviceTempEntry OBJECT-TYPE
+	    SYNTAX      FadcDeviceTempEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular device."
+	    INDEX       { fadcDeviceTempIndex }
+	    ::= { fadcDeviceTempTable 1 }
+    
+	FadcDeviceTempEntry ::= SEQUENCE {
+		fadcDeviceTempIndex		FnIndex,
+		fadcDeviceTempName		DisplayString,
+		fadcDeviceTempValue		Integer32		
+	}
+
+	fadcDeviceTempIndex	OBJECT-TYPE
+	    SYNTAX		FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"Device temperature index used to uniquely identify rows in this table."
+	    ::= { fadcDeviceTempEntry 1 }
+
+	fadcDeviceTempName		OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The name of the device."
+	    ::= { fadcDeviceTempEntry 2 }
+	   
+	fadcDeviceTempValue		OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The air temperature of the device."
+	    ::= { fadcDeviceTempEntry 3 }
+	
+	--
+	-- fnFortiADCMib.fadcHardware.fadcDeviceInfo.fadcDeviceFanTables
+	--
+	fadcDeviceFanTables OBJECT IDENTIFIER
+	    ::= { fadcDeviceInfo 2 }
+ 
+ 	--
+	-- fnFortiADCMib.fadcHardware.fadcDeviceInfo.fadcDeviceFanTables.fadcDeviceFanTable
+	--
+	fadcDeviceFanTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF FadcDeviceFanEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Device temperature information."
+	    ::= { fadcDeviceFanTables 1 }
+	    
+	fadcDeviceFanEntry OBJECT-TYPE
+	    SYNTAX      FadcDeviceFanEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"An entry containing information applicable
+	    	to a particular device fan."
+	    INDEX       { fadcDeviceFanIndex }
+	    ::= { fadcDeviceFanTable 1 }
+    
+	FadcDeviceFanEntry ::= SEQUENCE {
+		fadcDeviceFanIndex	FnIndex,
+		fadcDeviceFanName	DisplayString,
+		fadcDeviceFanSpeed	Integer32,
+		fadcDeviceFanStatus	DisplayString		
+	}
+
+	fadcDeviceFanIndex	OBJECT-TYPE
+	    SYNTAX		FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION 
+	    	"Device temperature index used to uniquely identify rows in this table."
+	    ::= { fadcDeviceFanEntry 1 }
+	    	    	
+	fadcDeviceFanName	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Devcice fan name."
+	    ::= { fadcDeviceFanEntry 2 }
+    
+    	fadcDeviceFanSpeed	OBJECT-TYPE
+   	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Device Fan speed."
+	    ::= { fadcDeviceFanEntry 3 }
+	    
+	fadcDeviceFanStatus	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Devcice fan tray status. (0 for good, 1 for bad or removed)"
+	    ::= { fadcDeviceFanEntry 4 }
+
+	--
+	-- fnFortiADCMib.fadcHardware.fadcHA
+	--
+	fadcHACurMode	OBJECT-TYPE
+	    SYNTAX		FadcHAModeVal
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"High-availability mode (Standalone, Active-Active, Active-Active-Vrrp or Active-Passive)."
+	    ::= { fadcHA 1 }
+
+	fadcHACurState	OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The state of HA."
+	    ::= { fadcHA 2 }
+
+	fadcHAPeerCount	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The count of Peer."
+	    ::= { fadcHA 3 }
+
+	fadcMoniterIntfCount	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The count of Moniter Interface"
+	    ::= { fadcHA 4 }   
+
+	fadcDiskState	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+			"The state of disk. (0 for good, 1 for bad)"
+	    ::= { fadcHA 5 }
+
+	fadcHALastChangedTime  OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"Last changed status time of HA."
+            ::= { fadcHA 6 }
+
+	fadcHALastChangedReason  OBJECT-TYPE
+	    SYNTAX		DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"Last changed status reason of HA."
+	    ::= { fadcHA 7 }   
+
+	--
+	-- fnFortiADCMib.fadcHardware.fadcHA.fadcSyncStats
+	--
+
+	fadcHASyncStatsTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcHASyncStatsEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	    	"A table of HA peers status"
+	    ::= { fadcSyncStats 1 }
+	fadcHASyncStatsEntry OBJECT-TYPE
+	    SYNTAX      FadcHASyncStatsEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	    	"An entry containing information applicable to a HA peer"
+	    INDEX       { fadcSyncTypeIndex }
+	    ::= { fadcHASyncStatsTable 1 }
+
+	FadcHASyncStatsEntry ::= SEQUENCE {
+	    fadcSyncTypeIndex			FnIndex,
+	    fadcSyncType        		DisplayString,
+	    fadcSyncSent			Integer32,
+	    fadcSyncReceived			Integer32
+	}
+
+	fadcSyncTypeIndex OBJECT-TYPE
+	    SYNTAX      FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	    	"An index uniquely defining a sync type within the fadcHASyncStatsTable."
+	    ::= { fadcHASyncStatsEntry 1 }
+
+	fadcSyncType OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"The name of sync type."
+	    ::= { fadcHASyncStatsEntry 2 }
+
+	fadcSyncSent OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"The number of sync pkts sent."
+	    ::= { fadcHASyncStatsEntry 3 }
+
+	fadcSyncReceived OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"The number of sync pkts received."
+	    ::= { fadcHASyncStatsEntry 4 }            
+
+	--
+	-- fnFortiADCMib.fadcHardware.fadcHA.fadcDeviceErrCount
+	--
+	fadcDuplicateNodeID OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"The number of duplicate node id error."
+	    ::= { fadcDeviceErrCount 1 }
+            
+	fadcVersionMismatch OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    	"The number of version mismatch error."
+	    ::= { fadcDeviceErrCount 2 }	 
+	--
+	-- fnFortiADCMib.fadcHardware.fadcHA.fadcHAPeerInfo
+	-- 
+ 
+        fadcHAPeerTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF FadcHAPeerEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	    	"A table of HA peers status"
+	    ::= { fadcHAPeerInfo 1 }
+
+	fadcHAPeerEntry OBJECT-TYPE
+	    SYNTAX      FadcHAPeerEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "An entry containing information applicable to a HA peer"
+	    INDEX       { fadcPeerIndex }
+	    ::= { fadcHAPeerTable 1 }
+
+	FadcHAPeerEntry ::= SEQUENCE {
+	    fadcPeerIndex		FnIndex,
+	    fadcPeerSerialNumber        DisplayString,
+	    fadcPeerStatus		DisplayString,
+	    fadcNodeID			Integer32,
+	    fadcIPAddress		DisplayString
+	}
+
+	fadcPeerIndex OBJECT-TYPE
+	    SYNTAX      FnIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "An index uniquely defining a peer within the fadcHAPeerTable."
+            ::= { fadcHAPeerEntry 1 }
+
+	fadcPeerSerialNumber OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The serial number of peer."
+	    ::= { fadcHAPeerEntry 2 }
+
+	fadcPeerStatus OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The status of peer."
+	    ::= { fadcHAPeerEntry 3 }
+
+	fadcNodeID OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The node id of peer."
+	    ::= { fadcHAPeerEntry 4 }
+
+	fadcIPAddress OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The ip address of peer."
+	    ::= { fadcHAPeerEntry 5 }
+
+	fadcVoltage		OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The Milli-Voltage value."
+	    ::= { fadcHardware 6 }
+
+	fadcPowerSupplyVoltage	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"The system voltage value."
+	    ::= { fadcHardware 7 }
+
+	fadcLogDiskStatus	OBJECT-TYPE
+	    SYNTAX		Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+			"The status of mounting log disk. ( 0: healthy, 1: not healthy, -1: Can't get status)"
+	    ::= { fadcHardware 8 }
+	    
+    --
+	-- fnFortiADCMib.fadcSecurity.fadcDDoSAttackStatus
+	--
+	fadcDDoSAttackStatus OBJECT-TYPE
+	    SYNTAX      Gauge32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION 
+	    	"Current DOS attack status. (1 for attacking, 0 for no attack)"
+	    ::= { fadcSecurity 1 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication
+	--
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcRealServer
+	--	
+  	fadcPoolNumber OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of pools in fadcRealServer."
+		::= { fadcRS 1 }
+
+	fadcRSNumber OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of real servers(pool members) in fadcRealServer."
+		::= { fadcRS 2 }
+
+	fadcRSTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcRSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of real servers(pool members) on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcRS 3 }
+
+	fadcRSEntry OBJECT-TYPE
+		SYNTAX      FadcRSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular real server(pool member)."
+		INDEX       { fadcRSIndex }
+		::= { fadcRSTable 1 }
+
+	FadcRSEntry ::= SEQUENCE {
+		fadcRSIndex				FnIndex,
+		fadcPoolName			DisplayString,
+		fadcRSStatus			DisplayString,
+		fadcRSHealth			DisplayString,
+		fadcRSVdom				DisplayString,
+		fadcRSName			DisplayString,
+		fadcRSObjStatus			DisplayString
+	}
+
+	fadcRSIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a real server(pool member) within the fadcRSTable."
+		::= { fadcRSEntry 1 }
+
+	fadcPoolName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server pool name of the specified real server(pool member)."
+		::= { fadcRSEntry 2 }
+
+	fadcRSStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The configuration status of specified real server(pool member)."
+		::= { fadcRSEntry 3 }
+	
+	fadcRSHealth OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+ 		DESCRIPTION
+			"The health of specified real server(pool member)."
+		::= { fadcRSEntry 4 }
+	
+	fadcRSVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified real server(pool member)."
+		::= { fadcRSEntry 5 }
+
+        fadcRSName OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The server name of the specified real server(pool member)."
+                ::= { fadcRSEntry 6 }
+
+	fadcRSObjStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The configuration status of specified real server object."
+		::= { fadcRSEntry 7 }
+
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcVirtualServer
+	--
+	
+	fadcVirturalServerNumber OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of virtual servers in fadcVirtualServer."
+		::= { fadcVS 1 }
+
+	fadcVirturalServerTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcVirturalServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of virtual servers on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcVS 2 }
+
+	fadcVirturalServerEntry OBJECT-TYPE
+		SYNTAX      FadcVirturalServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular virtual server."
+		INDEX       { fadcVirturalServerIndex }
+		::= { fadcVirturalServerTable 1 }
+
+	FadcVirturalServerEntry ::= SEQUENCE {
+		fadcVirturalServerIndex				FnIndex,
+		fadcVirturalServerName				DisplayString,
+		fadcVirturalServerStatus			DisplayString,
+		fadcVirturalServerHealth			DisplayString,
+		fadcVirturalServerNewConnections	Integer32,
+		fadcVirturalServerConcurrent		Integer32,
+		fadcVirturalServerThroughputKbps	Integer32,
+		fadcVirturalServerVdom				DisplayString,
+		fadcVirturalServerWAF				Integer32
+	}
+
+	fadcVirturalServerIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a virtual server within the fadcVSTable."
+		::= { fadcVirturalServerEntry 1 }
+
+	fadcVirturalServerName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server name of the specified virtual server."
+		::= { fadcVirturalServerEntry 2 }
+
+	fadcVirturalServerStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The configuration status of specified virtual server."
+		::= { fadcVirturalServerEntry 3 }
+
+	fadcVirturalServerHealth OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+ 		DESCRIPTION
+			"The health of specified virtual server."
+		::= { fadcVirturalServerEntry 4 }
+
+	fadcVirturalServerNewConnections OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"New Connections persecond rate for the specified virtual server."
+		::= { fadcVirturalServerEntry 5 }
+
+	fadcVirturalServerConcurrent OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Concurrent connection rate for the specified virtual server."
+		::= { fadcVirturalServerEntry 6 }
+
+	fadcVirturalServerThroughputKbps OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Throughput bps rate for the specified virtual server."
+		::= { fadcVirturalServerEntry 7 }
+
+	fadcVirturalServerVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified virtual server."
+		::= { fadcVirturalServerEntry 8 }
+
+	fadcVirturalServerWAF	OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of HTTP request blocked times. (The HTTP request was 
+			blocked because it issued (at least one) violation(s) which is 
+			marked as blocking at the current active policy in Application 
+			Security Module.)"
+		::= { fadcVirturalServerEntry 9 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGatewayTables
+	--
+	fadcGatewayTables OBJECT IDENTIFIER
+	    ::= { fadcLinkLoadBalance 1 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGatewayTables.fadcGatewayTable
+	--	
+    fadcGatewayTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcGatewayEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of gateways on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcGatewayTables 1 }
+
+	fadcGatewayEntry OBJECT-TYPE
+		SYNTAX      FadcGatewayEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular gateway."
+		INDEX       { fadcGatewayIndex }
+		::= { fadcGatewayTable 1 }
+
+	FadcGatewayEntry ::= SEQUENCE {
+		fadcGatewayIndex				FnIndex,
+		fadcGatewayName					DisplayString,
+		fadcGatewayHCStatus				DisplayString,
+		fadcGatewayInboundBandWidth		DisplayString,
+		fadcGatewayOutboundBandWidth	DisplayString,
+		fadcGatewayVdom		DisplayString
+	}
+
+	fadcGatewayIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a gateway within the fadcGatewayTable."
+		::= { fadcGatewayEntry 1 }
+
+	fadcGatewayName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The gateway name of the specified Gateway."
+		::= { fadcGatewayEntry 2 }
+
+	fadcGatewayHCStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The health check status of specified Gateway."
+		::= { fadcGatewayEntry 3 }
+	
+	fadcGatewayInboundBandWidth OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+ 		DESCRIPTION
+			"The current inbound bandwidth of specified Gateway."
+		::= { fadcGatewayEntry 4 }
+
+	fadcGatewayOutboundBandWidth OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+ 		DESCRIPTION
+			"The current outbound bandwidth of specified Gateway."
+		::= { fadcGatewayEntry 5 }
+			
+	fadcGatewayVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified Gateway."
+		::= { fadcGatewayEntry 6 }
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcLinkGroupTables
+	--
+
+	fadcLinkGroupTables OBJECT IDENTIFIER
+	    ::= { fadcLinkLoadBalance 2 }
+		
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcLinkGroupTables.fadcLinkGroupTable
+	--
+		
+	fadcLinkGroupTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcLinkGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of gateway groups on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcLinkGroupTables 1 }
+
+	fadcLinkGroupEntry OBJECT-TYPE
+		SYNTAX      FadcLinkGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular link group."
+		INDEX       { fadcLinkGroupIndex }
+		::= { fadcLinkGroupTable 1 }
+
+	FadcLinkGroupEntry ::= SEQUENCE {
+		fadcLinkGroupIndex		FnIndex,
+		fadcLinkGroupName		DisplayString,
+		fadcLinkGroupHCStatus	DisplayString,
+		fadcLinkGroupMode		DisplayString,
+		fadcLinkGroupVdom		DisplayString
+	}
+
+	fadcLinkGroupIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a real server within the fadcLinkGroupTable."
+		::= { fadcLinkGroupEntry 1 }
+
+	fadcLinkGroupName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server name of the specified Link Group."
+		::= { fadcLinkGroupEntry 2 }
+
+	fadcLinkGroupHCStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The health of specified Link Group."
+		::= { fadcLinkGroupEntry 3 }
+	
+	fadcLinkGroupMode OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+ 		DESCRIPTION
+			"The configuration status of specified Link Group."
+		::= { fadcLinkGroupEntry 4 }
+	
+	fadcLinkGroupVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified Link Group."
+		::= { fadcLinkGroupEntry 5 }
+  	
+  	--
+	-- fnFortiADCMib.fadcApplication.fadcGlobalLoadBalance.fadcGLBVSTables
+	--
+	fadcGLBVSTables OBJECT IDENTIFIER
+	    ::= { fadcGlobalLoadBalance 1 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGLBVSTables.fadcGLBVSTable
+	--	
+    fadcGLBVSTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcGLBVSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of GLB virtual server on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcGLBVSTables 1 }
+
+	fadcGLBVSEntry OBJECT-TYPE
+		SYNTAX      FadcGLBVSEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular GLB vs."
+		INDEX       { fadcGLBVSIndex }
+		::= { fadcGLBVSTable 1 }
+
+	FadcGLBVSEntry ::= SEQUENCE {
+		fadcGLBVSIndex		FnIndex,
+		fadcGLBVSName		DisplayString,
+		fadcGLBVSStatus		DisplayString,
+		fadcGLBVSServerName	DisplayString,
+		fadcGLBVSVdom		DisplayString
+	}
+
+	fadcGLBVSIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a GLB vs within the fadcGLBVSTable."
+		::= { fadcGLBVSEntry 1 }
+
+	fadcGLBVSName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The vs name of the specified GLB vs."
+		::= { fadcGLBVSEntry 2 }
+
+	fadcGLBVSStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The status of specified GLB vs."
+		::= { fadcGLBVSEntry 3 }
+
+	fadcGLBVSServerName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The vs server name of the specified GLB vs in."
+		::= { fadcGLBVSEntry 4 }		
+
+	fadcGLBVSVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified GLB vs."
+		::= { fadcGLBVSEntry 5 }
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcServerLoadBalance
+	--
+
+	fadcClientSideCPS OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side connecyions per second"
+		::= { fadcServerLoadBalance 1 }
+
+	fadcClientSideRPS OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side requests per second"
+		::= { fadcServerLoadBalance 2 }
+
+	fadcClientSideSSLCPS OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side SSL-only connecyions per second"
+		::= { fadcServerLoadBalance 3 }
+
+	fadcClientSideSSLRPS OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side SSL-only requests per second"
+		::= { fadcServerLoadBalance 4 }
+
+	fadcClientSideThroughput OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side throughputingress and egress"
+		::= { fadcServerLoadBalance 5 }
+
+	fadcClientSideSSLThroughput OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Client-side SSL-only (encrypted) throughput"
+		::= { fadcServerLoadBalance 6 }
+
+	fadcConcurrentClientConnections OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Concurrent client-side connections"
+		::= { fadcServerLoadBalance 7 }
+
+	fadcConcurrentClientSSLSessions OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Concurrent client-side SSL sessions"
+		::= { fadcServerLoadBalance 8 }
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcServerLoadBalance.fadcClientSideSSLCacheUtilizationTables
+	--
+
+	fadcClientSSLCacheUtilizTables OBJECT IDENTIFIER
+		::= { fadcServerLoadBalance 20 }
+
+	fadcClientSSLCacheUtilizTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcClientSSLCacheUtilizEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"Client-side SSL cache utilization table"
+		::= { fadcClientSSLCacheUtilizTables 1 }
+
+	fadcClientSSLCacheUtilizEntry OBJECT-TYPE
+		SYNTAX      FadcClientSSLCacheUtilizEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular virtual server."
+		INDEX       { fadcSLBVSIndex }
+		::= { fadcClientSSLCacheUtilizTable 1 }
+
+	FadcClientSSLCacheUtilizEntry ::= SEQUENCE {
+		fadcSLBVSIndex              FnIndex,
+		fadcSLBVSName               DisplayString,
+		fadcSLBTotalCacheItems             Integer32,
+		fadcSLBTotalCacheSize               Integer32,
+		fadcSLBCacheHitCount               Integer32,
+		fadcSLBCacheHitBytes               Integer32,
+		fadcSLBTotalCertCacheItems	Integer32,
+		fadcSLBTotalCertCacheSize	Integer32,
+		fadcSLBHitCertCacheCount	Integer32,
+		fadcSLBHitCertTotalCheck	Integer32,
+		fadcSLBHitCertPercentage	Integer32
+	}
+
+	fadcSLBVSIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a virtual server within the fadcClientSSLCacheUtilizationTable."
+		::= { fadcClientSSLCacheUtilizEntry 1 }
+
+	fadcSLBVSName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server name of the specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 2 }
+
+	fadcSLBTotalCacheItems OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The total cache items of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 3 }
+
+	fadcSLBTotalCacheSize OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The total cache size of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 4 }
+
+	fadcSLBCacheHitCount OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The cache hit count of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 5 }
+
+	fadcSLBCacheHitBytes OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The cache hit bytes of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 6 }
+
+	fadcSLBTotalCertCacheItems OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The total certificate cache items of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 7 }
+
+	fadcSLBTotalCertCacheSize OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The total certificate cache size of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 8 }
+
+	fadcSLBHitCertCacheCount OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The certificate cache hit count of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 9 }
+
+	fadcSLBHitCertTotalCheck OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The certificate cache hit total check of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 10 }
+
+	fadcSLBHitCertPercentage OBJECT-TYPE
+		SYNTAX      Integer32 (1..2147483647)
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The certificate cache hit percentage of specified virtual server."
+		::= { fadcClientSSLCacheUtilizEntry 11 }
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcGlobalLoadBalance.fadcGLBServerTables
+	--
+	fadcGLBServerTables OBJECT IDENTIFIER
+	    ::= { fadcGlobalLoadBalance 2 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGLBServerTables.fadcGLBServerTable
+	--	
+    fadcGLBServerTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcGLBServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of GLB server on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcGLBServerTables 1 }
+
+	fadcGLBServerEntry OBJECT-TYPE
+		SYNTAX      FadcGLBServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular GLB server."
+		INDEX       { fadcGLBServerIndex }
+		::= { fadcGLBServerTable 1 }
+
+	FadcGLBServerEntry ::= SEQUENCE {
+		fadcGLBServerIndex		FnIndex,
+		fadcGLBServerName		DisplayString,
+		fadcGLBServerStatus		DisplayString,
+		fadcGLBServerVdom		DisplayString
+	}
+
+	fadcGLBServerIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a GLB server within the fadcGLBServerTable."
+		::= { fadcGLBServerEntry 1 }
+
+	fadcGLBServerName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The server name of the specified GLB server."
+		::= { fadcGLBServerEntry 2 }
+
+	fadcGLBServerStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The status of specified GLB server."
+		::= { fadcGLBServerEntry 3 }	
+
+	fadcGLBServerVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified GLB server."
+		::= { fadcGLBServerEntry 4 }
+
+	--
+	-- fnFortiADCMib.fadcApplication.fadcGlobalLoadBalance.fadcGLBGatewayTables
+	--
+	fadcGLBGatewayTables OBJECT IDENTIFIER
+	    ::= { fadcGlobalLoadBalance 3 }
+	
+	--
+	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGLBGatewayTables.fadcGLBGatewayTable
+	--	
+    fadcGLBGatewayTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcGLBGatewayEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"A table of GLB gateway on the device. This table is
+			intended to be extended with platform specific information."
+		::= { fadcGLBGatewayTables 1 }
+
+	fadcGLBGatewayEntry OBJECT-TYPE
+		SYNTAX      FadcGLBGatewayEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An entry containing information applicable to a particular gateway."
+		INDEX       { fadcGLBGatewayIndex }
+		::= { fadcGLBGatewayTable 1 }
+
+	FadcGLBGatewayEntry ::= SEQUENCE {
+		fadcGLBGatewayIndex			FnIndex,
+		fadcGLBGatewayName			DisplayString,
+		fadcGLBGatewayStatus		DisplayString,
+		fadcGLBGatewayServerName	DisplayString,
+		fadcGLBGatewayVdom			DisplayString
+	}
+
+	fadcGLBGatewayIndex OBJECT-TYPE
+		SYNTAX      FnIndex
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"An index uniquely defining a GLB gateway within the fadcGLBGatewayTable."
+		::= { fadcGLBGatewayEntry 1 }
+
+	fadcGLBGatewayName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The gateway name of the specified GLB gateway."
+		::= { fadcGLBGatewayEntry 2 }
+
+	fadcGLBGatewayStatus OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The status of specified GLB gateway."
+		::= { fadcGLBGatewayEntry 3 }
+
+	fadcGLBGatewayServerName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The gateway server name of the specified GLB gateway in."
+		::= { fadcGLBGatewayEntry 4 }		
+
+	fadcGLBGatewayVdom OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The virtual domian of the specified GLB gateway."
+		::= { fadcGLBGatewayEntry 5 }
+
+	--
+	-- fnFortiADCMib.fadcMIBConformance
+	--
+	
+	fadcSystemConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcSysModel, fadcSysSerial, fadcSysVersion, fadcSysCpuUsage,
+					fadcSysMemUsage, fadcSysLogDiskUsage, fadcSysLoad,
+					fadcCpuName, fadcCpu2secAvgUsage, fadcCpu1minAvgUsage,
+					fadcCpu5minAvgUsage }
+		STATUS 		current
+		DESCRIPTION
+				"Object related to FortiADC system."
+		::= { fadcMIBConformance 1 }
+
+	fadcSysOptionsConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcSysOptIdleTimeout }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC system option."
+		::= { fadcMIBConformance 2 }
+
+	fadcTrapsConformanceGroup NOTIFICATION-GROUP
+		NOTIFICATIONS	{ fadcTrapCpuHighThreshold, fadcTrapMemLowThreshold, fadcTrapLogDiskHighThreshold,
+					fadcTrapDosAttackStart, fadcTrapDosAttackStop, fadcTrapFwConnectionLimit,
+					fadcTrapFwSnatLimit, fadcTrapRequestBlocked, fadcTrapXSSAttack,
+					fadcTrapSQLInjectionAttack, fadcTrapGenericAttack,
+					fadcTrapExploitsAttack, fadcTrapTrojansAttack,
+					fadcTrapInfoDisclosureAttack, fadcTrapURLPattenViolate,
+					fadcTrapProtocolConstraint, fadcTrapGeoViolateDetected,
+					fadcTrapReputaionViolateDetected, fadcTrapBotDetected, fadcTrapFwConnectionDeny,
+					fadcTrapXmlDetected, fadcTrapJsonDetected, fadcTrapSoapDetected,
+					fadcTrapCPUTempHigh, fadcTrapCPUTempNormal, fadcTrapDeviceTempHigh,
+					fadcTrapDeviceTempNormal, fadcTrapPSUTempHigh, fadcTrapPSUTempNormal,
+					fadcTrapPSUFanSlow, fadcTrapDeviceFanSlow, fadcTrapPSUFanBad, fadcTrapPSUFanGood,
+					fadcTrapDeviceFanBad, fadcTrapDeviceFanGood, fadcTrapVoltageHigh, fadcTrapPowerSupplyHigh,
+					fadcTrapPSUVoltageHigh, fadcTrapVoltageLow, fadcTrapPowerSupplyLow, fadcTrapPSUVoltageLow,
+					fadcTrapPSUFailure, fadcTrapARPConflict, fadcTrapExternalLinkChange, fadcTrapLogDiskCloseThreshold,
+					fadcTrapLogDiskLost, fadcTrapSsdMwiNearThreshold, fadcTrapSsdMwiReachedThreshold,
+					fadcTrapHAPeerLost, fadcTrapHAMasterFailover, fadcTrapPortStatusChange, fadcTrapDiskStatusChange,
+					fadcTrapInetPortExhaustion, fadcTrapCertExpire, fadcTrapLogicalInterfaceUp,
+					fadcTrapLogicalInterfaceDown, fadcTrapLogicalInterfaceDisabled, fadcTrapAlertTrigger,
+					fadcTrapSysConnMemHigh, fadcTrapSysLincenseExpiryNotif, fadcTrapSysDeviceRebooted,
+					fadcTrapSysDeviceStarted, fadcTrapSysUpgeadeComplete, fadcTrapSysUserLogin,
+					fadcTrapSysUserLogout, fadcTrapSysDhcpIpAllocFailure, fadcTrapSysMetricsDbDiskFull,
+					fadcTrapSysStatisticsDbDiskFull, fadcTrapSysLogFull, fadcTrapSysFwBandwidthLimit,
+					fadcTrapConfigExecute, fadcTrapConfigCreate, fadcTrapConfigDelete, fadcTrapConfigUpdate,
+					fadcTrapSysOcspResponseExpires, fadcTrapSysSslCertificateRevoked, fadcTrapSysCrlExpires,
+					fadcTrapMemberConnRateStart, fadcTrapVSConnRateStart, fadcTrapMemberConnLimitStart,
+					fadcTrapVSConnLimitStart, fadcTrapMemberConnRateStop, fadcTrapVSConnRateStop,
+					fadcTrapMemberConnLimitStop, fadcTrapVSConnLimitStop, fadcTrapVSTransactionRateStart,
+					fadcTrapVSTransactionRateStop, fadcTrapMemberHCDown, fadcTrapVSHealthChange, fadcTrapMemberHCUp,
+					fadcTrapVSAuthFail, fadcTrapVSIPPoolLimit, adcTrapGatewayHCDown,
+					fadcTrapLinkGroupHCDown, fadcTrapGatewayHCUp, fadcTrapLinkGroupHCUp, fadcTrapGatewayInboundBandwidth,
+					fadcTrapGatewayOutboundBandwidth, fadcTrapGatewayInboundSpillover, fadcTrapGatewayOutboundSpillover,
+					fadcTrapGatewayTotalSpillover, fadcTrapGlbServerNotAvail, fadcTrapGlbServerAvail, fadcTrapGlbVSNotAvail,
+					fadcTrapGlbVSAvail, fadcTrapGlbGWNotAvail, fadcTrapGlbGWAvail, fadcTrapSlbPoolDown,
+					fadcTrapSlbPoolUp, fadcTrapSlbPoolHealthChange, fadcTrapSlbServerHealthChange, fadcTrapSlbServerEnabled,
+					fadcTrapSlbServerDisabled, fadcTrapSlbServerMaintain, fadcTrapSlbVirtualServerDown, fadcTrapSlbVirtualServerUp,
+					fadcTrapSlbVirtualServerEnabled, fadcTrapSlbVirtualServerDisabled, fadcTrapSlbVirtualServerMaintain,
+					fadcTrapSlbFlowTblHigh, fadcTrapSlbPersistTblHigh, fadcTrapSlbPktBuffHigh, fadcTrapSlbSynCacheUsageHigh,
+					fadcTrapSlbSynTblHigh, fadcTrapSlbConnDropMaxFlowTbl, fadcTrapSlbConnDropMaxPersistTbl, fadcTrapSlbConnDropMaxSysTbl,
+					fadcTrapSlbConnDropNoConnMem, fadcTrapSlbConnDropNoPktBuff, fadcTrapSlbConnDropPoolLBFailure, fadcTrapSlbPktDropNoPktBuff,
+					fadcTrapSlbPktBuffAllocFail, fadcTrapSlbCertExpire, fadcTrapSlbCacheOBJAllocFail, fadcTrapLlbVSThroughputLimit }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Traps."
+		::= { fadcMIBConformance 3 }
+	
+	fadcHAModeConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcHAMode }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC HA mode."
+		::= { fadcMIBConformance 6 }
+
+	fadcAlertConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcAlertName, fadcAlertSourceType, fadcAlertPriority,
+					fadcAlertComments, fadcAlertVdomName }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Alert."
+		::= { fadcMIBConformance 7 }
+
+	fadcCertConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcLocalCertName, fadcLocalCertValidFrom, fadcLocalCertValidTo, fadcLocalCertVdom,
+					fadcIntermediateCAName, fadcIntermediateCAValidFrom, fadcIntermediateCAValidTo, fadcIntermediateCAVdom,
+					fadcCACertName, fadcCACertValidFrom, fadcCACertValidTo, fadcCACertVdom,
+					fadcRemoteCertName, fadcRemoteCertValidFrom, fadcRemoteCertValidTo, fadcRemoteCertVdom }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Cert."
+		::= { fadcMIBConformance 8 }
+
+	fadcVdomConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcVdNumber, fadcVdMaxVdoms, fadcVdEnabled,
+					fadcVdEntName, fadcVdEntHaState }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Virtual Domain."
+		::= { fadcMIBConformance 9 }
+
+	fadcVSConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcVSNumber, fadcVSName, fadcVSStatus, fadcVSHealth,
+					fadcVSNewConnections, fadcVSConcurrent,
+					fadcVSThroughputKbps, fadcVSVdom }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Virtual Server."
+		::= { fadcMIBConformance 10 }
+
+	fadcIntfConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcIntfName, fadcIntfVdom }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Interface."
+		::= { fadcMIBConformance 11 }
+
+	fadcAdminConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcAdminName, fadcAdminVdom }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Admin."
+		::= { fadcMIBConformance 12 }
+
+	fadcHardwareConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcCPUName, fadcCPUTemp,
+					fadcPSUName, fadcPSUTemp, fadcPSUFanSpeed,
+					fadcPSUFanStatus, fadcPSUVoltage, fadcPSUStatus,
+					fadcPortLinkName, fadcPortLinkStatus,
+					fadcDeviceTempName, fadcDeviceTempValue,
+					fadcDeviceFanName, fadcDeviceFanSpeed, fadcDeviceFanStatus,
+					fadcHACurMode, fadcHACurState, fadcHAPeerCount,	fadcMoniterIntfCount,
+					fadcDiskState, fadcHALastChangedTime, fadcHALastChangedReason,
+					fadcSyncType, fadcSyncSent, fadcSyncReceived,
+					fadcDuplicateNodeID, fadcVersionMismatch,
+					fadcPeerSerialNumber, fadcPeerStatus, fadcNodeID, fadcIPAddress,
+					fadcVoltage, fadcPowerSupplyVoltage, fadcLogDiskStatus }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Hardware."
+		::= { fadcMIBConformance 13 }
+
+	fadcSecurityConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcDDoSAttackStatus }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Security."
+		::= { fadcMIBConformance 14 }
+
+	fadcApplicationConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fadcPoolNumber, fadcRSNumber, fadcPoolName, fadcRSStatus,
+					fadcRSHealth, fadcRSVdom, fadcRSName,
+					fadcVirturalServerNumber, fadcVirturalServerName,
+					fadcVirturalServerStatus, fadcVirturalServerHealth,
+					fadcVirturalServerNewConnections, fadcVirturalServerConcurrent,
+					fadcVirturalServerThroughputKbps, fadcVirturalServerVdom,
+					fadcVirturalServerWAF,
+					fadcGatewayName, fadcGatewayHCStatus, fadcGatewayInboundBandWidth,
+					fadcGatewayOutboundBandWidth, fadcGatewayVdom,
+					fadcLinkGroupName, fadcLinkGroupHCStatus, fadcLinkGroupMode, fadcLinkGroupVdom,
+					fadcGLBVSName, fadcGLBVSStatus, fadcGLBVSServerName, fadcGLBVSVdom,
+					fadcGLBServerName, fadcGLBServerStatus, fadcGLBServerVdom,
+					fadcGLBGatewayName, fadcGLBGatewayStatus, fadcGLBGatewayServerName, fadcGLBGatewayVdom,
+					fadcClientSideCPS, fadcClientSideRPS, fadcClientSideSSLCPS,
+					fadcClientSideSSLRPS, fadcClientSideThroughput, fadcClientSideSSLThroughput,
+					fadcConcurrentClientConnections, fadcConcurrentClientSSLSessions,
+					fadcSLBVSName, fadcSLBTotalCacheItems, fadcSLBTotalCacheSize, fadcSLBCacheHitCount,
+					fadcSLBCacheHitBytes, fadcSLBTotalCertCacheItems, fadcSLBTotalCertCacheSize,
+					fadcSLBHitCertCacheCount, fadcSLBHitCertTotalCheck, fadcSLBHitCertPercentage }
+		STATUS		current
+		DESCRIPTION
+				"Object related to FortiADC Application."
+		::= { fadcMIBConformance 15 }
+
+	fadcMIBCompliance MODULE-COMPLIANCE
+		STATUS 		current
+		DESCRIPTION 
+			"The compliance statement for the application MIB."
+		
+		MODULE		-- this module
+		
+			GROUP	fadcSystemConformanceGroup
+			DESCRIPTION 
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+			
+			GROUP	fadcSysOptionsConformanceGroup	
+			DESCRIPTION 
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcTrapsConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+			
+			GROUP 	fadcHAModeConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcAlertConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcCertConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcVdomConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcVSConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcIntfConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcAdminConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcHardwareConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcSecurityConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			GROUP	fadcApplicationConformanceGroup
+			DESCRIPTION
+				"This group is mandatory for all FortiADC appliances supporting this MIB."
+
+			::= { fadcMIBConformance 100 }
+
+END

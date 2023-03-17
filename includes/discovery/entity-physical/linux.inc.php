@@ -85,24 +85,24 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
     $ifIndex = array_key_exists('ifIndex', $entry) ? $entry['ifIndex'] : '';
 
     discover_entity_physical($valid,
-                 $device,
-                 $entPhysicalIndex,
-                 $entPhysicalDescr,
-                 $entPhysicalClass,
-                 $entPhysicalName,
-                 $entPhysicalModelName,
-                 $entPhysicalSerialNum,
-                 $entPhysicalContainedIn,
-                 $entPhysicalMfgName,
-                 $entPhysicalParentRelPos,
-                 $entPhysicalVendorType,
-                 $entPhysicalHardwareRev,
-                 $entPhysicalFirmwareRev,
-                 $entPhysicalSoftwareRev,
-                 $entPhysicalIsFRU,
-                 $entPhysicalAlias,
-                 $entPhysicalAssetID,
-                 $ifIndex);
+        $device,
+        $entPhysicalIndex,
+        $entPhysicalDescr,
+        $entPhysicalClass,
+        $entPhysicalName,
+        $entPhysicalModelName,
+        $entPhysicalSerialNum,
+        $entPhysicalContainedIn,
+        $entPhysicalMfgName,
+        $entPhysicalParentRelPos,
+        $entPhysicalVendorType,
+        $entPhysicalHardwareRev,
+        $entPhysicalFirmwareRev,
+        $entPhysicalSoftwareRev,
+        $entPhysicalIsFRU,
+        $entPhysicalAlias,
+        $entPhysicalAssetID,
+        $ifIndex);
 }//end foreach
 
 echo "\n";

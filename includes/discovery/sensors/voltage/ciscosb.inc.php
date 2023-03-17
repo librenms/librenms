@@ -16,10 +16,14 @@ $multiplier = 1;
 $divisor = 1000000;
 foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
     foreach ($ciscosb_data as $key => $value) {
+        if (! isset($value['rlPhyTestTableTransceiverSupply'])) {
+            continue;
+        }
+
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.6';
         $sensor_type = 'rlPhyTestTableTransceiverSupply';
         $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-        $descr = $port_descr['ifDescr'] . ' Supply Voltage';
+        $descr = trim(($port_descr['ifDescr'] ?? null) . ' Supply Voltage');
         $voltage = $value['rlPhyTestTableTransceiverSupply'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';

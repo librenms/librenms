@@ -28,6 +28,8 @@ namespace App\Providers;
 use App\Logging\Reporting\Middleware\AddGitInformation;
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
+use App\Logging\Reporting\Middleware\SetInstanceId;
+use App\Models\Callback;
 use ErrorException;
 use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
@@ -44,6 +46,8 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     private $laravelErrorHandler;
     /** @var bool */
     private $reportingEnabled;
+    /** @var string|null */
+    private static $instanceId;
 
     public function boot(): void
     {
@@ -79,6 +83,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
         // Add more LibreNMS related info
         Flare::registerMiddleware(SetGroups::class);
+        Flare::registerMiddleware(SetInstanceId::class);
 
         // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
@@ -169,5 +174,21 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         return true;
+    }
+
+    public static function getInstanceId(): string
+    {
+        if (is_null(self::$instanceId)) {
+            $uuid = Callback::get('error_reporting_uuid');
+
+            if (! $uuid) {
+                $uuid = Str::uuid();
+                Callback::set('error_reporting_uuid', $uuid);
+            }
+
+            self::$instanceId = $uuid;
+        }
+
+        return self::$instanceId;
     }
 }

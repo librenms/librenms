@@ -187,7 +187,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function authSSOParseGroups()
     {
         // Parse a delimited group list
-        $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')));
+        $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')) ?? '');
 
         $valid_groups = [];
 

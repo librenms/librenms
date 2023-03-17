@@ -89,7 +89,7 @@ class Allied extends OS implements OSDiscovery
                 $serial = snmp_get($this->getDeviceArray(), 'arBoardSerialNumber.1', '-OsvQU', 'AT-INTERFACES-MIB');
 
             //AT-GS950/24 Gigabit Ethernet WebSmart Switch
-                //Also requires system description as no OIDs provide $hardware
+            //Also requires system description as no OIDs provide $hardware
             } elseif ($d == 'WebSmart' && $e == 'Switch') {
                 $version = snmp_get($this->getDeviceArray(), 'swhub.167.81.1.3.0', '-OsvQU', 'AtiL2-MIB');
                 $version = $d . ' ' . $version;
@@ -101,9 +101,9 @@ class Allied extends OS implements OSDiscovery
             $hardware = $e;
         }
 
-        $device->version = str_replace(['"', ','], '', $version ?? null);
-        $device->features = str_replace('"', '', $features ?? null);
-        $device->hardware = str_replace('"', '', $hardware ?? null);
+        $device->version = isset($version) ? str_replace(['"', ','], '', $version) : null;
+        $device->features = isset($features) ? str_replace('"', '', $features) : null;
+        $device->hardware = isset($hardware) ? str_replace('"', '', $hardware) : null;
         $device->serial = $serial ?? null;
     }
 }

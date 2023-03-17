@@ -1,36 +1,40 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Enum\ImageFormat;
 
 global $debug;
-
-[$type, $subtype] = extract_graph_type($vars['type']);
 
 if (isset($vars['device'])) {
     $device = is_numeric($vars['device'])
         ? device_by_id_cache($vars['device'])
         : device_by_name($vars['device']);
+    DeviceCache::setPrimary($device['device_id']);
 }
 
-// FIXME -- remove these
-$width = $vars['width'] ?? 400;
-$height = $vars['height'] ?? round($width / 3);
-$title = $vars['title'] ?? '';
-$vertical = $vars['vertical'] ?? '';
-$legend = $vars['legend'] ?? false;
-$output = (! empty($vars['output']) ? $vars['output'] : 'default');
-$from = empty($vars['from']) ? Config::get('time.day') : parse_at_time($vars['from']);
-$to = empty($vars['to']) ? Config::get('time.now') : parse_at_time($vars['to']);
-$period = ($to - $from);
-$prev_from = ($from - $period);
-
-$graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+// variables for included graphs
+$graph_params = new GraphParameters($vars);
+// set php variables for legacy graphs
+$type = $graph_params->type;
+$subtype = $graph_params->subtype;
+$height = $graph_params->height;
+$width = $graph_params->width;
+$from = $graph_params->from;
+$to = $graph_params->to;
+$period = $graph_params->period;
+$prev_from = $graph_params->prev_from;
+$inverse = $graph_params->inverse;
+$in = $graph_params->in;
+$out = $graph_params->out;
+$float_precision = $graph_params->float_precision;
+$title = $graph_params->visible('title');
+$nototal = ! $graph_params->visible('total');
+$nodetails = ! $graph_params->visible('details');
+$noagg = ! $graph_params->visible('aggregate');
 $rrd_options = '';
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
-
-//set default graph title
-$graph_title = format_hostname($device);
 
 if ($auth && is_customoid_graph($type, $subtype)) {
     $unit = $vars['unit'];
@@ -38,23 +42,17 @@ if ($auth && is_customoid_graph($type, $subtype)) {
 } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
     include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
 } else {
-    graph_error("$type*$subtype ");
-    // Graph Template Missing");
+    graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
 }
 
 if ($auth === null) {
     // We are unauthenticated :(
-    graph_error($width < 200 ? 'No Auth' : 'No Authorization');
+    graph_error('No Authorization', 'No Auth');
 
     return;
 }
 
-if ($graph_image_type === 'svg') {
-    $rrd_options .= ' --imgformat=SVG';
-    if ($width < 350) {
-        $rrd_options .= ' -m 0.75 -R light';
-    }
-}
+$rrd_options = $graph_params . ' ' . $rrd_options;
 
 // command output requested
 if (! empty($command_only)) {
@@ -77,7 +75,7 @@ if (! empty($command_only)) {
 }
 
 if (empty($rrd_options)) {
-    graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+    graph_error('Graph Definition Error', 'Def Error');
 
     return;
 }
@@ -88,10 +86,10 @@ try {
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
-        echo '<img src="data:' . get_image_type($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+        echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        header('Content-type: ' . get_image_type(Config::get('webui.graph_type')));
-        echo $output === 'base64' ? base64_encode($image_data) : $image_data;
+        header('Content-type: ' . ImageFormat::forGraph()->contentType());
+        echo (isset($vars['output']) && $vars['output'] === 'base64') ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
     if (\LibreNMS\Util\Debug::isEnabled()) {
@@ -99,8 +97,8 @@ try {
     }
 
     if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-        graph_error($width < 200 ? 'No Data' : 'No Data file ' . basename($rrd_filename));
+        graph_error('No Data file ' . basename($rrd_filename), 'No Data');
     } else {
-        graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph: ' . $e->getMessage());
+        graph_error('Error Drawing Graph: ' . $e->getMessage(), 'Draw Error');
     }
 }

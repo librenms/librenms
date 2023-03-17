@@ -727,7 +727,7 @@
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
             "default": [
-                "/-K9W8-/"
+                "/-K9W8/"
             ]
         },
         "bad_entity_sensor_regex": {
@@ -1776,6 +1776,13 @@
             "default": null,
             "type": "array"
         },
+        "graph_stat_percentile_disable": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 7,
+            "type": "boolean"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
@@ -1931,6 +1938,55 @@
                 "773177",
                 "5B185B",
                 "3F003F"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow": {
+            "default": [
+                "881177",
+                "AA3355",
+                "CC6666",
+                "EE9944",
+                "EEDD00",
+                "99DD55",
+                "44DD88",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_green": {
+            "default": [
+                "99DD55",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_purple": {
+            "default": [
+                "663399",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
             ],
             "type": "array"
         },
@@ -4295,6 +4351,7 @@
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
+                        {"match": "fortiswitch", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -4866,6 +4923,16 @@
             "type": "boolean"
         },
         "reporting.dump_errors": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.usage": {
+            "group": "system",
+            "section": "reporting",
+            "order": 0,
             "default": false,
             "type": "boolean"
         },
@@ -4935,11 +5002,11 @@
             "type": "text"
         },
         "rrdgraph_def_text": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_dark": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_color": {
@@ -5212,6 +5279,13 @@
             "default": 1200,
             "type": "integer",
             "units": "seconds"
+        },
+        "snmp.max_oid": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 10
         },
         "snmp.max_repeaters": {
             "group": "poller",

@@ -39,6 +39,7 @@ class KeyRotate extends LnmsCommand
         parent::__construct();
         $this->addArgument('old_key', InputArgument::OPTIONAL);
         $this->addOption('generate-new-key');
+        $this->addOption('forgot-key');
     }
 
     /**
@@ -56,8 +57,13 @@ class KeyRotate extends LnmsCommand
                 'exclude_unless:old_key,null',
                 'boolean',
             ],
+            'forgot-key' => [
+                'exclude_unless:old_key,null',
+                'boolean',
+            ],
             'old_key' => [
                 'exclude_if:generate-new-key,true',
+                'exclude_if:forgot-key,true',
                 'required',
                 'starts_with:base64:',
                 Rule::notIn([$new]),
@@ -72,12 +78,27 @@ class KeyRotate extends LnmsCommand
             return 0;
         }
 
+        if ($this->option('forgot-key')) {
+            $this->line(trans('commands.key:rotate.current_key', ['key' => $new]));
+            $this->error(trans('commands.key:rotate.backup_key'));
+            $this->newLine();
+
+            $this->error(trans('commands.key:rotate.destroy'));
+            if ($this->confirm(trans('commands.key:rotate.destroy_confirm'))) {
+                \App\Models\Config::where('config_name', 'validation.encryption.test')->delete();
+
+                return 0;
+            }
+
+            return 1;
+        }
+
         $old = $this->argument('old_key');
         if ($this->option('generate-new-key')) {
             $old = $new; // use key in env as existing key
             $new = 'base64:' . base64_encode(
-                    Encrypter::generateKey($this->laravel['config']['app.cipher'])
-                );
+                Encrypter::generateKey($this->laravel['config']['app.cipher'])
+            );
         }
 
         $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));

@@ -145,7 +145,7 @@ class Poller
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                \Log::event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                \App\Models\Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', 5);
             }
         }
@@ -188,7 +188,7 @@ class Poller
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                    \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                     report($e);
                 }
 

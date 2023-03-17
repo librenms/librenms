@@ -133,7 +133,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                     $days = floor($cputime / 86400);
                     $hours = str_pad(floor(($cputime / 3600) % 24), 2, '0', STR_PAD_LEFT);
                     $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
-                    $seconds = str_pad(($cputime % 60), 2, '0', STR_PAD_LEFT);
+                    $seconds = str_pad($cputime % 60, 2, '0', STR_PAD_LEFT);
                     $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
                     $data[] = ['device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
                 }
@@ -159,7 +159,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         // memcached
         if (! empty($agent_data['app']['memcached'])) {
-            $agent_data['app']['memcached'] = unserialize($agent_data['app']['memcached']);
+            $agent_data['app']['memcached'] = json_decode($agent_data['app']['memcached'], true);
             foreach ($agent_data['app']['memcached'] as $memcached_host => $memcached_data) {
                 if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'memcached', $memcached_host]) == '0') {
                     echo "Found new application 'Memcached' $memcached_host\n";

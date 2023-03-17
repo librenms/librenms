@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Time;
 
 unset($vars['page']);
 
@@ -14,8 +15,8 @@ if (session('widescreen')) {
     $thumb_width = 113;
 }
 
-$vars['from'] = parse_at_time($vars['from'] ?? '') ?: Config::get('time.day');
-$vars['to'] = parse_at_time($vars['to'] ?? '') ?: Config::get('time.now');
+$vars['from'] = Time::parseAt($vars['from'] ?? '') ?: Config::get('time.day');
+$vars['to'] = Time::parseAt($vars['to'] ?? '') ?: Config::get('time.now');
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
@@ -119,7 +120,7 @@ if (! $auth) {
         if ($screen_height > 960) {
             $graph_array['height'] = ($screen_height - ($screen_height / 2));
         } else {
-            $graph_array['height'] = max($graph_array['height'], ($screen_height - ($screen_height / 1.5)));
+            $graph_array['height'] = max($graph_array['height'], $screen_height - ($screen_height / 1.5));
         }
     }
 
@@ -180,7 +181,7 @@ if (! $auth) {
         print_optionbar_start();
         echo '<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
-            <i class="fa fa-info-circle fa-lg icon-theme" aria-hidden="true"></i>
+            <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>';
         echo Config::get('graph_descr.' . $vars['type']);
@@ -188,6 +189,7 @@ if (! $auth) {
     }
 
     if (! empty($vars['showcommand'])) {
+        $vars = $graph_array;
         $_GET = $graph_array;
         $command_only = 1;
 

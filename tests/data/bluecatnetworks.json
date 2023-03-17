@@ -1040,6 +1040,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnDhcpv4SerOperState"
                 },
                 {
@@ -1064,6 +1065,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnDnsSerOperState"
                 },
                 {
@@ -1088,6 +1090,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnHaSerOperState"
                 },
                 {
@@ -1112,6 +1115,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnNtpSerOperState"
                 }
             ],
@@ -1310,6 +1314,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnDhcpv4SerOperState"
                 },
                 {
@@ -1334,6 +1339,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnDnsSerOperState"
                 },
                 {
@@ -1358,6 +1364,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnHaSerOperState"
                 },
                 {
@@ -1382,6 +1389,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "bcnNtpSerOperState"
                 }
             ],

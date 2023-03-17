@@ -7,7 +7,7 @@ $vlans = snmpwalk_cache_oid($device, 'vlanDescription', [], 'ALCATEL-IND1-VLAN-M
 
 foreach ($vlans as $vlan_id => $vlan) {
     d_echo(" $vlan_id");
-    if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+    if (isset($vlans_db[$vtpdomain_id][$vlan_id]) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
         $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
         if ($vlan_data['vlan_name'] != $vlan['vlanDescription']) {
             $vlan_upd['vlan_name'] = $vlan['vlanDescription'];

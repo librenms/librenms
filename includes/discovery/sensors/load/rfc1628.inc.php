@@ -14,7 +14,7 @@ foreach ($load_data as $index => $data) {
         $value = $data['upsOutputPercentLoad'];
     }
 
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'load', $load_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'load', $load_oid);
     $descr = 'Percentage load';
     if (count($load_data) > 1) {
         $descr .= " $index";

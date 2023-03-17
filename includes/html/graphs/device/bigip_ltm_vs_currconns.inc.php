@@ -35,7 +35,6 @@ if (isset($components[$vars['id']])) {
         $colour_area_max = '9999cc';
 
         $graph_max = 1;
-        $graph_min = 0;
 
         $unit_text = 'Current Connections';
         $line_text = 'Current Connections';

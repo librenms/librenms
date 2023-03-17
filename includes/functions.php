@@ -245,7 +245,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
+        if (! (new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success()) {
             throw new HostUnreachablePingException($host);
         }
     }
@@ -499,7 +499,7 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
     return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
@@ -520,7 +520,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    Log::event($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -670,12 +670,22 @@ function is_port_valid($port, $device)
 /**
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
+ * Also trims the data
  *
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device)
 {
+    if (isset($port['ifDescr'])) {
+        $port['ifDescr'] = trim($port['ifDescr']);
+    }
+    if (isset($port['ifAlias'])) {
+        $port['ifAlias'] = trim($port['ifAlias']);
+    }
+    if (isset($port['ifName'])) {
+        $port['ifName'] = trim($port['ifName']);
+    }
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
@@ -960,7 +970,7 @@ function create_sensor_to_state_index($device, $state_name, $index)
 
 function delta_to_bits($delta, $period)
 {
-    return round(($delta * 8 / $period), 2);
+    return round($delta * 8 / $period, 2);
 }
 
 function report_this($message)

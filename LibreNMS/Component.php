@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
+use App\Models\Eventlog;
 use Illuminate\Support\Arr;
 use Log;
 
@@ -241,7 +242,7 @@ class Component
                     }
                     $component->save();
 
-                    Log::event($message, $component->device_id, 'component', 3, $component->id);
+                    Eventlog::log($message, $component->device_id, 'component', 3, $component->id);
                 }
 
                 // update preferences
@@ -257,18 +258,18 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component->id);
+                            Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component->id);
                             $existing->save();
                         }
                     } else {
                         $component->prefs()->save(new ComponentPref(['attribute' => $attribute, 'value' => $value]));
-                        Log::event("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', 3, $component->id);
+                        Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', 3, $component->id);
                     }
                 }
 
                 foreach ($invalid as $pref) {
                     $pref->delete();
-                    Log::event("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', 4);
+                    Eventlog::log("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', 4);
                 }
             });
 

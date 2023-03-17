@@ -53,7 +53,7 @@ class Browserpush extends Transport
     {
         $users = [__('All Users') => 0];
         foreach (User::get(['user_id', 'username', 'realname']) as $user) {
-            $users[$user->realname ?: $user->username] = $user->user_id;
+            $users[htmlentities($user->realname ?: $user->username)] = $user->user_id;
         }
 
         return [

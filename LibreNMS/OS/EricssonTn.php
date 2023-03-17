@@ -51,7 +51,7 @@ class EricssonTn extends OS implements
                 '.1.3.6.1.4.1.193.81.3.4.2.1.1.1.15.' . $index,
                 'ericsson-tn',
                 $index,
-                'MSE RAU: ' . $ifname[$index]['entPhysicalName'],
+                'MSE RAU: ' . ($ifname[$index]['entPhysicalName'] ?? null),
                 null,
                 1,
                 10

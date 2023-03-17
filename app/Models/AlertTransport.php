@@ -23,6 +23,7 @@ use LibreNMS\Alert\Transport;
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport whereTransportId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport whereTransportName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport whereTransportType($value)
+ *
  * @mixin \Eloquent
  */
 class AlertTransport extends Model

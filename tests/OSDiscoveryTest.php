@@ -63,6 +63,7 @@ class OSDiscoveryTest extends TestCase
      * Test each OS provided by osProvider
      *
      * @group os
+     *
      * @dataProvider osProvider
      *
      * @param  string  $os_name

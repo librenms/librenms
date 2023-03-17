@@ -64,6 +64,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      */
     public function testDataIsValid($os, $variant, $modules)
@@ -80,6 +81,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      *
      * @param  string  $os  base os
@@ -88,8 +90,10 @@ class OSModulesTest extends DBTestCase
      */
     public function testOS($os, $variant, $modules)
     {
+        // Lock testing time
+        $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
         $this->requireSnmpsim();  // require snmpsim for tests
-        // stub out Log::event and Fping->ping, we don't need to store them for these tests
+        // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
 
         try {
@@ -145,6 +149,7 @@ class OSModulesTest extends DBTestCase
         }
 
         DeviceCache::flush(); // clear cached devices
+        $this->travelBack();
     }
 
     public function dumpedDataProvider()
@@ -165,15 +170,15 @@ class OSModulesTest extends DBTestCase
 
     private function stubClasses(): void
     {
-        $this->app->bind('log', function ($app) {
-            $mock = \Mockery::mock('\App\Facades\LogManager[event]', [$app]);
-            $mock->shouldReceive('event');
+        $this->app->bind(\App\Models\Eventlog::class, function ($app) {
+            $mock = \Mockery::mock(\App\Models\Eventlog::class);
+            $mock->shouldReceive('_log');
 
             return $mock;
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock('\LibreNMS\Data\Source\Fping');
+            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;

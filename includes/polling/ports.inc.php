@@ -297,8 +297,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         }
         $hc_test = array_slice($port_stats, 0, 1);
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
-        if ((! isset($hc_test[0]['ifHCInOctets']) && ! is_numeric($hc_test[0]['ifHCInOctets'] ?? null)) ||
-            ((! isset($hc_test[0]['ifHighSpeed']) && ! is_numeric($hc_test[0]['ifHighSpeed'])))) {
+        if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null)) {
             $ifEntrySnmpFlags = ['-OQUst'];
             if ($device['os'] == 'bintec-beip-plus') {
                 $ifEntrySnmpFlags = ['-OQUst', '-Cc'];
@@ -506,7 +505,7 @@ foreach ($port_stats as $ifIndex => $port) {
             dbUpdate(['deleted' => '0'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '0';
         }
-        if ($ports[$port_id]['ports_statistics_port_id'] === null) {
+        if (! isset($ports[$port_id]['ports_statistics_port_id'])) {
             // in case the port was created before we created the table
             dbInsert(['port_id' => $port_id], 'ports_statistics');
         }
@@ -591,8 +590,8 @@ foreach ($ports as $port) {
 
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            [$a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($a_a) . zeropad($a_b) . zeropad($a_c) . zeropad($a_d) . zeropad($a_e) . zeropad($a_f);
+            $mac_split = explode(':', $this_port['ifPhysAddress']);
+            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4] ?? '') . zeropad($mac_split[5] ?? '');
         }
 
         // use HC values if they are available
@@ -663,7 +662,7 @@ foreach ($ports as $port) {
         echo 'VLAN = ' . ($this_port['ifVlan'] ?? '?') . ' ';
 
         // attempt to fill missing fields
-        port_fill_missing($this_port, $device);
+        port_fill_missing_and_trim($this_port, $device);
 
         // Update IF-MIB data
         $tune_port = false;
@@ -779,7 +778,7 @@ foreach ($ports as $port) {
                 }
 
                 $port[$port_update][$oid] = set_numeric($this_port[$oid] ?? 0);
-                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
+                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid] ?? null);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
@@ -807,8 +806,8 @@ foreach ($ports as $port) {
                 echo 'Wrote port debugging data';
             }
 
-            $port['stats']['ifInBits_rate'] = round(($port['stats']['ifInOctets_rate'] * 8));
-            $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
+            $port['stats']['ifInBits_rate'] = round($port['stats']['ifInOctets_rate'] * 8);
+            $port['stats']['ifOutBits_rate'] = round($port['stats']['ifOutOctets_rate'] * 8);
 
             // If we have a valid ifSpeed we should populate the stats for checking
             if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
@@ -843,19 +842,19 @@ foreach ($ports as $port) {
             $fields = [
                 'INOCTETS' => $this_port['ifInOctets'] ?? null,
                 'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
-                'INERRORS' => $this_port['ifInErrors'],
-                'OUTERRORS' => $this_port['ifOutErrors'],
+                'INERRORS' => $this_port['ifInErrors'] ?? null,
+                'OUTERRORS' => $this_port['ifOutErrors'] ?? null,
                 'INUCASTPKTS' => $this_port['ifInUcastPkts'] ?? null,
                 'OUTUCASTPKTS' => $this_port['ifOutUcastPkts'] ?? null,
                 'INNUCASTPKTS' => $this_port['ifInNUcastPkts'] ?? null,
                 'OUTNUCASTPKTS' => $this_port['ifOutNUcastPkts'] ?? null,
-                'INDISCARDS' => $this_port['ifInDiscards'],
-                'OUTDISCARDS' => $this_port['ifOutDiscards'],
+                'INDISCARDS' => $this_port['ifInDiscards'] ?? null,
+                'OUTDISCARDS' => $this_port['ifOutDiscards'] ?? null,
                 'INUNKNOWNPROTOS' => $this_port['ifInUnknownProtos'] ?? null,
-                'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'],
-                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
-                'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'],
-                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
+                'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'] ?? null,
+                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'] ?? null,
+                'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'] ?? null,
+                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
 
             // non rrd stats (will be filtered)

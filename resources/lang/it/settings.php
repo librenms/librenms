@@ -1491,8 +1491,8 @@ return [
         'update_channel' => [
             'description' => 'Set update Channel',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [
@@ -1546,6 +1546,10 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Disable Percentile for stats graphs globally',
+                'help' => 'Disables display of the percentile values and lines for graphs that display those',
             ],
         ],
         'device_display_default' => [

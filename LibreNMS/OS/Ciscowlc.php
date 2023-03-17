@@ -109,7 +109,7 @@ class Ciscowlc extends Cisco implements
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
-                    'rrd_dev' => $rrd_def,
+                    'rrd_def' => $rrd_def,
                 ], $ap->only([
                     'channel',
                     'txpow',

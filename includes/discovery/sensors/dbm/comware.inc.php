@@ -17,6 +17,11 @@ $multiplier = 1;
 $divisor = 100;
 foreach ($pre_cache['comware_oids'] as $index => $entry) {
     if (is_numeric($entry['hh3cTransceiverCurRXPower']) && $entry['hh3cTransceiverCurRXPower'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {
+        $interface = get_port_by_index_cache($device['device_id'], $index);
+        if ($interface['ifAdminStatus'] != 'up') {
+            continue;
+        }
+
         $oid = '.1.3.6.1.4.1.25506.2.70.1.1.1.12.' . $index;
         $limit_low = round(uw_to_dbm($entry['hh3cTransceiverRcvPwrLoAlarm'] / 10), 2);
         $warn_limit_low = round(uw_to_dbm($entry['hh3cTransceiverRcvPwrLoWarn'] / 10), 2);
@@ -25,11 +30,8 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
         $current = $entry['hh3cTransceiverCurRXPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $interface = get_port_by_index_cache($device['device_id'], $index);
-        if ($interface['ifAdminStatus'] == 'up') {
-            $descr = makeshortif($interface['ifDescr']) . ' Receive Power';
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
-        }
+        $descr = makeshortif($interface['ifDescr']) . ' Receive Power';
+        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 
     if (is_numeric($entry['hh3cTransceiverCurTXPower']) && $entry['hh3cTransceiverCurTXPower'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {

@@ -25,7 +25,7 @@ if (! isset($sort) || empty($sort)) {
 $sql .= " GROUP BY `bgpLocalAs` ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 

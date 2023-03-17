@@ -30,7 +30,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class CpUpsOverload implements SnmptrapHandler
 {
@@ -45,6 +44,6 @@ class CpUpsOverload implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $overload = CyberPowerUtil::getMessage($trap);
-        Log::event("$overload", $device->device_id, 'trap', 5);
+        $trap->log("$overload", 5);
     }
 }

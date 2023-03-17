@@ -80,7 +80,7 @@ if (isset($legacy)) {
         $powerdns['udp4-queries'],
         $powerdns['udp6-answers'],
         $powerdns['udp6-queries'],
-        ] = explode("\n", $legacy);
+    ] = explode("\n", $legacy);
 }
 
 d_echo($powerdns);

@@ -3,7 +3,7 @@
 $simple_rrd = true;
 
 foreach ((array) \LibreNMS\Config::get('nfsen_rrds', []) as $nfsenrrds) {
-    if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
+    if ($nfsenrrds[strlen($nfsenrrds) - 1] != '/') {
         $nfsenrrds .= '/';
     }
 
@@ -31,10 +31,6 @@ foreach ((array) \LibreNMS\Config::get('nfsen_rrds', []) as $nfsenrrds) {
             $units = '';
             $unit_text = $dsdescr;
             $scale_min = '0';
-
-            if ($_GET['debug']) {
-                print_r($rrd_list);
-            }
 
             $nfsen_iter++;
         }

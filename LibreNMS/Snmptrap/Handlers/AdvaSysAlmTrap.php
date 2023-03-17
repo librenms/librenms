@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaSysAlmTrap implements SnmptrapHandler
 {
@@ -65,6 +64,6 @@ class AdvaSysAlmTrap implements SnmptrapHandler
         }
 
         $sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
-        Log::event("System Alarm: $sysAlmDescr Status: $alSeverity", $device->device_id, 'trap', $logSeverity);
+        $trap->log("System Alarm: $sysAlmDescr Status: $alSeverity", $logSeverity);
     }
 }
