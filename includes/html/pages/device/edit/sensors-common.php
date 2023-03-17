@@ -54,8 +54,17 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
         $custom = '';
     }
 
+    if((isset($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit'])
+    || (isset($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low'])){
+	$sensor_current_state = 'danger';
+    }else if((isset($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn'])
+    || (isset($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn'])){
+        $sensor_current_state = 'warning';
+    }else{
+	$sensor_current_state = '';
+    }
     echo '
-        <tr>
+        <tr class="' . $sensor_current_state . '">
         <td>' . $sensor['sensor_class'] . '</td>
         <td>' . $sensor['sensor_type'] . '</td>
         <td style="white-space: nowrap">' . $sensor['sensor_descr'] . '</td>
