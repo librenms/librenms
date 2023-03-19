@@ -592,5 +592,15 @@
     "rule": "applications.app_type = \"systemd\" && application_metrics.metric = \"sub_service_failed\" && application_metrics.value > \"0\"",
     "name": "Systemd Services Failed > 0",
     "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"l2_errors\" && application_metrics.value >= \"1\"",
+    "name": "ZFS L2 errors present",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"health\" && application_metrics.value = \"0\"",
+    "name": "ZFS has one or more pool DEGRADED, FAULTED, UNAVAIL, REMOVED, or other",
+    "severity": "critical"
   }
 ]
