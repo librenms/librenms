@@ -7941,6 +7941,11 @@ parameters:
 			path: app/Models/Location.php
 
 		-
+			message: "#^Property App\\\\Models\\\\Location\\:\\:\\$location_ignore_regex has no type specified\\.$#"
+			count: 1
+			path: app/Models/Location.php
+
+		-
 			message: "#^Method App\\\\Models\\\\Mempool\\:\\:calculateTotal\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Mempool.php
