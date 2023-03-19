@@ -200,12 +200,12 @@ class DeviceController extends Controller
             'onclick' => 'http_fallback(this); return false;',
         ];
 
-        // Mgmt
+        // IPMI
         if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
                 'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
-                'title' => __('Mgmt'),
+                'title' => __('IPMI'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',
             ];
