@@ -77,7 +77,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             'HA'
         );
 
-        create_sensor_to_state_index($device, $stateName, $index);
+        create_sensor_to_state_index($device, $stateName, $fgHaStatsSyncStatus_txt . '.' . $index);
     }
 }
 
