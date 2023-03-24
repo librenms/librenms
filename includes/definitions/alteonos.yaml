@@ -10,4 +10,6 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.1872.1.13
+            - .1.3.6.1.4.1.1872.1.13.1  # Nortel  Alteon Application Switch 2000 Serise
+            - .1.3.6.1.4.1.1872.1.13.2  # Nortel  Alteon Application Switch 3000 Serise
+            - .1.3.6.1.4.1.1872.1.13.3  # Radware Alteon Application Switches
