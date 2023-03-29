@@ -150,6 +150,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     if (! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.unordered', 'snmp.')))) {
         $snmpcmd[] = '-Cc';
     }
+    
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } //end gen_snmpwalk_cmd()
 
@@ -973,14 +974,15 @@ function get_device_max_repeaters($device)
 
 /**
  * snmp walk function specially fitted to arista switches, that allows to give community as parameter
- * @param  unknown $device
- * @param  unknown $community
- * @param  unknown $vrf_name
- * @param  unknown $oid
- * @param  array $result_array
- * @param  unknown $mib
- * @param  unknown $mibdir
- * @param  string $snmpflags
+ * 
+ * @param  unknown  $device
+ * @param  unknown  $community
+ * @param  unknown  $vrf_name
+ * @param  unknown  $oid
+ * @param  array  $result_array
+ * @param  unknown  $mib
+ * @param  unknown  $mibdir
+ * @param  string  $snmpflags
  * @return array|string
  */
 function snmp_walk_arista($device, $community, $vrf_name, $oid, $result_array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
@@ -994,7 +996,7 @@ function snmp_walk_arista($device, $community, $vrf_name, $oid, $result_array = 
     $exec_output = [];
     exec(implode(' ', $command), $exec_output);
 
-    if (str_contains($exec_output[0],'No more variables left in this MIB View')) {
+    if (str_contains($exec_output[0], 'No more variables left in this MIB View')) {
         return [];
     }
 
