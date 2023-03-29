@@ -17,6 +17,7 @@ if (Config::get('enable_bgp')) {
     }
 
     foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+
         $device['context_name'] = $context_name;
 
         $vrfs = array_keys(DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid')->toArray());
@@ -34,6 +35,7 @@ if (Config::get('enable_bgp')) {
             }
 
             if ($device['os_group'] === 'arista') {
+
                 $peers_data = snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', '-Oq', 'ARISTA-BGP4V2-MIB');
                 $peers_data = $peers_data . "\n";
 
