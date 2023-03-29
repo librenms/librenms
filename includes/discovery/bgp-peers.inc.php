@@ -18,7 +18,7 @@ if (empty($bgpLocalAs)) {
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $device['context_name'] = $context_name;
 
-        $vrfs = array_keys(DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid')->toArray());
+    $vrfs = array_keys(DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid')->toArray());
 
     $peer2 = false;
     $peers_data = '';

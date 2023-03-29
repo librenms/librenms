@@ -150,7 +150,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     if (! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.unordered', 'snmp.')))) {
         $snmpcmd[] = '-Cc';
     }
-    
+
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } //end gen_snmpwalk_cmd()
 
@@ -974,7 +974,7 @@ function get_device_max_repeaters($device)
 
 /**
  * snmp walk function specially fitted to arista switches, that allows to give community as parameter
- * 
+ *
  * @param  unknown  $device
  * @param  unknown  $community
  * @param  unknown  $vrf_name
