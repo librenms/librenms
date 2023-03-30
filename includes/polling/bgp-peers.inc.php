@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-if (\LibreNMS\Config::get('enable_bgp')) {
     $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
     if (! empty($peers)) {
@@ -788,6 +787,5 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             echo "\n";
         } //end foreach
     } //end if
-} //end if
 
 unset($peers, $peer_data_tmp, $j_prefixes);
