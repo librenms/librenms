@@ -4,7 +4,6 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
-if (Config::get('enable_bgp')) {
     //
     // Load OS specific file
     //
@@ -197,4 +196,4 @@ if (Config::get('enable_bgp')) {
         $af_data,
         $contexts
     );
-}
+
