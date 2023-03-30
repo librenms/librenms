@@ -29,7 +29,6 @@ use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
-if (Config::get('enable_bgp')) {
     if ($device['os'] == 'dell-os10') {
         $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PeerTable', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell');
         foreach ($bgpPeersCache as $key => $value) {
@@ -117,4 +116,3 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeers);
         // No return statement here, so standard BGP mib will still be polled after this file is executed.
     }
-}
