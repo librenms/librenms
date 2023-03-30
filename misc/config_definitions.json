@@ -1584,10 +1584,6 @@
             "order": 1,
             "type": "text"
         },
-        "enable_bgp": {
-            "default": true,
-            "type": "boolean"
-        },
         "enable_billing": {
             "default": false,
             "type": "boolean"
