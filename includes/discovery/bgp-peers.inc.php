@@ -196,4 +196,3 @@ unset(
     $af_data,
     $contexts
 );
-
