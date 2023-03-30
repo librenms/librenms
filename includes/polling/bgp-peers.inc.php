@@ -79,8 +79,8 @@ if (! empty($peers)) {
                             $peer_ip_snmp = ltrim($index['orig'], '.');
                             $exploded_ip = explode('.', $peer_ip_snmp);
                             if (count($exploded_ip) > 11) {
-                                 // ipv6
-                                 $tmp_peer_ip = (string) IP::parse(snmp2ipv6($peer_ip_snmp), true);
+                                // ipv6
+                                $tmp_peer_ip = (string) IP::parse(snmp2ipv6($peer_ip_snmp), true);
                             } else {
                                 // ipv4
                                 $tmp_peer_ip = implode('.', array_slice($exploded_ip, -4));
@@ -418,7 +418,7 @@ if (! empty($peers)) {
                         } catch (InvalidIpException $e) {
                             // if parsing fails, leave the data as-is
                         }
-                     }
+                    }
                     $peer_data[$target] = $v;
                 }
                 if (strpos($peer_data['bgpPeerLastErrorCode'], ' ')) {
@@ -447,7 +447,7 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerIface'] = null;
                 }
             }
-             d_echo($peer_data);
+            d_echo($peer_data);
         } catch (InvalidIpException $e) {
             // ignore
         }
@@ -763,7 +763,7 @@ if (! empty($peers)) {
                     ->addDataset('AdvertisedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('SuppressedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('WithdrawnPrefixes', 'GAUGE', null, 100000000000);
-                 $fields = [
+                $fields = [
                     'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
                     'DeniedPrefixes'      => $cbgpPeerDeniedPrefixes,
                     'AdvertisedPrefixes'  => $cbgpPeerAdvertisedPrefixes,
