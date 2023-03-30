@@ -68,7 +68,7 @@ class OverviewController extends Controller
             ->limit(Config::get('front_page_down_box_limit'))
             ->with('device')
             ->get();
-        
+
         if (filter_var(Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
             && Config::get('uptime_warning') > 0
         ) {
