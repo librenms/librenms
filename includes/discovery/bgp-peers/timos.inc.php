@@ -27,7 +27,6 @@
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
-if (Config::get('enable_bgp')) {
     if ($device['os'] == 'timos') {
         $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {
@@ -98,4 +97,3 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeers);
         // No return statement here, so standard BGP mib will still be polled after this file is executed.
     }
-}
