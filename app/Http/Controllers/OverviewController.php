@@ -63,11 +63,11 @@ class OverviewController extends Controller
             ->get();
 
         // TODO: is inAlarm() equal to: bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != ''  ?
-            $bgp_down = BgpPeer::hasAccess(Auth::user())
-                ->inAlarm()
-                ->limit(Config::get('front_page_down_box_limit'))
-                ->with('device')
-                ->get();
+        $bgp_down = BgpPeer::hasAccess(Auth::user())
+            ->inAlarm()
+            ->limit(Config::get('front_page_down_box_limit'))
+            ->with('device')
+            ->get();
         
         if (filter_var(Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
             && Config::get('uptime_warning') > 0
