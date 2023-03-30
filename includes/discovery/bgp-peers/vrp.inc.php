@@ -168,4 +168,3 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
     }
 }
 // If not, we continue with standard BGP4 MIB
-
