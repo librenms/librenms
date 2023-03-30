@@ -27,7 +27,6 @@
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
-if (Config::get('enable_bgp')) {
     $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerRemoteAs', [], 'HUAWEI-BGP-VPN-MIB');
 
     if (count($bgpPeersCache) == 0) {
@@ -169,4 +168,4 @@ if (Config::get('enable_bgp')) {
         }
     }
     // If not, we continue with standard BGP4 MIB
-}
+
