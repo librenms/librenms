@@ -196,7 +196,15 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
             POLLER_GROUP
         ),
     )
-    parser.add_argument("-o", "--dns-only", dest="dns", action="store_true", help="Only DNS resolved Devices")
+
+    parser.add_argument(
+        "-o",
+        "--dns-only",
+        dest="dns",
+        action="store_true",
+        help="Only DNS resolved Devices",
+    )
+
     parser.add_argument("-l", "--legend", action="store_true", help="Print the legend.")
     parser.add_argument(
         "-v",
