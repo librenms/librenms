@@ -122,7 +122,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
                     ];
                     $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
-                    $seenPeerID[] = (DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id);
+                    $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
 
                     echo str_repeat('.', $affected);
                     $vrp_bgp_peer_count += $affected;

@@ -10,7 +10,7 @@ if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
         $extents = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);
         $dur = $extents['to'] - $extents['from'];
-        $reducefactor = round(($dur / 300 / (($vars['height'] - 100) * 3)), 0);
+        $reducefactor = round($dur / 300 / (($vars['height'] - 100) * 3), 0);
 
         if ($reducefactor < 2) {
             $reducefactor = 2;
@@ -20,7 +20,7 @@ if (is_numeric($bill_hist_id)) {
 } else {
     if ($reducefactor < 2) {
         $dur = $vars['to'] - $vars['from'];
-        $reducefactor = round(($dur / 300 / (($vars['height'] - 100) * 3)), 0);
+        $reducefactor = round($dur / 300 / (($vars['height'] - 100) * 3), 0);
 
         if ($reducefactor < 2) {
             $reducefactor = 2;
@@ -35,7 +35,7 @@ if (is_numeric($bill_hist_id)) {
 
 $n = count($graph_data['ticks']);
 $xmin = $graph_data['ticks'][0];
-$xmax = $graph_data['ticks'][($n - 1)];
+$xmax = $graph_data['ticks'][$n - 1];
 
 function TimeCallback($aVal)
 {

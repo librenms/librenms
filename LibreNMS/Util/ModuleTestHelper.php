@@ -489,7 +489,7 @@ class ModuleTestHelper
 
         foreach ($snmprec_data as $line) {
             if (! empty($line)) {
-                [$oid,] = explode('|', $line, 2);
+                [$oid] = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
         }

@@ -20,7 +20,7 @@ if ($device['os'] == 'hirschmann') {
 
         foreach ($oid as $index => $entry) {
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, 'hmPowerSupplyStatus' . $index, $state_name, 'Power Supply ' . $oid[$index]['hmPSID'], 1, 1, null, null, null, null, ($oid[$index]['hmPowerSupplyStatus'] ?? null), 'snmp', 'hmPowerSupplyStatus' . $index);
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, 'hmPowerSupplyStatus' . $index, $state_name, 'Power Supply ' . $oid[$index]['hmPSID'], 1, 1, null, null, null, null, $oid[$index]['hmPowerSupplyStatus'] ?? null, 'snmp', 'hmPowerSupplyStatus' . $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, 'hmPowerSupplyStatus' . $index);
