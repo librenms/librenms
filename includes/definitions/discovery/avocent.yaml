@@ -1,4 +1,3 @@
-mib_dir: avocent
 modules:
     sensors:
         pre-cache:
