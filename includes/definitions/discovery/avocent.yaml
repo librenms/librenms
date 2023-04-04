@@ -1,3 +1,4 @@
+mib: PM-MIB:ACS6000-MIB
 modules:
     sensors:
         pre-cache:
