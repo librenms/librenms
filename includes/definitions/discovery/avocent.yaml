@@ -4,7 +4,7 @@ modules:
             data:
                 -
                     oid:
-                        - acsSerialPortTableName
+                        - ACS6000-MIB::acsSerialPortTableName
         voltage:
             options:
                 skip_values: 0
@@ -153,7 +153,7 @@ modules:
         state:
             data:
                 -
-                    oid: acsPowerSupplyStatePw1
+                    oid: ACS6000-MIB::acsPowerSupplyStatePw1
                     num_oid: '.1.3.6.1.4.1.10418.16.2.1.8.2.0'
                     descr: Power Supply 1
                     states:
@@ -161,7 +161,7 @@ modules:
                         - { value: 2, generic: 2, graph: 1, descr: Power Off }
                         - { value: 9999, generic: 1, graph: 1, descr: Not Installed }
                 -
-                    oid: acsPowerSupplyStatePw2
+                    oid: ACS6000-MIB::acsPowerSupplyStatePw2
                     num_oid: '.1.3.6.1.4.1.10418.16.2.1.8.3.0'
                     descr: Power Supply 1
                     states:
@@ -169,7 +169,7 @@ modules:
                         - { value: 2, generic: 2, graph: 1, descr: Power Off }
                         - { value: 9999, generic: 1, graph: 1, descr: Not Installed }
                 -
-                    oid: acsSerialPortTable
+                    oid: ACS6000-MIB::acsSerialPortTable
                     num_oid: '.1.3.6.1.4.1.10418.16.2.3.2.1.3{{ $index }}'
                     index: 'acsSerialPortTableStatus.{{ $index }}'
                     descr: "{{ $acsSerialPortTableName }} Status"
@@ -241,6 +241,6 @@ modules:
         count:
             data:
                 -
-                    oid: acsActiveSessionsNumberOfSessions
+                    oid: ACS6000-MIB::acsActiveSessionsNumberOfSessions
                     num_oid: '.1.3.6.1.4.1.10418.16.2.2.1.0'
                     descr: 'Active Sessions'
