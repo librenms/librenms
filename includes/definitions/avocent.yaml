@@ -3,7 +3,6 @@ text: Avocent
 type: network
 icon: avocent
 rfc1628_compat: true
-mib_dir: avocent
 discovery:
     -
         sysDescr_regex:
