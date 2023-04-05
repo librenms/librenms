@@ -72,7 +72,7 @@ $rrd_options .= ' CDEF:avgpol=poller,datacountundef,/';
 // legend
 $rrd_options .= " 'COMMENT:Seconds             Cur       Min        Max       Avg\\n'";
 $rrd_options .= ' LINE1.25:pollerundef#' . $total_color . ":'Total      '";
-$rrd_options .= ' AREA:pollerundef#' . $total_color . "70";
+$rrd_options .= ' AREA:pollerundef#' . $total_color . '70';
 $rrd_options .= ' GPRINT:pollerundef:LAST:%8.2lf  GPRINT:pollerundef:MIN:%8.2lf';
 $rrd_options .= ' GPRINT:pollerundef:MAX:%8.2lf  GPRINT:pollerundef:AVERAGE:%8.2lf\\n';
 $rrd_options .= ' LINE1.25:avgpol#' . $device_color . ":'Per Device '";
