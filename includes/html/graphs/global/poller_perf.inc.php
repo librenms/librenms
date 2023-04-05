@@ -30,6 +30,7 @@ $scale_min = '0';
 require 'includes/html/graphs/common.inc.php';
 
 $cdef = [];
+$avg_cdef = [];
 $suffix = '';
 $cdefX = [];
 $suffixX = '';
@@ -40,6 +41,7 @@ foreach (Device::pluck('hostname') as $index => $hostname) {
         $rrd_options .= " DEF:pollerRaw$index=$rrd_filename:poller:AVERAGE";
         // change undefined to 0
         $rrd_options .= " CDEF:poller$index=pollerRaw$index,UN,0,pollerRaw$index,IF";
+        $rrd_options .= " CDEF:datapresent$index=pollerRaw$index,UN,0,1,IF";
         $cdef[] = 'poller' . $index . $suffix;
         $suffix = ',+';
         if ($graph_params->visible('previous')) {
@@ -53,19 +55,34 @@ foreach (Device::pluck('hostname') as $index => $hostname) {
     }
 }
 
+$total_color = \LibreNMS\Config::get('graph_colours.mixed.2', '36393D');
+$device_color = \LibreNMS\Config::get('graph_colours.mixed.6', '36393D');
+
+// sum all the poll times
 $rrd_options .= ' CDEF:poller=' . implode(',', $cdef);
-$rrd_options .= ' CDEF:avgpol=poller,' . count($cdef) . ',/';
-$rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg     Avg device\\n'";
-$rrd_options .= ' LINE1.25:poller#36393D:Poller';
-$rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:MIN:%6.2lf';
-$rrd_options .= ' GPRINT:poller:MAX:%6.2lf  GPRINT:poller:AVERAGE:%6.2lf';
-$rrd_options .= " 'GPRINT:avgpol:AVERAGE:%6.2lf\\n'";
+// sum the data present value to get a count
+$rrd_options .= ' CDEF:datacount=' . str_replace('poller', 'datapresent', implode(',', $cdef));
+// if no data for interval, push unknowns
+$rrd_options .= ' CDEF:pollerundef=datacount,0,EQ,UNKN,poller,IF';
+$rrd_options .= ' CDEF:datacountundef=datacount,0,EQ,UNKN,datacount,IF';
+// divide by count of datas to get accurate average
+$rrd_options .= ' CDEF:avgpol=poller,datacountundef,/';
+// legend
+$rrd_options .= " 'COMMENT:Seconds            Cur       Min        Max       Avg\\n'";
+$rrd_options .= ' LINE1.25:pollerundef#' . $total_color . ":'Total     '";
+$rrd_options .= ' AREA:pollerundef#' . $total_color . "70";
+$rrd_options .= ' GPRINT:pollerundef:LAST:%8.2lf  GPRINT:poller:MIN:%8.2lf';
+$rrd_options .= ' GPRINT:pollerundef:MAX:%8.2lf  GPRINT:poller:AVERAGE:%8.2lf\\n';
+$rrd_options .= ' LINE1.25:avgpol#' . $device_color . ":'Per Device'";
+$rrd_options .= ' AREA:avgpol#' . $device_color . '70';
+$rrd_options .= ' GPRINT:avgpol:LAST:%8.2lf  GPRINT:avgpol:MIN:%8.2lf';
+$rrd_options .= ' GPRINT:avgpol:MAX:%8.2lf  GPRINT:avgpol:AVERAGE:%8.2lf\\n';
 if ($graph_params->visible('previous')) {
     $rrd_options .= " COMMENT:' \\n'";
     $rrd_options .= ' CDEF:pollerX=' . implode(',', $cdefX);
     $rrd_options .= ' CDEF:avgpolX=pollerX,' . count($cdefX) . ',/';
     $rrd_options .= " LINE1.25:pollerX#CCCCCC:'Prev Poller'\t";
-    $rrd_options .= ' GPRINT:pollerX:MIN:%6.2lf';
-    $rrd_options .= ' GPRINT:pollerX:MAX:%6.2lf  GPRINT:pollerX:AVERAGE:%6.2lf';
-    $rrd_options .= " 'GPRINT:avgpolX:AVERAGE:%6.2lf\\n'";
+    $rrd_options .= ' GPRINT:pollerX:MIN:%8.2lf';
+    $rrd_options .= ' GPRINT:pollerX:MAX:%8.2lf  GPRINT:pollerX:AVERAGE:%8.2lf';
+    $rrd_options .= " 'GPRINT:avgpolX:AVERAGE:%8.2lf\\n'";
 }
