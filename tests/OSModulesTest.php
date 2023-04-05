@@ -64,6 +64,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      */
     public function testDataIsValid($os, $variant, $modules)
@@ -80,6 +81,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      *
      * @param  string  $os  base os
@@ -88,6 +90,8 @@ class OSModulesTest extends DBTestCase
      */
     public function testOS($os, $variant, $modules)
     {
+        // Lock testing time
+        $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
         $this->requireSnmpsim();  // require snmpsim for tests
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
@@ -145,6 +149,7 @@ class OSModulesTest extends DBTestCase
         }
 
         DeviceCache::flush(); // clear cached devices
+        $this->travelBack();
     }
 
     public function dumpedDataProvider()

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   viewBox="0 0 52.916666 15.875"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="lambdatrail.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="15.474052"
+     inkscape:cx="28.887068"
+     inkscape:cy="26.108223"
+     inkscape:window-width="2560"
+     inkscape:window-height="1380"
+     inkscape:window-x="1920"
+     inkscape:window-y="778"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     units="px" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient26446">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop26442" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop26444" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient26446"
+       id="linearGradient26448"
+       x1="2.6147276"
+       y1="11.522615"
+       x2="28.425646"
+       y2="11.522615"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       aria-label="λ"
+       transform="matrix(0.11982429,0,0,0.0739929,-46.28129,33.4911)"
+       id="text1058"
+       style="font-size:198.359px;letter-spacing:0px;word-spacing:0px;fill:#e50182;stroke-width:1.48769">
+      <path
+         d="M 95.895737,67.465215 145.96976,201.22194 H 127.08304 L 96.670577,121.02602 59.284555,201.22194 H 40.397835 L 87.953629,97.199693 80.78636,78.022408 Q 76.234176,65.818681 65.870694,65.818681 H 56.572616 V 50.515594 l 11.332032,0.19371 q 21.889225,0.290565 27.991089,16.755911 z"
+         id="path12743" />
+    </g>
+    <g
+       aria-label="λ"
+       transform="matrix(0.11982429,0,0,0.0739929,-35.380684,12.164081)"
+       id="text1058-3"
+       style="font-size:198.359px;letter-spacing:0px;word-spacing:0px;fill:#e50182;stroke-width:1.48769">
+      <path
+         d="M 95.895737,67.465215 145.96976,201.22194 H 127.08304 L 96.670577,121.02602 59.284555,201.22194 H 40.397835 L 87.953629,97.199693 80.78636,78.022408 Q 76.234176,65.818681 65.870694,65.818681 H 56.572616 V 50.515594 l 11.332032,0.19371 q 21.889225,0.290565 27.991089,16.755911 z"
+         id="path12743-6"
+         style="fill:#ffffff;fill-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.1404px;line-height:1.25;font-family:sans-serif;letter-spacing:2px;word-spacing:0px;fill:#e50182;fill-opacity:1;stroke:none;stroke-width:0.22851"
+       x="3.1029198"
+       y="7.6008506"
+       id="text15916"><tspan
+         sodipodi:role="line"
+         x="3.1029198"
+         y="7.6008506"
+         id="tspan15918"
+         style="fill:#e50182;fill-opacity:1;stroke-width:0.22851">LλMBDA</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.1404px;line-height:1.25;font-family:sans-serif;letter-spacing:1.5px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:#e50182;stroke-width:0.18897638;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="4.0456762"
+       y="15.366861"
+       id="text15916-7"><tspan
+         sodipodi:role="line"
+         x="4.0456762"
+         y="15.366861"
+         id="tspan15918-5"
+         style="fill:#ffffff;fill-opacity:1;stroke:#e50182;stroke-width:0.18897638;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">TRAIL</tspan></text>
+  </g>
+</svg>

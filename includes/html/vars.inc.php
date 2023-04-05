@@ -7,7 +7,7 @@ foreach ($_GET as $name => $value) {
 }
 
 foreach ($_POST as $name => $value) {
-    $vars[$name] = ($value);
+    $vars[$name] = $value;
 }
 
 // don't leak login and other data

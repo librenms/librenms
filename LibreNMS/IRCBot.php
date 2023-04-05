@@ -225,7 +225,7 @@ class IRCBot
             return false;
         }
 
-        if (($this->socket['alert'] = fopen($f, 'r+'))) {
+        if ($this->socket['alert'] = fopen($f, 'r+')) {
             $this->log('Opened Alert-File');
             stream_set_blocking($this->socket['alert'], false);
 
@@ -246,7 +246,7 @@ class IRCBot
         $r = strlen($r);
         if (strstr($this->buff[$buff], "\n")) {
             $tmp = explode("\n", $this->buff[$buff], 2);
-            $this->buff[$buff] = substr($this->buff[$buff], (strlen($tmp[0]) + 1));
+            $this->buff[$buff] = substr($this->buff[$buff], strlen($tmp[0]) + 1);
             if ($this->debug) {
                 $this->log("Returning buffer '$buff': '" . trim($tmp[0]) . "'");
             }
@@ -369,7 +369,7 @@ class IRCBot
                 }
             }
 
-            if (($this->config['irc_ctcp']) && (preg_match('/^:' . chr(1) . '.*/', $ex[3]))) {
+            if ($this->config['irc_ctcp'] && preg_match('/^:' . chr(1) . '.*/', $ex[3])) {
                 // Handle CTCP
                 $ctcp = trim(preg_replace('/[^A-Z]/', '', $ex[3]));
                 $ctcp_reply = null;
@@ -529,7 +529,7 @@ class IRCBot
         if ($try > $this->max_retry) {
             $this->log('Failed too many connection attempts, aborting');
 
-            return exit();
+            return exit;
         }
 
         $this->log('Trying to connect (' . ($try + 1) . ') to ' . $this->server . ':' . $this->port . ($this->ssl ? ' (SSL)' : ''));
@@ -612,7 +612,7 @@ class IRCBot
             } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
 
-                return exit();
+                return exit;
             }
         }
 
@@ -765,7 +765,7 @@ class IRCBot
         if ($this->user['level'] == 10) {
             $this->ircRaw('QUIT :Requested');
 
-            return exit();
+            return exit;
         } else {
             return $this->respond('Permission denied.');
         }

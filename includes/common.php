@@ -820,7 +820,7 @@ function string_to_float($value)
  */
 function uw_to_dbm($value)
 {
-    return $value == 0 ? $value : 10 * log10($value / 1000);
+    return $value == 0 ? -60 : 10 * log10($value / 1000);
 }
 
 /**
@@ -829,7 +829,7 @@ function uw_to_dbm($value)
  */
 function mw_to_dbm($value)
 {
-    return $value == 0 ? $value : 10 * log10($value);
+    return $value == 0 ? -60 : 10 * log10($value);
 }
 
 /**

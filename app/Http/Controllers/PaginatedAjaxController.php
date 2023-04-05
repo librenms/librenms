@@ -76,6 +76,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function searchFields($request)
@@ -88,6 +89,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function filterFields($request)
@@ -100,6 +102,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function sortFields($request)

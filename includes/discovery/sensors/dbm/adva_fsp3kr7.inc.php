@@ -18,8 +18,8 @@
 
 //********* ADVA FSP3000 R7 Series
 
-    $multiplier = 1;
-    $divisor = 10;
+$multiplier = 1;
+$divisor = 10;
 
 foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
     if ($entry['entityFacilityAidString'] and $entry['pmSnapshotCurrentInputPower']) {

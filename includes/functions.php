@@ -245,7 +245,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
+        if (! (new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success()) {
             throw new HostUnreachablePingException($host);
         }
     }
@@ -970,7 +970,7 @@ function create_sensor_to_state_index($device, $state_name, $index)
 
 function delta_to_bits($delta, $period)
 {
-    return round(($delta * 8 / $period), 2);
+    return round($delta * 8 / $period, 2);
 }
 
 function report_this($message)

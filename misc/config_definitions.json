@@ -1776,6 +1776,13 @@
             "default": null,
             "type": "array"
         },
+        "graph_stat_percentile_disable": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 7,
+            "type": "boolean"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
@@ -1931,6 +1938,55 @@
                 "773177",
                 "5B185B",
                 "3F003F"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow": {
+            "default": [
+                "881177",
+                "AA3355",
+                "CC6666",
+                "EE9944",
+                "EEDD00",
+                "99DD55",
+                "44DD88",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_green": {
+            "default": [
+                "99DD55",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_purple": {
+            "default": [
+                "663399",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
             ],
             "type": "array"
         },
@@ -5223,6 +5279,13 @@
             "default": 1200,
             "type": "integer",
             "units": "seconds"
+        },
+        "snmp.max_oid": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 10
         },
         "snmp.max_repeaters": {
             "group": "poller",

@@ -106,7 +106,7 @@ class Port extends DeviceRelatedModel
      */
     public function getDescription(): string
     {
-        return (string) ($this->ifAlias);
+        return (string) $this->ifAlias;
     }
 
     /**

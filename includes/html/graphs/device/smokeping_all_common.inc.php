@@ -22,9 +22,9 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . " RTT      Loss    SDev   RTT\:SDev\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . " RTT      Loss    SDev   RTT\:SDev\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l'";
 }
 
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
