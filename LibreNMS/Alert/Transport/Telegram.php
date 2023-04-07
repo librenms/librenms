@@ -28,8 +28,6 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use function preg_replace;
-use const true;
 
 class Telegram extends Transport
 {
