@@ -782,7 +782,7 @@ foreach ($ports as $port) {
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
-                    $oid_diff = (($this_port[$oid] ?? 0) - $port[$oid]);
+                    $oid_diff = (intval($this_port[$oid] ?? 0) - intval($port[$oid]));
                     $oid_rate = ($oid_diff / $polled_period);
                     if ($oid_rate < 0) {
                         $oid_rate = '0';
