@@ -321,10 +321,8 @@ class ServiceTemplateController extends Controller
         ServiceTemplateController::applyDeviceGroups($template);
 
         // remove any remaining services no longer in the correct device group
-        foreach ($template->groups as $group) { // notInDeviceGroup expects a group id, not a collection.
-            foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($group->id)->get() as $device) {
-                Service::where('device_id', $device->device_id)->where('service_template_id', $template->id)->delete();
-            }
+        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->pluck('device_id') as $device_id) {
+            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
         }
         $msg = __('All Service Templates have been applied');
 
