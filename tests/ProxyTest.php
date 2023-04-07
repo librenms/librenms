@@ -28,12 +28,12 @@ use LibreNMS\Util\Version;
 
 class ProxyTest extends TestCase
 {
-    public function testClientAgentIsCorrect()
+    public function testClientAgentIsCorrect(): void
     {
         $this->assertEquals('LibreNMS/' . Version::VERSION, Http::client()->getOptions()['headers']['User-Agent']);
     }
 
-    public function testProxyIsNotSet()
+    public function testProxyIsNotSet(): void
     {
         Config::set('http_proxy', '');
         Config::set('https_proxy', '');
@@ -44,7 +44,7 @@ class ProxyTest extends TestCase
         $this->assertEmpty($client_options['proxy']['no']);
     }
 
-    public function testProxyIsSet()
+    public function testProxyIsSet(): void
     {
         Config::set('http_proxy', 'http://proxy:5000');
         Config::set('https_proxy', 'tcp://proxy:5183');
@@ -60,12 +60,11 @@ class ProxyTest extends TestCase
         ], $client_options['proxy']['no']);
     }
 
-    public function testProxyIsSetFromEnv()
+    public function testProxyIsSetFromEnv(): void
     {
         Config::set('http_proxy', '');
         Config::set('https_proxy', '');
         Config::set('no_proxy', '');
-
 
         putenv('HTTP_PROXY=someproxy:3182');
         putenv('HTTPS_PROXY=https://someproxy:3182');
