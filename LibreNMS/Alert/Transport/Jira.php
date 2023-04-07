@@ -38,7 +38,7 @@ class Jira extends Transport
 
         $prjkey = $this->config['jira-key'];
         $issuetype = $this->config['jira-type'];
-        $details = empty($obj['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
+        $details = empty($alert_data['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
         $description = $alert_data['msg'];
         $url = $this->config['jira-url'] . '/rest/api/latest/issue';
 
