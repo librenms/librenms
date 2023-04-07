@@ -56,7 +56,7 @@ class Pagerduty extends Transport
         ];
 
         // EU service region
-        $url = match($this->config['region']) {
+        $url = match ($this->config['region']) {
             'EU' => 'https://events.eu.pagerduty.com/v2/enqueue',
             'US' => 'https://events.pagerduty.com/v2/enqueue',
             default => $this->config['custom-url'],

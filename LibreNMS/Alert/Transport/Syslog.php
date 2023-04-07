@@ -49,7 +49,6 @@ class Syslog extends Transport
                 }
             }
             $syslog_host = $this->config['syslog-host'];
-
         }
 
         if (! empty($this->config['syslog-port'])) {

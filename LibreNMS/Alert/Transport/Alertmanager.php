@@ -34,7 +34,6 @@ class Alertmanager extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-
         $url = $this->config['alertmanager-url'];
         $username = $this->config['alertmanager-username'];
         $password = $this->config['alertmanager-password'];

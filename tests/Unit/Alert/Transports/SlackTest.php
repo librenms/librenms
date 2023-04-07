@@ -51,21 +51,21 @@ class SlackTest extends TestCase
                 $request->method() == 'POST' &&
                 $request->hasHeader('Content-Type', 'application/json') &&
                 $request->data() == [
-                    "attachments" => [
+                    'attachments' => [
                         [
-                            "fallback" => "This is a test alert",
-                            "color" => "#ff0000",
-                            "title" => "Testing transport from LibreNMS",
-                            "text" => "This is a test alert",
-                            "mrkdwn_in" => [
-                                "text",
-                                "fallback",
+                            'fallback' => 'This is a test alert',
+                            'color' => '#ff0000',
+                            'title' => 'Testing transport from LibreNMS',
+                            'text' => 'This is a test alert',
+                            'mrkdwn_in' => [
+                                'text',
+                                'fallback',
                             ],
-                            "author_name" => null,
-                        ]
+                            'author_name' => null,
+                        ],
                     ],
-                    "channel" => null,
-                    "icon_emoji" => null,
+                    'channel' => null,
+                    'icon_emoji' => null,
                 ];
         });
     }
@@ -91,21 +91,21 @@ class SlackTest extends TestCase
                 $request->method() == 'POST' &&
                 $request->hasHeader('Content-Type', 'application/json') &&
                 $request->data() == [
-                    "attachments" => [
+                    'attachments' => [
                         [
-                            "fallback" => "This is a test alert",
-                            "color" => "#ff0000",
-                            "title" => "Testing transport from LibreNMS",
-                            "text" => "This is a test alert",
-                            "mrkdwn_in" => [
-                                "text",
-                                "fallback",
+                            'fallback' => 'This is a test alert',
+                            'color' => '#ff0000',
+                            'title' => 'Testing transport from LibreNMS',
+                            'text' => 'This is a test alert',
+                            'mrkdwn_in' => [
+                                'text',
+                                'fallback',
                             ],
-                            "author_name" => 'Me',
-                        ]
+                            'author_name' => 'Me',
+                        ],
                     ],
-                    "channel" => 'Alerts',
-                    "icon_emoji" => ':smile:',
+                    'channel' => 'Alerts',
+                    'icon_emoji' => ':smile:',
                 ];
         });
     }
@@ -134,21 +134,21 @@ class SlackTest extends TestCase
                 $request->method() == 'POST' &&
                 $request->hasHeader('Content-Type', 'application/json') &&
                 $request->data() == [
-                    "attachments" => [
+                    'attachments' => [
                         [
-                            "fallback" => "This is a test alert",
-                            "color" => "#ff0000",
-                            "title" => "Testing transport from LibreNMS",
-                            "text" => "This is a test alert",
-                            "mrkdwn_in" => [
-                                "text",
-                                "fallback",
+                            'fallback' => 'This is a test alert',
+                            'color' => '#ff0000',
+                            'title' => 'Testing transport from LibreNMS',
+                            'text' => 'This is a test alert',
+                            'mrkdwn_in' => [
+                                'text',
+                                'fallback',
                             ],
-                            "author_name" => 'Other',
-                        ]
+                            'author_name' => 'Other',
+                        ],
                     ],
-                    "channel" => 'Critical',
-                    "icon_emoji" => ':slight_smile:',
+                    'channel' => 'Critical',
+                    'icon_emoji' => ':slight_smile:',
                 ];
         });
     }

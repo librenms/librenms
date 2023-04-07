@@ -73,7 +73,7 @@ class Sensu extends Transport
 
         $data = $this->generateData($alert_data, $this->calculateStatus($alert_data['state'], $alert_data['severity']));
 
-        $result = $client->post($url  . '/events', $data);
+        $result = $client->post($url . '/events', $data);
 
         if ($result->successful()) {
             return true;
@@ -85,7 +85,7 @@ class Sensu extends Transport
     private function generateData(array $alert_data, int $status, int $offset = 0): array
     {
         $namespace = $this->config['sensu-namespace'] ?: 'default';
-        
+
         return [
             'check' => [
                 'metadata' => [

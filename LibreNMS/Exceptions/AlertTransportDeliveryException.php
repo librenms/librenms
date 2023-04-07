@@ -34,7 +34,6 @@ class AlertTransportDeliveryException extends \Exception
         protected string $template = '',
         protected array $params = []
     ) {
-
         $name = $data['transport_name'] ?? '';
 
         $message = "Transport delivery failed with $code for $name: $response";
