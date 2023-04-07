@@ -3761,7 +3761,7 @@
             "validate": {
                 "value": [
                     "nullable",
-                    "starts_with:http://,https://"
+                    "starts_with:http://,https://,tcp://"
                 ]
             }
         },
@@ -3773,7 +3773,7 @@
             "validate": {
                 "value": [
                     "nullable",
-                    "starts_with:http://,https://"
+                    "starts_with:http://,https://,tcp://"
                 ]
             }
         },

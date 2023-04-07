@@ -40,7 +40,7 @@ class Proxy
     public static function https(): string
     {
         // use local_only to avoid CVE-2016-5385
-        return getenv('https_proxy', local_only: true) ?: getenv('HTTPS_PROXY', local_only: true) ?: Config::get('http_proxy', '');
+        return getenv('https_proxy', local_only: true) ?: getenv('HTTPS_PROXY', local_only: true) ?: Config::get('https_proxy', '');
     }
 
     public static function ignore(): array
