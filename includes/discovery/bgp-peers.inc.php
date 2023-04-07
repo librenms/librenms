@@ -12,7 +12,7 @@ if (file_exists(Config::get('install_dir') . "/includes/discovery/bgp-peers/{$de
 }
 
 if (empty($bgpLocalAs)) {
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    $bgpLocalAs = snmp_get($device, 'bgpLocalAs.0', '-OQUsv', 'BGP4-MIB');
 }
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
