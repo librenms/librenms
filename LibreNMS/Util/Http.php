@@ -1,6 +1,6 @@
 <?php
 /**
- * BaseApi.php
+ * Http.php
  *
  * -Description-
  *
@@ -19,27 +19,31 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\ApiClients;
+namespace LibreNMS\Util;
 
-use LibreNMS\Util\Http;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http as LaravelHttp;
+use LibreNMS\Config;
 
-class BaseApi
+class Http
 {
-    protected string $base_uri = '';
-    protected int $timeout = 3;
-    private ?\Illuminate\Http\Client\PendingRequest $client = null;
-
-    protected function getClient(): \Illuminate\Http\Client\PendingRequest
+    /**
+     * Create a new client with proxy set if appropriate and a distinct User-Agent header
+     */
+    public static function client(): PendingRequest
     {
-        if (is_null($this->client)) {
-            $this->client = Http::client()->baseUrl($this->base_uri)
-            ->timeout($this->timeout);
-        }
-
-        return $this->client;
+        return LaravelHttp::withOptions([
+            'proxy' => [
+                'http' => Proxy::http(),
+                'https' => Proxy::https(),
+                'no' => Proxy::ignore(),
+            ],
+        ])->withHeaders([
+            'User-Agent' => Config::get('project_name') . '/' . Version::VERSION, // we don't need fine version here, just rough
+        ]);
     }
 }

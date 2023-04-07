@@ -22,21 +22,7 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Util\Proxy;
-
 class ProxyTest extends TestCase
 {
-    public function testShouldBeUsed(): void
-    {
-        $this->assertTrue(Proxy::shouldBeUsed('http://example.com/foobar'));
-        $this->assertTrue(Proxy::shouldBeUsed('foo/bar'));
-        $this->assertTrue(Proxy::shouldBeUsed('192.168.0.1'));
-        $this->assertTrue(Proxy::shouldBeUsed('2001:db8::8a2e:370:7334'));
-
-        $this->assertFalse(Proxy::shouldBeUsed('http://localhost/foobar'));
-        $this->assertFalse(Proxy::shouldBeUsed('localhost/foobar'));
-        $this->assertFalse(Proxy::shouldBeUsed('127.0.0.1'));
-        $this->assertFalse(Proxy::shouldBeUsed('127.0.0.1:1337'));
-        $this->assertFalse(Proxy::shouldBeUsed('::1'));
-    }
+    // TODO tests
 }

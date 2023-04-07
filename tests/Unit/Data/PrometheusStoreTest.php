@@ -48,7 +48,7 @@ class PrometheusStoreTest extends TestCase
         Config::set('prometheus.url', 'http://fake:9999');
     }
 
-    public function testFailWrite()
+    public function testFailWrite(): void
     {
         $this->mockGuzzleClient([
             new Response(422, [], 'Bad response'),
@@ -64,7 +64,7 @@ class PrometheusStoreTest extends TestCase
         $prometheus->put(['hostname' => 'test'], 'none', [], ['one' => 1]);
     }
 
-    public function testSimpleWrite()
+    public function testSimpleWrite(): void
     {
         $this->mockGuzzleClient([
             new Response(200),

@@ -9,7 +9,6 @@
  */
 
 use App\Models\Device;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
@@ -23,7 +22,6 @@ use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -759,14 +757,6 @@ function guidv4($data)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-/**
- * @param $curl
- */
-function set_curl_proxy($curl)
-{
-    \LibreNMS\Util\Proxy::applyToCurl($curl);
-}
-
 function target_to_id($target)
 {
     if ($target[0] . $target[1] == 'g:') {
@@ -1197,7 +1187,7 @@ function cache_mac_oui()
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
 
             echo '  -> Downloading ...' . PHP_EOL;
-            $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($mac_oui_url);
+            $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
             foreach (explode("\n", $csv_data) as $csv_line) {
@@ -1255,7 +1245,7 @@ function cache_peeringdb()
             $ix_keep = [];
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
@@ -1276,7 +1266,7 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $ix_keep[] = $pdb_ix_id;
-                    $get_ix = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get("$peeringdb_url/netixlan?ix_id=$ixid");
+                    $get_ix = \LibreNMS\Util\Http::client()->get("$peeringdb_url/netixlan?ix_id=$ixid");
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};

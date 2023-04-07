@@ -23,7 +23,7 @@ class ApiTransportTest extends TestCase
 
         $obj = ['msg' => "This is a multi-line\nalert."];
         $opts = Config::get('alert.transports.' . $transport->transport_type);
-        $result = $transport->instance()->deliverAlert($obj, $opts);
+        $result = $transport->instance()->deliverAlert($obj);
 
         $this->assertTrue($result);
 
@@ -48,7 +48,7 @@ class ApiTransportTest extends TestCase
 
         $obj = ['msg' => "This is a post multi-line\nalert."];
         $opts = Config::get('alert.transports.' . $transport->transport_type);
-        $result = $transport->instance()->deliverAlert($obj, $opts);
+        $result = $transport->instance()->deliverAlert($obj);
 
         $this->assertTrue($result);
 

@@ -823,8 +823,12 @@ return [
             'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
         'http_proxy' => [
-            'description' => 'HTTP(S) Proxy',
-            'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.',
+            'description' => 'HTTP Proxy',
+            'help' => 'Set this as a fallback if http_proxy environment variable is not available.',
+        ],
+        'https_proxy' => [
+            'description' => 'HTTPS Proxy',
+            'help' => 'Set this as a fallback if https_proxy environment variable is not available.',
         ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
@@ -967,6 +971,10 @@ return [
         ],
         'nmap' => [
             'description' => 'Path to nmap',
+        ],
+        'no_proxy' => [
+            'description' => 'Proxy Exceptions',
+            'help' => 'Set this as a fallback if no_proxy environment variable is not available. Comma seperated list of IPs, hosts or domains to ignore.',
         ],
         'opentsdb' => [
             'enable' => [
