@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.1004.28.5",
                     "sysDescr": "CBS350-24P-4G 24-Port Gigabit PoE Managed Switch",
                     "sysContact": "<private>",
-                    "version": "",
+                    "version": null,
                     "hardware": "CBS350-24P-4G",
                     "features": null,
                     "location": "<private>",
