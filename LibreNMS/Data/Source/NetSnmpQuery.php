@@ -506,7 +506,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             return array_chunk($oids, $max_oids);
         }
 
-        return $oids;
+        return [$oids]; // wrap in array for execMultiple so they are all done at once
     }
 
     private function parseOid(array|string $oid): array
