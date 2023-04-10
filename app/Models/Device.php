@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -567,7 +568,7 @@ class Device extends BaseModel
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
                 ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
+                ->whereIn('device_group_id', Arr::wrap($deviceGroup));
             }
         );
     }
@@ -578,7 +579,7 @@ class Device extends BaseModel
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
                 ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
+                ->whereIn('device_group_id', Arr::wrap($deviceGroup));
             }
         );
     }
