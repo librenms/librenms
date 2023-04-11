@@ -1012,7 +1012,7 @@ function get_oxidized_nodes_list()
  */
 function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (Config::get('webui.graph_stacked') == true or $force_stack == true) {
+    if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
