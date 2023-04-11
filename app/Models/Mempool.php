@@ -87,7 +87,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         }
 
         if ($percent == null) {
-            $this->mempool_perc = Number::calculatePercent($this->mempool_used, $this->mempool_total);
+            $this->mempool_perc = (int) Number::calculatePercent($this->mempool_used, $this->mempool_total, 0);
         }
 
         return $this;
