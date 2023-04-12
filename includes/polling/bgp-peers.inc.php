@@ -30,7 +30,15 @@ if (! empty($peers)) {
     } else {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
     }
-    if (empty($peer_data_check)) {
+    // If a Cisco device has BGP peers in VRF(s), but no BGP peers in
+    // the default VRF: don't fall back to the default MIB, to avoid
+    // skipping IPv6 peers (CISCO-BGP4-MIB is required.)
+    // count(getVrfContexts) returns VRF's with a configured SNMP context
+    // e.g. snmp-server context context_name vrf vrf_name
+    // "> 0" because the default VRF is only included in the count,
+    // if it has a switch configured SNMP context.
+    $cisco_with_vrf = ($device['os_group'] == 'cisco' && count(DeviceCache::getPrimary()->getVrfContexts()) > 0);
+    if (empty($peer_data_check) && ! $cisco_with_vrf) {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         $generic = true;
     }
@@ -53,7 +61,7 @@ if (! empty($peers)) {
             // cbgpPeer2RemoteAs, resulting in empty $peer_data_check.
             // Without the or clause, we won't see the VRF BGP peers.
             // ($peer_data_check isn't used in the Cisco code path,)
-            if (count($peer_data_check) > 0 || ($device['os_group'] == 'cisco' && count(DeviceCache::getPrimary()->getVrfContexts()) > 1)) {
+            if (count($peer_data_check) > 0 || $cisco_with_vrf) {
                 if ($generic) {
                     echo "\nfallback to default mib";
 
