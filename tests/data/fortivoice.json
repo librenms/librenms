@@ -7,13 +7,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.12356.115",
                     "sysDescr": "<host-name>",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
+                    "version": "v6.0.11(GA), build285, 2022.03.28",
+                    "hardware": "FortiVoice-500F",
                     "features": null,
                     "location": "<private>",
                     "os": "fortivoice",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "FO500FT919000082",
                     "icon": "fortinet.svg"
                 }
             ]
