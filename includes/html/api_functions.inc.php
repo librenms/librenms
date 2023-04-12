@@ -1050,8 +1050,7 @@ function get_port_info(Illuminate\Http\Request $request)
     $port_id = $request->route('portid');
 
     return check_port_permission($port_id, null, function ($port_id) {
-        // use hostname as device_id if it's all digits
-        $port = dbFetchRows('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
+        $port = Port::with('vlans')->where('port_id',$port_id)->get();
 
         return api_success($port, 'port');
     });
