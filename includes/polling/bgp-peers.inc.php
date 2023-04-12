@@ -37,7 +37,9 @@ if (! empty($peers)) {
     // e.g. snmp-server context context_name vrf vrf_name
     // "> 0" because the default VRF is only included in the count,
     // if it has a switch configured SNMP context.
-    $cisco_with_vrf = ($device['os_group'] == 'cisco' && count(DeviceCache::getPrimary()->getVrfContexts()) > 0);
+    // The issues occured on NX-OS (Nexus) and IOS-XR (ASR) devices.
+    // Using os_group 'cisco' breaks the 3560g snmpsim tests.
+    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && count(DeviceCache::getPrimary()->getVrfContexts()) > 0);
     if (empty($peer_data_check) && ! $cisco_with_vrf) {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         $generic = true;
