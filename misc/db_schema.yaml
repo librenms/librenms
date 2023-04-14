@@ -1448,7 +1448,7 @@ ports:
     - { Field: ifAlias, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifPhysAddress, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifLastChange, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: ifVlan, Type: varchar(8), 'Null': false, Extra: '' }
+    - { Field: ifVlan, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

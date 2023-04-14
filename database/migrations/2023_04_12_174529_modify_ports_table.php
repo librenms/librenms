@@ -14,7 +14,7 @@ class ModifyPortsTable extends Migration
     public function up()
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->string('ifVlan', 8)->nullable()->change();
+            $table->string('ifVlan', 8)->nullable()->default(null)->change();
             $table->dropColumn(['ifHardType', 'counter_in', 'counter_out', 'detailed', 'ifPromiscuousMode']);
         });
     }
