@@ -22,27 +22,27 @@ use Spatie\LaravelIgnition\FlareMiddleware\AddQueries;
 
 return [
      /*
-      |
-      |--------------------------------------------------------------------------
-      | Flare API key
-      |--------------------------------------------------------------------------
-      |
-      | Specify Flare's API key below to enable error reporting to the service.
-      |
-      | More info: https://flareapp.io/docs/general/projects
-      |
-      */
+       |
+       |--------------------------------------------------------------------------
+       | Flare API key
+       |--------------------------------------------------------------------------
+       |
+       | Specify Flare's API key below to enable error reporting to the service.
+       |
+       | More info: https://flareapp.io/docs/general/projects
+       |
+       */
 
      'key' => env('FLARE_KEY', 'quYFBTFNKHLBqFCoeo5yDVOQNbs6muV1'),
 
      /*
-      |--------------------------------------------------------------------------
-      | Middleware
-      |--------------------------------------------------------------------------
-      |
-      | These middleware will modify the contents of the report sent to Flare.
-      |
-      */
+       |--------------------------------------------------------------------------
+       | Middleware
+       |--------------------------------------------------------------------------
+       |
+       | These middleware will modify the contents of the report sent to Flare.
+       |
+       */
 
      'flare_middleware' => [
          RemoveRequestIp::class,
@@ -52,10 +52,10 @@ return [
          AddExceptionInformation::class,
          AddDumps::class,
          /*
-          AddLogs::class => [
-              'maximum_number_of_collected_logs' => 200,
-          ],
-          */
+           AddLogs::class => [
+               'maximum_number_of_collected_logs' => 200,
+           ],
+           */
          AddQueries::class => [
              'maximum_number_of_collected_queries' => 50,
              'report_query_bindings' => true,
@@ -84,14 +84,14 @@ return [
      ],
 
      /*
-      |--------------------------------------------------------------------------
-      | Reporting log statements
-      |--------------------------------------------------------------------------
-      |
-      | If this setting is `false` log statements won't be sent as events to Flare,
-      | no matter which error level you specified in the Flare log channel.
-      |
-      */
+       |--------------------------------------------------------------------------
+       | Reporting log statements
+       |--------------------------------------------------------------------------
+       |
+       | If this setting is `false` log statements won't be sent as events to Flare,
+       | no matter which error level you specified in the Flare log channel.
+       |
+       */
 
      'send_logs_as_events' => false,
  ];
