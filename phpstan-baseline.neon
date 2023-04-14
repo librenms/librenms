@@ -1406,11 +1406,6 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/TwoFactor.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\TwoFactor\\:\\:\\$base32 has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php

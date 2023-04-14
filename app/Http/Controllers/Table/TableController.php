@@ -77,7 +77,7 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param  LengthAwarePaginator  $paginator
+     * @param  LengthAwarePaginator|\Countable  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)

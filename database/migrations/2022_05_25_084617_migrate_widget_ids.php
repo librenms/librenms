@@ -20,8 +20,8 @@ class MigrateWidgetIds extends Migration
         $this->map = DB::table('widgets')->pluck('widget', 'widget_id');
 
         UserWidget::query()->chunk(1000, function (Collection $widgets) {
-            $widgets->each(function ($widget) {
-                $widget->widget = $this->map[$widget->widget_id];
+            $widgets->each(function (UserWidget $widget) {
+                $widget->widget = $this->map[$widget->getAttribute('widget_id')];
                 $widget->save();
             });
         });
