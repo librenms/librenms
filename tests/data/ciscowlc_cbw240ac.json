@@ -46,7 +46,7 @@
                     "ifAlias": "Unit: 0 Slot: 0 Port: 1 Gigabit - Level 0x8010001",
                     "ifPhysAddress": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
