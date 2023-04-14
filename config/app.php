@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
 
 return [
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Name
      |--------------------------------------------------------------------------
@@ -23,9 +23,9 @@ return [
      |
      */
 
-     'name' => env('APP_NAME', 'LibreNMS'),
+    'name' => env('APP_NAME', 'LibreNMS'),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Environment
      |--------------------------------------------------------------------------
@@ -36,9 +36,9 @@ return [
      |
      */
 
-     'env' => env('APP_ENV', 'production'),
+    'env' => env('APP_ENV', 'production'),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Debug Mode
      |--------------------------------------------------------------------------
@@ -49,9 +49,9 @@ return [
      |
      */
 
-     'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool) env('APP_DEBUG', false),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application URL
      |--------------------------------------------------------------------------
@@ -62,11 +62,11 @@ return [
      |
      */
 
-     'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost'),
 
-     'asset_url' => env('ASSET_URL', null),
+    'asset_url' => env('ASSET_URL', null),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Timezone
      |--------------------------------------------------------------------------
@@ -77,9 +77,9 @@ return [
      |
      */
 
-     'timezone' => ini_get('date.timezone') ?: 'UTC', // use existing timezone
+    'timezone' => ini_get('date.timezone') ?: 'UTC', // use existing timezone
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Locale Configuration
      |--------------------------------------------------------------------------
@@ -90,9 +90,9 @@ return [
      |
      */
 
-     'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'en'),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Application Fallback Locale
      |--------------------------------------------------------------------------
@@ -103,9 +103,9 @@ return [
      |
      */
 
-     'fallback_locale' => 'en',
+    'fallback_locale' => 'en',
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Faker Locale
      |--------------------------------------------------------------------------
@@ -116,9 +116,9 @@ return [
      |
      */
 
-     'faker_locale' => 'en_US',
+    'faker_locale' => 'en_US',
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Encryption Key
      |--------------------------------------------------------------------------
@@ -129,9 +129,9 @@ return [
      |
      */
 
-     'key' => env('APP_KEY'),
+    'key' => env('APP_KEY'),
 
-     'cipher' => 'AES-256-CBC',
+    'cipher' => 'AES-256-CBC',
 
     /*
     |--------------------------------------------------------------------------
@@ -162,56 +162,56 @@ return [
     |
     */
 
-     'providers' => [
+    'providers' => [
 
-         /*
+        /*
           * Laravel Framework Service Providers...
           */
-         Illuminate\Auth\AuthServiceProvider::class,
-         Illuminate\Broadcasting\BroadcastServiceProvider::class,
-         Illuminate\Bus\BusServiceProvider::class,
-         Illuminate\Cache\CacheServiceProvider::class,
-         Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
-         Illuminate\Cookie\CookieServiceProvider::class,
-         Illuminate\Database\DatabaseServiceProvider::class,
-         Illuminate\Encryption\EncryptionServiceProvider::class,
-         Illuminate\Filesystem\FilesystemServiceProvider::class,
-         Illuminate\Foundation\Providers\FoundationServiceProvider::class,
-         Illuminate\Hashing\HashServiceProvider::class,
-         Illuminate\Mail\MailServiceProvider::class,
-         Illuminate\Notifications\NotificationServiceProvider::class,
-         Illuminate\Pagination\PaginationServiceProvider::class,
-         Illuminate\Pipeline\PipelineServiceProvider::class,
-         Illuminate\Queue\QueueServiceProvider::class,
-         Illuminate\Redis\RedisServiceProvider::class,
-         Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
-         Illuminate\Session\SessionServiceProvider::class,
-         Illuminate\Translation\TranslationServiceProvider::class,
-         Illuminate\Validation\ValidationServiceProvider::class,
-         Illuminate\View\ViewServiceProvider::class,
+        Illuminate\Auth\AuthServiceProvider::class,
+        Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        Illuminate\Bus\BusServiceProvider::class,
+        Illuminate\Cache\CacheServiceProvider::class,
+        Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+        Illuminate\Cookie\CookieServiceProvider::class,
+        Illuminate\Database\DatabaseServiceProvider::class,
+        Illuminate\Encryption\EncryptionServiceProvider::class,
+        Illuminate\Filesystem\FilesystemServiceProvider::class,
+        Illuminate\Foundation\Providers\FoundationServiceProvider::class,
+        Illuminate\Hashing\HashServiceProvider::class,
+        Illuminate\Mail\MailServiceProvider::class,
+        Illuminate\Notifications\NotificationServiceProvider::class,
+        Illuminate\Pagination\PaginationServiceProvider::class,
+        Illuminate\Pipeline\PipelineServiceProvider::class,
+        Illuminate\Queue\QueueServiceProvider::class,
+        Illuminate\Redis\RedisServiceProvider::class,
+        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+        Illuminate\Session\SessionServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\View\ViewServiceProvider::class,
 
-         /*
+        /*
           * Package Service Providers...
           */
 
-         /*
+        /*
           * LibreNMS Service Providers...
           */
-         App\Providers\ConfigServiceProvider::class,
-         App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded
-         App\Providers\AppServiceProvider::class,
-         App\Providers\CliServiceProvider::class,
-         App\Providers\AuthServiceProvider::class,
-         // App\Providers\BroadcastServiceProvider::class,
-         App\Providers\EventServiceProvider::class,
-         App\Providers\RouteServiceProvider::class,
-         App\Providers\ComposerServiceProvider::class,
-         App\Providers\DatastoreServiceProvider::class,
-         App\Providers\SnmptrapProvider::class,
-         App\Providers\PluginProvider::class,
-     ],
+        App\Providers\ConfigServiceProvider::class,
+        App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded
+        App\Providers\AppServiceProvider::class,
+        App\Providers\CliServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
+        App\Providers\ComposerServiceProvider::class,
+        App\Providers\DatastoreServiceProvider::class,
+        App\Providers\SnmptrapProvider::class,
+        App\Providers\PluginProvider::class,
+    ],
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Class Aliases
      |--------------------------------------------------------------------------
@@ -235,5 +235,5 @@ return [
         'SnmpQuery' => \App\Facades\FacadeAccessorSnmp::class,
     ])->toArray(),
 
-     'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),
- ];
+    'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),
+];

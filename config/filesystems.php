@@ -10,7 +10,7 @@
 
 return [
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Default Filesystem Disk
      |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ return [
     |
     */
 
-     'disks' => [
+    'disks' => [
 
         'local' => [
             'driver' => 'local',
@@ -44,10 +44,10 @@ return [
             'throw' => false,
         ],
 
-         'base' => [
-             'driver' => 'local',
-             'root' => base_path(),
-         ],
+        'base' => [
+            'driver' => 'local',
+            'root' => base_path(),
+        ],
 
         'public' => [
             'driver' => 'local',
@@ -69,9 +69,9 @@ return [
             'throw' => false,
         ],
 
-     ],
+    ],
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Symbolic Links
      |--------------------------------------------------------------------------
@@ -82,8 +82,8 @@ return [
      |
      */
 
-     'links' => [
-         public_path('storage') => storage_path('app/public'),
-     ],
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
+    ],
 
- ];
+];

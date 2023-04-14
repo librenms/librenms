@@ -10,7 +10,7 @@
 
 return [
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Default Broadcaster
      |--------------------------------------------------------------------------
@@ -23,9 +23,9 @@ return [
      |
      */
 
-     'default' => env('BROADCAST_DRIVER', 'null'),
+    'default' => env('BROADCAST_DRIVER', 'null'),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Broadcast Connections
      |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ return [
      |
      */
 
-     'connections' => [
+    'connections' => [
 
         'pusher' => [
             'driver' => 'pusher',
@@ -55,24 +55,24 @@ return [
             ],
         ],
 
-         'ably' => [
-             'driver' => 'ably',
-             'key' => env('ABLY_KEY'),
-         ],
+        'ably' => [
+            'driver' => 'ably',
+            'key' => env('ABLY_KEY'),
+        ],
 
-         'redis' => [
-             'driver' => 'redis',
-             'connection' => 'default',
-         ],
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+        ],
 
-         'log' => [
-             'driver' => 'log',
-         ],
+        'log' => [
+            'driver' => 'log',
+        ],
 
-         'null' => [
-             'driver' => 'null',
-         ],
+        'null' => [
+            'driver' => 'null',
+        ],
 
-     ],
+    ],
 
- ];
+];

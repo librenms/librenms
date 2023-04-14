@@ -8,9 +8,9 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
- use Illuminate\Support\Str;
+use Illuminate\Support\Str;
 
- return [
+return [
 
      /*
      |--------------------------------------------------------------------------
@@ -133,20 +133,20 @@
              'engine' => null,
          ],
 
-        'pgsql' => [
-            'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => 'prefer',
-        ],
+         'pgsql' => [
+             'driver' => 'pgsql',
+             'url' => env('DATABASE_URL'),
+             'host' => env('DB_HOST', '127.0.0.1'),
+             'port' => env('DB_PORT', '5432'),
+             'database' => env('DB_DATABASE', 'forge'),
+             'username' => env('DB_USERNAME', 'forge'),
+             'password' => env('DB_PASSWORD', ''),
+             'charset' => 'utf8',
+             'prefix' => '',
+             'prefix_indexes' => true,
+             'search_path' => 'public',
+             'sslmode' => 'prefer',
+         ],
 
          'sqlsrv' => [
              'driver' => 'sqlsrv',
