@@ -21,7 +21,7 @@ use Spatie\LaravelIgnition\FlareMiddleware\AddNotifierName;
 use Spatie\LaravelIgnition\FlareMiddleware\AddQueries;
 
 return [
-     /*
+    /*
      |
      |--------------------------------------------------------------------------
      | Flare API key
@@ -33,9 +33,9 @@ return [
      |
      */
 
-     'key' => env('FLARE_KEY', 'quYFBTFNKHLBqFCoeo5yDVOQNbs6muV1'),
+    'key' => env('FLARE_KEY', 'quYFBTFNKHLBqFCoeo5yDVOQNbs6muV1'),
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Middleware
      |--------------------------------------------------------------------------
@@ -44,46 +44,46 @@ return [
      |
      */
 
-     'flare_middleware' => [
-         RemoveRequestIp::class,
-         //AddGitInformation::class,
-         AddNotifierName::class,
-         AddEnvironmentInformation::class,
-         AddExceptionInformation::class,
-         AddDumps::class,
-         /*
+    'flare_middleware' => [
+        RemoveRequestIp::class,
+        //AddGitInformation::class,
+        AddNotifierName::class,
+        AddEnvironmentInformation::class,
+        AddExceptionInformation::class,
+        AddDumps::class,
+        /*
            AddLogs::class => [
                'maximum_number_of_collected_logs' => 200,
            ],
            */
-         AddQueries::class => [
-             'maximum_number_of_collected_queries' => 50,
-             'report_query_bindings' => true,
-         ],
-         AddJobs::class => [
-             'max_chained_job_reporting_depth' => 5,
-         ],
-         CensorRequestBodyFields::class => [
-             'censor_fields' => [
-                 'password',
-                 'password_confirmation',
-                 // LibreNMS
-                 'username',
-                 'sysContact',
-                 'community',
-                 'authname',
-                 'authpass',
-                 'cryptopass',
-             ],
-         ],
-         CensorRequestHeaders::class => [
-             'headers' => [
-                 'API-KEY',
-             ],
-         ],
-     ],
+        AddQueries::class => [
+            'maximum_number_of_collected_queries' => 50,
+            'report_query_bindings' => true,
+        ],
+        AddJobs::class => [
+            'max_chained_job_reporting_depth' => 5,
+        ],
+        CensorRequestBodyFields::class => [
+            'censor_fields' => [
+                'password',
+                'password_confirmation',
+                // LibreNMS
+                'username',
+                'sysContact',
+                'community',
+                'authname',
+                'authpass',
+                'cryptopass',
+            ],
+        ],
+        CensorRequestHeaders::class => [
+            'headers' => [
+                'API-KEY',
+            ],
+        ],
+    ],
 
-     /*
+    /*
      |--------------------------------------------------------------------------
      | Reporting log statements
      |--------------------------------------------------------------------------
@@ -93,5 +93,5 @@ return [
      |
      */
 
-     'send_logs_as_events' => false,
- ];
+    'send_logs_as_events' => false,
+];
