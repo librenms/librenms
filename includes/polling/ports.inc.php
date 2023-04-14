@@ -18,7 +18,6 @@ $data_oids = [
     'ifSpeed',
     'ifType',
     'ifPhysAddress',
-    'ifPromiscuousMode',
     'ifConnectorPresent',
     'ifDuplex',
     'ifTrunk',
@@ -161,7 +160,6 @@ $hc_oids = [
     'ifHCOutUcastPkts',
     'ifHCOutMulticastPkts',
     'ifHCOutBroadcastPkts',
-    'ifPromiscuousMode',
     'ifConnectorPresent',
 ];
 
