@@ -1,0 +1,3328 @@
+
+-- *****************************************************************
+-- TRELLIX-INTRUVERT-EMS-TRAP-MIB:  
+-- EMS Alerts/Events MIB
+--
+-- Copyright (c) 2022 MUSARUBRA US, LLC
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+TRELLIX-INTRUVERT-EMS-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Integer32, 
+	IpAddress, TimeTicks, NOTIFICATION-TYPE,
+	Unsigned32
+		FROM SNMPv2-SMI
+	Ipv6Address
+		FROM IPV6-TC
+	TimeInterval, TruthValue, RowStatus, 
+	MacAddress, DateAndTime, DisplayString,
+	TimeStamp
+		FROM SNMPv2-TC
+	trellix-intruvert
+		FROM TRELLIX-INTRUVERT-SMI;
+
+ivEMSTrapMIB MODULE-IDENTITY
+	LAST-UPDATED "201201100000Z"
+	ORGANIZATION "MUSARUBRA US LLC"
+	CONTACT-INFO "Trellix Customer Service Department
+ 		      Postal: 6220 American Center Drive
+                	      San Jose CA 95002-2563
+                	      USA
+		      Tel: +1 800 338 8754
+		      E-mail: support@mcafee.com"
+	DESCRIPTION  "The definition of the Trellix-IntruShield Element Management System 
+		     Traps, which will be forwarded from the north bound interface 
+		     to the 3rd-party Fault management system."
+	REVISION     "201201100000Z"
+	DESCRIPTION  "Initial version"
+	::= { trellix-intruvert 5 }
+
+-- *****************************************************************
+-- top level groups in the TRELLIX-INTRUVERT-EMS-TRAP-MIB
+-- *****************************************************************
+
+ivEMSNotificationTrap		OBJECT IDENTIFIER ::= { ivEMSTrapMIB 0 }
+ivEMSNotificationAlertData	OBJECT IDENTIFIER ::= { ivEMSTrapMIB 2 }
+ivEMSNotificationSysEventData	OBJECT IDENTIFIER ::= { ivEMSTrapMIB 3 }
+ivEMSGeneratedEventData		OBJECT IDENTIFIER ::= { ivEMSTrapMIB 4 }
+ivEnterceptAlertData		OBJECT IDENTIFIER ::= { ivEMSTrapMIB 5 }
+ivEMSNotificationAuditData	OBJECT IDENTIFIER ::= { ivEMSTrapMIB 6 }
+
+-- *****************************************************************
+-- IntruShield Alert Common Data Fields Group
+-- *****************************************************************
+
+ivAlertCommonGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 1 }
+
+-- This group contains the data fields that shared by multiple Alerts
+-- types, which defines some generic information about the Alert
+
+ivSensorName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The sensor name in EMS to represents the sensor from where the event is 
+	generated."
+	::= { ivAlertCommonGrp 1 }
+
+ivAdministratorDomainName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The administrator domain name in EMS where the sensor that generates the
+	event belongs to."
+	::= { ivAlertCommonGrp 2 }
+
+ivAlarmSeverity  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		critical  (1),
+		error  (2),
+		warning  (3),
+		info	(4)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The severity of the fault."
+	::= { ivAlertCommonGrp 3 }
+
+
+ivGlobalAttackName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The global attack name. Each attack has its own unique integer
+	identifier, which is defined by the Trellix Intrusion Detection 
+	Department and is mapped to the attack name."
+	::= { ivAlertCommonGrp 4 }
+
+ivAlertTimeStamp  OBJECT-TYPE
+	SYNTAX 	DateAndTime
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The time that the Alert is get generated."
+	::= { ivAlertCommonGrp 5 }
+
+ivAlertCount  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The number of alerts that were raised by the same signature as the 
+	current one, but were suppressed by the sensor."
+	::= { ivAlertCommonGrp 6 }
+
+ivAlertDuration  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The time interval from the first unsent alert, which raised by the same
+	signature as current one but suppressed, till the current alert, which 
+	sent after one or more suppressed alerts raised by the same signature.
+	The time is in seconds."
+	::= { ivAlertCommonGrp 7 }
+
+ivGlobalVIDSName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	"The VIDS name.  Each VIDS has a global identity number.  VIDS -- 
+	Virtual Intrusion Detection System."
+	::= { ivAlertCommonGrp 8 }
+
+ivSensorSlotId  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The slot number on the sensor that detected the attack/abnormal."
+	::= { ivAlertCommonGrp 9 }
+
+ivSensorPortId  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The port number of slot <ivSensorSlotId> on the sensor that detected the
+	attack/abnormal."
+	::= { ivAlertCommonGrp 10 }
+
+ivGlobalProtocolName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The global protocol Name.  Each protocol has a unique identification number 
+	defined by Trellix Intrusion Detection Department."
+	::= { ivAlertCommonGrp 11 }
+
+ivGlobalNIName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The NI name. Each NI has an unique ID number in EMS."
+	::= { ivAlertCommonGrp 12 }
+
+ivAlertCategory  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		exploit  (111),
+		doSandDDoS  (112),
+		reconnaissance  (113),
+		policyViolation	(114)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The impact category, i.e. attack type. It describes the general types of the 
+	 impacts that can be performed to a system.
+	 Exploit -- This category covers the majority of attacks that actively seek to
+	 compromises systems, gain unauthorized access to confidential information or
+	 service, or tamper normal system operations by exploiting known or potential
+	 system vulnerability.
+	 DoSandDDoS -- (Distributed) deny of service attack. Possibly harm the ability
+	 of the network or system to respond or continue providing services.
+	 Reconnaissance -- This type activities is for the purpose of intelligence 
+	 gathering to prepare for future attacks, for example, port scan.
+	 PolicyViolation -- An attacker performed an action that goes against the 
+	 organizational or system policy, possibly by attempting to gain access 
+	 they are not authorized to have."
+	::= { ivAlertCommonGrp 13 }
+
+ivAlertSubCategory  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The detailed impact category that can be performed to a system."
+	::= { ivAlertCommonGrp 14 }
+ 
+ivDetectionMechanism  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The method used to detect attack.  Each method relates to a specific 
+	 attack category."
+	::= { ivAlertCommonGrp 15 }
+
+ivAttackResult  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		attack-Successful (100),
+		inconclusive  (200),
+		attack-Failed  (300),
+		not-Applicable  (400),
+		doS-Blocking-Activated  (888),
+		attack-Blocked  (999),
+		blocking-Simulated-Attack-Successful (10100),
+		blocking-Simulated-Inconclusive (10200),
+		blocking-Simulated-Attack-Failed (10300),
+		blocking-Simulated (10400),
+		smart-blocked (777)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The result of detected attacks.
+	 Attack Successful -- the attack was either successful or possibly successful.
+	 Inconclusive -- the result of the attack is unknown. This is most likely due 
+	 to a generic policy, such as the default or all-inclusive policy are not
+	 environment specific.
+	 Attack Failed -- the attack had no impact.
+	 Not Applicable -- the alert was raised for suspicious, but not necessarily 
+	 malicious, traffic. This result is common for Reconnaissance attacks due 
+	 to the nature of port scanning and host sweeping.
+	 DoS Blocking Activated -- Drop action for DOS attacks.
+	 Attack Blocked -- attacks blocked by a 'Drop packets' sensor response."
+	::= { ivAlertCommonGrp 16 }
+
+ivAlertDirection  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		outbound  (0),
+		inbound  (1),
+		unknown  (2),
+		biDirection  (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Inbound and Outbound refer to the direction that traffic is flowing in
+	 regards to the network.  Inbound refers to the traffic destined for the
+	 internal network, and Outbound refers to traffic destined for the 
+	 external network."
+	::= { ivAlertCommonGrp 17 } 
+
+ivAlertSeverity  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		high  (1),
+		medium  (2),
+		low  (3),
+		info	(4)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The severity of the alert.  Distinguish it from ivAlarmSeverity as required."
+	::= { ivAlertCommonGrp 18 }
+
+ivAlertRawSeverity  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..9)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The raw severity of the alert. 0 - informational; 1,2,3 - low; 
+	4,5,6 - medium; 7,8,9 - high"
+	::= { ivAlertCommonGrp 19 }
+
+ivAlertIsHostIsolationEnabled  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		notEnabled  (0),
+		enabled  (1) }
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Flag to indicating if Host Isolation is enabled for the alert, 0 - Not Enabled, 1 - Enabled"
+	::= { ivAlertCommonGrp 20 }
+
+
+ivAlertMPENotification  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		notEnabled  (0),
+		enabled  (1) 
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"McAffee policy Enforcer (MPE) notification status of the alert, 0 - Not Enabled, 1 - Enabled"
+	::= { ivAlertCommonGrp 21 }
+
+ivAlertSensorUUID  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Unique ID generated for every alert."
+	::= { ivAlertCommonGrp 22 }
+	
+ivAlertDeviceType  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Device type from which the alert was raised.IPS Sensor (0), NTBA Device (1), HIPS (2)"
+	::= { ivAlertCommonGrp 27 }
+	
+ivAlertZoneName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+		"Zone in which the alert was raised. Applicable only to NTBA alerts."
+	::= { ivAlertCommonGrp 28 }	
+
+ivAlertSrcPhone  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Source phone number."
+	::= { ivAlertCommonGrp 29 }	
+
+ivAlertSrcIMSI  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Source phone IMSI."
+	::= { ivAlertCommonGrp 30 }	
+	
+ivAlertSrcAPN  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Source phone APN."
+	::= { ivAlertCommonGrp 31 }	
+	
+ivAlertDestPhone  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Destination phone number."
+	::= { ivAlertCommonGrp 32 }	
+
+ivAlertDestIMSI  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Destination phone IMSI."
+	::= { ivAlertCommonGrp 33 }	
+	
+ivAlertDestAPN  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Destination phone APN."
+	::= { ivAlertCommonGrp 34 }	
+
+ivSensorIPAddress  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"The sensor ipAddress from where the event is generated. This is the ipAddress of the sensor represented by ivSensorName"
+	::= { ivAlertCommonGrp 35 }
+
+ivSensorIPv6Address  OBJECT-TYPE
+	SYNTAX 	Ipv6Address
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"The sensor IP V6 Address from where the event is generated. This is the IPv6Address of the sensor represented by ivSensorName"
+	::= { ivAlertCommonGrp 36 }
+	
+ivExecutableName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Executable Name."
+	::= { ivAlertCommonGrp 37 }	
+	
+
+ivExecutableHash  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Executable Hash"
+	::= { ivAlertCommonGrp 38 }	
+	
+ivExecutableMalwareConfidence  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"Executable Malware Confidence"
+	::= { ivAlertCommonGrp 39 }	
+	
+	
+-- *****************************************************************
+
+-- IntruShield Alert 5 Tuple Fields Group
+-- *****************************************************************
+
+ivAlert5TupleGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 2 }
+
+-- The attributes to describe a specific network session
+
+ivNetworkProtocolName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The well-known 8 bits protocol number in the IP header.  The protocol 
+	value is set to zero in both Port Scan and Host Sweep Alerts.  Here shows
+	as string."
+	::= { ivAlert5TupleGrp 1 }
+
+ivSourceIPAddress  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The source IP address of the attack get detected."
+	::= { ivAlert5TupleGrp 2 }
+
+ivDestinationIPAddress  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The destination IP address of the attack get detected.  The 
+	destination IP address value is set to zero by the sensor in the 
+	Host Sweep Alert."
+	::= { ivAlert5TupleGrp 3 }
+
+ivSourcePort  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The source port of the attack get detected."
+	::= { ivAlert5TupleGrp 4 }
+
+ivDestinationPort  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The destination port of the attack get detected.  The destination
+	port value is set to zero by the sensor in the Port Scan Alert."
+	::= { ivAlert5TupleGrp 5 }
+	
+ivSourceIPv6Address  OBJECT-TYPE
+	SYNTAX 	Ipv6Address
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The source IP V6 address of the attack get detected."
+	::= { ivAlert5TupleGrp 6 }
+
+ivDestinationIPv6Address  OBJECT-TYPE
+	SYNTAX 	Ipv6Address
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The destination IP V6 address of the attack get detected.  The 
+	destination IP address value is set to zero by the sensor in the 
+	Host Sweep Alert."
+	::= { ivAlert5TupleGrp 7 }
+
+-- *****************************************************************
+-- IntruShield Signature Alert Specific Data Fields Group
+-- *****************************************************************
+
+ivSignatureAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 3 }
+
+-- The specific data fields that belongs to the Signature Alert
+
+ivSignatureId  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The signature identifier name of a specific attack which is defined by
+	<ivGlobalAttackId>."
+	::= { ivSignatureAlertGrp 1 }
+
+ivSigAlertQualifier1  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Internal state of protocol parsing machine, TBD."
+	::= { ivSignatureAlertGrp 2 }
+
+ivSigAlertQualifier2  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Internal state of protocol parsing machine, TBD."
+	::= { ivSignatureAlertGrp 3 }
+
+ivSigAlertProtocolParsingStateId  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Internal state of protocol parsing machine, TBD."
+	::= { ivSignatureAlertGrp 4 }
+
+ivSuppressedSignatureIds  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"A group of signature identifier names that are related to the alert 
+	 other than the one specified in ivSignatureId field, which means 
+	 the attack fits in multiple signatures.  The names are separated by 
+	 ';'.  If the alert has only one signatureId, this field would be empty
+	 or as text 'No Others' "
+	::= { ivSignatureAlertGrp 5 }
+
+
+-- *****************************************************************
+-- IntruShield Statistical Anomaly Alert Specific Data Fields Group
+-- *****************************************************************
+
+ivStatAnormalyGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 4 }
+
+-- The specific data fields that belongs to the Statistical Anomaly Alert
+
+ivFirstAlarmTime  OBJECT-TYPE
+	SYNTAX 	DateAndTime
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The first alarm time in the statistical anomaly."
+	::= { ivStatAnormalyGrp 1 }
+
+ivAccumulateTime  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The alarm accumulate time in the statistical anomaly since the first
+	alarm get raised. The time is in seconds."
+	::= { ivStatAnormalyGrp 2 }
+
+ivStatMeasureCount  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..16)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The number of measures existed in the statistical Anomaly Alert. Each 
+	measure pair contains a short term measure and a long term measure."
+	::= { ivStatAnormalyGrp 3 }
+
+ivStatMeasureTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF IvStatMeasureEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The table that contains all the statistical measures in the Anomaly
+	alert."
+	::= { ivStatAnormalyGrp 4 }
+
+ivStatMeasureEntry  OBJECT-TYPE
+	SYNTAX 	IvStatMeasureEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The entry contains a pair of Short Term Measure and a Long Term Measure."
+	INDEX  { ivStatMeasureId }
+	::= { ivStatMeasureTable 1 }
+
+IvStatMeasureEntry  ::= SEQUENCE  {
+	ivStatMeasureId  INTEGER,
+	ivMeasureBinCount  INTEGER
+}
+
+ivStatMeasureId  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..16)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The Measure Id of the specific measure shown in the Anomaly Alert."
+	::= { ivStatMeasureEntry 1 }
+
+ivMeasureBinCount  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..32)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The number of the Distributions(in short Term)/Probabilities(in long 
+	Term) in the Measure, Which should be the number of entries in the 
+	ivMeaDistributionTable."
+	::= { ivStatMeasureEntry 2 }
+
+ivMeaDistributionTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF IvMeaDistributionEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The table that contains all the Short Term distributions and Long
+	Term Probabilities for the specific measure in the Anomaly alert."
+	::= { ivStatAnormalyGrp 5 }
+
+ivMeaDistributionEntry  OBJECT-TYPE
+	SYNTAX 	IvMeaDistributionEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The entry that contains all the Short Term distributions and Long
+	Term Probabilities."
+	INDEX  { ivStatMeasureId, ivDistOrProbIndex }
+	::= { ivMeaDistributionTable 1 }
+
+IvMeaDistributionEntry  ::= SEQUENCE  {
+	ivDistOrProbIndex  INTEGER,
+	ivShortTermDistribution  DisplayString,
+	ivLongTermProbability  DisplayString
+}
+
+ivDistOrProbIndex  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..32)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The index of the short term Distribution or Long term Probability
+	value in the values list."
+	::= { ivMeaDistributionEntry 1 }
+
+ivShortTermDistribution  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The short term Distribution value.  In fact this value is a float type,
+	but the value may not be parsed by the 3rdparty(just display), so send the
+	value as a display String, like 0.7895."
+	::= { ivMeaDistributionEntry 2 }
+
+ivLongTermProbability  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The long term Probability value.  In fact this value is a float type,
+	but the value may not be parsed by the 3rdparty(just display), so send the
+	value as a display String, like 0.7895."
+	::= { ivMeaDistributionEntry 3 }
+
+-- **********************************************************************
+-- IntruShield Simple Threshold Anomaly Alert Specific Data Fields Group
+-- **********************************************************************
+
+ivSimpleThresholdAnormalyGrp  OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 5 }
+
+-- The specific data fields that belongs to the Simple Threshold Anomaly Alert
+
+ivObservedValue  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The actual value get by the sensor that went over the threshold. The
+	threshold itself is defined in the Policy(EMS)."
+	::= { ivSimpleThresholdAnormalyGrp 1 }
+
+ivThresholdName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The threshold name. Each threshold has an unique identity number."
+	::= { ivSimpleThresholdAnormalyGrp 2 }
+
+ivThresholdValue  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The current value of the Threshold."
+	::= { ivSimpleThresholdAnormalyGrp 3 }
+
+ivThresholdDuration  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The accumulate time to get the current Threshold value."
+	::= { ivSimpleThresholdAnormalyGrp 4 }
+
+
+
+-- **************************************************************
+-- IntruShield Port Scan  Alert Specific Data Fields Group
+-- **************************************************************
+
+ivPortScanAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 6 }
+
+-- The specific data fields that belongs to the Port Scan Alert
+
+ivPSAlertPortCount  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The number of ports that get scanned in the Port Scan Alert."
+	::= { ivPortScanAlertGrp 1 }
+
+ivPSAlertDestPortTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF IvPSAlertDestPortEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The ports list that get scanned in the Port Scan Alert."
+	::= { ivPortScanAlertGrp 2 }
+
+ivPSAlertDestPortEntry  OBJECT-TYPE
+	SYNTAX 	IvPSAlertDestPortEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"One of the ports that get scanned in the Port Scan Alert."
+	INDEX { ivPSAlertDestPortIndex }
+	::= { ivPSAlertDestPortTable 1 }
+
+IvPSAlertDestPortEntry  ::= SEQUENCE  {
+	ivPSAlertDestPortIndex  INTEGER,
+	ivPSAlertDestinationPort  INTEGER
+}
+
+ivPSAlertDestPortIndex  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The index of a destination port get scanned in the Port Scan Alert."
+	::= { ivPSAlertDestPortEntry 1 }
+
+ivPSAlertDestinationPort  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"A destination port number get scanned in the Port Scan Alert."
+	::= { ivPSAlertDestPortEntry 2 }
+
+-- **************************************************************
+-- IntruShield Host Sweep Alert Specific Data Fields Group
+-- **************************************************************
+
+ivHostSweepAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 7 }
+
+-- The specific data fields that belongs to the Host Sweep Alert
+
+ivHSAlertIPAddrCount  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The number of IP Addresses that get scanned in the Host Sweep 
+	Alert."
+	::= { ivHostSweepAlertGrp 1 }
+
+ivHSAlertIPAddrTable  OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF IvHSAlertIPAddrEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The IP Addresses list that get scanned in the Host Sweep Alert."
+	::= { ivHostSweepAlertGrp 2 }
+
+ivHSAlertIPAddrEntry  OBJECT-TYPE
+	SYNTAX 	IvHSAlertIPAddrEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"One of the IP Addresses that get scanned in the Host Sweep Alert."
+	INDEX { ivHSAlertIPAddrIndex }
+	::= { ivHSAlertIPAddrTable 1 }
+
+IvHSAlertIPAddrEntry  ::= SEQUENCE  {
+	ivHSAlertIPAddrIndex  INTEGER,
+	ivHSAlertDestinationIPAddress  IpAddress,
+	ivHSAlertDestinationIPv6Address  Ipv6Address
+}
+
+ivHSAlertIPAddrIndex  OBJECT-TYPE
+	SYNTAX 	INTEGER (0..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The index of a destination port get scanned in the Host Sweep Alert."
+	::= { ivHSAlertIPAddrEntry 1 }
+
+ivHSAlertDestinationIPAddress  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"A destination IP Address get scanned in the Host Sweep Alert."
+	::= { ivHSAlertIPAddrEntry 2 }
+
+ivHSAlertDestinationIPv6Address  OBJECT-TYPE
+	SYNTAX 	Ipv6Address
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"A destination IP v6 Address get scanned in the Host Sweep Alert."
+	::= { ivHSAlertIPAddrEntry 3 }
+
+-- *****************************************************************
+-- IntruShield System Event Data Fields Group
+-- *****************************************************************
+
+ivEventTimeStamp OBJECT-TYPE
+	SYNTAX 	DateAndTime
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The time stamp of the system event generated in the IntruShield box."
+	::= { ivEMSNotificationSysEventData 1 }
+
+ivEventTemperatureStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		normal (1),
+		abnormal (2),
+		critical (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The temperature status of the chassis of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 2 }
+
+ivEventFanStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		normal (1),
+		abnormal (2),
+		removed (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The fan status of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 3 }
+
+ivEventPowerSupplyStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		inserted (1),
+		removed (2),
+		operational (3),
+		non-operational (4)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The primary power supply status of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 4 }
+
+ivEventSecondaryPowerSupplyStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		inserted (1),
+		removed (2),
+		operational (3),
+		non-operational (4)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The secondary power supply status of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 5 }
+
+ivEventLinkIntfPort  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..24)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The interface port number of the status change Link(pass<->fail)."
+	::= { ivEMSNotificationSysEventData 6 }
+
+ivEventLinkStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		fail (1),
+		pass (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The Link status of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 7 }
+
+ivEventFirewallConnectionStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		connect (1),
+		disconnect (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The firewall connection status of the IntruShield box."
+	::= { ivEMSNotificationSysEventData 8 }
+
+ivEventFirewallFilterAttackName  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The Attack name of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 9 }
+
+ivEventFirewallFilterVidsName  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The VIDs description of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 10 }
+
+ivEventFirewallFilterSourceIP  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The source IP address of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 11 }
+
+ivEventFirewallFilterDestinationIP  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The destination IP address of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 12 }
+
+ivEventFirewallFilterPort  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The VIDs ID of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 13 }
+
+ivEventFirewallFilterProtocolName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The network protocol name of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 14 }
+
+ivEventFirewallFilterType  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		sAM-SRC-IP (1),
+		sAM-dst-IP (2),
+		sAM-DST-SERV (3),
+		sAM-SERV (4)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The SAM type of the firewall filter which is in the event. The SAM-SRC-IP 
+	means filtering based on the source IP address.  The SAM-DST-IP means 
+	filtering based on the destination IP address.  The SAM-DST-SERV means 
+	filtering based on the destination IP address and destination port number.
+	The SAM-SERV means filtering based on all the available fields."
+	::= { ivEMSNotificationSysEventData 15 }
+
+ivEventFirewallFilterErrorStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		exceedMaxFilters (1),
+		errorApplyingFilter (2),
+		filterTimeout (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The status of the firewall filter which is in the event."
+	::= { ivEMSNotificationSysEventData 16 }
+
+ivEventPortLateCollisionCount  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The count of the port late collisions."
+	::= { ivEMSNotificationSysEventData 17 }
+
+ivEventFailOverPeerSensorName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the failover peer sensor."
+	::= { ivEMSNotificationSysEventData 18 }
+			
+ivEventFailOverPeerSensorStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		up (1),
+		down (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The status of the failover peer sensor."
+	::= { ivEMSNotificationSysEventData 19 }
+
+ivEventLinkIntfPortPeer  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..24)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The interface port number that belongs to a port group, like a inline or tap
+	port pair."
+	::= { ivEMSNotificationSysEventData 20 }
+
+
+ivEventInlineFailOpenPortStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		restoreToFailOpen (1),
+		bypassMode (2),
+		illegalConfiguration (3),
+		statusUnknown (4),
+		tapMode (5),
+		kitAbsent (6),
+		layer2BypassMode (7)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The status of the inline fail open port pair."
+	::= { ivEMSNotificationSysEventData 21 }
+
+
+ivEventSignatureSegmentID OBJECT-TYPE
+	SYNTAX 	INTEGER (1..255)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The signature segment ID of the error segment."
+	::= { ivEMSNotificationSysEventData 22 }
+
+
+ivEventSignatureSegmentErrorCause OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unknownCause (0)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The cause of the signature segment error."
+	::= { ivEMSNotificationSysEventData 23 }
+
+
+ivEventSignatureDownloadType OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		init (1),
+		update (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The type of the signature segment download."
+	::= { ivEMSNotificationSysEventData 24 }
+
+
+ivEventSensorInterConfigErrorType OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		signatureHandling (1),
+		sNMPRequestAndOther (2),
+		imageDowngrade (10),
+		unsupportedConfigurationUpgrade (11)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The cause of the sensor internal configuration communication error."
+	::= { ivEMSNotificationSysEventData 25 }
+
+
+ivEventSSLDecryptionKeyAlias OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The SSL decryption key Alias."
+	::= { ivEMSNotificationSysEventData 26 }
+
+ivEventSensorRunningMode OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		iPS (0),
+		layer2Switch (1)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The sensor running status."
+	::= { ivEMSNotificationSysEventData 27 }
+
+ivEventSubEventID  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The sub ID of the new String content event."
+	::= { ivEMSNotificationSysEventData 28 }
+		
+ivEventStringContent  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The content of the sensor reported error."
+	::= { ivEMSNotificationSysEventData 29 }
+
+ivEventLinkIntfPortName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The interface port name of the status change Link."
+	::= { ivEMSNotificationSysEventData 30 }
+			
+ivEventPowerSupplyName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the power supply."
+	::= { ivEMSNotificationSysEventData 31 } 
+
+ivEventLinkIntfSlot  OBJECT-TYPE
+	SYNTAX 	INTEGER (1..14)
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The slot number of the interface port that has status change."
+	::= { ivEMSNotificationSysEventData 32 }
+
+ivEventConfiguredMediaType OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unknown (0),
+		optical (1),
+		copper (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Media type configuration of the plugable interface."
+	::= { ivEMSNotificationSysEventData 33 }
+
+ivEventInsertedMediaType OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unknown (0),
+		optical (1),
+		copper (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Media type of the inserted plugable interface."
+	::= { ivEMSNotificationSysEventData 34 }
+
+ivEventPluggableInterfaceCertificationMatchStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		match (1),
+		mismatch (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Trellix certification status of the plugable interface."
+	::= { ivEMSNotificationSysEventData 35 }
+
+ivEventClusterSensorIndex OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		primary (1),
+		secondary (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Indicates the primary and secondary sensor in a cluster."
+	::= { ivEMSNotificationSysEventData 36 }
+
+ivEventClusterSoftwareMatchStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		match (1),
+		mismatch (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Cluster software match status between primary and secondary sensor in the cluster."
+	::= { ivEMSNotificationSysEventData 37 }
+
+ivEventPluggableInterfaceTrellixCertificationStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		certified (1),
+		notcertified (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Trellix certification status of the plugable interface."
+	::= { ivEMSNotificationSysEventData 38 }
+
+ivEventTemperatureSensorName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the temperature sensor."
+	::= { ivEMSNotificationSysEventData 39 } 
+
+ivEventPluggableInterfacePresenceStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		present (1),
+		absent (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Status of the plugable interface."
+	::= { ivEMSNotificationSysEventData 40 }
+	
+ivEventBootloaderUpgradeStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		failure (1),
+		partial-success (2),
+		success (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Status of the bootloader upgrade."
+	::= { ivEMSNotificationSysEventData 41 }
+	
+	
+ivEventOfflineDownloadState  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The state of the offline download action."
+	::= { ivEMSNotificationSysEventData 42 }
+	
+	
+ivEventOfflineDownloadStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The status of the offline download action."
+	::= { ivEMSNotificationSysEventData 43 }
+	
+	
+ivEventOfflineDownloadFailureCode  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The failure code  of the offline download action."
+	::= { ivEMSNotificationSysEventData 44 }
+	
+	
+ivEventOfflineDownloadTimeStamp  OBJECT-TYPE
+	SYNTAX 	DateAndTime 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The timestamp of the offline download"
+	::= { ivEMSNotificationSysEventData 45 }
+	
+ivEventOfflineDownloadType  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The type of the offline download being performed"
+	::= { ivEMSNotificationSysEventData 46 }
+	
+ivEventOfflineDownloadFilename  OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the offline download file"
+	::= { ivEMSNotificationSysEventData 47 }
+
+ivEventSensorLatencyStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		latency-mode-activated (1),
+		latency-mode-deactivated (2),
+		latency-and-Layer2Bypass-mode-activated (3) 
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor latency mode status."
+	::= { ivEMSNotificationSysEventData 48 }
+
+ivEventSwitchIPaddress  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The IP address of the switch."
+	::= { ivEMSNotificationSysEventData 49 }
+
+ivEventSwitchIPv6address  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The IPv6 address of the switch."
+	::= { ivEMSNotificationSysEventData 50 }
+
+ivEventSwitchStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		up (1),
+		down (2),
+		unknown (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Switch status from IntruShield sensor."
+	::= { ivEMSNotificationSysEventData 51 }
+
+ivEventSensorSwitchCountOutOfSyncStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		global-id-mapping-error (1),
+	    local-id-creation-error (2),
+		switch-entry-not-found (3),
+		internal-send-message-error (4),
+		switch-segment-error (5),
+		invalid-global-id (6)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor Out-of-Band NAC Switch count out of sync with Manager. 
+	Please update configuration of sensor by pushing signature file."
+	::= { ivEMSNotificationSysEventData 52 }
+	
+ivEventSensorLatencyConfConflictStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		configuration-conflict-detected (1),
+		configuration-conflict-resolved (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor latency monitoring configuration conflict with Layer2 monitoring configuration status."
+	::= { ivEMSNotificationSysEventData 53 }
+
+ivEventSensorPacketCaptureStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		error-connecting-tftp-server (1),
+	    error-sending-file (2),
+		start-transferring-file (3),
+	    file-transfer-completed (4),
+		sensor-overload-error (5),
+		reached-max-file-size (6),
+		internal-memory-error (7),
+		internal-error (8),
+		stop-capturing (9),
+		authentication-failure (10),
+		upload-to-NSM (11)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor Packet Capture Status.
+	# 1, 2, 5, 7, 8, 10 - Error 
+	# 6, 9 - Warning
+	# 3, 4, 11 - Information
+	1 = Sensor reports error connecting to TFTP server while transferring packet capture file.
+	2 = Sensor unable to send packet capture file via TFTP.
+	3 = Sensor start sending packet capture file via TFTP.
+	4 = Sensor completed sending packet capture file via TFTP.
+	5 = Sensor experiencing overload, sensor packet capture feature might not capture all packets.
+	6 = Sensor stop capturing packet due to reaching maximum configured file size.
+	7 = Sensor stop capturing packet due to insufficient internal memory.
+	8 = Sensor experiencing internal error while performing packet capture.
+	9 = Sensor stop capturing packet due to reaching maximum configured duration or user manual stop.
+	10 = Sensor unable to authenticate with target server for uploading packet capture file.
+	11 = Sensor ready to upload packet capture file to NSM.
+	"
+	::= { ivEMSNotificationSysEventData 54 }
+
+ivEventAutoRecoveryStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		successful (1),
+		failure (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor auto recovery status."
+	::= { ivEMSNotificationSysEventData 55 }
+
+ivEventHitlessRebootStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		successful (1),
+		failure (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor hitless reboot status."
+	::= { ivEMSNotificationSysEventData 56 }
+
+
+ivEventFipsUsername  OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the user"
+	::= { ivEMSNotificationSysEventData 57 }
+
+ivEventFipsNMSKeyDecryptFailureStatus OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		privacy-key-decrypt-failure (1),
+		auth-key-decrypt-failure (2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"IntruShield sensor NMS user privacy/auth key decryption failure status."
+	::= { ivEMSNotificationSysEventData 58 }
+
+ivPerfMonThresholdAlarmDescription OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	"The description of the Performance Threshold Alarm"
+	::= { ivEMSNotificationSysEventData 59 }
+	
+ivDNSConnectivityStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		up-and-Reachable(1),
+		down-or-Unreachable(2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 60 }
+	
+ivBeaconCommunicationStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		up(0),
+		authentication-Failure(1),
+		incorrect-Base-DN(2),
+		sSL-Error(3),
+		timeout-Error(4),
+		connectivity-Error(5),
+		internal-Error(6)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 61 }
+	
+ivRubiconSlotNumber OBJECT-TYPE
+	SYNTAX	INTEGER	
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	"G0(2), G1(3), G2(4), G3(5) at al"
+	::= { ivEMSNotificationSysEventData 62 }
+	
+ivRubiconModuleType OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		nULL(0),
+		qSFP(1),
+		sFP-plus(2),		
+		qSFP-4(3),		
+		sFP-plus-12(4),		
+		rJ45-6(5)		
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 63 }
+	
+ivRubiconSlotStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		removed(1),
+		added(2)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 64 }
+	
+ivSSStatusID OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		sSD-1(0),
+		sSD-2(1),
+		sSD-1-and-SSD-2(2),
+		sSD-3(3),
+		sSD-4(4),
+		sSD-3-and-SSD-4(5)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 65 }
+	
+ivSSStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		normal(1),
+		abnormal(2)		
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 66 }
+	
+ivGTIServerConnectivityStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		reachable(1),
+		unreachable(2)		
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 67 }
+	
+ivManualSensorRebootStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		unreachableSNMPDError(1),
+		unreachableTLVError(2)		
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 68 }
+	
+ivATDConnStatus OBJECT-TYPE
+	SYNTAX  INTEGER{
+		down(0),
+		in-Progress(1),
+		success(2),
+		unknown-Reason(3),
+		certificate-Mismatch(4),
+		hash-Mismatch(5),
+		network-Issues(6),
+		error-in-Certificate-Retrieval-Value(7),
+		config-Not-Present(8),
+		wrong-Config(9),
+		certificate-Absence(10),
+		ssl-Handshake-Fail(11),
+		unknown-Reason(12),
+		config-Disable(13),
+		connection-Closed-By-ATD(14),
+		large-Packet-From-ATD(15),
+		missed-Keep-Alive(16)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+	""
+	::= { ivEMSNotificationSysEventData 69 }
+	
+	
+ivEventAttackDetectionErrorStatus OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		mismatch(1),
+		resourceExhaustion(2)		
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	"Attack detection error status."
+	::= { ivEMSNotificationSysEventData 70 }
+
+-- *****************************************************************
+-- Entercept Alert Data Fields Group
+-- *****************************************************************
+
+ivEnterceptSignatureName OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of an Entercept system defined signature."
+	::= { ivEnterceptAlertData 1 }
+
+ivEnterceptProxyIP OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The IP address of the proxy agent that installed on the Entercept
+	manager."
+	::= { ivEnterceptAlertData 2 }
+
+ivEnterceptAlertNote OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The description/note of the Entercept alert."
+	::= { ivEnterceptAlertData 3 }
+
+ivEnterceptOperatingMode OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		warning (1),
+		protected (2),
+		vault (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The current mode of operation for the Entercept agent generated the 
+	Entercept alert."
+	::= { ivEnterceptAlertData 4 }
+
+ivEnterceptAlertAckLevel OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		unread (1),
+		read (2),
+		hidden (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The acknowledgment level of an Entercept alert."
+	::= { ivEnterceptAlertData 5 }
+
+ivEnterceptAlertAckTime OBJECT-TYPE
+	SYNTAX 	DateAndTime
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The acknowledgment time of an Entercept alert."
+	::= { ivEnterceptAlertData 6 }
+
+ivEnterceptOSUserName OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The OS user name of an Entercept alert."
+	::= { ivEnterceptAlertData 7 }
+
+ivEnterceptProcessName OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The process name(without the path) of an Entercept alert."
+	::= { ivEnterceptAlertData 8 }
+
+ivEnterceptProcessPath OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The process path(without the name) of an Entercept alert."
+	::= { ivEnterceptAlertData 9 }
+
+
+-- *****************************************************************
+-- IntruShield Malware Alert Specific Data Fields Group
+-- *****************************************************************
+
+ivMalwareAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 9 }
+
+-- The specific data fields that belongs to the Malware Alert
+
+ivMalwareFileType  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The file type."
+	::= { ivMalwareAlertGrp 1 }
+
+ivMalwareDirtiness  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The malware detection dirtiness level type."
+	::= { ivMalwareAlertGrp 2 }
+
+ivMalwareClassification  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The malware classification."
+	::= { ivMalwareAlertGrp 3 }
+
+ivMalwareMD5  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The MD5 hash."
+	::= { ivMalwareAlertGrp 4 }
+
+ivMalwareURL  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The URL of file."
+	::= { ivMalwareAlertGrp 5 }
+	
+	
+-- *****************************************************************
+-- IntruShield NTBA Alert Common Data Fields Group
+-- *****************************************************************
+
+ivNTBAAlertCommonGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 10 }
+
+-- The common data fields that belong to the NTBA Alert
+
+ivNTBAHostIP  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The IP Address of the source IP."
+	::= { ivNTBAAlertCommonGrp 1 }
+
+ivNTBASrcVLANID  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The source VLAN Id."
+	::= { ivNTBAAlertCommonGrp 2 }
+
+ivNTBADestVLANID  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The destination VLAN Id."
+	::= { ivNTBAAlertCommonGrp 3 }
+	
+	
+-- *****************************************************************
+-- IntruShield NTBA Policy Alert Data Fields Group
+-- *****************************************************************
+
+ivNTBAPolicyAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 11 }
+
+-- The data fields that belong to the NTBA Policy Alert
+
+ivNTBARuleName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The communication rule which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 1 }
+
+ivNTBAServiceName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal service which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 2 }
+
+ivNTBAAppName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal application which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 3 }	
+	
+ivNTBAAppTypeName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal application type which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 4 }
+	
+ivNTBAPortId  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal port which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 5 }
+	
+ivNTBAProtocolId  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal protocol which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 6 }
+	
+ivNTBAURI  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal URI which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 7 }
+	
+ivNTBAOsId  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal OS which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 8 }
+	
+ivNTBAFileName  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal file which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 9 }
+	
+ivNTBAFileAccessType  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal file access type which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 10 }
+	
+ivNTBAIllegalHostIP  OBJECT-TYPE
+	SYNTAX 	IpAddress
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The illegal IP Address which caused this alert."
+	::= { ivNTBAPolicyAlertGrp 11 }
+	
+ivNTBAMinViolationVal  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The minimum violation value configured in the policy."
+	::= { ivNTBAPolicyAlertGrp 12 }
+		
+ivNTBAMaxViolationVal  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The maximum violation value configured in the policy."
+	::= { ivNTBAPolicyAlertGrp 13 }
+	
+ivNTBAAvgVal  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The average value of the parameter which violated the rule."
+	::= { ivNTBAPolicyAlertGrp 14 }
+	
+ivNTBAObsVal  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The observed value of the parameter which violated the rule."
+	::= { ivNTBAPolicyAlertGrp 15 }
+
+
+-- *****************************************************************
+-- IntruShield NTBA Worm Alert Data Fields Group
+-- *****************************************************************
+
+ivNTBAWormAlertGrp	OBJECT IDENTIFIER ::= { ivEMSNotificationAlertData 12 }
+
+-- The data fields that belong to the NTBA Worm Alert
+
+ivNTBAHosts  OBJECT-TYPE
+	SYNTAX 	DisplayString
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION
+	"The list of hosts which were involved in the worm attack."
+	::= { ivNTBAWormAlertGrp 1 }	
+	
+
+
+-- *****************************************************************
+-- IntruShield Manager Generated Event Data Fields Group
+-- *****************************************************************
+
+ivEMSGenEventName  OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the system event generated by the EMS."
+	::= { ivEMSGeneratedEventData 1 }
+
+ivEMSGenEventComponent  OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The EMS Component name that generates the system event."
+	::= { ivEMSGeneratedEventData 2 }
+
+ivEMSGenEventDescription  OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The description of the system event generated by the EMS."
+	::= { ivEMSGeneratedEventData 3 }
+
+ivEMSGenEventStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		create (1),
+		clear (2),
+		ack (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The field indicates an event is created or cleared 
+	an old event or acknowledged."
+	::= { ivEMSGeneratedEventData 4 }
+	
+-- *****************************************************************
+-- IntruShield Audit Notifcations Start
+-- *****************************************************************
+	
+ivEMSAuditUserName OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The name of the user who performed the action."
+	::= { ivEMSNotificationAuditData 1 }
+
+ivEMSAuditActionType OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Indicates the category to which to action belongs..eg Sensor,User,Manager etc"
+	::= { ivEMSNotificationAuditData 2 }
+
+ivEMSAuditResult OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Indicates the success or failure of the action."
+	::= { ivEMSNotificationAuditData 3 }
+
+ivEMSAuditMessage OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The audit message containing the details of the action."
+	::= { ivEMSNotificationAuditData 4 }
+
+ivEMSAuditAction OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"Gives the breif description of the type of action performed."
+	::= { ivEMSNotificationAuditData 5 }
+
+ivEMSAuditDomain OBJECT-TYPE
+	SYNTAX 	DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+	"The Domain in which the action was performed."
+	::= { ivEMSNotificationAuditData 6 }	
+	
+-- *****************************************************************
+-- IntruShield Audit Notifcations End
+-- *****************************************************************
+
+-- *****************************************************************
+-- IntruShield Notifications
+-- *****************************************************************
+
+
+
+ivEMSGeneratedEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEMSGenEventName,
+			ivEMSGenEventComponent,
+			ivEMSGenEventDescription,
+			ivEMSGenEventStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a system event generated by EMS, like 
+	update server down, sensor unreachable, etc."
+::= { ivEMSNotificationTrap 1 }
+
+ivSignatureAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivSensorSlotId,
+			ivSensorPortId,
+			ivGlobalProtocolName,
+			ivNetworkProtocolName,
+			ivSourceIPAddress,
+			ivDestinationIPAddress,
+			ivSourceIPv6Address,
+			ivDestinationIPv6Address,
+			ivAlertSrcPhone,
+			ivAlertSrcIMSI,
+			ivAlertSrcAPN,
+			ivAlertDestPhone,
+			ivAlertDestIMSI,
+			ivAlertDestAPN,
+			ivSourcePort,
+			ivDestinationPort,
+			ivSignatureId,
+			ivSuppressedSignatureIds,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Signature Alert, which is sent out by a
+	IntruShield Sensor to EMS originally.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 2 }
+
+ivStatisticalAnormalyAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivGlobalNIName,
+			ivNTBAHostIP,
+			ivNTBASrcVLANID,
+			ivNTBADestVLANID,
+			ivAlertZoneName,
+			ivAlertDeviceType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Statistical Anomaly Alert, which is 
+	sent out by a IntruShield Sensor to EMS originally.  To check the measure 
+	details, browse the information in the IntruShield Alert viewer."
+::= { ivEMSNotificationTrap 3 }
+
+ivSimpleThresholdAnomalyAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivGlobalNIName,
+			ivObservedValue,
+			ivThresholdName,
+			ivThresholdValue,
+			ivThresholdDuration,
+			ivNTBAHostIP,
+			ivNTBASrcVLANID,
+			ivNTBADestVLANID,
+			ivAlertZoneName,
+			ivAlertDeviceType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Simple Threshold Anomaly Alert, which 
+	is sent out by a IntruShield Sensor to EMS originally."
+::= { ivEMSNotificationTrap 4 }
+
+
+ivPortScanAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivSourceIPAddress,
+			ivDestinationIPAddress,
+			ivSourceIPv6Address,
+			ivDestinationIPv6Address,
+			ivAlertSrcPhone,
+			ivAlertSrcIMSI,
+			ivAlertSrcAPN,
+			ivAlertDestPhone,
+			ivAlertDestIMSI,
+			ivAlertDestAPN,
+			ivSourcePort,
+			ivPSAlertPortCount,
+			ivPSAlertDestinationPort,
+			ivAlertZoneName,
+			ivAlertDeviceType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Port Scan Alert, which is sent out by a
+	IntruShield Sensor to EMS originally. There may be multiple MIB variable
+	----- ivPSAlertDestinationPort appeared at the end of the Trap packet.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 5 }
+
+ivHostSweepAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivSourceIPAddress,
+			ivSourceIPv6Address,
+			ivAlertSrcPhone,
+			ivAlertSrcIMSI,
+			ivAlertSrcAPN,
+			ivAlertDestPhone,
+			ivAlertDestIMSI,
+			ivAlertDestAPN,
+			ivSourcePort,
+			ivDestinationPort,
+			ivHSAlertIPAddrCount,
+			ivHSAlertDestinationIPAddress,
+			ivHSAlertDestinationIPv6Address,
+			ivAlertZoneName,
+			ivAlertDeviceType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Host Sweep Alert, which is sent out 
+	by a IntruShield Sensor to EMS originally. There may be multiple MIB 
+	variable ----- ivHSAlertDestinationIPAddress appeared at the end of the 
+	Trap packet.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 6 }
+
+ivSummarySignatureAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivAlertDuration,
+			ivGlobalVIDSName,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The summary Alert of a bunch of Signature Alerts, which is sent out 
+	by a IntruShield Sensor to EMS originally."
+::= { ivEMSNotificationTrap 7 }
+
+ivSummarySignatureAlertIPPairBased  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertIsHostIsolationEnabled,
+			ivAlertMPENotification,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivAlertDuration,
+			ivGlobalVIDSName,
+			ivSourceIPAddress,
+			ivDestinationIPAddress,
+			ivSourceIPv6Address,
+			ivDestinationIPv6Address,
+			ivAlertSrcPhone,
+			ivAlertSrcIMSI,
+			ivAlertSrcAPN,
+			ivAlertDestPhone,
+			ivAlertDestIMSI,
+			ivAlertDestAPN,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The summary Alert of a bunch of Signature Alerts whose src/dest IP
+	Addresses are as specified, which is sent out 	by a IntruShield Sensor 
+	to EMS originally.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 8 }
+
+ivTemperatureStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventTemperatureStatus,
+			ivEventTemperatureSensorName,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the temperature status of the IntruShield chassis
+	has changed."
+::= { ivEMSNotificationTrap 9 }
+
+ivFanStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFanStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the fan status of the IntruShield chassis
+	has changed."
+::= { ivEMSNotificationTrap 10 }
+
+ivPowerSupplyStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventPowerSupplyName,
+			ivEventPowerSupplyStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the Power Supply status of the IntruShield chassis
+	has changed."
+::= { ivEMSNotificationTrap 11 }
+
+ivLinkStatusChangeEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortName,
+			ivEventLinkStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a Link status of the IntruShield box has changed."
+::= { ivEMSNotificationTrap 12 }
+
+ivMemoryErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a memory error happened on the IntruShield box."
+::= { ivEMSNotificationTrap 13 }
+
+ivHardwareErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a hardware error happened on the IntruShield box."
+::= { ivEMSNotificationTrap 14 }
+
+ivSoftwareErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a software error happened on the IntruShield box."
+::= { ivEMSNotificationTrap 15 }
+
+ivPacketBufferOverflowEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that packet buffer overflow happened on the IntruShield box."
+::= { ivEMSNotificationTrap 16 }
+
+ivCRCErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a CRC error happened on the IntruShield box."
+::= { ivEMSNotificationTrap 17 }
+
+ivFailOverEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a failover happened between the two sensors' cluster."
+::= { ivEMSNotificationTrap 18 }
+
+ivSensorConfigChangeEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that some configuration has been changed through the CLI
+	on the IntruShield box."
+::= { ivEMSNotificationTrap 19 }
+
+ivFirewallFilterErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFirewallFilterAttackName,
+			ivEventFirewallFilterVidsName,
+			ivEventFirewallFilterSourceIP,
+			ivEventFirewallFilterDestinationIP,
+			ivEventFirewallFilterPort,
+			ivEventFirewallFilterProtocolName,
+			ivEventFirewallFilterType,
+			ivEventFirewallFilterErrorStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that some Firewall Filter action failed."
+::= { ivEMSNotificationTrap 20 }
+
+ivFirewallConnectionStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFirewallConnectionStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that Firewall connection status changed."
+::= { ivEMSNotificationTrap 21 }
+
+ivSensorPowerUpEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that Sensor just powered up."
+::= { ivEMSNotificationTrap 22 }
+
+ivLateCollisionEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventPortLateCollisionCount,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that Sensor experiences late collision."
+::= { ivEMSNotificationTrap 23 }
+
+ivFailOverPeerStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFailOverPeerSensorName,
+			ivEventFailOverPeerSensorStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the fail over peer sensor's status has changed."
+::= { ivEMSNotificationTrap 24 }
+
+ivInlineFailOpenPortStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortPeer,
+			ivEventInlineFailOpenPortStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the status of the inline fail open port pair, which could be in 
+	inline or bypass mode."
+::= { ivEMSNotificationTrap 25 }
+
+ivInlineBypassSwitchTimeoutEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the error situation that the inline fail open bypass switch has
+	timed out, which will cause all the inline fail open ports work in bypass 
+	mode.  This error situation should be cleared whenever a inline port pair 
+	restores to fail open mode event (25) is received, regardless the port number."
+::= { ivEMSNotificationTrap 26 }
+
+ivSignatureSegmentErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSignatureSegmentID,
+			ivEventSignatureSegmentErrorCause,
+			ivEventSignatureDownloadType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the error situation that sensor detects some signature segment
+	is not correct."
+::= { ivEMSNotificationTrap 27 }
+
+ivSensorInterConfigErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorInterConfigErrorType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the error situation that sensor experiences some kind of internal
+	configuration communication error."
+::= { ivEMSNotificationTrap 28 }
+
+ivInvalidSSLDecryptionKeyEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSSLDecryptionKeyAlias,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the error situation that sensor detects some SSL decryption key
+	is invalid."
+::= { ivEMSNotificationTrap 29 }
+
+ivSensorInLayer2SwitchModeEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorRunningMode,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform the error situation that sensor changes to Layer 2 switch mode."
+::= { ivEMSNotificationTrap 30 }
+
+ivSensorStringContentEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSubEventID,
+			ivEventStringContent,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform any generic message form Intrushield device. Intrushield device use this generic event to convey any unexpected errors or warnings. The ivEventStringContent will convey the actual string message from device."
+::= { ivEMSNotificationTrap 31 }
+
+ivPortMediaTypeMismatchStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortName,
+			ivEventConfiguredMediaType,
+			ivEventInsertedMediaType,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the plugable interface media type is different from the configured media type for the port."
+::= { ivEMSNotificationTrap 32 }
+
+ivPortCertificationMismatchStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortName,
+			ivEventPluggableInterfaceCertificationMatchStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the plugable interface Trellix certification is different from the configured Trellix certification for the port."
+::= { ivEMSNotificationTrap 33 }
+
+ivClusterBootUpStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventClusterSensorIndex,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the primary or secondary sensor in a cluster has booted up."
+::= { ivEMSNotificationTrap 34 }
+
+ivClusterSoftwareMismatchStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventClusterSoftwareMatchStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the software version is mismatched between the primary and secondary sensor in a cluster."
+::= { ivEMSNotificationTrap 35 }
+
+ivPortCertificationStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortName,
+			ivEventPluggableInterfaceTrellixCertificationStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the plugable interface Trellix certification is different from the configured Trellix certification for the port."
+::= { ivEMSNotificationTrap 36 }
+
+
+ivPortPluggableInterfacePresenceStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventLinkIntfSlot,
+			ivEventLinkIntfPort,
+			ivEventLinkIntfPortName,
+			ivEventPluggableInterfacePresenceStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that the plugable interface is not present in the port."
+::= { ivEMSNotificationTrap 37 }
+
+ivBootloaderUpgradeStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventBootloaderUpgradeStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS the bootloader upgrade status."
+::= { ivEMSNotificationTrap 38 }
+
+ivInternalPacketDropErrorEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform EMS that a Internal Packet Drop error happened on the IntruShield box."
+::= { ivEMSNotificationTrap 39 }
+
+ivSensorLatencyStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorLatencyStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor high latency mode status."
+::= { ivEMSNotificationTrap 40 }
+
+ivOutOfBandNACSwitchStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSwitchIPaddress,
+			ivEventSwitchIPv6address,
+			ivEventSwitchStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"Indicates that the Switch cannot communicate with the Sensor: the connection between the Switch and Sensor is down, 
+	or the Switch has been administratively disconnected. Troubleshoot connectivity issues: 1) check that a connection 
+	route exists between the Sensor and the Switch; 2) check the Switch status. This fault clears when the Sensor detects 
+	the Switch again.
+	Note: Based on switch IPaddress, either IPv4 (ivEventSwitchIPaddress) or IPv6 (ivEventSwitchIPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 41 }
+
+ivSensorSwitchCountOutOfSyncStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorSwitchCountOutOfSyncStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor Out-of-Band NAC Switch count out of sync with Manager. 
+	Please update configuration of sensor by pushing signature file."
+::= { ivEMSNotificationTrap 42 }
+
+ivSensorLatencyConfConflictStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorLatencyConfConflictStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor latency monitoring configuration is conflicting with Layer2 monitoring configuration."
+::= { ivEMSNotificationTrap 43 }
+
+ivSensorPacketCaptureStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventSensorPacketCaptureStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor Packet Capture status."
+::= { ivEMSNotificationTrap 44 }
+
+ ivSensorAutoRecoveryStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventAutoRecoveryStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor auto recovery status."
+::= { ivEMSNotificationTrap 45 }
+
+ivSensorHitlessRebootStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventHitlessRebootStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor hitless reboot status."
+::= { ivEMSNotificationTrap 46 }
+
+ivSensorFipsConsoleViolationStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFipsUsername,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor user login via console after sensor initialization. This is a FIPS 140-2 Level 3 violation."
+::= { ivEMSNotificationTrap 47 }
+
+ivSensorFipsNMSKeyDecryptFailureStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventFipsUsername,
+			ivEventFipsNMSKeyDecryptFailureStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor NMS user privacy/auth key decryption failure."
+::= { ivEMSNotificationTrap 48 }
+
+ivSensorFipsResetConfigStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor upgrade or downgrade between FIPS and non-FIPS software images has been detected. This resets the sensor configuration and restores the default login password."
+::= { ivEMSNotificationTrap 49 }
+
+ivSensorPerfMonThresholdAlarmEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivPerfMonThresholdAlarmDescription,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"To inform IntruShield Sensor Performance Threshold Events."
+::= { ivEMSNotificationTrap 50 }
+
+ivDNSConnStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivDNSConnectivityStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 51 }
+
+ivBeaconCommStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivBeaconCommunicationStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 52 }
+
+ivRubiconSlotChangeStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivRubiconSlotNumber,
+			ivRubiconModuleType,
+			ivRubiconSlotStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 53 }
+
+ivSSDStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivSSStatusID,
+			ivSSStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 54 }
+
+ivGTIServerConnStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivGTIServerConnectivityStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 55 }
+
+ivManualSensorRebootStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivManualSensorRebootStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 56 }
+
+ivATDConnStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivATDConnStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS current
+	DESCRIPTION
+	""
+::= { ivEMSNotificationTrap 57 }
+
+ivSensorAttackDetectionErrorStatusEvent  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlarmSeverity,
+			ivEventTimeStamp,
+			ivEventAttackDetectionErrorStatus,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"To inform IntruShield sensor attack detection error status. Device reboot is required for recovery."
+::= { ivEMSNotificationTrap 58 }
+
+
+ivEnterceptAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertCount,
+			ivAlertTimeStamp,
+			ivEnterceptSignatureName,
+			ivEnterceptProxyIP,
+			ivEnterceptAlertNote,
+			ivEnterceptOperatingMode,
+			ivEnterceptAlertAckLevel,
+			ivEnterceptAlertAckTime,
+			ivEnterceptOSUserName,
+			ivEnterceptProcessName,
+			ivEnterceptProcessPath,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe an Entercept signature Alert, which is sent out 
+	by a proxy agent on the Entercept agent machine originally.  The Entercept proxy 
+	agent is one kind of foreign devices."
+
+::= { ivEMSNotificationTrap 100 }
+
+ivMalwareAlert  NOTIFICATION-TYPE
+	OBJECTS {	ivSensorName,
+			ivAdministratorDomainName,
+			ivAlertSeverity,
+			ivAlertRawSeverity,
+			ivAlertCategory,
+			ivAlertSubCategory,
+			ivDetectionMechanism,
+			ivAttackResult,
+			ivAlertDirection,
+			ivAlertSensorUUID,
+			ivGlobalAttackName,
+			ivAlertTimeStamp,
+			ivGlobalVIDSName,
+			ivSensorSlotId,
+			ivSensorPortId,
+			ivGlobalProtocolName,
+			ivNetworkProtocolName,
+			ivSourceIPAddress,
+			ivDestinationIPAddress,
+			ivSourceIPv6Address,
+			ivDestinationIPv6Address,
+			ivAlertSrcPhone,
+			ivAlertSrcIMSI,
+			ivAlertSrcAPN,
+			ivAlertDestPhone,
+			ivAlertDestIMSI,
+			ivAlertDestAPN,
+			ivSourcePort,
+			ivDestinationPort,
+			ivSignatureId,
+			ivMalwareFileType,
+			ivMalwareDirtiness,
+			ivMalwareClassification,
+			ivMalwareMD5,
+			ivMalwareURL,
+			ivSensorIPAddress,
+			ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describe a Malware Alert, which is sent out by a
+	IntruShield Sensor to EMS originally.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 102 }
+
+
+ivNTBAGenericBehaviouralAlert  NOTIFICATION-TYPE
+	OBJECTS {ivSensorName,
+		ivAdministratorDomainName,
+		ivAlertSeverity,
+		ivAlertRawSeverity,
+		ivAlertCategory,
+		ivAlertSubCategory,
+		ivDetectionMechanism,
+		ivAttackResult,
+		ivAlertDirection,
+		ivAlertSensorUUID,
+		ivGlobalAttackName,
+		ivAlertTimeStamp,
+		ivGlobalVIDSName,
+		ivNTBAHostIP,
+       	ivNTBASrcVLANID,
+       	ivNTBADestVLANID,
+       	ivAlertZoneName,
+       	ivAlertDeviceType,
+		ivSensorIPAddress,
+		ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"The Notification that describes an NTBA Generic Behavioral Alert."
+::= { ivEMSNotificationTrap 103 }
+
+ivNTBAPolicyAlert  NOTIFICATION-TYPE
+	OBJECTS {ivSensorName,
+		ivAdministratorDomainName,
+		ivAlertSeverity,
+		ivAlertRawSeverity,
+		ivAlertCategory,
+		ivAlertSubCategory,
+		ivDetectionMechanism,
+		ivAttackResult,
+		ivAlertDirection,
+		ivAlertSensorUUID,
+		ivGlobalAttackName,
+		ivAlertTimeStamp,
+		ivGlobalVIDSName,
+    	ivNTBAServiceName,
+       	ivNTBAAppName,
+       	ivNTBAAppTypeName,
+       	ivNTBAPortId,
+       	ivNTBAProtocolId,
+       	ivNTBAURI,
+       	ivNTBAOsId,
+       	ivNTBAFileName,
+       	ivNTBAFileAccessType,
+       	ivNTBAIllegalHostIP,
+       	ivNTBAMinViolationVal,
+       	ivNTBAMaxViolationVal,
+       	ivNTBAAvgVal,
+       	ivNTBAObsVal,
+       	ivNetworkProtocolName,
+       	ivSourceIPAddress,
+		ivSourceIPv6Address,
+       	ivSourcePort,
+       	ivDestinationIPAddress,
+		ivDestinationIPv6Address,
+       	ivDestinationPort,
+       	ivNTBASrcVLANID,
+       	ivNTBADestVLANID,
+       	ivAlertZoneName,
+       	ivAlertDeviceType,
+       	ivNTBARuleName,
+		ivSensorIPAddress,
+		ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"The Notification that describes an NTBA Policy Alert.
+	Note: Based on src/dst IPaddress type, either IPv4 (IPaddress) or IPv6 (IPv6address) address will be encoded."
+::= { ivEMSNotificationTrap 104 }
+
+ivNTBAWormAlert  NOTIFICATION-TYPE
+	OBJECTS {ivSensorName,
+		ivAdministratorDomainName,
+		ivAlertSeverity,
+		ivAlertRawSeverity,
+		ivAlertCategory,
+		ivAlertSubCategory,
+		ivDetectionMechanism,
+		ivAttackResult,
+		ivAlertDirection,
+		ivAlertSensorUUID,
+		ivGlobalAttackName,
+		ivAlertTimeStamp,
+		ivGlobalVIDSName,
+       	ivNTBAHosts,
+		ivSensorIPAddress,
+		ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"The Notification that describes an NTBA Worm Alert."
+::= { ivEMSNotificationTrap 105 }
+
+ivMultiAIDAlert  NOTIFICATION-TYPE
+	OBJECTS {ivSensorName,
+		ivAdministratorDomainName,
+		ivAlertSeverity,
+		ivAlertRawSeverity,
+		ivAlertCategory,
+		ivAlertSubCategory,
+		ivDetectionMechanism,
+		ivAttackResult,
+		ivAlertDirection,
+		ivAlertSensorUUID,
+		ivGlobalAttackName,
+		ivAlertTimeStamp,
+		ivGlobalVIDSName,
+       	ivNetworkProtocolName,
+       	ivSourceIPAddress,
+		ivSourceIPv6Address,
+       	ivSourcePort,
+       	ivDestinationIPAddress,
+		ivDestinationIPv6Address,
+       	ivDestinationPort,
+		ivNTBAHostIP,
+       	ivNTBASrcVLANID,
+       	ivNTBADestVLANID,
+       	ivAlertZoneName,
+		ivSensorIPAddress,
+		ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"The Notification that describes an Multi AID Alert."
+::= { ivEMSNotificationTrap 106 }
+
+ivEMSNotificationAuditEvent  NOTIFICATION-TYPE
+	OBJECTS {	
+			ivEMSAuditUserName,
+			ivEMSAuditActionType,
+			ivEMSAuditResult,
+			ivEMSAuditMessage,
+			ivEMSAuditAction,
+			ivEMSAuditDomain
+			}
+	STATUS	current
+	DESCRIPTION 
+	"The Notification that describes a log generated due a action taken in NSM."
+::= { ivEMSNotificationTrap 107 }
+
+ivExecutableAlerts  NOTIFICATION-TYPE
+	OBJECTS {ivSensorName,
+		ivAdministratorDomainName,
+		ivAlertSeverity,
+		ivAlertRawSeverity,
+		ivAlertCategory,
+		ivAlertSubCategory,
+		ivAttackResult,
+		ivAlertDirection,
+		ivAlertSensorUUID,
+		ivGlobalAttackName,
+		ivAlertTimeStamp,
+       	ivNetworkProtocolName,
+       	ivSourceIPAddress,
+		ivSourceIPv6Address,
+       	ivSourcePort,
+       	ivDestinationIPAddress,
+		ivDestinationIPv6Address,
+      	ivDestinationPort,
+      	ivExecutableName,
+       	ivExecutableHash,
+       	ivExecutableMalwareConfidence,
+       	ivNTBASrcVLANID,
+       	ivNTBADestVLANID,
+       	ivAlertZoneName,
+		ivSensorIPAddress,
+		ivSensorIPv6Address
+		}
+	STATUS	current
+	DESCRIPTION
+	"The Notification that describes an Multi AID Alert."
+::= { ivEMSNotificationTrap 108 }
+
+
+END
+
+
+
