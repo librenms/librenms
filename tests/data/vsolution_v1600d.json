@@ -3523,7 +3523,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0.00682,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
