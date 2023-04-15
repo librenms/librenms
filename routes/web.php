@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // Socialite
-Route::prefix('auth')->name('socialite.')->group(function () {
+Route::prefix('auth:web')->name('socialite.')->group(function () {
     Route::post('{provider}/redirect', [Auth\SocialiteController::class, 'redirect'])->name('redirect');
     Route::match(['get', 'post'], '{provider}/callback', [Auth\SocialiteController::class, 'callback'])->name('callback');
     Route::get('{provider}/metadata', [Auth\SocialiteController::class, 'metadata'])->name('metadata');
