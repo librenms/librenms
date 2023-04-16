@@ -1,8 +1,9 @@
 os: wxgoos
 text: 'ITWatchDogs Goose'
 type: environment
+mib_dir: wxgoos
 over:
-    - { graph: device_temperature, text: temperature }
+    - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -
         sysObjectID:
