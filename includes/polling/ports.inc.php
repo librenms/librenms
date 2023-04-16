@@ -1,13 +1,12 @@
 <?php
 
-// Build SNMP Cache Array
-use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
+// Build SNMP Cache Array
 $data_oids = [
     'ifName',
     'ifDescr',
@@ -572,8 +571,8 @@ foreach ($ports as $port) {
         // Check to make sure Port data is cached.
         $this_port = &$port_stats[$ifIndex];
 
-        if (Str::startsWith($device['os'], 'vmware') && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
-            $this_port['ifDescr'] = $matches[1];
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
+            $this_port['ifName'] = $matches[1];
         }
 
         $polled_period = ($polled - $port['poll_time']);

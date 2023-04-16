@@ -30,7 +30,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Device eth0 at 03:00.0 VMware - VMXNET3 Ethernet Controller",
-                    "ifName": "Device eth0 at 03:00.0 VMware - VMXNET3 Ethernet Controller",
+                    "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
@@ -128,12 +128,12 @@
         "poller": {
             "ports": [
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "device eth0 at 03",
+                    "port_descr_descr": "00.0 VMware - VMXNET3 Ethernet Controller",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "eth0",
+                    "ifDescr": "Device eth0 at 03:00.0 VMware - VMXNET3 Ethernet Controller",
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
@@ -147,7 +147,7 @@
                     "ifDuplex": null,
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "eth0",
+                    "ifAlias": "Device eth0 at 03:00.0 VMware - VMXNET3 Ethernet Controller",
                     "ifPhysAddress": "0050568b3265",
                     "ifLastChange": 0,
                     "ifVlan": null,
