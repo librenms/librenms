@@ -25,17 +25,13 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-
 class AdvaObjectCreationTest extends SnmpTrapTestCase
 {
-    public function testUserCreation()
+    public function testUserCreation(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectCreationTrap
 CM-SECURITY-MIB::cmSecurityUserPrivLevel.\"testuser\".false superuser
@@ -44,21 +40,18 @@ CM-SECURITY-MIB::cmSecurityUserName.\"testuser\".false testuser
 CM-SECURITY-MIB::cmSecurityUserComment.\"testuser\".false Remote User
 RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 08 37 29 00 2D 06 00 \"
 ADVA-MIB::neEventLogIndex.91 91
-ADVA-MIB::neEventLogTimeStamp.91 2018-12-10,8:55:41.1,-6:0";
-
-        $trap = new Trap($trapText);
-
-        $message = 'User object testuser created';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectCreationTrap user created');
+ADVA-MIB::neEventLogTimeStamp.91 2018-12-10,8:55:41.1,-6:0
+TRAP,
+            'User object testuser created',
+            'Could not handle cmObjectCreationTrap user created',
+        );
     }
 
-    public function testLagCreation()
+    public function testLagCreation(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectCreationTrap
 IEEE8023-LAG-MIB::dot3adAggCollectorMaxDelay.9 50
@@ -74,13 +67,10 @@ F3-LAG-MIB::f3LagName.1.1
 F3-LAG-MIB::f3LagEntry.14.1.1 \"B0 00 \"
 RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 08 3A 2B 00 2D 06 00 \"
 ADVA-MIB::neEventLogIndex.110 110
-ADVA-MIB::neEventLogTimeStamp.110 2018-12-10,8:58:43.7,-6:0";
-
-        $trap = new Trap($trapText);
-
-        $message = 'LAG 1 created';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectCreationTrap LAG created');
+ADVA-MIB::neEventLogTimeStamp.110 2018-12-10,8:58:43.7,-6:0
+TRAP,
+            'LAG 1 created',
+            'Could not handle cmObjectCreationTrap LAG created',
+        );
     }
 }

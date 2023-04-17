@@ -18,7 +18,7 @@ behaviour only found in Python3.4+.
 - PyMySQL is recommended as it requires no C compiler to
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
-- redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- redis-py 4.0+ and Redis 5.0+ server (if using distributed polling)
 - psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
@@ -76,19 +76,39 @@ DB_PASSWORD=
 
 Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
+There are a number of options - most of them are optional if your redis instance is standalone and unauthenticated (neither recommended).
+
 ```dotenv
+##
+## Standalone
+##
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-# OR
-REDIS_SENTINEL=192.0.2.1:26379
-REDIS_SENTINEL_SERVICE=myservice
-
 REDIS_DB=0
-#REDIS_PASSWORD=
-#REDIS_TIMEOUT=60
+REDIS_TIMEOUT=60
 
-CACHE_DRIVER=redis
+# If requirepass is set in redis set everything above as well as: (recommended)
+REDIS_PASSWORD=PasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_USERNAME=UsernameGoesHere
+
+##
+## Sentinel
+##
+REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
+REDIS_SENTINEL_SERVICE=mymaster
+
+# If requirepass is set in sentinel, set everything above as well as: (recommended)
+REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
+
+For more information on ACL's, see <https://redis.io/docs/management/security/acl/> 
+
+Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT` - Sentinel just provides the address of the instance currently accepting writes and manages failover. It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
 
 ### Basic Configuration
 
@@ -166,25 +186,33 @@ Once the LibreNMS service is installed, the cron scripts used by LibreNMS to sta
 
 ## Service Installation
 
-A systemd unit file is provided - the sysv and upstart init scripts
-could also be used with a little modification.
+A systemd unit file is provided - You must adapt `ExecStart` and `WorkingDirectory` if you did not install librenms in `/opt/librenms`
 
-### systemd
+The sysv and upstart init scripts could also be used with a little modification.
+
+### systemd service
 
 A systemd unit file can be found in `misc/librenms.service`. To
-install run `cp /opt/librenms/misc/librenms.service
-/etc/systemd/system/librenms.service && systemctl enable --now
-librenms.service`
+install run:
+```bash
+cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
-### systemd-watchdog
+
+
+### systemd service with watchdog
+
+This service file is an alternative to the above service file. It uses the systemd WatchdogSec= option to restart the service if it does not receive a keep-alive from the running process.
 
 A systemd unit file can be found in `misc/librenms-watchdog.service`. To
-install run `cp /opt/librenms/misc/librenms-watchdog.service
-/etc/systemd/system/librenms.service && systemctl enable --now
-librenms.service`
+install run:
+```bash
+cp /opt/librenms/misc/librenms-watchdog.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
 This requires: python3-systemd (or python-systemd on older systems)
 or https://pypi.org/project/systemd-python/
+If you run this systemd service without python3-systemd it will restart every 30 seconds.
 
 ### OS-Specific Instructions
 
@@ -229,16 +257,17 @@ replacement scl.
 
 #### Debian/Ubuntu
 
-##### Debian 9 (stretch)
+##### Debian 11 (Bullseye)
 
-install python3 and python-mysqldb. python-dotenv is not yet
-available, but the testing package is working fine, you can grab it on
-<https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
-package may be updated and have a new version number).
+Warning: Bullseye provide PHP 7.4 that is too old to run LibreNMS.
 
+##### Debian 12 (Bookworm)
+
+Warning: Bookworm is not available as stable yet (as 2022 november).
+
+Install dependancies
 ```
-apt install python3 python-mysqldb
-cd /tmp
-wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
-dpkg -i python3-dotenv_0.9.1-1_all.deb
+apt install python3 python3-mysqldb python3-dotenv
 ```
+
+Add the `python3-systemd` package for service with watchdog.

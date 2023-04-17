@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app->app_id]);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= ' -b 1000 ';
@@ -16,6 +16,4 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " GPRINT:a:LAST:'%6.2lf %s'";
     $rrd_options .= " GPRINT:a:AVERAGE:'%6.2lf %s'";
     $rrd_options .= " GPRINT:a:MAX:'%6.2lf %s\\n'";
-} else {
-    $error_msg = 'Missing RRD';
 }

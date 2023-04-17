@@ -10,11 +10,11 @@
                     "version": "dmr-3.05.00.0007",
                     "hardware": "TB9300/TB7300",
                     "features": null,
+                    "location": "<private>",
                     "os": "tait-infra93",
                     "type": "network",
                     "serial": "18271180",
-                    "icon": "tait.png",
-                    "location": "<private>"
+                    "icon": "tait.png"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "eth0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -250,7 +240,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -260,15 +249,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -355,7 +340,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -365,15 +349,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "eth0",
                     "ifPhysAddress": "000dca01733e",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -662,6 +642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -686,6 +667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -710,6 +692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -734,6 +717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -758,6 +742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -782,6 +767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -806,6 +792,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -830,6 +817,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -854,6 +842,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryBaseStation"
                 },
                 {
@@ -878,6 +867,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryCustomAlarms"
                 },
                 {
@@ -902,6 +892,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryFrontPanel"
                 },
                 {
@@ -926,6 +917,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryMajor"
                 },
                 {
@@ -950,6 +942,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryMinor"
                 },
                 {
@@ -974,6 +967,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryPowerAmplifier"
                 },
                 {
@@ -998,6 +992,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryPowerManagementUnit"
                 },
                 {
@@ -1022,6 +1017,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummaryReciter"
                 },
                 {
@@ -1046,6 +1042,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmSummarySystem"
                 },
                 {
@@ -1070,6 +1067,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fpAlarmFan1"
                 },
                 {
@@ -1094,6 +1092,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fpAlarmFan2"
                 },
                 {
@@ -1118,6 +1117,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fpAlarmFan3"
                 },
                 {
@@ -1142,6 +1142,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fpAlarmInvalidFirmware"
                 },
                 {
@@ -1166,6 +1167,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fpAlarmNoFPDetected"
                 },
                 {
@@ -1190,6 +1192,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "healthNetworkConnLogChan1State"
                 },
                 {
@@ -1214,6 +1217,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "healthNetworkConnLogChan2State"
                 },
                 {
@@ -1238,6 +1242,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "healthRunMode"
                 },
                 {
@@ -1262,6 +1267,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "linkInfoCtrlProtocolStatus"
                 },
                 {
@@ -1286,6 +1292,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmCurrentImbalance"
                 },
                 {
@@ -1310,6 +1317,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmDriverCurrentHigh"
                 },
                 {
@@ -1334,6 +1342,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmDriverTemperatureHigh"
                 },
                 {
@@ -1358,6 +1367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmFinal1CurrentHigh"
                 },
                 {
@@ -1382,6 +1392,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmFinal1TemperatureHigh"
                 },
                 {
@@ -1406,6 +1417,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmFinal2CurrentHigh"
                 },
                 {
@@ -1430,6 +1442,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmFinal2TemperatureHigh"
                 },
                 {
@@ -1454,6 +1467,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmForwardPowerLow"
                 },
                 {
@@ -1478,6 +1492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmInvalidCalibration"
                 },
                 {
@@ -1502,6 +1517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmInvalidFirmware"
                 },
                 {
@@ -1526,6 +1542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmNoPADetected"
                 },
                 {
@@ -1550,6 +1567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmPowerFoldback"
                 },
                 {
@@ -1574,6 +1592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmReversePowerHigh"
                 },
                 {
@@ -1598,6 +1617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmShutdownImminent"
                 },
                 {
@@ -1622,6 +1642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmSupplyVoltageHigh"
                 },
                 {
@@ -1646,6 +1667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmSupplyVoltageLow"
                 },
                 {
@@ -1670,6 +1692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "paAlarmVSWRFault"
                 },
                 {
@@ -1694,6 +1717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmBatteryProtect"
                 },
                 {
@@ -1718,6 +1742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmBatteryVoltageHigh"
                 },
                 {
@@ -1742,6 +1767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmBatteryVoltageLow"
                 },
                 {
@@ -1766,6 +1792,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmCurrentOutHigh"
                 },
                 {
@@ -1790,6 +1817,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmInvalidFirmware"
                 },
                 {
@@ -1814,6 +1842,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmMainsFailure"
                 },
                 {
@@ -1838,6 +1867,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmNoPMUDetected"
                 },
                 {
@@ -1862,6 +1892,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmSelfTestFailure"
                 },
                 {
@@ -1886,6 +1917,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmShutdownImminent"
                 },
                 {
@@ -1910,6 +1942,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmTemperatureHigh"
                 },
                 {
@@ -1934,6 +1967,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmVoltageOutHigh"
                 },
                 {
@@ -1958,6 +1992,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuAlarmVoltageOutLow"
                 },
                 {
@@ -1982,31 +2017,8 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuStateAuxOutState"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.3570.2.2.2.1.2.4.2.2.0",
-                    "sensor_index": "pmuStateBatteryInState.0",
-                    "sensor_type": "pmuStateBatteryInState",
-                    "sensor_descr": "PMU DC power input state",
-                    "group": "PMUState",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": "pmuStateBatteryInState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -2030,6 +2042,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuStateBusConnect"
                 },
                 {
@@ -2054,6 +2067,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuStateMainsInState"
                 },
                 {
@@ -2078,6 +2092,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "pmuStateOutStatus"
                 },
                 {
@@ -2102,6 +2117,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarm25MHzSynthOutOfLock"
                 },
                 {
@@ -2126,6 +2142,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarm6144MHzSynthOutOfLock"
                 },
                 {
@@ -2150,6 +2167,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmInvalidChannelSelected"
                 },
                 {
@@ -2174,6 +2192,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmInvalidConfiguration"
                 },
                 {
@@ -2198,6 +2217,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmOverTemperature"
                 },
                 {
@@ -2222,6 +2242,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmReceiverSynch"
                 },
                 {
@@ -2246,6 +2267,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmRxCalibrationInvalid"
                 },
                 {
@@ -2270,6 +2292,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmRxSynthOutOfLock"
                 },
                 {
@@ -2294,6 +2317,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmSimulcastSynch"
                 },
                 {
@@ -2318,6 +2342,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmTxCalibrationInvalid"
                 },
                 {
@@ -2342,6 +2367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmTxFSynthOutOfLock"
                 },
                 {
@@ -2366,6 +2392,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rctAlarmTxRSynthOutOfLock"
                 },
                 {
@@ -2390,6 +2417,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarm1PPSAbsent"
                 },
                 {
@@ -2414,6 +2442,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmAmbientTempHigh"
                 },
                 {
@@ -2438,6 +2467,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmAmbientTempLow"
                 },
                 {
@@ -2462,6 +2492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmCartesianLoopUnstable"
                 },
                 {
@@ -2486,6 +2517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmDuplicateNodePriority"
                 },
                 {
@@ -2510,6 +2542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmExternalRefAbsent"
                 },
                 {
@@ -2534,6 +2567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmFallbackControlled"
                 },
                 {
@@ -2558,6 +2592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmNTPSynchronisation"
                 },
                 {
@@ -2582,6 +2617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmQoSJitter"
                 },
                 {
@@ -2606,6 +2642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmQoSLostPackets"
                 },
                 {
@@ -2630,6 +2667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmQoSTransmitBuffer"
                 },
                 {
@@ -2654,6 +2692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemAlarmTxRCableAbsent"
                 },
                 {
@@ -2678,6 +2717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2702,6 +2742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2726,6 +2767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -3127,7 +3169,7 @@
                     "state_descr": "inactive",
                     "state_draw_graph": 1,
                     "state_value": 0,
-                    "state_generic_value": 1
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "healthNetworkConnLogChan1State",
@@ -3176,7 +3218,7 @@
                     "state_descr": "inactive",
                     "state_draw_graph": 1,
                     "state_value": 0,
-                    "state_generic_value": 1
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "healthNetworkConnLogChan2State",
@@ -3260,7 +3302,7 @@
                     "state_descr": "standby",
                     "state_draw_graph": 1,
                     "state_value": 2,
-                    "state_generic_value": 1
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "linkInfoCtrlProtocolStatus",
@@ -3288,7 +3330,7 @@
                     "state_descr": "dmr-hibernate",
                     "state_draw_graph": 1,
                     "state_value": 6,
-                    "state_generic_value": 1
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "linkInfoCtrlProtocolStatus",
@@ -4139,27 +4181,6 @@
                 },
                 {
                     "state_name": "pmuStateAuxOutState",
-                    "state_descr": "not fitted",
-                    "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
-                },
-                {
-                    "state_name": "pmuStateBatteryInState",
-                    "state_descr": "bad",
-                    "state_draw_graph": 1,
-                    "state_value": 0,
-                    "state_generic_value": 1
-                },
-                {
-                    "state_name": "pmuStateBatteryInState",
-                    "state_descr": "good",
-                    "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "pmuStateBatteryInState",
                     "state_descr": "not fitted",
                     "state_draw_graph": 1,
                     "state_value": 2,

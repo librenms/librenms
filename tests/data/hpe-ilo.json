@@ -10,11 +10,11 @@
                     "version": "2.50",
                     "hardware": "ProLiant ML350 Gen9",
                     "features": null,
+                    "location": "<private>",
                     "os": "hpe-ilo",
                     "type": "appliance",
                     "serial": "AB123456CD",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

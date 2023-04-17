@@ -80,7 +80,7 @@ register_shutdown_function(function () {
         spl_autoload_register(function ($class) {
             @include str_replace('\\', '/', $class) . '.php';
         });
-        print_header(version_info());
+        print_header();
     }
 });
 
@@ -134,7 +134,7 @@ if (\LibreNMS\DB\Eloquent::isConnected()) {
 }
 
 $precheck_complete = true; // disable shutdown function
-print_header(version_info());
+print_header();
 
 if (isset($options['g'])) {
     $modules = explode(',', $options['g']);
@@ -147,38 +147,25 @@ if (isset($options['g'])) {
 // run checks
 $validator->validate($modules, isset($options['s']) || ! empty($modules));
 
-function print_header($versions)
+function print_header()
 {
     $output = ob_get_clean();
     @ob_end_clean();
 
-    echo <<< EOF
-====================================
-Component | Version
---------- | -------
-LibreNMS  | ${versions['local_ver']}
-DB Schema | ${versions['db_schema']}
-PHP       | ${versions['php_ver']}
-Python    | ${versions['python_ver']}
-MySQL     | ${versions['mysql_ver']}
-RRDTool   | ${versions['rrdtool_ver']}
-SNMP      | ${versions['netsnmp_ver']}
-====================================
-
-$output
-EOF;
+    echo \LibreNMS\Util\Version::get()->header() . PHP_EOL;
+    echo $output;
 }
 
 // output matches that of ValidationResult
 function print_fail($msg, $fix = null)
 {
-    c_echo("[%RFAIL%n]  $msg");
+    echo "[\033[31;1mFAIL\033[0m]  $msg";
     if ($fix && strlen($msg) > 72) {
         echo PHP_EOL . '       ';
     }
 
     if (! empty($fix)) {
-        c_echo(" [%BFIX%n] %B$fix%n");
+        echo " [\033[34;1mFIX\033[0m] \033[34;1m$fix\033[0m";
     }
     echo PHP_EOL;
 }

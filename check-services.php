@@ -33,7 +33,7 @@ $polled_services = 0;
 
 $where = '';
 $params = [];
-if ($options['h']) {
+if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $where = 'AND `S`.`device_id` = ?';
         $params[] = (int) $options['h'];
@@ -65,7 +65,7 @@ foreach (dbFetchRows($sql, $params) as $service) {
         if (! $service['service_disabled']) {
             d_echo("\nService check - " . $service['service_id'] . "\nSkipping service check because device "
                 . $service['hostname'] . " is down due to icmp.\n");
-            Log::event(
+            \App\Models\Eventlog::log(
                 "Service check - {$service['service_desc']} ({$service['service_id']}) -
                 Skipping service check because device {$service['hostname']} is down due to icmp",
                 $service['device_id'],

@@ -1,9 +1,5 @@
 <?php
 
-$domain_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'docker');
-
-print_optionbar_start();
-
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -11,29 +7,44 @@ $link_array = [
     'app' => 'docker',
 ];
 
-$containers_list = [];
+print_optionbar_start();
 
-foreach ($domain_list as $label) {
-    $container = $label;
+echo generate_link('All Containers', $link_array);
+echo ' | Containers:';
 
-    if ($vars['container'] == $container) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+$containers = $app->data['containers'] ?? [];
+sort($containers);
+foreach ($containers as $index => $container) {
+    $label = $vars['container'] == $container
+        ? '<span class="pagemenu-selected">' . $container . '</span>'
+        : $container;
+
+    echo generate_link($label, $link_array, ['container' => $container]);
+
+    if ($index < (count($containers) - 1)) {
+        echo ', ';
     }
-
-    array_push($containers_list, generate_link($label, $link_array, ['container' => $container]));
 }
-
-printf('%s | containers: %s', generate_link('All Containers', $link_array), implode(', ', $containers_list));
 
 print_optionbar_end();
 
-$graphs = [
+$graphs = [];
+if (! isset($vars['container'])) {
+    $graphs = array_merge($graphs, [
+        'docker_totals' => 'Totals status',
+    ]);
+}
+
+$graphs = array_merge($graphs, [
     'docker_pids' => 'PIDs',
     'docker_mem_limit' => 'Container memory limit',
     'docker_mem_used' => 'Container memory used',
     'docker_cpu_usage' => 'Container CPU usage, %',
     'docker_mem_perc' => 'Container Memory usage, %',
-];
+    'docker_uptime' => 'Container uptime',
+    'docker_size_rw' => 'Container Size RW',
+    'docker_size_root_fs' => 'Container Size Root FS',
+]);
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;

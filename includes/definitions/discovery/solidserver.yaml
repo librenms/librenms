@@ -1,5 +1,249 @@
+mib: EIP-STATS-MIB:EIP-MON-MIB
 modules:
     os:
         hardware: EIP-MON-MIB::eipHwApplianceModel.0
         serial: EIP-MON-MIB::eipHwApplianceSerial.0
         version: EIP-MON-MIB::eipSdsVersionNumber.0
+    sensors:
+        power:
+              data:
+                -
+                    oid: eipHwPowerInstant
+                    value: eipHwPowerInstant
+                    descr: 'Instant Power'
+                    num_oid: '.1.3.6.1.4.1.2440.1.14.6.1.{{ $index }}'
+                    index: 'power.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: eipHwTempRaidController
+                    value: eipHwTempRaidController
+                    descr: 'Raid Controller Temperature'
+                    num_oid: '.1.3.6.1.4.1.2440.1.14.3.6.{{ $index }}'
+                    index: 'raid.{{ $index }}'
+                -
+                    oid: eipHwTempInlet
+                    value: eipHwTempInlet
+                    descr: 'Inlet Temperature'
+                    num_oid: '.1.3.6.1.4.1.2440.1.14.3.4.{{ $index }}'
+                    index: 'inlet.{{ $index }}'
+                -
+                    oid: eipHwTempCpu
+                    value: eipHwTempCpu
+                    num_oid: '.1.3.6.1.4.1.2440.1.14.3.1.{{ $index }}'
+                    descr: 'Cpu Temperature'
+                    index: 'cpu.{{ $index }}'
+                -
+                    oid: eipHwTempBaseboard
+                    value: eipHwTempBaseboard
+                    num_oid: '.1.3.6.1.4.1.2440.1.14.3.5.{{ $index }}'
+                    descr: 'Baseboard Temperature'
+                    index: 'BB.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: eipDnsStatTable
+                    value: eipDnsStatValue
+                    num_oid: '.1.3.6.1.4.1.2440.1.4.2.3.1.3.{{ $index_string }}'
+                    descr: '{{ $eipDnsStatName }}'
+                    index: 'counter__{{ $index }}'
+                    rrd_type: 'COUNTER'
+                    group: 'DNS'
+                    skip_values:
+                        -
+                            oid: eipDnsStatName
+                            op: 'not_in_array'
+                            value:
+                                - requestv4
+                                - requestv6
+                                - badednsver
+                                - requesttcp
+                                - recurserej
+                                - success
+                                - ratedropped
+                                - udp
+                                - tcp
+                                - queryv4
+                                - queryv6
+                                - responsev4
+                                - responsev6
+                                - xfrdone
+                                - servfail
+                                - invalidsig
+                -
+                    oid: eipDhcpStatTable
+                    value: eipDhcpStatValue
+                    num_oid: '.1.3.6.1.4.1.2440.1.3.2.22.1.3.{{ $index_string }}'
+                    descr: '{{ $eipDhcpStatName }}'
+                    rrd_type: 'COUNTER'
+                    index: 'counter__{{ $index }}'
+                    group: 'DHCP'
+        state:
+             data:
+                -
+                     oid: eipHwPsuRedundancy
+                     num_oid: '.1.3.6.1.4.1.2440.1.14.5.1.{{ $index }}'
+                     descr: 'Power Supply Redondancy'
+                     group: 'HW'
+                     state_name: eipHwPsuRedundancy
+                     states:
+                         - { descr: 'not available', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'fully redundant', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'lost redundancy', graph: 1, value: 2, generic: 2 }
+                -
+                     oid: eipSvcSyslogStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.1.1.{{ $index }}'
+                     descr: 'Syslog'
+                     group: 'Services'
+                     state_name: eipSyslogStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcSshStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.2.1.{{ $index }}'
+                     descr: 'SSH'
+                     group: 'Services'
+                     state_name: eipSshStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcApacheStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.3.1.{{ $index }}'
+                     descr: 'Apache'
+                     group: 'Services'
+                     state_name: eipSvcApacheStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcIpmServerStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.4.1.{{ $index }}'
+                     descr: 'IpmServer'
+                     group: 'Services'
+                     state_name: eipSvcIpmServerStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcDatabaseStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.5.1.{{ $index }}'
+                     descr: 'Database'
+                     group: 'Services'
+                     state_name: eipSvcDatabaseStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcDhcpStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.6.1.{{ $index }}'
+                     descr: 'DHCP'
+                     group: 'Services'
+                     state_name: eipSvcDhcpStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcDhcpMsStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.7.1.{{ $index }}'
+                     descr: 'DHCP MS'
+                     group: 'Services'
+                     state_name: eipSvcDhcpMsStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                -
+                     oid: eipSvcDnsStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.8.1.{{ $index }}'
+                     descr: 'DNS'
+                     group: 'Services'
+                     state_name: eipSvcDnsStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcQuaggaStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.10.1.{{ $index }}'
+                     descr: 'Quagga'
+                     group: 'Services'
+                     state_name: eipSvcQuaggaStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcNtpStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.11.1.{{ $index }}'
+                     descr: 'Ntp'
+                     group: 'Services'
+                     state_name: eipSvcNtpStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcTftpStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.12.1.{{ $index }}'
+                     descr: 'Tftp'
+                     group: 'Services'
+                     state_name: eipSvcTftpStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSvcSendmailStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.16.14.1.{{ $index }}'
+                     descr: 'Sendmail'
+                     group: 'Services'
+                     state_name: eipSvcSendmailStatus
+                     states:
+                         - { descr: disabled, graph: 1, value: 0, generic: 3 }
+                         - { descr: running, graph: 1, value: 1, generic: 0 }
+                         - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
+                         - { descr: failed, graph: 1, value: 3, generic: 2 }
+                -
+                     oid: eipSdsMemberRole
+                     num_oid: '.1.3.6.1.4.1.2440.1.17.2.1.{{ $index }}'
+                     descr: 'Member Role'
+                     group: 'Cluster'
+                     state_name: eipSdsMemberRole
+                     states:
+                         - { descr: standalone, graph: 1, value: 0, generic: 0 }
+                         - { descr: master, graph: 1, value: 1, generic: 0 }
+                         - { descr: 'hot-standby', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'master-recovered', graph: 1, value: 3, generic: 1 }
+                -
+                     oid: eipSdsMemberStatus
+                     num_oid: '.1.3.6.1.4.1.2440.1.17.2.2.{{ $index }}'
+                     descr: 'Member Status'
+                     group: 'Cluster'
+                     state_name: eipSdsMemberStatus
+                     states:
+                         - { descr: ok, graph: 1, value: 0, generic: 0 }
+                         - { descr: 'not-configured', graph: 1, value: 1, generic: 3 }
+                         - { descr: upgrading, graph: 1, value: 2, generic: 1 }
+                         - { descr: 'init-standby', graph: 1, value: 3, generic: 1 }
+                         - { descr: 'invalid-credentials', graph: 1, value: 4, generic: 2 }
+                         - { descr: 'remote-managed', graph: 1, value: 5, generic: 0 }
+                         - { descr: timeout, graph: 1, value: 6, generic: 2 }
+                         - { descr: 'split-brain', graph: 1, value: 7, generic: 2 }
+                         - { descr: 'replication-stopped', graph: 1, value: 8, generic: 2 }

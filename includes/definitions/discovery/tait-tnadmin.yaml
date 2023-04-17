@@ -1,0 +1,420 @@
+mib: TAIT-TNADMIN-MIB:TAIT-TN9300-MIB
+modules:
+    os:
+        sysDescr_regex: '/Tait Communications, Core Network, (?<hardware>[^,]+),/'
+        version: tnAdminTaitServiceVersion.1443
+    processors:
+        data:
+            -
+                oid: TAIT-TNADMIN-MIB::tnAdminTaitServiceTable
+                num_oid: '.1.3.6.1.4.1.3570.3.15.2.1.1.1.6.{{ $index }}'
+                value: TAIT-TNADMIN-MIB::tnAdminTaitServiceCpu
+                descr: '{{ $TAIT-TNADMIN-MIB::tnAdminTaitServiceName }} CPU pct'
+                index: 'tnServiceCpu.{{ $index }}'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - TAIT-TNADMIN-MIB::tnAdminTaitServiceVersion
+                        - TAIT-TNADMIN-MIB::tnAdminTaitServiceName
+                        - TAIT-TN9300-MIB::tn9300RemoteNodeName
+                        - TAIT-TN9300-MIB::tn9300DipLineName
+                        - TAIT-TN9300-MIB::tn9300DipLineAddress
+                        - TAIT-TN9300-MIB::tn9300SiteName
+        state:
+            data:
+                -
+                    oid: TAIT-TNADMIN-MIB::tnAdminTaitServiceTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.15.2.1.1.1.8.{{ $index }}'
+                    value: TAIT-TNADMIN-MIB::tnAdminTaitServiceState
+                    descr: '{{ $TAIT-TNADMIN-MIB::tnAdminTaitServiceName }} {{ $TAIT-TNADMIN-MIB::tnAdminTaitServiceVersion }}'
+                    index: 'tnServiceState.{{ $index }}'
+                    group: TnAdmin
+                    state_name: tnAdminTaitServiceState
+                    states:
+                        - { descr: Running, graph: 1, value: 0, generic: 0 }
+                        - { descr: Watchdog Stopped, graph: 1, value: 1, generic: 1 }
+                        - { descr: Application Stopped, graph: 1, value: 2, generic: 3 }
+                        - { descr: Stopped, graph: 1, value: 3, generic: 1 }
+                        - { descr: Not Installed, graph: 1, value: 4, generic: 3 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.6.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300RemoteNodeState
+                    descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Remote Node State'
+                    index: 'tnRemoteNodeState.{{ $index }}'
+                    group: Tn9300RemoteNode
+                    state_name: tn9300RemoteNodeState
+                    states:
+                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
+                        - { descr: Offline, graph: 1, value: 1, generic: 3 }
+                        - { descr: Program, graph: 1, value: 2, generic: 3 }
+                        - { descr: Switching, graph: 1, value: 3, generic: 0 }
+                        - { descr: Control, graph: 1, value: 4, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 5, generic: 1 }
+                        - { descr: Graceful Shutdown, graph: 1, value: 6, generic: 3 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.9.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300RemoteNodeSynced
+                    descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Remote Node Sync State'
+                    index: 'tnRemoteNodeSync.{{ $index }}'
+                    group: Tn9300RemoteNode
+                    state_name: tn9300RemoteNodeSynced
+                    states:
+                        - { descr: OK, graph: 1, value: 0, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 1, generic: 1 }
+                        - { descr: Unknown, graph: 1, value: 2, generic: 3 }
+                        - { descr: None, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300NodeObjs
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.17.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DiskSpaceOk
+                    descr: 'Disk Space OK'
+                    index: 'tn9300DiskSpaceOk.{{ $index }}'
+                    group: Alarms Local Node
+                    state_name: tn9300DiskSpaceOk
+                    states:
+                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                        - { descr: NOK, graph: 1, value: 2, generic: 1 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300NodeObjs
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.18.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300LicenseValidity
+                    descr: 'Local Node Licence'
+                    index: 'tn9300LicenseValidity.{{ $index }}'
+                    group: Alarms Local Node
+                    state_name: tn9300LicenseValidity
+                    states:
+                        - { descr: Valid, graph: 1, value: 0, generic: 0 }
+                        - { descr: File Not Found, graph: 1, value: 1, generic: 1 }
+                        - { descr: Invalid host ID, graph: 1, value: 2, generic: 1 }
+                        - { descr: Invalid product code, graph: 1, value: 3, generic: 1 }
+                        - { descr: Invalid version, graph: 1, value: 4, generic: 1 }
+                        - { descr: Invalid expiry date, graph: 1, value: 5, generic: 1 }
+                        - { descr: Expired, graph: 1, value: 6, generic: 1 }
+                        - { descr: Corrupt signature, graph: 1, value: 7, generic: 1 }
+                        - { descr: Conflicting features, graph: 1, value: 8, generic: 1 }
+                        - { descr: Invalid tier mode, graph: 1, value: 9, generic: 1 }
+                        - { descr: Invalid license format, graph: 1, value: 10, generic: 1 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.8.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineState
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Dip Line State'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineState.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                    state_name: tn9300DipLineState
+                    states:
+                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
+                        - { descr: Unconfigured, graph: 1, value: 1, generic: 3 }
+                        - { descr: Idle, graph: 1, value: 2, generic: 3 }
+                        - { descr: Active, graph: 1, value: 3, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.9.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineNgwLinkState
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Dip Line to NetGW State'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineNgwLinkState.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                    state_name: tn9300DipLineNgwLinkState
+                    states:
+                        - { descr: Unknown, graph: 1, value: 0, generic: 3 }
+                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 2, generic: 1 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.4.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteEnabled
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Site Enabled State'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteEnabled.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                    state_name: tn9300SiteEnabled
+                    states:
+                        - { descr: Disabled, graph: 1, value: 0, generic: 1 }
+                        - { descr: Enabled, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.5.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteOk
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Site State'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteOk.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                    state_name: tn9300SiteOk
+                    states:
+                        - { descr: Not OK, graph: 1, value: 0, generic: 1 }
+                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.42.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteControlChCountOk
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ctrl Nb Ch Match Required'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteControlChCountOk.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                    state_name: tn9300SiteControlChCountOk
+                    states:
+                        - { descr: Not OK, graph: 1, value: 0, generic: 1 }
+                        - { descr: OK, graph: 1, value: 1, generic: 0 }
+        count:
+            data:
+                -
+                    oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.5.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300RemoteNodePriority
+                    descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Remote Node Prio'
+                    index: 'tn9300RemotePrio.{{ $index }}'
+                    group: Tn9300RemoteNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300RemoteNodeCallSw
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.7.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300RemoteNodeCallSw
+                    descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Nb Calls switched on remote node'
+                    index: 'tn9300RemoteNodeCallSw.{{ $index }}'
+                    group: Tn9300RemoteNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300RemoteNodeTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.7.1.1.8.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300RemoteNodeConnectSw
+                    descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Nb Connections switched on remote node'
+                    index: 'tn9300RemoteNodeConnectSw.{{ $index }}'
+                    group: Tn9300RemoteNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300NodeObjs
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.3.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300Priority
+                    descr: 'Priority of the local node'
+                    index: 'tn9300Priority.{{ $index }}'
+                    group: Tn9300LocalNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300NodeObjs
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.13.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300CallsSwitching
+                    descr: 'Nb Calls Switching'
+                    index: 'tn9300CallsSwitching.{{ $index }}'
+                    group: Tn9300LocalNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300NodeObjs
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.14.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300ConnectionsSwitching
+                    descr: 'Nb Connections Switching'
+                    index: 'tn9300ConnectionsSwitching.{{ $index }}'
+                    group: Tn9300LocalNode
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.15.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineClientConnects
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb Client Connect on DIP Line'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineClientConnects.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.16.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineNgpRxPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb NGP pkts Rx on DIP from NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineNgpRxPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.17.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineNgpTxPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb NGP pkts Tx on DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineNgpTxPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.18.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineNgpLostPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb NGP pkts Lost from DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineNgpLostPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.19.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineRtpRxPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb RTP pkts Rx on DIP from NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineRtpRxPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.20.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineRtpTxPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb RTP pkts Tx from DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineRtpTxPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.21.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineRtpLostPackets
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} Nb RTP pkts Lost Tx from DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineRtpLostPackets.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.22.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineRtpRtt
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} RTT from DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineRtpRtt.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300DipLineEntry
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.4.1.1.23.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300DipLineRtpJitter
+                    descr: '{{ TAIT-TN9300-MIB::tn9300DipLineName }} RTT jitter from DIP to NetGW'
+                    index: 'TAIT-TN9300-MIB::tn9300DipLineRtpJitter.{{ $index }}'
+                    group: 'TN9300 DipConnections {{ TAIT-TN9300-MIB::tn9300DipLineName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTable
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.7.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteQueueDepth
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Calls Queue'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteQueueDepth.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNChannels
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.21.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNChannels
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb ch installed'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNChannels.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNTrafficChannels
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.23.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNTrafficChannels
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Traffic Ch'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNTrafficChannels.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNIdleChannels
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.24.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNIdleChannels
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Idle Ch'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNIdleChannels.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNFailedChannels
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.26.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNFailedChannels
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Failed Ch'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNFailedChannels.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNOnAirCalls
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.27.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNOnAirCalls
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Calls on air'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNOnAirCalls.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNRingingCalls
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.28.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNRingingCalls
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Calls waiting'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNRingingCalls.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNQueuedCalls
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.29.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNQueuedCalls
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Calls queued'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNQueuedCalls.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTotalCalls
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.30.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteTotalCalls
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Total Calls since start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteTotalCalls.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTotalChannelCalls
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.31.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteTotalChannelCalls
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb Total Calls wth traffic ch'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteTotalChannelCalls.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteTotalQueueTime
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.32.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteTotalQueueTime
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Queue Secs since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteTotalQueueTime.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeFailed
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.33.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeFailed
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time Failed (sec) since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeFailed.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeControl
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.34.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeControl
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time Traffic Ch (sec) since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeControl.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeControl
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.35.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeControl
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time Control (sec) since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeControl.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.36.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time Idle (sec) since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.36.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time Idle (sec) since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeIdle.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteCallsQueuedUnder5
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.37.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteCallsQueuedUnder5
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb calls queued under 5 sec since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteCallsQueuedUnder5.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteCallsQueued5To10
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.38.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteCallsQueued5To10
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb calls queued 5 to 10 sec since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteCallsQueued5To10.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteCallsQueued10To20
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.39.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteCallsQueued10To20
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb calls queued 10 to 20 sec since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteCallsQueued10To20.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteCallsQueuedOver20
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.40.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteCallsQueuedOver20
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb calls queued above 20 sec since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteCallsQueuedOver20.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteNAlternateChannels
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.43.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteNAlternateChannels
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Nb alternate ch'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteNAlternateChannels.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'
+                -
+                    oid: TAIT-TN9300-MIB::tn9300SiteChannelTimeAlternate
+                    num_oid: '.1.3.6.1.4.1.3570.3.6.2.2.1.1.44.{{ $index }}'
+                    value: TAIT-TN9300-MIB::tn9300SiteChannelTimeAlternate
+                    descr: '{{ TAIT-TN9300-MIB::tn9300SiteName }} Ch time as alternate ch since node start'
+                    index: 'TAIT-TN9300-MIB::tn9300SiteChannelTimeAlternate.{{ $index }}'
+                    group: 'Site {{ TAIT-TN9300-MIB::tn9300SiteName }}'

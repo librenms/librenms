@@ -1,0 +1,45 @@
+mib: FORTINET-FORTIADC-MIB
+modules:
+    os:
+        version: FORTINET-FORTIADC-MIB::fadcSysVersion.0
+        serial: FORTINET-FORTIADC-MIB::fadcSysSerial.0
+    processors:
+        data:
+            -
+                oid: fadcSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.112.1.4.{{ $index }}'
+                descr: System CPU Usage
+                type: fortigate-fixed
+    mempools:
+        data:
+            -
+                percent_used: FORTINET-FORTIADC-MIB::fadcSysMemUsage
+                descr: System Memory Usage
+    sensors:
+        count:
+            data:
+                -
+                    oid: fadcConcurrentClientConnections
+                    index: 'fadcConcurrentClientConnections.{{ $index }}'
+                    descr: Client Connections
+                    group: Server Load Balance
+                -
+                    oid: fadcConcurrentClientSSLSessions
+                    index: 'fadcConcurrentClientSSLSessions.{{ $index }}'
+                    descr: Client SSL Sessions
+                    group: Server Load Balance
+                -
+                    oid: fadcVirturalServerNumber
+                    index: 'fadcVirturalServerNumber.{{ $index }}'
+                    descr: Virtual Servers
+                    group: Server Load Balance
+                -
+                    oid: fadcRSNumber
+                    index: 'fadcRSNumber.{{ $index }}'
+                    descr: Real Server Pools
+                    group: Server Load Balance
+                -
+                    oid: fadcVdNumber
+                    index: 'fadcVdNumber.{{ $index }}'
+                    high_limit: '{{ $fadcVdMaxVdoms }}'
+                    descr: VDOMs

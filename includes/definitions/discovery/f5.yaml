@@ -9,3 +9,14 @@ modules:
                 used: F5-BIGIP-SYSTEM-MIB::sysStatMemoryUsed
                 total: F5-BIGIP-SYSTEM-MIB::sysStatMemoryTotal
                 descr: 'TMM Memory'
+                index: 0
+            -
+                used: F5-BIGIP-SYSTEM-MIB::sysGlobalHostOtherMemoryUsed
+                total: F5-BIGIP-SYSTEM-MIB::sysGlobalHostOtherMemoryTotal
+                descr: 'Other Memory'
+                index: 1
+            -
+                used: F5-BIGIP-SYSTEM-MIB::sysGlobalHostSwapUsed
+                total: F5-BIGIP-SYSTEM-MIB::sysGlobalHostSwapTotal
+                descr: 'Swap Memory'
+                index: 2

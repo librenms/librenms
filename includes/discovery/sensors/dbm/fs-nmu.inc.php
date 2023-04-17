@@ -248,7 +248,7 @@ if (is_numeric($b2_rx)) {
         $valid['sensor'],
         'dbm',
         $device,
-        $oid_b2_tx,
+        $oid_b2_rx,
         $index,
         'fs-nmu',
         $descr,
@@ -258,7 +258,7 @@ if (is_numeric($b2_rx)) {
         null,
         null,
         null,
-        $b2_tx,
+        $b2_rx,
         'snmp'
     );
 }
@@ -348,7 +348,7 @@ if (is_numeric($c2_rx)) {
         $valid['sensor'],
         'dbm',
         $device,
-        $oid_c2_tx,
+        $oid_c2_rx,
         $index,
         'fs-nmu',
         $descr,
@@ -358,7 +358,7 @@ if (is_numeric($c2_rx)) {
         null,
         null,
         null,
-        $c2_tx,
+        $c2_rx,
         'snmp'
     );
 }

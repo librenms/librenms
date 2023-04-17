@@ -177,6 +177,7 @@ Artisan::command('poller:billing-calculate
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
     {--P|ping-only : ' . __('Add the device as a ping only device if it replies to ping but not SNMP') . '}
+    {--o|dns-only : ' . __('Only DNS resolved Devices') . '}
     {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
     {--l|legend : ' . __('Print the legend') . '}
 ', function () {
@@ -187,6 +188,10 @@ Artisan::command('scan
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
+    }
+
+    if ($this->option('dns-only')) {
+        $command[] = '-o';
     }
 
     if ($this->option('ping-only')) {
@@ -213,5 +218,16 @@ Artisan::command('scan
 
     $command = array_merge($command, $this->argument('network'));
 
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    $scan_process = (new Process($command))
+        ->setTimeout(null)
+        ->setIdleTimeout(null)
+        ->setTty(Process::isTtySupported() && ! $this->option('quiet'));
+    $scan_process->run();
+
+    if (! Process::isTtySupported() && ! $this->option('quiet')) {
+        // just dump the output after we are done if we couldn't use tty
+        $this->line($scan_process->getOutput());
+    }
+
+    return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));

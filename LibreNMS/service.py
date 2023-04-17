@@ -4,9 +4,10 @@ import sys
 import threading
 import time
 
-import pymysql
+import pymysql  # pylint: disable=import-error
 
 import LibreNMS
+from LibreNMS.config import DBConfig
 
 try:
     import psutil
@@ -37,7 +38,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class ServiceConfig:
+class ServiceConfig(DBConfig):
     def __init__(self):
         """
         Stores all of the configuration variables for the LibreNMS service in a common object
@@ -90,18 +91,14 @@ class ServiceConfig:
     redis_host = "localhost"
     redis_port = 6379
     redis_db = 0
+    redis_user = None
     redis_pass = None
     redis_socket = None
     redis_sentinel = None
+    redis_sentinel_user = None
+    redis_sentinel_pass = None
     redis_sentinel_service = None
     redis_timeout = 60
-
-    db_host = "localhost"
-    db_port = 0
-    db_socket = None
-    db_user = "librenms"
-    db_pass = ""
-    db_name = "librenms"
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
@@ -184,6 +181,9 @@ class ServiceConfig:
         self.redis_db = os.getenv(
             "REDIS_DB", config.get("redis_db", ServiceConfig.redis_db)
         )
+        self.redis_user = os.getenv(
+            "REDIS_USERNAME", config.get("redis_user", ServiceConfig.redis_user)
+        )
         self.redis_pass = os.getenv(
             "REDIS_PASSWORD", config.get("redis_pass", ServiceConfig.redis_pass)
         )
@@ -195,6 +195,14 @@ class ServiceConfig:
         )
         self.redis_sentinel = os.getenv(
             "REDIS_SENTINEL", config.get("redis_sentinel", ServiceConfig.redis_sentinel)
+        )
+        self.redis_sentinel_user = os.getenv(
+            "REDIS_SENTINEL_USERNAME",
+            config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user),
+        )
+        self.redis_sentinel_pass = os.getenv(
+            "REDIS_SENTINEL_PASSWORD",
+            config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass),
         )
         self.redis_sentinel_service = os.getenv(
             "REDIS_SENTINEL_SERVICE",
@@ -226,6 +234,12 @@ class ServiceConfig:
         )
         self.db_user = os.getenv(
             "DB_USERNAME", config.get("db_user", ServiceConfig.db_user)
+        )
+        self.db_sslmode = os.getenv(
+            "DB_SSLMODE", config.get("db_sslmode", ServiceConfig.db_sslmode)
+        )
+        self.db_ssl_ca = os.getenv(
+            "MYSQL_ATTR_SSL_CA", config.get("db_ssl_ca", ServiceConfig.db_ssl_ca)
         )
 
         self.watchdog_enabled = config.get(
@@ -644,10 +658,17 @@ class Service:
         """
         try:
             return LibreNMS.RedisLock(
+                sentinel_kwargs={
+                    "username": self.config.redis_sentinel_user,
+                    "password": self.config.redis_sentinel_pass,
+                    "socket_timeout": self.config.redis_timeout,
+                    "unix_socket_path": self.config.redis_socket,
+                },
                 namespace="librenms.lock",
                 host=self.config.redis_host,
                 port=self.config.redis_port,
                 db=self.config.redis_db,
+                username=self.config.redis_user,
                 password=self.config.redis_pass,
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
@@ -668,7 +689,11 @@ class Service:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Could not connect to Redis. {}".format(e))
+                logger.critical(
+                    "Lock manager could not connect to Redis. {}: {}".format(
+                        type(e).__name__, e
+                    )
+                )
                 self.exit(2)
 
         return LibreNMS.ThreadingLock()
@@ -814,12 +839,13 @@ class Service:
         try:
             # Report on the poller instance as a whole
             self._db.query(
-                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, last_report, master) "
-                'values("{0}", "{1}", "{2}", NOW(), {3}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={3}; '.format(
+                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
+                'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
+                    ",".join(str(i) for i in self.config.group),
                     1 if self.is_master else 0,
                 )
             )

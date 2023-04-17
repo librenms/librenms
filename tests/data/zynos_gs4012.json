@@ -10,11 +10,11 @@
                     "version": "",
                     "hardware": "GS-4012F",
                     "features": null,
+                    "location": "<private>",
                     "os": "zynos",
                     "type": "network",
                     "serial": "0Z0724031894",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

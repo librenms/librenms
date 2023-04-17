@@ -25,9 +25,13 @@
 
 namespace LibreNMS\Util;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
+
 class Time
 {
-    public static function legacyTimeSpecToSecs($description)
+    public static function legacyTimeSpecToSecs(string $description): int
     {
         $conversion = [
             'now' => 0,
@@ -46,90 +50,78 @@ class Time
             'twoyear' => 63072000,
         ];
 
-        return isset($conversion[$description]) ? $conversion[$description] : 0;
+        return $conversion[$description] ?? 0;
     }
 
-    public static function formatInterval($interval, $format = 'long')
-    {
-        $result = '';
-        $data = [
-            'years' => 31536000,
-            'days' => 86400,
-            'hours' => 3600,
-            'minutes' => 60,
-            'seconds' => 1,
-        ];
-
-        foreach ($data as $k => $v) {
-            if ($interval >= $v) {
-                $diff = floor($interval / $v);
-
-                $result .= " $diff";
-                if ($format == 'short') {
-                    $result .= substr($k, 0, 1);
-                }
-
-                if ($format != 'short' && $diff > 1) {
-                    $result .= ' ' . $k;
-                }
-
-                if ($format != 'short' && $diff < 2) {
-                    $result .= ' ' . substr($k, 0, -1);
-                }
-
-                $interval -= $v * $diff;
-            }
-        }
-
-        return $result;
-    }
-
-    /*
-     * @param integer seconds of a time period
-     * @return string human readably time period
+    /**
+     * Format seconds as a human readable interval.  Negative seconds will say "ago".
      */
-    public static function humanTime($s)
+    public static function formatInterval(?int $seconds, bool $short = false, ?int $parts = null): string
     {
-        $ret = [];
-
-        if ($s >= 86400) {
-            $d = floor($s / 86400);
-            $s -= $d * 86400;
-            if ($d == 1) {
-                $ret[] = $d . ' day';
-            } else {
-                $ret[] = $d . ' days';
-            }
+        if ($seconds == 0) {
+            return '';
         }
 
-        if ($s >= 3600) {
-            $h = floor($s / 3600);
-            $s -= $h * 3600;
-            if ($h == 1) {
-                $ret[] = $h . ' hour';
-            } else {
-                $ret[] = $h . ' hours';
+        $parts = $parts ?? ($short ? 3 : -1);
+
+        try {
+            // handle negative seconds correctly
+            if ($seconds < 0) {
+                return CarbonInterval::seconds($seconds)->invert()->cascade()->forHumans([
+                    'syntax' => CarbonInterface::DIFF_RELATIVE_TO_NOW,
+                    'parts' => $parts,
+                    'short' => $short,
+                ]);
             }
+
+            return CarbonInterval::seconds($seconds)->cascade()->forHumans([
+                'syntax' => CarbonInterface::DIFF_ABSOLUTE,
+                'parts' => $parts,
+                'short' => $short,
+            ]);
+        } catch (\Exception) {
+            return '';
+        }
+    }
+
+    /**
+     * Parse a time string into a timestamp including signed relative times using:
+     * m - month
+     * d - day
+     * h - hour
+     * y - year
+     */
+    public static function parseAt(string|int $time): int
+    {
+        if (is_numeric($time)) {
+            return $time < 0 ? time() + $time : intval($time);
         }
 
-        if ($s >= 60) {
-            $m = floor($s / 60);
-            $s -= $m * 60;
-            if ($m == 1) {
-                $ret[] = $m . ' minute';
-            } else {
-                $ret[] = $m . ' minutes';
-            }
+        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+            $units = [
+                'm' => 60,
+                'h' => 3600,
+                'd' => 86400,
+                'y' => 31557600,
+            ];
+            $value = Number::cast(substr($time, 1, -1));
+            $unit = substr($time, -1);
+
+            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+
+            return time() + $offset;
         }
 
-        if ($s > 0) {
-            if ($s == 1) {
-                $ret[] = $s . ' second';
-            } else {
-                $ret[] = $s . ' seconds';
-            }
-        }
+        return (int) strtotime($time);
+    }
 
-        return implode(' ,', $ret);
+    /**
+     * Take a date and return the number of days from now
+     */
+    public static function dateToDays(string|int $date): int
+    {
+        $carbon = new Carbon();
+
+        return $carbon->diffInDays($date, false);
     }
 }

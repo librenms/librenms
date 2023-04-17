@@ -226,7 +226,7 @@ class Lcos extends OS implements
                 'lcos',
                 $bssid,
                 'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
-                $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
+                $entry['lcsStatusWlanCompetingNetworksEntryPhySignal']
             );
         }
 

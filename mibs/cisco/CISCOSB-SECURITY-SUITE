@@ -16,7 +16,7 @@ IMPORTS
 
 
 rlSecuritySuiteMib MODULE-IDENTITY
-        LAST-UPDATED "200604080000Z"
+        LAST-UPDATED "200604080001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO

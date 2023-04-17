@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 class Epmp extends OS implements
     OSPolling,
@@ -121,8 +122,8 @@ class Epmp extends OS implements
         $dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'] ?? null;
 
         if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && $ulWLanTotalAvailableFrameTimePerSecond && $ulWLanTotalUsedFrameTimePerSecond) {
-            $ulWlanFrameUtilization = round(($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100, 2);
-            $dlWlanFrameUtilization = round(($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100, 2);
+            $ulWlanFrameUtilization = Number::calculatePercent($ulWLanTotalUsedFrameTimePerSecond, $ulWLanTotalAvailableFrameTimePerSecond);
+            $dlWlanFrameUtilization = Number::calculatePercent($dlWLanTotalUsedFrameTimePerSecond, $dlWLanTotalAvailableFrameTimePerSecond);
             d_echo($dlWlanFrameUtilization);
             d_echo($ulWlanFrameUtilization);
             $rrd_def = RrdDefinition::make()

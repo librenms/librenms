@@ -50,6 +50,7 @@ use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
@@ -59,22 +60,22 @@ class AboutController extends Controller
 {
     public function index(Request $request)
     {
-        $callback_status = Callback::get('enabled') === '1';
         $version = Version::get();
 
         return view('about.index', [
-            'callback_status' => $callback_status,
-            'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
+            'usage_reporting_status' => Config::get('reporting.usage'),
+            'error_reporting_status' => Config::get('reporting.error'),
+            'reporting_clearable'   => Callback::whereIn('name', ['uuid', 'error_reporting_uuid'])->exists(),
 
-            'db_schema' => vsprintf('%s (%s)', $version->database()),
-            'git_log' => $version->gitChangelog(),
-            'git_date' => $version->gitDate(),
+            'db_schema' => $version->database(),
+            'git_log' => $version->git->log(),
+            'git_date' => $version->date(),
             'project_name' => Config::get('project_name'),
 
-            'version_local' => $version->local(),
-            'version_mysql' => $version->databaseServer(),
+            'version_local' => $version->name(),
+            'version_database' => $version->databaseServer(),
             'version_php' => phpversion(),
-            'version_laravel' => App::VERSION(),
+            'version_laravel' => App::version(),
             'version_python' => $version->python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool' => Rrd::version(),
@@ -104,5 +105,22 @@ class AboutController extends Controller
             'stat_vrf'        => Vrf::count(),
             'stat_wireless'   => WirelessSensor::count(),
         ]);
+    }
+
+    public function clearReportingData(): JsonResponse
+    {
+        $usage_uuid = Callback::get('uuid');
+
+        // try to clear usage data if we have a uuid
+        if ($usage_uuid) {
+            if (! \Http::post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
+                return response()->json([], 500); // don't clear if this fails to delete upstream data
+            }
+        }
+
+        // clear all reporting ids
+        Callback::truncate();
+
+        return response()->json();
     }
 }

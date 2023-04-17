@@ -2,7 +2,7 @@
 
 // PDU - Phase
 $oids = snmp_walk($device, 'rPDUStatusPhaseIndex', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {
@@ -15,7 +15,7 @@ if ($oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -45,7 +45,7 @@ if ($oids) {
 }
 unset($oids);
 $oids = snmp_walk($device, 'rPDULoadStatusPhaseNumber', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {
@@ -62,7 +62,7 @@ if ($oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -97,7 +97,7 @@ if ($bank_count > 0) {
     $oids = snmp_walk($device, 'rPDULoadStatusBankNumber', '-OsqnU', 'PowerNet-MIB');
 }
 // should work with firmware v2 and v3
-if ($oids) {
+if (isset($oids) && $oids) {
     echo 'APC PowerNet-MIB Banks ';
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -112,7 +112,7 @@ if ($oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $descr = 'Bank ' . $banknum;
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
@@ -139,7 +139,7 @@ if ($oids) {
 unset($oids);
 // Per Outlet Power Bar
 $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     echo 'APC PowerNet-MIB Outlets ';
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -150,7 +150,7 @@ if ($oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $voltage_oid = '.1.3.6.1.4.1.318.1.1.26.6.3.1.6';
             // rPDU2PhaseStatusVoltage
             $current_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.' . $index;
@@ -165,9 +165,17 @@ if ($oids) {
             // rPDU2OutletMeteredStatusName
             $voltage = snmp_get($device, $voltage_oid, '-Oqv', '');
             $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-            $limit = (snmp_get($device, $limit_oid, '-Oqv', '') / $voltage);
-            $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', '') / $voltage);
-            $warnlimit = (snmp_get($device, $warnlimit_oid, '-Oqv', '') / $voltage);
+
+            $limit = null;
+            $lowlimit = null;
+            $warnlimit = null;
+
+            if ($voltage) {
+                $limit = (snmp_get($device, $limit_oid, '-Oqv', '') / $voltage);
+                $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', '') / $voltage);
+                $warnlimit = (snmp_get($device, $warnlimit_oid, '-Oqv', '') / $voltage);
+            }
+
             $descr = 'Outlet ' . $index . ' - ' . snmp_get($device, $name_oid, '-Oqv', '');
             discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
@@ -176,8 +184,9 @@ if ($oids) {
 unset($oids);
 // ATS
 $oids = snmp_walk($device, 'atsConfigPhaseTableIndex', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     $type = 'apc';
+    $precision = '10';
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {
@@ -206,12 +215,12 @@ unset($oids);
 
 // UPS
 
-    $phasecount = $phasecount = $pre_cache['apcups_phase_count'];
+$phasecount = $pre_cache['apcups_phase_count'];
 if ($phasecount > 1) {
-    $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', $oids, 'PowerNet-MIB');
+    $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', [], 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputCurrent', $in_oids, 'PowerNet-MIB');
 } else {
-    $oids = snmpwalk_cache_oid($device, 'upsHighPrecOutputCurrent', $oids, 'PowerNet-MIB');
+    $oids = snmpwalk_cache_oid($device, 'upsHighPrecOutputCurrent', [], 'PowerNet-MIB');
 }
 if (isset($in_oids)) {
     foreach ($in_oids as $index => $data) {
@@ -229,8 +238,8 @@ if (isset($in_oids)) {
         }
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);
 foreach ($oids as $index => $data) {
     $type = 'apcUPS';
     $descr = 'Phase ' . substr($index, -1) . ' Output';
@@ -247,5 +256,5 @@ foreach ($oids as $index => $data) {
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);

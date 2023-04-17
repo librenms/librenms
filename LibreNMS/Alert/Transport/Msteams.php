@@ -35,15 +35,13 @@ class Msteams extends Transport
             'title' => $obj['title'],
             'themeColor' => self::getColorForState($obj['state']),
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'summary' => $obj['title'],
         ];
         $curl = curl_init();
         Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-type' => 'application/json',
-            'Expect:',
-        ]);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Expect:']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         if ($this->config['use-json'] === 'on' && $obj['uid'] !== '000') {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);

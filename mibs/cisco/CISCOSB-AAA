@@ -72,7 +72,7 @@ IMPORTS
     InetAddressType,InetAddress,InetAddressIPv6 FROM INET-ADDRESS-MIB; -- RFC2851
 
 rlAAA MODULE-IDENTITY
-        LAST-UPDATED "201006210000Z"
+        LAST-UPDATED "202105190000Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -86,7 +86,7 @@ rlAAA MODULE-IDENTITY
         DESCRIPTION
                 "The private MIB module definition for Authentication, Authorization and Accounting
                  in CISCOSB devices."
-        REVISION "201006210000Z"
+        REVISION "202105190000Z"
         DESCRIPTION
                 "Added this MODULE-IDENTITY clause."
         ::= { switch001 79 }

@@ -10,11 +10,11 @@
                     "version": "R75.40",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "secureplatform",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },
@@ -63,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

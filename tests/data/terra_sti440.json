@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "sti440",
                     "features": null,
+                    "location": null,
                     "os": "terra",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "terra.svg",
-                    "location": null
+                    "icon": "terra.svg"
                 }
             ]
         },
@@ -63,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

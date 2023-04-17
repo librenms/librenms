@@ -1,23 +1,28 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'memcached';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app']['memcached'])) {
-    $data = $agent_data['app']['memcached'][$app['app_instance']];
+    $data = $agent_data['app']['memcached'];
 } else {
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
-    $result = snmp_get($device, $oid, '-Oqv');
-    $data = trim($result, '"');
-    $data = unserialize(stripslashes(str_replace("<<<app-memcached>>>\n", '', $data)));
-    $data = reset($data);
+    try {
+        $data = json_app_get($device, $name, '1.1')['data'] ?? [];
+        $data = $data[$app->app_instance] ?? reset($data);
+    } catch (JsonAppException $e) {
+        $error_string = 'ERROR: ' . $e->getCode() . ':' . $e->getMessage();
+        echo PHP_EOL . $name . ':' . $error_string . PHP_EOL;
+        update_application($app, $error_string); // Set empty metrics and error message
+
+        return;
+    }
 }
+echo ' memcached(' . $app->app_instance . ')';
+$data = $data[$app->app_instance] ?? reset($data);  // specified instance or just the first one
 
-echo ' memcached(' . $app['app_instance'] . ')';
-
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('uptime', 'GAUGE', 0, 125000000000)
     ->addDataset('threads', 'GAUGE', 0, 125000000000)
@@ -39,26 +44,27 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('bytes_written', 'DERIVE', 0, 125000000000);
 
 $fields = [
-    'uptime'            => $data['uptime'],
-    'threads'           => $data['threads'],
-    'rusage_user_ms'    => $data['rusage_user_microseconds'],
-    'rusage_system_ms'  => $data['rusage_system_microseconds'],
-    'curr_items'        => $data['curr_items'],
-    'total_items'       => $data['total_items'],
-    'limit_maxbytes'    => $data['limit_maxbytes'],
-    'curr_connections'  => $data['curr_connections'],
-    'total_connections' => $data['total_connections'],
-    'conn_structures'   => $data['connection_structures'],
-    'bytes'             => $data['bytes'],
-    'cmd_get'           => $data['cmd_get'],
-    'cmd_set'           => $data['cmd_set'],
-    'get_hits'          => $data['get_hits'],
-    'get_misses'        => $data['get_misses'],
-    'evictions'         => $data['evictions'],
-    'bytes_read'        => $data['bytes_read'],
-    'bytes_written'     => $data['bytes_written'],
+    'uptime'            => $data['uptime'] ?? null,
+    'threads'           => $data['threads'] ?? null,
+    'rusage_user_ms'    => $data['rusage_user_microseconds'] ?? null,
+    'rusage_system_ms'  => $data['rusage_system_microseconds'] ?? null,
+    'curr_items'        => $data['curr_items'] ?? null,
+    'total_items'       => $data['total_items'] ?? null,
+    'limit_maxbytes'    => $data['limit_maxbytes'] ?? null,
+    'curr_connections'  => $data['curr_connections'] ?? null,
+    'total_connections' => $data['total_connections'] ?? null,
+    'conn_structures'   => $data['connection_structures'] ?? null,
+    'bytes'             => $data['bytes'] ?? null,
+    'cmd_get'           => $data['cmd_get'] ?? null,
+    'cmd_set'           => $data['cmd_set'] ?? null,
+    'get_hits'          => $data['get_hits'] ?? null,
+    'get_misses'        => $data['get_misses'] ?? null,
+    'evictions'         => $data['evictions'] ?? null,
+    'bytes_read'        => $data['bytes_read'] ?? null,
+    'bytes_written'     => $data['bytes_written'] ?? null,
 ];
 
+$app_id = $app->app_id;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, $result, $fields);
+update_application($app, empty($data) ? 'ERROR: No Data' : 'OK', $fields);

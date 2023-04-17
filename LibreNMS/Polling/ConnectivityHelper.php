@@ -27,11 +27,11 @@ namespace LibreNMS\Polling;
 
 use App\Models\Device;
 use App\Models\DeviceOutage;
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\RRD\RrdDefinition;
-use Log;
 use SnmpQuery;
 use Symfony\Component\Process\Process;
 
@@ -124,7 +124,7 @@ class ConnectivityHelper
         );
 
         if ($status->duplicates > 0) {
-            Log::event('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', 4);
+            Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', 4);
             $status->exit_code = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
         }
 
@@ -140,17 +140,18 @@ class ConnectivityHelper
 
     public function traceroute(): array
     {
-        $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', $this->target];
+        $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', '-I', $this->target];
         if ($this->ipFamily() == 'ipv6') {
             $command[] = '-6';
         }
 
         $process = new Process($command);
+        $process->setTimeout(120);
         $process->run();
 
         return [
             'traceroute' => $process->getOutput(),
-            'output' => $process->getErrorOutput(),
+            'traceroute_output' => $process->getErrorOutput(),
         ];
     }
 
@@ -167,7 +168,7 @@ class ConnectivityHelper
     public function ipFamily(): string
     {
         if ($this->family === null) {
-            $this->family = preg_match('/6$/', $this->device->transport) ? 'ipv6' : 'ipv4';
+            $this->family = preg_match('/6$/', $this->device->transport ?? '') ? 'ipv6' : 'ipv4';
         }
 
         return $this->family;
@@ -200,8 +201,9 @@ class ConnectivityHelper
     private function savePingStats(FpingResponse $ping_response): void
     {
         $perf = $ping_response->toModel();
+        $perf->debug = ['poller_name'=>Config::get('distributed_poller_name')];
         if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
-            $perf->debug = $this->traceroute();
+            $perf->debug = array_merge($perf->debug, $this->traceroute());
         }
         $this->device->perf()->save($perf);
         $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;

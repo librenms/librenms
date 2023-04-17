@@ -31,9 +31,7 @@ below under LOCAL OPTIONS
 */
 
 $name = 'powermon';
-$app_id = $app['app_id'];
-
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $ds_list[0]['vname'] = 'watts';
 $ds_list[0]['ds'] = 'watts-gauge';
@@ -50,10 +48,6 @@ $ds_list[1]['filename'] = $rrd_filename;
 $ds_list[1]['descr'] = '  Total Cost';
 $ds_list[1]['units_text'] = '$';
 $ds_list[1]['colour'] = '006600'; // money green
-
-if ($_GET['debug']) {
-    print_r($ds_list);
-}
 
 // COMMON OPTIONS
 

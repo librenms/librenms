@@ -17,5 +17,7 @@ discovery:
             - Versatile Routing Platform Software
 poller_modules:
     slas: true
+    xdsl: true
 discovery_modules:
     slas: true
+    xdsl: true

@@ -54,6 +54,6 @@ class Vminfo extends DeviceRelatedModel
 
     public function parentDevice(): HasOne
     {
-        return $this->hasOne('App\Models\Device', 'hostname', 'vmwVmDisplayName');
+        return $this->hasOne(\App\Models\Device::class, 'hostname', 'vmwVmDisplayName');
     }
 }

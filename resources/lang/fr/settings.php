@@ -257,6 +257,15 @@ return [
             'description' => 'Utilisateur AD "bind"',
             'help' => 'Utilisé pour questionner l\'AD quand aucun autre utilisateur n\'est dans le contexte (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Utiliser STARTTLS',
+            'help' => 'Utiliser STARTTLS pour sécuriser la connexion.  Alternative à LDAPS.',
+            'options' => [
+                'disabled' => 'Désactivé',
+                'optional' => 'Optionnel',
+                'required' => 'Obligatoire',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'Expiration du cache LDAP',
             'help' => 'Durée du cache LDAP conservant les résultats des requêtes. Meilleure réactivité mais risque de données imprécises/en retard',
@@ -364,13 +373,13 @@ return [
         ],
         'discovery_modules' => [
             'arp-table' => [
-                'description' => 'ARP Table',
+                'description' => 'Table ARP',
             ],
             'applications' => [
                 'description' => 'Applications',
             ],
             'bgp-peers' => [
-                'description' => 'BGP Peers',
+                'description' => 'Adjacences BGP',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
@@ -387,8 +396,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
@@ -397,10 +406,10 @@ return [
                 'description' => 'Cisco VRF Lite',
             ],
             'discovery-arp' => [
-                'description' => 'Discovery ARP',
+                'description' => 'Découverte ARP',
             ],
             'discovery-protocols' => [
-                'description' => 'Discovery Protocols',
+                'description' => 'Protocoles de découverte',
             ],
             'entity-physical' => [
                 'description' => 'Entity Physical',
@@ -450,8 +459,11 @@ return [
             'ports-stack' => [
                 'description' => 'Ports Stack',
             ],
+            'printer-supplies' => [
+                'description' => 'Ressources d\'impression',
+            ],
             'processors' => [
-                'description' => 'Processors',
+                'description' => 'Processeurs',
             ],
 
             'route' => [
@@ -466,14 +478,10 @@ return [
                 'description' => 'Services',
             ],
             'storage' => [
-                'description' => 'Storage',
+                'description' => 'Stockage',
             ],
-
             'stp' => [
                 'description' => 'STP',
-            ],
-            'toner' => [
-                'description' => 'Toner',
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
@@ -489,6 +497,9 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
             ],
         ],
         'distributed_poller' => [
@@ -769,12 +780,152 @@ return [
         'ping' => [
             'description' => 'Chemin vers `ping`',
         ],
+        'poller_modules' => [
+            'unix-agent' => [
+                'description' => 'Unix Agent',
+            ],
+            'os' => [
+                'description' => 'OS',
+            ],
+            'ipmi' => [
+                'description' => 'IPMI',
+            ],
+            'sensors' => [
+                'description' => 'Sensors',
+            ],
+            'processors' => [
+                'description' => 'Processeurs',
+            ],
+            'mempools' => [
+                'description' => 'Mempools',
+            ],
+            'storage' => [
+                'description' => 'Stockage',
+            ],
+            'netstats' => [
+                'description' => 'Netstats',
+            ],
+            'hr-mib' => [
+                'description' => 'HR Mib',
+            ],
+            'ucd-mib' => [
+                'description' => 'Ucd Mib',
+            ],
+            'ipSystemStats' => [
+                'description' => 'ipSystemStats',
+            ],
+            'ports' => [
+                'description' => 'Ports',
+            ],
+            'bgp-peers' => [
+                'description' => 'Adjacences BGP',
+            ],
+            'junose-atm-vp' => [
+                'description' => 'JunOS ATM VP',
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO',
+            ],
+            'wifi' => [
+                'description' => 'Wifi',
+            ],
+            'wireless' => [
+                'description' => 'Wireless',
+            ],
+            'ospf' => [
+                'description' => 'OSPF',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
+            ],
+            'cisco-ipsec-flow-monitor' => [
+                'description' => 'Cisco IPSec flow Monitor',
+            ],
+            'cisco-remote-access-monitor' => [
+                'description' => 'Cisco remote access Monitor',
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF',
+            ],
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting',
+            ],
+            'cipsec-tunnels' => [
+                'description' => 'Ipsec Tunnels',
+            ],
+            'cisco-ace-serverfarms' => [
+                'description' => 'Cisco ACE Serverfarms',
+            ],
+            'cisco-asa-firewall' => [
+                'description' => 'Cisco ASA Firewall',
+            ],
+            'cisco-voice' => [
+                'description' => 'Cisco Voice',
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS',
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV',
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP',
+            ],
+            'cisco-vpdn' => [
+                'description' => 'Cisco VPDN',
+            ],
+            'nac' => [
+                'description' => 'NAC',
+            ],
+            'netscaler-vsvr' => [
+                'description' => 'Netscaler VSVR',
+            ],
+            'aruba-controller' => [
+                'description' => 'Contrôleur Aruba',
+            ],
+            'availability' => [
+                'description' => 'Disponibilité',
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical',
+            ],
+            'entity-state' => [
+                'description' => 'Entity State',
+            ],
+            'applications' => [
+                'description' => 'Applications',
+            ],
+            'stp' => [
+                'description' => 'STP',
+            ],
+            'ntp' => [
+                'description' => 'NTP',
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers',
+            ],
+            'mef' => [
+                'description' => 'MEF',
+            ],
+            'mpls' => [
+                'description' => 'MPLS',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Ressources d\'impression',
+            ],
+        ],
         'ports_fdb_purge' => [
             'description' => 'Table port FDB, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Interfaces, entrées plus anciennes que',
+            'description' => 'Purger les ports supprimés',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'public_status' => [
@@ -908,9 +1059,6 @@ return [
         'traceroute' => [
             'description' => 'Chemin vers `traceroute`',
         ],
-        'traceroute6' => [
-            'description' => 'Chemin vers `traceroute6`',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Délai d\'attente de connexion Unix-agent',
@@ -929,8 +1077,8 @@ return [
         'update_channel' => [
             'description' => 'Choisir le canal des mises à jour',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

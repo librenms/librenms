@@ -26,7 +26,6 @@
 namespace LibreNMS\Util;
 
 use DB;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
@@ -34,17 +33,15 @@ use Symfony\Component\Process\Process;
 
 class Version
 {
-    // Update this on release
-    public const VERSION = '22.4.0';
+    /** @var string Update this on release */
+    public const VERSION = '23.4.0';
 
-    /**
-     * @var bool
-     */
-    protected $is_git_install = false;
+    /** @var Git convenience instance */
+    public $git;
 
     public function __construct()
     {
-        $this->is_git_install = Git::repoPresent() && Git::binaryExists();
+        $this->git = Git::make();
     }
 
     public static function get(): Version
@@ -52,94 +49,76 @@ class Version
         return new static;
     }
 
-    public function local(): string
+    public function release(): string
     {
-        if ($this->is_git_install && $version = $this->fromGit()) {
-            return $version;
-        }
-
-        return self::VERSION;
+        return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
     }
 
-    /**
-     * Compiles local commit data
-     *
-     * @return array with keys sha, date, and branch
-     */
-    public function localCommit(): array
+    public function date(string $format = 'c'): string
     {
-        if ($this->is_git_install) {
-            [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-
-            return [
-                'sha' => $local_sha,
-                'date' => $local_date,
-                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`),
-            ];
-        }
-
-        return ['sha' => null, 'date' => null, 'branch' => null];
+        return date($format, $this->git->commitDate() ?: filemtime(__FILE__));  // approximate date for non-git installs
     }
 
-    /**
-     * Fetches the remote commit from the github api if on the daily release channel
-     *
-     * @return array
-     */
-    public function remoteCommit(): array
+    public function name(): string
     {
-        if ($this->is_git_install && Config::get('update_channel') == 'master') {
-            try {
-                $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
-
-                return $github->json();
-            } catch (ConnectionException $e) {
-            }
-        }
-
-        return [];
+        return $this->git->tag() ?: self::VERSION;
     }
 
     public function databaseServer(): string
     {
-        return Eloquent::isConnected() ? Arr::first(DB::selectOne('select version()')) : 'Not Connected';
-    }
-
-    public function database(): array
-    {
-        if (Eloquent::isConnected()) {
-            try {
-                $query = Eloquent::DB()->table('migrations');
-
-                return [
-                    'last' => $query->orderBy('id', 'desc')->value('migration'),
-                    'total' => $query->count(),
-                ];
-            } catch (\Exception $e) {
-                return ['last' => 'No Schema', 'total' => 0];
-            }
+        if (! Eloquent::isConnected()) {
+            return 'Not Connected';
         }
 
-        return ['last' => 'Not Connected', 'total' => 0];
+        switch (Eloquent::getDriver()) {
+            case 'mysql':
+                $ret = Arr::first(DB::selectOne('select version()'));
+
+                return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
+            case 'sqlite':
+                return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));
+            default:
+                return 'Unsupported: ' . Eloquent::getDriver();
+        }
     }
 
-    private function fromGit(): string
+    /**
+     * Get the database last migration and count as a string
+     */
+    public function database(): string
     {
-        return rtrim(shell_exec('git describe --tags 2>/dev/null'));
+        return sprintf('%s (%s)', $this->lastDatabaseMigration(), $this->databaseMigrationCount());
     }
 
-    public function gitChangelog(): string
+    /**
+     * Get the total number of migrations applied to the database
+     */
+    public function databaseMigrationCount(): int
     {
-        return $this->is_git_install
-            ? rtrim(shell_exec('git log -10'))
-            : '';
+        try {
+            if (Eloquent::isConnected()) {
+                return Eloquent::DB()->table('migrations')->count();
+            }
+        } catch (\Exception $e) {
+        }
+
+        return 0;
     }
 
-    public function gitDate(): string
+    /**
+     * Get the name of the last migration that was applied to the database
+     */
+    public function lastDatabaseMigration(): string
     {
-        return $this->is_git_install
-            ? rtrim(shell_exec("git show --pretty='%ct' -s HEAD"))
-            : '';
+        if (! Eloquent::isConnected()) {
+            return 'Not Connected';
+        }
+
+        try {
+            return Eloquent::DB()->table('migrations')->orderBy('id', 'desc')->value('migration');
+        } catch (\Exception $e) {
+            return 'No Schema';
+        }
     }
 
     public function python(): string
@@ -166,9 +145,73 @@ class Version
     public function netSnmp(): string
     {
         $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
+
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
 
         return $matches[0] ?? '';
+    }
+
+    /**
+     * The OS/distribution and version
+     */
+    public function os(): string
+    {
+        $info = [];
+
+        // find release file
+        if (file_exists('/etc/os-release')) {
+            $info = @parse_ini_file('/etc/os-release');
+        } else {
+            foreach (glob('/etc/*-release') as $file) {
+                $content = file_get_contents($file);
+                // normal os release style
+                $info = @parse_ini_string($content);
+                if (! empty($info)) {
+                    break;
+                }
+
+                // just a string of text
+                if (substr_count($content, PHP_EOL) <= 1) {
+                    $info = ['NAME' => trim(str_replace('release ', '', $content))];
+                    break;
+                }
+            }
+        }
+
+        $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
+
+        return implode(' ', $only);
+    }
+
+    /**
+     * Get a formatted header to print out to the user.
+     */
+    public function header(): string
+    {
+        return sprintf(<<<'EOH'
+===========================================
+Component | Version
+--------- | -------
+LibreNMS  | %s (%s)
+DB Schema | %s (%s)
+PHP       | %s
+Python    | %s
+Database  | %s
+RRDTool   | %s
+SNMP      | %s
+===========================================
+
+EOH,
+            $this->name(),
+            $this->date(),
+            $this->lastDatabaseMigration(),
+            $this->databaseMigrationCount(),
+            phpversion(),
+            $this->python(),
+            $this->databaseServer(),
+            $this->rrdtool(),
+            $this->netSnmp()
+        );
     }
 }

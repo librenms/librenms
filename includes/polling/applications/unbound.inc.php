@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'unbound';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
@@ -21,7 +20,7 @@ foreach ($lines as $line) {
     $unbound[strtolower($var)] = $value;
 }
 //Unbound Queries
-$rrd_name = ['app', $name, 'queries', $app_id];
+$rrd_name = ['app', $name, 'queries', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('type0', 'DERIVE', 0, 125000000000)
     ->addDataset('A', 'DERIVE', 0, 125000000000)
@@ -65,7 +64,7 @@ $metrics['queries'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 //Unbound Cache
-$rrd_name = ['app', $name, 'cache', $app_id];
+$rrd_name = ['app', $name, 'cache', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('queries', 'DERIVE', 0, 125000000000)
     ->addDataset('hits', 'DERIVE', 0, 125000000000)
@@ -79,7 +78,7 @@ $metrics['cache'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 //Unbound Operations - Total opcodes and three valuable return codes
-$rrd_name = ['app', $name, 'operations', $app_id];
+$rrd_name = ['app', $name, 'operations', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('opcodeQuery', 'DERIVE', 0, 125000000000)
     ->addDataset('rcodeNOERROR', 'DERIVE', 0, 125000000000)
@@ -96,7 +95,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //Unbound requestlist
-$rrd_name = ['app', $name, 'requestlist', $app_id];
+$rrd_name = ['app', $name, 'requestlist', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('max', 'DERIVE', 0, 125000000000)
     ->addDataset('overwritten', 'DERIVE', 0, 125000000000)
@@ -111,7 +110,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //Unbound recursiontime
-$rrd_name = ['app', $name, 'recursiontime', $app_id];
+$rrd_name = ['app', $name, 'recursiontime', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('avg', 'GAUGE', 0, 125000000000)
     ->addDataset('median', 'GAUGE', 0, 125000000000);

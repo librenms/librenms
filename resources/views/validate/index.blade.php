@@ -3,9 +3,17 @@
 @section('title', __('validation.results.validate'))
 
 @section('content')
-    <div x-data="{results: [], listItems: 10, errorMessage: ''}"
-         x-init="fetch('{{ route('validate.results') }}').then(response => response.json().then(data => results = data).catch(error => errorMessage=(error instanceof SyntaxError)?'{{ trans('validation.results.backend_failed') }}':error))"
-         >
+    <div x-data="{results: [], listItems: 10, errorMessage: ''}" x-init="fetch('{{ route('validate.results') }}')
+                .then(response => {
+                    if (response.ok) {
+                        response.json()
+                            .then(data => results = data)
+                            .catch(error => errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : error))
+                    } else {
+                        errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                        response.text().then(console.log);
+                    }
+                });">
         <div class="tw-grid tw-place-items-center" style="height: 80vh" x-show="! results.length">
             <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
             <div x-show="errorMessage" class="panel panel-danger">
@@ -36,7 +44,13 @@
                                         <div class="panel-heading"
                                              x-text="result.statusText + ': ' + result.message"
                                         ></div>
-                                        <div class="panel-body" x-show="result.fix.length || result.list.length">
+                                        <div class="panel-body" x-show="result.fix.length || result.list.length || result.fixer">
+                                            <div x-show="result.fixer" class="tw-mb-2" x-data="fixerData(result.fixer)">
+                                                <button class="btn btn-success" x-on:click="runFixer" x-bind:disabled="running" x-show="! fixed">
+                                                    <i class="fa-solid" x-bind:class="running ? 'fa-spinner fa-spin' : 'fa-wrench'"></i> {{ __('validation.results.autofix') }}
+                                                </button>
+                                                <div x-show="fixed">{{ __('validation.results.fixed') }}</div>
+                                            </div>
                                             <div x-show="result.fix.length">
                                                 {{ __('validation.results.fix') }}: <pre x-text='result.fix.join("\r\n")'>
                                                 </pre>
@@ -71,6 +85,30 @@
 
 @push('scripts')
     <script>
-
+        function fixerData(name) {
+            return {
+                running: false,
+                fixed: false,
+                fixer: name,
+                runFixer() {
+                    event.target.disabled = true;
+                    fetch('{{ route('validate.fix') }}', {
+                        method: 'POST',
+                        body: JSON.stringify({fixer: this.fixer}),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            "X-CSRF-Token": document.querySelector('input[name=_token]').value
+                        },
+                    }).then(response => {
+                        if (response.ok) {
+                            this.fixed = true;
+                        } else {
+                            this.running = false;
+                        }
+                    }).catch(response => this.running = false);
+                }
+            }
+        }
     </script>
 @endpush

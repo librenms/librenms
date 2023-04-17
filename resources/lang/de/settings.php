@@ -210,6 +210,15 @@ return [
             'description' => 'Active Directory Benutzername',
             'help' => 'Benutzt zum durchsuchen des AD Server wenn kein Nutzer eingeloggt ist in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Benutze STARTTLS',
+            'help' => 'Benutze STARTTLS um Verbindungen abzusichern.  Alternative zu LDAPS.',
+            'options' => [
+                'disabled' => 'Deaktiviert',
+                'optional' => 'Optional',
+                'required' => 'Benötigt',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP Cache Gültigkeit',
             'help' => 'Speichert temporär LDAP Suchergebnisse.  Erhöht die Geschwindigkeit, aber die Daten können veraltet sein.',
@@ -586,7 +595,7 @@ return [
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports älter als',
+            'description' => 'Purge Ports gelöscht',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'public_status' => [
@@ -710,9 +719,6 @@ return [
         'traceroute' => [
             'description' => 'Pfad zu  traceroute',
         ],
-        'traceroute6' => [
-            'description' => 'Pfad zu traceroute6',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent Verbindungstimeout',
@@ -731,8 +737,8 @@ return [
         'update_channel' => [
             'description' => 'Definiere Updatekanal',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'virsh' => [

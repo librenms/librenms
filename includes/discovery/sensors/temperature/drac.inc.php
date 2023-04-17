@@ -22,7 +22,7 @@ foreach (explode("\n", $oids) as $data) {
 
         if ($status == 'ok') {
             $split_oid = explode('.', $oid);
-            $temperature_id = $split_oid[(count($split_oid) - 2)] . '.' . $split_oid[(count($split_oid) - 1)];
+            $temperature_id = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
             $descr_oid = ".1.3.6.1.4.1.674.10892.5.4.700.20.1.8.$temperature_id";
             $temperature_oid = ".1.3.6.1.4.1.674.10892.5.4.700.20.1.6.$temperature_id";
             $limit_oid = ".1.3.6.1.4.1.674.10892.5.4.700.20.1.10.$temperature_id";
@@ -37,7 +37,7 @@ foreach (explode("\n", $oids) as $data) {
             $limit = snmp_get($device, $limit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'drac', $descr, '10', '1', ($lowlimit / 10), ($low_warn_limit / 10), ($warnlimit / 10), ($limit / 10), ($temperature / 10));
+            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'drac', $descr, '10', '1', $lowlimit / 10, $lowwarnlimit / 10, $warnlimit / 10, $limit / 10, $temperature / 10);
         }
     }//end if
 }

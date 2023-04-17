@@ -6,7 +6,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 // $cambiumSTADLRSSI = snmp_get($device, "cambiumSTADLRSSI.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
 // $cambiumSTADLSNR = snmp_get($device, "cambiumSTADLSNR.0", "-Ovqn", "CAMBIUM-PMP80211-MIB");
@@ -112,8 +114,8 @@ $dlWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-
 $dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'];
 
 if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond)) {
-    $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100), 2);
-    $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100), 2);
+    $ulWlanFrameUtilization = Number::calculatePercent($ulWLanTotalUsedFrameTimePerSecond, $ulWLanTotalAvailableFrameTimePerSecond);
+    $dlWlanFrameUtilization = Number::calculatePercent($dlWLanTotalUsedFrameTimePerSecond, $dlWLanTotalAvailableFrameTimePerSecond);
     d_echo($dlWlanFrameUtilization);
     d_echo($ulWlanFrameUtilization);
     $rrd_def = RrdDefinition::make()

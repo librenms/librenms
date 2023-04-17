@@ -23,8 +23,8 @@ class DeviceFactory extends Factory
     public function definition()
     {
         return [
-            'hostname' => $this->faker->domainWord . '-' . $this->faker->domainWord . '-' . $this->faker->domainWord . '.' . $this->faker->domainName,
-            'ip' => $this->faker->randomElement([$this->faker->ipv4, $this->faker->ipv6]),
+            'hostname' => $this->faker->domainWord() . '-' . $this->faker->domainWord() . '-' . $this->faker->domainWord() . '.' . $this->faker->domainName(),
+            'ip' => $this->faker->randomElement([$this->faker->ipv4(), $this->faker->ipv6()]),
             'type' => $this->faker->randomElement([
                 'appliance',
                 'camera',
@@ -45,6 +45,7 @@ class DeviceFactory extends Factory
                 'wireless',
                 'workstation',
             ]),
+            'sysDescr' => $this->faker->text(64),
             'status' => $status = random_int(0, 1),
             'status_reason' => $status == 0 ? $this->faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
         ];

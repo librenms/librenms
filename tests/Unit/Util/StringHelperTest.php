@@ -70,8 +70,7 @@ class StringHelperTest extends TestCase
         };
         $this->assertTrue(StringHelpers::isStringable($stringable));
 
-        $nonstringable = new class
-        {
+        $nonstringable = new class {
         };
         $this->assertFalse(StringHelpers::isStringable($nonstringable));
     }

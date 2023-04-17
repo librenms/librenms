@@ -41,6 +41,7 @@ class MibTest extends TestCase
      * Test mib file in a directory for errors
      *
      * @group mibs
+     *
      * @dataProvider mibDirs
      *
      * @param  string  $dir
@@ -57,6 +58,7 @@ class MibTest extends TestCase
      * Test that each mib only exists once.
      *
      * @group mibs
+     *
      * @dataProvider mibFiles
      *
      * @param  string  $path
@@ -88,6 +90,7 @@ class MibTest extends TestCase
      * Test that the file name matches the mib name
      *
      * @group mibs
+     *
      * @dataProvider mibFiles
      *
      * @param  string  $path
@@ -107,6 +110,7 @@ class MibTest extends TestCase
      * Test each mib file for errors
      *
      * @group mibs
+     *
      * @dataProvider mibFiles
      *
      * @param  string  $path
@@ -139,7 +143,7 @@ class MibTest extends TestCase
             if ($file->isDir()) {
                 continue;
             }
-            $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathName());
+            $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathname());
             $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),

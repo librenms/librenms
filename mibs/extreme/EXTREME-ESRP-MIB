@@ -1,0 +1,1301 @@
+-- ################################################################################
+
+EXTREME-ESRP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        MODULE-IDENTITY         FROM SNMPv2-SMI
+	NOTIFICATION-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+        RowStatus               FROM SNMPv2-TC
+        MacAddress              FROM SNMPv2-TC
+        OBJECT-TYPE             FROM SNMPv2-SMI
+        Counter32, IpAddress    FROM SNMPv2-SMI
+	Integer32               FROM SNMPv2-SMI
+        TruthValue              FROM SNMPv2-TC
+	DisplayString		FROM RFC1213-MIB
+        ExtremeGenAddr          FROM EXTREME-BASE-MIB
+        extremeAgent            FROM EXTREME-BASE-MIB
+        PortList                FROM EXTREME-BASE-MIB;
+
+        extremeEsrp MODULE-IDENTITY
+	        LAST-UPDATED "200506240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Standby Routing Protocol information"
+        ::= { extremeAgent 12 }
+
+	extremeEsrpNotifications       OBJECT IDENTIFIER ::= { extremeEsrp 7 }
+	extremeEsrpNotificationsPrefix OBJECT IDENTIFIER ::= { extremeEsrpNotifications 0 }
+ 	extremeEsrpObjects             OBJECT IDENTIFIER ::= { extremeEsrp 8 }
+
+    extremeEsrpTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremeEsrpEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains ESRP information for this device."
+        ::= { extremeEsrp 2 }
+
+    extremeEsrpEntry    OBJECT-TYPE
+        SYNTAX    ExtremeEsrpEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An individual entry of this table contains ESRP information for                 a given vlan belonging to a given ESRP group."
+        INDEX {extremeEsrpVlanIfIndex, extremeEsrpGroup}
+        ::= {extremeEsrpTable 1}
+
+    ExtremeEsrpEntry ::= SEQUENCE {
+                extremeEsrpVlanIfIndex        INTEGER,
+                extremeEsrpGroup              INTEGER,
+                extremeEsrpRowStatus          RowStatus,
+                extremeEsrpNetAddress         ExtremeGenAddr,
+                extremeEsrpState              INTEGER,
+                extremeEsrpPriority           INTEGER,
+                extremeEsrpElectionAlgorithm  INTEGER,
+                extremeEsrpHelloTimer         INTEGER,
+                extremeEsrpActivePorts        INTEGER,
+                extremeEsrpTrackedActivePorts Integer32,
+                extremeEsrpTrackedIpRoutes    Integer32,
+                extremeEsrpTrackedPings       Integer32,
+                extremeEsrpNumTransitionsToMaster Integer32,
+                extremeEsrpNumTransitionsToSlave  Integer32,
+                extremeEsrpInternalActivePorts    INTEGER
+        }
+
+        extremeEsrpVlanIfIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	accessible-for-notify
+                STATUS    current
+                DESCRIPTION
+                        "Any index to this table has a value that is
+                        the same as the ifIndex of one of the vlans
+                        present in the ifTable."
+                ::= { extremeEsrpEntry 1 }
+
+         extremeEsrpGroup OBJECT-TYPE
+                SYNTAX    INTEGER (1..65535)
+                MAX-ACCESS 	accessible-for-notify
+                STATUS    current
+                DESCRIPTION
+                        "Indicates a gateway addresses this router backs
+                        up. Any gateway address can be backed up by a
+                        group of routers with one as the master and the
+                        others as backup. An instance of this object 
+                        refers to one such group. Only the default group
+                        1 is supported currently."
+                ::= { extremeEsrpEntry 2 }
+
+          extremeEsrpRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The status of this entry."
+                ::= { extremeEsrpEntry 3 }
+                
+          extremeEsrpNetAddress OBJECT-TYPE
+                SYNTAX  ExtremeGenAddr
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The IP/IPX address of this vlan. This entry
+                        is null if no address has been assigned to the
+                        vlan."
+                ::= { extremeEsrpEntry 4 }
+                
+          extremeEsrpState OBJECT-TYPE
+                SYNTAX    INTEGER {
+                        neutral(1),
+                        master(2),
+                        slave(3)
+                }
+            MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the ESRP state of this ESRP router."
+                ::= { extremeEsrpEntry 5 }
+
+        extremeEsrpPriority OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The priority which would be advertised by this
+                        router for determining the esrp master."
+                ::= { extremeEsrpEntry 6 }
+
+         extremeEsrpElectionAlgorithm OBJECT-TYPE
+                SYNTAX    INTEGER {
+                        portsTrackPriorityMac(1),
+                        trackPortsPriorityMac(2),
+                        priorityPortsTrackMac(3),
+		                priorityTrackPortsMac(4),
+		                priorityMacOnly(5)
+                }
+                MAX-ACCESS read-create
+                STATUS    current
+                DESCRIPTION
+                    "The algorithm to use in selecting the esrp master."
+        ::= { extremeEsrpEntry 7 }
+
+        extremeEsrpHelloTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The time interval for exchanging hello messages."
+                ::= { extremeEsrpEntry 8 }
+
+        extremeEsrpActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of physical ports that are in this
+                        vlan."
+                ::= { extremeEsrpEntry 9 }
+
+        extremeEsrpTrackedActivePorts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ports belonging to the vlans
+                        that are tracked by this esrp router."
+                ::= { extremeEsrpEntry 10 }
+
+        extremeEsrpTrackedIpRoutes OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ip routes that are tracked
+                        by this esrp router."
+                ::= { extremeEsrpEntry 11 }
+
+        extremeEsrpTrackedPings OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ip addresses that are ping-tracked
+                        by this esrp router."
+                ::= { extremeEsrpEntry 12 }
+
+        extremeEsrpNumTransitionsToMaster OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of transitions to Master
+                        by this esrp router."
+                ::= { extremeEsrpEntry 13 }
+
+        extremeEsrpNumTransitionsToSlave OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of transitions to Slave
+                        by this esrp router."
+                ::= { extremeEsrpEntry 14 }
+
+
+        extremeEsrpInternalActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of internal physical ports that are
+                        in this vlan."
+                ::= { extremeEsrpEntry 15 }
+
+    extremeEsrpNeighborTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremeEsrpNeighborEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains ESRP information received from the ESRP 
+             neighbors of this device."
+        ::= { extremeEsrp 3 }
+
+    extremeEsrpNeighborEntry    OBJECT-TYPE
+        SYNTAX    ExtremeEsrpNeighborEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "Each individual entry of this table contains ESRP information 
+            of one ESRP neighbor."
+        INDEX {extremeEsrpVlanIfIndex,
+                       extremeEsrpGroup,
+                       extremeEsrpNeighborMacAddress}
+        ::= {extremeEsrpNeighborTable 1}
+
+    ExtremeEsrpNeighborEntry  ::= SEQUENCE {
+                extremeEsrpNeighborMacAddress  MacAddress,
+                extremeEsrpNeighborGroup       INTEGER,
+                extremeEsrpNeighborNetAddress  ExtremeGenAddr,
+                extremeEsrpNeighborState       INTEGER,
+                extremeEsrpNeighborPriority    Integer32,
+                extremeEsrpNeighborElectionAlgorithm INTEGER,
+                extremeEsrpNeighborHelloTimer  Integer32,
+                extremeEsrpNeighborActivePorts Integer32,
+                extremeEsrpNeighborTrackedActivePorts  Integer32,
+                extremeEsrpNeighborTrackedIpRoutes     Integer32,
+                extremeEsrpNeighborInternalActivePorts Integer32
+        }
+
+        extremeEsrpNeighborMacAddress OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Mac address of other esrp routers that backup
+                        this gateway address."
+                ::= { extremeEsrpNeighborEntry 1 }
+
+         extremeEsrpNeighborGroup OBJECT-TYPE
+                SYNTAX    INTEGER (1..65535)
+                MAX-ACCESS     not-accessible
+                STATUS    current
+                DESCRIPTION
+                        "Indicates a gateway addresses this router backs
+                        up. Any gateway address can be backed up by a
+                        group of routers with one as the master and the
+                        others as backup. An instance of this object 
+                        refers to one such group. Note that this object
+                        is defined in addition to extremeEsrpGroup.
+                        Whereas the extremeEsrpGroup refers to the group
+                        information advertised by this host the
+                        extremeEsrpNeighborGroup refers to the group
+                        information reported by the neighbor. There
+                        might be a conflict. Only the default group
+                        1 is supported currently."
+                ::= { extremeEsrpNeighborEntry 2 }
+
+        extremeEsrpNeighborNetAddress OBJECT-TYPE
+                SYNTAX  ExtremeGenAddr
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The network layer address of this router. This
+                        may be null if no address was assigned."
+                ::= { extremeEsrpNeighborEntry 3 }
+
+        extremeEsrpNeighborState OBJECT-TYPE
+                SYNTAX    INTEGER {
+                        neutral(1),
+                        master(2),
+                        slave(3)
+                }
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "State of the esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 4 }
+
+        extremeEsrpNeighborPriority OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The priority reported by this esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 5 }
+
+         extremeEsrpNeighborElectionAlgorithm OBJECT-TYPE
+                SYNTAX    INTEGER {
+                        portAndPriority(1),
+                        priority(2),
+                        priorityThenPort(3)
+                }
+                MAX-ACCESS read-only
+                STATUS    current
+                DESCRIPTION
+                    "The algorithm to use in selecting the esrp master
+                    reported by this esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 6 }
+
+         extremeEsrpNeighborHelloTimer OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The time interval for exchanging hello messages
+                        configured at this esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 7 }
+
+        extremeEsrpNeighborActivePorts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of physical ports that are in present
+                        in the neighbor's vlan."
+                ::= { extremeEsrpNeighborEntry 8 }
+
+        extremeEsrpNeighborTrackedActivePorts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ports belonging to the vlans
+                        that are tracked by this esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 9 }
+
+        extremeEsrpNeighborTrackedIpRoutes OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ip routes that are tracked
+                        by this esrp neighbor."
+                ::= { extremeEsrpNeighborEntry 10 }
+
+        extremeEsrpNeighborInternalActivePorts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of internal ports that are in present
+                        in the neighbor."
+                ::= { extremeEsrpNeighborEntry 11 }
+
+    extremeEsrpTrackVlanTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremeEsrpTrackVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing information on the VLANs tracked by 
+            this ESRP router."
+        ::= { extremeEsrp 4 }
+
+    extremeEsrpTrackVlanEntry    OBJECT-TYPE
+        SYNTAX    ExtremeEsrpTrackVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An entry in the table of tracked VLAN information."
+        INDEX {extremeEsrpVlanIfIndex,
+                       extremeEsrpGroup,
+                       extremeEsrpTrackVlanIfIndex}
+        ::= {extremeEsrpTrackVlanTable 1}
+
+    ExtremeEsrpTrackVlanEntry ::= SEQUENCE {
+                extremeEsrpTrackVlanIfIndex INTEGER,
+                extremeEsrpTrackVlanRowStatus RowStatus
+        }
+
+        extremeEsrpTrackVlanIfIndex OBJECT-TYPE
+                SYNTAX  INTEGER   (1..65535)
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The ifIndex of the tracked vlan."
+                ::= { extremeEsrpTrackVlanEntry 1 }
+
+        extremeEsrpTrackVlanRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The status of this entry."
+                ::= { extremeEsrpTrackVlanEntry 2 }
+
+
+    extremeEsrpTrackIpRouteTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremeEsrpTrackIpRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing information on the IP routes tracked
+            by this ESRP router."
+        ::= { extremeEsrp 5 }
+
+    extremeEsrpTrackIpRouteEntry    OBJECT-TYPE
+        SYNTAX    ExtremeEsrpTrackIpRouteEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An entry in the table of tracked IP routes information."
+        INDEX {extremeEsrpVlanIfIndex,
+                       extremeEsrpGroup,
+                       extremeEsrpTrackIpRouteIpAddress,
+                       extremeEsrpTrackIpRouteNetMask}
+        ::= {extremeEsrpTrackIpRouteTable 1}
+
+    ExtremeEsrpTrackIpRouteEntry ::= SEQUENCE {
+                extremeEsrpTrackIpRouteIpAddress IpAddress,
+                extremeEsrpTrackIpRouteNetMask   IpAddress,
+                extremeEsrpTrackIpRouteRowStatus RowStatus
+        }
+
+        extremeEsrpTrackIpRouteIpAddress OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The ifIndex of the tracked vlan."
+                ::= { extremeEsrpTrackIpRouteEntry 1 }
+
+        extremeEsrpTrackIpRouteNetMask OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The ifIndex of the tracked vlan."
+                ::= { extremeEsrpTrackIpRouteEntry 2 }
+
+        extremeEsrpTrackIpRouteRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The status of this entry."
+                ::= { extremeEsrpTrackIpRouteEntry 3 }
+
+    extremeEsrpPortTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremeEsrpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing information on the ports belonging 
+            to the ESRP vlans on this router."
+        ::= { extremeEsrp 6 }
+
+    extremeEsrpPortEntry    OBJECT-TYPE
+        SYNTAX    ExtremeEsrpPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An entry in the table of ESRP port information."
+        INDEX {extremeEsrpVlanIfIndex, extremeEsrpPortIfIndex}
+        ::= {extremeEsrpPortTable 1}
+
+    ExtremeEsrpPortEntry ::= SEQUENCE {
+                extremeEsrpPortIfIndex    Integer32,
+                extremeEsrpPortState      TruthValue
+        }
+
+        extremeEsrpPortIfIndex OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The ifIndex of the physical port that is part
+                        of the vlan specified by the extremeEsrpVlanIfIndex."
+                ::= { extremeEsrpPortEntry 1 }
+
+        extremeEsrpPortState OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                        "Indicates if esrp is enabled or disabled on this
+                        port."
+                ::= { extremeEsrpPortEntry 2 }
+
+	extremeEsrpDomainTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpDomainEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains information for ESRP domains
+            on this device."
+		::= { extremeEsrpObjects  1 }
+
+	extremeEsrpDomainEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpDomainEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains ESRP 
+			information for	 a given ESRP domain and group."
+		INDEX {extremeEsrpDmnName}
+		::= {extremeEsrpDomainTable 1}
+
+        ExtremeEsrpDomainEntry ::= SEQUENCE {
+            extremeEsrpDmnName        		DisplayString,
+            extremeEsrpDmnGroup	  		INTEGER,
+            extremeEsrpDmnVersion	    INTEGER,
+            extremeEsrpDmnAdminStatus   INTEGER,
+            extremeEsrpDmnVlan       	DisplayString,
+            extremeEsrpDmnVlanTag      	INTEGER,
+            extremeEsrpDmnId	  		INTEGER,
+            extremeEsrpDmnNetAddress  	IpAddress,
+            extremeEsrpDmnState	  		INTEGER,
+            extremeEsrpDmnMasterMacAddress  	MacAddress,
+            extremeEsrpDmnPriority			INTEGER,
+            extremeEsrpDmnOperPriority		INTEGER,
+            extremeEsrpDmnHelloTimer		INTEGER,
+            extremeEsrpDmnNeutralTimer		INTEGER,
+            extremeEsrpDmnPreMasterTimer		INTEGER,
+            extremeEsrpDmnNbrTimer			INTEGER,
+            extremeEsrpDmnRestartTimer		INTEGER,
+            extremeEsrpDmnActivePorts		INTEGER,
+            extremeEsrpDmnActivePortWeight	INTEGER,
+            extremeEsrpDmnInternalActivePorts	INTEGER,
+            extremeEsrpDmnTrackedActivePorts	INTEGER,
+            extremeEsrpDmnTrackedActivePortWeight	INTEGER,
+            extremeEsrpDmnTrackedIpRoutes		INTEGER,
+            extremeEsrpDmnTrackedPings		INTEGER,
+            extremeEsrpDmnTrackedVlans		INTEGER,
+            extremeEsrpDmnElectPreferenceForPorts	INTEGER,
+            extremeEsrpDmnElectPreferenceForPriority	INTEGER,
+            extremeEsrpDmnElectPreferenceForMac	INTEGER,
+            extremeEsrpDmnElectPreferenceForTrack	INTEGER,
+            extremeEsrpDmnElectPreferenceForSticky	INTEGER,
+            extremeEsrpDmnElectPreferenceForWeight	INTEGER,
+            extremeEsrpDmnRowStatus			RowStatus	
+        }
+
+	  extremeEsrpDmnName  OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..31))
+                MAX-ACCESS 	accessible-for-notify
+                STATUS	current
+                DESCRIPTION
+                        "A unique name assigned to ESRP Domain."
+                ::= { extremeEsrpDomainEntry 1 }
+
+	  extremeEsrpDmnGroup OBJECT-TYPE
+                SYNTAX	INTEGER (0..32)
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                        "Identifier to pair ESRP routers with in a ESRP domain."
+                ::= { extremeEsrpDomainEntry 2 }
+
+	  extremeEsrpDmnVersion OBJECT-TYPE
+		        SYNTAX INTEGER {
+                        v1(1),
+                        v2(2)
+                }
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "ESRP Protocol Version Identifier."
+                ::= { extremeEsrpDomainEntry 3 }
+
+	  extremeEsrpDmnAdminStatus OBJECT-TYPE
+		        SYNTAX INTEGER {
+                        enabled (1),
+                        disabled (2)
+                }
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                        "This objects is used to enable domain for ESRP-Core 
+                        functionality or disable to function just as ESRP-Aware."
+                ::= { extremeEsrpDomainEntry 4 }
+
+	  extremeEsrpDmnVlan  OBJECT-TYPE
+		SYNTAX	DisplayString
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "Master Vlan of ESRP domain."
+                ::= { extremeEsrpDomainEntry 5 }
+
+	  extremeEsrpDmnVlanTag OBJECT-TYPE
+                SYNTAX	INTEGER (1..4093)
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "802.1q tag assigned to Master Vlan of
+                        ESRP domain."
+                ::= { extremeEsrpDomainEntry 6 }
+
+	  extremeEsrpDmnId OBJECT-TYPE
+                SYNTAX	INTEGER (1..65535)
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                        "A unique identifer assigned to ESRP domain. This
+			parameter is passed in ESRP V2 Hello PDU in order to 
+			identify ESRP domains."
+                ::= { extremeEsrpDomainEntry 7 }
+
+	  extremeEsrpDmnState OBJECT-TYPE
+		 SYNTAX INTEGER {
+                        neutral(0),
+                        master(1),
+                        slave(2),
+		 	premaster(3),
+		 	aware(4)
+		}
+        	MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the ESRP state of this ESRP router."
+                ::= { extremeEsrpDomainEntry 8 }
+
+	  extremeEsrpDmnNetAddress OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+			"Indicates a gateway addresses this router backs
+                        up. Any gateway address can be backed up by 2 routers 
+                        with one as the master and other as backup.
+                        This entry is null if no address has been assigned to 
+			the master vlan of this domain."
+                ::= { extremeEsrpDomainEntry 9 }
+
+	  extremeEsrpDmnMasterMacAddress OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address of Master ESRP router."
+                ::= { extremeEsrpDomainEntry 10 }
+
+	  extremeEsrpDmnPriority OBJECT-TYPE
+                SYNTAX  INTEGER  (0..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The priority which is configured by this
+                        router for determining the esrp master."
+                ::= { extremeEsrpDomainEntry 11 }
+
+	  extremeEsrpDmnOperPriority OBJECT-TYPE
+                SYNTAX  INTEGER  (0..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The operational priority which would be 
+                        advertised by this router for determining 
+                        the esrp master."
+                ::= { extremeEsrpDomainEntry 12 }
+
+	 extremeEsrpDmnHelloTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The time interval for exchanging hello messages."
+                ::= { extremeEsrpDomainEntry 13 }
+
+	 extremeEsrpDmnNeutralTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The time interval to stay in NEUTRAL state before
+			changing state."
+                ::= { extremeEsrpDomainEntry 14 }
+
+	 extremeEsrpDmnPreMasterTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The time interval to stay in PREMASTER state 
+			before changing state."
+                ::= { extremeEsrpDomainEntry 15 }
+
+	 extremeEsrpDmnNbrTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Keep-Alive time interval to listen from ESRP neighbor."
+                ::= { extremeEsrpDomainEntry 16 }
+
+	 extremeEsrpDmnRestartTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The time interval to freeze any state transition 
+			while neighbor is going through MSM failover or 
+			graceful restart."
+                ::= { extremeEsrpDomainEntry 17 }
+
+	   extremeEsrpDmnActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of active vlan-ports that are part of this
+			ESRP domain."
+                ::= { extremeEsrpDomainEntry 18 }
+
+        extremeEsrpDmnActivePortWeight OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The normalised link-weight of active vlan-ports that 
+			are part of this ESRP domain."
+                ::= { extremeEsrpDomainEntry 19 }
+
+	extremeEsrpDmnInternalActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of internal active ports that are part of 
+			this ESRP domain."
+                ::= { extremeEsrpDomainEntry 20 }
+
+	extremeEsrpDmnTrackedActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of vlan-ports belonging to the vlans
+                        that are tracked by this ESRP domain."
+                ::= { extremeEsrpDomainEntry 21 }
+
+	extremeEsrpDmnTrackedActivePortWeight OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The normalised link-weight of active vlan-ports that 
+			are tracked by this  ESRP domain."
+                ::= { extremeEsrpDomainEntry 22 }
+
+	extremeEsrpDmnTrackedIpRoutes OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ip routes that are tracked
+                        by this ESRP domain."
+                ::= { extremeEsrpDomainEntry 23 }
+
+        extremeEsrpDmnTrackedPings OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of ip addresses that are ping-tracked
+                        by this ESRP domain."
+                ::= { extremeEsrpDomainEntry 24 }
+
+        extremeEsrpDmnTrackedVlans OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of vlans being tracked
+                        by this ESRP domain."
+                ::= { extremeEsrpDomainEntry 25 }
+
+        extremeEsrpDmnElectPreferenceForPorts OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to ports while computing 
+			Master Election for this ESRP domain."
+                ::= { extremeEsrpDomainEntry 26 }
+        
+	extremeEsrpDmnElectPreferenceForPriority OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to Priority while computing 
+			Master Election for this ESRP domain."
+                ::= { extremeEsrpDomainEntry 27 }
+
+        extremeEsrpDmnElectPreferenceForMac OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to MAC while computing 
+			Master Election for this ESRP domain."
+                ::= { extremeEsrpDomainEntry 28 }
+
+        extremeEsrpDmnElectPreferenceForTrack OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to vlan tracking while 
+			computing Master Election for this ESRP domain."
+                ::= { extremeEsrpDomainEntry 29 }
+
+        extremeEsrpDmnElectPreferenceForSticky OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to sticky bit while 
+			computing Master Election for this ESRP domain."
+                ::= { extremeEsrpDomainEntry 30 }
+
+        extremeEsrpDmnElectPreferenceForWeight OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "Level of preference given to active port weight
+                        (APW) while computing Master Election for this 
+                        ESRP domain."
+                ::= { extremeEsrpDomainEntry 31 }
+
+	extremeEsrpDmnRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The status of this entry."
+                ::= { extremeEsrpDomainEntry 32 }
+
+   	extremeEsrpDomainMemberTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpDomainMemberEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains information for member vlans 
+            of ESRP domain."
+		::= { extremeEsrpObjects  2 }
+
+   extremeEsrpDomainMemberEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpDomainMemberEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains member vlan 
+			information for	a given ESRP domain ."
+		INDEX {extremeEsrpDmnName, extremeEsrpVlanDescr}
+		::= {extremeEsrpDomainMemberTable 1}
+
+        ExtremeEsrpDomainMemberEntry ::= SEQUENCE {
+            extremeEsrpVlanDescr            DisplayString,
+            extremeEsrpVlanType             INTEGER,
+	    extremeEsrpDomainVlanIfIndex    Integer32,
+            extremeEsrpVlanRowStatus        RowStatus
+        }
+
+	  extremeEsrpVlanDescr OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..31))
+                MAX-ACCESS 	not-accessible
+                STATUS	current
+                DESCRIPTION
+                        "Name identifier assigned to member vlan of 
+                        ESRP domain."
+                ::= { extremeEsrpDomainMemberEntry 1 }
+
+      extremeEsrpVlanType OBJECT-TYPE
+                SYNTAX  INTEGER {
+                    master(1),
+                    protected(2)
+                }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "ESRP domain can have one master vlan and many
+                        protected vlans.This object is used to identify whether
+                        the vlan is a master or protected one."
+                ::= { extremeEsrpDomainMemberEntry 2 }
+
+      extremeEsrpDomainVlanIfIndex OBJECT-TYPE
+                SYNTAX  Integer32 
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "permanent interface index assigned to this
+                        ESRP domain member vlan."
+                ::= { extremeEsrpDomainMemberEntry 3 }
+
+	  extremeEsrpVlanRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The status of this entry."
+                ::= { extremeEsrpDomainMemberEntry 4 }
+
+
+	extremeEsrpDomainNeighborTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpDomainNeighborEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains neighbor router information for 
+            ESRP domains on this device."
+		::= { extremeEsrpObjects  3 }
+
+	extremeEsrpDomainNeighborEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpDomainNeighborEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains neighbor 
+            ESRP router information for a given ESRP domain."
+		INDEX {extremeEsrpDmnName }
+		::= {extremeEsrpDomainNeighborTable 1}
+
+        ExtremeEsrpDomainNeighborEntry ::= SEQUENCE {
+            extremeEsrpDmnNeighborMacAddress                MacAddress,
+            extremeEsrpDmnNeighborGroup                     INTEGER,
+            extremeEsrpDmnNeighborNetAddress                IpAddress,
+            extremeEsrpDmnNeighborState                     INTEGER,
+            extremeEsrpDmnNeighborPriority                  INTEGER,
+            extremeEsrpDmnNeighborHelloTimer                INTEGER,
+            extremeEsrpDmnNeighborActivePorts               INTEGER,
+            extremeEsrpDmnNeighborInternalActivePorts       INTEGER,
+            extremeEsrpDmnNeighborTrackedActivePorts        INTEGER,
+            extremeEsrpDmnNeighborTrackedIpCount            INTEGER,
+            extremeEsrpDmnNeighborActivePortWeight          INTEGER,
+            extremeEsrpDmnNeighborTrackedActivePortWeight   INTEGER
+        }
+
+	  extremeEsrpDmnNeighborMacAddress OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address of ESRP Neighbor router."
+                ::= { extremeEsrpDomainNeighborEntry 1 }
+
+	  extremeEsrpDmnNeighborGroup OBJECT-TYPE
+                SYNTAX	INTEGER (0..32)
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "Identifier to pair ESRP routers with in a ESRP domain."
+                ::= { extremeEsrpDomainNeighborEntry 2 }
+
+      extremeEsrpDmnNeighborNetAddress OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+			            "Indicates a gateway address which is backed up by
+                        ESRP neighbor and this router."
+                ::= { extremeEsrpDomainNeighborEntry 3 }
+
+      extremeEsrpDmnNeighborState OBJECT-TYPE
+		 SYNTAX INTEGER {
+                        neutral(0),
+                        master(1),
+                        slave(2),
+		 	premaster(3),
+		 	aware(4)
+		}
+        	MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the ESRP state of neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 4 }
+
+	  extremeEsrpDmnNeighborPriority OBJECT-TYPE
+                SYNTAX  INTEGER  (0..255)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The priority which is being advertised by neighbor
+                        ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 5 }
+
+	  extremeEsrpDmnNeighborHelloTimer OBJECT-TYPE
+                SYNTAX  INTEGER  (1..255)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The hello time interval being advertised by neighbor
+                        ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 6 }
+
+      extremeEsrpDmnNeighborActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of active ports being advertised by neighbor
+                        ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 7 }
+
+	  extremeEsrpDmnNeighborInternalActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of internal active ports being advertised 
+                        by neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 8 }
+
+	  extremeEsrpDmnNeighborTrackedActivePorts OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of tracked active ports being advertised 
+                        by neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 9 }
+
+	  extremeEsrpDmnNeighborTrackedIpCount OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The number represents sum of tracked routes and tracked
+                        pings being advertised by neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 10 }
+	  
+      extremeEsrpDmnNeighborActivePortWeight OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The weight of active ports being advertised 
+                        by neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 11 }
+	  
+      extremeEsrpDmnNeighborTrackedActivePortWeight OBJECT-TYPE
+                SYNTAX  INTEGER  (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The weight of tracked active ports being advertised 
+                        by neighbor ESRP router."
+                ::= { extremeEsrpDomainNeighborEntry 12 }
+
+     extremeEsrpDomainAwareTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpDomainAwareEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains ESRP aware information for this device."
+		::= { extremeEsrpObjects  4 }
+
+	 extremeEsrpDomainAwareEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpDomainAwareEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains
+            ESRP Aware information for a given ESRP domain and group."
+		INDEX {extremeEsrpDmnName, extremeEsrpDmnGroup}
+		::= {extremeEsrpDomainAwareTable 1}
+
+        ExtremeEsrpDomainAwareEntry ::= SEQUENCE {
+            extremeEsrpMasterMacAddress     MacAddress,
+            extremeEsrpMasterLastChanged    DisplayString,
+            extremeEsrpNumFdbFlushes        Counter32,
+            extremeEsrpHelloPktsReceived    Counter32,
+            extremeEsrpHelloPktsForwarded   Counter32
+        }
+
+	 extremeEsrpMasterMacAddress OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address of Master ESRP router."
+                ::= { extremeEsrpDomainAwareEntry 1 }
+
+	 extremeEsrpMasterLastChanged OBJECT-TYPE
+		        SYNTAX	DisplayString (SIZE(0..31))
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Date and time when new ESRP master was elected."
+                ::= { extremeEsrpDomainAwareEntry 2 }
+
+	 extremeEsrpNumFdbFlushes OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This object represents number of times switch
+                        FDB has been flushed on new master election."
+                ::= { extremeEsrpDomainAwareEntry 3 }
+
+ 	 extremeEsrpHelloPktsReceived OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of ESRP Aware hello packets received."
+                ::= { extremeEsrpDomainAwareEntry 4 }
+
+   	 extremeEsrpHelloPktsForwarded OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of ESRP Aware hello packets forwarded."
+                ::= { extremeEsrpDomainAwareEntry 5 }
+
+     extremeEsrpDomainStatsTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpDomainStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains statistics on ESRP hello packets 
+            exchanged and ESRP state changes for this device."
+		::= { extremeEsrpObjects  5 }
+
+	 extremeEsrpDomainStatsEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpDomainStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains
+            statistical information for a given ESRP domain."
+		INDEX {extremeEsrpDmnName}
+		::= {extremeEsrpDomainStatsTable 1}
+
+     ExtremeEsrpDomainStatsEntry ::= SEQUENCE {
+        extremeEsrpLastStateChanged             DisplayString,
+	    extremeEsrpDomainNumTransitionsToMaster       Counter32,
+	    extremeEsrpNumTransitionsToPreMaster    Counter32,
+	    extremeEsrpDomainNumTransitionsToSlave        Counter32,
+	    extremeEsrpNumTransitionsToNeutral      Counter32,
+	    extremeEsrpNumTransitionsToAware        Counter32,
+        extremeEsrpHelloPktsReceived1           Counter32,
+        extremeEsrpHelloPktsTransmitted         Counter32
+     }
+
+	 extremeEsrpLastStateChanged OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..31))
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Date and time when ESRP state changed last."
+                ::= { extremeEsrpDomainStatsEntry 1 }
+
+ 	 extremeEsrpDomainNumTransitionsToMaster OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of times ESRP domain entered 'MASTER' state."
+                ::= { extremeEsrpDomainStatsEntry 2 }
+
+ 	 extremeEsrpNumTransitionsToPreMaster OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of times ESRP domain entered 'PREMASTER' state."
+                ::= { extremeEsrpDomainStatsEntry 3 }
+
+ 	 extremeEsrpDomainNumTransitionsToSlave OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of times ESRP domain entered 'SLAVE' state."
+                ::= { extremeEsrpDomainStatsEntry 4 }
+
+ 	 extremeEsrpNumTransitionsToNeutral OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of times ESRP domain entered 'NEUTRAL' state."
+                ::= { extremeEsrpDomainStatsEntry 5 }
+
+ 	 extremeEsrpNumTransitionsToAware OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of times ESRP domain entered 'AWARE' state."
+                ::= { extremeEsrpDomainStatsEntry 6 }
+
+ 	 extremeEsrpHelloPktsReceived1 OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of ESRP hello packets received."
+                ::= { extremeEsrpDomainStatsEntry 7 }
+ 	 
+     extremeEsrpHelloPktsTransmitted OBJECT-TYPE
+                SYNTAX  Counter32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Count of ESRP hello packets transmitted."
+		::= { extremeEsrpDomainStatsEntry 8 }
+		
+
+     extremeEsrpAwareSelectForwardPortsTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEsrpAwareSelectForwardPortsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains ESRP aware selective forward ports information for this device."
+		::= { extremeEsrpObjects  6 }
+
+	 extremeEsrpAwareSelectForwardPortsEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEsrpAwareSelectForwardPortsEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual entry of this table contains
+            ESRP Aware selective forward port information for a given ESRP domain and group."
+		INDEX {extremeEsrpAwareSelFwdListDmnName, 
+		       extremeEsrpAwareSelFwdListDmnGroup}
+		::= {extremeEsrpAwareSelectForwardPortsTable 1}
+
+        ExtremeEsrpAwareSelectForwardPortsEntry ::= SEQUENCE {
+            extremeEsrpAwareSelFwdListDmnName        		DisplayString,
+            extremeEsrpAwareSelFwdListDmnGroup	  		INTEGER,
+            extremeEsrpAwareSelFwdListPortCount	  		INTEGER,
+            extremeEsrpAwareSelFwdListPortList	  		PortList
+        }
+
+	 extremeEsrpAwareSelFwdListDmnName OBJECT-TYPE
+                SYNTAX  DisplayString
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "A unique name assigned to ESRP Domain."
+                ::= { extremeEsrpAwareSelectForwardPortsEntry 1 }
+
+	 extremeEsrpAwareSelFwdListDmnGroup OBJECT-TYPE
+                SYNTAX  INTEGER (0..31)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Identifier to pair ESRP routers with in a ESRP domain."
+                ::= { extremeEsrpAwareSelectForwardPortsEntry 2 }
+
+	 extremeEsrpAwareSelFwdListPortCount OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of selective forward ports"
+                ::= { extremeEsrpAwareSelectForwardPortsEntry 3 }
+ 
+ 	 extremeEsrpAwareSelFwdListPortList OBJECT-TYPE
+                 SYNTAX  PortList
+                 MAX-ACCESS  read-only
+                 STATUS current
+                 DESCRIPTION
+                        "Each bit in the octet string represents one port.
+                         A 1 means that the port is a selective forward port in that vlan. 
+                         The bit value for a port is 0 otherwise."
+                 ::= { extremeEsrpAwareSelectForwardPortsEntry 4 }
+ 
+
+    extremeEsrpDomainStateChange NOTIFICATION-TYPE
+            OBJECTS { extremeEsrpDmnName,
+                     extremeEsrpDmnGroup,
+                     extremeEsrpDmnState,
+                     extremeEsrpDmnNetAddress,
+                     extremeEsrpDmnMasterMacAddress,
+                     extremeEsrpDmnActivePorts,
+                     extremeEsrpDmnInternalActivePorts,
+                     extremeEsrpDmnTrackedActivePorts,
+                     extremeEsrpDmnTrackedIpRoutes,
+                     extremeEsrpDmnTrackedPings,
+                     extremeEsrpDmnActivePortWeight,
+                     extremeEsrpDmnTrackedActivePortWeight}
+            STATUS   current
+            DESCRIPTION
+            "Signifies Esrp state change"
+        ::= { extremeEsrpNotificationsPrefix 1 }
+
+END

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "truenas",
                     "type": "storage",
                     "serial": null,
-                    "icon": "truenas.png",
-                    "location": "<private>"
+                    "icon": "truenas.png"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "cxl0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "cxl1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -246,7 +236,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -256,15 +245,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "igb0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -351,7 +336,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -361,15 +345,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "igb1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -456,7 +436,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -466,15 +445,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "em0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -561,7 +536,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -571,15 +545,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -666,7 +636,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -676,15 +645,11 @@
                     "ifType": "ifPwType",
                     "ifAlias": "pflog0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -771,7 +736,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -781,15 +745,11 @@
                     "ifType": "l2vlan",
                     "ifAlias": "vlan19",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -876,7 +836,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -886,15 +845,11 @@
                     "ifType": "l2vlan",
                     "ifAlias": "vlan250",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -985,7 +940,6 @@
                     "ifSpeed": 10000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -995,15 +949,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "cxl0",
                     "ifPhysAddress": "5dfc42dfaa13",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1090,7 +1040,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -1100,15 +1049,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "cxl1",
                     "ifPhysAddress": "000743389588",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1195,7 +1140,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -1205,15 +1149,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "igb0",
                     "ifPhysAddress": "00aa14e9eaf2",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1300,7 +1240,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -1310,15 +1249,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "igb1",
                     "ifPhysAddress": "00aa14e9eaf5",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1405,7 +1340,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -1415,15 +1349,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "em0",
                     "ifPhysAddress": "0005ca4134aa",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1507,10 +1437,9 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -1520,15 +1449,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1612,10 +1537,9 @@
                     "ifName": "pflog0",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -1625,15 +1549,11 @@
                     "ifType": "ifPwType",
                     "ifAlias": "pflog0",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1720,7 +1640,6 @@
                     "ifSpeed": 10000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -1730,15 +1649,11 @@
                     "ifType": "l2vlan",
                     "ifAlias": "vlan19",
                     "ifPhysAddress": "5dfc42dfaa13",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1825,7 +1740,6 @@
                     "ifSpeed": 10000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -1835,15 +1749,11 @@
                     "ifType": "l2vlan",
                     "ifAlias": "vlan250",
                     "ifPhysAddress": "5dfc42dfaa13",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2328,7 +2238,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2343,6 +2253,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2367,6 +2278,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2374,7 +2286,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -2391,6 +2303,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2415,6 +2328,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2422,7 +2336,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -2439,6 +2353,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2463,6 +2378,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2472,7 +2388,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2487,6 +2403,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2511,6 +2428,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2518,7 +2436,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -2535,6 +2453,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2542,7 +2461,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -2559,6 +2478,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2566,7 +2486,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -2583,6 +2503,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2607,6 +2528,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2614,7 +2536,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -2631,6 +2553,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2655,6 +2578,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2679,6 +2603,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2703,6 +2628,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2727,6 +2653,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 },
                 {
@@ -2751,6 +2678,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 },
                 {
@@ -2775,6 +2703,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2799,6 +2728,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2823,6 +2753,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2847,6 +2778,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2871,6 +2803,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2895,6 +2828,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -2952,7 +2886,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2967,6 +2901,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2991,6 +2926,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2998,7 +2934,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -3015,6 +2951,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3039,6 +2976,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3046,7 +2984,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -3063,6 +3001,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3087,6 +3026,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0.29955942419893,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3096,7 +3036,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3111,6 +3051,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3135,6 +3076,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3142,7 +3084,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -3159,6 +3101,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3166,7 +3109,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -3183,6 +3126,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3190,7 +3134,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -3207,6 +3151,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3231,6 +3176,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3238,7 +3184,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -3255,6 +3201,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3279,6 +3226,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3303,6 +3251,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3327,6 +3276,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3351,6 +3301,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 },
                 {
@@ -3375,6 +3326,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "zpoolTable"
                 },
                 {
@@ -3399,6 +3351,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3423,6 +3376,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3447,6 +3401,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3471,6 +3426,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3495,6 +3451,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3519,6 +3476,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

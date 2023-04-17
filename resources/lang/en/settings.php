@@ -72,6 +72,7 @@ return [
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
             'server' => ['name' => 'Server'],
+            'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
             'availability-map' => ['name' => 'Availability Map Settings'],
@@ -331,6 +332,15 @@ return [
             'description' => 'Bind username',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Use STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => 'Disabled',
+                'optional' => 'Optional',
+                'required' => 'Required',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP cache expiration',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -364,6 +374,10 @@ return [
         'auth_ldap_groups' => [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
+        ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
         ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
@@ -485,8 +499,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
@@ -573,9 +587,6 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -590,6 +601,12 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'distributed_poller' => [
@@ -611,6 +628,10 @@ return [
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
+        ],
+        'email_attach_graphs' => [
+            'description' => 'Attach graph images',
+            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
@@ -796,6 +817,10 @@ return [
                     'help' => 'Sets the primary link in the device dropdown menu',
                 ],
             ],
+        ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
@@ -1074,9 +1099,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -1101,8 +1123,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
@@ -1155,9 +1177,6 @@ return [
             'applications' => [
                 'description' => 'Applications',
             ],
-            'mib' => [
-                'description' => 'MIB',
-            ],
             'stp' => [
                 'description' => 'STP',
             ],
@@ -1173,13 +1192,19 @@ return [
             'mpls' => [
                 'description' => 'MPLS',
             ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than',
+            'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1224,6 +1249,16 @@ return [
             'nets-exclude' => [
                 'description' => 'Networks/IPs to be ignored',
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
+        ],
+        'reporting' => [
+            'error' => [
+                'description' => 'Send Error Reports',
+                'help' => 'Sends some errors to LibreNMS for analysis and fixing',
+            ],
+            'usage' => [
+                'description' => 'Send Usage Reports',
+                'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
             ],
         ],
         'route_purge' => [
@@ -1357,7 +1392,7 @@ return [
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
         ],
         'site_style' => [
-            'description' => 'Set the site css style',
+            'description' => 'Default Theme',
             'options' => [
                 'blue' => 'Blue',
                 'dark' => 'Dark',
@@ -1378,6 +1413,10 @@ return [
                 'description' => 'Communities (priority)',
                 'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
             ],
+            'max_oid' => [
+                'description' => 'Max OIDs',
+                'help' => 'Maximum OIDs per query.  Can be overriden at OS and device levels.',
+            ],
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
@@ -1388,7 +1427,7 @@ return [
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
                 'unordered' => [
-                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'description' => 'Allow out of order snmp responses for OIDs',
                     'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
             ],
@@ -1463,9 +1502,6 @@ return [
         'traceroute' => [
             'description' => 'Path to traceroute',
         ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
-        ],
         'twofactor' => [
             'description' => 'Two-Factor',
             'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
@@ -1490,10 +1526,10 @@ return [
             'description' => 'Enable updates in ./daily.sh',
         ],
         'update_channel' => [
-            'description' => 'Set update Channel',
+            'description' => 'Update Channel',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [
@@ -1547,6 +1583,10 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Disable Percentile for stats graphs globally',
+                'help' => 'Disables display of the percentile values and lines for graphs that display those',
             ],
         ],
         'device_display_default' => [

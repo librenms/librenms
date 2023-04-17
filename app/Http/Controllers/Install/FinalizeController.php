@@ -26,9 +26,12 @@
 namespace App\Http\Controllers\Install;
 
 use Exception;
+use Illuminate\Http\Request;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Interfaces\InstallerStep;
 use LibreNMS\Util\EnvHelper;
+use LibreNMS\Util\Git;
 
 class FinalizeController extends InstallationController implements InstallerStep
 {
@@ -39,6 +42,29 @@ class FinalizeController extends InstallationController implements InstallerStep
         if (! $this->initInstallStep()) {
             return $this->redirectToIncomplete();
         }
+
+        return view('install.finish', $this->formatData([
+            'can_update' => Git::make()->isAvailable(),
+            'success' => '',
+            'env' => '',
+            'config' => '',
+            'messages' => '',
+            'env_message' => '',
+            'config_message' => '',
+        ]));
+    }
+
+    public function saveConfig(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'update_channel' => 'in:master,release',
+            'site_style' => 'in:light,dark',
+        ]);
+
+        $this->saveSetting('update_channel', $request->get('update_channel', 'master'));
+        $this->saveSetting('site_style', $request->get('site_style'));
+        $this->saveSetting('reporting.error', $request->has('error_reporting'));
+        $this->saveSetting('reporting.usage', $request->has('usage_reporting'));
 
         $env = '';
         $config = '';
@@ -65,23 +91,31 @@ class FinalizeController extends InstallationController implements InstallerStep
             $env_message = trans('install.finish.env_not_written');
         }
 
-        return view('install.finish', $this->formatData([
+        return response()->json([
             'success' => $success,
             'env' => $env,
             'config' => $config,
             'messages' => $messages,
             'env_message' => $env_message,
             'config_message' => $config_message,
-        ]));
+        ]);
     }
 
     private function writeEnvFile()
     {
-        return EnvHelper::writeEnv(
+        $env = EnvHelper::writeEnv(
             $this->envVars(),
             ['INSTALL'],
             base_path('.env')
         );
+
+        // make sure the new env is reflected live
+        \Artisan::call('config:clear');
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        return $env;
     }
 
     private function envVars()
@@ -128,6 +162,18 @@ class FinalizeController extends InstallationController implements InstallerStep
             $this->envVars(),
             ['INSTALL']
         );
+    }
+
+    /**
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return void
+     */
+    private function saveSetting(string $name, $value): void
+    {
+        if (Config::get($name) !== $value) {
+            Config::persist($name, $value);
+        }
     }
 
     public function enabled(): bool

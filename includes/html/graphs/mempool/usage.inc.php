@@ -2,6 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
+$unit_text = $unit_text ?? '';
 $rrd_options .= ' -u 100 -l 0 -E -b 1024 ';
 
 $iter = '1';
@@ -17,10 +18,10 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Total      Used      Free(    Min       Max      Ave)'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total      Used      Free(    Min       Max      Ave)'";
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Total      Used      Free\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total      Used      Free\l'";
 }
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len);
@@ -43,7 +44,7 @@ if ($width > '500') {
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}free:MIN:%5.2lf%sB";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}free:MAX:%5.2lf%sB";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}free:AVERAGE:%5.2lf%sB\\n";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('', ($descr_len + 12)), 0, ($descr_len + 12)) . " '";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('', $descr_len + 12), 0, $descr_len + 12) . " '";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}perc:LAST:'%5.2lf%%  '";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}percx:LAST:'%5.2lf%% '";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}perc:MIN:'%5.2lf%% '";
@@ -55,7 +56,7 @@ if ($width > '500') {
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}used:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}free:LAST:%6.2lf%sB";
     $rrd_options .= " COMMENT:'\l'";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('', ($descr_len + 12)), 0, ($descr_len + 12)) . " '";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('', $descr_len + 12), 0, $descr_len + 12) . " '";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}perc:LAST:'%5.2lf%%  '";
     $rrd_options .= " GPRINT:{$mempool['mempool_id']}percx:LAST:'%5.2lf%% '";
     $rrd_options .= " COMMENT:'\l'";

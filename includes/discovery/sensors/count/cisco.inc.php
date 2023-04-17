@@ -26,9 +26,10 @@ foreach ($tables as $tablevalue) {
     $state_name = $tablevalue['state_name'];
     foreach ($temp as $index => $entry) {
         //Discover Sensors
-        $descr = ucwords($temp[$index][$tablevalue['descr']]);
         if ($state_name == 'c3gGsmNumberOfNearbyCell' || $state_name == 'cwceLteCurrOperatingBand') {
             $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
+        } else {
+            $descr = ucwords($temp[$index][$tablevalue['descr']]);
         }
         discover_sensor($valid['sensor'], 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }

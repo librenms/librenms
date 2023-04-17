@@ -9,12 +9,12 @@
                     "sysContact": null,
                     "version": "2.2.5.0",
                     "hardware": "RAy2-17",
-                    "features": "L",
+                    "features": "U",
+                    "location": "<private>",
                     "os": "ray",
                     "type": "wireless",
-                    "serial": "9617522",
-                    "icon": "ray.png",
-                    "location": "<private>"
+                    "serial": "9879730",
+                    "icon": "ray.png"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p2_data_e1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p4_data_e2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -246,7 +236,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -256,15 +245,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p6_air",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -355,7 +340,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -365,15 +349,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p2_data_e1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -385,11 +365,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 2548120777,
+                    "ifInUcastPkts": 1541434,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 3526471525,
+                    "ifOutUcastPkts": 2295681,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -410,11 +390,11 @@
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
                     "poll_prev": null,
-                    "ifInNUcastPkts": 48662661,
+                    "ifInNUcastPkts": 983743,
                     "ifInNUcastPkts_prev": 0,
                     "ifInNUcastPkts_delta": null,
                     "ifInNUcastPkts_rate": null,
-                    "ifOutNUcastPkts": 25026762,
+                    "ifOutNUcastPkts": 1263010,
                     "ifOutNUcastPkts_prev": 0,
                     "ifOutNUcastPkts_delta": null,
                     "ifOutNUcastPkts_rate": null,
@@ -430,19 +410,19 @@
                     "ifInUnknownProtos_prev": 0,
                     "ifInUnknownProtos_delta": null,
                     "ifInUnknownProtos_rate": null,
-                    "ifInBroadcastPkts": 554881,
+                    "ifInBroadcastPkts": 27448,
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
-                    "ifOutBroadcastPkts": 1119157,
+                    "ifOutBroadcastPkts": 28173,
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
-                    "ifInMulticastPkts": 48107757,
+                    "ifInMulticastPkts": 956281,
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
-                    "ifOutMulticastPkts": 23907591,
+                    "ifOutMulticastPkts": 1234825,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -460,7 +440,6 @@
                     "ifSpeed": 0,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
@@ -470,15 +449,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p4_data_e2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -565,7 +540,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -575,15 +549,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "p6_air",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -595,15 +565,15 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 3578525485,
+                    "ifInUcastPkts": 6060624,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 527498015,
+                    "ifOutUcastPkts": 5306547,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
-                    "ifInErrors": 0,
+                    "ifInErrors": 1,
                     "ifInErrors_prev": 0,
                     "ifInErrors_delta": null,
                     "ifInErrors_rate": null,
@@ -620,11 +590,11 @@
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
                     "poll_prev": null,
-                    "ifInNUcastPkts": 25026604,
+                    "ifInNUcastPkts": 1235860,
                     "ifInNUcastPkts_prev": 0,
                     "ifInNUcastPkts_delta": null,
                     "ifInNUcastPkts_rate": null,
-                    "ifOutNUcastPkts": 48606357,
+                    "ifOutNUcastPkts": 1010868,
                     "ifOutNUcastPkts_prev": 0,
                     "ifOutNUcastPkts_delta": null,
                     "ifOutNUcastPkts_rate": null,
@@ -640,25 +610,70 @@
                     "ifInUnknownProtos_prev": 0,
                     "ifInUnknownProtos_delta": null,
                     "ifInUnknownProtos_rate": null,
-                    "ifInBroadcastPkts": 1119021,
+                    "ifInBroadcastPkts": 28178,
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
-                    "ifOutBroadcastPkts": 554059,
+                    "ifOutBroadcastPkts": 27453,
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
-                    "ifInMulticastPkts": 23907570,
+                    "ifInMulticastPkts": 1207669,
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
-                    "ifOutMulticastPkts": 48052271,
+                    "ifOutMulticastPkts": 983401,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
                 }
             ]
         }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.33555.1.1.5.1.0",
+                    "processor_index": "0",
+                    "processor_type": "ray",
+                    "processor_usage": 51,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ray",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Memory",
+                    "mempool_perc": 37,
+                    "mempool_perc_oid": ".1.3.6.1.4.1.33555.1.1.5.2.0",
+                    "mempool_used": 37,
+                    "mempool_used_oid": null,
+                    "mempool_free": 63,
+                    "mempool_free_oid": null,
+                    "mempool_total": 100,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -667,7 +682,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "ber",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.33555.4.3.2.11.0",
+                    "sensor_oid": ".1.3.6.1.4.1.33555.1.3.2.11.0",
                     "sensor_index": "0",
                     "sensor_type": "ray",
                     "sensor_descr": "BER",
@@ -685,6 +700,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -709,7 +725,33 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rfPowerStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.33555.1.2.1.8.0",
+                    "sensor_index": "0",
+                    "sensor_type": "rxModulationIndex-ray",
+                    "sensor_descr": "Rx Modulation Rate",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "rxModulationIndex-ray"
                 },
                 {
                     "sensor_deleted": 0,
@@ -733,7 +775,33 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.33555.1.2.1.7.0",
+                    "sensor_index": "0",
+                    "sensor_type": "txModulationIndex-ray",
+                    "sensor_descr": "Tx Modulation Rate",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "txModulationIndex-ray"
                 },
                 {
                     "sensor_deleted": 0,
@@ -746,10 +814,10 @@
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 7,
-                    "sensor_limit": 27,
+                    "sensor_current": 35,
+                    "sensor_limit": 55,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": -3,
+                    "sensor_limit_low": 25,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -757,6 +825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -770,10 +839,10 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 53.2,
-                    "sensor_limit": 61.18,
+                    "sensor_current": 24.5,
+                    "sensor_limit": 28.175,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.22,
+                    "sensor_limit_low": 20.825,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -781,6 +850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -805,6 +875,48 @@
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QPSK",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QAM16",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QAM32",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QAM64",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QAM128",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "rxModulationIndex-ray",
+                    "state_descr": "QAM256",
+                    "state_draw_graph": 1,
+                    "state_value": 6,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "systemStatus",
@@ -833,6 +945,48 @@
                     "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QPSK",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QAM16",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QAM32",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QAM64",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QAM128",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "txModulationIndex-ray",
+                    "state_descr": "QAM256",
+                    "state_draw_graph": 1,
+                    "state_value": 6,
+                    "state_generic_value": 0
                 }
             ]
         },
@@ -860,7 +1014,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.13.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.13.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -881,7 +1036,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.14.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.14.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -892,7 +1048,7 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 29.2,
+                    "sensor_current": 29.1,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -902,7 +1058,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.2.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.2.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -913,7 +1070,7 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -58.7,
+                    "sensor_current": -53.8,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -923,7 +1080,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.1.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.1.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -934,7 +1092,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -5,
+                    "sensor_current": -2,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -944,7 +1102,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.17.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.17.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -965,7 +1124,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.12.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.12.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -973,27 +1133,6 @@
                     "sensor_index": "1",
                     "sensor_type": "racom-tx",
                     "sensor_descr": "TX Frequency",
-                    "sensor_divisor": 1000,
-                    "sensor_multiplier": 1,
-                    "sensor_aggregator": "sum",
-                    "sensor_current": 17129.5,
-                    "sensor_prev": null,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.4.0\"]"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "frequency",
-                    "sensor_index": "1",
-                    "sensor_type": "racom-rx",
-                    "sensor_descr": "RX Frequency",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -1007,7 +1146,30 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.3.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.4.0\"]",
+                    "rrd_type": "GAUGE"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "frequency",
+                    "sensor_index": "1",
+                    "sensor_type": "racom-rx",
+                    "sensor_descr": "RX Frequency",
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 17129.5,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.3.0\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -1032,7 +1194,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.13.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.13.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1053,7 +1216,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.14.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.14.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1064,8 +1228,8 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 29.2,
-                    "sensor_prev": 29.2,
+                    "sensor_current": 29.1,
+                    "sensor_prev": 29.1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1074,7 +1238,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.2.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.2.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1085,8 +1250,8 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -58.7,
-                    "sensor_prev": -58.7,
+                    "sensor_current": -53.8,
+                    "sensor_prev": -53.8,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1095,7 +1260,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.1.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.3.2.1.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1106,8 +1272,8 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": -5,
-                    "sensor_prev": -5,
+                    "sensor_current": -2,
+                    "sensor_prev": -2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1116,7 +1282,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.17.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.17.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1137,7 +1304,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.12.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.12.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1145,27 +1313,6 @@
                     "sensor_index": "1",
                     "sensor_type": "racom-tx",
                     "sensor_descr": "TX Frequency",
-                    "sensor_divisor": 1000,
-                    "sensor_multiplier": 1,
-                    "sensor_aggregator": "sum",
-                    "sensor_current": 17129.5,
-                    "sensor_prev": 17129.5,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.4.0\"]"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "frequency",
-                    "sensor_index": "1",
-                    "sensor_type": "racom-rx",
-                    "sensor_descr": "RX Frequency",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -1179,54 +1326,32 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.3.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.4.0\"]",
+                    "rrd_type": "GAUGE"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "frequency",
+                    "sensor_index": "1",
+                    "sensor_type": "racom-rx",
+                    "sensor_descr": "RX Frequency",
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 17129.5,
+                    "sensor_prev": 17129.5,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.33555.1.2.1.3.0\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         }
-    },
-    "processors": {
-        "discovery": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.33555.1.1.5.1.0",
-                    "processor_index": "0",
-                    "processor_type": "ray",
-                    "processor_usage": 52,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": [
-                {
-                    "mempool_index": "0",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ray",
-                    "mempool_class": "system",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Memory",
-                    "mempool_perc": 38,
-                    "mempool_perc_oid": ".1.3.6.1.4.1.33555.1.1.5.2.0",
-                    "mempool_used": 38,
-                    "mempool_used_oid": null,
-                    "mempool_free": 62,
-                    "mempool_free_oid": null,
-                    "mempool_total": 100,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }

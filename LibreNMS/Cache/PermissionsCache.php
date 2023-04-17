@@ -177,7 +177,7 @@ class PermissionsCache
         // if we don't have a map for this user yet, populate it.
         if (! isset($this->deviceGroupMap[$user_id])) {
             $this->deviceGroupMap[$user_id] = DB::table('device_group_device')
-                ->whereIn('device_id', $this->devicesForUser($user))
+                ->whereIntegerInRaw('device_id', $this->devicesForUser($user))
                 ->distinct('device_group_id')
                 ->pluck('device_group_id');
         }

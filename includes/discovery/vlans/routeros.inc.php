@@ -59,11 +59,11 @@ if (isset($sIndex)) {
             ]);
 
             if ($vlan->isDirty('vlan_name')) {
-                Log::event("Vlan id: $vId changed name to: $vName from " . $vlan->getOriginal('vlan_name'), $device['device_id'], 'vlan', 4);
+                \App\Models\Eventlog::log("Vlan id: $vId changed name to: $vName from " . $vlan->getOriginal('vlan_name'), $device['device_id'], 'vlan', 4);
             }
 
             if (! $vlan->exists) {
-                Log::event("Vlan id: $vId: $vName added", $device['device_id'], 'vlan', 4);
+                \App\Models\Eventlog::log("Vlan id: $vId: $vName added", $device['device_id'], 'vlan', 4);
             }
 
             $vlan->save();

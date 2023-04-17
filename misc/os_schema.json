@@ -147,6 +147,9 @@
                 "services": {
                     "type": "boolean"
                 },
+                "route": {
+                    "type": "boolean"
+                },
                 "stp": {
                     "type": "boolean"
                 },
@@ -208,6 +211,9 @@
                     "type": "boolean"
                 },
                 "netscaler-vsvr": {
+                    "type": "boolean"
+                },
+                "xdsl": {
                     "type": "boolean"
                 }
             },
@@ -274,6 +280,9 @@
                     "type": "boolean"
                 },
                 "ucd-diskio": {
+                    "type": "boolean"
+                },
+                "ucd-dsktable": {
                     "type": "boolean"
                 },
                 "services": {
@@ -347,6 +356,9 @@
                 },
                 "ip6-addresses": {
                     "type": "boolean"
+                },
+                "xdsl": {
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false
@@ -379,7 +391,8 @@
             "type": "boolean"
         },
         "snmp_max_oid": {
-            "type": "string"
+            "type": "integer",
+            "minimum": 1
         },
         "ifXmcbc": {
             "type": "boolean"

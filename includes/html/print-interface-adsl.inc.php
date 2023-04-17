@@ -23,8 +23,7 @@ if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = '';
 }
 
-echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
-onclick=\"location.href='device/" . $device['device_id'] . '/port/' . $port['port_id'] . "/'\" style='cursor: pointer;'>
+echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
  <td valign=top width=350>";
 echo '        <span class=list-large>
               ' . generate_port_link($port, $port['ifIndex'] . '. ' . $port['label']) . '
@@ -54,7 +53,7 @@ $height = '40';
 $from = Config::get('time.day');
 
 echo '</td><td width=135>';
-echo \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps') . " <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
+echo \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps') . " <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_bits';
 echo generate_port_link(
@@ -64,7 +63,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps');
+echo '' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_adsl_speed';
 echo generate_port_link(

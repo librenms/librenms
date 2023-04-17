@@ -342,7 +342,7 @@ class SmokepingCliTest extends DBTestCase
 
         // Disable DNS lookups
         \Artisan::call('smokeping:generate --targets --no-header --no-dns --single-process --compat');
-        $new = \Artisan::Output();
+        $new = \Artisan::output();
         $old = $this->legacyAlgo($data);
 
         $this->assertEquals($this->canonicalise($new), $this->canonicalise($old));

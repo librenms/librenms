@@ -2,58 +2,60 @@ SEMI-MIB DEFINITIONS ::= BEGIN
 
   IMPORTS
      OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
-     enterprises, IpAddress
+     enterprises, Integer32
        	FROM SNMPv2-SMI
      	TEXTUAL-CONVENTION
        	FROM SNMPv2-TC
      	OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
        	FROM SNMPv2-CONF;
 
-    hp           OBJECT IDENTIFIER ::= { enterprises 11 }
-    nm           OBJECT IDENTIFIER ::= { hp 2 }
-    hpWebMgmt    OBJECT IDENTIFIER ::= { nm 36 }
-
--- ========================================================================
 -- Module Identity
 
   hpHttpMgMod MODULE-IDENTITY
-    LAST-UPDATED "0104030000Z"
-    ORGANIZATION "Hewlett-Packard"
-    CONTACT-INFO "brian_harrison@hp.com"
-
+    LAST-UPDATED "200010160000Z"
+    ORGANIZATION "HP Networking"
+    CONTACT-INFO "Hewlett Packard Company,
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747." 
     DESCRIPTION 
       "Management information for HP devices. This MIB provides SNMP 
        systems asset and HTTP management information, as well as 
        entity relationship information for host based implementations.
        This version contains additions for SEMI"
+    REVISION     "200010160000Z"
 
-    REVISION     "0010160000Z"
     DESCRIPTION  "Minor syntactic changes in notifications."
+    REVISION     "200010120000Z"
 
-    REVISION     "0010120000Z"
     DESCRIPTION  "Fixed semantic error, modified traps and included
                   changes from the review team."
 
-    REVISION     "0010040000Z"
+    REVISION     "200010040000Z"
     DESCRIPTION  "Moved Device asset information into a container model.
                   Modified traps and compliance definitions. Depricated
                   previous device asset objects."
 
-    REVISION     "0001120000Z"
+    REVISION     "200001120000Z"
     DESCRIPTION  "Added cluster support"
 
-    REVISION     "9903170000Z"
+    REVISION     "199903170000Z"
     DESCRIPTION  "Corrected definition of hpHttpMgMod"
 
-    REVISION     "9812010000Z"
+    REVISION     "199812010000Z"
     DESCRIPTION  "Incorporated entity-relationship table"
 
-    REVISION     "9706260000Z"
+    REVISION     "199706260000Z"
     DESCRIPTION  "Incorporated NetCitizen definitions"
 
-    REVISION     "9606120000Z"
+    REVISION     "199606120000Z"
     DESCRIPTION  "Initial Version"
-       ::= { hpWebMgmt 1 }
+  ::= { hpWebMgmt 1 }
+
+-- ========================================================================
+
+    hp           OBJECT IDENTIFIER ::= { enterprises 11 }
+    nm           OBJECT IDENTIFIER ::= { hp 2 }
+    hpWebMgmt    OBJECT IDENTIFIER ::= { nm 36 }
 
 -- ========================================================================
 -- Textual Conventions for this MIB
@@ -207,7 +209,7 @@ SEMI-MIB DEFINITIONS ::= BEGIN
   hpHttpMgEntityNetInfo    OBJECT IDENTIFIER ::= { hpHttpMgObjects 3 }
 
   hpHttpMgEntityNetInfoTable OBJECT-TYPE
-      SYNTAX SEQUENCE OF HpHttpMgEntityNetInfoEntrySequence
+      SYNTAX SEQUENCE OF HpHttpMgEntityNetInfoEntry
       MAX-ACCESS not-accessible
       STATUS current
       DESCRIPTION
@@ -217,7 +219,7 @@ SEMI-MIB DEFINITIONS ::= BEGIN
    ::= { hpHttpMgEntityNetInfo 1 }
 
    hpHttpMgEntityNetInfoEntry OBJECT-TYPE
-      SYNTAX HpHttpMgEntityNetInfoEntrySequence
+      SYNTAX HpHttpMgEntityNetInfoEntry
       MAX-ACCESS not-accessible
       STATUS current
       DESCRIPTION
@@ -225,8 +227,8 @@ SEMI-MIB DEFINITIONS ::= BEGIN
       INDEX { hpHttpMgEntityNetInfoIndex }
    ::= { hpHttpMgEntityNetInfoTable 1 }
 
-   HpHttpMgEntityNetInfoEntrySequence ::=    SEQUENCE {
-      hpHttpMgEntityNetInfoIndex     INTEGER,
+   HpHttpMgEntityNetInfoEntry ::=    SEQUENCE {
+      hpHttpMgEntityNetInfoIndex     Integer32,
       hpHttpMgEntityNetInfoSysObjID  Utf8String,
       hpHttpMgEntityNetInfoRelationshipType  INTEGER,
       hpHttpMgEntityNetInfoUniqueID  Utf8String, 
@@ -236,7 +238,7 @@ SEMI-MIB DEFINITIONS ::= BEGIN
    }
 
    hpHttpMgEntityNetInfoIndex OBJECT-TYPE
-      SYNTAX INTEGER (0..65536)
+      SYNTAX Integer32 (0..65536)
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
@@ -349,7 +351,7 @@ SEMI-MIB DEFINITIONS ::= BEGIN
 
     HpHttpMgDeviceEntry ::=
        SEQUENCE {
-          hpHttpMgDeviceIndex              INTEGER,
+          hpHttpMgDeviceIndex              Integer32,
           hpHttpMgDeviceGlobalUniqueID     Utf8String,
           hpHttpMgDeviceHealth             INTEGER,
           hpHttpMgDeviceSysObjID           Utf8String,
@@ -374,7 +376,7 @@ SEMI-MIB DEFINITIONS ::= BEGIN
           }
 
   hpHttpMgDeviceIndex OBJECT-TYPE
-    SYNTAX INTEGER (0..1000)
+    SYNTAX Integer32 (0..1000)
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -747,6 +749,36 @@ SEMI-MIB DEFINITIONS ::= BEGIN
                                    hpHttpMgEnhancedNetCitizenGroup,
                                    hpHttpMgEnhancedNetCitizenTrapGroup }
                 ::= { hpHttpMgCompliances 3 }
+
+    hpHttpMgExtentedNetCitizenCompliance MODULE-COMPLIANCE
+            STATUS current
+                DESCRIPTION
+                    " The compliance statement for SNMP entities which
+                      meet basic NetCitizen crieria"
+                MODULE -- this module
+                MANDATORY-GROUPS { hpHttpMgClusterGroup,
+                                   hpHttpMgEntityRelationshipGroup }
+                ::= { hpHttpMgCompliances 4 }
+
+    hpHttpMgExtentedNetCitizenCompliance1 MODULE-COMPLIANCE
+            STATUS deprecated
+                DESCRIPTION
+                    " The compliance statement for SNMP entities which
+                      meet basic NetCitizen crieria"
+                MODULE -- this module
+                MANDATORY-GROUPS { hpHttpMgExtendedNetCitizenGroup,
+                                   hpHttpMgExtendedNetCitizenTrapGroup}
+                ::= { hpHttpMgCompliances 5 }
+
+    hpHttpMgExtentedNetCitizenCompliance2 MODULE-COMPLIANCE
+            STATUS current
+                DESCRIPTION
+                    " The compliance statement for SNMP entities which
+                      meet basic NetCitizen crieria"
+                MODULE -- this module
+                MANDATORY-GROUPS {hpHttpMgDeviceSpecificGroup}
+                ::= { hpHttpMgCompliances 6 }
+
 -- ========================================================================
 -- Units of conformance
      
@@ -857,4 +889,14 @@ SEMI-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "HP NetCitizen notifications"
               ::= { hpHttpMgGroups 9 }
+
+    hpHttpMgDeviceSpecificGroup OBJECT-GROUP
+        OBJECTS { hpHttpMgDeviceSpecificEventCode,
+                  hpHttpMgDeviceSpecificFRU  
+                }
+        STATUS current
+        DESCRIPTION
+            "Additional HP NetCitizen objects"
+              ::= { hpHttpMgGroups 10 }
+
 END

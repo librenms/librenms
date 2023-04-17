@@ -211,6 +211,15 @@ return [
             'description' => '系结使用者名称',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => '使用 STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => '停用',
+                'optional' => '选用',
+                'required' => '必要',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP 快取有效期',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -593,7 +602,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '连接埠大于',
+            'description' => '清除端口已删除',
             'help' => 'Cleanup done by daily.sh',
         ],
         'public_status' => [
@@ -725,9 +734,6 @@ return [
         'traceroute' => [
             'description' => 'traceroute 路径',
         ],
-        'traceroute6' => [
-            'description' => 'traceroute6 路径',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent 联机逾时',
@@ -746,8 +752,8 @@ return [
         'update_channel' => [
             'description' => '设定更新频道',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'virsh' => [

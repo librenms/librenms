@@ -29,7 +29,7 @@ if ($device['os'] == 'linux') {
     include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
 }
 
-if (strstr($device['hardware'], 'Dell')) {
+if (isset($device['hardware']) && strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
     include 'includes/discovery/sensors/voltage/dell.inc.php';
@@ -37,16 +37,15 @@ if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/temperature/dell.inc.php';
 }
 
-if (strstr($device['hardware'], 'ProLiant')) {
+if (isset($device['hardware']) && strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
 if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
-
-if ($device['os_group'] == 'printer') {
-    include 'includes/discovery/sensors/state/printer.inc.php';
+if ($device['os'] == 'loop-telecom') {
+    include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
 }
 
 $run_sensors = [

@@ -10,11 +10,11 @@
                     "version": "7.5.3.0(R0016.0036)",
                     "hardware": "1.0.1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dcn-software",
                     "type": "network",
                     "serial": "SW053110GB09000067",
-                    "icon": "dcn.png",
-                    "location": "<private>"
+                    "icon": "dcn.png"
                 }
             ]
         },

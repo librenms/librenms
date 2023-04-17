@@ -28,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class JnxVpnPwUp implements SnmptrapHandler
 {
@@ -45,6 +44,6 @@ class JnxVpnPwUp implements SnmptrapHandler
         $vpnType = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnType'));
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnName'));
 
-        Log::event("$vpnType on a pseudowire belonging to $vpnName is now connected", $device->device_id, 'trap', 1);
+        $trap->log("$vpnType on a pseudowire belonging to $vpnName is now connected", 1);
     }
 }

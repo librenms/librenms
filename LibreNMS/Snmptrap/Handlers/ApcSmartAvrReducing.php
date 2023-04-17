@@ -29,7 +29,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class ApcSmartAvrReducing implements SnmptrapHandler
 {
@@ -44,6 +43,6 @@ class ApcSmartAvrReducing implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $message = $trap->getOidData($trap->findOid('PowerNet-MIB::mtrapargsString'));
-        Log::event($message, $device->device_id, 'trap', 3);
+        $trap->log($message, 3);
     }
 }

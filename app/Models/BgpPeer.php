@@ -35,7 +35,23 @@ class BgpPeer extends DeviceRelatedModel
     public $timestamps = false;
     protected $table = 'bgpPeers';
     protected $primaryKey = 'bgpPeer_id';
-
+    protected $fillable = [
+        'vrf_id',
+        'bgpPeerIdentifier',
+        'bgpPeerRemoteAs',
+        'bgpPeerState',
+        'bgpPeerAdminStatus',
+        'bgpLocalAddr',
+        'bgpPeerRemoteAddr',
+        'bgpPeerInUpdates',
+        'bgpPeerOutUpdates',
+        'bgpPeerInTotalMessages',
+        'bgpPeerOutTotalMessages',
+        'bgpPeerFsmEstablishedTime',
+        'bgpPeerInUpdateElapsedTime',
+        'bgpPeerDescr',
+        'astext',
+    ];
     // ---- Query scopes ----
 
     public function scopeInAlarm(Builder $query)

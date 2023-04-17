@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(DefaultAlertTemplateSeeder::class);
-        $this->call(DefaultWidgetSeeder::class);
         $this->call(DefaultLegacySchemaSeeder::class);
         $this->call(ConfigSeeder::class);
     }

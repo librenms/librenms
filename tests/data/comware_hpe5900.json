@@ -28,11 +28,11 @@
                     "version": "7.1.045",
                     "hardware": "5900AF-48G-4XG-2QSFP+ Switch",
                     "features": "2422P01",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
@@ -63,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -87,6 +88,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -111,6 +113,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -135,6 +138,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -159,6 +163,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

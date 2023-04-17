@@ -26,7 +26,7 @@
 use App\Models\DevicePerf;
 
 $perf_info = DevicePerf::where('device_id', $device['device_id'])->latest('timestamp')->first();
-if ($perf_info['debug']['traceroute']) {
+if (! empty($perf_info['debug']['traceroute'])) {
     echo "
 <div class='row'>
      <div class='col-md-12'>

@@ -9,8 +9,13 @@ over:
     - { graph: device_charge, text: Charge }
 discovery:
     -
+        sysObjectID:
+            - .1.3.6.1.4.1.2011.6.164.
+    -
         sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         snmpget:
             oid: .1.3.6.1.4.1.2011.6.164.1.1.1.4.0
             op: starts
-            value: HUAWEI SMU
+            value:
+                - HUAWEI SMU
+                - huawei description

@@ -12,7 +12,7 @@ IMPORTS
     rldot1dStpTrapVrblifIndex, rldot1dStpTrapVrblVID    FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 rndNotifications MODULE-IDENTITY
-                LAST-UPDATED "201006250000Z"
+                LAST-UPDATED "201006250001Z"
 				ORGANIZATION "Cisco Systems, Inc."
 
 				CONTACT-INFO

@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "Calix E7-2",
                     "features": "",
+                    "location": "<private>",
                     "os": "exa",
                     "type": "network",
                     "serial": null,
-                    "icon": "calix.svg",
-                    "location": "<private>"
+                    "icon": "calix.svg"
                 }
             ]
         },

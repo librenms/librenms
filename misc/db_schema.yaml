@@ -168,9 +168,10 @@ applications:
     - { Field: app_state, Type: varchar(32), 'Null': false, Extra: '', Default: UNKNOWN }
     - { Field: discovered, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: app_state_prev, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: app_status, Type: varchar(8), 'Null': false, Extra: '' }
+    - { Field: app_status, Type: varchar(1024), 'Null': false, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: app_instance, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: data, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
@@ -214,6 +215,7 @@ bgpPeers:
     - { Field: bgpPeerLastErrorCode, Type: int, 'Null': true, Extra: '' }
     - { Field: bgpPeerLastErrorSubCode, Type: int, 'Null': true, Extra: '' }
     - { Field: bgpPeerLastErrorText, Type: varchar(254), 'Null': true, Extra: '' }
+    - { Field: bgpPeerIface, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
@@ -1355,6 +1357,7 @@ plugins:
     - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [plugin_id], Unique: true, Type: BTREE }
+    plugins_version_plugin_name_unique: { Name: plugins_version_plugin_name_unique, Columns: [version, plugin_name], Unique: true, Type: BTREE }
 pollers:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1435,7 +1438,6 @@ ports:
     - { Field: ifSpeed, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
-    - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }
@@ -1445,16 +1447,12 @@ ports:
     - { Field: ifType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifAlias, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifPhysAddress, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: ifHardType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifLastChange, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: ifVlan, Type: varchar(8), 'Null': false, Extra: '', Default: '' }
+    - { Field: ifVlan, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: counter_in, Type: int, 'Null': true, Extra: '' }
-    - { Field: counter_out, Type: int, 'Null': true, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: detailed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: pagpOperationMode, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: pagpPortState, Type: varchar(16), 'Null': true, Extra: '' }
@@ -1502,23 +1500,23 @@ ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_adsl_updated, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: adslLineCoding, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslLineType, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: adslAtucInvVendorID, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAtucInvVersionNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrAttainableRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAtucChanCurrTxRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAturInvSerialNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturInvVendorID, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturInvVersionNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturChanCurrTxRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAturCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrAttainableRate, Type: int, 'Null': false, Extra: '' }
+    - { Field: adslLineCoding, Type: varchar(8), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslLineType, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucInvVendorID, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucInvVersionNumber, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrAttainableRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAtucChanCurrTxRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAturInvSerialNumber, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturInvVendorID, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturInvVersionNumber, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturChanCurrTxRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAturCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrAttainableRate, Type: int, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     ports_adsl_port_id_unique: { Name: ports_adsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_fdb:
@@ -1634,6 +1632,18 @@ ports_stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
     ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
+ports_vdsl:
+  Columns:
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_vdsl_updated, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: xdsl2LineStatusAttainableRateDs, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2LineStatusAttainableRateUs, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2ChStatusActDataRateXtur, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2ChStatusActDataRateXtuc, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2LineStatusActAtpDs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
+    - { Field: xdsl2LineStatusActAtpUs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
+  Indexes:
+    ports_vdsl_port_id_unique: { Name: ports_vdsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1809,6 +1819,7 @@ sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_prev, Type: double, 'Null': true, Extra: '' }
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: rrd_type, Type: 'enum(''GAUGE'',''COUNTER'',''DERIVE'',''DCOUNTER'',''DDERIVE'',''ABSOLUTE'')', 'Null': false, Extra: '', Default: GAUGE }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensors_device_id_index: { Name: sensors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -2066,7 +2077,7 @@ users_widgets:
   Columns:
     - { Field: user_widget_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: widget_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: widget, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: col, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: row, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: size_x, Type: tinyint, 'Null': false, Extra: '' }
@@ -2077,7 +2088,7 @@ users_widgets:
     - { Field: dashboard_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_widget_id], Unique: true, Type: BTREE }
-    user_id: { Name: user_id, Columns: [user_id, widget_id], Unique: false, Type: BTREE }
+    user_id: { Name: user_id, Columns: [user_id], Unique: false, Type: BTREE }
 vlans:
   Columns:
     - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2130,15 +2141,6 @@ vrf_lite_cisco:
     vrf_lite_cisco_device_id_context_name_vrf_name_index: { Name: vrf_lite_cisco_device_id_context_name_vrf_name_index, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
     vrf_lite_cisco_device_id_index: { Name: vrf_lite_cisco_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vrf_lite_cisco_vrf_name_index: { Name: vrf_lite_cisco_vrf_name_index, Columns: [vrf_name], Unique: false, Type: BTREE }
-widgets:
-  Columns:
-    - { Field: widget_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: widget_title, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: widget, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: base_dimensions, Type: varchar(10), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [widget_id], Unique: true, Type: BTREE }
-    widgets_widget_unique: { Name: widgets_widget_unique, Columns: [widget], Unique: true, Type: BTREE }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2164,6 +2166,7 @@ wireless_sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_oids, Type: text, 'Null': false, Extra: '' }
     - { Field: access_point_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: rrd_type, Type: 'enum(''GAUGE'',''COUNTER'',''DERIVE'',''DCOUNTER'',''DDERIVE'',''ABSOLUTE'')', 'Null': false, Extra: '', Default: GAUGE }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     wireless_sensors_device_id_index: { Name: wireless_sensors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

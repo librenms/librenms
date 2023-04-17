@@ -38,8 +38,8 @@ foreach ($cooling_status as $index => $data) {
 
     $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $states = [];
-    foreach ($tmp_states as $k => $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+    foreach ($tmp_states as $ref) {
+        preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
         $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
     }
@@ -158,35 +158,75 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 }
 
 // Monitor contact switches via the UIO ports.
-$apcContactData = snmpwalk_cache_oid($device, 'iemConfigContactsTable', [], 'PowerNet-MIB', null, '-OQUse');
-$apcContactData = snmpwalk_cache_oid($device, 'iemStatusContactsTable', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
+$apcContactData = snmpwalk_cache_oid($device, 'uioInputContact', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
+if ($apcContactData['uioInputContactStatusTableSize'] > 0) {
+    // NMC2/NMC3/etc Universal Input Output
+    foreach (array_keys($apcContactData) as $index) {
+        // APC disabled (1), enabled (2)
+        $current = $apcContactData[$index]['uioInputContactStatusCurrentState'];
+        // state 4 is "not applicable"
+        if ($current != 4) {
+            $sensorType = 'apc';
+            $cur_oid = '.1.3.6.1.4.1.318.1.1.25.2.2.1.5.' . $index;
+            $severity = $apcContactData[$index]['uioInputContactStatusAlarmStatus'];
 
-foreach (array_keys($apcContactData) as $index) {
-    // APC disabled (1), enabled (2)
-    if ($apcContactData[$index]['iemConfigContactEnable'] == 2) {
-        $current = $apcContactData[$index]['iemStatusContactStatus'];
-        $sensorType = 'apc';
-        $cur_oid = '.1.3.6.1.4.1.318.1.1.10.2.3.4.1.3.' . $index;
-        $severity = $apcContactData[$index]['iemConfigContactSeverity'];
+            // APC normal (1), warning (2), critical (3), notaplicable (4)
+            // LibreNMS warning (1), critical (2)
 
-        // APC critical (1), warning (2)
-        // LibreNMS warning (1), critical (2)
-        $faultGeneric = 1;
-        if ($severity == 1) {
-            $faultGeneric = 2;
-        } elseif ($severity == 2) {
-            $faultGeneric = 1;
+            $state_name = $apcContactData[$index]['uioInputContactStatusContactName'];
+            $states = [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
+                ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+                ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
+            ];
+            create_state_index($state_name, $states);
+
+            // universalInputOutput sensor entries all have an sub-index, presumably to allow for multiple sensors in the
+            // future. Here we remove the sub-index from the first entry, so 1.1 becomes 1, 2.1 becomes 2, etc. However any
+            // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
+            // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
+            // created by prior versions using the legacy iemConfig and iemStatus tables.
+            $split_index = explode('.', $index);
+            if (count($split_index) == 2 && $split_index[1] == 1) {
+                $index = $split_index[0];
+            }
+
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
         }
+    }
+} else {
+    // NMC1 Integrated Environmental Monitor (legacy)
+    $apcContactData = snmpwalk_cache_oid($device, 'iemConfigContactsTable', [], 'PowerNet-MIB', null, '-OQUse');
+    $apcContactData = snmpwalk_cache_oid($device, 'iemStatusContactsTable', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
 
-        $state_name = $apcContactData[$index]['iemConfigContactName'];
-        $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noFault'],
-            ['value' => 2, 'generic' => $faultGeneric, 'graph' => 1, 'descr' => 'fault'],
-            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
-        ];
-        create_state_index($state_name, $states);
+    foreach (array_keys($apcContactData) as $index) {
+        // APC disabled (1), enabled (2)
+        if ($apcContactData[$index]['iemConfigContactEnable'] == 2) {
+            $current = $apcContactData[$index]['iemStatusContactStatus'];
+            $sensorType = 'apc';
+            $cur_oid = '.1.3.6.1.4.1.318.1.1.10.2.3.4.1.3.' . $index;
+            $severity = $apcContactData[$index]['iemConfigContactSeverity'];
 
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+            // APC critical (1), warning (2)
+            // LibreNMS warning (1), critical (2)
+            $faultGeneric = 1;
+            if ($severity == 1) {
+                $faultGeneric = 2;
+            } elseif ($severity == 2) {
+                $faultGeneric = 1;
+            }
+
+            $state_name = $apcContactData[$index]['iemConfigContactName'];
+            $states = [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noFault'],
+                ['value' => 2, 'generic' => $faultGeneric, 'graph' => 1, 'descr' => 'fault'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
+            ];
+            create_state_index($state_name, $states);
+
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+        }
     }
 }

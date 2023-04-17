@@ -30,6 +30,10 @@ return [
         'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
         'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => \LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
         'CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1' => \LibreNMS\Snmptrap\Handlers\CiscoErrDisableInterfaceEvent::class,
+        'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStart::class,
+        'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStopTime' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStop::class,
+        'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerFreeAddressLow' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerFreeAddressLow::class,
+        'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerFreeAddressHigh' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerFreeAddressHigh::class,
         'CM-ALARM-MIB::cmNetworkElementAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaNetworkElementAlmTrap::class,
         'CM-ALARM-MIB::cmSysAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaSysAlmTrap::class,
         'CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdCrossingAlert' => \LibreNMS\Snmptrap\Handlers\AdvaAccThresholdCrossingAlert::class,
@@ -127,7 +131,8 @@ return [
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'OSPF-TRAP-MIB::ospfTxRetransmit' => \LibreNMS\Snmptrap\Handlers\OspfTxRetransmit::class,
-        'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
+        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
+        'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class, // apparently bad/old UPS-MIB
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,
         'VEEAM-MIB::onLinuxFLRMountStarted' => \LibreNMS\Snmptrap\Handlers\VeeamLinuxFLRMountStarted::class,
@@ -145,6 +150,5 @@ return [
         'VEEAM-MIB::onSobrOffloadFinished' => \LibreNMS\Snmptrap\Handlers\VeeamSobrOffloadFinished::class,
         'VEEAM-MIB::onCdpRpoReport' => \LibreNMS\Snmptrap\Handlers\VeeamCdpRpoReport::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
-        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
     ],
 ];

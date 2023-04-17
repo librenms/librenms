@@ -10,11 +10,11 @@
                     "version": "8.2.29_20180611",
                     "hardware": "RAX711-C-DC/D-02 version A.02",
                     "features": null,
+                    "location": "<private>",
                     "os": "raisecom",
                     "type": "network",
                     "serial": "123002030702S18B08S0001G",
-                    "icon": "raisecom.png",
-                    "location": "<private>"
+                    "icon": "raisecom.png"
                 }
             ]
         },
@@ -26,31 +26,17 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.5",
+                    "processor_oid": ".1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.3",
                     "processor_index": "3",
                     "processor_type": "raisecom",
-                    "processor_usage": 3,
+                    "processor_usage": 6,
                     "processor_descr": "Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.5",
-                    "processor_index": "3",
-                    "processor_type": "raisecom",
-                    "processor_usage": 4,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -77,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -101,6 +88,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -125,6 +113,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -149,6 +138,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -173,6 +163,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomConfigLoadState"
                 },
                 {
@@ -197,6 +188,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomFanMonitorStateTable"
                 },
                 {
@@ -221,6 +213,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomFanMonitorStateTable"
                 },
                 {
@@ -245,6 +238,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomFanMonitorStateTable"
                 },
                 {
@@ -269,6 +263,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomFanMonitorStateTable"
                 },
                 {
@@ -293,6 +288,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomPowerMonitorStateTable"
                 },
                 {
@@ -317,6 +313,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "raisecomPowerMonitorStateTable"
                 },
                 {
@@ -341,6 +338,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -365,6 +363,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -389,6 +388,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -413,6 +413,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -437,6 +438,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -461,6 +463,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -485,6 +488,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

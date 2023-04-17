@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -45,17 +46,22 @@ class Device extends BaseModel
         'community',
         'cryptoalgo',
         'cryptopass',
+        'disable_notify',
         'features',
         'hardware',
         'hostname',
         'display',
         'icon',
         'ip',
+        'location_id',
+        'notes',
         'os',
+        'override_sysLocation',
         'overwrite_ip',
         'poller_group',
         'port',
         'port_association_mode',
+        'purpose',
         'retries',
         'serial',
         'snmp_disable',
@@ -210,7 +216,7 @@ class Device extends BaseModel
 
                 if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
-                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
+                        $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
@@ -562,7 +568,7 @@ class Device extends BaseModel
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
                 ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
+                ->whereIn('device_group_id', Arr::wrap($deviceGroup));
             }
         );
     }
@@ -573,7 +579,7 @@ class Device extends BaseModel
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
                 ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
+                ->whereIn('device_group_id', Arr::wrap($deviceGroup));
             }
         );
     }
@@ -782,6 +788,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
     }
 
+    public function portsAdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortAdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+    }
+
     public function portsFdb(): HasMany
     {
         return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
@@ -795,6 +806,11 @@ class Device extends BaseModel
     public function portsStp(): HasMany
     {
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
     }
 
     public function portsVlan(): HasMany

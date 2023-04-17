@@ -14,10 +14,14 @@
 */
 
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
-$errors_visible = var_export($vars['format'] == 'list_detail' || $vars['errors'], 1);
+$errors_visible = var_export($vars['format'] == 'list_detail' || isset($vars['errors']), 1);
 $no_refresh = true;
+$device = DeviceCache::get((int) $vars['device_id']);
+$device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
+$location = \App\Models\Location::find((int) $vars['location']);
+$location_selected = json_encode(! empty($location) ? ['id' => $location->id, 'text' => $location->location] : '');
 
-if ($vars['errors']) {
+if (isset($vars['errors'])) {
     $error_sort = ' data-order="desc"';
     $sort = '';
 } else {
@@ -109,23 +113,28 @@ var grid = $("#ports").bootgrid({
     post: function ()
     {
         return {
-            device_id: '<?php echo $vars['device_id']; ?>',
-            hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
-            state: '<?php echo $vars['state']; ?>',
-            ifSpeed: '<?php echo $vars['ifSpeed']; ?>',
-            ifType: '<?php echo $vars['ifType']; ?>',
-            port_descr_type: '<?php echo $vars['port_descr_type']; ?>',
-            ifAlias: '<?php echo $vars['ifAlias']; ?>',
-            location: '<?php echo $vars['location']; ?>',
-            disabled: '<?php echo $vars['disabled']; ?>',
-            ignore: '<?php echo $vars['ignore']; ?>',
-            deleted: '<?php echo $vars['deleted']; ?>',
-            errors: '<?php echo $vars['errors']; ?>',
+            device_id: '<?php echo $vars['device_id'] ?? ''; ?>',
+            hostname: '<?php echo htmlspecialchars($vars['hostname'] ?? ''); ?>',
+            state: '<?php echo $vars['state'] ?? ''; ?>',
+            ifSpeed: '<?php echo $vars['ifSpeed'] ?? ''; ?>',
+            ifType: '<?php echo $vars['ifType'] ?? ''; ?>',
+            port_descr_type: '<?php echo $vars['port_descr_type'] ?? ''; ?>',
+            ifAlias: '<?php echo $vars['ifAlias'] ?? ''; ?>',
+            location: '<?php echo $vars['location'] ?? ''; ?>',
+            disabled: '<?php echo $vars['disabled'] ?? ''; ?>',
+            ignore: '<?php echo $vars['ignore'] ?? ''; ?>',
+            deleted: '<?php echo $vars['deleted'] ?? ''; ?>',
+            errors: '<?php echo $vars['errors'] ?? ''; ?>',
+            group: '<?php echo $vars['group'] ?? ''; ?>',
+            devicegroup: '<?php echo $vars['devicegroup'] ?? ''; ?>',
         };
     },
     url: '<?php echo route('table.ports') ?>'
 });
 
-$(".actionBar").append("<?php echo $output; ?>");
+$(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
+
+init_select2('#device_id', 'device', {}, <?php echo $device_selected ?>, 'All Devices');
+init_select2('#location', 'location', {}, <?php echo $location_selected ?>, 'All Locations');
 
 </script>

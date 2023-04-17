@@ -10,11 +10,11 @@
                     "version": "6.60A.309.001",
                     "hardware": "MP-118 FXS",
                     "features": null,
+                    "location": "<private>",
                     "os": "audiocodes",
                     "type": "network",
                     "serial": "10512508",
-                    "icon": "audiocodes.png",
-                    "location": "<private>"
+                    "icon": "audiocodes.png"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Ethernet Port 1/1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -145,7 +140,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -155,15 +149,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Ethernet Port 1/1",
                     "ifPhysAddress": "00908fa0687c",
-                    "ifHardType": null,
                     "ifLastChange": 1598682540,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -310,6 +300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -334,6 +325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -358,6 +350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -382,6 +375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -406,6 +400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -430,6 +425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -454,6 +450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -478,6 +475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "acAnalogFxsFxoHookState"
                 }
             ],

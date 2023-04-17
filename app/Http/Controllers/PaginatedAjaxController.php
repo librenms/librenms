@@ -76,6 +76,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function searchFields($request)
@@ -88,6 +89,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function filterFields($request)
@@ -100,6 +102,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function sortFields($request)
@@ -146,9 +149,18 @@ abstract class PaginatedAjaxController extends Controller
     protected function filter($request, $query, $fields)
     {
         foreach ($fields as $target => $field) {
-            if (is_callable($field)) {
-                $field($query, $request->get($target));
-            } elseif ($value = $request->get($field)) {
+            $callable = is_callable($field);
+            $value = $request->get($callable ? $target : $field);
+
+            // unfiltered field
+            if ($value === null) {
+                continue;
+            }
+
+            // apply the filter
+            if ($callable) {
+                $field($query, $value);
+            } else {
                 $value = $this->adjustFilterValue($field, $value);
                 if (is_string($target)) {
                     $query->where($target, $value);

@@ -1,3 +1,38 @@
+### `list_locations`
+
+Return a list of locations.
+
+Route: `/api/v0/resources/locations`
+
+Input:
+
+-
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "locations": [
+        {
+            "id": "1",
+            "location": "Example location, Example city, Example Country",
+            "lat": "-18.911436",
+            "lng": "47.517446",
+            "timestamp": "2017-04-01 02:40:05"
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
 ### `add_location`
 
 Add a new location
@@ -30,9 +65,9 @@ Output:
 
 Deletes an existing location
 
-Route: `/api/v0/locations/location`
+Route: `/api/v0/locations/:location`
 
-- location: name of the location to delete
+- location: name or id of the location to delete
 
 Example:
 
@@ -54,9 +89,9 @@ Output:
 
 Edits a location
 
-Route: `/api/v0/locations/location`
+Route: `/api/v0/locations/:location`
 
-- location: name of the location to edit
+- location: name or id of the location to edit
 
 Input:
 

@@ -1,7 +1,7 @@
 mib: ICT-MODULAR-POWER-SYSTEM-MIB
 modules:
     os:
-        hardware: ICT-MODULAR-POWER-SYSTEM-MIB::deviceHardware.0
+        hardware: ICT-MODULAR-POWER-SYSTEM-MIB::deviceModel.0
         version: ICT-MODULAR-POWER-SYSTEM-MIB::deviceFirmware.0
     sensors:
         current:
@@ -29,6 +29,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.39145.13.10.1.4.{{ $index }}'
                     descr: 'Module #{{ $index }} Voltage (VDC)'
                     index: 'moduleVoltage.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: moduleVoltage
+                            op: =
+                            value: '.'
         state:
             data:
                 -

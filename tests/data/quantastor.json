@@ -10,11 +10,11 @@
                     "version": "5.7.2.006+1483656",
                     "hardware": "HP Gen8 ServBP 25+2",
                     "features": null,
+                    "location": "<private>",
                     "os": "quantastor",
                     "type": "storage",
                     "serial": "1b2cc97f",
-                    "icon": "quantastor.svg",
-                    "location": "<private>"
+                    "icon": "quantastor.svg"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -246,7 +236,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -256,15 +245,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -351,7 +336,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -361,15 +345,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -456,7 +436,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -466,15 +445,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -565,7 +540,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -575,15 +549,11 @@
                     "ifType": "softwareLoopback",
                     "ifAlias": "lo",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -670,7 +640,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -680,15 +649,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": "a0d3c105bd0c",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -772,10 +737,9 @@
                     "ifName": "eno2",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -785,15 +749,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": "a0d3c105bd0d",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -877,10 +837,9 @@
                     "ifName": "eno3",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -890,15 +849,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": "a0d3c105bd0e",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -982,10 +937,9 @@
                     "ifName": "eno4",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -995,15 +949,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Broadcom Inc. and subsidiaries NetXtreme BCM5719 Gigabit Ethernet PCIe",
                     "ifPhysAddress": "a0d3c105bd0f",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1537,6 +1487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-enablestate"
                 },
                 {
@@ -1561,6 +1512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-enablestate"
                 },
                 {
@@ -1585,6 +1537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-enablestate"
                 },
                 {
@@ -1609,6 +1562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-enablestate"
                 },
                 {
@@ -1633,6 +1587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-state"
                 },
                 {
@@ -1657,6 +1612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-state"
                 },
                 {
@@ -1681,6 +1637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-state"
                 },
                 {
@@ -1705,6 +1662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fctarget-state"
                 },
                 {
@@ -1729,6 +1687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1753,6 +1712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1777,6 +1737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1801,6 +1762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1825,6 +1787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1849,6 +1812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1873,6 +1837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1897,6 +1862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1921,6 +1887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1945,6 +1912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1969,6 +1937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -1993,6 +1962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2017,6 +1987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2041,6 +2012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2065,6 +2037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2089,6 +2062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2113,6 +2087,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2137,6 +2112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2161,6 +2137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2185,6 +2162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2209,6 +2187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2233,6 +2212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2257,6 +2237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2281,6 +2262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2305,6 +2287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwDisk-status"
                 },
                 {
@@ -2329,6 +2312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-alarms"
                 },
                 {
@@ -2353,6 +2337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-alarms"
                 },
                 {
@@ -2377,6 +2362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-psusens"
                 },
                 {
@@ -2401,6 +2387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-psusens"
                 },
                 {
@@ -2425,6 +2412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-status"
                 },
                 {
@@ -2449,6 +2437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-status"
                 },
                 {
@@ -2473,6 +2462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-tempsens"
                 },
                 {
@@ -2497,6 +2487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwEnclosure-tempsens"
                 },
                 {
@@ -2521,6 +2512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwUnit-status"
                 },
                 {
@@ -2545,6 +2537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwUnit-status"
                 },
                 {
@@ -2569,6 +2562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hwUnit-status"
                 },
                 {
@@ -2593,6 +2587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "license-status"
                 },
                 {
@@ -2617,6 +2612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storagePool"
                 },
                 {
@@ -2641,6 +2637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storagePool"
                 },
                 {
@@ -2665,6 +2662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2689,6 +2687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2713,6 +2712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2737,6 +2737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2761,6 +2762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2785,6 +2787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2809,6 +2812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2833,6 +2837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2857,6 +2862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2881,6 +2887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2905,6 +2912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2929,6 +2937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2953,6 +2962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -2977,6 +2987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3001,6 +3012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3025,6 +3037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3049,6 +3062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3073,6 +3087,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3097,6 +3112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3121,6 +3137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "storageVolume"
                 },
                 {
@@ -3128,7 +3145,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.0",
-                    "sensor_index": "{{ $hwDisk-Index }}.0",
+                    "sensor_index": "0.0",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:01)",
                     "group": "HDD",
@@ -3145,6 +3162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3152,7 +3170,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.1",
-                    "sensor_index": "{{ $hwDisk-Index }}.1",
+                    "sensor_index": "0.1",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:02)",
                     "group": "HDD",
@@ -3169,6 +3187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3176,7 +3195,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.10",
-                    "sensor_index": "{{ $hwDisk-Index }}.10",
+                    "sensor_index": "0.10",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:11)",
                     "group": "HDD",
@@ -3193,6 +3212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3200,7 +3220,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.11",
-                    "sensor_index": "{{ $hwDisk-Index }}.11",
+                    "sensor_index": "0.11",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:12)",
                     "group": "HDD",
@@ -3217,6 +3237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3224,7 +3245,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.12",
-                    "sensor_index": "{{ $hwDisk-Index }}.12",
+                    "sensor_index": "0.12",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:13)",
                     "group": "HDD",
@@ -3241,6 +3262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3248,7 +3270,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.13",
-                    "sensor_index": "{{ $hwDisk-Index }}.13",
+                    "sensor_index": "0.13",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:14)",
                     "group": "HDD",
@@ -3265,6 +3287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3272,7 +3295,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.14",
-                    "sensor_index": "{{ $hwDisk-Index }}.14",
+                    "sensor_index": "0.14",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:15)",
                     "group": "HDD",
@@ -3289,6 +3312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3296,7 +3320,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.15",
-                    "sensor_index": "{{ $hwDisk-Index }}.15",
+                    "sensor_index": "0.15",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:16)",
                     "group": "HDD",
@@ -3313,6 +3337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3320,7 +3345,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.16",
-                    "sensor_index": "{{ $hwDisk-Index }}.16",
+                    "sensor_index": "0.16",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:17)",
                     "group": "HDD",
@@ -3337,6 +3362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3344,7 +3370,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.17",
-                    "sensor_index": "{{ $hwDisk-Index }}.17",
+                    "sensor_index": "0.17",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:18)",
                     "group": "HDD",
@@ -3361,6 +3387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3368,7 +3395,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.18",
-                    "sensor_index": "{{ $hwDisk-Index }}.18",
+                    "sensor_index": "0.18",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:19)",
                     "group": "HDD",
@@ -3385,6 +3412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3392,7 +3420,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.19",
-                    "sensor_index": "{{ $hwDisk-Index }}.19",
+                    "sensor_index": "0.19",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:20)",
                     "group": "HDD",
@@ -3409,6 +3437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3416,7 +3445,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.2",
-                    "sensor_index": "{{ $hwDisk-Index }}.2",
+                    "sensor_index": "0.2",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:03)",
                     "group": "HDD",
@@ -3433,6 +3462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3440,7 +3470,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.20",
-                    "sensor_index": "{{ $hwDisk-Index }}.20",
+                    "sensor_index": "0.20",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:21)",
                     "group": "HDD",
@@ -3457,6 +3487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3464,7 +3495,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.21",
-                    "sensor_index": "{{ $hwDisk-Index }}.21",
+                    "sensor_index": "0.21",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:22)",
                     "group": "HDD",
@@ -3481,6 +3512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3488,7 +3520,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.22",
-                    "sensor_index": "{{ $hwDisk-Index }}.22",
+                    "sensor_index": "0.22",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:23)",
                     "group": "HDD",
@@ -3505,6 +3537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3512,7 +3545,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.23",
-                    "sensor_index": "{{ $hwDisk-Index }}.23",
+                    "sensor_index": "0.23",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:24)",
                     "group": "HDD",
@@ -3529,6 +3562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3536,7 +3570,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.24",
-                    "sensor_index": "{{ $hwDisk-Index }}.24",
+                    "sensor_index": "0.24",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (2I:1:25)",
                     "group": "HDD",
@@ -3553,6 +3587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3560,7 +3595,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.3",
-                    "sensor_index": "{{ $hwDisk-Index }}.3",
+                    "sensor_index": "0.3",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:04)",
                     "group": "HDD",
@@ -3577,6 +3612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3584,7 +3620,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.4",
-                    "sensor_index": "{{ $hwDisk-Index }}.4",
+                    "sensor_index": "0.4",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:05)",
                     "group": "HDD",
@@ -3601,6 +3637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3608,7 +3645,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.5",
-                    "sensor_index": "{{ $hwDisk-Index }}.5",
+                    "sensor_index": "0.5",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:06)",
                     "group": "HDD",
@@ -3625,6 +3662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3632,7 +3670,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.6",
-                    "sensor_index": "{{ $hwDisk-Index }}.6",
+                    "sensor_index": "0.6",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:07)",
                     "group": "HDD",
@@ -3649,6 +3687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3656,7 +3695,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.7",
-                    "sensor_index": "{{ $hwDisk-Index }}.7",
+                    "sensor_index": "0.7",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:08)",
                     "group": "HDD",
@@ -3673,6 +3712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3680,7 +3720,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.8",
-                    "sensor_index": "{{ $hwDisk-Index }}.8",
+                    "sensor_index": "0.8",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:09)",
                     "group": "HDD",
@@ -3697,6 +3737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3704,7 +3745,7 @@
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.39324.1.1.48.1.1.30.9",
-                    "sensor_index": "{{ $hwDisk-Index }}.9",
+                    "sensor_index": "0.9",
                     "sensor_type": "quantastor",
                     "sensor_descr": "Disk (1I:1:10)",
                     "group": "HDD",
@@ -3721,6 +3762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3745,6 +3787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3769,6 +3812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3793,6 +3837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3817,6 +3862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3841,6 +3887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3865,6 +3912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3889,6 +3937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3913,6 +3962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3937,6 +3987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

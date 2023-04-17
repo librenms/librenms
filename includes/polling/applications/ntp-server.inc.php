@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ntp-server';
-$app_id = $app['app_id'];
 
 try {
     $ntp = json_app_get($device, $name);
@@ -18,9 +17,9 @@ try {
     ];
 
     [$ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],
-          $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
-          $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
-          $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']] = explode("\n", $legacy);
+        $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
+        $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
+        $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']] = explode("\n", $legacy);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
@@ -28,7 +27,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('stratum', 'GAUGE', 0, 1000)
     ->addDataset('offset', 'GAUGE', -1000, 1000)

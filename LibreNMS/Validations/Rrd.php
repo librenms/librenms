@@ -25,65 +25,8 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
-use LibreNMS\Util\Version;
-use LibreNMS\Validator;
-
 class Rrd extends BaseValidation
 {
-    /**
-     * Validate this module.
-     * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
-     *
-     * @param  Validator  $validator
-     */
-    public function validate(Validator $validator)
-    {
-        // Check that rrdtool config version is what we see
-        if (Config::has('rrdtool_version')) {
-            $rrd_version = Version::get()->rrdtool();
-            if (version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
-                && version_compare(Config::get('rrdtool_version'), $rrd_version, '>')
-            ) {
-                $validator->fail(
-                    'The rrdtool version you have specified is newer than what is installed.',
-                    "Either comment out \$config['rrdtool_version'] = '" .
-                    Config::get('rrdtool_version') . "'; or set \$config['rrdtool_version'] = '{$rrd_version}';"
-                );
-            }
-        }
-
-        if (Config::get('rrdcached')) {
-            self::checkRrdcached($validator);
-        } else {
-            $rrd_dir = Config::get('rrd_dir');
-
-            $dir_stat = stat($rrd_dir);
-            if ($dir_stat[4] == 0 || $dir_stat[5] == 0) {
-                $validator->warn('Your RRD directory is owned by root, please consider changing over to user a non-root user');
-            }
-
-            if (substr(sprintf('%o', fileperms($rrd_dir)), -3) != 775) {
-                $validator->warn('Your RRD directory is not set to 0775', "chmod 775 $rrd_dir");
-            }
-        }
-    }
-
-    public static function checkRrdcached(Validator $validator)
-    {
-        [$host,$port] = explode(':', Config::get('rrdcached'));
-        if ($host == 'unix') {
-            // Using socket, check that file exists
-            if (! file_exists($port)) {
-                $validator->fail("$port doesn't appear to exist, rrdcached test failed");
-            }
-        } else {
-            $connection = @fsockopen($host, (int) $port);
-            if (is_resource($connection)) {
-                fclose($connection);
-            } else {
-                $validator->fail('Cannot connect to rrdcached instance');
-            }
-        }
-    }
+    protected $directory = 'Rrd';
+    protected $name = 'rrd';
 }

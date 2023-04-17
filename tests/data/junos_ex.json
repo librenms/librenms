@@ -10,11 +10,11 @@
                     "version": "15.1X53-D59.4",
                     "hardware": "Juniper EX3400-48T",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },
@@ -24,7 +24,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "idle",
@@ -32,6 +32,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -46,7 +47,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -54,6 +55,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -68,7 +70,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "idle",
@@ -76,6 +78,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -94,7 +97,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "established",
@@ -102,6 +105,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.43",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -116,7 +120,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -124,6 +128,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.185",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -138,7 +143,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "established",
@@ -146,6 +151,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.225",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -243,6 +249,56 @@
             "sensors": [
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "power",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.105.1.3.1.1.4.1",
+                    "sensor_index": "pethMainPseConsumptionPower.1",
+                    "sensor_type": "junos",
+                    "sensor_descr": "PoE Controller 1 Load",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 248,
+                    "sensor_limit": 1764,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": -1,
+                    "sensor_limit_low_warn": -1,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "power",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.105.1.3.1.1.4.2",
+                    "sensor_index": "pethMainPseConsumptionPower.2",
+                    "sensor_type": "junos",
+                    "sensor_descr": "PoE Controller 2 Load",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 137,
+                    "sensor_limit": 767,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": -1,
+                    "sensor_limit_low_warn": -1,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.1.1.0",
@@ -263,6 +319,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -287,6 +344,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -311,6 +369,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -335,6 +394,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -359,6 +419,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -383,6 +444,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -407,6 +469,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -431,6 +494,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -455,6 +519,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -479,6 +544,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -503,7 +569,58 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.105.1.3.1.1.3.1",
+                    "sensor_index": "pethMainPseOperStatus.1",
+                    "sensor_type": "POWER-ETHERNET-MIB::pethMainPseTable",
+                    "sensor_descr": "PoE Controller 1 Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "POWER-ETHERNET-MIB::pethMainPseTable"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.105.1.3.1.1.3.2",
+                    "sensor_index": "pethMainPseOperStatus.2",
+                    "sensor_type": "POWER-ETHERNET-MIB::pethMainPseTable",
+                    "sensor_descr": "PoE Controller 2 Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "POWER-ETHERNET-MIB::pethMainPseTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -527,6 +644,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -551,6 +669,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -664,6 +783,27 @@
                     "state_name": "jnxYellowAlarmState",
                     "state_descr": "on",
                     "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "POWER-ETHERNET-MIB::pethMainPseTable",
+                    "state_descr": "on",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "POWER-ETHERNET-MIB::pethMainPseTable",
+                    "state_descr": "off",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "POWER-ETHERNET-MIB::pethMainPseTable",
+                    "state_descr": "fault",
+                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 }

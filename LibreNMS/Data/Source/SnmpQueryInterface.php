@@ -59,6 +59,12 @@ interface SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface;
 
     /**
+     * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
+     * OIDs will be walked in order, so you may want to put your OIDs in a specific order.
+     */
+    public function abortOnFailure(): SnmpQueryInterface;
+
+    /**
      * Do not error on out of order indexes.
      * Use with caution as we could get stuck in an infinite loop.
      */
@@ -67,7 +73,7 @@ interface SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQueryInterface;
+    public function numeric(bool $numeric = true): SnmpQueryInterface;
 
     /**
      * Hide MIB in output
@@ -121,5 +127,5 @@ interface SnmpQueryInterface
      * Translate an OID.
      * Call numeric method prior output numeric OID.
      */
-    public function translate(string $oid, ?string $mib = null): SnmpResponse;
+    public function translate(string $oid, ?string $mib = null): string;
 }

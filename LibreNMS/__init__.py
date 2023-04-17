@@ -26,7 +26,7 @@ from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
-MAX_LOGFILE_SIZE = (1024 ** 2) * 10  # 10 Megabytes max log files
+MAX_LOGFILE_SIZE = (1024**2) * 10  # 10 Megabytes max log files
 
 logger = logging.getLogger(__name__)
 
@@ -248,6 +248,24 @@ class DB:
             if self.config.db_socket:
                 args["unix_socket"] = self.config.db_socket
 
+            sslmode = self.config.db_sslmode.lower()
+            if sslmode == "disabled":
+                logger.debug("Using cleartext MySQL connection")
+            elif sslmode == "verify_ca":
+                logger.info(
+                    "Using TLS MySQL connection without CN/SAN check (CA validation only)"
+                )
+                args["ssl"] = {"ca": self.config.db_ssl_ca, "check_hostname": False}
+            elif sslmode == "verify_identity":
+                logger.info("Using TLS MySQL connection with full validation")
+                args["ssl"] = {"ca": self.config.db_ssl_ca}
+            else:
+                logger.critical(
+                    "Unsupported MySQL sslmode %s, dispatcher supports DISABLED, VERIFY_CA, and VERIFY_IDENTITY only",
+                    self.config.db_sslmode,
+                )
+                raise SystemExit(2)
+
             conn = MySQLdb.connect(**args)
             conn.autocommit(True)
             conn.ping(True)
@@ -402,9 +420,9 @@ class ThreadingLock(Lock):
 
 
 class RedisLock(Lock):
-    def __init__(self, namespace="lock", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+    def __init__(self, namespace="lock", sentinel_kwargs=None, **redis_kwargs):
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
@@ -415,9 +433,12 @@ class RedisLock(Lock):
             kwargs = {
                 k: v
                 for k, v in redis_kwargs.items()
-                if k in ["decode_responses", "password", "db", "socket_timeout"]
+                if k
+                in ["decode_responses", "username", "password", "db", "socket_timeout"]
             }
-            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+            self._redis = Sentinel(
+                sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs
+            ).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
@@ -440,7 +461,7 @@ class RedisLock(Lock):
         :param owner: str a unique name for the locking node
         :param expiration: int in seconds, 0 expiration means forever
         """
-        import redis
+        import redis  # pylint: disable=import-error
 
         try:
             if int(expiration) < 1:
@@ -449,13 +470,18 @@ class RedisLock(Lock):
             key = self.__key(name)
             non_existing = not (allow_owner_relock and self._redis.get(key) == owner)
             return self._redis.set(key, owner, ex=int(expiration), nx=non_existing)
-        except redis.exceptions.ResponseError as e:
+        except (
+            redis.exceptions.ResponseError,
+            redis.exceptions.TimeoutError,
+            redis.exceptions.ConnectionError,
+        ) as e:
             logger.critical(
-                "Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
+                "Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s. %s",
                 name,
                 owner,
                 expiration,
                 allow_owner_relock,
+                repr(e),
             )
 
     def unlock(self, name, owner):
@@ -464,14 +490,34 @@ class RedisLock(Lock):
         :param name: str the name of the lock
         :param owner: str a unique name for the locking node
         """
-        key = self.__key(name)
-        if self._redis.get(key) == owner:
-            self._redis.delete(key)
-            return True
+        import redis  # pylint: disable=import-error
+
+        try:
+            key = self.__key(name)
+            if self._redis.get(key) == owner:
+                self._redis.delete(key)
+                return True
+        except (redis.exceptions.TimeoutError, redis.exceptions.ConnectionError) as e:
+            logger.critical(
+                "Unable to release lock because of a redis timeout/connection error, local state: name: %s, owner: %s. %s",
+                name,
+                owner,
+                repr(e),
+            )
         return False
 
     def check_lock(self, name):
-        return self._redis.get(self.__key(name)) is not None
+        import redis  # pylint: disable=import-error
+
+        try:
+            return self._redis.get(self.__key(name)) is not None
+        except (redis.exceptions.TimeoutError, redis.exceptions.ConnectionError) as e:
+            logger.critical(
+                "Unable check the status of lock %s because of a redis timeout/connection error: %s",
+                name,
+                repr(e),
+            )
+            return True
 
     def print_locks(self):
         keys = self._redis.keys(self.__key("*"))
@@ -484,9 +530,9 @@ class RedisLock(Lock):
 
 
 class RedisUniqueQueue(object):
-    def __init__(self, name, namespace="queue", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+    def __init__(self, name, namespace="queue", sentinel_kwargs=None, **redis_kwargs):
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
@@ -497,9 +543,12 @@ class RedisUniqueQueue(object):
             kwargs = {
                 k: v
                 for k, v in redis_kwargs.items()
-                if k in ["decode_responses", "password", "db", "socket_timeout"]
+                if k
+                in ["decode_responses", "username", "password", "db", "socket_timeout"]
             }
-            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+            self._redis = Sentinel(
+                sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs
+            ).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
@@ -516,20 +565,47 @@ class RedisUniqueQueue(object):
             self._redis.delete(self.key)
 
     def qsize(self):
-        return self._redis.zcount(self.key, "-inf", "+inf")
+        import redis  # pylint: disable=import-error
+
+        try:
+            return self._redis.zcount(self.key, "-inf", "+inf")
+        except (redis.exceptions.TimeoutError, redis.exceptions.ConnectionError) as e:
+            logger.critical(
+                "Failed to retrieve the size of the queue because of a redis timeout/connection error: %s",
+                repr(e),
+            )
+            return 0
 
     def empty(self):
         return self.qsize() == 0
 
     def put(self, item):
-        self._redis.zadd(self.key, {item: time()}, nx=True)
+        import redis  # pylint: disable=import-error
+
+        try:
+            self._redis.zadd(self.key, {item: time()}, nx=True)
+        except (redis.exceptions.TimeoutError, redis.exceptions.ConnectionError) as e:
+            logger.critical(
+                "Failed to put item %s in queue because of a redis timeout/connection error: %s",
+                str(item),
+                repr(e),
+            )
 
     def get(self, block=True, timeout=None):
+        import redis  # pylint: disable=import-error
+
         try:
             if block:
                 item = self._redis.bzpopmin(self.key, timeout=timeout)
             else:
                 item = self._redis.zpopmin(self.key)
+        except (redis.exceptions.TimeoutError, redis.exceptions.ConnectionError) as e:
+            logger.critical(
+                "Failed to get item %s from queue because of a redis timeout/connection error: %s",
+                self.key,
+                repr(e),
+            )
+            item = None
         # Unfortunately we cannot use _redis.exceptions.ResponseError Exception here
         # Since it would trigger another exception in queuemanager
         except Exception as e:

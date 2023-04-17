@@ -26,19 +26,16 @@
 namespace LibreNMS\Device;
 
 use App\View\SimpleTemplate;
-use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\Oid;
 
 class YamlDiscovery
 {
-    private static $cache_time = 1800; // 30 min, Used for oid translation cache
-
     /**
      * @param  OS  $os
      * @param  DiscoveryItem|string  $class
@@ -100,7 +97,7 @@ class YamlDiscovery
                     }
 
                     foreach ($data as $name => $value) {
-                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags'])) {
+                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
                             $current_data[$name] = $value;
                         } elseif (Str::contains($value, '{{')) {
                             // replace embedded values
@@ -145,7 +142,7 @@ class YamlDiscovery
         }
 
         try {
-            $num_oid = static::oidToNumeric($data['value'], $os->getDeviceArray(), $search_mib);
+            $num_oid = Oid::toNumeric($data['value'], $search_mib);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -226,7 +223,9 @@ class YamlDiscovery
         $sub_index = 0;
         $sub_index_end = null;
         if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            [,$name, $sub_index, $sub_index_end] = $matches;
+            $name = $matches[1] ?? null;
+            $sub_index = $matches[2] ?? null;
+            $sub_index_end = $matches[3] ?? null;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -239,7 +238,7 @@ class YamlDiscovery
                     return current($pre_cache[$name]);
                 } elseif (isset($sub_indexes[$sub_index])) {
                     if ($sub_index_end) {
-                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
+                        $multi_sub_index = implode('.', array_slice($sub_indexes, (int) $sub_index, (int) $sub_index_end));
                         if (isset($pre_cache[$name][$multi_sub_index][$name])) {
                             return $pre_cache[$name][$multi_sub_index][$name];
                         }
@@ -291,14 +290,14 @@ class YamlDiscovery
                     $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
-                        foreach ((array) $data['oid'] as $oid) {
+                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUS'];
+                                    $snmp_flag = ['-OteQUSa'];
                                 } else {
-                                    $snmp_flag = ['-OteQUs'];
+                                    $snmp_flag = ['-OteQUsa'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
@@ -307,7 +306,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'];
+                                $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
@@ -377,47 +376,5 @@ class YamlDiscovery
         }
 
         return false;
-    }
-
-    /**
-     * Translate an oid to numeric format (if already numeric, return as-is)
-     *
-     * @param  string  $oid
-     * @param  array|null  $device
-     * @param  string  $mib
-     * @return string numeric oid
-     *
-     * @throws \LibreNMS\Exceptions\InvalidOidException
-     */
-    public static function oidToNumeric($oid, $device = null, $mib = 'ALL')
-    {
-        if (self::oidIsNumeric($oid)) {
-            return $oid;
-        }
-        $key = 'YamlDiscovery:oidToNumeric:' . $mib . '/' . $oid;
-        if (Cache::has($key)) {
-            $numeric_oid = Cache::get($key);
-        } else {
-            foreach (explode(':', $mib) as $mib_name) {
-                $numeric_oid = snmp_translate($oid, $mib_name, null, null, $device);
-                if ($numeric_oid) {
-                    break;
-                }
-            }
-        }
-
-        //Store the value
-        Cache::put($key, $numeric_oid, self::$cache_time);
-
-        if (empty($numeric_oid)) {
-            throw new InvalidOidException("Unable to translate oid $oid");
-        }
-
-        return $numeric_oid;
-    }
-
-    public static function oidIsNumeric($oid)
-    {
-        return (bool) preg_match('/^[.\d]+$/', $oid);
     }
 }

@@ -34,7 +34,7 @@ function string_to_oid($string)
 }//end string_to_oid()
 
 // Options!
-$short_opts = 'sktmlhj:a:S';
+$short_opts = 'S:sktmlhj:a:';
 $options = getopt($short_opts);
 
 // print the help
@@ -63,7 +63,7 @@ if (isset($options['h'])) {
    prints it in a slightly neater manner and in a manner and in tested
    order.
 ';
-    exit();
+    exit;
 }
 
 // make sure we have a JSON file to work with
@@ -105,7 +105,7 @@ if ((isset($options['l'])) || (
     (! isset($options['t'])) &&
     (! isset($options['s'])) &&
     (! isset($options['m']))
-    )) {
+)) {
     exit(0);
 }
 
@@ -172,6 +172,7 @@ if (isset($options['t'])) {
                     'app_state_prev' => null,
                     'app_status' => '',
                     'app_instance' => '',
+                    'data' => null,
                 ]],
             ],
             'poller' => [
@@ -182,6 +183,7 @@ if (isset($options['t'])) {
                     'app_state_prev' => 'UNKNOWN',
                     'app_status' => '',
                     'app_instance' => '',
+                    'data' => null,
                 ]],
                 'application_metrics' => [],
             ],

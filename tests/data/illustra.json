@@ -10,11 +10,11 @@
                     "version": "SS004.01.06.05.0026",
                     "hardware": "IFS03D1OCWIT",
                     "features": null,
+                    "location": "<private>",
                     "os": "illustra",
                     "type": "network",
                     "serial": null,
-                    "icon": "illustra.png",
-                    "location": "<private>"
+                    "icon": "illustra.png"
                 }
             ]
         },

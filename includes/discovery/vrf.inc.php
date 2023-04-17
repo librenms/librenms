@@ -67,7 +67,7 @@ if (Config::get('enable_vrfs')) {
             $t = explode(' ', $port);
             $dotpos = strrpos($t[0], '.');
             $vrf_oid = substr($t[0], 0, $dotpos);
-            $port_id = substr($t[0], ($dotpos + 1));
+            $port_id = substr($t[0], $dotpos + 1);
 
             if (empty($port_table[$vrf_oid])) {
                 $port_table[$vrf_oid][0] = $port_id;
@@ -213,7 +213,7 @@ if (Config::get('enable_vrfs')) {
 
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
-            echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
+            //echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
 
             $vrfs = [
                 'vrf_oid' => $vrf_oid,
@@ -225,16 +225,16 @@ if (Config::get('enable_vrfs')) {
             ];
 
             if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $vrf_desc], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => null], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
             } else {
                 dbInsert($vrfs, 'vrfs');
             }
         } //end foreach
 
-        echo "\n  [VRF $vrf_name] PORTS - ";
         foreach ($aristaVrfIfTable as $if_index => $if_data) {
             try {
                 $ifVrfName = $if_data['aristaVrfIfMembership'];
+                echo "\n  [VRF $ifVrfName] PORTS - ";
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
                 $valid_vrf[$vrf_id] = 1;
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);

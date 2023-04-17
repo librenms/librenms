@@ -77,8 +77,8 @@ if (! empty($_POST['hostname'])) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
 
-        $poller_group = strip_tags($_POST['poller_group']);
-        $force_add = ($_POST['force_add'] == 'on');
+        $poller_group = strip_tags($_POST['poller_group'] ?? '');
+        $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
 
         $port_assoc_mode = strip_tags($_POST['port_assoc_mode']);
         try {
@@ -165,12 +165,7 @@ $pagetitle[] = 'Add host';
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
 foreach (Config::get('snmp.transports') as $transport) {
-    echo "<option value='" . $transport . "'";
-    if ($transport == $device['transport']) {
-        echo " selected='selected'";
-    }
-
-    echo '>' . $transport . '</option>';
+    echo "<option value='" . $transport . "'>" . $transport . '</option>';
 }
 ?>
             </select>

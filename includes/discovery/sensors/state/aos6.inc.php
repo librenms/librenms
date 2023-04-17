@@ -5,7 +5,7 @@ $stack_left = snmp_walk($device, 'chasFreeSlots', '-OQUse', 'ALCATEL-IND1-CHASSI
 $stack_role = snmp_walk($device, 'alaStackMgrChasRole', '-OQUse', 'ALCATEL-IND1-STACK-MANAGER-MIB', 'nokia');
 $stack_alone = substr($stack_role, strpos($stack_role, '=') + 1);
 $stack_left = substr($stack_left, strpos($stack_left, '=') + 1);
-$true_stacking = (7 - $stack_left);
+//$true_stacking = (7 - $stack_left);
 $stacking = '7';
 $stacking_non = '4';
 $aos6_fan_oids = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysFanTable', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
@@ -14,7 +14,7 @@ foreach ($aos6_fan_oids as $index => $data) {
         $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.' . $index;
         $state_name = 'alaChasEntPhysFanStatus';
         $current = $data['alaChasEntPhysFanStatus'];
-        [$revindex, $revchass, $revdata,] = explode('.', strrev($oid), 4);
+        [$revindex, $revchass, $revdata] = explode('.', strrev($oid), 4);
         $chassis = strrev($revchass);
         $indexName = strrev($revindex);
         $descr = 'Chassis-' . ($chassis - 568) . " Fan $indexName";

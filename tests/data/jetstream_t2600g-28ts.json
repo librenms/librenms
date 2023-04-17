@@ -10,11 +10,11 @@
                     "version": "3.0.3 Build 20181101 Rel.42543(s)",
                     "hardware": "T2600G-28TS 3.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetstream",
                     "type": "network",
                     "serial": "217B851000014",
-                    "icon": "tplink.svg",
-                    "location": "<private>"
+                    "icon": "tplink.svg"
                 }
             ]
         },
@@ -90,6 +90,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -114,6 +115,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -138,6 +140,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -162,6 +165,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -186,6 +190,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -210,6 +215,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -234,6 +240,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusDataReady"
                 },
                 {
@@ -258,6 +265,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusDataReady"
                 },
                 {
@@ -282,6 +290,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusLossSignal"
                 },
                 {
@@ -306,6 +315,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusLossSignal"
                 },
                 {
@@ -330,6 +340,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusTxFault"
                 },
                 {
@@ -354,6 +365,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusTxFault"
                 },
                 {
@@ -378,6 +390,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -402,6 +415,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -426,6 +440,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -450,6 +465,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -543,6 +559,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -567,6 +584,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -591,6 +609,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -5.9998036493484,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -615,6 +634,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -5.9998036493484,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -639,6 +659,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.0011692792631,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -663,6 +684,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.9902710431325,
                     "user_func": "mw_to_dbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -687,6 +709,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusDataReady"
                 },
                 {
@@ -711,6 +734,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusDataReady"
                 },
                 {
@@ -735,6 +759,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusLossSignal"
                 },
                 {
@@ -759,6 +784,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusLossSignal"
                 },
                 {
@@ -783,6 +809,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusTxFault"
                 },
                 {
@@ -807,6 +834,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ddmStatusTxFault"
                 },
                 {
@@ -831,6 +859,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -855,6 +884,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -879,6 +909,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -903,6 +934,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

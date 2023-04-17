@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class RuckusSetError implements SnmptrapHandler
 {
@@ -47,6 +46,6 @@ class RuckusSetError implements SnmptrapHandler
     {
         $errorOidDirty = $trap->getOidData($trap->findOid('RUCKUS-EVENT-MIB::ruckusEventSetErrorOID'));
         $errorOid = substr($errorOidDirty, 43);
-        Log::event("SNMP set error on oid $errorOid", $device->device_id, 'trap', 2);
+        $trap->log("SNMP set error on oid $errorOid");
     }
 }

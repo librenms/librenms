@@ -26,6 +26,38 @@ The LibreNMS uses dot notation for config items:
 
 If you set up bash completion, you can use tab completion to find config settings.
 
+### Getting a list of all current values
+
+To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`.
+
+Example output:
+```
+librenms@librenms:~$ lnms config:get --dump | jq 
+{
+  "install_dir": "/opt/librenms",
+  "active_directory": {
+    "users_purge": 0
+  },
+  "addhost_alwayscheckip": false,
+  "alert": {
+    "ack_until_clear": false,
+    "admins": true,
+    "default_copy": true,
+    "default_if_none": false,
+    "default_mail": false,
+    "default_only": true,
+    "disable": false,
+    "fixed-contacts": true,
+    "globals": true,
+    "syscontact": true,
+    "transports": {
+      "mail": 5
+    },
+    "tolerance_window": 5,
+    "users": false,
+    ...
+```
+
 ### Examples
 
 ```bash
@@ -210,13 +242,12 @@ under Device -> Edit -> Misc -> Disable ICMP Test? On
 
 #### traceroute
 
-LibreNMS uses traceroute / traceroute6 to record debug information
+LibreNMS uses traceroute to record debug information
 when a device is down due to icmp AND you have
 `lnms config:set debug.run_trace true` set.
 
 ```bash
 lnms config:set traceroute /usr/bin/traceroute
-lnms config:set traceroute6 /usr/bin/traceroute6
 ```
 
 #### SNMP
@@ -422,21 +453,22 @@ lnms config:set overview_show_sysDescr true
 Enable or disable the sysDescr output for a device.
 
 ```bash
-lnms config:set force_ip_to_sysname false
+lnms config:set device_display_default '{{ $hostname }}'
 ```
 
-When using IP addresses as a hostname you can instead represent the
-devices on the WebUI by its SNMP sysName resulting in an easier to
-read overview of your network. This would apply on networks where you
-don't have DNS records for most of your devices.
+This is a simple template to control the display of device names by default.
+You can override this setting per-device.
 
-```bash
-lnms config:set force_hostname_to_sysname false
-```
+You may enter any free-form text including one or more of the following template replacements:
 
-When using a dynamic DNS hostname or one that does not resolve, this
-option would allow you to make use of the SNMP sysName instead as the
-preferred reference to the device.
+| Template                    | Replacement                                                          |
+|-----------------------------|----------------------------------------------------------------------|
+| `{{ $hostname }}`           | The hostname or IP of the device that was set when added  *default   |
+| `{{ $sysName_fallback }}`   | The hostname or sysName if hostname is an IP                         |
+| `{{ $sysName }}`            | The SNMP sysName of the device, falls back to hostname/IP if missing |
+| `{{ $ip }}`                 | The actual polled IP of the device, will not display a hostname      |
+
+For example, `{{ $sysName_fallback }} ({{ $ip }})` will display something like `server (192.168.1.1)`
 
 ```bash
 lnms config:set device_traffic_iftype.+ '/loopback/'
@@ -625,7 +657,6 @@ Please refer to [Billing](../Extensions/Billing-Module.md)
 ## Global module support
 
 ```bash
-lnms config:set enable_bgp true # Enable BGP session collection and display
 lnms config:set enable_syslog false # Enable Syslog
 lnms config:set enable_inventory true # Enable Inventory
 lnms config:set enable_pseudowires true # Enable Pseudowires
@@ -639,7 +670,6 @@ Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Pa
 ```bash
 lnms config:set enable_ports_etherlike false
 lnms config:set enable_ports_junoseatmvp false
-lnms config:set enable_ports_adsl true
 lnms config:set enable_ports_poe false
 ```
 
@@ -721,6 +751,38 @@ Please refer to [Smokeping](../Extensions/Smokeping.md)
 
 Please refer to [NFSen](../Extensions/NFSen.md)
 
+### Location parsing
+
+LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
+
+- Info-keywords
+  - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
+  - `()` contains optional information that is ignored during GeoCoding lookups.
+
+
+#### **GeoCoordinates** 
+If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
+
+Example:
+```bash
+name_that_can_not_be_looked_up [40.424521, -86.912755]
+```
+
+#### **GeoCoding**
+Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
+
+Example:
+```bash
+1100 Congress Ave, Austin, TX 78701 (3rd floor)
+Geocoding lookup is:
+1100 Congress Ave, Austin, TX 78701
+```
+#### **Overrides**
+1. You can overwrite each device sysLocation information in the webGUI under "Device settings".
+2. You can overwrite the location coordinates n in the webGUI under Device>GEO Locations
+
+
+
 ### Location mapping
 
 If you just want to set GPS coordinates on a location, you should
@@ -730,19 +792,19 @@ there.
 Exact Matching:
 
 ```bash
-lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Matching:
 
 ```bash
-lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Match Substitution:
 
 ```bash
-lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
+lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match
