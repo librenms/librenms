@@ -55,6 +55,7 @@ if ($_POST['editing']) {
                 $v3['authpass'] = $_POST['authpass'];
                 $v3['cryptoalgo'] = $_POST['cryptoalgo'];
                 $v3['cryptopass'] = $_POST['cryptopass'];
+                $v3['context_name'] = $_POST['context_name'];
 
                 $update = array_merge($update, $v3);
             }
@@ -383,10 +384,16 @@ echo '</select>
 if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {
     echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
-    echo '
+    echo "
     </div>
     </div>
-    </div>';
+    <div class='form-group'>
+    <label for='context_name' class='col-sm-2 control-label'>Context Name</label>
+    <div class='col-sm-4'>
+    <input type='text' id='context_name' name='context_name' class='form-control' value='".$device['context_name']."'>
+    </div>
+    </div>
+    </div>";
 ?>
 
 </div>

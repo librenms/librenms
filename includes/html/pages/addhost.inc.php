@@ -65,6 +65,7 @@ if (! empty($_POST['hostname'])) {
                 'authalgo'   => strip_tags($_POST['authalgo']),
                 'cryptopass' => $_POST['cryptopass'],
                 'cryptoalgo' => $_POST['cryptoalgo'],
+                'context_name' => strip_tags($_POST['context_name']),
             ];
 
             $v3_config = Config::get('snmp.v3');
@@ -265,6 +266,12 @@ foreach (PortAssociationMode::getModes() as $mode) {
               <?php if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="context_name" class="col-sm-3 control-label">Context Name</label>
+            <div class="col-sm-9">
+              <input type="text" name="context_name" id="context_name" placeholder="Context Name" class="form-control input-sm">
             </div>
           </div>
         </div>
