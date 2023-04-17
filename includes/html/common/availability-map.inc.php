@@ -171,7 +171,6 @@ if (defined('SHOW_SETTINGS')) {
 
     // Only show devices if mode is 0 or 2 (Only Devices or both)
     if ($mode == 0 || $mode == 2) {
-
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`display`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (! Auth::user()->hasGlobalRead()) {
