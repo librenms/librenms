@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertTransportController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\ValidateController;
+use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,14 +25,14 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // Socialite
 Route::prefix('auth:web')->name('socialite.')->group(function () {
-    Route::post('{provider}/redirect', [Auth\SocialiteController::class, 'redirect'])->name('redirect');
-    Route::match(['get', 'post'], '{provider}/callback', [Auth\SocialiteController::class, 'callback'])->name('callback');
-    Route::get('{provider}/metadata', [Auth\SocialiteController::class, 'metadata'])->name('metadata');
+    Route::post('{provider}/redirect', [SocialiteController::class, 'redirect'])->name('redirect');
+    Route::match(['get', 'post'], '{provider}/callback', [SocialiteController::class, 'callback'])->name('callback');
+    Route::get('{provider}/metadata', [SocialiteController::class, 'metadata'])->name('metadata');
 });
 
 Route::get('graph/{path?}', GraphController::class)
     ->where('path', '.*')
-    ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
+    ->middleware(['web', AuthenticateGraph::class])->name('graph');
 
 // WebUI
 Route::middleware(['auth'])->group(function () {
@@ -50,8 +57,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController')->only('index', 'store');
     Route::resource('users', 'UserController');
-    Route::get('about', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
-    Route::delete('reporting', [\App\Http\Controllers\AboutController::class, 'clearReportingData'])->name('reporting.clear');
+    Route::get('about', [AboutController::class, 'index'])->name('about');
+    Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
