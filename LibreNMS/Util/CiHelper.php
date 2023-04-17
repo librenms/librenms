@@ -178,7 +178,7 @@ class CiHelper
      */
     public function checkUnit()
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always'];
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--debug'];
 
         if ($this->flags['fail-fast']) {
             array_push($phpunit_cmd, '--stop-on-error', '--stop-on-failure');
@@ -391,10 +391,18 @@ class CiHelper
         $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
-            $proc->setTty(Process::isTtySupported());
-        }
 
-        $proc->run();
+            if (Process::isTtySupported()) {
+                $proc->setTty(true);
+                $proc->run();
+            } else {
+                $proc->run(function ($type, $buffer) {
+                    echo $buffer;
+                });
+            }
+        } else {
+            $proc->run();
+        }
 
         $duration = sprintf('%.2fs', microtime(true) - $start);
         if ($proc->getExitCode() > 0) {

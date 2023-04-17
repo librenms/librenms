@@ -49,7 +49,7 @@ class Port extends DeviceRelatedModel
             DB::table('links')->where('local_port_id', $port->port_id)->orWhere('remote_port_id', $port->port_id)->delete();
             DB::table('ports_stack')->where('port_id_low', $port->port_id)->orWhere('port_id_high', $port->port_id)->delete();
 
-            \Rrd::purge(optional($port->device)->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
+            \Rrd::purge($port->device?->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
         });
     }
 
@@ -62,7 +62,7 @@ class Port extends DeviceRelatedModel
      */
     public function getLabel()
     {
-        $os = optional($this->device)->os;
+        $os = $this->device?->os;
 
         if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
