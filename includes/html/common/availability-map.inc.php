@@ -163,12 +163,14 @@ if (defined('SHOW_SETTINGS')) {
         $serviceOrderBy = '`D`.`hostname`';
     }
 
+    // Get device group membership for all modes
+    if (Config::get('webui.availability_map_use_device_groups') != 0) {
+        $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
+        $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
+    }
+
+    // Only show devices if mode is 0 or 2 (Only Devices or both)
     if ($mode == 0 || $mode == 2) {
-        // Only show devices if mode is 0 or 2 (Only Devices or both)
-        if (Config::get('webui.availability_map_use_device_groups') != 0) {
-            $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-            $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
-        }
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`display`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
@@ -262,12 +264,17 @@ if (defined('SHOW_SETTINGS')) {
 
     if (($mode == 1 || $mode == 2) && (Config::get('show_services') != 0)) {
         if (Auth::user()->hasGlobalRead()) {
-            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY ' . $serviceOrderBy . ';';
+            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id`';
             $service_par = [];
         } else {
-            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ? ORDER BY ' . $serviceOrderBy . ';';
+            $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ?';
             $service_par = [Auth::id()];
         }
+        if (! empty($in_devices)) {
+            $service_query .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($in_devices));
+            $service_par = array_merge($service_par, $in_devices);
+        }
+        $service_query .= ' ORDER BY ' . $serviceOrderBy . ';';
         $services = dbFetchRows($service_query, $service_par);
         if (count($services) > 0) {
             foreach ($services as $service) {
@@ -345,7 +352,7 @@ if (defined('SHOW_SETTINGS')) {
         </div>
         <div class="page-availability-title-right">';
 
-        if ((Config::get('webui.availability_map_use_device_groups') != 0) && ($mode == 0 || $mode == 2)) {
+        if ((Config::get('webui.availability_map_use_device_groups') != 0) && ($mode == 0 || $mode == 1 || $mode == 2)) {
             $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
             $dev_groups = dbFetchRows($sql);
 
