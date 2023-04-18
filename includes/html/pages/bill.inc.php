@@ -25,7 +25,7 @@ if (bill_permitted($bill_id)) {
     $bill_name = $bill_data['bill_name'];
     $dayofmonth = $bill_data['bill_day'];
 
-    $day_data = getDates($dayofmonth);
+    $day_data = \LibreNMS\Billing::getDates($dayofmonth, 0);
 
     $datefrom = $day_data['0'];
     $dateto = $day_data['1'];
@@ -166,7 +166,7 @@ if (bill_permitted($bill_id)) {
             $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;ave=yes'; ?>
         <td>
-            <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
+            <?php echo \LibreNMS\Billing::formatBytes($total_data) ?> of <?php echo \LibreNMS\Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
             - Average rate <?php echo Number::formatSi($rate_average, 2, 3, 'bps') ?>
         </td>
         <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
@@ -174,7 +174,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
             <?php
-            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
+            echo 'Predicted usage: ' . \LibreNMS\Billing::formatBytes(\LibreNMS\Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
             </td>
             <?php
         } elseif ($bill_data['bill_type'] == 'cdr') {
@@ -195,7 +195,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
             <?php
-                echo 'Predicted usage: ' . Number::formatSi(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
+                echo 'Predicted usage: ' . Number::formatSi(\LibreNMS\Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
             </td>
 
         <?php

@@ -108,6 +108,7 @@ class Graph
         include_once base_path('includes/common.php');
         include_once base_path('includes/html/functions.inc.php');
         include_once base_path('includes/rewrites.php');
+        include_once base_path('includes/rewrites.php');
 
         // handle possible graph url input
         if (is_string($vars)) {

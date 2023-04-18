@@ -7,11 +7,11 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Util\Number;
 
 if (is_numeric($vars['bill_hist_id'])) {
-    $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
+    $graph_data = \LibreNMS\Billing::getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
 } elseif (is_numeric($vars['from'])) {
-    $graph_data = getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
+    $graph_data = \LibreNMS\Billing::getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
-    $graph_data = getHistoricTransferGraphData($vars['id']);
+    \LibreNMS\Billing::getHistoricTransferGraphData($vars['id']);
     $vars['imgtype'] = 'historical';
 }
 
@@ -75,7 +75,7 @@ $barplot_tot->SetLegend('Traffic total');
 $barplot_tot->SetColor('darkgray');
 $barplot_tot->SetFillColor('lightgray@0.4');
 $barplot_tot->value->Show();
-$barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
+$barplot_tot->value->SetFormatCallback('\LibreNMS\Billing::formatBytesShort');
 
 $barplot_in = new BarPlot($graph_data['in_data']);
 $barplot_in->SetLegend('Traffic In');

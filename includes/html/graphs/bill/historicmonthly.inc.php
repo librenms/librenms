@@ -6,7 +6,7 @@ use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Util\Number;
 
-$graph_data = getHistoricTransferGraphData($vars['id']);
+\LibreNMS\Billing::getHistoricTransferGraphData($vars['id']);
 
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
@@ -74,7 +74,7 @@ $barplot_tot->SetLegend('Traffic total');
 $barplot_tot->SetColor('darkgray');
 $barplot_tot->SetFillColor('lightgray@0.4');
 $barplot_tot->value->Show();
-$barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
+$barplot_tot->value->SetFormatCallback('\LibreNMS\Billing::formatBytesShort');
 
 $barplot_in = new BarPlot($graph_data['in_data']);
 $barplot_in->SetLegend('Traffic In');
