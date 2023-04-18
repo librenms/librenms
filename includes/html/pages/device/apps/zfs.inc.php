@@ -7,9 +7,13 @@ $link_array = [
     'app'    => 'zfs',
 ];
 
+if (! isset($vars['zfspage'])) {
+    $vars['zfspage']='arcgen';
+}
+
 print_optionbar_start();
 
-echo generate_link('ARC', $link_array);
+echo generate_link('ARC', $link_array, ['zfspage' => 'arcgen']);
 echo '| Pools:';
 
 $pools = $app->data['pools'] ?? [];
@@ -29,18 +33,24 @@ foreach ($pools as $index => $pool) {
 print_optionbar_end();
 
 if (! isset($vars['pool'])) {
-    $graphs = [
-        'zfs_arc_misc' => 'ARC misc',
-        'zfs_arc_size' => 'ARC size in bytes',
-        'zfs_arc_size_per' => 'ARC size, percent of max size',
-        'zfs_arc_size_breakdown' => 'ARC size breakdown',
-        'zfs_arc_efficiency' => 'ARC efficiency',
-        'zfs_arc_cache_hits_by_list' => 'ARC cache hits by list',
-        'zfs_arc_cache_hits_by_type' => 'ARC cache hits by type',
-        'zfs_arc_cache_misses_by_type' => 'ARC cache misses by type',
-        'zfs_arc_cache_hits' => 'ARC cache hits',
-        'zfs_arc_cache_miss' => 'ARC cache misses',
-    ];
+    if ($vars['zfspage'] == 'l2gen') {
+        $graphs = [
+            'zfs_l2_hitnmiss' => 'L2 Hits and Misses',
+        ];
+    }else{
+        $graphs = [
+            'zfs_arc_misc' => 'ARC misc',
+            'zfs_arc_size' => 'ARC size in bytes',
+            'zfs_arc_size_per' => 'ARC size, percent of max size',
+            'zfs_arc_size_breakdown' => 'ARC size breakdown',
+            'zfs_arc_efficiency' => 'ARC efficiency',
+            'zfs_arc_cache_hits_by_list' => 'ARC cache hits by list',
+            'zfs_arc_cache_hits_by_type' => 'ARC cache hits by type',
+            'zfs_arc_cache_misses_by_type' => 'ARC cache misses by type',
+            'zfs_arc_cache_hits' => 'ARC cache hits',
+            'zfs_arc_cache_miss' => 'ARC cache misses',
+        ];
+    }
 } else {
     $graphs = [
         'zfs_pool_space'=>'Pool Space',
