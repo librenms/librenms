@@ -4,9 +4,10 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\BarPlot;
 use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
-\LibreNMS\Billing::getHistoricTransferGraphData($vars['id']);
+Billing::getHistoricTransferGraphData($vars['id']);
 
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
