@@ -50,6 +50,7 @@ class Device extends BaseModel
         'features',
         'hardware',
         'hostname',
+        'disabled',
         'display',
         'icon',
         'ip',
