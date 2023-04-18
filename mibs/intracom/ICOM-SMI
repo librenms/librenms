@@ -1,0 +1,17 @@
+ICOM-SMI DEFINITIONS ::= BEGIN
+IMPORTS enterprises FROM SNMPv2-SMI;
+
+intracom       OBJECT IDENTIFIER ::= { enterprises 1807 }	
+
+-- redefined in such a way as to avoid implicit node definition warnings
+intracomDot60     OBJECT IDENTIFIER ::= { intracom 60 }
+intracomDot60Dot2 OBJECT IDENTIFIER ::= { intracomDot60 2 }
+
+-- intracomPackets
+intracomPackets   OBJECT IDENTIFIER ::= { intracomDot60Dot2 10 }		
+
+-- intracomWimax
+intracomWimax   OBJECT IDENTIFIER ::= { intracomDot60Dot2 11 }		
+
+END
+
