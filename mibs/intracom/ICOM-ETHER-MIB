@@ -1,0 +1,2334 @@
+ICOM-ETHER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Unsigned32, Gauge32, Counter64
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, MacAddress, TruthValue, RowStatus, TimeInterval
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ifIndex
+                FROM IF-MIB
+        IcomDateTimeType
+                FROM ICOM-PERFHIST-TC-MIB
+        intracom
+                FROM ICOM-SMI;
+
+icomEthMIB MODULE-IDENTITY
+    LAST-UPDATED        "201709290000Z"     -- 29 September 2017
+    ORGANIZATION        "Intracom S.A."
+    CONTACT-INFO
+       "EMail:
+        Phone:
+        Co-editor:
+        EMail:
+        Phone:
+       "
+    DESCRIPTION
+       "This module provides proprietary Intracom objects to support
+        configuration & monitoring of Ethernet interfaces. The MIB
+        includes the following proprietary objects:
+
+        1.  icomEthCfgTable
+        2.  icomEthStatusTable
+        3.  icomEthStatsTable
+        4.  icomEthLoopTable
+        5.  icomEthLlfCfgTable
+        6.  icomEthLlfStatusTable
+        7.  icomEthPerfEnable
+        8.  icomEthPerfCurrentTable
+        9.  icomEthPerf1MinIntervalTable
+        10. icomEthPerf15MinIntervalTable
+        11. icomEthPerf1DayIntervalTable
+        12. icomEthLoopTrap
+        13. icomEthSFPExistsTrap
+        14. icomEthSFPTxFaultTrap
+        15. icomEthSFPRxLOSTrap
+        16. icomEthLlfTrap
+       "
+
+-- Revision History
+
+    REVISION            "201709290000Z"     -- 29 September 2017
+    DESCRIPTION
+       "
+        Add historical statistics for errors at Ethernet interfaces.
+       "
+
+    REVISION            "201601200000Z"     -- 20 January 2016
+    DESCRIPTION
+       "
+        Add Link Loss Forwarding (LLF) support.
+       "
+
+    REVISION            "201401310000Z"     -- 31 January 2014
+    DESCRIPTION
+       "
+        This is the initial version of this MIB.
+       "
+
+::= { intracom 65 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+IcomVlanListType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256x"
+    STATUS      current
+    DESCRIPTION
+       "Each octet within this value specifies a set of eight VIDs,
+        with the first octet specifying VID 1 through 8, the second
+        octet specifying VID 9 through 16, etc. Within each octet,
+        the most significant bit represents the lowest numbered VID,
+        and the least significant bit represents the highest numbered
+        VID. Thus, each VID is represented by a single bit within the
+        value of this object. If that bit has a value of '1' then that
+        VID is included in the set of VIDs; the VID is not included if
+        its bit has a value of '0'. This OCTET STRING will be 512 Octets
+        in length to accommodate all possible VIDs between (1..4096). The
+        default value of this object is a string of all zeros.
+       "
+    SYNTAX      OCTET STRING (SIZE(512))
+
+IcomBwUtilType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION
+       "Hundredths of bandwidth utilization percentage (0..10000). To
+        obtain the actual percentage in the 0.00..100.00 range, divide
+        the IcomBwUtilType value by 100.
+       "
+    SYNTAX      Unsigned32
+
+   --
+   --  The icomEthMIBObjects group
+   --
+icomEthMIBObjects   OBJECT IDENTIFIER ::= { icomEthMIB 1 }
+
+-- -------------------------------------------------------------
+-- icomEthCfgTable
+-- -------------------------------------------------------------
+
+icomEthCfgTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table enables configuration of Ethernet interfaces.
+       "
+    ::= { icomEthMIBObjects 1 }
+
+icomEthCfgEntry    OBJECT-TYPE
+    SYNTAX      IcomEthCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthCfgTable.
+       "
+    INDEX       { ifIndex }
+    ::= { icomEthCfgTable 1 }
+
+IcomEthCfgEntry ::= SEQUENCE {
+    icomEthCfgAutoNegotiation                   TruthValue,
+    icomEthCfgSpeed                             INTEGER,
+    icomEthCfgDuplex                            INTEGER,
+    icomEthCfgLoopback                          INTEGER,
+    icomEthCfgSFPType                           INTEGER
+}
+
+icomEthCfgAutoNegotiation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the auto-negotiation mode of the current
+        Ethernet interface.
+
+        If value is set to 'true(1)', then auto-negotiation is enabled
+        for the current Ethernet interface.
+
+        If value is set to 'false(2)', then auto-negotiation is disabled
+        for the current Ethernet interface.
+       "
+    ::= { icomEthCfgEntry 1 }
+
+icomEthCfgSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+            auto        (1), -- auto
+            mbps10      (2), -- 10 Mbps
+            mbps100     (3), -- 100 Mbps
+            mbps1000    (4)  -- 1000 Mpbs
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is used to administratively specify the speed of
+        the current Ethernet interface.
+       "
+    ::= { icomEthCfgEntry 2 }
+
+icomEthCfgDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+            auto        (1), -- auto
+            halfDuplex  (2), -- half duplex
+            fullDuplex  (3)  -- full duplex
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is used to administratively specify the duplex
+        status of the current Ethernet interface.
+       "
+    ::= { icomEthCfgEntry 3 }
+
+icomEthCfgLoopback OBJECT-TYPE
+    SYNTAX      INTEGER {
+            none        (1),
+            internal    (2),
+            external    (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the loopback status of the current Ethernet
+        interface.
+
+        If value is set to 'none(1)', then Ethernet loopback is disabled
+        for the current Ethernet interface.
+
+        If value is set to 'internal(2)', then loopback of Ethernet
+        traffic from relay (bridge) is enabled for the current Ethernet
+        interface. The internal loopback functionality is further
+        configured with the aid of icomEthLoopTable.
+
+        If value is set to 'external(3)', then loopback of Ethernet
+        traffic from wire is enabled for the current Ethernet interface.
+       "
+    DEFVAL { none }
+    ::= { icomEthCfgEntry 4 }
+
+icomEthCfgSFPType OBJECT-TYPE
+    SYNTAX      INTEGER {
+            baseX1000                (1), -- optical/copper 1000BaseX
+            baseT10baseT100baseT1000 (2)  -- copper 10BaseT/100BaseT/1000BaseT
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the type of the configured SFP module in
+        the current Ethernet interface.
+
+        If value is set to 'baseX1000(1)', then an optical SFP or a
+        copper 1000Mbps-only SFP is configured in the current Ethernet
+        interface. These are the SFP types where the PHY is connected
+        to MAC with 1000BaseX over SerDes.
+
+        If value is set to 'baseT10baseT100baseT1000(2)', then a copper
+        SFP that can operate as 10BaseT or 100BaseT or 1000BaseT is
+        configured in the current Ethernet interface. This is the SFP
+        type where the PHY is connected to MAC via SGMII.
+
+        The object is only applicable if icomEthStatusModuleType indicates
+        an SFP port (e.g., has a value other than rj45Electrical(1)).
+       "
+    DEFVAL { baseX1000 }
+    ::= { icomEthCfgEntry 5 }
+
+-- -------------------------------------------------------------
+-- icomEthStatusTable
+-- -------------------------------------------------------------
+
+icomEthStatusTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides status information for Ethernet interfaces.
+       "
+    ::= { icomEthMIBObjects 2 }
+
+icomEthStatusEntry    OBJECT-TYPE
+    SYNTAX      IcomEthStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthStatusTable.
+       "
+    AUGMENTS    { icomEthCfgEntry }
+    ::= { icomEthStatusTable 1 }
+
+IcomEthStatusEntry ::= SEQUENCE {
+    icomEthStatusModuleType                     INTEGER,
+    icomEthStatusSFPExists                      TruthValue,
+    icomEthStatusSFPTxFault                     TruthValue,
+    icomEthStatusSFPRxLOS                       TruthValue
+}
+
+icomEthStatusModuleType OBJECT-TYPE
+    SYNTAX      INTEGER {
+            rj45Electrical (1), -- RJ45 electrical
+            sfpUnknown     (2), -- SFP (unknown)
+            sfpElectrical  (3), -- SFP electrical
+            sfpOptical     (4)  -- SFP optical
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the module type of the current
+        Ethernet interface.
+       "
+    ::= { icomEthStatusEntry 1 }
+
+icomEthStatusSFPExists OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the existence of an SFP in the current
+        Ethernet interface.
+
+        If value is set to 'true(1)', then an SFP exists in the current
+        Ethernet interface.
+
+        If value is set to 'false(2)', then an SFP does not exist in
+        the current Ethernet interface.
+       "
+    ::= { icomEthStatusEntry 2 }
+
+icomEthStatusSFPTxFault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the SFP Tx fault indication status.
+       "
+    ::= { icomEthStatusEntry 3 }
+
+icomEthStatusSFPRxLOS OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the SFP Rx loss of signal status.
+       "
+    ::= { icomEthStatusEntry 4 }
+
+-- -------------------------------------------------------------
+-- icomEthStatsTable
+-- -------------------------------------------------------------
+
+icomEthStatsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides statistics for Ethernet interfaces.
+       "
+    ::= { icomEthMIBObjects 3 }
+
+icomEthStatsEntry    OBJECT-TYPE
+    SYNTAX      IcomEthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthStatsTable.
+       "
+    AUGMENTS    { icomEthCfgEntry }
+    ::= { icomEthStatsTable 1 }
+
+IcomEthStatsEntry ::= SEQUENCE {
+    icomEthStatsReset                           TruthValue,
+    icomEthStatsTxBitRate                       Gauge32,
+    icomEthStatsRxBitRate                       Gauge32,
+    icomEthStatsTxPktRate                       Gauge32,
+    icomEthStatsRxPktRate                       Gauge32,
+    icomEthStatsHCPkts1519to1522Octets          Counter64,
+    icomEthStatsHCPkts1523toMRUOctets           Counter64,
+    icomEthStatsRxIwPkts                        Counter64,
+    icomEthStatsTxMacCtrlPkts                   Counter64,
+    icomEthStatsRxMacCtrlPkts                   Counter64,
+    icomEthStatsTxUndersizePkts                 Counter64,
+    icomEthStatsRxUndersizePkts                 Counter64,
+    icomEthStatsTxOversizePkts                  Counter64,
+    icomEthStatsRxOversizePkts                  Counter64,
+    icomEthStatsTxBwUtil                        IcomBwUtilType,
+    icomEthStatsRxBwUtil                        IcomBwUtilType
+}
+
+icomEthStatsReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables reset of all Ethernet statistics. If value
+        is set to 'true(1)', then all Ethernet statistics counters are
+        reset to zero.
+       "
+    ::= { icomEthStatsEntry 1 }
+
+icomEthStatsTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the mean Tx bit rate of the
+        current Ethernet interface (in kbps).
+       "
+    ::= { icomEthStatsEntry 2 }
+
+icomEthStatsRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the mean Rx bit rate of the
+        current Ethernet interface (in kbps).
+       "
+    ::= { icomEthStatsEntry 3 }
+
+icomEthStatsTxPktRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the mean Tx packet rate of the
+        current Ethernet interface (in packets per second).
+       "
+    ::= { icomEthStatsEntry 4 }
+
+icomEthStatsRxPktRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the mean Rx packet rate of the
+        current Ethernet interface (in packets per second).
+       "
+    ::= { icomEthStatsEntry 5 }
+
+icomEthStatsHCPkts1519to1522Octets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        (including bad packets) received that were between 1519 and 1522
+        octets in length inclusive (excluding framing bits but including
+        FCS octets).
+       "
+    ::= { icomEthStatsEntry 6 }
+
+icomEthStatsHCPkts1523toMRUOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        (including bad packets) received that were between 1519 and MRU
+        (Max Received Unit Length) octets in length inclusive (excluding
+        framing bits but including FCS octets).
+       "
+    ::= { icomEthStatsEntry 7 }
+
+icomEthStatsRxIwPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets that
+        were received on this interface and were sent to relay (bridge).
+       "
+    ::= { icomEthStatsEntry 8 }
+
+icomEthStatsTxMacCtrlPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of MAC Control
+        frames that were transmitted by this interface.
+       "
+    ::= { icomEthStatsEntry 9 }
+
+icomEthStatsRxMacCtrlPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of MAC Control
+        frames that were received by this interface.
+       "
+    ::= { icomEthStatsEntry 10 }
+
+icomEthStatsTxUndersizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of transmitted packets that were less than 64
+        octets long (excluding framing bits, but including FCS octets)
+        and were otherwise well formed.
+       "
+    ::= { icomEthStatsEntry 11 }
+
+icomEthStatsRxUndersizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of received packets that were less than 64
+        octets long (excluding framing bits, but including FCS octets)
+        and were otherwise well formed.
+       "
+    ::= { icomEthStatsEntry 12 }
+
+icomEthStatsTxOversizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of transmitted packets that were longer than
+        1518 octets (excluding framing bits, but including FCS octets)
+        and were otherwise well formed.
+       "
+    ::= { icomEthStatsEntry 13 }
+
+icomEthStatsRxOversizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The total number of received packets that were longer than
+        1518 octets (excluding framing bits, but including FCS octets)
+        and were otherwise well formed.
+       "
+    ::= { icomEthStatsEntry 14 }
+
+icomEthStatsTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Current Tx bandwidth utilization.
+       "
+    ::= { icomEthStatsEntry 15 }
+
+icomEthStatsRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Current Rx bandwidth utilization.
+       "
+    ::= { icomEthStatsEntry 16 }
+
+-- -------------------------------------------------------------
+-- icomEthLoopTable
+-- -------------------------------------------------------------
+
+icomEthLoopTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthLoopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table is used to configure the internal Ethernet loopback
+        functionality for a specific Ethernet interface.
+       "
+    ::= { icomEthMIBObjects 4 }
+
+icomEthLoopEntry    OBJECT-TYPE
+    SYNTAX      IcomEthLoopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthLoopTable.
+       "
+    INDEX       { ifIndex }
+    ::= { icomEthLoopTable 1 }
+
+IcomEthLoopEntry ::= SEQUENCE {
+    icomEthLoopSrcAddress                       MacAddress,
+    icomEthLoopDestAddress                      MacAddress,
+    icomEthLoopVlanList                         IcomVlanListType,
+    icomEthLoopTimeout                          Unsigned32,
+    icomEthLoopTimer                            Unsigned32,
+    icomEthLoopRowStatus                        RowStatus
+}
+
+icomEthLoopSrcAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the source MAC address of the received
+        frames that should be looped back.
+       "
+    ::= { icomEthLoopEntry 1 }
+
+icomEthLoopDestAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the destination MAC address of the received
+        frames that should be looped back.
+       "
+    ::= { icomEthLoopEntry 2 }
+
+icomEthLoopVlanList OBJECT-TYPE
+    SYNTAX      IcomVlanListType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the list of VLANs to which received
+        frames must be tagged so as to be looped back.
+       "
+    DEFVAL { '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'H }
+    ::= { icomEthLoopEntry 3 }
+
+icomEthLoopTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the Ethernet loopback timeout (in
+        seconds). Value 0 implies endless time supervision of Ethernet
+        loopback.
+       "
+    DEFVAL { 60 }
+    ::= { icomEthLoopEntry 4 }
+
+icomEthLoopTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the current Ethernet loopback timer value (in
+        seconds).
+       "
+    ::= { icomEthLoopEntry 5 }
+
+icomEthLoopRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the RowStatus. It is used for creation
+        and deletion of rows from the manager.
+       "
+    ::= { icomEthLoopEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomEthLlfCfgTable
+-- -------------------------------------------------------------
+
+icomEthLlfCfgTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthLlfCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table enables configuration of the Link Loss Forwarding
+        (LLF) feature on Ethernet interfaces. LLF is a feature which is
+        used to forward the air link status to the user by controlling the
+        Ethernet interface PHY. When air link is interrupted, the related
+        Ethernet interface will be shut down. When link is re-established,
+        the related Ethernet interface will be started.
+
+        All writable objects of this table are persistent, and their
+        values must be retained across reinitializations of the management
+        system.
+       "
+    ::= { icomEthMIBObjects 5 }
+
+icomEthLlfCfgEntry    OBJECT-TYPE
+    SYNTAX      IcomEthLlfCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthLlfCfgTable.
+       "
+    INDEX       { ifIndex }
+    ::= { icomEthLlfCfgTable 1 }
+
+IcomEthLlfCfgEntry ::= SEQUENCE {
+    icomEthLlfCfgEnable                         TruthValue,
+    icomEthLlfCfgModemList                      OCTET STRING,
+    icomEthLlfCfgModemLogic                     INTEGER,
+    icomEthLlfCfgHoldoffTime                    Unsigned32,
+    icomEthLlfCfgWtrTime                        Unsigned32
+}
+
+icomEthLlfCfgEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables the LLF feature for the current Ethernet
+        interface.
+
+        If value is set to 'true(1)', then LLF is enabled for the current
+        Ethernet interface.
+
+        If value is set to 'false(2)', then LLF is disabled for the
+        current Ethernet interface.
+       "
+    DEFVAL { false }
+    ::= { icomEthLlfCfgEntry 1 }
+
+icomEthLlfCfgModemList OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Each octet within this value specifies a set of eight modems,
+        with the first octet specifying modem 1 through 8, the second
+        octet specifying modem 9 through 16, etc. Within each octet, the
+        most significant bit represents the lowest numbered modem, and the
+        least significant bit represents the highest numbered modem. Thus,
+        each of 256 (maximum) modems is represented by a single bit
+        within the value of this object. If that bit has a value of '1'
+        then that modem participates in the LLF feature of the current
+        Ethernet interface; the modem does not take part to LLF if its
+        bit has a value of '0'. This OCTET STRING will be 32 Octets in
+        length to accommodate all possible modems between (1..256). The
+        default value of this object is a string of all zeros.
+       "
+    DEFVAL { '0000000000000000000000000000000000000000000000000000000000000000'H }
+    ::= { icomEthLlfCfgEntry 2 }
+
+icomEthLlfCfgModemLogic OBJECT-TYPE
+    SYNTAX      INTEGER {
+            or          (1),
+            and         (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the LLF modem slot usage logic.
+
+        If value is set to 'or(1)', then the Ethernet link will be
+        shutdown when any of the modems which take part to LLF have an air
+        link failure. The Ethernet interface link is up when all modems
+        which take part to LLF for this interface have established the
+        air link.
+
+        If value is set to 'and(2)', then the Ethernet link will be
+        shutdown when all modems which take part to LLF have an air
+        link failure. The Ethernet interface link is up when any of the
+        modems which take part to LLF for this interface has established
+        the air link.
+       "
+    DEFVAL { or }
+    ::= { icomEthLlfCfgEntry 3 }
+
+icomEthLlfCfgHoldoffTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies a hold-off time for the shutdown of the
+        current Ethernet interface upon interruption of the air link.
+       "
+    DEFVAL { 60 }
+    ::= { icomEthLlfCfgEntry 4 }
+
+icomEthLlfCfgWtrTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies a wait-to-restore time for the startup
+        of the current Ethernet interface upon (re-)establishment of
+        the air link.
+       "
+    DEFVAL { 30 }
+    ::= { icomEthLlfCfgEntry 5 }
+
+-- -------------------------------------------------------------
+-- icomEthLlfStatusTable
+-- -------------------------------------------------------------
+
+icomEthLlfStatusTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthLlfStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table enables monitoring of the Link Loss Forwarding (LLF)
+        feature on Ethernet interfaces.
+       "
+    ::= { icomEthMIBObjects 6 }
+
+icomEthLlfStatusEntry    OBJECT-TYPE
+    SYNTAX      IcomEthLlfStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthLlfStatusTable.
+       "
+    AUGMENTS    { icomEthLlfCfgEntry }
+    ::= { icomEthLlfStatusTable 1 }
+
+IcomEthLlfStatusEntry ::= SEQUENCE {
+    icomEthLlfStatusState                       INTEGER,
+    icomEthLlfStatusHoldoffTimer                Unsigned32,
+    icomEthLlfStatusWtrTimer                    Unsigned32
+}
+
+icomEthLlfStatusState OBJECT-TYPE
+    SYNTAX      INTEGER {
+            up          (1),
+            down        (2),
+            shuttingDown(3),
+            startingUp  (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the operational status of the current Ethernet
+        interface with respect to the LLF feature.
+
+        If value equals 'up(1)', then the LLF operational status of the
+        current Ethernet interface is up.
+
+        If value equals 'down(2)', then the LLF operational status of
+        the current Ethernet interface is down.
+
+        If value equals 'shuttingDown(3)', then the current Ethernet
+        interface is transitioning to the 'down' LLF operational status
+        due to an air link failure, but the hold-off timer has not
+        expired yet.
+
+        If value equals 'startingUp(4)', then the current Ethernet
+        interface is transitioning to the 'up' LLF operational status
+        due to an air link re-establishment, but the wait-to-restore
+        timer has not expired yet.
+       "
+    ::= { icomEthLlfStatusEntry 1 }
+
+icomEthLlfStatusHoldoffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the current value of the LLF hold-off timer
+        (in seconds).
+       "
+    ::= { icomEthLlfStatusEntry 2 }
+
+icomEthLlfStatusWtrTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides the current value of the LLF wait-to-restore
+        timer (in seconds).
+       "
+    ::= { icomEthLlfStatusEntry 3 }
+
+   --
+   --  The icomEthMIBPerfObjects group
+   --
+icomEthMIBPerfObjects   OBJECT IDENTIFIER ::= { icomEthMIB 2 }
+
+-- -------------------------------------------------------------
+-- icomEthPerfEnable
+-- -------------------------------------------------------------
+
+icomEthPerfEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of historical
+        performance statistics.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomEthMIBPerfObjects 1 }
+
+-- -------------------------------------------------------------
+-- icomEthPerfCurrentTable
+-- -------------------------------------------------------------
+
+icomEthPerfCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthPerfCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides performance statistics for the current
+        1-minute interval. All table statistics are reset to zero after
+        the completion of each 1-minute measurement interval.
+       "
+    ::= { icomEthMIBPerfObjects 2 }
+
+icomEthPerfCurrentEntry OBJECT-TYPE
+    SYNTAX      IcomEthPerfCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthPerfCurrentTable.
+       "
+    INDEX       { ifIndex }
+    ::= { icomEthPerfCurrentTable 1 }
+
+IcomEthPerfCurrentEntry ::= SEQUENCE {
+    icomEthPerfCurrentElapsedTime               TimeInterval,
+    icomEthPerfCurrentSuspect                   TruthValue,
+    icomEthPerfCurrentTxPkts                    Counter64,
+    icomEthPerfCurrentRxPkts                    Counter64,
+    icomEthPerfCurrentTxOctets                  Counter64,
+    icomEthPerfCurrentRxOctets                  Counter64,
+    icomEthPerfCurrentMinTxBitRate              Gauge32,
+    icomEthPerfCurrentMaxTxBitRate              Gauge32,
+    icomEthPerfCurrentMinRxBitRate              Gauge32,
+    icomEthPerfCurrentMaxRxBitRate              Gauge32,
+    icomEthPerfCurrentCRCAlignErrors            Counter64,
+    icomEthPerfCurrentFragments                 Counter64,
+    icomEthPerfCurrentJabbers                   Counter64,
+    icomEthPerfCurrentMinTxBwUtil               IcomBwUtilType,
+    icomEthPerfCurrentMaxTxBwUtil               IcomBwUtilType,
+    icomEthPerfCurrentAvgTxBwUtil               IcomBwUtilType,
+    icomEthPerfCurrentMinRxBwUtil               IcomBwUtilType,
+    icomEthPerfCurrentMaxRxBwUtil               IcomBwUtilType,
+    icomEthPerfCurrentAvgRxBwUtil               IcomBwUtilType
+}
+
+icomEthPerfCurrentElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that the current measurement interval has
+        been running for, in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerfCurrentEntry 1 }
+
+icomEthPerfCurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerfCurrentEntry 2 }
+
+icomEthPerfCurrentTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        transmitted by the current Ethernet interface in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 3 }
+
+icomEthPerfCurrentRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 4 }
+
+icomEthPerfCurrentTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        transmitted by the current Ethernet interface in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 5 }
+
+icomEthPerfCurrentRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        received by the current Ethernet interface in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 6 }
+
+icomEthPerfCurrentMinTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bit rate of the
+        current Ethernet interface (in kbps) in the current 1-minute
+        interval.
+       "
+    ::= { icomEthPerfCurrentEntry 7 }
+
+icomEthPerfCurrentMaxTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bit rate of the
+        current Ethernet interface (in kbps) in the current 1-minute
+        interval.
+       "
+    ::= { icomEthPerfCurrentEntry 8 }
+
+icomEthPerfCurrentMinRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bit rate of the
+        current Ethernet interface (in kbps) in the current 1-minute
+        interval.
+       "
+    ::= { icomEthPerfCurrentEntry 9 }
+
+icomEthPerfCurrentMaxRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bit rate of the
+        current Ethernet interface (in kbps) in the current 1-minute
+        interval.
+       "
+    ::= { icomEthPerfCurrentEntry 10 }
+
+icomEthPerfCurrentCRCAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that had a length
+        (excluding framing bits, but including FCS octets) of between
+        64 and 1518 octets, inclusive, but had either a bad Frame Check
+        Sequence (FCS) with an integral number of octets (FCS Error) or
+        a bad FCS with a non-integral number of octets (Alignment Error)
+        in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 11 }
+
+icomEthPerfCurrentFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that were less than
+        64 octets in length (excluding framing bits but including FCS
+        octets) and had either a bad Frame Check Sequence (FCS) with
+        an integral number of octets (FCS Error) or a bad FCS with a
+        non-integral number of octets (Alignment Error) in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 12 }
+
+icomEthPerfCurrentJabbers OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that were longer
+        than 1518 octets (excluding framing bits, but including FCS
+        octets), and had either a bad Frame Check Sequence (FCS) with
+        an integral number of octets (FCS Error) or a bad FCS with a
+        non-integral number of octets (Alignment Error) in the current
+        1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 13 }
+
+icomEthPerfCurrentMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Tx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 14 }
+
+icomEthPerfCurrentMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Tx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 15 }
+
+icomEthPerfCurrentAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Tx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 16 }
+
+icomEthPerfCurrentMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Rx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 17 }
+
+icomEthPerfCurrentMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Rx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 18 }
+
+icomEthPerfCurrentAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Rx bandwidth utilization in the current 1-minute interval.
+       "
+    ::= { icomEthPerfCurrentEntry 19 }
+
+-- -------------------------------------------------------------
+-- icomEthPerf1MinIntervalTable
+-- -------------------------------------------------------------
+
+icomEthPerf1MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthPerf1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides performance statistics for historical
+        (completed) 1-minute intervals.
+
+        This table will have a maximum of 60 entries of completed 1-minute
+        intervals, to provide historical statistics for one hour.
+       "
+    ::= { icomEthMIBPerfObjects 3 }
+
+icomEthPerf1MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomEthPerf1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthPerf1MinIntervalTable.
+       "
+    INDEX       { ifIndex,
+                  icomEthPerf1MinIntervalNumber
+                }
+    ::= { icomEthPerf1MinIntervalTable 1 }
+
+IcomEthPerf1MinIntervalEntry ::= SEQUENCE {
+    icomEthPerf1MinIntervalNumber               Unsigned32,
+    icomEthPerf1MinIntervalEndTime              IcomDateTimeType,
+    icomEthPerf1MinIntervalElapsedTime          TimeInterval,
+    icomEthPerf1MinIntervalSuspect              TruthValue,
+    icomEthPerf1MinIntervalTxPkts               Counter64,
+    icomEthPerf1MinIntervalRxPkts               Counter64,
+    icomEthPerf1MinIntervalTxOctets             Counter64,
+    icomEthPerf1MinIntervalRxOctets             Counter64,
+    icomEthPerf1MinIntervalMinTxBitRate         Gauge32,
+    icomEthPerf1MinIntervalMaxTxBitRate         Gauge32,
+    icomEthPerf1MinIntervalMinRxBitRate         Gauge32,
+    icomEthPerf1MinIntervalMaxRxBitRate         Gauge32,
+    icomEthPerf1MinIntervalCRCAlignErrors       Counter64,
+    icomEthPerf1MinIntervalFragments            Counter64,
+    icomEthPerf1MinIntervalJabbers              Counter64,
+    icomEthPerf1MinIntervalMinTxBwUtil          IcomBwUtilType,
+    icomEthPerf1MinIntervalMaxTxBwUtil          IcomBwUtilType,
+    icomEthPerf1MinIntervalAvgTxBwUtil          IcomBwUtilType,
+    icomEthPerf1MinIntervalMinRxBwUtil          IcomBwUtilType,
+    icomEthPerf1MinIntervalMaxRxBwUtil          IcomBwUtilType,
+    icomEthPerf1MinIntervalAvgRxBwUtil          IcomBwUtilType
+}
+
+icomEthPerf1MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 1 }
+
+icomEthPerf1MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1MinIntervalEntry 2 }
+
+icomEthPerf1MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1MinIntervalEntry 3 }
+
+icomEthPerf1MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1MinIntervalEntry 4 }
+
+icomEthPerf1MinIntervalTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        transmitted by the current Ethernet interface in this completed
+        1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 5 }
+
+icomEthPerf1MinIntervalRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface in this completed
+        1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 6 }
+
+icomEthPerf1MinIntervalTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        transmitted by the current Ethernet interface in this completed
+        1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 7 }
+
+icomEthPerf1MinIntervalRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        received by the current Ethernet interface in this completed
+        1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 8 }
+
+icomEthPerf1MinIntervalMinTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 9 }
+
+icomEthPerf1MinIntervalMaxTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 10 }
+
+icomEthPerf1MinIntervalMinRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 11 }
+
+icomEthPerf1MinIntervalMaxRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 12 }
+
+icomEthPerf1MinIntervalCRCAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that had a length
+        (excluding framing bits, but including FCS octets) of between
+        64 and 1518 octets, inclusive, but had either a bad Frame Check
+        Sequence (FCS) with an integral number of octets (FCS Error) or
+        a bad FCS with a non-integral number of octets (Alignment Error)
+        in this completed 1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 13 }
+
+icomEthPerf1MinIntervalFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that were less than
+        64 octets in length (excluding framing bits but including FCS
+        octets) and had either a bad Frame Check Sequence (FCS) with
+        an integral number of octets (FCS Error) or a bad FCS with a
+        non-integral number of octets (Alignment Error) in this completed
+        1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 14 }
+
+icomEthPerf1MinIntervalJabbers OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of packets received
+        by the current Ethernet interface that were longer than 1518
+        octets (excluding framing bits, but including FCS octets), and had
+        either a bad Frame Check Sequence (FCS) with an integral number
+        of octets (FCS Error) or a bad FCS with a non-integral number
+        of octets (Alignment Error) in this completed 1-minute interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 15 }
+
+icomEthPerf1MinIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Tx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 16 }
+
+icomEthPerf1MinIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Tx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 17 }
+
+icomEthPerf1MinIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Tx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 18 }
+
+icomEthPerf1MinIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Rx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 19 }
+
+icomEthPerf1MinIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Rx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 20 }
+
+icomEthPerf1MinIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Rx bandwidth utilization in this completed 1-minute
+        interval.
+       "
+    ::= { icomEthPerf1MinIntervalEntry 21 }
+
+-- -------------------------------------------------------------
+-- icomEthPerf15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomEthPerf15MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthPerf15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides performance statistics for historical
+        (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed
+        15-minute intervals, to provide historical statistics for one day.
+       "
+    ::= { icomEthMIBPerfObjects 4 }
+
+icomEthPerf15MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomEthPerf15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthPerf15MinIntervalTable.
+       "
+    INDEX       { ifIndex,
+                  icomEthPerf15MinIntervalNumber
+                }
+    ::= { icomEthPerf15MinIntervalTable 1 }
+
+IcomEthPerf15MinIntervalEntry ::= SEQUENCE {
+    icomEthPerf15MinIntervalNumber              Unsigned32,
+    icomEthPerf15MinIntervalEndTime             IcomDateTimeType,
+    icomEthPerf15MinIntervalElapsedTime         TimeInterval,
+    icomEthPerf15MinIntervalSuspect             TruthValue,
+    icomEthPerf15MinIntervalTxPkts              Counter64,
+    icomEthPerf15MinIntervalRxPkts              Counter64,
+    icomEthPerf15MinIntervalTxOctets            Counter64,
+    icomEthPerf15MinIntervalRxOctets            Counter64,
+    icomEthPerf15MinIntervalMinTxBitRate        Gauge32,
+    icomEthPerf15MinIntervalMaxTxBitRate        Gauge32,
+    icomEthPerf15MinIntervalMinRxBitRate        Gauge32,
+    icomEthPerf15MinIntervalMaxRxBitRate        Gauge32,
+    icomEthPerf15MinIntervalCRCAlignErrors      Counter64,
+    icomEthPerf15MinIntervalFragments           Counter64,
+    icomEthPerf15MinIntervalJabbers             Counter64,
+    icomEthPerf15MinIntervalMinTxBwUtil         IcomBwUtilType,
+    icomEthPerf15MinIntervalMaxTxBwUtil         IcomBwUtilType,
+    icomEthPerf15MinIntervalAvgTxBwUtil         IcomBwUtilType,
+    icomEthPerf15MinIntervalMinRxBwUtil         IcomBwUtilType,
+    icomEthPerf15MinIntervalMaxRxBwUtil         IcomBwUtilType,
+    icomEthPerf15MinIntervalAvgRxBwUtil         IcomBwUtilType
+}
+
+icomEthPerf15MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 1 }
+
+icomEthPerf15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf15MinIntervalEntry 2 }
+
+icomEthPerf15MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf15MinIntervalEntry 3 }
+
+icomEthPerf15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf15MinIntervalEntry 4 }
+
+icomEthPerf15MinIntervalTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        transmitted by the current Ethernet interface in this completed
+        15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 5 }
+
+icomEthPerf15MinIntervalRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface in this completed
+        15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 6 }
+
+icomEthPerf15MinIntervalTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        transmitted by the current Ethernet interface in this completed
+        15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 7 }
+
+icomEthPerf15MinIntervalRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        received by the current Ethernet interface in this completed
+        15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 8 }
+
+icomEthPerf15MinIntervalMinTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 9 }
+
+icomEthPerf15MinIntervalMaxTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 10 }
+
+icomEthPerf15MinIntervalMinRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 11 }
+
+icomEthPerf15MinIntervalMaxRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 12 }
+
+icomEthPerf15MinIntervalCRCAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that had a length
+        (excluding framing bits, but including FCS octets) of between
+        64 and 1518 octets, inclusive, but had either a bad Frame Check
+        Sequence (FCS) with an integral number of octets (FCS Error) or
+        a bad FCS with a non-integral number of octets (Alignment Error)
+        in this completed 15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 13 }
+
+icomEthPerf15MinIntervalFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that were less than
+        64 octets in length (excluding framing bits but including FCS
+        octets) and had either a bad Frame Check Sequence (FCS) with
+        an integral number of octets (FCS Error) or a bad FCS with a
+        non-integral number of octets (Alignment Error) in this completed
+        15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 14 }
+
+icomEthPerf15MinIntervalJabbers OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of packets received
+        by the current Ethernet interface that were longer than 1518
+        octets (excluding framing bits, but including FCS octets), and had
+        either a bad Frame Check Sequence (FCS) with an integral number
+        of octets (FCS Error) or a bad FCS with a non-integral number
+        of octets (Alignment Error) in this completed 15-minute interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 15 }
+
+icomEthPerf15MinIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Tx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 16 }
+
+icomEthPerf15MinIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Tx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 17 }
+
+icomEthPerf15MinIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Tx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 18 }
+
+icomEthPerf15MinIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Rx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 19 }
+
+icomEthPerf15MinIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Rx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 20 }
+
+icomEthPerf15MinIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Rx bandwidth utilization in this completed 15-minute
+        interval.
+       "
+    ::= { icomEthPerf15MinIntervalEntry 21 }
+
+-- -------------------------------------------------------------
+-- icomEthPerf1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomEthPerf1DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomEthPerf1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides performance statistics for historical
+        (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomEthMIBPerfObjects 5 }
+
+icomEthPerf1DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomEthPerf1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEthPerf1DayIntervalTable.
+       "
+    INDEX       { ifIndex,
+                  icomEthPerf1DayIntervalNumber
+                }
+    ::= { icomEthPerf1DayIntervalTable 1 }
+
+IcomEthPerf1DayIntervalEntry ::= SEQUENCE {
+    icomEthPerf1DayIntervalNumber               Unsigned32,
+    icomEthPerf1DayIntervalEndTime              IcomDateTimeType,
+    icomEthPerf1DayIntervalElapsedTime          TimeInterval,
+    icomEthPerf1DayIntervalSuspect              TruthValue,
+    icomEthPerf1DayIntervalTxPkts               Counter64,
+    icomEthPerf1DayIntervalRxPkts               Counter64,
+    icomEthPerf1DayIntervalTxOctets             Counter64,
+    icomEthPerf1DayIntervalRxOctets             Counter64,
+    icomEthPerf1DayIntervalMinTxBitRate         Gauge32,
+    icomEthPerf1DayIntervalMaxTxBitRate         Gauge32,
+    icomEthPerf1DayIntervalMinRxBitRate         Gauge32,
+    icomEthPerf1DayIntervalMaxRxBitRate         Gauge32,
+    icomEthPerf1DayIntervalCRCAlignErrors       Counter64,
+    icomEthPerf1DayIntervalFragments            Counter64,
+    icomEthPerf1DayIntervalJabbers              Counter64,
+    icomEthPerf1DayIntervalMinTxBwUtil          IcomBwUtilType,
+    icomEthPerf1DayIntervalMaxTxBwUtil          IcomBwUtilType,
+    icomEthPerf1DayIntervalAvgTxBwUtil          IcomBwUtilType,
+    icomEthPerf1DayIntervalMinRxBwUtil          IcomBwUtilType,
+    icomEthPerf1DayIntervalMaxRxBwUtil          IcomBwUtilType,
+    icomEthPerf1DayIntervalAvgRxBwUtil          IcomBwUtilType
+}
+
+icomEthPerf1DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 1 }
+
+icomEthPerf1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1DayIntervalEntry 2 }
+
+icomEthPerf1DayIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1DayIntervalEntry 3 }
+
+icomEthPerf1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEthPerf1DayIntervalEntry 4 }
+
+icomEthPerf1DayIntervalTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        transmitted by the current Ethernet interface in this completed
+        1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 5 }
+
+icomEthPerf1DayIntervalRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface in this completed
+        1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 6 }
+
+icomEthPerf1DayIntervalTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        transmitted by the current Ethernet interface in this completed
+        1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 7 }
+
+icomEthPerf1DayIntervalRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of octets
+        received by the current Ethernet interface in this completed
+        1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 8 }
+
+icomEthPerf1DayIntervalMinTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-day
+        interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 9 }
+
+icomEthPerf1DayIntervalMaxTxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-day
+        interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 10 }
+
+icomEthPerf1DayIntervalMinRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-day
+        interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 11 }
+
+icomEthPerf1DayIntervalMaxRxBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bit rate of the
+        current Ethernet interface (in kbps) in this completed 1-day
+        interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 12 }
+
+icomEthPerf1DayIntervalCRCAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that had a length
+        (excluding framing bits, but including FCS octets) of between
+        64 and 1518 octets, inclusive, but had either a bad Frame Check
+        Sequence (FCS) with an integral number of octets (FCS Error) or
+        a bad FCS with a non-integral number of octets (Alignment Error)
+        in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 13 }
+
+icomEthPerf1DayIntervalFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the total number of packets
+        received by the current Ethernet interface that were less than
+        64 octets in length (excluding framing bits but including FCS
+        octets) and had either a bad Frame Check Sequence (FCS) with
+        an integral number of octets (FCS Error) or a bad FCS with a
+        non-integral number of octets (Alignment Error) in this completed
+        1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 14 }
+
+icomEthPerf1DayIntervalJabbers OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of packets received
+        by the current Ethernet interface that were longer than 1518
+        octets (excluding framing bits, but including FCS octets), and had
+        either a bad Frame Check Sequence (FCS) with an integral number
+        of octets (FCS Error) or a bad FCS with a non-integral number
+        of octets (Alignment Error) in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 15 }
+
+icomEthPerf1DayIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Tx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 16 }
+
+icomEthPerf1DayIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Tx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 17 }
+
+icomEthPerf1DayIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Average Tx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 18 }
+
+icomEthPerf1DayIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Minimum Rx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 19 }
+
+icomEthPerf1DayIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Maximum Rx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 20 }
+
+icomEthPerf1DayIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+
+       "Average Rx bandwidth utilization in this completed 1-day interval.
+       "
+    ::= { icomEthPerf1DayIntervalEntry 21 }
+
+   --
+   --  The icomEthMIBNotifObjects group
+   --
+icomEthMIBNotifObjects   OBJECT IDENTIFIER ::= { icomEthMIB 0 }
+
+icomEthLoopTrap NOTIFICATION-TYPE
+    OBJECTS {
+        icomEthCfgLoopback
+    }
+    STATUS current
+    DESCRIPTION
+        "This trap reports a change in the loopback status of an Ethernet
+         interface.
+        "
+    ::= { icomEthMIBNotifObjects 1 }
+
+icomEthSFPExistsTrap NOTIFICATION-TYPE
+    OBJECTS {
+        icomEthStatusSFPExists
+    }
+    STATUS current
+    DESCRIPTION
+        "This trap reports a change in the existence of an SFP.
+        "
+    ::= { icomEthMIBNotifObjects 2 }
+
+icomEthSFPTxFaultTrap NOTIFICATION-TYPE
+    OBJECTS {
+        icomEthStatusSFPTxFault
+    }
+    STATUS current
+    DESCRIPTION
+        "This trap reports a change in the Tx fault indication status
+         of an SFP.
+        "
+    ::= { icomEthMIBNotifObjects 3 }
+
+icomEthSFPRxLOSTrap NOTIFICATION-TYPE
+    OBJECTS {
+        icomEthStatusSFPRxLOS
+    }
+    STATUS current
+    DESCRIPTION
+        "This trap reports a change in the Rx loss of signal status of
+         an SFP.
+        "
+    ::= { icomEthMIBNotifObjects 4 }
+
+icomEthLlfTrap NOTIFICATION-TYPE
+    OBJECTS {
+        icomEthLlfStatusState
+    }
+    STATUS current
+    DESCRIPTION
+        "This trap reports a change in the LLF operational status of an
+         Ethernet interface.
+        "
+    ::= { icomEthMIBNotifObjects 5 }
+
+   --
+   -- Conformance information
+   --
+
+icomEthMIBConformance OBJECT IDENTIFIER ::= { icomEthMIB 3 }
+
+icomEthMIBCompliances OBJECT IDENTIFIER ::= { icomEthMIBConformance 1 }
+
+icomEthMIBGroups      OBJECT IDENTIFIER ::= { icomEthMIBConformance 2 }
+
+   --
+   -- Compliance statements
+   --
+icomEthMIBCompliance  MODULE-COMPLIANCE
+    STATUS            current
+    DESCRIPTION
+       "The compliance statement for icomEthMIB.
+       "
+    MODULE -- This Module
+    MANDATORY-GROUPS {
+        icomEthMIBGroup,
+        icomEthMIBPerfGroup,
+        icomEthMIBNotifGroup
+    }
+    ::= { icomEthMIBCompliances 1 }
+
+icomEthMIBGroup OBJECT-GROUP
+    OBJECTS {
+        icomEthCfgAutoNegotiation,
+        icomEthCfgSpeed,
+        icomEthCfgDuplex,
+        icomEthCfgLoopback,
+        icomEthCfgSFPType,
+
+        icomEthStatusModuleType,
+        icomEthStatusSFPExists,
+        icomEthStatusSFPTxFault,
+        icomEthStatusSFPRxLOS,
+
+        icomEthStatsReset,
+        icomEthStatsTxBitRate,
+        icomEthStatsRxBitRate,
+        icomEthStatsTxPktRate,
+        icomEthStatsRxPktRate,
+        icomEthStatsHCPkts1519to1522Octets,
+        icomEthStatsHCPkts1523toMRUOctets,
+        icomEthStatsRxIwPkts,
+        icomEthStatsTxMacCtrlPkts,
+        icomEthStatsRxMacCtrlPkts,
+        icomEthStatsTxUndersizePkts,
+        icomEthStatsRxUndersizePkts,
+        icomEthStatsTxOversizePkts,
+        icomEthStatsRxOversizePkts,
+        icomEthStatsTxBwUtil,
+        icomEthStatsRxBwUtil,
+
+        icomEthLoopSrcAddress,
+        icomEthLoopDestAddress,
+        icomEthLoopVlanList,
+        icomEthLoopTimeout,
+        icomEthLoopTimer,
+        icomEthLoopRowStatus,
+
+        icomEthLlfCfgEnable,
+        icomEthLlfCfgModemList,
+        icomEthLlfCfgModemLogic,
+        icomEthLlfCfgHoldoffTime,
+        icomEthLlfCfgWtrTime,
+
+        icomEthLlfStatusState,
+        icomEthLlfStatusHoldoffTimer,
+        icomEthLlfStatusWtrTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for icomEthMIB.
+        "
+    ::= { icomEthMIBGroups 1 }
+
+icomEthMIBPerfGroup OBJECT-GROUP
+    OBJECTS {
+        icomEthPerfEnable,
+
+        icomEthPerfCurrentElapsedTime,
+        icomEthPerfCurrentSuspect,
+        icomEthPerfCurrentTxPkts,
+        icomEthPerfCurrentRxPkts,
+        icomEthPerfCurrentTxOctets,
+        icomEthPerfCurrentRxOctets,
+        icomEthPerfCurrentMinTxBitRate,
+        icomEthPerfCurrentMaxTxBitRate,
+        icomEthPerfCurrentMinRxBitRate,
+        icomEthPerfCurrentMaxRxBitRate,
+        icomEthPerfCurrentCRCAlignErrors,
+        icomEthPerfCurrentFragments,
+        icomEthPerfCurrentJabbers,
+        icomEthPerfCurrentMinTxBwUtil,
+        icomEthPerfCurrentMaxTxBwUtil,
+        icomEthPerfCurrentAvgTxBwUtil,
+        icomEthPerfCurrentMinRxBwUtil,
+        icomEthPerfCurrentMaxRxBwUtil,
+        icomEthPerfCurrentAvgRxBwUtil,
+
+        icomEthPerf1MinIntervalEndTime,
+        icomEthPerf1MinIntervalElapsedTime,
+        icomEthPerf1MinIntervalSuspect,
+        icomEthPerf1MinIntervalTxPkts,
+        icomEthPerf1MinIntervalRxPkts,
+        icomEthPerf1MinIntervalTxOctets,
+        icomEthPerf1MinIntervalRxOctets,
+        icomEthPerf1MinIntervalMinTxBitRate,
+        icomEthPerf1MinIntervalMaxTxBitRate,
+        icomEthPerf1MinIntervalMinRxBitRate,
+        icomEthPerf1MinIntervalMaxRxBitRate,
+        icomEthPerf1MinIntervalCRCAlignErrors,
+        icomEthPerf1MinIntervalFragments,
+        icomEthPerf1MinIntervalJabbers,
+        icomEthPerf1MinIntervalMinTxBwUtil,
+        icomEthPerf1MinIntervalMaxTxBwUtil,
+        icomEthPerf1MinIntervalAvgTxBwUtil,
+        icomEthPerf1MinIntervalMinRxBwUtil,
+        icomEthPerf1MinIntervalMaxRxBwUtil,
+        icomEthPerf1MinIntervalAvgRxBwUtil,
+
+        icomEthPerf15MinIntervalEndTime,
+        icomEthPerf15MinIntervalElapsedTime,
+        icomEthPerf15MinIntervalSuspect,
+        icomEthPerf15MinIntervalTxPkts,
+        icomEthPerf15MinIntervalRxPkts,
+        icomEthPerf15MinIntervalTxOctets,
+        icomEthPerf15MinIntervalRxOctets,
+        icomEthPerf15MinIntervalMinTxBitRate,
+        icomEthPerf15MinIntervalMaxTxBitRate,
+        icomEthPerf15MinIntervalMinRxBitRate,
+        icomEthPerf15MinIntervalMaxRxBitRate,
+        icomEthPerf15MinIntervalCRCAlignErrors,
+        icomEthPerf15MinIntervalFragments,
+        icomEthPerf15MinIntervalJabbers,
+        icomEthPerf15MinIntervalMinTxBwUtil,
+        icomEthPerf15MinIntervalMaxTxBwUtil,
+        icomEthPerf15MinIntervalAvgTxBwUtil,
+        icomEthPerf15MinIntervalMinRxBwUtil,
+        icomEthPerf15MinIntervalMaxRxBwUtil,
+        icomEthPerf15MinIntervalAvgRxBwUtil,
+
+        icomEthPerf1DayIntervalEndTime,
+        icomEthPerf1DayIntervalElapsedTime,
+        icomEthPerf1DayIntervalSuspect,
+        icomEthPerf1DayIntervalTxPkts,
+        icomEthPerf1DayIntervalRxPkts,
+        icomEthPerf1DayIntervalTxOctets,
+        icomEthPerf1DayIntervalRxOctets,
+        icomEthPerf1DayIntervalMinTxBitRate,
+        icomEthPerf1DayIntervalMaxTxBitRate,
+        icomEthPerf1DayIntervalMinRxBitRate,
+        icomEthPerf1DayIntervalMaxRxBitRate,
+        icomEthPerf1DayIntervalCRCAlignErrors,
+        icomEthPerf1DayIntervalFragments,
+        icomEthPerf1DayIntervalJabbers,
+        icomEthPerf1DayIntervalMinTxBwUtil,
+        icomEthPerf1DayIntervalMaxTxBwUtil,
+        icomEthPerf1DayIntervalAvgTxBwUtil,
+        icomEthPerf1DayIntervalMinRxBwUtil,
+        icomEthPerf1DayIntervalMaxRxBwUtil,
+        icomEthPerf1DayIntervalAvgRxBwUtil
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of performance objects for icomEthMIB.
+        "
+    ::= { icomEthMIBGroups 2 }
+
+icomEthMIBNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        icomEthLoopTrap,
+        icomEthSFPExistsTrap,
+        icomEthSFPTxFaultTrap,
+        icomEthSFPRxLOSTrap,
+        icomEthLlfTrap
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of notifications for icomEthMIB.
+        "
+    ::= { icomEthMIBGroups 3 }
+
+END

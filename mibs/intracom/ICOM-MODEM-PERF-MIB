@@ -1,0 +1,3501 @@
+ICOM-MODEM-PERF-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32, Counter64
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TruthValue, TimeInterval
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        IcomDateTimeType
+                FROM ICOM-PERFHIST-TC-MIB
+        intracom
+                FROM ICOM-SMI;
+
+icomModemPerfMIB MODULE-IDENTITY
+    LAST-UPDATED        "201804110000Z"     -- 11 April 2018
+    ORGANIZATION        "Intracom S.A."
+    CONTACT-INFO
+       "EMail:
+        Phone:
+        Co-editor:
+        EMail:
+        Phone:
+       "
+    DESCRIPTION
+       "This module provides proprietary Intracom objects to support
+        historical statistics of modem interfaces on point-to-point
+        systems. The MIB includes the following proprietary objects:
+
+        1.  icomModemPerfStatusEnable
+        2.  icomModemPerfStatusCurrentTable
+        3.  icomModemPerfStatus1MinIntervalTable
+        4.  icomModemPerfStatus15MinIntervalTable
+        5.  icomModemPerfStatus1DayIntervalTable
+        6.  icomModemPerfStatsEnable
+        7.  icomModemPerfStatsCurrentTable
+        8.  icomModemPerfStats15MinIntervalTable
+        9.  icomModemPerfStats1DayIntervalTable
+        10. icomModemPerfG826Enable
+        11. icomModemPerfG826CurrentTable
+        12. icomModemPerfG82615MinIntervalTable
+        13. icomModemPerfG8261DayIntervalTable
+        14. icomModemPerfPhyEnable
+        15. icomModemPerfPhyCurrentTable
+        16. icomModemPerfPhy15MinIntervalTable
+        17. icomModemPerfPhy1DayIntervalTable
+        18. icomModemPerfRfuEnable
+        19. icomModemPerfRfuCurrentTable
+        20. icomModemPerfRfu1MinIntervalTable
+        21. icomModemPerfRfu15MinIntervalTable
+        22. icomModemPerfRfu1DayIntervalTable
+       "
+
+-- Revision History
+
+    REVISION            "201804110000Z"     -- 11 April 2018
+    DESCRIPTION
+       "Refactor fine-grain modem performance statistics:
+        - compute min/max/avg for Rx SNR, LDPC decoder stress and Tx/Rx
+        bandwidth utilization each minute
+        - compute min/max/mod for Tx/Rx PHY modulation each minute
+        - move total FEC blocks & uncorrected FEC blocks to fine-grain
+        modem performance statistics
+        - add link out of lock (LoL) events
+        - add ElapsedTime MOs, due to the introduction of counter-type
+        modem performance statistics
+
+        Refactor RFU performance statistics:
+        - compute min/max/avg Tx power and RSSI each minute
+       "
+    REVISION            "201512030000Z"     -- 03 December 2015
+    DESCRIPTION
+       "
+        This is the initial version of this MIB.
+       "
+
+::= { intracom 71 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+IcomModemPerfDbType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION
+        "Normalized dB value. To obtain the actual value in dB, divide
+         the IcomModemPerfDbType value by 10.
+        "
+    SYNTAX      Integer32
+
+IcomModemPerfDbmType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION
+        "Normalized dBm value. To obtain the actual value in dBm, divide the
+         IcomModemPerfDbmType value by 10.
+        "
+    SYNTAX      Integer32
+
+IcomModemPerfModulationType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Modem modulation type.
+        "
+    SYNTAX      Unsigned32
+
+IcomModemPerfBwUtilType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION
+        "Hundredths of bandwidth utilization percentage (0..10000). To
+         obtain the actual percentage in the 0.00..100.00 range, divide
+         the IcomModemPerfBwUtilType value by 100.
+        "
+    SYNTAX      Unsigned32
+
+--
+--  The icomModemPerfMIBObjects group
+--
+icomModemPerfMIBObjects   OBJECT IDENTIFIER ::= { icomModemPerfMIB 1 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatusEnable
+-- -------------------------------------------------------------
+
+icomModemPerfStatusEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of fine-grain
+        historical performance statistics for the modem interfaces with
+        a 1-minute granularity.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomModemPerfMIBObjects 1 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatusCurrentTable
+-- -------------------------------------------------------------
+
+icomModemPerfStatusCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStatusCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides fine-grain modem performance statistics for
+        the current 1-minute interval. All table statistics are reset to
+        zero after the completion of each 1-minute measurement interval.
+       "
+    ::= { icomModemPerfMIBObjects 2 }
+
+icomModemPerfStatusCurrentEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStatusCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStatusCurrentTable.
+       "
+    INDEX       { icomModemPerfModemId }
+    ::= { icomModemPerfStatusCurrentTable 1 }
+
+IcomModemPerfStatusCurrentEntry ::= SEQUENCE {
+    icomModemPerfModemId                          Unsigned32,
+    icomModemPerfStatusCurrentElapsedTime         TimeInterval,
+    icomModemPerfStatusCurrentSuspect             TruthValue,
+    icomModemPerfStatusCurrentMinRxSnr            IcomModemPerfDbType,
+    icomModemPerfStatusCurrentMaxRxSnr            IcomModemPerfDbType,
+    icomModemPerfStatusCurrentAvgRxSnr            IcomModemPerfDbType,
+    icomModemPerfStatusCurrentMinTxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentMaxTxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentModTxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentMinRxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentMaxRxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentModRxPhyMod         IcomModemPerfModulationType,
+    icomModemPerfStatusCurrentMinLpdcStress       Unsigned32,
+    icomModemPerfStatusCurrentMaxLpdcStress       Unsigned32,
+    icomModemPerfStatusCurrentAvgLpdcStress       Unsigned32,
+    icomModemPerfStatusCurrentMinTxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentMaxTxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentAvgTxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentMinRxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentMaxRxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentAvgRxBwUtil         IcomModemPerfBwUtilType,
+    icomModemPerfStatusCurrentFecBlocks           Counter64,
+    icomModemPerfStatusCurrentFecUncorBlocks      Counter64,
+    icomModemPerfStatusCurrentLossOfLink          Counter64
+}
+
+icomModemPerfModemId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The modem identifier.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 1 }
+
+icomModemPerfStatusCurrentElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that the current measurement interval has
+        been running for, in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatusCurrentEntry 2 }
+
+icomModemPerfStatusCurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatusCurrentEntry 3 }
+
+icomModemPerfStatusCurrentMinRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum received SNR (in 0.1
+        dB steps) of the indexed modem interface in the current 1-minute
+        interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 4 }
+
+icomModemPerfStatusCurrentMaxRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum received SNR (in 0.1
+        dB steps) of the indexed modem interface in the current 1-minute
+        interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 5 }
+
+icomModemPerfStatusCurrentAvgRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average received SNR (in 0.1
+        dB steps) of the indexed modem interface in the current 1-minute
+        interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 6 }
+
+icomModemPerfStatusCurrentMinTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx PHY modulation of
+        the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 7 }
+
+icomModemPerfStatusCurrentMaxTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx PHY modulation of
+        the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 8 }
+
+icomModemPerfStatusCurrentModTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Tx PHY modulation of the indexed modem interface
+        in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 9 }
+
+icomModemPerfStatusCurrentMinRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx PHY modulation of
+        the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 10 }
+
+icomModemPerfStatusCurrentMaxRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx PHY modulation of
+        the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 11 }
+
+icomModemPerfStatusCurrentModRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Rx PHY modulation of the indexed modem interface
+        in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 12 }
+
+icomModemPerfStatusCurrentMinLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum LDPC decoder stress
+        of the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 13 }
+
+icomModemPerfStatusCurrentMaxLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum LDPC decoder stress
+        of the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 14 }
+
+icomModemPerfStatusCurrentAvgLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average LDPC decoder stress
+        of the indexed modem interface in the current 1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 15 }
+
+icomModemPerfStatusCurrentMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 16 }
+
+icomModemPerfStatusCurrentMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 17 }
+
+
+icomModemPerfStatusCurrentAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 18 }
+
+icomModemPerfStatusCurrentMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 19 }
+
+icomModemPerfStatusCurrentMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 20 }
+
+
+icomModemPerfStatusCurrentAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Rx bandwidth
+        utilization of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 21 }
+
+icomModemPerfStatusCurrentFecBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the current number of total FEC
+        blocks of the indexed modem interface in the current 1-minute
+        interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 22 }
+
+icomModemPerfStatusCurrentFecUncorBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the current number of uncorrected
+        FEC blocks of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 23 }
+
+icomModemPerfStatusCurrentLossOfLink OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the current number of link out of
+        lock (LoL) events of the indexed modem interface in the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatusCurrentEntry 24 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatus1MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfStatus1MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStatus1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides fine-grain modem performance statistics
+        for historical (completed) 1-minute intervals.
+
+        This table will have a maximum of 60 entries of completed 1-minute
+        intervals, to provide historical statistics for one hour.
+       "
+    ::= { icomModemPerfMIBObjects 3 }
+
+icomModemPerfStatus1MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStatus1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStatus1MinIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfStatus1MinIntervalNumber
+                }
+    ::= { icomModemPerfStatus1MinIntervalTable 1 }
+
+IcomModemPerfStatus1MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfStatus1MinIntervalNumber         Unsigned32,
+    icomModemPerfStatus1MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfStatus1MinIntervalElapsedTime    TimeInterval,
+    icomModemPerfStatus1MinIntervalSuspect        TruthValue,
+    icomModemPerfStatus1MinIntervalMinRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1MinIntervalMaxRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1MinIntervalAvgRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1MinIntervalMinTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalMaxTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalModTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalMinRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalMaxRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalModRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1MinIntervalMinLpdcStress  Unsigned32,
+    icomModemPerfStatus1MinIntervalMaxLpdcStress  Unsigned32,
+    icomModemPerfStatus1MinIntervalAvgLpdcStress  Unsigned32,
+    icomModemPerfStatus1MinIntervalMinTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalMaxTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalAvgTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalMinRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalMaxRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalAvgRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1MinIntervalFecBlocks      Counter64,
+    icomModemPerfStatus1MinIntervalFecUncorBlocks Counter64,
+    icomModemPerfStatus1MinIntervalLossOfLink     Counter64
+}
+
+icomModemPerfStatus1MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 1 }
+
+icomModemPerfStatus1MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 2 }
+
+icomModemPerfStatus1MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 3 }
+
+icomModemPerfStatus1MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 4 }
+
+icomModemPerfStatus1MinIntervalMinRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum received SNR (in
+        0.1 dB steps) of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 5 }
+
+icomModemPerfStatus1MinIntervalMaxRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum received SNR (in
+        0.1 dB steps) of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 6 }
+
+icomModemPerfStatus1MinIntervalAvgRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average received SNR (in
+        0.1 dB steps) of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 7 }
+
+icomModemPerfStatus1MinIntervalMinTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx PHY modulation of
+        the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 8 }
+
+icomModemPerfStatus1MinIntervalMaxTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx PHY modulation of
+        the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 9 }
+
+icomModemPerfStatus1MinIntervalModTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Tx PHY modulation of the indexed modem interface
+        in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 10 }
+
+icomModemPerfStatus1MinIntervalMinRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx PHY modulation of
+        the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 11 }
+
+icomModemPerfStatus1MinIntervalMaxRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx PHY modulation of
+        the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 12 }
+
+icomModemPerfStatus1MinIntervalModRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Rx PHY modulation of the indexed modem interface
+        in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 13 }
+
+icomModemPerfStatus1MinIntervalMinLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum LDPC decoder stress
+        of the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 14 }
+
+icomModemPerfStatus1MinIntervalMaxLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum LDPC decoder stress
+        of the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 15 }
+
+icomModemPerfStatus1MinIntervalAvgLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum LDPC decoder stress
+        of the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 16 }
+
+icomModemPerfStatus1MinIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 17 }
+
+icomModemPerfStatus1MinIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 18 }
+
+icomModemPerfStatus1MinIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 19 }
+
+icomModemPerfStatus1MinIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 20 }
+
+icomModemPerfStatus1MinIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 21 }
+
+icomModemPerfStatus1MinIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 22 }
+
+icomModemPerfStatus1MinIntervalFecBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of total FEC blocks of
+        the indexed modem interface in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 23 }
+
+icomModemPerfStatus1MinIntervalFecUncorBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of uncorrected FEC
+        blocks of the indexed modem interface in this completed 1-minute
+        interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 24 }
+
+icomModemPerfStatus1MinIntervalLossOfLink OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of link out of lock
+        (LoL) events of the indexed modem interface in this completed
+        1-minute interval.
+       "
+    ::= { icomModemPerfStatus1MinIntervalEntry 25 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatus15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfStatus15MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStatus15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides fine-grain modem performance statistics
+        for historical (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed 15-minute
+        intervals, to provide historical statistics for one day.
+       "
+    ::= { icomModemPerfMIBObjects 4 }
+
+icomModemPerfStatus15MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStatus15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStatus15MinIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfStatus15MinIntervalNumber
+                }
+    ::= { icomModemPerfStatus15MinIntervalTable 1 }
+
+IcomModemPerfStatus15MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfStatus15MinIntervalNumber         Unsigned32,
+    icomModemPerfStatus15MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfStatus15MinIntervalElapsedTime    TimeInterval,
+    icomModemPerfStatus15MinIntervalSuspect        TruthValue,
+    icomModemPerfStatus15MinIntervalMinRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus15MinIntervalMaxRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus15MinIntervalAvgRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus15MinIntervalMinTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalMaxTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalModTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalMinRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalMaxRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalModRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus15MinIntervalMinLpdcStress  Unsigned32,
+    icomModemPerfStatus15MinIntervalMaxLpdcStress  Unsigned32,
+    icomModemPerfStatus15MinIntervalAvgLpdcStress  Unsigned32,
+    icomModemPerfStatus15MinIntervalMinTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalMaxTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalAvgTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalMinRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalMaxRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalAvgRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus15MinIntervalFecBlocks      Counter64,
+    icomModemPerfStatus15MinIntervalFecUncorBlocks Counter64,
+    icomModemPerfStatus15MinIntervalLossOfLink     Counter64
+}
+
+icomModemPerfStatus15MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 1 }
+
+icomModemPerfStatus15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 2 }
+
+icomModemPerfStatus15MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 3 }
+
+icomModemPerfStatus15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 4 }
+
+icomModemPerfStatus15MinIntervalMinRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 5 }
+
+icomModemPerfStatus15MinIntervalMaxRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 6 }
+
+icomModemPerfStatus15MinIntervalAvgRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 7 }
+
+icomModemPerfStatus15MinIntervalMinTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx PHY modulation of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 8 }
+
+icomModemPerfStatus15MinIntervalMaxTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx PHY modulation of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 9 }
+
+icomModemPerfStatus15MinIntervalModTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Tx PHY modulation of the indexed modem interface
+        in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 10 }
+
+icomModemPerfStatus15MinIntervalMinRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx PHY modulation of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 11 }
+
+icomModemPerfStatus15MinIntervalMaxRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx PHY modulation of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 12 }
+
+icomModemPerfStatus15MinIntervalModRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Rx PHY modulation of the indexed modem interface
+        in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 13 }
+
+icomModemPerfStatus15MinIntervalMinLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum LDPC decoder stress of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 14 }
+
+icomModemPerfStatus15MinIntervalMaxLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum LDPC decoder stress of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 15 }
+
+icomModemPerfStatus15MinIntervalAvgLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average LDPC decoder stress of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 16 }
+
+icomModemPerfStatus15MinIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 17 }
+
+icomModemPerfStatus15MinIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 18 }
+
+icomModemPerfStatus15MinIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 19 }
+
+icomModemPerfStatus15MinIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 20 }
+
+icomModemPerfStatus15MinIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 21 }
+
+icomModemPerfStatus15MinIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 22 }
+
+icomModemPerfStatus15MinIntervalFecBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of total FEC blocks of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 23 }
+
+icomModemPerfStatus15MinIntervalFecUncorBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of uncorrected FEC
+        blocks of the indexed modem interface in this completed 15-minute
+        interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 24 }
+
+icomModemPerfStatus15MinIntervalLossOfLink OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of link out of lock
+        (LoL) events of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatus15MinIntervalEntry 25 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatus1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfStatus1DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStatus1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides fine-grain modem performance statistics
+        for historical (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomModemPerfMIBObjects 5 }
+
+icomModemPerfStatus1DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStatus1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStatus1DayIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfStatus1DayIntervalNumber
+                }
+    ::= { icomModemPerfStatus1DayIntervalTable 1 }
+
+IcomModemPerfStatus1DayIntervalEntry ::= SEQUENCE {
+    icomModemPerfStatus1DayIntervalNumber         Unsigned32,
+    icomModemPerfStatus1DayIntervalEndTime        IcomDateTimeType,
+    icomModemPerfStatus1DayIntervalElapsedTime    TimeInterval,
+    icomModemPerfStatus1DayIntervalSuspect        TruthValue,
+    icomModemPerfStatus1DayIntervalMinRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1DayIntervalMaxRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1DayIntervalAvgRxSnr       IcomModemPerfDbType,
+    icomModemPerfStatus1DayIntervalMinTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalMaxTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalModTxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalMinRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalMaxRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalModRxPhyMod    IcomModemPerfModulationType,
+    icomModemPerfStatus1DayIntervalMinLpdcStress  Unsigned32,
+    icomModemPerfStatus1DayIntervalMaxLpdcStress  Unsigned32,
+    icomModemPerfStatus1DayIntervalAvgLpdcStress  Unsigned32,
+    icomModemPerfStatus1DayIntervalMinTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalMaxTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalAvgTxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalMinRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalMaxRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalAvgRxBwUtil    IcomModemPerfBwUtilType,
+    icomModemPerfStatus1DayIntervalFecBlocks      Counter64,
+    icomModemPerfStatus1DayIntervalFecUncorBlocks Counter64,
+    icomModemPerfStatus1DayIntervalLossOfLink     Counter64
+}
+
+icomModemPerfStatus1DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 1 }
+
+icomModemPerfStatus1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 2 }
+
+icomModemPerfStatus1DayIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 3 }
+
+icomModemPerfStatus1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 4 }
+
+icomModemPerfStatus1DayIntervalMinRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 5 }
+
+icomModemPerfStatus1DayIntervalMaxRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 6 }
+
+icomModemPerfStatus1DayIntervalAvgRxSnr OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average received
+        SNR (in 0.1 dB steps) of the indexed modem interface in this
+        completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 7 }
+
+icomModemPerfStatus1DayIntervalMinTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx PHY modulation of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 8 }
+
+icomModemPerfStatus1DayIntervalMaxTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx PHY modulation of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 9 }
+
+icomModemPerfStatus1DayIntervalModTxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Tx PHY modulation of the indexed modem interface
+        in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 10 }
+
+icomModemPerfStatus1DayIntervalMinRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx PHY modulation of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 11 }
+
+icomModemPerfStatus1DayIntervalMaxRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx PHY modulation of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 12 }
+
+icomModemPerfStatus1DayIntervalModRxPhyMod OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the most frequent (i.e.,
+        statistical mode) Rx PHY modulation of the indexed modem interface
+        in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 13 }
+
+icomModemPerfStatus1DayIntervalMinLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum LDPC decoder stress of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 14 }
+
+icomModemPerfStatus1DayIntervalMaxLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum LDPC decoder stress of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 15 }
+
+icomModemPerfStatus1DayIntervalAvgLpdcStress OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average LDPC decoder stress of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 16 }
+
+icomModemPerfStatus1DayIntervalMinTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 17 }
+
+icomModemPerfStatus1DayIntervalMaxTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 18 }
+
+icomModemPerfStatus1DayIntervalAvgTxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 19 }
+
+icomModemPerfStatus1DayIntervalMinRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 20 }
+
+icomModemPerfStatus1DayIntervalMaxRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 21 }
+
+icomModemPerfStatus1DayIntervalAvgRxBwUtil OBJECT-TYPE
+    SYNTAX      IcomModemPerfBwUtilType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Rx bandwidth
+        utilization of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 22 }
+
+icomModemPerfStatus1DayIntervalFecBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of total FEC blocks of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 23 }
+
+icomModemPerfStatus1DayIntervalFecUncorBlocks OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of uncorrected FEC
+        blocks of the indexed modem interface in this completed 1-day
+        interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 24 }
+
+icomModemPerfStatus1DayIntervalLossOfLink OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of link out of lock
+        (LoL) events of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStatus1DayIntervalEntry 25 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatsEnable
+-- -------------------------------------------------------------
+
+icomModemPerfStatsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of coarse-grain
+        historical performance statistics for the modem interfaces with
+        a 15-minute granularity.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomModemPerfMIBObjects 6 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStatsCurrentTable
+-- -------------------------------------------------------------
+
+icomModemPerfStatsCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStatsCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides coarse-grain modem performance statistics for
+        the current 15-minute interval. All table statistics are reset to
+        zero after the completion of each 15-minute measurement interval.
+       "
+    ::= { icomModemPerfMIBObjects 7 }
+
+icomModemPerfStatsCurrentEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStatsCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStatsCurrentTable.
+       "
+    INDEX       { icomModemPerfModemId }
+    ::= { icomModemPerfStatsCurrentTable 1 }
+
+IcomModemPerfStatsCurrentEntry ::= SEQUENCE {
+    icomModemPerfStatsCurrentElapsedTime         TimeInterval,
+    icomModemPerfStatsCurrentSuspect             TruthValue,
+    icomModemPerfStatsCurrentInService           Counter64,
+    icomModemPerfStatsCurrentOutService          Counter64
+}
+
+icomModemPerfStatsCurrentElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that the current measurement interval has
+        been running for, in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatsCurrentEntry 1 }
+
+icomModemPerfStatsCurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStatsCurrentEntry 2 }
+
+icomModemPerfStatsCurrentInService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the current time in service (in
+        seconds) of the indexed modem interface in the current 15-minute
+        interval.
+       "
+    ::= { icomModemPerfStatsCurrentEntry 3 }
+
+icomModemPerfStatsCurrentOutService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the current time out of service
+        (in seconds) of the indexed modem interface in the current
+        15-minute interval.
+       "
+    ::= { icomModemPerfStatsCurrentEntry 4 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStats15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfStats15MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStats15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides coarse-grain modem performance statistics
+        for historical (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed 15-minute
+        intervals, to provide historical statistics for one day.
+       "
+    ::= { icomModemPerfMIBObjects 8 }
+
+icomModemPerfStats15MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStats15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStats15MinIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfStats15MinIntervalNumber
+                }
+    ::= { icomModemPerfStats15MinIntervalTable 1 }
+
+IcomModemPerfStats15MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfStats15MinIntervalNumber         Unsigned32,
+    icomModemPerfStats15MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfStats15MinIntervalElapsedTime    TimeInterval,
+    icomModemPerfStats15MinIntervalSuspect        TruthValue,
+    icomModemPerfStats15MinIntervalInService      Counter64,
+    icomModemPerfStats15MinIntervalOutService     Counter64
+}
+
+icomModemPerfStats15MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 1 }
+
+icomModemPerfStats15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 2 }
+
+icomModemPerfStats15MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 3 }
+
+icomModemPerfStats15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 4 }
+
+icomModemPerfStats15MinIntervalInService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time in service (in seconds) of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 5 }
+
+icomModemPerfStats15MinIntervalOutService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time out of service (in
+        seconds) of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfStats15MinIntervalEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfStats1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfStats1DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfStats1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides coarse-grain modem performance statistics
+        for historical (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomModemPerfMIBObjects 9 }
+
+icomModemPerfStats1DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfStats1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfStats1DayIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfStats1DayIntervalNumber
+                }
+    ::= { icomModemPerfStats1DayIntervalTable 1 }
+
+IcomModemPerfStats1DayIntervalEntry ::= SEQUENCE {
+    icomModemPerfStats1DayIntervalNumber         Unsigned32,
+    icomModemPerfStats1DayIntervalEndTime        IcomDateTimeType,
+    icomModemPerfStats1DayIntervalElapsedTime    TimeInterval,
+    icomModemPerfStats1DayIntervalSuspect        TruthValue,
+    icomModemPerfStats1DayIntervalInService      Counter64,
+    icomModemPerfStats1DayIntervalOutService     Counter64
+}
+
+icomModemPerfStats1DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 1 }
+
+icomModemPerfStats1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 2 }
+
+icomModemPerfStats1DayIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 3 }
+
+icomModemPerfStats1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 4 }
+
+icomModemPerfStats1DayIntervalInService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time in service (in seconds) of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 5 }
+
+icomModemPerfStats1DayIntervalOutService OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time out of service (in
+        seconds) of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfStats1DayIntervalEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfG826Enable
+-- -------------------------------------------------------------
+
+icomModemPerfG826Enable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of historical
+        performance statistics for the G.826 error performance counters.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomModemPerfMIBObjects 10 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfG826CurrentTable
+-- -------------------------------------------------------------
+
+icomModemPerfG826CurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfG826CurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides G.826 error performance statistics for the
+        current 15-minute interval. All table statistics are reset to
+        zero after the completion of each 15-minute measurement interval.
+       "
+    ::= { icomModemPerfMIBObjects 11 }
+
+icomModemPerfG826CurrentEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfG826CurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfG826CurrentTable.
+       "
+    INDEX       { icomModemPerfModemId }
+    ::= { icomModemPerfG826CurrentTable 1 }
+
+IcomModemPerfG826CurrentEntry ::= SEQUENCE {
+    icomModemPerfG826CurrentElapsedTime         TimeInterval,
+    icomModemPerfG826CurrentSuspect             TruthValue,
+    icomModemPerfG826CurrentBlockErrors         Counter64,
+    icomModemPerfG826CurrentBgBlockErrors       Counter64,
+    icomModemPerfG826CurrentESs                 Counter64,
+    icomModemPerfG826CurrentSESs                Counter64,
+    icomModemPerfG826CurrentASs                 Counter64,
+    icomModemPerfG826CurrentUASs                Counter64
+}
+
+icomModemPerfG826CurrentElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that the current measurement interval has
+        been running for, in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG826CurrentEntry 1 }
+
+icomModemPerfG826CurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG826CurrentEntry 2 }
+
+icomModemPerfG826CurrentBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error block counter of the
+        indexed modem interface in the current 15-minute interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 3 }
+
+icomModemPerfG826CurrentBgBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the background block error counter
+        of the indexed modem interface in the current 15-minute interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 4 }
+
+icomModemPerfG826CurrentESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error seconds counter of the
+        indexed modem interface in the current 15-minute interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 5 }
+
+icomModemPerfG826CurrentSESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the severely errored seconds
+        counter of the indexed modem interface in the current 15-minute
+        interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 6 }
+
+icomModemPerfG826CurrentASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the available seconds counter of
+        the indexed modem interface in the current 15-minute interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 7 }
+
+icomModemPerfG826CurrentUASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the unavailable seconds counter
+        of the indexed modem interface in the current 15-minute interval.
+       "
+    ::= { icomModemPerfG826CurrentEntry 8 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfG82615MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfG82615MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfG82615MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides G.826 error performance statistics for
+        historical (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed 15-minute
+        intervals, to provide historical statistics for one day.
+       "
+    ::= { icomModemPerfMIBObjects 12 }
+
+icomModemPerfG82615MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfG82615MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfG82615MinIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfG82615MinIntervalNumber
+                }
+    ::= { icomModemPerfG82615MinIntervalTable 1 }
+
+IcomModemPerfG82615MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfG82615MinIntervalNumber         Unsigned32,
+    icomModemPerfG82615MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfG82615MinIntervalElapsedTime    TimeInterval,
+    icomModemPerfG82615MinIntervalSuspect        TruthValue,
+    icomModemPerfG82615MinIntervalBlockErrors    Counter64,
+    icomModemPerfG82615MinIntervalBgBlockErrors  Counter64,
+    icomModemPerfG82615MinIntervalESs            Counter64,
+    icomModemPerfG82615MinIntervalSESs           Counter64,
+    icomModemPerfG82615MinIntervalASs            Counter64,
+    icomModemPerfG82615MinIntervalUASs           Counter64
+}
+
+icomModemPerfG82615MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 1 }
+
+icomModemPerfG82615MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 2 }
+
+icomModemPerfG82615MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 3 }
+
+icomModemPerfG82615MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 4 }
+
+icomModemPerfG82615MinIntervalBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error block counter of the
+        indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 5 }
+
+icomModemPerfG82615MinIntervalBgBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the background block error
+        counter of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 6 }
+
+icomModemPerfG82615MinIntervalESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error seconds counter of the
+        indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 7 }
+
+icomModemPerfG82615MinIntervalSESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the severely errored seconds
+        counter of the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 8 }
+
+icomModemPerfG82615MinIntervalASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the available seconds counter of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 9 }
+
+icomModemPerfG82615MinIntervalUASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the unavailable seconds counter of
+        the indexed modem interface in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfG82615MinIntervalEntry 10 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfG8261DayIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfG8261DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfG8261DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides G.826 error performance statistics for
+        historical (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomModemPerfMIBObjects 13 }
+
+icomModemPerfG8261DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfG8261DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfG8261DayIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfG8261DayIntervalNumber
+                }
+    ::= { icomModemPerfG8261DayIntervalTable 1 }
+
+IcomModemPerfG8261DayIntervalEntry ::= SEQUENCE {
+    icomModemPerfG8261DayIntervalNumber         Unsigned32,
+    icomModemPerfG8261DayIntervalEndTime        IcomDateTimeType,
+    icomModemPerfG8261DayIntervalElapsedTime    TimeInterval,
+    icomModemPerfG8261DayIntervalSuspect        TruthValue,
+    icomModemPerfG8261DayIntervalBlockErrors    Counter64,
+    icomModemPerfG8261DayIntervalBgBlockErrors  Counter64,
+    icomModemPerfG8261DayIntervalESs            Counter64,
+    icomModemPerfG8261DayIntervalSESs           Counter64,
+    icomModemPerfG8261DayIntervalASs            Counter64,
+    icomModemPerfG8261DayIntervalUASs           Counter64
+}
+
+icomModemPerfG8261DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 1 }
+
+icomModemPerfG8261DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 2 }
+
+icomModemPerfG8261DayIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 3 }
+
+icomModemPerfG8261DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 4 }
+
+icomModemPerfG8261DayIntervalBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error block counter of the
+        indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 5 }
+
+icomModemPerfG8261DayIntervalBgBlockErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the background block error
+        counter of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 6 }
+
+icomModemPerfG8261DayIntervalESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the error seconds counter of the
+        indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 7 }
+
+icomModemPerfG8261DayIntervalSESs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the severely errored seconds
+        counter of the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 8 }
+
+icomModemPerfG8261DayIntervalASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the available seconds counter of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 9 }
+
+icomModemPerfG8261DayIntervalUASs OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the unavailable seconds counter of
+        the indexed modem interface in this completed 1-day interval.
+       "
+    ::= { icomModemPerfG8261DayIntervalEntry 10 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfPhyEnable
+-- -------------------------------------------------------------
+
+icomModemPerfPhyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of historical
+        performance statistics for the Rx PHY modes.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomModemPerfMIBObjects 14 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfPhyCurrentTable
+-- -------------------------------------------------------------
+
+icomModemPerfPhyCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfPhyCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides Rx PHY performance statistics for the
+        current 15-minute interval. All table statistics are reset to
+        zero after the completion of each 15-minute measurement interval.
+       "
+    ::= { icomModemPerfMIBObjects 15 }
+
+icomModemPerfPhyCurrentEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfPhyCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfPhyCurrentTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfPhyMode
+                }
+    ::= { icomModemPerfPhyCurrentTable 1 }
+
+IcomModemPerfPhyCurrentEntry ::= SEQUENCE {
+    icomModemPerfPhyMode                       IcomModemPerfModulationType,
+    icomModemPerfPhyCurrentElapsedTime         TimeInterval,
+    icomModemPerfPhyCurrentSuspect             TruthValue,
+    icomModemPerfPhyCurrentInPhyTime           Counter64,
+    icomModemPerfPhyCurrentInPhyChanges        Counter64
+}
+
+icomModemPerfPhyMode OBJECT-TYPE
+    SYNTAX      IcomModemPerfModulationType (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The physical mode.
+       "
+    ::= { icomModemPerfPhyCurrentEntry 1 }
+
+icomModemPerfPhyCurrentElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that the current measurement interval has
+        been running for, in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhyCurrentEntry 2 }
+
+icomModemPerfPhyCurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhyCurrentEntry 3 }
+
+icomModemPerfPhyCurrentInPhyTime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time spent in the indexed Rx
+        PHY mode by the indexed modem interface in the current 15-minute
+        interval.
+       "
+    ::= { icomModemPerfPhyCurrentEntry 4 }
+
+icomModemPerfPhyCurrentInPhyChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of changes (switches)
+        to the indexed Rx PHY mode by the indexed modem interface in
+        the current 15-minute interval.
+       "
+    ::= { icomModemPerfPhyCurrentEntry 5 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfPhy15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfPhy15MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfPhy15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides Rx PHY performance statistics for historical
+        (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed 15-minute
+        intervals, to provide historical statistics for one day.
+       "
+    ::= { icomModemPerfMIBObjects 16 }
+
+icomModemPerfPhy15MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfPhy15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfPhy15MinIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfPhyMode,
+                  icomModemPerfPhy15MinIntervalNumber
+                }
+    ::= { icomModemPerfPhy15MinIntervalTable 1 }
+
+IcomModemPerfPhy15MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfPhy15MinIntervalNumber        Unsigned32,
+    icomModemPerfPhy15MinIntervalEndTime       IcomDateTimeType,
+    icomModemPerfPhy15MinIntervalElapsedTime   TimeInterval,
+    icomModemPerfPhy15MinIntervalSuspect       TruthValue,
+    icomModemPerfPhy15MinIntervalInPhyTime     Counter64,
+    icomModemPerfPhy15MinIntervalInPhyChanges  Counter64
+}
+
+icomModemPerfPhy15MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 1 }
+
+icomModemPerfPhy15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 2 }
+
+icomModemPerfPhy15MinIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 3 }
+
+icomModemPerfPhy15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 4 }
+
+icomModemPerfPhy15MinIntervalInPhyTime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time spent in the indexed
+        Rx PHY mode by the indexed modem interface in this completed
+        15-minute interval.
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 5 }
+
+icomModemPerfPhy15MinIntervalInPhyChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of changes (switches)
+        to the indexed Rx PHY mode by the indexed modem interface in
+        this completed 15-minute interval.
+       "
+    ::= { icomModemPerfPhy15MinIntervalEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfPhy1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfPhy1DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfPhy1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides Rx PHY performance statistics for historical
+        (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomModemPerfMIBObjects 17 }
+
+icomModemPerfPhy1DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfPhy1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfPhy1DayIntervalTable.
+       "
+    INDEX       { icomModemPerfModemId,
+                  icomModemPerfPhyMode,
+                  icomModemPerfPhy1DayIntervalNumber
+                }
+    ::= { icomModemPerfPhy1DayIntervalTable 1 }
+
+IcomModemPerfPhy1DayIntervalEntry ::= SEQUENCE {
+    icomModemPerfPhy1DayIntervalNumber        Unsigned32,
+    icomModemPerfPhy1DayIntervalEndTime       IcomDateTimeType,
+    icomModemPerfPhy1DayIntervalElapsedTime   TimeInterval,
+    icomModemPerfPhy1DayIntervalSuspect       TruthValue,
+    icomModemPerfPhy1DayIntervalInPhyTime     Counter64,
+    icomModemPerfPhy1DayIntervalInPhyChanges  Counter64
+}
+
+icomModemPerfPhy1DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 1 }
+
+icomModemPerfPhy1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 2 }
+
+icomModemPerfPhy1DayIntervalElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The length of time that this measurement interval ran for,
+        in centi-seconds.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 3 }
+
+icomModemPerfPhy1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 4 }
+
+icomModemPerfPhy1DayIntervalInPhyTime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the time spent in the indexed
+        Rx PHY mode by the indexed modem interface in this completed
+        1-day interval.
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 5 }
+
+icomModemPerfPhy1DayIntervalInPhyChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the number of changes (switches)
+        to the indexed Rx PHY mode by the indexed modem interface in
+        this completed 1-day interval.
+       "
+    ::= { icomModemPerfPhy1DayIntervalEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfRfuEnable
+-- -------------------------------------------------------------
+
+icomModemPerfRfuEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables/disables the collection of historical
+        performance statistics for the attached RFUs.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomModemPerfMIBObjects 18 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfRfuCurrentTable
+-- -------------------------------------------------------------
+
+icomModemPerfRfuCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfRfuCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides RFU performance statistics for the current
+        1-minute interval.
+       "
+    ::= { icomModemPerfMIBObjects 19 }
+
+icomModemPerfRfuCurrentEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfRfuCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfRfuCurrentTable.
+       "
+    INDEX       { icomModemPerfRfuId }
+    ::= { icomModemPerfRfuCurrentTable 1 }
+
+IcomModemPerfRfuCurrentEntry ::= SEQUENCE {
+    icomModemPerfRfuId                         Unsigned32,
+    icomModemPerfRfuCurrentSuspect             TruthValue,
+    icomModemPerfRfuCurrentMinTxPower          IcomModemPerfDbmType,
+    icomModemPerfRfuCurrentMaxTxPower          IcomModemPerfDbmType,
+    icomModemPerfRfuCurrentAvgTxPower          IcomModemPerfDbmType,
+    icomModemPerfRfuCurrentMinRssi             IcomModemPerfDbmType,
+    icomModemPerfRfuCurrentMaxRssi             IcomModemPerfDbmType,
+    icomModemPerfRfuCurrentAvgRssi             IcomModemPerfDbmType
+}
+
+icomModemPerfRfuId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The RFU identifier.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 1 }
+
+icomModemPerfRfuCurrentSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfuCurrentEntry 2 }
+
+icomModemPerfRfuCurrentMinTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 3 }
+
+icomModemPerfRfuCurrentMaxTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 4 }
+
+icomModemPerfRfuCurrentAvgTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx power (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 5 }
+
+icomModemPerfRfuCurrentMinRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum RSSI (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 6 }
+
+icomModemPerfRfuCurrentMaxRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum RSSI (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 7 }
+
+icomModemPerfRfuCurrentAvgRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average RSSI (in 0.1 dBm
+        steps) of the indexed RFU in the current 1-minute interval.
+       "
+    ::= { icomModemPerfRfuCurrentEntry 8 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfRfu1MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfRfu1MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfRfu1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides RFU performance statistics for historical
+        (completed) 1-minute intervals.
+
+        This table will have a maximum of 60 entries of completed 1-minute
+        intervals, to provide historical statistics for one hour.
+       "
+    ::= { icomModemPerfMIBObjects 20 }
+
+icomModemPerfRfu1MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfRfu1MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfRfu1MinIntervalTable.
+       "
+    INDEX       { icomModemPerfRfuId,
+                  icomModemPerfRfu1MinIntervalNumber
+                }
+    ::= { icomModemPerfRfu1MinIntervalTable 1 }
+
+IcomModemPerfRfu1MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfRfu1MinIntervalNumber         Unsigned32,
+    icomModemPerfRfu1MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfRfu1MinIntervalSuspect        TruthValue,
+    icomModemPerfRfu1MinIntervalMinTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1MinIntervalMaxTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1MinIntervalAvgTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1MinIntervalMinRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu1MinIntervalMaxRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu1MinIntervalAvgRssi        IcomModemPerfDbmType
+}
+
+icomModemPerfRfu1MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 1 }
+
+icomModemPerfRfu1MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 2 }
+
+icomModemPerfRfu1MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 3 }
+
+icomModemPerfRfu1MinIntervalMinTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 4 }
+
+icomModemPerfRfu1MinIntervalMaxTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 5 }
+
+icomModemPerfRfu1MinIntervalAvgTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 6 }
+
+icomModemPerfRfu1MinIntervalMinRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 7 }
+
+icomModemPerfRfu1MinIntervalMaxRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 8 }
+
+icomModemPerfRfu1MinIntervalAvgRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-minute interval.
+       "
+    ::= { icomModemPerfRfu1MinIntervalEntry 9 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfRfu15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfRfu15MinIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfRfu15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides RFU performance statistics for historical
+        (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed 15-minute
+        intervals, to provide historical statistics for one day.
+       "
+    ::= { icomModemPerfMIBObjects 21 }
+
+icomModemPerfRfu15MinIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfRfu15MinIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfRfu15MinIntervalTable.
+       "
+    INDEX       { icomModemPerfRfuId,
+                  icomModemPerfRfu15MinIntervalNumber
+                }
+    ::= { icomModemPerfRfu15MinIntervalTable 1 }
+
+IcomModemPerfRfu15MinIntervalEntry ::= SEQUENCE {
+    icomModemPerfRfu15MinIntervalNumber         Unsigned32,
+    icomModemPerfRfu15MinIntervalEndTime        IcomDateTimeType,
+    icomModemPerfRfu15MinIntervalSuspect        TruthValue,
+    icomModemPerfRfu15MinIntervalMinTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu15MinIntervalMaxTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu15MinIntervalAvgTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu15MinIntervalMinRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu15MinIntervalMaxRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu15MinIntervalAvgRssi        IcomModemPerfDbmType
+}
+
+icomModemPerfRfu15MinIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 1 }
+
+icomModemPerfRfu15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 2 }
+
+icomModemPerfRfu15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 3 }
+
+icomModemPerfRfu15MinIntervalMinTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 4 }
+
+icomModemPerfRfu15MinIntervalMaxTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 5 }
+
+icomModemPerfRfu15MinIntervalAvgTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 6 }
+
+icomModemPerfRfu15MinIntervalMinRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 7 }
+
+icomModemPerfRfu15MinIntervalMaxRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 8 }
+
+icomModemPerfRfu15MinIntervalAvgRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 15-minute interval.
+       "
+    ::= { icomModemPerfRfu15MinIntervalEntry 9 }
+
+-- -------------------------------------------------------------
+-- icomModemPerfRfu1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomModemPerfRfu1DayIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcomModemPerfRfu1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table provides RFU performance statistics for historical
+        (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed 1-day
+        intervals, to provide historical statistics for one month.
+       "
+    ::= { icomModemPerfMIBObjects 22 }
+
+icomModemPerfRfu1DayIntervalEntry OBJECT-TYPE
+    SYNTAX      IcomModemPerfRfu1DayIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomModemPerfRfu1DayIntervalTable.
+       "
+    INDEX       { icomModemPerfRfuId,
+                  icomModemPerfRfu1DayIntervalNumber
+                }
+    ::= { icomModemPerfRfu1DayIntervalTable 1 }
+
+IcomModemPerfRfu1DayIntervalEntry ::= SEQUENCE {
+    icomModemPerfRfu1DayIntervalNumber         Unsigned32,
+    icomModemPerfRfu1DayIntervalEndTime        IcomDateTimeType,
+    icomModemPerfRfu1DayIntervalSuspect        TruthValue,
+    icomModemPerfRfu1DayIntervalMinTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1DayIntervalMaxTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1DayIntervalAvgTxPower     IcomModemPerfDbmType,
+    icomModemPerfRfu1DayIntervalMinRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu1DayIntervalMaxRssi        IcomModemPerfDbmType,
+    icomModemPerfRfu1DayIntervalAvgRssi        IcomModemPerfDbmType
+}
+
+icomModemPerfRfu1DayIntervalNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 1 }
+
+icomModemPerfRfu1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX      IcomDateTimeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 2 }
+
+icomModemPerfRfu1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 3 }
+
+icomModemPerfRfu1DayIntervalMinTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 4 }
+
+icomModemPerfRfu1DayIntervalMaxTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 5 }
+
+icomModemPerfRfu1DayIntervalAvgTxPower OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average Tx power (in 0.1 dBm
+        steps) of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 6 }
+
+icomModemPerfRfu1DayIntervalMinRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the minimum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 7 }
+
+icomModemPerfRfu1DayIntervalMaxRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the maximum RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 8 }
+
+icomModemPerfRfu1DayIntervalAvgRssi OBJECT-TYPE
+    SYNTAX      IcomModemPerfDbmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is used to provide the average RSSI (in 0.1 dBm steps)
+        of the indexed RFU in this completed 1-day interval.
+       "
+    ::= { icomModemPerfRfu1DayIntervalEntry 9 }
+
+--
+-- Conformance information
+--
+icomModemPerfMIBConformance OBJECT IDENTIFIER ::= { icomModemPerfMIB 2 }
+
+icomModemPerfMIBCompliances OBJECT IDENTIFIER ::= { icomModemPerfMIBConformance 1 }
+
+icomModemPerfMIBGroups      OBJECT IDENTIFIER ::= { icomModemPerfMIBConformance 2 }
+
+--
+-- Compliance statements
+--
+icomModemPerfMIBCompliance  MODULE-COMPLIANCE
+    STATUS            current
+    DESCRIPTION
+       "The compliance statement for icomModemPerfMIB.
+       "
+    MODULE -- This Module
+    MANDATORY-GROUPS {
+        icomModemPerfMIBGroup
+    }
+    ::= { icomModemPerfMIBCompliances 1 }
+
+icomModemPerfMIBGroup OBJECT-GROUP
+    OBJECTS {
+        icomModemPerfStatusEnable,
+
+        icomModemPerfStatusCurrentElapsedTime,
+        icomModemPerfStatusCurrentSuspect,
+        icomModemPerfStatusCurrentMinRxSnr,
+        icomModemPerfStatusCurrentMaxRxSnr,
+        icomModemPerfStatusCurrentAvgRxSnr,
+        icomModemPerfStatusCurrentMinTxPhyMod,
+        icomModemPerfStatusCurrentMaxTxPhyMod,
+        icomModemPerfStatusCurrentModTxPhyMod,
+        icomModemPerfStatusCurrentMinRxPhyMod,
+        icomModemPerfStatusCurrentMaxRxPhyMod,
+        icomModemPerfStatusCurrentModRxPhyMod,
+        icomModemPerfStatusCurrentMinLpdcStress,
+        icomModemPerfStatusCurrentMaxLpdcStress,
+        icomModemPerfStatusCurrentAvgLpdcStress,
+        icomModemPerfStatusCurrentMinTxBwUtil,
+        icomModemPerfStatusCurrentMaxTxBwUtil,
+        icomModemPerfStatusCurrentAvgTxBwUtil,
+        icomModemPerfStatusCurrentMinRxBwUtil,
+        icomModemPerfStatusCurrentMaxRxBwUtil,
+        icomModemPerfStatusCurrentAvgRxBwUtil,
+        icomModemPerfStatusCurrentFecBlocks,
+        icomModemPerfStatusCurrentFecUncorBlocks,
+        icomModemPerfStatusCurrentLossOfLink,
+
+        icomModemPerfStatus1MinIntervalEndTime,
+        icomModemPerfStatus1MinIntervalElapsedTime,
+        icomModemPerfStatus1MinIntervalSuspect,
+        icomModemPerfStatus1MinIntervalMinRxSnr,
+        icomModemPerfStatus1MinIntervalMaxRxSnr,
+        icomModemPerfStatus1MinIntervalAvgRxSnr,
+        icomModemPerfStatus1MinIntervalMinTxPhyMod,
+        icomModemPerfStatus1MinIntervalMaxTxPhyMod,
+        icomModemPerfStatus1MinIntervalModTxPhyMod,
+        icomModemPerfStatus1MinIntervalMinRxPhyMod,
+        icomModemPerfStatus1MinIntervalMaxRxPhyMod,
+        icomModemPerfStatus1MinIntervalModRxPhyMod,
+        icomModemPerfStatus1MinIntervalMinLpdcStress,
+        icomModemPerfStatus1MinIntervalMaxLpdcStress,
+        icomModemPerfStatus1MinIntervalAvgLpdcStress,
+        icomModemPerfStatus1MinIntervalMinTxBwUtil,
+        icomModemPerfStatus1MinIntervalMaxTxBwUtil,
+        icomModemPerfStatus1MinIntervalAvgTxBwUtil,
+        icomModemPerfStatus1MinIntervalMinRxBwUtil,
+        icomModemPerfStatus1MinIntervalMaxRxBwUtil,
+        icomModemPerfStatus1MinIntervalAvgRxBwUtil,
+        icomModemPerfStatus1MinIntervalFecBlocks,
+        icomModemPerfStatus1MinIntervalFecUncorBlocks,
+        icomModemPerfStatus1MinIntervalLossOfLink,
+
+        icomModemPerfStatus15MinIntervalEndTime,
+        icomModemPerfStatus15MinIntervalElapsedTime,
+        icomModemPerfStatus15MinIntervalSuspect,
+        icomModemPerfStatus15MinIntervalMinRxSnr,
+        icomModemPerfStatus15MinIntervalMaxRxSnr,
+        icomModemPerfStatus15MinIntervalAvgRxSnr,
+        icomModemPerfStatus15MinIntervalMinTxPhyMod,
+        icomModemPerfStatus15MinIntervalMaxTxPhyMod,
+        icomModemPerfStatus15MinIntervalModTxPhyMod,
+        icomModemPerfStatus15MinIntervalMinRxPhyMod,
+        icomModemPerfStatus15MinIntervalMaxRxPhyMod,
+        icomModemPerfStatus15MinIntervalModRxPhyMod,
+        icomModemPerfStatus15MinIntervalMinLpdcStress,
+        icomModemPerfStatus15MinIntervalMaxLpdcStress,
+        icomModemPerfStatus15MinIntervalAvgLpdcStress,
+        icomModemPerfStatus15MinIntervalMinTxBwUtil,
+        icomModemPerfStatus15MinIntervalMaxTxBwUtil,
+        icomModemPerfStatus15MinIntervalAvgTxBwUtil,
+        icomModemPerfStatus15MinIntervalMinRxBwUtil,
+        icomModemPerfStatus15MinIntervalMaxRxBwUtil,
+        icomModemPerfStatus15MinIntervalAvgRxBwUtil,
+        icomModemPerfStatus15MinIntervalFecBlocks,
+        icomModemPerfStatus15MinIntervalFecUncorBlocks,
+        icomModemPerfStatus15MinIntervalLossOfLink,
+
+        icomModemPerfStatus1DayIntervalEndTime,
+        icomModemPerfStatus1DayIntervalElapsedTime,
+        icomModemPerfStatus1DayIntervalSuspect,
+        icomModemPerfStatus1DayIntervalMinRxSnr,
+        icomModemPerfStatus1DayIntervalMaxRxSnr,
+        icomModemPerfStatus1DayIntervalAvgRxSnr,
+        icomModemPerfStatus1DayIntervalMinTxPhyMod,
+        icomModemPerfStatus1DayIntervalMaxTxPhyMod,
+        icomModemPerfStatus1DayIntervalModTxPhyMod,
+        icomModemPerfStatus1DayIntervalMinRxPhyMod,
+        icomModemPerfStatus1DayIntervalMaxRxPhyMod,
+        icomModemPerfStatus1DayIntervalModRxPhyMod,
+        icomModemPerfStatus1DayIntervalMinLpdcStress,
+        icomModemPerfStatus1DayIntervalMaxLpdcStress,
+        icomModemPerfStatus1DayIntervalAvgLpdcStress,
+        icomModemPerfStatus1DayIntervalMinTxBwUtil,
+        icomModemPerfStatus1DayIntervalMaxTxBwUtil,
+        icomModemPerfStatus1DayIntervalAvgTxBwUtil,
+        icomModemPerfStatus1DayIntervalMinRxBwUtil,
+        icomModemPerfStatus1DayIntervalMaxRxBwUtil,
+        icomModemPerfStatus1DayIntervalAvgRxBwUtil,
+        icomModemPerfStatus1DayIntervalFecBlocks,
+        icomModemPerfStatus1DayIntervalFecUncorBlocks,
+        icomModemPerfStatus1DayIntervalLossOfLink,
+
+        icomModemPerfStatsEnable,
+
+        icomModemPerfStatsCurrentElapsedTime,
+        icomModemPerfStatsCurrentSuspect,
+        icomModemPerfStatsCurrentInService,
+        icomModemPerfStatsCurrentOutService,
+
+        icomModemPerfStats15MinIntervalEndTime,
+        icomModemPerfStats15MinIntervalElapsedTime,
+        icomModemPerfStats15MinIntervalSuspect,
+        icomModemPerfStats15MinIntervalInService,
+        icomModemPerfStats15MinIntervalOutService,
+
+        icomModemPerfStats1DayIntervalEndTime,
+        icomModemPerfStats1DayIntervalElapsedTime,
+        icomModemPerfStats1DayIntervalSuspect,
+        icomModemPerfStats1DayIntervalInService,
+        icomModemPerfStats1DayIntervalOutService,
+
+        icomModemPerfG826Enable,
+
+        icomModemPerfG826CurrentElapsedTime,
+        icomModemPerfG826CurrentSuspect,
+        icomModemPerfG826CurrentBlockErrors,
+        icomModemPerfG826CurrentBgBlockErrors,
+        icomModemPerfG826CurrentESs,
+        icomModemPerfG826CurrentSESs,
+        icomModemPerfG826CurrentASs,
+        icomModemPerfG826CurrentUASs,
+
+        icomModemPerfG82615MinIntervalEndTime,
+        icomModemPerfG82615MinIntervalElapsedTime,
+        icomModemPerfG82615MinIntervalSuspect,
+        icomModemPerfG82615MinIntervalBlockErrors,
+        icomModemPerfG82615MinIntervalBgBlockErrors,
+        icomModemPerfG82615MinIntervalESs,
+        icomModemPerfG82615MinIntervalSESs,
+        icomModemPerfG82615MinIntervalASs,
+        icomModemPerfG82615MinIntervalUASs,
+
+        icomModemPerfG8261DayIntervalEndTime,
+        icomModemPerfG8261DayIntervalElapsedTime,
+        icomModemPerfG8261DayIntervalSuspect,
+        icomModemPerfG8261DayIntervalBlockErrors,
+        icomModemPerfG8261DayIntervalBgBlockErrors,
+        icomModemPerfG8261DayIntervalESs,
+        icomModemPerfG8261DayIntervalSESs,
+        icomModemPerfG8261DayIntervalASs,
+        icomModemPerfG8261DayIntervalUASs,
+
+        icomModemPerfPhyEnable,
+
+        icomModemPerfPhyCurrentElapsedTime,
+        icomModemPerfPhyCurrentSuspect,
+        icomModemPerfPhyCurrentInPhyTime,
+        icomModemPerfPhyCurrentInPhyChanges,
+
+        icomModemPerfPhy15MinIntervalEndTime,
+        icomModemPerfPhy15MinIntervalElapsedTime,
+        icomModemPerfPhy15MinIntervalSuspect,
+        icomModemPerfPhy15MinIntervalInPhyTime,
+        icomModemPerfPhy15MinIntervalInPhyChanges,
+
+        icomModemPerfPhy1DayIntervalEndTime,
+        icomModemPerfPhy1DayIntervalElapsedTime,
+        icomModemPerfPhy1DayIntervalSuspect,
+        icomModemPerfPhy1DayIntervalInPhyTime,
+        icomModemPerfPhy1DayIntervalInPhyChanges,
+
+        icomModemPerfRfuEnable,
+
+        icomModemPerfRfuCurrentSuspect,
+        icomModemPerfRfuCurrentMinTxPower,
+        icomModemPerfRfuCurrentMaxTxPower,
+        icomModemPerfRfuCurrentAvgTxPower,
+        icomModemPerfRfuCurrentMinRssi,
+        icomModemPerfRfuCurrentMaxRssi,
+        icomModemPerfRfuCurrentAvgRssi,
+
+        icomModemPerfRfu1MinIntervalEndTime,
+        icomModemPerfRfu1MinIntervalSuspect,
+        icomModemPerfRfu1MinIntervalMinTxPower,
+        icomModemPerfRfu1MinIntervalMaxTxPower,
+        icomModemPerfRfu1MinIntervalAvgTxPower,
+        icomModemPerfRfu1MinIntervalMinRssi,
+        icomModemPerfRfu1MinIntervalMaxRssi,
+        icomModemPerfRfu1MinIntervalAvgRssi,
+
+        icomModemPerfRfu15MinIntervalEndTime,
+        icomModemPerfRfu15MinIntervalSuspect,
+        icomModemPerfRfu15MinIntervalMinTxPower,
+        icomModemPerfRfu15MinIntervalMaxTxPower,
+        icomModemPerfRfu15MinIntervalAvgTxPower,
+        icomModemPerfRfu15MinIntervalMinRssi,
+        icomModemPerfRfu15MinIntervalMaxRssi,
+        icomModemPerfRfu15MinIntervalAvgRssi,
+
+        icomModemPerfRfu1DayIntervalEndTime,
+        icomModemPerfRfu1DayIntervalSuspect,
+        icomModemPerfRfu1DayIntervalMinTxPower,
+        icomModemPerfRfu1DayIntervalMaxTxPower,
+        icomModemPerfRfu1DayIntervalAvgTxPower,
+        icomModemPerfRfu1DayIntervalMinRssi,
+        icomModemPerfRfu1DayIntervalMaxRssi,
+        icomModemPerfRfu1DayIntervalAvgRssi
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for icomModemPerfMIB.
+        "
+    ::= { icomModemPerfMIBGroups 2 }
+
+END
