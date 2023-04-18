@@ -218,7 +218,7 @@ class Billing
         return $ptot;
     }
 
-    public static function getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
+    public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
     {
         $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average, bill_type FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);
 
@@ -226,7 +226,7 @@ class Billing
             return null;
         }
 
-        $graph_data = self::getBillingBitsGraphData($bill_id, $histrow['from'], $histrow['to'], $reducefactor);
+        $graph_data = self::getBitsGraphData($bill_id, $histrow['from'], $histrow['to'], $reducefactor);
 
         // Overwrite the rate data with the historical version
         $graph_data['rate_95th'] = $histrow['rate_95th'];
@@ -236,7 +236,7 @@ class Billing
         return $graph_data;
     }
 
-    public static function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor): array
+    public static function getBitsGraphData($bill_id, $from, $to, $reducefactor): array
     {
         $i = '0';
         $iter = 0;
@@ -392,7 +392,7 @@ class Billing
         ];
     }
 
-    public static function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
+    public static function getBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
     {
         if (is_numeric($bill_hist_id)) {
             $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', [$bill_id, $bill_hist_id]);

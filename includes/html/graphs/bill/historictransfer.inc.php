@@ -4,14 +4,15 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\BarPlot;
 use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
 if (is_numeric($vars['bill_hist_id'])) {
-    $graph_data = \LibreNMS\Billing::getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
+    $graph_data = Billing::getBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
 } elseif (is_numeric($vars['from'])) {
-    $graph_data = \LibreNMS\Billing::getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
+    $graph_data = Billing::getBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
-    \LibreNMS\Billing::getHistoricTransferGraphData($vars['id']);
+    Billing::getHistoricTransferGraphData($vars['id']);
     $vars['imgtype'] = 'historical';
 }
 

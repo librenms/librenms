@@ -1635,7 +1635,7 @@ function get_bill_graphdata(Illuminate\Http\Request $request)
             $to = $request->get('to', time());
             $reducefactor = $request->get('reducefactor');
 
-            $graph_data = Billing::getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+            $graph_data = Billing::getBitsGraphData($bill_id, $from, $to, $reducefactor);
         } elseif ($graph_type == 'monthly') {
             Billing::getHistoricTransferGraphData($bill_id);
         }
@@ -1704,11 +1704,11 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
             case 'bits':
                 $reducefactor = $request->get('reducefactor');
 
-                $graph_data = Billing::getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+                $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
                 break;
             case 'day':
             case 'hour':
-                $graph_data = Billing::getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+                $graph_data = Billing::getBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
                 break;
         }
 

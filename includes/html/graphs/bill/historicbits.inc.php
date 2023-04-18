@@ -17,7 +17,7 @@ if (is_numeric($bill_hist_id)) {
             $reducefactor = 2;
         }
     }
-    $graph_data = Billing::getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+    $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
 } else {
     if ($reducefactor < 2) {
         $dur = $vars['to'] - $vars['from'];
@@ -27,7 +27,7 @@ if (is_numeric($bill_hist_id)) {
             $reducefactor = 2;
         }
     }
-    $graph_data = Billing::getBillingBitsGraphData($bill_id, $vars['from'], $vars['to'], $reducefactor);
+    $graph_data = Billing::getBitsGraphData($bill_id, $vars['from'], $vars['to'], $reducefactor);
 }
 
 // header('Content-Type: application/json');
