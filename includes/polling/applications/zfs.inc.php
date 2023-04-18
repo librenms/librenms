@@ -270,6 +270,29 @@ foreach ($zfs['pools'] as $pool) {
     }
 }
 
+// gets the pool health status
+$old_health = $app->data['health'] ?? 1;
+if (isset($zfs['health'])) {
+    $health = $zfs['health'];
+    if ($old_health != $zfs['health']){
+        if ($zfs['health'] == 1) {
+            log_event('ZFS pool(s) now healthy', $device, 'application', 1);
+        }else{
+            log_event('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', 5);
+        }
+    }
+}else{
+    $health=1;
+}
+
+// gets the l2 error status
+$old_l2_errors = $app->data['l2_errors'] ?? 0;
+if (isset($zfs['l2_errors'])) {
+    if ($old_l2_errors != $zfs['l2_errors']){
+        log_event('ZFS L2 cache has experienced errors', $device, 'application', 5);
+    }
+}
+
 // check for added or removed pools
 $old_pools = $app->data['pools'] ?? [];
 $added_pools = array_diff($pools, $old_pools);
@@ -277,11 +300,11 @@ $removed_pools = array_diff($old_pools, $pools);
 
 // if we have any source pools, save and log
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
-    $app->data = ['pools' => $pools];
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
     log_event($log_message, $device, 'application');
 }
+$app->data = ['pools' => $pools, 'health' => $health, 'l2_errors' => $zfs['l2_errors']];
 
 update_application($app, 'OK', $metrics);
