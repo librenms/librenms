@@ -2,7 +2,10 @@
 mib: PTP-MODEM-MIB:ICOM-ETHER-MIB:ICOM-ENTITY-SENSOR-EXT-MIB:ICOM-MODEM-PERF-MIB:ICOM-PERFHIST-TC-MIB
 modules:
     os:
-        sysDescr_regex: '/5\d(?<hardware>.*?)( Wireless|,).*Version\s+(?<version>[\d-]+)/'
+        hardware: '.1.3.6.1.4.1.1807.32.1.1.1.1.1'
+        serial: '.1.3.6.1.4.1.1807.32.1.1.1.2.1'
+        version: '.1.3.6.1.4.1.1807.13.1.3.1.10.9'
+
     sensors:
         temperature:
             data:
