@@ -17,7 +17,6 @@ try {
 
 $data=$returned['data'];
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('1d_size_diff', 'GAUGE')
     ->addDataset('1d_size_diffp', 'GAUGE')
@@ -35,6 +34,13 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('7d_size_diffp', 'GAUGE')
     ->addDataset('size', 'GAUGE');
 
+$set_rrd_def = RrdDefinition::make()
+    ->addDataset('max_size', 'GAUGE')
+    ->addDataset('max_size_diff', 'GAUGE')
+    ->addDataset('max_size_diffp', 'GAUGE')
+    ->addDataset('min_size_diff', 'GAUGE')
+    ->addDataset('min_size_diffp', 'GAUGE')
+    ->addDataset('size', 'GAUGE');
 
 $app_data=['sets'=>[]];
 
@@ -45,6 +51,19 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         'files' => array_keys($set_data['files']),
         'log_end' => $set_data['log_end'],
     ];
+
+    $rrd_name = ['app', $name, $app->app_id, $set_name];
+    $fields=[
+        'max_size' => $set_data['max_size'],
+        'max_size_diff' => $set_data['max_size_diff'],
+        'max_size_diffp' => $set_data['max_size_diffp'],
+        'min_size_diff' => $set_data['min_size_diff'],
+        'min_size_diffp' => $set_data['min_size_diffp'],
+        'size' => $set_data['size'],
+    ];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
+    data_update($device, 'app', $tags, $fields);
+
     foreach ($set_data['files'] as $log_name => $log_data ) {
         $rrd_name = ['app', $name, $app->app_id, $set_name.'_____-_____'.$log_name];
         $fields=[
