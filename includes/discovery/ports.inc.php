@@ -104,6 +104,10 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+            $snmp_data['ifName'] = $matches[1];
+        }
+
         // Port newly discovered?
         if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
