@@ -47,6 +47,7 @@ class Device extends BaseModel
         'cryptoalgo',
         'cryptopass',
         'disable_notify',
+        'disabled',
         'features',
         'hardware',
         'hostname',
