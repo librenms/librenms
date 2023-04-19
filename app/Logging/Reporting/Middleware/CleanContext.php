@@ -25,14 +25,14 @@
 
 namespace App\Logging\Reporting\Middleware;
 
-use Facade\FlareClient\Report;
+use Spatie\FlareClient\Report;
 
-class CleanContext
+class CleanContext implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to remove sensitive data from the context.
      *
-     * @param  \Facade\FlareClient\Report  $report
+     * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next
      * @return mixed
      */

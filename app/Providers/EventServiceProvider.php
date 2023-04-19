@@ -9,7 +9,7 @@ class EventServiceProvider extends ServiceProvider
     /**
      * The event listener mappings for the application.
      *
-     * @var array
+     * @var array<string, array<int, string>>
      */
     protected $listen = [
         \Illuminate\Auth\Events\Login::class => ['App\Listeners\AuthEventListener@login'],
@@ -43,5 +43,15 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+    }
+
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverEvents()
+    {
+        return false;
     }
 }

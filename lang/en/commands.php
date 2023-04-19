@@ -97,7 +97,7 @@ return [
         ],
         'messages' => [
             'save_failed' => 'Failed to save device :hostname',
-            'try_force' => 'You my try with the --force option to skip safety checks',
+            'try_force' => 'You may try with the --force option to skip safety checks',
             'added' => 'Added device :hostname (:device_id)',
         ],
     ],

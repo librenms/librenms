@@ -657,7 +657,6 @@ Please refer to [Billing](../Extensions/Billing-Module.md)
 ## Global module support
 
 ```bash
-lnms config:set enable_bgp true # Enable BGP session collection and display
 lnms config:set enable_syslog false # Enable Syslog
 lnms config:set enable_inventory true # Enable Inventory
 lnms config:set enable_pseudowires true # Enable Pseudowires
