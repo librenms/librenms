@@ -39,6 +39,7 @@ class Device extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
+        'attribs',
         'authalgo',
         'authlevel',
         'authname',
@@ -53,6 +54,7 @@ class Device extends BaseModel
         'hostname',
         'display',
         'icon',
+        'ignore',
         'ip',
         'location_id',
         'notes',
@@ -70,6 +72,7 @@ class Device extends BaseModel
         'snmpver',
         'status',
         'status_reason',
+		'sysContact',
         'sysDescr',
         'sysName',
         'sysObjectID',
