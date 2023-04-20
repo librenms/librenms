@@ -104,6 +104,9 @@ class GraphParameters
         $this->to = empty($vars['to']) ? time() : Time::parseAt($vars['to']);
         $this->period = $this->to - $this->from;
         $this->prev_from = $this->from - $this->period;
+        $this->scale_min = $vars['scale_min'] ?? null;
+        $this->scale_max = $vars['scale_max'] ?? null;
+        $this->scale_rigid = isset($vars['scale_rigid']) && $vars['scale_rigid'] && $vars['scale_rigid'] !== 'no';
 
         $this->inverse = ! empty($vars['inverse']);
         $this->in = $this->inverse ? 'out' : 'in';
