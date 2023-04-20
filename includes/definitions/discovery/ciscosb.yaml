@@ -72,7 +72,7 @@ modules:
                     descr: 'FAN {{ $index }} Temperature'
                     user_func: fahrenheit_to_celsius
                     high_limit: 50 # true for all switches
-                    low_limit: -5 # true for nearly all switches except CBS250-8T-D and CBS250-8PP-D, they would like 0°C
+                    low_limit: 0 # true for CBS250-8T-D and CBS250-8PP-D, all other tolerate -5
                     skip_values:
                         -
                             oid: rlEnvFanDataTemp
