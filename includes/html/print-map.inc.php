@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 
 $highlight_node = $vars['highlight_node'] ?? 0;
 $group = $vars['group'] ?? 0;
@@ -276,8 +277,8 @@ foreach ($list as $items) {
     } else {
         $width = round(0.77 * pow($speed, 0.25));
     }
-    $link_in_used = $items['local_ifspeed'] ? (($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
-    $link_out_used = $items['local_ifspeed'] ? (($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
+    $link_in_used = Number::calculatePercent($items['local_ifinoctets_rate'], $items['local_ifspeed']);
+    $link_out_used = Number::calculatePercent($items['local_ifoutoctets_rate'], $items['local_ifspeed']);
     if ($link_in_used > $link_out_used) {
         $link_used = $link_in_used;
     } else {

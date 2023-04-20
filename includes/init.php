@@ -112,7 +112,7 @@ try {
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     echo $exception->getMessage() . PHP_EOL;
-    exit();
+    exit;
 }
 
 if (module_selected('web', $init_modules)) {

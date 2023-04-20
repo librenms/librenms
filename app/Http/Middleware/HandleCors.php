@@ -25,11 +25,11 @@
 
 namespace App\Http\Middleware;
 
-use Asm89\Stack\CorsService;
+use Fruitcake\Cors\CorsService;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
 
-class HandleCors extends \Fruitcake\Cors\HandleCors
+class HandleCors extends \Illuminate\Http\Middleware\HandleCors
 {
     private $map = [
         'allowmethods' => 'allowed_methods',
@@ -38,7 +38,7 @@ class HandleCors extends \Fruitcake\Cors\HandleCors
         'exposeheaders' => 'exposed_headers',
     ];
 
-    public function __construct(Container $container)
+    public function __construct(Container $container, CorsService $cors)
     {
         // load legacy config settings before booting the CorsService
         if (\LibreNMS\Config::get('api.cors.enabled')) {
@@ -58,7 +58,6 @@ class HandleCors extends \Fruitcake\Cors\HandleCors
             $container['config']->set('cors', $laravel_config);
         }
 
-        $cors = $container->make(CorsService::class);
-        parent::__construct($cors, $container);
+        parent::__construct($container, $cors);
     }
 }

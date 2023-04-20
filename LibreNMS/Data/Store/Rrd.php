@@ -656,9 +656,9 @@ class Rrd extends BaseDatastore
             $substr_count_length = $length <= 0 ? null : min(strlen($descr), $length);
 
             $extra = substr_count($descr, ':', 0, $substr_count_length);
-            $result = substr(str_pad($result, $length), 0, ($length + $extra));
+            $result = substr(str_pad($result, $length), 0, $length + $extra);
             if ($extra > 0) {
-                $result = substr($result, 0, (-1 * $extra));
+                $result = substr($result, 0, -1 * $extra);
             }
         }
 

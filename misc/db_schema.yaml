@@ -1438,7 +1438,6 @@ ports:
     - { Field: ifSpeed, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifSpeed_prev, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
-    - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }
@@ -1448,16 +1447,12 @@ ports:
     - { Field: ifType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifAlias, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifPhysAddress, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: ifHardType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifLastChange, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: ifVlan, Type: varchar(8), 'Null': false, Extra: '', Default: '' }
+    - { Field: ifVlan, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: counter_in, Type: int, 'Null': true, Extra: '' }
-    - { Field: counter_out, Type: int, 'Null': true, Extra: '' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: detailed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: pagpOperationMode, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: pagpPortState, Type: varchar(16), 'Null': true, Extra: '' }

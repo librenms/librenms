@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.54743.1.7",
+                    "sysDescr": "FLEX-24 Switch",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "phybridge-flex",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "phybridge.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

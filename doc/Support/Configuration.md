@@ -657,7 +657,6 @@ Please refer to [Billing](../Extensions/Billing-Module.md)
 ## Global module support
 
 ```bash
-lnms config:set enable_bgp true # Enable BGP session collection and display
 lnms config:set enable_syslog false # Enable Syslog
 lnms config:set enable_inventory true # Enable Inventory
 lnms config:set enable_pseudowires true # Enable Pseudowires
@@ -751,6 +750,38 @@ Please refer to [Smokeping](../Extensions/Smokeping.md)
 ### NFSen
 
 Please refer to [NFSen](../Extensions/NFSen.md)
+
+### Location parsing
+
+LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
+
+- Info-keywords
+  - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
+  - `()` contains optional information that is ignored during GeoCoding lookups.
+
+
+#### **GeoCoordinates** 
+If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
+
+Example:
+```bash
+name_that_can_not_be_looked_up [40.424521, -86.912755]
+```
+
+#### **GeoCoding**
+Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
+
+Example:
+```bash
+1100 Congress Ave, Austin, TX 78701 (3rd floor)
+Geocoding lookup is:
+1100 Congress Ave, Austin, TX 78701
+```
+#### **Overrides**
+1. You can overwrite each device sysLocation information in the webGUI under "Device settings".
+2. You can overwrite the location coordinates n in the webGUI under Device>GEO Locations
+
+
 
 ### Location mapping
 

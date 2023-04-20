@@ -35,7 +35,7 @@ $ds_out = 'OUTOCTETS';
 if ($bill['bill_type'] == 'cdr') {
     $custom_graph = " COMMENT:'\\r' ";
     $custom_graph .= ' HRULE:' . $rates['rate_95th'] . "#cc0000:'95th %ile \: " . Number::formatSi($rates['rate_95th'], 2, 3,
-            'bps') . ' (' . $rates['dir_95th'] . ') (CDR\: ' . Number::formatSi($bill['bill_cdr'], 2, 3, 'bps') . ")'";
+        'bps') . ' (' . $rates['dir_95th'] . ') (CDR\: ' . Number::formatSi($bill['bill_cdr'], 2, 3, 'bps') . ")'";
     $custom_graph .= ' HRULE:' . ($rates['rate_95th'] * -1) . '#cc0000';
 } elseif ($bill['bill_type'] == 'quota') {
     $custom_graph = " COMMENT:'\\r' ";

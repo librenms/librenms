@@ -21,7 +21,7 @@ if (! isset($sort) || empty($sort)) {
 
 // Define the Limit parameters
 if (isset($current)) {
-    $start = (($current * $rowCount) - ($rowCount));
+    $start = (($current * $rowCount) - $rowCount);
 }
 if ($rowCount != -1) {
     $options['limit'] = [$start, $rowCount];

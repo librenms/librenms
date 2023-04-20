@@ -63,7 +63,7 @@ if (isset($options['h'])) {
    prints it in a slightly neater manner and in a manner and in tested
    order.
 ';
-    exit();
+    exit;
 }
 
 // make sure we have a JSON file to work with
@@ -105,7 +105,7 @@ if ((isset($options['l'])) || (
     (! isset($options['t'])) &&
     (! isset($options['s'])) &&
     (! isset($options['m']))
-    )) {
+)) {
     exit(0);
 }
 

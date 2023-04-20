@@ -27,9 +27,9 @@
  */
 
 // Detect type of UPS (Signle-Phase/3 Phase)
-    // Number of input lines
-    $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
-    $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
+// Number of input lines
+$upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
+$in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
 // Single-phase system
 if ($in_phaseNum == '1') {

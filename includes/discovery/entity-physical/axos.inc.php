@@ -51,11 +51,11 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
 echo "\n";
 unset(
-$physical_name,
-$serial_number,
-$card_array,
-$card,
-$entry,
-$entity_array,
-$id
+    $physical_name,
+    $serial_number,
+    $card_array,
+    $card,
+    $entry,
+    $entity_array,
+    $id
 );

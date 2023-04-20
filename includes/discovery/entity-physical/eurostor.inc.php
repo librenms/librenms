@@ -78,8 +78,8 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
 echo "\n";
 unset(
-$update_data,
-$insert_data,
-$entry,
-$entity_array
+    $update_data,
+    $insert_data,
+    $entry,
+    $entity_array
 );

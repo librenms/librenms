@@ -105,8 +105,8 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             } elseif ($unit == '%') {
                 $type = 'percent';
             }
-        $cmc_iii_sensors[$sensor_id]['type'] = $type;
-        break;
+            $cmc_iii_sensors[$sensor_id]['type'] = $type;
+            break;
     }
 }
 
