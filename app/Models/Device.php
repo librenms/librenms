@@ -53,6 +53,7 @@ class Device extends BaseModel
         'hostname',
         'display',
         'icon',
+        'ignore',
         'ip',
         'location_id',
         'notes',
