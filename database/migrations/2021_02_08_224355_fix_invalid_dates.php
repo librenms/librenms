@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class FixInvalidDates extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -43,4 +43,4 @@ class FixInvalidDates extends Migration
     {
         //
     }
-}
+};

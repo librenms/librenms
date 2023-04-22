@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class SerializeConfig extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -44,4 +44,4 @@ class SerializeConfig extends Migration
                 ->update(['config_value' => $value]);
         });
     }
-}
+};

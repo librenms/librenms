@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateProxmoxPortsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -30,4 +30,4 @@ class CreateProxmoxPortsTable extends Migration
     {
         Schema::drop('proxmox_ports');
     }
-}
+};

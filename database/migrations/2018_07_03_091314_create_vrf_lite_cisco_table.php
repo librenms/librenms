@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateVrfLiteCiscoTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -31,4 +31,4 @@ class CreateVrfLiteCiscoTable extends Migration
     {
         Schema::drop('vrf_lite_cisco');
     }
-}
+};
