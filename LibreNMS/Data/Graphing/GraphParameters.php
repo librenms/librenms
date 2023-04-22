@@ -106,7 +106,7 @@ class GraphParameters
         $this->prev_from = $this->from - $this->period;
         $this->scale_min = $vars['scale_min'] ?? null;
         $this->scale_max = $vars['scale_max'] ?? null;
-        $this->scale_rigid = isset($vars['scale_rigid']) && $vars['scale_rigid'] && $vars['scale_rigid'] !== 'no';
+        $this->scale_rigid = isset($vars['scale_rigid']) ? $vars['scale_rigid'] && $vars['scale_rigid'] !== 'no' : null;
 
         $this->inverse = ! empty($vars['inverse']);
         $this->in = $this->inverse ? 'out' : 'in';
