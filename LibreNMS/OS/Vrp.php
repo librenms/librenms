@@ -227,7 +227,7 @@ class Vrp extends OS implements
 
                     $foundid = 0;
 
-                    for ($z = 0; $z < sizeof($ap_db); $z++) {
+                    for ($z = 0; $z < count($ap_db); $z++) {
                         if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
                             $foundid = $ap_db[$z]['accesspoint_id'];
                             $ap_db[$z]['seen'] = 1;
@@ -277,7 +277,7 @@ class Vrp extends OS implements
                 }//end foreach 1
             }//end foreach 2
 
-            for ($z = 0; $z < sizeof($ap_db); $z++) {
+            for ($z = 0; $z < count($ap_db); $z++) {
                 if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
                     dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
                 }
