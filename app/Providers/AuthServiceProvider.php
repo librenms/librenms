@@ -31,8 +31,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPolicies();
-
         Auth::provider('legacy', function ($app, array $config) {
             return new LegacyUserProvider();
         });
