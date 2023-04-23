@@ -7,7 +7,7 @@ use Amenadiel\JpGraph\Plot\LinePlot;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
-Billing::getHistoricTransferGraphData($vars['id']);
+$graph_data = Billing::getHistoricTransferGraphData($vars['id']);
 
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
