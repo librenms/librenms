@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // Socialite
-Route::prefix('auth:web')->name('socialite.')->group(function () {
+Route::prefix('auth')->name('socialite.')->group(function () {
     Route::post('{provider}/redirect', [SocialiteController::class, 'redirect'])->name('redirect');
     Route::match(['get', 'post'], '{provider}/callback', [SocialiteController::class, 'callback'])->name('callback');
     Route::get('{provider}/metadata', [SocialiteController::class, 'metadata'])->name('metadata');
@@ -35,7 +35,7 @@ Route::get('graph/{path?}', GraphController::class)
     ->middleware(['web', AuthenticateGraph::class])->name('graph');
 
 // WebUI
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
