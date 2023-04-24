@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 
@@ -17,8 +18,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $this->scheduleMarkWorking($schedule);
     }
 
     /**
@@ -61,5 +61,16 @@ class Kernel extends ConsoleKernel
         }
 
         return parent::handle($input, $output);
+    }
+
+    /**
+     * Store in the cache that the schedule is triggered.
+     * Used for Validation.
+     */
+    private function scheduleMarkWorking(Schedule $schedule): void
+    {
+        $schedule->call(function () {
+            Cache::put('scheduler_working', now(), now()->addMinutes(6));
+        })->everyFiveMinutes();
     }
 }
