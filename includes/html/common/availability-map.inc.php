@@ -351,7 +351,7 @@ if (defined('SHOW_SETTINGS')) {
         </div>
         <div class="page-availability-title-right">';
 
-        if ((Config::get('webui.availability_map_use_device_groups') != 0) && ($mode == 0 || $mode == 1 || $mode == 2)) {
+        if ((Config::get('webui.availability_map_use_device_groups') != 0)) {
             $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
             $dev_groups = dbFetchRows($sql);
 
