@@ -35,7 +35,7 @@ Route::get('graph/{path?}', GraphController::class)
     ->middleware(['web', AuthenticateGraph::class])->name('graph');
 
 // WebUI
-Route::middleware(['auth:web'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
