@@ -12,7 +12,7 @@ if (is_numeric($vars['bill_hist_id'])) {
 } elseif (is_numeric($vars['from'])) {
     $graph_data = Billing::getBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
-    Billing::getHistoricTransferGraphData($vars['id']);
+    $graph_data = Billing::getHistoricTransferGraphData($vars['id']);
     $vars['imgtype'] = 'historical';
 }
 
