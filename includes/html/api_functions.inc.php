@@ -1637,7 +1637,7 @@ function get_bill_graphdata(Illuminate\Http\Request $request)
 
             $graph_data = Billing::getBitsGraphData($bill_id, $from, $to, $reducefactor);
         } elseif ($graph_type == 'monthly') {
-            Billing::getHistoricTransferGraphData($bill_id);
+            $graph_data = Billing::getHistoricTransferGraphData($bill_id);
         }
 
         if (! isset($graph_data)) {
