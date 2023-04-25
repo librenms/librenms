@@ -52,7 +52,7 @@ class GraphiteStoreTest extends TestCase
         parent::tearDown();
     }
 
-    public function testSocketConnectError()
+    public function testSocketConnectError(): void
     {
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
@@ -62,7 +62,7 @@ class GraphiteStoreTest extends TestCase
         new Graphite($mockFactory);
     }
 
-    public function testSocketWriteError()
+    public function testSocketWriteError(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
@@ -73,7 +73,7 @@ class GraphiteStoreTest extends TestCase
         $graphite->put(['hostname' => 'test'], 'fake', ['rrd_name' => 'name'], ['one' => 1]);
     }
 
-    public function testSimpleWrite()
+    public function testSimpleWrite(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);

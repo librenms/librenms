@@ -17,7 +17,7 @@ class AlertRule extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         $rule = parent::toArray($request);
         $rule['devices'] = $this->devices->pluck('device_id')->all();

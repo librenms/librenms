@@ -93,7 +93,7 @@ class PingCheck implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $ping_start = microtime(true);
 

@@ -12,7 +12,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('port_group_port', function (Blueprint $table) {
             // check existing foreign key constraints because initially was in one migration
@@ -36,7 +36,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('port_group_port', function (Blueprint $table) {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Closure;
 use LibreNMS\Config;
 
@@ -14,7 +16,7 @@ class LoadUserPreferences
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $preferences = ['locale', 'site_style', 'timezone'];
         $this->loadPreferences($request, $preferences);

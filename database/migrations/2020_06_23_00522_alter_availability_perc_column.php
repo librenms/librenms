@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('availability', function (Blueprint $table) {
             $table->decimal('availability_perc', 9, 6)->default(0)->change();
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('availability', function (Blueprint $table) {
             $table->float('availability_perc', 6, 6)->default(0)->change();

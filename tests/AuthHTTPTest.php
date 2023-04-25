@@ -52,7 +52,7 @@ class AuthHTTPTest extends TestCase
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
-    public function testCapabilityFunctions()
+    public function testCapabilityFunctions(): void
     {
         $a = LegacyAuth::reset();
 
@@ -62,7 +62,7 @@ class AuthHTTPTest extends TestCase
         $this->assertTrue($a->authIsExternal());
     }
 
-    public function testOldBehaviourAgainstCurrent()
+    public function testOldBehaviourAgainstCurrent(): void
     {
         $old_username = null;
         $new_username = null;

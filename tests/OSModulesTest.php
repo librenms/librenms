@@ -70,7 +70,7 @@ class OSModulesTest extends DBTestCase
      *
      * @dataProvider dumpedDataProvider
      */
-    public function testDataIsValid($os, $variant, $modules)
+    public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
         if ($os === false) {
@@ -91,7 +91,7 @@ class OSModulesTest extends DBTestCase
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
-    public function testOS($os, $variant, $modules)
+    public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));

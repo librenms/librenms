@@ -25,6 +25,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use LibreNMS\Util\EnvHelper;
@@ -38,7 +40,7 @@ class CheckInstalled
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $installed = ! config('librenms.install') && file_exists(base_path('.env'));
         $is_install_route = $request->is('install*');

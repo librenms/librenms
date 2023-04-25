@@ -25,6 +25,7 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Http\Response;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class AuthenticateGraph
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next, $relative = null)
+    public function handle(Request $request, Closure $next, $relative = null): Response
     {
         // if user is logged in, allow
         if (\Auth::check()) {
