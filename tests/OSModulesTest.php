@@ -92,6 +92,8 @@ class OSModulesTest extends DBTestCase
      */
     public function testOS($os, $variant, $modules)
     {
+        $this->expectNotToPerformAssertions(); // successful tests will make no assertions due to checkTestData()
+
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
         $this->requireSnmpsim();  // require snmpsim for tests
