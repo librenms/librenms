@@ -40,7 +40,7 @@ if (! empty($peers)) {
     // The issues occured on NX-OS (Nexus) and IOS-XR (ASR) devices.
     // Using os_group 'cisco' breaks the 3560g snmpsim tests.
     $vrf_contexts = DeviceCache::getPrimary()->getVrfContexts();
-    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && (count($vrf_contexts) > 1 || ! empty($vrf_contexts[0])));
+    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && ! empty($vrf_contexts[0]));
     if (empty($peer_data_check) && ! $cisco_with_vrf) {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         $generic = true;
