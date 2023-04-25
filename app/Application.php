@@ -27,7 +27,7 @@ namespace App;
 
 class Application extends \Illuminate\Foundation\Application
 {
-    public function publicPath()
+    public function publicPath($path = '')
     {
         // override the public path
         return $this->basePath . DIRECTORY_SEPARATOR . 'html';

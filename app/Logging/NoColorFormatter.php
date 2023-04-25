@@ -38,7 +38,7 @@ class NoColorFormatter extends \Monolog\Formatter\LineFormatter
         $this->console_color = new \Console_Color2();
     }
 
-    public function format(array $record): string
+    public function format(\Monolog\LogRecord $record): string
     {
         // only strip messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {

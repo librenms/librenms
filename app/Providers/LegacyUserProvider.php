@@ -71,7 +71,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token)
+    public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         $user = new User();
         $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
@@ -97,7 +97,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(Authenticatable $user, $token)
+    public function updateRememberToken(Authenticatable $user, $token): void
     {
         /** @var User $user */
         $user->setRememberToken($token);

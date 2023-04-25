@@ -37,7 +37,7 @@ class SetGroups implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
      * @param  callable  $next
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    public function handle(Report $report, \Closure $next)
     {
         try {
             $version = Version::get();

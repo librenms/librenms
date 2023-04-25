@@ -34,7 +34,7 @@ class SetInstanceId implements \Spatie\FlareClient\FlareMiddleware\FlareMiddlewa
      * @param  callable  $next
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    public function handle(Report $report, \Closure $next)
     {
         try {
             $user = $report->getGroup('user', []);
