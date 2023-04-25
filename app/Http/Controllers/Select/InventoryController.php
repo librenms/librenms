@@ -43,6 +43,7 @@ class InventoryController extends SelectController
             'device_id' => 'device',
         ];
     }
+
     protected function searchFields($request)
     {
         return [$this->fieldToColumn($request->get('field'))];
@@ -51,13 +52,15 @@ class InventoryController extends SelectController
     protected function baseQuery($request)
     {
         $column = $this->fieldToColumn($request->get('field'));
+
         return EntPhysical::hasAccess($request->user())
             ->select($column)
             ->orderBy($column)
             ->distinct();
     }
 
-    private function fieldToColumn($field) {
+    private function fieldToColumn($field)
+    {
         return match ($field) {
             'name' => 'entPhysicalName',
             'model' => 'entPhysicalModelName',

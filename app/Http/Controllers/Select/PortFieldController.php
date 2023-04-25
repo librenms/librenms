@@ -44,6 +44,7 @@ class PortFieldController extends SelectController
 
     /**
      * Defines fields that can be used as filters
+     *
      * @param $request
      * @return string[]
      */

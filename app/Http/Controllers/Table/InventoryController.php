@@ -80,7 +80,7 @@ class InventoryController extends TableController
     }
 
     /**
-     * @param EntPhysical $entPhysical
+     * @param  EntPhysical  $entPhysical
      * @return array|Model|Collection
      */
     public function formatItem($entPhysical)
