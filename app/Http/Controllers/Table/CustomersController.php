@@ -26,6 +26,8 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;

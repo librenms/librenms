@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Install;
 
 use App\StreamedOutput;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;

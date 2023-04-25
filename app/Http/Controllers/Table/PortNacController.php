@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\PortsNac;
+use Illuminate\Http\Request;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 

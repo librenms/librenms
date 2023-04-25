@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Application;
+use Illuminate\Http\Request;
 
 class ApplicationController extends SelectController
 {

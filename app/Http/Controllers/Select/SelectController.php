@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 use App\Http\Controllers\PaginatedAjaxController;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

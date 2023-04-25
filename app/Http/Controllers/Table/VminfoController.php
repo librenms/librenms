@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Vminfo;
+use Illuminate\Http\Request;
 use LibreNMS\Util\Url;
 
 class VminfoController extends TableController

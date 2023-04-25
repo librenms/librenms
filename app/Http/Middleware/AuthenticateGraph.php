@@ -25,10 +25,10 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Response;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;

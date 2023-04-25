@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 
 class WorldMapController extends WidgetController

@@ -29,6 +29,7 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\UserWidget;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;

@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Eventlog;
+use Illuminate\Http\Request;
 
 class EventlogController extends SelectController
 {

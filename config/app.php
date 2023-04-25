@@ -8,8 +8,8 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
 
 return [
 

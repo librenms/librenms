@@ -2,8 +2,8 @@
 
 namespace LibreNMS\Tests;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 
 trait CreatesApplication
 {

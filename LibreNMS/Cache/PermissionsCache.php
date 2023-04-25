@@ -29,6 +29,8 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
 use DB;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Hash;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 use LibreNMS\Config;
 
 class UpdateUserRequest extends FormRequest

@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\MuninPlugin;
+use Illuminate\Http\Request;
 
 class MuninPluginController extends SelectController
 {

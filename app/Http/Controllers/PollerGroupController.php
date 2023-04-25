@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PollerGroup;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PollerGroupController extends Controller

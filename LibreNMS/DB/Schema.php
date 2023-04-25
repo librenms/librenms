@@ -26,6 +26,7 @@
 namespace LibreNMS\DB;
 
 use DB;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;

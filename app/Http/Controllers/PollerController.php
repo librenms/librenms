@@ -9,6 +9,7 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use LibreNMS\Config;
 
 class PollerController extends Controller

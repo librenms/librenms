@@ -46,14 +46,14 @@ class AlertNotification extends Notification
             ->action('View', 'alert.view')
             ->options(['TTL' => 2000])
             ->data(['id' => $alert_id]);
-            // ->badge()
-            // ->dir()
-            // ->image()
-            // ->lang()
-            // ->renotify()
-            // ->requireInteraction()
-            // ->tag()
-            // ->vibrate()
+        // ->badge()
+        // ->dir()
+        // ->image()
+        // ->lang()
+        // ->renotify()
+        // ->requireInteraction()
+        // ->tag()
+        // ->vibrate()
     }
 
     /**

@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use Illuminate\Http\Request;
 use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController

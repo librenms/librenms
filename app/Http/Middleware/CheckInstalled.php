@@ -25,11 +25,11 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Http\Request;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use LibreNMS\Util\EnvHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckInstalled
 {

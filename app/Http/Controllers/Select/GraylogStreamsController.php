@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Select;
 
 use App\ApiClients\GraylogApi;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Log;

@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Http\Request;
 use App\Models\UserPref;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class VerifyTwoFactor
 {
