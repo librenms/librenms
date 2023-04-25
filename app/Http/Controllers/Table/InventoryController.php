@@ -86,7 +86,7 @@ class InventoryController extends TableController
     public function formatItem($entPhysical)
     {
         return [
-            'device' => Url::deviceLink($entPhysical?->device),
+            'device' => Url::deviceLink($entPhysical->device),
             'descr' => htmlspecialchars($entPhysical->entPhysicalDescr),
             'name' => htmlspecialchars($entPhysical->entPhysicalName),
             'model' => htmlspecialchars($entPhysical->entPhysicalModelName),

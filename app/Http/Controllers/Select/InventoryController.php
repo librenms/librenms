@@ -59,13 +59,14 @@ class InventoryController extends SelectController
             ->distinct();
     }
 
-    private function fieldToColumn($field)
+    private function fieldToColumn(string $field): string
     {
         return match ($field) {
             'name' => 'entPhysicalName',
             'model' => 'entPhysicalModelName',
             'descr' => 'entPhysicalDescr',
             'class' => 'entPhysicalClass',
+            default => 'entPhysicalName',
         };
     }
 }
