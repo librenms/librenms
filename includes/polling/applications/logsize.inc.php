@@ -44,12 +44,27 @@ $set_rrd_def = RrdDefinition::make()
 
 $app_data=['sets'=>[]];
 
+$rrd_name = ['app', $name, $app->app_id];
+$fields=[
+    'max_size' => $data['max_size'],
+    'max_size_diff' => $data['max_size_diff'],
+    'max_size_diffp' => $data['max_size_diffp'],
+    'min_size_diff' => $data['min_size_diff'],
+    'min_size_diffp' => $data['min_size_diffp'],
+    'size' => $data['size'],
+];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, $fields);
+
 foreach ($data['sets'] as $set_name => $set_data ) {
     $app_data['sets'][$set_name]=[
-        'chomp' => $set_data['chomp'],
-        'dir' => $set_data['dir'],
         'files' => array_keys($set_data['files']),
-        'log_end' => $set_data['log_end'],
+        'max_size' => $set_data['max_size'],
+        'max_size_diff' => $set_data['max_size_diff'],
+        'max_size_diffp' => $set_data['max_size_diffp'],
+        'min_size_diff' => $set_data['min_size_diff'],
+        'min_size_diffp' => $set_data['min_size_diffp'],
+        'size' => $set_data['size'],
     ];
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
