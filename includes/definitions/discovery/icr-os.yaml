@@ -1,0 +1,70 @@
+modules:
+    os:
+        serial: CONEL-INFO-MIB::infoSN.0
+        version: CONEL-INFO-MIB::infoFirmware.0
+        hardware: CONEL-INFO-MIB::infoProduct.0
+
+    mempools:
+        data:
+            -
+                total: CONEL-STATUS-MIB::statusRAMTotal
+                used: CONEL-STATUS-MIB::statusRAMUsed
+    processors:
+        data:
+            -
+                oid: CONEL-STATUS-MIB::statusCPUUsage
+                num_oid: .1.3.6.1.4.1.30140.3.6.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: CONEL-STATUS-MIB::statusTemperature
+                    num_oid: '.1.3.6.1.4.1.30140.3.3.{{ $index }}'
+                    descr: Temperature
+                    index: 'CONEL-STATUS-MIB::status.Temperature.{{ $ index }}'
+        voltage:
+            data:
+                -
+                    oid: CONEL-STATUS-MIB::statusVoltage
+                    num_oid: '.1.3.6.1.4.1.30140.3.4.{{ $index }}'
+                    descr: Voltage
+                    divisor: 1000
+                    index: 'CONEL-STATUS-MIB::statusVoltage.{{ $ index }}'
+        state:
+            data:
+                -
+                    oid: CONEL-STATUS-MIB::statusRTCBattery
+                    num_oid: .1.3.6.1.4.1.30140.3.5.0
+                    descr: RTC battery status
+                    states:
+                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: OK, graph: 2, value: 1, generic: 0 }
+                        - { descr: Empty, graph: 1, value: 2, generic: 1 }
+                -
+                    oid: CONEL-IO-MIB::ioBin0
+                    num_oid: .1.3.6.1.4.1.30140.2.3.1.0
+                    descr: IO BIN0 status
+                    states:
+                        - { descr: Low, graph: 0, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                -
+                    oid: CONEL-IO-MIB::ioBin1
+                    num_oid: .1.3.6.1.4.1.30140.2.3.3.0 
+                    descr: IO BIN1 status
+                    states:
+                        - { descr: Low, graph: 0, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                -
+                    oid: CONEL-IO-MIB::ioOut0
+                    num_oid: .1.3.6.1.4.1.30140.2.3.2.0 
+                    descr: IO OUT0 status
+                    states:
+                        - { descr: Low, graph: 0, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                -
+                    oid: CONEL-IO-MIB::ioOut1
+                    num_oid: .1.3.6.1.4.1.30140.2.3.4.0 
+                    descr: IO OUT1 status
+                    states:
+                        - { descr: Low, graph: 0, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 1 }
