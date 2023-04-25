@@ -44,7 +44,7 @@ function dbQuery($sql, $parameters = [])
 
         return Eloquent::DB()->statement($sql, (array) $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
 
         return false;
     }
@@ -65,7 +65,7 @@ function dbInsert($data, $table)
     try {
         $result = Eloquent::DB()->insert($sql, (array) $data);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $data, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $data, $pdoe));
     }
 
     if ($result) {
@@ -111,7 +111,7 @@ function dbBulkInsert($data, $table)
             return $result;
         } catch (PDOException $pdoe) {
             // FIXME query?
-            dbHandleException(new QueryException("Bulk insert $table", $data_chunk, $pdoe));
+            dbHandleException(new QueryException("dbFacile", "Bulk insert $table", $data_chunk, $pdoe));
         }
     }
 
@@ -162,7 +162,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 
         return $result;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $data, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $data, $pdoe));
     }
 
     return false;
@@ -182,7 +182,7 @@ function dbDelete($table, $where = null, $parameters = [])
     try {
         $result = Eloquent::DB()->delete($sql, (array) $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
     }
 
     return $result;
@@ -231,7 +231,7 @@ function dbDeleteOrphans($target_table, $parents)
     try {
         $result = Eloquent::DB()->delete($query);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($query, [], $pdoe));
+        dbHandleException(new QueryException("dbFacile", $query, [], $pdoe));
     }
 
     return $result;
@@ -254,7 +254,7 @@ function dbFetchRows($sql, $parameters = [])
 
         return $rows;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -301,7 +301,7 @@ function dbFetchRow($sql = null, $parameters = [])
 
         return $row;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -327,7 +327,7 @@ function dbFetchCell($sql, $parameters = [])
             // shift first field off first row
         }
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -357,7 +357,7 @@ function dbFetchColumn($sql, $parameters = [])
 
         return $cells;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException("dbFacile", $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
