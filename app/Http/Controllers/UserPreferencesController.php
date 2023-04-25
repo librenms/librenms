@@ -125,7 +125,7 @@ class UserPreferencesController extends Controller
 
     private function getValidLocales()
     {
-        return array_reduce(glob(resource_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
+        return array_reduce(glob(base_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
             $locale = basename($locale);
             $lang = __('preferences.lang', [], $locale);
             $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
