@@ -53,25 +53,19 @@ class VmwareEsxi extends \LibreNMS\OS
         $vm_info = \SnmpQuery::hideMib()->walk('VMWARE-VMINFO-MIB::vmwVmTable');
 
         $vms = $vm_info->mapTable(function ($data, $vmwVmVMID) {
-            $vm_data = [
-                'vm_type' => 'vmware',
-                'vmwVmVMID' => $vmwVmVMID,
-                'vmwVmDisplayName' => $data['vmwVmDisplayName'],
-                'vmwVmGuestOS' => $data['vmwVmGuestOS'],
-                'vmwVmMemSize' => $data['vmwVmMemSize'],
-                'vmwVmCpus' => $data['vmwVmCpus'],
-                'vmwVmState' => PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN,
-            ];
+            $data['vm_type'] = 'vmware';
+            $data['vmwVmVMID'] = $vmwVmVMID;
+            $data['vmwVmState'] = PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN;
 
             /*
              * If VMware Tools is not running then don't overwrite the GuestOS with the error
              * message, but just leave it as it currently is.
              */
-            if (str_contains($vm_data['vmwVmGuestOS'], 'tools not ')) {
-                unset($vm_data['vmwVmGuestOS']);
+            if (str_contains($data['vmwVmGuestOS'], 'tools not ')) {
+                unset($data['vmwVmGuestOS']);
             }
 
-            return new Vminfo($vm_data);
+            return new Vminfo($data);
         });
 
         ModuleModelObserver::observe(Vminfo::class);
