@@ -1,0 +1,82 @@
+<?php
+/**
+ * VmwareEsxi.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2023 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace LibreNMS\OS;
+
+use App\Models\Device;
+use App\Models\Vminfo;
+use App\Observers\ModuleModelObserver;
+use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PowerState;
+
+class VmwareEsxi extends \LibreNMS\OS
+{
+    use SyncsModels;
+
+    public function discoverOS(Device $device): void
+    {
+        echo 'VMware VM: ';
+
+        /*
+         * Fetch the Virtual Machine information.
+         *
+         *  VMWARE-VMINFO-MIB::vmwVmDisplayName.224 = STRING: My First VM
+         *  VMWARE-VMINFO-MIB::vmwVmGuestOS.224 = STRING: windows7Server64Guest
+         *  VMWARE-VMINFO-MIB::vmwVmMemSize.224 = INTEGER: 8192 megabytes
+         *  VMWARE-VMINFO-MIB::vmwVmState.224 = STRING: poweredOn
+         *  VMWARE-VMINFO-MIB::vmwVmVMID.224 = INTEGER: 224
+         *  VMWARE-VMINFO-MIB::vmwVmCpus.224 = INTEGER: 2
+         */
+
+        $vm_info = \SnmpQuery::hideMib()->walk('VMWARE-VMINFO-MIB::vmwVmTable');
+
+        $vms = $vm_info->mapTable(function ($data, $vmwVmVMID) {
+            $vm_data = [
+                'vm_type' => 'vmware',
+                'vmwVmVMID' => $vmwVmVMID,
+                'vmwVmDisplayName' => $data['vmwVmDisplayName'],
+                'vmwVmGuestOS' => $data['vmwVmGuestOS'],
+                'vmwVmMemSize' => $data['vmwVmMemSize'],
+                'vmwVmCpus' => $data['vmwVmCpus'],
+                'vmwVmState' => PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN,
+            ];
+
+            /*
+             * If VMware Tools is not running then don't overwrite the GuestOS with the error
+             * message, but just leave it as it currently is.
+             */
+            if (str_contains($vm_data['vmwVmGuestOS'], 'tools not ')) {
+                unset($vm_data['vmwVmGuestOS']);
+            }
+
+            return new Vminfo($vm_data);
+        });
+
+        ModuleModelObserver::observe(Vminfo::class);
+        $this->syncModels($device, 'vminfo', $vms);
+
+        echo "\n";
+    }
+}
