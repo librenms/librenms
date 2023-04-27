@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdatePortsStpUniqueIndex extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class UpdatePortsStpUniqueIndex extends Migration
             $table->dropIndex('ports_stp_device_id_vlan_port_index_unique');
         });
     }
-}
+};

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RenamePrinterColumns extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -93,4 +93,4 @@ class RenamePrinterColumns extends Migration
             $table->string('toner_descr', 32)->change();
         });
     }
-}
+};
