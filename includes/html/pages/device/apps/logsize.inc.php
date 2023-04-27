@@ -36,7 +36,7 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
             ? '<span class="pagemenu-selected">' . $log_file . '</span>'
             : $log_file;
 
-        echo generate_link($label, $link_array, ['log_set' => $log_set, 'log_file'=>$log_file]) . "\n";
+        echo generate_link($label, $link_array, ['log_set' => $vars['log_set'], 'log_file'=>$log_file]) . "\n";
 
         if ($index < (count($log_files) - 1)) {
             echo ', ';
