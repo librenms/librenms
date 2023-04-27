@@ -482,7 +482,7 @@ class Vrp extends OS implements
         return $sensors;
     }
 
-    public function discoverSlas()
+    public function discoverSlas(): Collection
     {
         $slas = new Collection();
         // Get the index of the last finished test
@@ -513,7 +513,7 @@ class Vrp extends OS implements
         return $slas;
     }
 
-    public function pollSlas($slas)
+    public function pollSlas($slas): void
     {
         $device = $this->getDeviceArray();
 

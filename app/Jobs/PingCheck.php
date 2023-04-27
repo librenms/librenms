@@ -48,7 +48,7 @@ class PingCheck implements ShouldQueue
     private $wait;
     private $rrd_tags;
 
-    /** @var \Illuminate\Database\Eloquent\Collection List of devices keyed by hostname */
+    /** @var \Illuminate\Database\Eloquent\Collection<string, Device>|null List of devices keyed by hostname */
     private $devices;
     /** @var array List of device group ids to check */
     private $groups = [];
@@ -158,7 +158,6 @@ class PingCheck implements ShouldQueue
             return $this->devices;
         }
 
-        /** @var Builder $query */
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
             ->orderBy('max_depth');
@@ -168,8 +167,6 @@ class PingCheck implements ShouldQueue
         }
 
         $this->devices = $query->get()->keyBy(function ($device) {
-            /** @var Device $device */
-
             return $device->overwrite_ip ?: $device->hostname;
         });
 
@@ -235,7 +232,6 @@ class PingCheck implements ShouldQueue
             echo "Attempting to record data for $hostname... ";
         }
 
-        /** @var Device $device */
         $device = $this->devices->get($hostname);
 
         // process the data if this is a standalone device or in the current tier
