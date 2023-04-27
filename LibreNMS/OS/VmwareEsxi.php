@@ -37,6 +37,9 @@ class VmwareEsxi extends \LibreNMS\OS
 
     public function discoverOS(Device $device): void
     {
+        // discover os fields
+        parent::discoverOS($device);
+
         echo 'VMware VM: ';
 
         /*
