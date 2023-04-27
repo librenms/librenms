@@ -426,7 +426,7 @@ If the thread count needs to be changed, you can do so by editing the cron file 
 Create the cronjob
 
 ```
-cp librenms.nonroot.cron /etc/cron.d/librenms
+cp dist/librenms.cron /etc/cron.d/librenms
 ```
 
 > NOTE: Keep in mind  that cron, by default, only uses a very limited

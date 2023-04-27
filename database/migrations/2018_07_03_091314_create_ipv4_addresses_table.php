@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateIpv4AddressesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -31,4 +31,4 @@ class CreateIpv4AddressesTable extends Migration
     {
         Schema::drop('ipv4_addresses');
     }
-}
+};

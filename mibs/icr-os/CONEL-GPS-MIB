@@ -1,0 +1,67 @@
+CONEL-GPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises, Gauge
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+gps			OBJECT IDENTIFIER ::= { conel 7 }
+
+gpsTimeUTC		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 1 }
+
+gpsLatitude		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 2 }
+
+gpsLongitude		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 3 }
+
+gpsAltitude		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 4 }
+
+gpsSatellites		OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 5 }
+
+gpsFixStatus		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 6 }
+
+gpsSpeedOverGround	OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 7 }
+
+gpsCourseOverGround	OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 8 }
+
+gpsDate			OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+			::= { gps 9 }
+
+END

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveMibPollingTables extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -70,4 +70,4 @@ class RemoveMibPollingTables extends Migration
             $table->primary(['module', 'mib', 'object_type']);
         });
     }
-}
+};

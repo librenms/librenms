@@ -262,7 +262,7 @@ curl -L -X POST 'https://sink.librenms.org/api/v0/syslogsink/' -H 'X-Auth-Token:
 
 ### Graylog
 
-This mvariant ethod use a external Graylog installation and its database. Please refer to the dedicated [Graylog](Graylog.md) documentation.
+This variant method use a external Graylog installation and its database. Please refer to the dedicated [Graylog](Graylog.md) documentation.
 
 ## Client configuration
 
