@@ -38,6 +38,7 @@ $set_rrd_def = RrdDefinition::make()
     ->addDataset('max_size', 'GAUGE')
     ->addDataset('max_size_diff', 'GAUGE')
     ->addDataset('max_size_diffp', 'GAUGE')
+    ->addDataset('min_size', 'GAUGE')
     ->addDataset('min_size_diff', 'GAUGE')
     ->addDataset('min_size_diffp', 'GAUGE')
     ->addDataset('size', 'GAUGE');
@@ -49,6 +50,7 @@ $fields=[
     'max_size' => $data['max_size'],
     'max_size_diff' => $data['max_size_diff'],
     'max_size_diffp' => $data['max_size_diffp'],
+    'min_size' => $data['min_size'],
     'min_size_diff' => $data['min_size_diff'],
     'min_size_diffp' => $data['min_size_diffp'],
     'size' => $data['size'],
@@ -62,6 +64,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         'max_size' => $set_data['max_size'],
         'max_size_diff' => $set_data['max_size_diff'],
         'max_size_diffp' => $set_data['max_size_diffp'],
+        'min_size' => $set_data['min_size'],
         'min_size_diff' => $set_data['min_size_diff'],
         'min_size_diffp' => $set_data['min_size_diffp'],
         'size' => $set_data['size'],
@@ -72,6 +75,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         'max_size' => $set_data['max_size'],
         'max_size_diff' => $set_data['max_size_diff'],
         'max_size_diffp' => $set_data['max_size_diffp'],
+        'min_size' => $set_data['min_size'],
         'min_size_diff' => $set_data['min_size_diff'],
         'min_size_diffp' => $set_data['min_size_diffp'],
         'size' => $set_data['size'],
