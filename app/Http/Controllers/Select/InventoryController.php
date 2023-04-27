@@ -39,9 +39,7 @@ class InventoryController extends SelectController
 
     protected function filterFields($request)
     {
-        return [
-            'device_id' => 'device',
-        ];
+        return ['device_id'];
     }
 
     protected function searchFields($request)
