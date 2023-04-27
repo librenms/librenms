@@ -1928,7 +1928,7 @@ slas:
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
-    - { Field: opstatus, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: opstatus, Type: tinyint unsigned, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sla_id], Unique: true, Type: BTREE }
