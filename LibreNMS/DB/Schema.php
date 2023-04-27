@@ -350,9 +350,9 @@ class Schema
 
         DB::statement("SET TIME_ZONE='+00:00'"); // set timezone to UTC to avoid timezone issues
 
-        foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
+        foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")->getValue(DB::connection($connection)->getQueryGrammar())) as $table) {
             $table = $table->TABLE_NAME;
-            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")) as $data) {
+            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")->getValue(DB::connection($connection)->getQueryGrammar())) as $data) {
                 $def = [
                     'Field' => $data->COLUMN_NAME,
                     'Type' => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
@@ -372,7 +372,7 @@ class Schema
                 $output[$table]['Columns'][] = $def;
             }
 
-            $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`"));
+            $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`")->getValue(DB::connection($connection)->getQueryGrammar()));
             usort($keys, function ($a, $b) {
                 return $a->Key_name <=> $b->Key_name;
             });
@@ -390,7 +390,7 @@ class Schema
                 }
             }
 
-            $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`"))[0];
+            $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`")->getValue(DB::connection($connection)->getQueryGrammar()))[0];
 
             if (isset($create->{'Create Table'})) {
                 $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';

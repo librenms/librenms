@@ -76,7 +76,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckDBCollation(): void
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')")->getValue(DB::connection($this->connection)->getQueryGrammar()));
         if (isset($collation[0])) {
             $error = implode(' ', (array) $collation[0]);
         } else {
@@ -87,7 +87,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckTableCollation(): void
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );")->getValue(DB::connection($this->connection)->getQueryGrammar()));
         $error = '';
         foreach ($collation as $data) {
             $error .= implode(' ', (array) $data) . PHP_EOL;
@@ -97,7 +97,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckColumnCollation(): void
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );")->getValue(DB::connection($this->connection)->getQueryGrammar()));
         $error = '';
         foreach ($collation as $data) {
             $error .= implode(' ', (array) $data) . PHP_EOL;
@@ -107,7 +107,7 @@ class DBSetupTest extends DBTestCase
 
     public function testSqlMode(): void
     {
-        $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode'));
+        $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode')->getValue(DB::connection($this->connection)->getQueryGrammar()));
         preg_match('/([0-9.]+)(?:-(\w+))?/', $result->version, $matches);
         $version = $matches[1] ?? null;
         $vendor = $matches[2] ?? null;
