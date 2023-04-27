@@ -49,12 +49,12 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         $this->console = \App::runningInConsole();
     }
 
-    public function format(array $record): string
+    public function format(\Monolog\LogRecord $record): string
     {
         // only format messages where color is enabled
-        if (isset($record['context']['color']) && $record['context']['color']) {
-            $record['message'] = $this->console_color->convert($record['message'], $this->console);
-            unset($record['context']['color']);
+        if (isset($record->context->color) && $record->context->color) {
+            $record->message = $this->console_color->convert($record->message, $this->console);
+            unset($record->context->color);
         }
 
         return parent::format($record);
