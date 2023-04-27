@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Location;
-use Illuminate\Http\Request;
 
 class LocationController extends SelectController
 {

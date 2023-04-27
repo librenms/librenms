@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;

@@ -31,7 +31,6 @@ use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 

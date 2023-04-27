@@ -29,7 +29,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TwoFactorManagementRequest;
 use App\Models\User;
 use App\Models\UserPref;
-use Illuminate\Http\JsonResponse;
 
 class TwoFactorManagementController extends Controller
 {

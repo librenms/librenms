@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Location;
-use Illuminate\Http\Request;
 
 class LocationController extends TableController
 {

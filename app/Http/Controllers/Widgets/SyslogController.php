@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class SyslogController extends WidgetController
 {

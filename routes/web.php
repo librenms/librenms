@@ -7,7 +7,6 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Controllers\Widgets;
-use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Route;
 

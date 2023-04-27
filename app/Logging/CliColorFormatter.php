@@ -60,7 +60,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
                 $record->level,
                 $this->console_color->convert($record->message, $this->console),
                 $context,
-                $record->extra ,
+                $record->extra,
                 $record->formatted,
             );
         }

@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class ImageController extends WidgetController
 {

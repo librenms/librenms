@@ -26,7 +26,6 @@
 namespace LibreNMS\Util;
 
 use App;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel

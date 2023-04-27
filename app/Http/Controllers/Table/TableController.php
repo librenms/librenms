@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Table;
 use App\Http\Controllers\PaginatedAjaxController;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 abstract class TableController extends PaginatedAjaxController

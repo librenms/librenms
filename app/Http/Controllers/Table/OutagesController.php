@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
