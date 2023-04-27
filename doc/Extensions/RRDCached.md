@@ -6,9 +6,11 @@ Since version 1.5, rrdtool / rrdcached now supports creating rrd files
 over rrdcached. If you have rrdcached 1.5.5 or above, you can also
 tune over rrdcached. To enable this set the following config:
 
-```php
-$config['rrdtool_version'] = '1.5.5';
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdtool_version '1.5.5'
+    ```
+
 This setting has to be the exact version of rrdtool you are running.
 
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
@@ -85,11 +87,12 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 systemctl restart rrdcached.service
 ```
 
-5: Edit `/opt/librenms/config.php` to include:
+5: Edit your config to include:
 
-```php
-$config['rrdcached'] = "unix:/run/rrdcached.sock";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "unix:/run/rrdcached.sock"
+    ```
 
 ### RRDCached installation Debian Buster
 (rrdcached 1.7.1)
@@ -129,13 +132,14 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 systemctl restart rrdcached.service
 ```
 
-5: Edit /opt/librenms/config.php to include:
+5: Edit your config to include:
 
 For local RRDCached server
 
-```php
-$config['rrdcached'] = "unix:/run/rrdcached.sock";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "unix:/run/rrdcached.sock"
+    ```
 
 For remote RRDCached server make sure you have network option in /var/default/rrdcached
 
@@ -143,9 +147,10 @@ For remote RRDCached server make sure you have network option in /var/default/rr
 NETWORK_OPTIONS="-L"
 ```
 
-```php
-$config['rrdcached'] = "IPADDRESS:42217";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "IPADDRESS:42217"
+    ```
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
@@ -187,13 +192,14 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 systemctl restart rrdcached.service
 ```
 
-5: Edit /opt/librenms/config.php to include:
+5: Edit your config to include:
 
 For local RRDCached server
 
-```php
-$config['rrdcached'] = "unix:/run/rrdcached.sock";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "unix:/run/rrdcached.sock"
+    ```
 
 For remote RRDCached server make sure you have network option in /var/default/rrdcached
 
@@ -201,9 +207,10 @@ For remote RRDCached server make sure you have network option in /var/default/rr
 NETWORK_OPTIONS="-L"
 ```
 
-```php
-$config['rrdcached'] = "IPADDRESS:42217";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "IPADDRESS:42217"
+    ```
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
@@ -262,11 +269,12 @@ semodule -i rrdcached_librenms.pp
 systemctl enable --now rrdcached.service
 ```
 
-4: Edit `/opt/librenms/config.php` to include:
+4: Edit your config to include:
 
-```php
-$config['rrdcached'] = "unix:/run/rrdcached.sock";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "unix:/run/rrdcached.sock"
+    ```
 
 ### RRDCached installation CentOS 6
 
@@ -302,11 +310,12 @@ chkconfig rrdcached on
 service rrdcached start
 ```
 
-- Edit /opt/librenms/config.php to include:
+- Edit your config to include:
 
-```php
-$config['rrdcached']    = "unix:/run/rrdcached.sock";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "unix:/run/rrdcached.sock"
+    ```
 
 ## Verify
 

@@ -112,28 +112,31 @@ Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERN
 
 ### Basic Configuration
 
-Additional configuration settings can be set in `config.php` or
-directly into the database.
+Additional configuration settings can be set in your config.
 
 The defaults are shown here - it's recommended that you at least tune
 the number of workers.
 
-```php
-$config['service_poller_workers']              = 24;     # Processes spawned for polling
-$config['service_services_workers']            = 8;      # Processes spawned for service polling
-$config['service_discovery_workers']           = 16;     # Processes spawned for discovery
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set service_poller_workers 24
+    lnms config:set service_services_workers 8
+    lnms config:set service_discovery_workers 16
+    ```
 
+Optional Settings
 
-//Optional Settings
-$config['service_poller_frequency']            = 300;    # Seconds between polling attempts
-$config['service_services_frequency']          = 300;    # Seconds between service polling attempts
-$config['service_discovery_frequency']         = 21600;  # Seconds between discovery runs
-$config['service_billing_frequency']           = 300;    # Seconds between billing calculations
-$config['service_billing_calculate_frequency'] = 60;     # Billing interval
-$config['service_poller_down_retry']           = 60;     # Seconds between failed polling attempts
-$config['service_loglevel']                    = 'INFO'; # Must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
-$config['service_update_frequency']            = 86400;  # Seconds between LibreNMS update checks
-```
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set service_poller_frequency 300
+    lnms config:set service_services_frequency 300
+    lnms config:set service_discovery_frequency 21600
+    lnms config:set service_billing_frequency 300
+    lnms config:set service_billing_calculate_frequency 60
+    lnms config:set service_poller_down_retry 60
+    lnms config:set service_loglevel INFO
+    lnms config:set service_update_frequency 86400
+    ```
 
 There are also some SQL options, but these should be inherited from
 your LibreNMS web UI configuration.
