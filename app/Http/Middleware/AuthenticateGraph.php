@@ -49,7 +49,6 @@ class AuthenticateGraph
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  $relative
-     * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */

@@ -13,9 +13,8 @@ class UserPolicy
      * Determine whether the user can manage users.
      *
      * @param  User  $user
-     * @return bool
      */
-    public function manage(User $user)
+    public function manage(User $user): bool
     {
         return $user->isAdmin();
     }
@@ -25,7 +24,6 @@ class UserPolicy
      *
      * @param  User  $user
      * @param  User  $target
-     * @return bool
      */
     public function view(User $user, User $target): bool
     {
@@ -36,7 +34,6 @@ class UserPolicy
      * Determine whether the user can view any user.
      *
      * @param  User  $user
-     * @return mixed
      */
     public function viewAny(User $user): bool
     {
@@ -47,7 +44,6 @@ class UserPolicy
      * Determine whether the user can create users.
      *
      * @param  User  $user
-     * @return bool
      */
     public function create(User $user): bool
     {
@@ -59,7 +55,6 @@ class UserPolicy
      *
      * @param  User  $user
      * @param  User  $target
-     * @return bool
      */
     public function update(User $user, User $target): bool
     {
@@ -71,7 +66,6 @@ class UserPolicy
      *
      * @param  User  $user
      * @param  User  $target
-     * @return bool
      */
     public function delete(User $user, User $target): bool
     {

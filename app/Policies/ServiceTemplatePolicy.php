@@ -14,7 +14,6 @@ class ServiceTemplatePolicy
      * Determine whether the user can view any service templates.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
     public function viewAny(User $user): bool
     {
@@ -26,7 +25,6 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
     public function view(User $user, ServiceTemplate $template): bool
     {
@@ -37,7 +35,6 @@ class ServiceTemplatePolicy
      * Determine whether the user can create service templates.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
     public function create(User $user): bool
     {
@@ -49,7 +46,6 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
     public function update(User $user, ServiceTemplate $template): bool
     {
@@ -61,7 +57,6 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
     public function delete(User $user, ServiceTemplate $template): bool
     {
@@ -73,7 +68,6 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
     public function restore(User $user, ServiceTemplate $template): bool
     {
@@ -85,7 +79,6 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
     public function forceDelete(User $user, ServiceTemplate $template): bool
     {
@@ -98,9 +91,8 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
-    public function showConfig(User $user, ServiceTemplate $template)
+    public function showConfig(User $user, ServiceTemplate $template): bool
     {
         return $user->isAdmin();
     }
@@ -110,9 +102,8 @@ class ServiceTemplatePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\ServiceTemplate  $template
-     * @return mixed
      */
-    public function updateNotes(User $user, ServiceTemplate $template)
+    public function updateNotes(User $user, ServiceTemplate $template): bool
     {
         return $user->isAdmin();
     }

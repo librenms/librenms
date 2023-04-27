@@ -15,7 +15,6 @@ class DevicePolicy
      * Determine whether the user can view any devices.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
     public function viewAny(User $user): bool
     {
@@ -27,7 +26,6 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
     public function view(User $user, Device $device): bool
     {
@@ -38,7 +36,6 @@ class DevicePolicy
      * Determine whether the user can create devices.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
     public function create(User $user): bool
     {
@@ -50,7 +47,6 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
     public function update(User $user, Device $device): bool
     {
@@ -62,7 +58,6 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
     public function delete(User $user, Device $device): bool
     {
@@ -74,7 +69,6 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
     public function restore(User $user, Device $device): bool
     {
@@ -86,7 +80,6 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
     public function forceDelete(User $user, Device $device): bool
     {
@@ -99,9 +92,8 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
-    public function showConfig(User $user, Device $device)
+    public function showConfig(User $user, Device $device): bool
     {
         return $user->isAdmin();
     }
@@ -111,9 +103,8 @@ class DevicePolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Device  $device
-     * @return mixed
      */
-    public function updateNotes(User $user, Device $device)
+    public function updateNotes(User $user, Device $device): bool
     {
         return $user->isAdmin();
     }

@@ -32,8 +32,6 @@ class CleanContext implements \Spatie\FlareClient\FlareMiddleware\FlareMiddlewar
     /**
      * Middleware to remove sensitive data from the context.
      *
-     * @param  \Spatie\FlareClient\Report  $report
-     * @param  callable  $next
      * @return mixed
      */
     public function handle(Report $report, \Closure $next)
