@@ -25,7 +25,7 @@
 
 namespace LibreNMS\DB;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;

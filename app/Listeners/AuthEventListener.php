@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Models\User;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Request;

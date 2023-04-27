@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\UserCreated;
 use App\Models\Notification;
 use App\Models\NotificationAttrib;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class MarkNotificationsRead
 {

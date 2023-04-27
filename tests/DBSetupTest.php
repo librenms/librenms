@@ -26,7 +26,7 @@
 namespace LibreNMS\Tests;
 
 use Artisan;
-use DB;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Schema;
 
 class DBSetupTest extends DBTestCase

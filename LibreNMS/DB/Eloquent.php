@@ -25,7 +25,7 @@
 
 namespace LibreNMS\DB;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Connection;
 use LibreNMS\Util\Laravel;
 use PDOException;

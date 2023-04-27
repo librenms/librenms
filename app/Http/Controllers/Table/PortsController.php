@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use LibreNMS\Util\Number;

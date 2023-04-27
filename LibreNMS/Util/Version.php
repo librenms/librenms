@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Util;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;

@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Component;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 

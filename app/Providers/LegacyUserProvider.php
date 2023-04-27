@@ -26,7 +26,7 @@
 namespace App\Providers;
 
 use App\Models\User;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use LibreNMS\Authentication\LegacyAuth;

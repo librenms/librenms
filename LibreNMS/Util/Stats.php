@@ -26,7 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Callback;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
