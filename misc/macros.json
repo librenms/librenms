@@ -20,7 +20,7 @@
     "past_30m": "DATE_SUB(NOW(),INTERVAL 30 MINUTE)",
     "past_60m": "DATE_SUB(NOW(),INTERVAL 60 MINUTE)",
     "port": "(%ports.deleted = 0 && %ports.ignore = 0 && %ports.disabled = 0)",
-    "port_error_perc": "SELECT IF(%ports.ifOutErrors_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate \/ %ports.ifOutUcastPkts_rate, %ports.ifInOctets_rate \/ %ports.ifInUcastPkts_rate)",
+    "port_error_perc": "SELECT IF(%ports.ifOutErrors_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate \/ %ports.ifOutUcastPkts_rate, %ports.ifInOctets_rate \/ %ports.ifInUcastPkts_rate)*100",
     "port_down": "(%ports.ifOperStatus = \"down\" && %ports.ifAdminStatus != \"down\" && %macros.port)",
     "port_up": "(%ports.ifOperStatus = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port)",
     "port_usage_perc": "((SELECT IF(%ports.ifOutOctets_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate, %ports.ifInOctets_rate)*8) \/ %ports.ifSpeed)*100",
