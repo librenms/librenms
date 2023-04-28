@@ -1,6 +1,6 @@
 <?php
 /**
- * PortFieldController.php
+ * EntPhysicalController.php
  *
  * -Description-
  *
@@ -19,62 +19,52 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\Port;
+use App\Models\EntPhysical;
 
-class PortFieldController extends SelectController
+class InventoryController extends SelectController
 {
-    /**
-     * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
-     */
     protected function rules()
     {
         return [
-            'field' => 'required|in:ifType',
+            'field' => 'required|in:name,model,descr,class',
             'device' => 'nullable|int',
         ];
     }
 
-    /**
-     * Defines fields that can be used as filters
-     *
-     * @param $request
-     * @return string[]
-     */
     protected function filterFields($request)
     {
-        return [
-            'device_id' => 'device',
-        ];
+        return ['device_id'];
     }
 
-    /**
-     * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     protected function searchFields($request)
     {
-        return [$request->get('field')];
+        return [$this->fieldToColumn($request->get('field'))];
     }
 
-    /**
-     * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
-     */
     protected function baseQuery($request)
     {
-        return Port::hasAccess($request->user())
-            ->select($request->get('field'))->distinct();
+        $column = $this->fieldToColumn($request->get('field'));
+
+        return EntPhysical::hasAccess($request->user())
+            ->select($column)
+            ->orderBy($column)
+            ->distinct();
+    }
+
+    private function fieldToColumn(string $field): string
+    {
+        return match ($field) {
+            'name' => 'entPhysicalName',
+            'model' => 'entPhysicalModelName',
+            'descr' => 'entPhysicalDescr',
+            'class' => 'entPhysicalClass',
+            default => 'entPhysicalName',
+        };
     }
 }

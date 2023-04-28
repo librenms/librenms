@@ -39,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::any('inventory', \App\Http\Controllers\InventoryController::class)->name('inventory');
+    Route::get('inventory/purge', [\App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::resource('port', 'PortController')->only('update');
     Route::prefix('poller')->group(function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
@@ -166,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('graph', 'GraphController')->name('ajax.select.graph');
             Route::get('graph-aggregate', 'GraphAggregateController')->name('ajax.select.graph-aggregate');
             Route::get('graylog-streams', 'GraylogStreamsController')->name('ajax.select.graylog-streams');
+            Route::get('inventory', 'InventoryController')->name('ajax.select.inventory');
             Route::get('syslog', 'SyslogController')->name('ajax.select.syslog');
             Route::get('location', 'LocationController')->name('ajax.select.location');
             Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
@@ -185,6 +188,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');
+            Route::post('inventory', 'InventoryController')->name('table.inventory');
             Route::post('location', 'LocationController');
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
