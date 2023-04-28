@@ -68,6 +68,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         'min_size_diff' => $set_data['min_size_diff'],
         'min_size_diffp' => $set_data['min_size_diffp'],
         'size' => $set_data['size'],
+        'log_sizes' => [],
     ];
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
@@ -104,7 +105,16 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
+
+        $app_data['sets'][$set_name]['log_sizes'][$log_name]=$log_data['size'];
     }
+
+    uasort($app_data['sets'][$set_name]['log_sizes'], function ($a,$b){
+        if ($a == $b) {
+            return 0;
+        }
+        return ($a > $b) ? -1 : 1;
+    });
 }
 
 $app->data=$app_data;
