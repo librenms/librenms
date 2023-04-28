@@ -76,7 +76,7 @@ if (isset($vars['log_file']) && isset($vars['log_set'])){
 }elseif(isset($vars['log_set'])){
     $graphs = [
         'logsize_size'=>'Set Size',
-        'logsize_log_sizes'=>'Log Sizes',
+        'logsize_log_sizes'=>'Log Sizes, Top 12',
         'logsize_max_size'=>'Max Log Size',
         'logsize_max_size_diff'=>'Max Size Difference',
         'logsize_max_size_diffp'=>'Max Size Difference, Percentage ',
