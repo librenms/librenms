@@ -10,15 +10,16 @@ $addarea = 0;
 $transparency = 0;
 $float_precision = 3;
 
-$log_files = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'logsize', $vars['log_set'].'_____-_____');
+$log_files_sizes=$app->data['sets'][$vars['log_set']]['log_sizes'] ?? [];
+
+$log_files=array_slice(array_keys( $log_files_sizes ), 0, 12);
 
 $rrd_list = [];
 foreach ($log_files as $index => $log_file) {
-    $label = preg_filter('/^.*\_\_\_\_\_\-\_\_\_\_\_/', '', $log_file);
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $log_file]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'].'_____-_____'.$log_file]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => $label,
+        'descr'    => $log_file,
         'ds'       => 'size',
     ];
 }
