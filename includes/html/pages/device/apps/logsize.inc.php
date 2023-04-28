@@ -29,8 +29,9 @@ foreach ($sets_list as $index => $log_set) {
 }
 
 if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
-    echo "<br>\n Files: \n";
     $log_files=$sets[$vars['log_set']]['files'];
+    $log_count=count($log_files);
+    echo "<br>\nFiles Count: ".$log_count."<br>\nFiles: \n";
     sort($log_files);
 
     foreach ($log_files as $index => $log_file) {
