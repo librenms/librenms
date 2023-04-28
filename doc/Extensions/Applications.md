@@ -1529,6 +1529,11 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
+
 ## PHP-FPM
 
 ### SNMP Extend
