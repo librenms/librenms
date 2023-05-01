@@ -15,7 +15,7 @@ class VminfoObserver
      */
     public function created(Vminfo $vminfo)
     {
-        Eventlog::log($vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU) Discovered", $vminfo->device_id, 'system', 3, $vminfo->vmwVmVMID);
+        Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', 3, $vminfo->vmwVmVMID);
     }
 
     /**
@@ -27,7 +27,7 @@ class VminfoObserver
     public function updating(Vminfo $vminfo)
     {
         foreach ($vminfo->getDirty() as $field => $value) {
-            Eventlog::log($vminfo->vmwVmDisplayName . ' (' . preg_replace('/^vmwVm/', '', $field) . ') -> ' . $value, $vminfo->device_id);
+            Eventlog::log($vminfo->vmwVmDisplayName . ' (' . preg_replace('/^vmwVm/', '', $field) . ') -> ' . $value, $vminfo->device_id, 'vm');
         }
     }
 
@@ -39,7 +39,7 @@ class VminfoObserver
      */
     public function deleted(Vminfo $vminfo)
     {
-        Eventlog::log($vminfo->vmwVmDisplayName . ' Removed', $vminfo->device_id, 'system', 4, $vminfo->vmwVmVMID);
+        Eventlog::log('Virtual Machine removed: ' . $vminfo->vmwVmDisplayName, $vminfo->device_id, 'vm', 4, $vminfo->vmwVmVMID);
     }
 
     /**

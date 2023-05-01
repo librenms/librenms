@@ -1,6 +1,6 @@
 <?php
-/**
- * VmwareEsxi.php
+/*
+ * Linux.php
  *
  * -Description-
  *
@@ -15,20 +15,40 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
+ * @package    LibreNMS
+ * @link       http://librenms.org
  * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
+use LibreNMS\OS\Traits\VminfoLibvirt;
 use LibreNMS\OS\Traits\VminfoVmware;
 
-class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery
+class Linux extends Shared\Unix implements VminfoDiscovery
 {
-    use VminfoVmware;
+    // NOTE: Only Linux specific stuff should go here, most things should be in Unix
+
+    use VminfoLibvirt, VminfoVmware {
+        VminfoLibvirt::discoverVminfo as discoverLibvirtVminfo;
+        VminfoVmware::discoverVmInfo as discoverVmwareVminfo;
+    }
+
+    public function discoverVmInfo(): Collection
+    {
+        $vms = $this->discoverLibvirtVminfo();
+
+        if ($vms->isNotEmpty()) {
+            return $vms;
+        }
+
+        echo PHP_EOL;
+
+        return $this->discoverVmwareVminfo();
+    }
 }

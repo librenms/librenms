@@ -539,9 +539,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
-            ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
             ],
@@ -594,8 +591,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -1188,6 +1185,9 @@ return [
             ],
             'stp' => [
                 'description' => 'STP',
+            ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'ntp' => [
                 'description' => 'NTP',

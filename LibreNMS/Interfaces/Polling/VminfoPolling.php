@@ -1,6 +1,6 @@
 <?php
-/**
- * VmwareEsxi.php
+/*
+ * VminfoPolling.php
  *
  * -Description-
  *
@@ -15,20 +15,26 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
+ * @package    LibreNMS
+ * @link       http://librenms.org
  * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\Interfaces\Polling;
 
-use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
-use LibreNMS\OS\Traits\VminfoVmware;
+use App\Models\Vminfo;
+use Illuminate\Support\Collection;
 
-class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery
+interface VminfoPolling
 {
-    use VminfoVmware;
+    /**
+     * Poll the given VMs
+     *
+     * @param Collection<Vminfo> $vms
+     * @return Collection<Vminfo>
+     */
+    public function pollVminfo(Collection $vms): Collection;
 }
