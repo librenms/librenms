@@ -97,7 +97,6 @@ Modules.
     lnms config:set discovery_modules.bgp-peers true
     lnms config:set discovery_modules.vlans true
     lnms config:set discovery_modules.vminfo false
-    lnms config:set discovery_modules.libvirt-vminfo false
     lnms config:set discovery_modules.printer-supplies false
     lnms config:set discovery_modules.ucd-diskio true
     lnms config:set discovery_modules.applications false
