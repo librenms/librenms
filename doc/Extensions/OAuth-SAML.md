@@ -263,6 +263,43 @@ The final step is to now add an event listener.
         ```
     Don't forget the initial backslack (\\) !
 
+### Default User level
+
+    Since most Socialite Providers don't provide Authorization only Authentication it is possible to set
+    the default User level for Authorized users.   Appropriate care should be taken.
+
+- 1: **Normal User**: You will need to assign device / port
+      permissions for users at this level.
+
+- 5: **Global Read**: Read only Administrator.
+
+- 10: **Administrator**: This is a global read/write admin account.
+
+- 11: **Demo Account**: Provides full read/write with certain
+    restrictions (i.e can't delete devices).
+
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.defaultlevel 5
+        ```
+
+### Okta Group Claims
+
+    If Okta is configured to expose group(s) it is possible to use these groups to configure User levels
+
+    First enable sending the 'groups' claim (along with the normal openid, profile, and email claims )
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.configs.okta.group_claim true
+        ```
+    
+    Then setup mappings from the returned groups to the User levels you want
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.groups.MY_ADMIN_GROUP.level 10
+        lnms config:set auth.socialite.groups.MY_READ_GROUP.level 5
+        ```
+
 Now you are done with setting up the OAuth provider!
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
 

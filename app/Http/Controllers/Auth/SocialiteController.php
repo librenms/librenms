@@ -52,6 +52,11 @@ class SocialiteController extends Controller
         // Re-store target url since it will be forgotten after the redirect
         $request->session()->put('url.intended', redirect()->intended()->getTargetUrl());
 
+        if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
+            return Socialite::driver($provider)
+                ->scopes(['groups'])
+                ->redirect();
+        }
         return Socialite::driver($provider)->redirect();
     }
 
@@ -95,6 +100,7 @@ class SocialiteController extends Controller
             }
 
             Auth::login($user);
+            $this->setLevelFromGroupsClaim( $provider, $user );
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
@@ -123,7 +129,27 @@ class SocialiteController extends Controller
         $user->email = $this->socialite_user->getEmail();
         $user->realname = $this->buildRealName();
 
+        $user->level  =  intval( LibreNMSConfig::get('auth.socialite.defaultlevel', 0 ));
+        $this->setLevelFromGroupsClaim( $provider, $user );
+
         $user->save();
+    }
+
+    private function setLevelFromGroupsClaim(string $provider, $user)
+    {
+        if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
+            $user->level  =  intval( LibreNMSConfig::get('auth.socialite.defaultlevel', 0 ));
+            if( array_key_exists( 'groups', $this->socialite_user->user ) && is_array( $this->socialite_user->user['groups'] )){
+                $groups = $this->socialite_user->user['groups'] ;
+                foreach ( $groups as $groupname ){
+                    $newlevel = intval( LibreNMSConfig::get('auth.socialite.groups.' . $groupname . '.level' , 0 ));
+                    if( $newlevel > $user->level ){
+                        $user->level = $newlevel;
+                    }
+                }
+                $user->save();
+            }
+        }
     }
 
     private function pairUser(string $provider): RedirectResponse

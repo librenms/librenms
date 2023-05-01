@@ -404,6 +404,26 @@
             }
         },
 
+        "auth.socialite.defaultlevel": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 4,
+            "type": "integer",
+            "default": 0
+        },
+
+        "auth.socialite.groups": {
+            "default": {},
+            "group": "auth",
+            "section": "socialite",
+            "order": 5,
+            "type": "ldap-groups",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
+        },
+
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
