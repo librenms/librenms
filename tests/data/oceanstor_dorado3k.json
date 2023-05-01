@@ -1233,14 +1233,10 @@
                     "storage_type": "dsk",
                     "storage_descr": "File System",
                     "storage_size": 76546048,
-                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1736334,
-                    "storage_used_oid": null,
                     "storage_free": 0,
-                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_oid": null,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 }
@@ -1254,14 +1250,10 @@
                     "storage_type": "dsk",
                     "storage_descr": "File System",
                     "storage_size": 76546048,
-                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1736334,
-                    "storage_used_oid": null,
                     "storage_free": 74809714,
-                    "storage_free_oid": null,
                     "storage_perc": 2,
-                    "storage_perc_oid": null,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 }
