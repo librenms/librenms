@@ -134,7 +134,7 @@ class SocialiteController extends Controller
         $user->email = $this->socialite_user->getEmail();
         $user->realname = $this->buildRealName();
 
-        $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_level', 'none' ));
+        $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
         $this->setLevelFromGroupsClaim( $provider, $user );
 
         $user->save();
@@ -143,7 +143,7 @@ class SocialiteController extends Controller
     private function setLevelFromGroupsClaim(string $provider, $user)
     {
         if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
-            $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_level', 'none' ));
+            $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
 
             if( in_array('ArrayAccess', class_implements($this->socialite_user)) &&
                 isset( $this->socialite_user->user ) &&
