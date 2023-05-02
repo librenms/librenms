@@ -206,16 +206,12 @@ class SocialiteController extends Controller
         switch($role) {
           case 'admin':
             return 10;
-            break;
           case 'global-read':
             return 5;
-            break;
           case 'normal':
             return 1;
-            break;
           default:
             return 0;
-            break;
         }
       }
 
