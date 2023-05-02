@@ -3,9 +3,9 @@ modules:
     mempools:
         data:
             -
-                free: FIREBRICK-GLOBAL::fbFreeMem
-                total: FIREBRICK-GLOBAL::fbTotalMem
-                index: 0
+                free: .1.3.6.1.4.1.24693.100.4.1.2
+                total: .1.3.6.1.4.1.24693.100.4.1.1
+                precision: 1024
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
     sensors:
