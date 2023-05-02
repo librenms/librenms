@@ -1,5 +1,11 @@
 mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING:FIREBRICK-L2TP-MIB:FIREBRICK-VOIP-MIB
 modules:
+    mempools:
+        data:
+            -
+                free: FIREBRICK-GLOBAL::fbFreeMem
+                total: FIREBRICK-GLOBAL::fbTotalMem
+                index: 0
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
     sensors:
