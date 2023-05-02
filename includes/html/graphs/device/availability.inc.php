@@ -7,7 +7,6 @@ $scale_min = '0';
 $scale_max = '100';
 
 if ($vars['duration'] > 86400) {
-
     $rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
 
     $colour_line = '000000';
