@@ -52,12 +52,17 @@ class SocialiteController extends Controller
         // Re-store target url since it will be forgotten after the redirect
         $request->session()->put('url.intended', redirect()->intended()->getTargetUrl());
 
-        if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
-            return Socialite::driver($provider)
+        $driver = Socialite::driver($provider);
+
+        if( $provider == "okta" && 
+            LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) &&
+            $driver instanceof \Laravel\Socialite\Two\AbstractProvider )
+        {
+            return $driver
                 ->scopes(['groups'])
                 ->redirect();
         }
-        return Socialite::driver($provider)->redirect();
+        return $driver->redirect();
     }
 
     public function callback(Request $request, string $provider): RedirectResponse
@@ -129,7 +134,7 @@ class SocialiteController extends Controller
         $user->email = $this->socialite_user->getEmail();
         $user->realname = $this->buildRealName();
 
-        $user->level  =  intval( LibreNMSConfig::get('auth.socialite.defaultlevel', 0 ));
+        $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_level', 'none' ));
         $this->setLevelFromGroupsClaim( $provider, $user );
 
         $user->save();
@@ -138,11 +143,17 @@ class SocialiteController extends Controller
     private function setLevelFromGroupsClaim(string $provider, $user)
     {
         if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
-            $user->level  =  intval( LibreNMSConfig::get('auth.socialite.defaultlevel', 0 ));
-            if( array_key_exists( 'groups', $this->socialite_user->user ) && is_array( $this->socialite_user->user['groups'] )){
+            $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_level', 'none' ));
+
+            if( in_array('ArrayAccess', class_implements($this->socialite_user)) &&
+                isset( $this->socialite_user->user ) &&
+                is_array( $this->socialite_user->user ) &&
+                array_key_exists( 'groups', $this->socialite_user->user ) && 
+                is_array( $this->socialite_user->user['groups'] ) )
+            {
                 $groups = $this->socialite_user->user['groups'] ;
                 foreach ( $groups as $groupname ){
-                    $newlevel = intval( LibreNMSConfig::get('auth.socialite.groups.' . $groupname . '.level' , 0 ));
+                    $newlevel = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.groups.' . $groupname . '.role' , 'none' ));
                     if( $newlevel > $user->level ){
                         $user->level = $newlevel;
                     }
@@ -189,6 +200,24 @@ class SocialiteController extends Controller
 
         return ! empty($name) ? $name : '';
     }
+
+    private function getRoleAsLevel(string $role): int
+    {
+        switch($role) {
+          case 'admin':
+            return 10;
+            break;
+          case 'global-read':
+            return 5;
+            break;
+          case 'normal':
+            return 1;
+            break;
+          default:
+            return 0;
+            break;
+        }
+      }
 
     /**
      * Take the config from Librenms Config, and insert it into Laravel Config

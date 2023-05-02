@@ -404,12 +404,18 @@
             }
         },
 
-        "auth.socialite.defaultlevel": {
+        "auth.socialite.default_role": {
             "group": "auth",
             "section": "socialite",
             "order": 4,
-            "type": "integer",
-            "default": 0
+            "type": "select",
+            "default": "none",
+            "options" : {
+                "none" : "No Access",
+                "normal" : "Normal Access",
+                "global-read" : "Global Viewing Access",
+                "admin" : "Global Administrative Access"
+            }
         },
 
         "auth.socialite.groups": {
