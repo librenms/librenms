@@ -59,7 +59,9 @@ The following is a standard config, combined with a locking mechanism below:
 If you want to customise the hostname for the poller then you will need
 to set this in `config.php`:
 
-`lnms config:set distributed_poller_name 'custom'`
+```php
+$config['distributed_poller_name']           = php_uname('n');
+```
 
 ## Locking mechanisms
 Pick one of the following setups, do not use all of them at the same
