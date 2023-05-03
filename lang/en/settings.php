@@ -1564,6 +1564,10 @@ return [
                 'description' => 'Enable dynamic graphs',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
             ],
+            'global_search_ctrlf_focus' => [
+                'description' => 'Enable Ctrl-F keyboard shortcut',
+                'help' => 'Enable Ctrl-F keyboard shortcut to focus the global search bar',
+            ],
             'global_search_result_limit' => [
                 'description' => 'Set the max search result limit',
                 'help' => 'Global search results limit',
