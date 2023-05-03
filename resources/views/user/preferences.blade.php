@@ -99,9 +99,9 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="global_search_ctrlf_focus" class="col-sm-4 control-label">{{ __('Enable Ctrl-F to focus the global search bar') }}</label>
+                <label for="global_search_ctrlf_focus" class="col-sm-4 control-label">{{ __('Ctrl-F to focus the global search bar') }}</label>
                 <div class="col-sm-4">
-                    <input id="notetodevice" type="checkbox" name="global_search_ctrlf_focus" @if($global_search_ctrlf_focus) checked @endif>
+                    <input id="global_search_ctrlf_focus" type="checkbox" name="global_search_ctrlf_focus" @if($global_search_ctrlf_focus) checked @endif>
                 </div>
             </div>
         </form>
