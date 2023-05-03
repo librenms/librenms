@@ -404,10 +404,17 @@
             }
         },
 
-        "auth.socialite.default_role": {
+        "auth.socialite.scopes": {
             "group": "auth",
             "section": "socialite",
             "order": 4,
+            "type": "array"
+        },
+
+        "auth.socialite.default_role": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 5,
             "type": "select",
             "default": "none",
             "options" : {
@@ -422,14 +429,14 @@
             "default": {},
             "group": "auth",
             "section": "socialite",
-            "order": 5,
+            "order": 6,
             "type": "ldap-groups",
             "validate": {
                 "value": "array",
                 "value.*": "array"
             }
         },
-
+        
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
