@@ -73,6 +73,14 @@ class SocialiteController extends Controller
 
     public function callback(Request $request, string $provider): RedirectResponse
     {
+        /* If we get an error in the callback then attempt to handle nicely  */
+        if( array_key_exists('error', $request->query() )) {
+            $error = $request->query('error');
+            $error_description = $request->query('error_description') ;
+            flash()->addError( $error . ": " . $error_description );
+            return redirect()->route('login');
+        }
+        
         $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
