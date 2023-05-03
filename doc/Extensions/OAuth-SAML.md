@@ -282,21 +282,25 @@ The final step is to now add an event listener.
         lnms config:set auth.socialite.default_role global-read
         ```
 
-### Okta Group Claims
+###  Claims / Access Scopes
 
-    If Okta is configured to expose group(s) it is possible to use these groups to configure User Roles
+    Socialite can specifiy scopes that should be included with in the authentication request.
+    (see https://laravel.com/docs/10.x/socialite#access-scopes )
+
+    For example, if Okta is configured to expose group information it is possible to use these group
+    names to configure User Roles.
 
     First enable sending the 'groups' claim (along with the normal openid, profile, and email claims )
     !!! setting "settings/auth/socialite"
         ```bash
-        lnms config:set auth.socialite.configs.okta.group_claim true
+        lnms config:set auth.socialite.scopes.+ groups
         ```
     
-    Then setup mappings from the returned groups to the User levels you want
+    Then setup mappings from the returned claim arrays to the User levels you want
     !!! setting "settings/auth/socialite"
         ```bash
-        lnms config:set auth.socialite.groups.MY_ADMIN_GROUP.role admin
-        lnms config:set auth.socialite.groups.MY_READ_GROUP.role global-read
+        lnms config:set auth.socialite.groups.RETURN_FROM_CLAIM.role admin
+        lnms config:set auth.socialite.groups.OTHER_RETURN_FROM_CLAIM.role global-read
         ```
 
 Now you are done with setting up the OAuth provider!

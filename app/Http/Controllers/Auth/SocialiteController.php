@@ -54,15 +54,21 @@ class SocialiteController extends Controller
 
         $driver = Socialite::driver($provider);
 
-        if( $provider == "okta" && 
-            LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) &&
-            $driver instanceof \Laravel\Socialite\Two\AbstractProvider )
+        // https://laravel.com/docs/10.x/socialite#access-scopes
+        if( $driver instanceof \Laravel\Socialite\Two\AbstractProvider &&
+            LibreNMSConfig::has('auth.socialite.scopes') )
         {
-            return $driver
-                ->scopes(['groups'])
-                ->redirect();
+            $scopes = LibreNMSConfig::get('auth.socialite.scopes');
+            if( is_array( $scopes ) &&
+                count( $scopes ) > 0 )
+            {
+                return $driver
+                    ->scopes( $scopes )
+                    ->redirect();
+            }
         }
         return $driver->redirect();
+
     }
 
     public function callback(Request $request, string $provider): RedirectResponse
@@ -105,7 +111,7 @@ class SocialiteController extends Controller
             }
 
             Auth::login($user);
-            $this->setLevelFromGroupsClaim( $provider, $user );
+            $this->setLevelFromClaim( $provider, $user );
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
@@ -135,30 +141,44 @@ class SocialiteController extends Controller
         $user->realname = $this->buildRealName();
 
         $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
-        $this->setLevelFromGroupsClaim( $provider, $user );
+        $this->setLevelFromClaim( $provider, $user );
 
         $user->save();
     }
 
-    private function setLevelFromGroupsClaim(string $provider, $user)
+    private function setLevelFromClaim(string $provider, $user)
     {
-        if( $provider == "okta" && LibreNMSConfig::get('auth.socialite.configs.okta.group_claim', false) ){
-            $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
+        if( LibreNMSConfig::has('auth.socialite.scopes') )
+        {
+            $level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
+            $scopes = LibreNMSConfig::get('auth.socialite.scopes');
 
-            if( in_array('ArrayAccess', class_implements($this->socialite_user)) &&
-                isset( $this->socialite_user->user ) &&
-                is_array( $this->socialite_user->user ) &&
-                array_key_exists( 'groups', $this->socialite_user->user ) && 
-                is_array( $this->socialite_user->user['groups'] ) )
+            if( is_array( $scopes ) &&
+                count( $scopes ) > 0 )
             {
-                $groups = $this->socialite_user->user['groups'] ;
-                foreach ( $groups as $groupname ){
-                    $newlevel = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.groups.' . $groupname . '.role' , 'none' ));
-                    if( $newlevel > $user->level ){
-                        $user->level = $newlevel;
+                foreach( $scopes as $scope )
+                {
+                    if( in_array('ArrayAccess', class_implements($this->socialite_user)) &&
+                        isset( $this->socialite_user->user ) &&
+                        is_array( $this->socialite_user->user ) &&
+                        array_key_exists( $scope, $this->socialite_user->user ) && 
+                        is_array( $this->socialite_user->user[$scope] ) )
+                    {
+                        $scope_data_array = $this->socialite_user->user[$scope];
+                        foreach( $scope_data_array as $scope_data )
+                        {
+                            $newlevel = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.groups.' . $scope_data . '.role' , 'none' ));   
+                            if( $newlevel > $level ){
+                                $level = $newlevel;
+                            }
+                        }
                     }
                 }
-                $user->save();
+                /* if the level has changed the set it and persist it */
+                if( $level != $user->level ){
+                    $user->level = $level;
+                    $user->save();
+                }
             }
         }
     }
