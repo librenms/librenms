@@ -74,6 +74,7 @@ class UserPreferencesController extends Controller
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
+            'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
         if (Config::get('twofactor')) {
@@ -111,6 +112,7 @@ class UserPreferencesController extends Controller
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
             'hide_dashboard_editor' => 'required|integer',
+            'global_search_ctrlf_focus' => 'required|integer',
         ];
 
         $this->validate($request, [

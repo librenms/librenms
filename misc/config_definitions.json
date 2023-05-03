@@ -5795,13 +5795,6 @@
             "order": 3,
             "type": "boolean"
         },
-        "webui.global_search_ctrlf_focus": {
-            "default": true,
-            "group": "webui",
-            "section": "search",
-            "order": 1,
-            "type": "boolean"
-        },
         "webui.global_search_result_limit": {
             "default": 8,
             "group": "webui",
