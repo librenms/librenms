@@ -68,7 +68,6 @@ class SocialiteController extends Controller
             }
         }
         return $driver->redirect();
-
     }
 
     public function callback(Request $request, string $provider): RedirectResponse
@@ -154,7 +153,7 @@ class SocialiteController extends Controller
         $user->save();
     }
 
-    private function setLevelFromClaim(string $provider, $user)
+    private function setLevelFromClaim(string $provider, $user): void
     {
         if( LibreNMSConfig::has('auth.socialite.scopes') )
         {
