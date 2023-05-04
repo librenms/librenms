@@ -1,0 +1,371 @@
+	ALPHA-RECTIFIER-SYS-MIB DEFINITIONS ::= BEGIN
+
+	--==========================================================================
+	--
+	-- Alpha Technologies Ltd.
+	-- Copyright 2014
+	--                      
+	--==========================================================================
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE
+			FROM SNMPv2-SMI  
+		ScaledNumber, simple
+			FROM ALPHA-RESOURCE-MIB
+	   	MODULE-COMPLIANCE, OBJECT-GROUP
+      	 	FROM SNMPv2-CONF;  
+                           
+	rectifierSystem MODULE-IDENTITY
+		LAST-UPDATED "201704060000Z"
+		ORGANIZATION "Alpha Technologies Ltd."
+		CONTACT-INFO
+		  	 "Alpha Technologies Ltd.
+			  7700 Riverfront Gate
+			  Burnaby, BC  V5J 5M4
+			  Canada
+
+			  Tel: 1-604-436-5900
+			  Fax: 1-604-436-1233"
+		DESCRIPTION
+		  	"This MIB defines the notification block(s) available in system controllers."
+
+		REVISION    "201704060000Z"  -- April 4, 2017
+		DESCRIPTION
+			"
+			Added fields for power save and some battery fields.
+			Tested with SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+		
+		REVISION    "201507280000Z"  -- July 28, 2015
+		DESCRIPTION
+			"
+			Updated to follow MIB structure conformance rules.  Tested with 
+			SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+
+		REVISION    "201507230000Z"  -- July 23, 2015
+		DESCRIPTION
+			"Fixed MIB syntax warnings."
+
+		REVISION    "201506230000Z"  -- June 23, 2015
+		DESCRIPTION
+			"General revision."        
+
+	::= { simple 1 }
+
+                         
+    -- Tectual convention
+	
+   rectSysTotalOutputCurrent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "
+               Total accumulated output current of all the rectifiers associated with the current system.
+               "
+       ::= { rectifierSystem 1 }       
+       
+   rectSysTotalOutputPower OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Total output current of all system rectifiers."
+       ::= { rectifierSystem 2 }
+       
+   rectSysTotalCapacityInstalledAmps OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "A rectifier output current multiplied by the number of rectifiers installed."
+       ::= { rectifierSystem 3 }
+
+   rectSysTotalCapacityInstalledPower OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "A rectifier output power multiplied by the number of rectifiers installed."
+       ::= { rectifierSystem 4 }
+
+   rectSysAverageRectifierOutputVoltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Average rectifier output voltage."
+       ::= { rectifierSystem 5 }
+  
+   rectSysAverageRectifierACInputVoltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Average rectifier input voltage."
+       ::= { rectifierSystem 6 }
+  
+   rectSysAveragePhase1Voltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Average output voltage of rectifiers in Phase 1."
+       ::= { rectifierSystem 7 }
+
+   rectSysAveragePhase2Voltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Average output voltage of rectifiers in Phase 2."
+       ::= { rectifierSystem 8 }
+
+   rectSysAveragePhase3Voltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Average output voltage of rectifiers in Phase 3."
+       ::= { rectifierSystem 9 }               
+       
+   rectSysSystemVoltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "System voltage."
+       ::= { rectifierSystem 10 }
+
+   rectSysTotalLoadCurrent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Total load current."
+       ::= { rectifierSystem 11 }
+       
+   rectSysBatteryVoltage OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Battery voltage."
+       ::= { rectifierSystem 12 }
+  
+   rectSysBatteryCurrent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Battery current."
+       ::= { rectifierSystem 13 }
+                                  
+   rectSysBatteryTemperature OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Battery temperature."
+       ::= { rectifierSystem 14 }
+
+   rectSysSystemNumber OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Snmp ID# assigned to the system."
+       ::= { rectifierSystem 15 }
+	   
+   rectSysEstimatedRequiredCapacityInWatts OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated required capacity needed in watts."
+       ::= { rectifierSystem 16 }
+   
+   rectSysEstimatedRequiredCapacityInAmps OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated required capacity needed in amps."
+       ::= { rectifierSystem 17 }
+	   
+   rectSysEstimatedAvailableCapacityInWatts OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated available capacity needed in watts."
+       ::= { rectifierSystem 18 }
+   
+   rectSysEstimatedAvailableCapacityInAmps OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated available capacity needed in amps."
+       ::= { rectifierSystem 19 }
+	   
+   rectSysEstimatedRedundantCapacityInWatts OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated redundant capacity needed in watts."
+       ::= { rectifierSystem 20 }
+   
+   rectSysEstimatedRedundantCapacityInAmps OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated redundant capacity needed in amps."
+       ::= { rectifierSystem 21 }
+	   
+   rectSysEstimatedStandbyCapacityInWatts OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated standby capacity needed in watts."
+       ::= { rectifierSystem 22 }
+   
+   rectSysEstimatedStandbyCapacityInAmps OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated standby capacity needed in amps."
+       ::= { rectifierSystem 23 }
+	   
+   rectSysPowerAveragePower OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The average power of all modules supplying power for Power Save in percentage."
+       ::= { rectifierSystem 24 }
+	   
+   rectSysModulesSupplyingPower OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of modules supplying power."
+       ::= { rectifierSystem 25 }
+	   
+   rectSysModulesInStandby OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of modules in standby."
+       ::= { rectifierSystem 26 }
+	   
+   rectSysEstimatedCapacityRemainingCurrent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated capacity remaining in amps."
+       ::= { rectifierSystem 28 }
+	   
+   rectSysEstimatedCapacityRemainingPower OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated capacity remaining in watts."
+       ::= { rectifierSystem 29 }
+	   
+   rectSysEstimatedSOCPercent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated state of charge percent remaining."
+       ::= { rectifierSystem 30 }
+	   
+   rectSysEstimatedBatteryRuntime OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated battery runtime remaining in hours."
+       ::= { rectifierSystem 31 }
+	   
+   rectSysEstimatedBatteryHealthPercent OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Estimated battery health percentage."
+       ::= { rectifierSystem 32 }
+                                      
+                                      
+	-- Conformance                                      
+                                      
+	conformance OBJECT IDENTIFIER ::= { rectifierSystem 100 }
+	
+	compliances OBJECT IDENTIFIER ::= { conformance 1 }
+	
+	compliance MODULE-COMPLIANCE
+	      STATUS  current
+	      DESCRIPTION
+	          "The compliance statement for systems supporting
+	          the alpha MIB."
+	      MODULE -- this module
+	          MANDATORY-GROUPS {
+				rectifierGroup
+	          }               
+	   ::= { compliances 1 }
+	
+	rectifierGroups OBJECT IDENTIFIER ::= { conformance 2 }
+         
+	rectifierGroup OBJECT-GROUP
+	    OBJECTS {      
+	    	rectSysTotalOutputCurrent,
+	    	rectSysTotalOutputPower, 
+	    	rectSysTotalCapacityInstalledAmps,  
+	    	rectSysTotalCapacityInstalledPower, 	
+	    	rectSysAverageRectifierOutputVoltage,
+	    	rectSysAverageRectifierACInputVoltage,
+	    	rectSysAveragePhase1Voltage,
+	    	rectSysAveragePhase2Voltage,
+	    	rectSysAveragePhase3Voltage,
+	    	rectSysSystemVoltage,
+	    	rectSysTotalLoadCurrent,
+	    	rectSysBatteryVoltage,
+	    	rectSysBatteryCurrent,
+	    	rectSysBatteryTemperature,
+	    	rectSysSystemNumber,
+			rectSysEstimatedRequiredCapacityInWatts,
+			rectSysEstimatedRequiredCapacityInAmps,
+			rectSysEstimatedAvailableCapacityInWatts,
+			rectSysEstimatedAvailableCapacityInAmps,
+			rectSysEstimatedRedundantCapacityInWatts,
+			rectSysEstimatedRedundantCapacityInAmps,
+			rectSysEstimatedStandbyCapacityInWatts,
+			rectSysEstimatedStandbyCapacityInAmps,
+			rectSysPowerAveragePower,
+			rectSysModulesSupplyingPower,
+			rectSysModulesInStandby,
+			rectSysEstimatedCapacityRemainingCurrent,
+			rectSysEstimatedCapacityRemainingPower,
+			rectSysEstimatedSOCPercent,
+			rectSysEstimatedBatteryRuntime,
+			rectSysEstimatedBatteryHealthPercent
+		}
+		STATUS   current
+		DESCRIPTION
+		     "Alpha Rectifier System data list group."
+		::= { rectifierGroups 1 }
+           
+           
+END

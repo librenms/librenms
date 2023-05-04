@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class PluginsUniqueIndex extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -42,4 +42,4 @@ class PluginsUniqueIndex extends Migration
             $table->dropUnique('plugins_version_plugin_name_unique');
         });
     }
-}
+};
