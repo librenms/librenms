@@ -24,6 +24,7 @@ $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.4.1.3.',       'oid' => 'ciscoEnvMonFanStatusTable',            'state_name' => 'ciscoEnvMonFanState',          'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonFanStatusDescr'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.5.1.3.',       'oid' => 'ciscoEnvMonSupplyStatusTable',         'state_name' => 'ciscoEnvMonSupplyState',       'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonSupplyStatusDescr'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.1.2.1.2.',    'oid' => 'cefcFRUPowerStatusTable',              'state_name' => 'cefcFRUPowerOperStatus',       'mib' => 'CISCO-ENTITY-FRU-CONTROL-MIB',    'descr' => 'Sensor Name'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.2.1.1.2.',    'oid' => 'cefcModuleOperStatus',                 'state_name' => 'cefcModuleOperStatus',         'mib' => 'CISCO-ENTITY-FRU-CONTROL-MIB',    'descr' => 'Sensor Name'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.2.',        'oid' => 'cRFStatusUnitState',                   'state_name' => 'cRFStatusUnitState',           'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Device State'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.4.',        'oid' => 'cRFStatusPeerUnitState',               'state_name' => 'cRFStatusPeerUnitState',       'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Peer State'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.14.',       'oid' => 'cRFCfgRedundancyOperMode',             'state_name' => 'cRFCfgRedundancyOperMode',     'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Mode'],
@@ -122,6 +123,36 @@ foreach ($tables as $tablevalue) {
                 ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'off (connector rating)'],
                 ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'on (no inline power)'],
             ];
+        } elseif ($state_name == 'cefcModuleOperStatus') {
+            $states = [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'okButDiagFailed'],
+                ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'boot'],
+                ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'selfTest'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'missing'],
+                ['value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'mismatchWithParent'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'mismatchConfig'],
+                ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'diagFailed'],
+                ['value' => 12, 'generic' => 2, 'graph' => 0, 'descr' => 'dormant'],
+                ['value' => 13, 'generic' => 2, 'graph' => 0, 'descr' => 'outOfServiceAdmin'],
+                ['value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'outOfServiceEnvTemp'],
+                ['value' => 15, 'generic' => 2, 'graph' => 0, 'descr' => 'poweredDown'],
+                ['value' => 16, 'generic' => 2, 'graph' => 0, 'descr' => 'poweredUp'],
+                ['value' => 17, 'generic' => 2, 'graph' => 0, 'descr' => 'powerDenied'],
+                ['value' => 18, 'generic' => 2, 'graph' => 0, 'descr' => 'powerCycled'],
+                ['value' => 19, 'generic' => 1, 'graph' => 0, 'descr' => 'okButPowerOverWarning'],
+                ['value' => 20, 'generic' => 2, 'graph' => 0, 'descr' => 'okButPowerOverCritical'],
+                ['value' => 21, 'generic' => 1, 'graph' => 0, 'descr' => 'syncInProgress'],
+                ['value' => 22, 'generic' => 1, 'graph' => 0, 'descr' => 'upgrading'],
+                ['value' => 23, 'generic' => 2, 'graph' => 0, 'descr' => 'okButAuthFailed'],
+                ['value' => 24, 'generic' => 1, 'graph' => 0, 'descr' => 'mdr'],
+                ['value' => 25, 'generic' => 2, 'graph' => 0, 'descr' => 'fwMismatchFound'],
+                ['value' => 26, 'generic' => 1, 'graph' => 0, 'descr' => 'fwDownloadSuccess'],
+                ['value' => 27, 'generic' => 2, 'graph' => 0, 'descr' => 'fwDownloadFailure'],
+            ];
         } elseif ($state_name == 'c3gModemStatus') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
@@ -211,6 +242,8 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
+                } elseif ($state_name == 'cefcModuleOperStatus') {
+                    $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' Operating Status';
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
                     $descr = $tablevalue['descr'];
                     $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
