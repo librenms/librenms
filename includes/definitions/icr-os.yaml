@@ -1,0 +1,15 @@
+os: icr-os
+text: 'ICR-OS'
+type: network
+icon: advantech
+group: advantech
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.30140.1
+
+mib_dir: icr-os
+

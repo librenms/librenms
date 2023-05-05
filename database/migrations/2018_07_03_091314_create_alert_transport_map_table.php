@@ -26,7 +26,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateAlertTransportMapTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -52,4 +52,4 @@ class CreateAlertTransportMapTable extends Migration
     {
         Schema::drop('alert_transport_map');
     }
-}
+};

@@ -93,7 +93,7 @@ if ($print_total) {
         $tot[] = '+';
     }
 
-    $rrd_options .= ' CDEF:tot=' . implode($tot, ',');
+    $rrd_options .= ' CDEF:tot=' . implode(',', $tot);
     $rrd_options .= ' COMMENT:"  ' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $descr_len) . '"';
     $rrd_options .= ' GPRINT:tot:LAST:%5.1lf%s';
     $rrd_options .= ' GPRINT:tot:MIN:%5.1lf%s';

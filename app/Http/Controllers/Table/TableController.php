@@ -61,8 +61,8 @@ abstract class TableController extends PaginatedAjaxController
         /** @var Builder $query */
         $query = $this->baseQuery($request);
 
-        $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
         $this->filter($request, $query, $this->filterFields($request));
+        $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
         $this->sort($request, $query);
 
         $limit = $request->get('rowCount', 25);

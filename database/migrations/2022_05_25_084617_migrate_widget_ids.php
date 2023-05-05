@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
-class MigrateWidgetIds extends Migration
+return new class extends Migration
 {
     /** @var Illuminate\Support\Collection<string, mixed> */
     private $map;
@@ -42,4 +42,4 @@ class MigrateWidgetIds extends Migration
             $table->string('widget', 32)->default('')->change();
         });
     }
-}
+};

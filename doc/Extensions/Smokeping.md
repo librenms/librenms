@@ -194,7 +194,7 @@ Then configure Nginx with the default configuration
 cp /usr/share/doc/fcgiwrap/examples/nginx.conf /etc/nginx/fcgiwrap.conf
 ```
 
-Add the following configuration to your `/etc/nginx/conf.d/librenms` config file.
+Add the following configuration to your `/etc/nginx/conf.d/librenms.conf` file within `server` section.
 
 The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:
 
