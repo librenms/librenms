@@ -362,5 +362,5 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$user of static method App\\\\Models\\\\UserPref\\:\\:getPref\\(\\) expects App\\\\Models\\\\User, Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable given\\.$#"
-			count: 2
+			count: 1
 			path: app/Providers/LegacyUserProvider.php
