@@ -1,31 +1,48 @@
 ---
-mib: PTP-MODEM-MIB:ICOM-ETHER-MIB:ICOM-ENTITY-SENSOR-EXT-MIB:ICOM-MODEM-PERF-MIB:ICOM-PERFHIST-TC-MIB
+mib: PTP-MODEM-MIB:ICOM-ETHER-MIB:ICOM-ENTITY-SENSOR-EXT-MIB:ICOM-MODEM-PERF-MIB:ICOM-PERFHIST-TC-MIB:ICOM-SFP-MIB
 modules:
     os:
-        sysDescr_regex: '/5\d(?<hardware>.*?)( Wireless|,).*Version\s+(?<version>[\d-]+)/'
+        hardware: '.1.3.6.1.2.1.1.1.0'
+        serial: '.1.3.6.1.4.1.1807.32.1.1.1.2.1'
+        version: '.1.3.6.1.4.1.1807.13.1.3.1.10.9'
+        features: '.1.3.6.1.4.1.1807.101.1.2.1.3.1'
+
     sensors:
-        temperature:
+        pre-cache:
             data:
                 -
-                    oid: oduTemperature
-                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.4.1.2.{{ $index }}'
-                    descr: ODU Temperature
-                    index: 'oduTemperature.{{ $index }}'
-                    low_limit: 0
-                    high_limit: 80
-                    low_warn_limit: 5
-                    warn_limit: 75
-                    divisor: 10
+                    interface_names:
+                    oid: ifName
+                    num_oid: '.1.3.6.1.2.1.31.1.1.1.1.{{ $index }}'
                 -
-                    oid: modemStatTemperature
-                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.3.1.2.{{ $index }}'
-                    descr: Modem Temperature
-                    index: 'modemStatTemperature.{{ $index }}'
-                    low_limit: 0
-                    high_limit: 80
+                    interface_descr:
+                    oid: ifDescr
+                    num_oid: '.1.3.6.1.2.1.2.2.1.2.{{ $index }}'
+                -
+                    interface_alias:
+                    oid: ifAlias
+                    num_oid: '.1.3.6.1.2.1.31.1.1.1.18.{{ $index }}'
+                -
+                    sensor_names:
+                    oid: entPhysicalName
+                    num_oid: '.1.3.6.1.2.1.47.1.1.1.1.2.{{ $index }}'
+
+        temperature:
+            options:
+                skip_value_lt: 1
+                skip_value_gt: 100000
+            data:
+                -
+                    oid: icomEntSensorValue
+                    num_oid: '.1.3.6.1.4.1.1807.30.1.1.1.4.{{ $index }}'
+                    descr: ' {{ $entPhysicalName }}.{{ $index }} '
+                    index: 'icomEntSensorValue.{{ $index }}'
+                    group: 'Unit Temperatures'
+                    divisor: 1000
+                    low_limit: -5
+                    high_limit: 65
                     low_warn_limit: 5
-                    warn_limit: 75
-                    divisor: 10
+                    warn_limit: 60
                 -
         signal:
             data:
@@ -87,89 +104,35 @@ modules:
         bitrate:
             data:
                 -
-                    multiplier: 10
-                    oid: modemEthRxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.6.1.23.{{ $index }}'
-                    descr: 'RX Bit Rate'
-                    index: 'modemEthRxBitRate.{{ $index }}'
-                    group: 'Modem'
-                -
-                    multiplier: 10
-                    oid: modemEthTxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.6.1.44.{{ $index }}'
-                    descr: 'TX Bit Rate'
-                    index: 'modemEthTxBitRate.{{ $index }}'
-                    group: 'Modem'
-                -
-                    multiplier: 1000
                     oid: icomEthStatsTxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.1'
-                    descr: 'Gbe1-PoE - Ethernet TX Throughput'
-                    index: 'icomEthStatsTxBitRate.1'
-                    group: 'Ethernet'
-                -
+                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.{{ $index }}'
+                    descr: 'TX Throughput - {{ $ifName }}'
+                    index: 'icomEthStatsTxBitRate.{{ $index }}'
+                    group: 'Ethernet {{ $ifName }} - {{ $ifAlias }}'
+                    divisor: 1
                     multiplier: 1000
-                    oid: icomEthStatsTxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.2'
-                    descr: 'Combo1 - Ethernet TX Throughput'
-                    index: 'icomEthStatsTxBitRate.2'
-                    group: 'Ethernet'
                 -
-                    multiplier: 1000
-                    oid: icomEthStatsTxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.3'
-                    descr: 'Combo2 - Ethernet TX Throughput'
-                    index: 'icomEthStatsTxBitRate.3'
-                    group: 'Ethernet'
-                -
-                    multiplier: 1000
-                    oid: icomEthStatsTxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.4'
-                    descr: 'Combo3 - Ethernet TX Throughput'
-                    index: 'icomEthStatsTxBitRate.4'
-                    group: 'Ethernet'
-                -
-                    multiplier: 1000
                     oid: icomEthStatsRxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.1'
-                    descr: 'Gbe1-PoE - Ethernet RX Throughput'
-                    index: 'icomEthStatsRxBitRate.1'
-                    group: 'Ethernet'
-                -
+                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.{{ $index }}'
+                    descr: 'RX Throughput - {{ $ifName }}'
+                    index: 'icomEthStatsRxBitRate.{{ $index }}'
+                    group: 'Ethernet {{ $ifName }} - {{ $ifAlias }}'
+                    divisor: 1
                     multiplier: 1000
-                    oid: icomEthStatsRxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.2'
-                    descr: 'Combo1 - Ethernet RX Throughput'
-                    index: 'icomEthStatsRxBitRate.2'
-                    group: 'Ethernet'
-                -
-                    multiplier: 1000
-                    oid: icomEthStatsRxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.3'
-                    descr: 'Combo2 - Ethernet RX Throughput'
-                    index: 'icomEthStatsRxBitRate.3'
-                    group: 'Ethernet'
-                -
-                    multiplier: 1000
-                    oid: icomEthStatsRxBitRate
-                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.4'
-                    descr: 'Combo3 - Ethernet RX Throughput'
-                    index: 'icomEthStatsRxBitRate.4'
-                    group: 'Ethernet'
                 -
                     oid: icomEthPerfCurrentMaxTxBitRate
                     num_oid: '.1.3.6.1.4.1.1807.65.2.2.1.8.50'
-                    descr: 'Max TX Bitrate'
+                    descr: 'Max TX Bitrate - {{ $ifName }}'
                     index: 'icomEthPerfCurrentMaxTxBitRate.50'
-                    group: 'Modem - Max Bitrate last minute'
+                    group: '{{ $ifName }} - Max Bitrate last minute - {{ $ifAlias }}'
                     divisor: 1
                     multiplier: 1000
                 -
                     oid: icomEthPerfCurrentMaxRxBitRate
                     num_oid: '.1.3.6.1.4.1.1807.65.2.2.1.10.50'
-                    descr: 'Max RX Bitrate'
+                    descr: 'Max RX Bitrate - {{ $ifName }}'
                     index: 'icomEthPerfCurrentMaxRxBitRate.50'
-                    group: 'Modem - Max Bitrate last minute'
+                    group: '{{ $ifName }} - Max Bitrate last minute - {{ $ifAlias }}'
                     divisor: 1
                     multiplier: 1000
                 -
@@ -266,7 +229,7 @@ modules:
                     descr: 'TX BW Utilization'
                     index: 'icomModemPerfStatusCurrentAvgTxBwUtil.{{ $index }}'
                     group: 'Bandwidth Utilization - Average over last 1 Minute'
-                    divisor: 10
+                    divisor: 100
                     multiplier: 1
                 -
                     oid: icomModemPerfStatusCurrentAvgRxBwUtil
@@ -274,7 +237,7 @@ modules:
                     descr: 'RX BW Utilization'
                     index: 'icomModemPerfStatusCurrentAvgRxBwUtil.{{ $index }}'
                     group: 'Bandwidth Utilization - Average over last 1 Minute'
-                    divisor: 10
+                    divisor: 100
                     multiplier: 1
                 -
         frequency:
@@ -306,7 +269,14 @@ modules:
                         - { value: 6, generic: 0, graph: 1, descr: 128QAM }
                         - { value: 7, generic: 0, graph: 1, descr: 256QAM }
                         - { value: 8, generic: 0, graph: 1, descr: 512QAM }
-                        - { value: 0, generic: 2, graph: 1, descr: Link Down }
+                        - { value: 9, generic: 0, graph: 1, descr: 1024/2048QAM }
+                        - { value: 10, generic: 0, graph: 1, descr: 2024QAM }
+                        - { value: 11, generic: 0, graph: 1, descr: 2048QAM }
+                        - { value: 12, generic: 0, graph: 1, descr: 4096QAM }
+                        - { value: 13, generic: 0, graph: 1, descr: None }
+                        - { value: 14, generic: 0, graph: 1, descr: None }
+                        - { value: 15, generic: 0, graph: 1, descr: None }
+                        - { value: 16, generic: 2, graph: 1, descr: Link Down }
                 -
                     oid: modemStatRxPHYModValue
                     num_oid: '.1.3.6.1.4.1.1807.55.1.1.3.1.10.{{ $index }}'
@@ -321,7 +291,14 @@ modules:
                         - { value: 6, generic: 0, graph: 1, descr: 128QAM }
                         - { value: 7, generic: 0, graph: 1, descr: 256QAM }
                         - { value: 8, generic: 0, graph: 1, descr: 512QAM }
-                        - { value: 0, generic: 2, graph: 1, descr: Link Down }
+                        - { value: 9, generic: 0, graph: 1, descr: 1024/2048QAM }
+                        - { value: 10, generic: 0, graph: 1, descr: 2024QAM }
+                        - { value: 11, generic: 0, graph: 1, descr: 2048QAM }
+                        - { value: 12, generic: 0, graph: 1, descr: 4096QAM }
+                        - { value: 13, generic: 0, graph: 1, descr: None }
+                        - { value: 14, generic: 0, graph: 1, descr: None }
+                        - { value: 15, generic: 0, graph: 1, descr: None }
+                        - { value: 16, generic: 2, graph: 1, descr: Link Down }
                 -
                     oid: oduBandSelection
                     num_oid: '.1.3.6.1.4.1.1807.55.1.2.1.1.2.{{ $index }}'
