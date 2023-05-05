@@ -113,7 +113,7 @@ class OutagesController extends TableController
         }
 
         $output = "<span style='display:inline;'>";
-        $output .= Carbon::createFromTimestamp($timestamp, session('timezone')))->format(Config::get('dateformat.compact'); // Convert epoch to local time
+        $output .= Carbon::createFromTimestamp($timestamp, session('timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
         $output .= '</span>';
 
         return $output;
