@@ -370,6 +370,7 @@ class ServiceTemplateController extends Controller
                     'service_ignore' => $template->ignore,
                 ]
             );
+
             return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
         }
 
@@ -390,6 +391,7 @@ class ServiceTemplateController extends Controller
                         'service_ignore' => $template->ignore,
                     ]
                 );
+
                 return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
             }
         }
