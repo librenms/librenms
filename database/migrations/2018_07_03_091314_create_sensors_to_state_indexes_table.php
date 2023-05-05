@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateSensorsToStateIndexesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class CreateSensorsToStateIndexesTable extends Migration
     {
         Schema::drop('sensors_to_state_indexes');
     }
-}
+};

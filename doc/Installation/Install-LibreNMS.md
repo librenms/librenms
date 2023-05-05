@@ -592,7 +592,7 @@ systemctl restart snmpd
 ## Cron job
 
 ```
-cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
 > NOTE: Keep in mind  that cron, by default, only uses a very limited
@@ -602,6 +602,15 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
 > <@= config.site_url =@/Support/Configuration/#proxy-support>
+
+## Enable the scheduler
+
+```
+cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/
+
+systemctl enable librenms-scheduler.timer
+systemctl start librenms-scheduler.timer
+```
 
 ## Copy logrotate config
 

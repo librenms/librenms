@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class UpdateRouteTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -58,4 +58,4 @@ class UpdateRouteTable extends Migration
             $table->index(['device_id', 'context_name', 'ipRouteDest', 'ipRouteNextHop'], 'device');
         });
     }
-}
+};
