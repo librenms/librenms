@@ -55,31 +55,31 @@ class SocialiteController extends Controller
         $driver = Socialite::driver($provider);
 
         // https://laravel.com/docs/10.x/socialite#access-scopes
-        if( $driver instanceof \Laravel\Socialite\Two\AbstractProvider &&
-            LibreNMSConfig::has('auth.socialite.scopes') )
-        {
+        if ($driver instanceof \Laravel\Socialite\Two\AbstractProvider &&
+            LibreNMSConfig::has('auth.socialite.scopes')) {
             $scopes = LibreNMSConfig::get('auth.socialite.scopes');
-            if( is_array( $scopes ) &&
-                count( $scopes ) > 0 )
-            {
+            if (is_array($scopes) &&
+                count($scopes) > 0) {
                 return $driver
-                    ->scopes( $scopes )
+                    ->scopes($scopes)
                     ->redirect();
             }
         }
+
         return $driver->redirect();
     }
 
     public function callback(Request $request, string $provider): RedirectResponse
     {
         /* If we get an error in the callback then attempt to handle nicely  */
-        if( array_key_exists('error', $request->query() )) {
+        if (array_key_exists('error', $request->query())) {
             $error = $request->query('error');
-            $error_description = $request->query('error_description') ;
-            flash()->addError( $error . ": " . $error_description );
+            $error_description = $request->query('error_description');
+            flash()->addError($error . ': ' . $error_description);
+
             return redirect()->route('login');
         }
-        
+
         $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
@@ -118,7 +118,7 @@ class SocialiteController extends Controller
             }
 
             Auth::login($user);
-            $this->setLevelFromClaim( $provider, $user );
+            $this->setLevelFromClaim($provider, $user);
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
@@ -147,42 +147,37 @@ class SocialiteController extends Controller
         $user->email = $this->socialite_user->getEmail();
         $user->realname = $this->buildRealName();
 
-        $user->level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
-        $this->setLevelFromClaim( $provider, $user );
+        $user->level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role', 'none'));
+        $this->setLevelFromClaim($provider, $user);
 
         $user->save();
     }
 
     private function setLevelFromClaim(string $provider, $user): void
     {
-        if( LibreNMSConfig::has('auth.socialite.scopes') )
-        {
-            $level = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.default_role', 'none' ));
+        if (LibreNMSConfig::has('auth.socialite.scopes')) {
+            $level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role', 'none'));
             $scopes = LibreNMSConfig::get('auth.socialite.scopes');
 
-            if( is_array( $scopes ) &&
-                count( $scopes ) > 0 )
-            {
-                foreach( $scopes as $scope )
-                {
-                    if( in_array('ArrayAccess', class_implements($this->socialite_user)) &&
-                        isset( $this->socialite_user->user ) &&
-                        is_array( $this->socialite_user->user ) &&
-                        array_key_exists( $scope, $this->socialite_user->user ) && 
-                        is_array( $this->socialite_user->user[$scope] ) )
-                    {
+            if (is_array($scopes) &&
+                count($scopes) > 0) {
+                foreach ($scopes as $scope) {
+                    if (in_array('ArrayAccess', class_implements($this->socialite_user)) &&
+                        isset($this->socialite_user->user) &&
+                        is_array($this->socialite_user->user) &&
+                        array_key_exists($scope, $this->socialite_user->user) &&
+                        is_array($this->socialite_user->user[$scope])) {
                         $scope_data_array = $this->socialite_user->user[$scope];
-                        foreach( $scope_data_array as $scope_data )
-                        {
-                            $newlevel = $this->getRoleAsLevel( LibreNMSConfig::get('auth.socialite.groups.' . $scope_data . '.role' , 'none' ));   
-                            if( $newlevel > $level ){
+                        foreach ($scope_data_array as $scope_data) {
+                            $newlevel = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.groups.' . $scope_data . '.role', 'none'));
+                            if ($newlevel > $level) {
                                 $level = $newlevel;
                             }
                         }
                     }
                 }
                 /* if the level has changed the set it and persist it */
-                if( $level != $user->level ){
+                if ($level != $user->level) {
                     $user->level = $level;
                     $user->save();
                 }
@@ -231,16 +226,16 @@ class SocialiteController extends Controller
     private function getRoleAsLevel(string $role): int
     {
         switch($role) {
-          case 'admin':
-            return 10;
-          case 'global-read':
-            return 5;
-          case 'normal':
-            return 1;
-          default:
-            return 0;
+            case 'admin':
+                return 10;
+            case 'global-read':
+                return 5;
+            case 'normal':
+                return 1;
+            default:
+                return 0;
         }
-      }
+    }
 
     /**
      * Take the config from Librenms Config, and insert it into Laravel Config
