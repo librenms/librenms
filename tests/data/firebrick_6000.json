@@ -1995,5 +1995,34 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.24693.100.2.1.1.2.5.1",
+                    "processor_index": "5.5.1",
+                    "processor_type": "firebrick",
+                    "processor_usage": 10,
+                    "processor_descr": "Processor",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.24693.100.2.1.1.2.5.2",
+                    "processor_index": "5.5.2",
+                    "processor_type": "firebrick",
+                    "processor_usage": 4,
+                    "processor_descr": "Processor",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
