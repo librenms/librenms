@@ -157,6 +157,7 @@ class SocialiteController extends Controller
     {
         $scopes = LibreNMSConfig::get('auth.socialite.scopes');
         $groups = LibreNMSConfig::get('auth.socialite.groups');
+
         if (is_array($scopes) &&
             $this->socialite_user instanceof AbstractUser &&
             ! empty($groups)
