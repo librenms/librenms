@@ -72,6 +72,22 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+function updateTimezone(tz, static)
+{
+    $.post(ajax_url + '/set_timezone',
+        {
+            timezone: tz,
+            static: static
+        },
+        function(data) {
+            if(data === tz) {
+                location.reload();
+            }
+        },
+        'text'
+    );
+}
+
 function updateResolution(refresh)
 {
     $.post(ajax_url + '/set_resolution',

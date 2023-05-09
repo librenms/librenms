@@ -93,6 +93,17 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="timezone" class="col-sm-4 control-label">{{ __('Timezone') }}</label>
+                <div class="col-sm-4">
+                    <select class="form-control ajax-select" name="timezone" data-pref="timezone" data-previous="{{ $timezone }}">
+                        <option value="default">Browser Timezone</option>
+                        @foreach(timezone_identifiers_list() as $tz)
+                            <option value="{{ $tz }}" @if($timezone == $tz) selected @endif>{{ $tz }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
@@ -237,6 +248,14 @@
                     }
                     if (pref === 'site_style') {
                         location.reload();
+                    }
+                    if (pref === 'timezone') {
+                        if(value === 'default') {
+                            var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            updateTimezone(tz, false);
+                        } else {
+                            updateTimezone(value, true);
+                        }
                     }
 
                     $this.data('previous', value);

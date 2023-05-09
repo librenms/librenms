@@ -230,6 +230,11 @@ Route::middleware(['auth'])->group(function () {
     Route::permanentRedirect('demo', '/');
 });
 
+// routes that don't need authentication
+Route::group(['prefix' => 'ajax', 'namespace' => 'Ajax'], function () {
+    Route::post('set_timezone', 'TimezoneController@set');
+});
+
 // installation routes
 Route::prefix('install')->namespace('Install')->group(function () {
     Route::get('/', 'InstallationController@redirectToFirst')->name('install');

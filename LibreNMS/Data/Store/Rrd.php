@@ -561,9 +561,9 @@ class Rrd extends BaseDatastore
      *
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public function graph(string $options): string
+    public function graph(string $options, array $env = null): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 

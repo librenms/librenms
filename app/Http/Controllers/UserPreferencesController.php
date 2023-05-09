@@ -73,6 +73,7 @@ class UserPreferencesController extends Controller
             'site_style' => UserPref::getPref($user, 'site_style'),
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
+            'timezone' => UserPref::getPref($user, 'timezone'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
         ];
 
@@ -109,6 +110,10 @@ class UserPreferencesController extends Controller
             'site_style' => [
                 'required',
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
+            ],
+            'timezone' => [
+                'required',
+                Rule::in(array_merge(['default'], timezone_identifiers_list())),
             ],
             'hide_dashboard_editor' => 'required|integer',
         ];
