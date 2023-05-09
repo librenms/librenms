@@ -159,7 +159,7 @@ class SocialiteController extends Controller
         $groups = LibreNMSConfig::get('auth.socialite.groups');
 
         if (is_array($scopes) &&
-            $this->socialite_user instanceof AbstractUser &&
+            $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
             ! empty($groups)
         ) {
             $user->level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role'));
