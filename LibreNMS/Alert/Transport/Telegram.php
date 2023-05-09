@@ -33,7 +33,7 @@ class Telegram extends Transport
     public function deliverAlert($obj, $opts)
     {
         $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
-        $telegram_opts['message_thread_id'] = $this->config['message-thread-id'];
+        $telegram_opts['message_thread_id'] = $this->config['message-thread-id'] ?? null;
         $telegram_opts['token'] = $this->config['telegram-token'];
         $telegram_opts['format'] = $this->config['telegram-format'];
 
