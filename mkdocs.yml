@@ -68,10 +68,11 @@ plugins:
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
         'Extensions/Prometheus.md': 'Extensions/metrics/Prometheus.md'
         'General/Contributing.md': 'Developing/Getting-Started.md'
-        'Installation/CentOS-image.md': 'Installation/Images.md'
+        'Installation/CentOS-image.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Images.md': 'Installation/Install-LibreNMS.md'
         'Installation/index.md': 'Installation/Install-LibreNMS.md'
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
-        'Installation/Ubuntu-image.md': 'Installation/Images.md'
+        'Installation/Ubuntu-image.md': 'Installation/Install-LibreNMS.md'
         'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
   - minify:
       minify_html: true
@@ -115,7 +116,6 @@ nav:
     - Installing LibreNMS: Installation/Install-LibreNMS.md
     - Other Methods:
       - Docker: Installation/Docker.md
-      - Virtual machines: Installation/Images.md
       - Older guides:
         - RHEL / CentOS 6: Installation/Installation-CentOS-6-Apache-Nginx.md
         - RHEL / CentOS 7 - Apache: Installation/Installation-CentOS-7-Apache.md
