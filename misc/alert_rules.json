@@ -592,5 +592,10 @@
     "rule": "applications.app_type = \"systemd\" && application_metrics.metric = \"sub_service_failed\" && application_metrics.value > \"0\"",
     "name": "Systemd Services Failed > 0",
     "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"linux_config_files\" && application_metrics.metric = \"number_of_confs\" && application_metrics.value > \"0\"",
+    "name": "linux_config_files Configuration Files Out-Of-Sync > 0",
+    "severity": "warning"
   }
 ]
