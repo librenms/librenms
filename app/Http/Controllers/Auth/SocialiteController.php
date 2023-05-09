@@ -27,6 +27,7 @@ use App\Models\User;
 use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
@@ -55,11 +56,9 @@ class SocialiteController extends Controller
         $driver = Socialite::driver($provider);
 
         // https://laravel.com/docs/10.x/socialite#access-scopes
-        if ($driver instanceof \Laravel\Socialite\Two\AbstractProvider &&
-            LibreNMSConfig::has('auth.socialite.scopes')) {
+        if ($driver instanceof \Laravel\Socialite\Two\AbstractProvider) {
             $scopes = LibreNMSConfig::get('auth.socialite.scopes');
-            if (is_array($scopes) &&
-                count($scopes) > 0) {
+            if (! empty($scopes) && is_array($scopes)) {
                 return $driver
                     ->scopes($scopes)
                     ->redirect();
@@ -119,6 +118,7 @@ class SocialiteController extends Controller
 
             Auth::login($user);
             $this->setLevelFromClaim($provider, $user);
+            $user->save();
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
@@ -147,7 +147,7 @@ class SocialiteController extends Controller
         $user->email = $this->socialite_user->getEmail();
         $user->realname = $this->buildRealName();
 
-        $user->level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role', 'none'));
+        $user->level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role'));
         $this->setLevelFromClaim($provider, $user);
 
         $user->save();
@@ -155,31 +155,20 @@ class SocialiteController extends Controller
 
     private function setLevelFromClaim(string $provider, $user): void
     {
-        if (LibreNMSConfig::has('auth.socialite.scopes')) {
-            $level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role', 'none'));
-            $scopes = LibreNMSConfig::get('auth.socialite.scopes');
+        $scopes = LibreNMSConfig::get('auth.socialite.scopes');
+        $groups = LibreNMSConfig::get('auth.socialite.groups');
+        if (is_array($scopes) &&
+            $this->socialite_user instanceof AbstractUser &&
+            ! empty($groups)
+        ) {
+            $user->level = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.default_role'));
+            $attributes = $this->socialite_user->getRaw();
 
-            if (is_array($scopes) &&
-                count($scopes) > 0) {
-                foreach ($scopes as $scope) {
-                    if (in_array('ArrayAccess', class_implements($this->socialite_user)) &&
-                        isset($this->socialite_user->user) &&
-                        is_array($this->socialite_user->user) &&
-                        array_key_exists($scope, $this->socialite_user->user) &&
-                        is_array($this->socialite_user->user[$scope])) {
-                        $scope_data_array = $this->socialite_user->user[$scope];
-                        foreach ($scope_data_array as $scope_data) {
-                            $newlevel = $this->getRoleAsLevel(LibreNMSConfig::get('auth.socialite.groups.' . $scope_data . '.role', 'none'));
-                            if ($newlevel > $level) {
-                                $level = $newlevel;
-                            }
-                        }
-                    }
-                }
-                /* if the level has changed the set it and persist it */
-                if ($level != $user->level) {
-                    $user->level = $level;
-                    $user->save();
+            foreach ($scopes as $scope) {
+                foreach (Arr::wrap($attributes[$scope] ?? []) as $scope_data) {
+                    $user->level = max($user->level,
+                        $this->getRoleAsLevel($groups[$scope_data]['role'] ?? 'none')
+                    );
                 }
             }
         }
@@ -223,18 +212,14 @@ class SocialiteController extends Controller
         return ! empty($name) ? $name : '';
     }
 
-    private function getRoleAsLevel(string $role): int
+    private function getRoleAsLevel(string $role = 'none'): int
     {
-        switch($role) {
-            case 'admin':
-                return 10;
-            case 'global-read':
-                return 5;
-            case 'normal':
-                return 1;
-            default:
-                return 0;
-        }
+        return match ($role) {
+            'admin' => 10,
+            'global-read' => 5,
+            'normal' => 1,
+            default => 0,
+        };
     }
 
     /**
