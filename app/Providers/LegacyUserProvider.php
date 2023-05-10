@@ -26,6 +26,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\UserPref;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -128,6 +129,13 @@ class LegacyUserProvider implements UserProvider
 
             if (empty($credentials['username']) || ! $authorizer->authenticate($credentials)) {
                 throw new AuthenticationException();
+            }
+
+            if ($tz = UserPref::getPref($user, 'timezone')) {
+                session([
+                    'timezone' => $tz,
+                    'timezone_static' => true,
+                ]);
             }
 
             return true;

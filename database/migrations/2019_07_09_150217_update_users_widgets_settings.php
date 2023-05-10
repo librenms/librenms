@@ -3,7 +3,7 @@
 use App\Models\UserWidget;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateUsersWidgetsSettings extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -12,6 +12,7 @@ class UpdateUsersWidgetsSettings extends Migration
      */
     public function up()
     {
+        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
@@ -31,6 +32,7 @@ class UpdateUsersWidgetsSettings extends Migration
      */
     public function down()
     {
+        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
@@ -42,4 +44,4 @@ class UpdateUsersWidgetsSettings extends Migration
             $widget->save();
         }
     }
-}
+};

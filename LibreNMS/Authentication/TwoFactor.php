@@ -194,7 +194,7 @@ class TwoFactor
                 ((ord($hash[$offset + 2]) & 0xFF) << 8) |
                 (ord($hash[$offset + 3]) & 0xFF)) % pow(10, self::OTP_SIZE);
 
-        return str_pad($truncated, self::OTP_SIZE, '0', STR_PAD_LEFT);
+        return str_pad("$truncated", self::OTP_SIZE, '0', STR_PAD_LEFT);
     }
 
     /**

@@ -27,7 +27,7 @@ foreach ($pre_cache['junos_ifotn_oids'] as $index => $entry) {
         $limit = null;
         $warn_limit = null;
         $tmp_exp = $pre_cache['junos_ifotn_oids'][$index . '.1']['jnxoptIfOTNPMCurrentFECBERExponent'];
-        $current = ($entry['jnxoptIfOTNPMCurrentFECBERMantissa']) * pow(10, (-$tmp_exp));
+        $current = $entry['jnxoptIfOTNPMCurrentFECBERMantissa'] * pow(10, -$tmp_exp);
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
         discover_sensor($valid['sensor'], 'ber', $device, $oid, $index, 'junos', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);

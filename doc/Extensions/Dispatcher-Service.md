@@ -18,7 +18,7 @@ behaviour only found in Python3.4+.
 - PyMySQL is recommended as it requires no C compiler to
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
-- redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- redis-py 4.0+ and Redis 5.0+ server (if using distributed polling)
 - psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
@@ -76,19 +76,39 @@ DB_PASSWORD=
 
 Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
+There are a number of options - most of them are optional if your redis instance is standalone and unauthenticated (neither recommended).
+
 ```dotenv
+##
+## Standalone
+##
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-# OR
-REDIS_SENTINEL=192.0.2.1:26379
-REDIS_SENTINEL_SERVICE=myservice
-
 REDIS_DB=0
-#REDIS_PASSWORD=
-#REDIS_TIMEOUT=60
+REDIS_TIMEOUT=60
 
-CACHE_DRIVER=redis
+# If requirepass is set in redis set everything above as well as: (recommended)
+REDIS_PASSWORD=PasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_USERNAME=UsernameGoesHere
+
+##
+## Sentinel
+##
+REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
+REDIS_SENTINEL_SERVICE=mymaster
+
+# If requirepass is set in sentinel, set everything above as well as: (recommended)
+REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
+
+For more information on ACL's, see <https://redis.io/docs/management/security/acl/> 
+
+Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT` - Sentinel just provides the address of the instance currently accepting writes and manages failover. It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
 
 ### Basic Configuration
 

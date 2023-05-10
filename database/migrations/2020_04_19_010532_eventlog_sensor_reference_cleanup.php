@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class EventlogSensorReferenceCleanup extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -27,4 +27,4 @@ class EventlogSensorReferenceCleanup extends Migration
             DB::table('eventlog')->where('type', $type)->update(['type' => ucfirst($type)]);
         }
     }
-}
+};

@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class ExtendServicesTableForServiceTemplatesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -44,4 +44,4 @@ class ExtendServicesTableForServiceTemplatesTable extends Migration
             $table->text('service_message')->change();
         });
     }
-}
+};

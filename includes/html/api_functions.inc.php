@@ -34,6 +34,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Billing;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -349,6 +350,9 @@ function list_devices(Illuminate\Http\Request $request)
         $param[] = $query;
     } elseif ($type == 'type') {
         $sql = '`d`.`type`=?';
+        $param[] = $query;
+    } elseif ($type == 'display') {
+        $sql = '`d`.`display`=?';
         $param[] = $query;
     } else {
         $sql = '1';
@@ -1579,15 +1583,15 @@ function list_bills(Illuminate\Http\Request $request)
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
-            $allowed = format_bytes_billing($bill['bill_quota']);
-            $used = format_bytes_billing($rate_data['total_data']);
+            $allowed = Billing::formatBytes($bill['bill_quota']);
+            $used = Billing::formatBytes($rate_data['total_data']);
             if ($bill['bill_quota'] > 0) {
                 $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
-            $overuse = (($overuse <= 0) ? '-' : format_bytes_billing($overuse));
+            $overuse = (($overuse <= 0) ? '-' : Billing::formatBytes($overuse));
         }
         $bill['allowed'] = $allowed;
         $bill['used'] = $used;
@@ -1631,9 +1635,9 @@ function get_bill_graphdata(Illuminate\Http\Request $request)
             $to = $request->get('to', time());
             $reducefactor = $request->get('reducefactor');
 
-            $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+            $graph_data = Billing::getBitsGraphData($bill_id, $from, $to, $reducefactor);
         } elseif ($graph_type == 'monthly') {
-            $graph_data = getHistoricTransferGraphData($bill_id);
+            $graph_data = Billing::getHistoricTransferGraphData($bill_id);
         }
 
         if (! isset($graph_data)) {
@@ -1700,11 +1704,11 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
             case 'bits':
                 $reducefactor = $request->get('reducefactor');
 
-                $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+                $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
                 break;
             case 'day':
             case 'hour':
-                $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+                $graph_data = Billing::getBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
                 break;
         }
 
@@ -2919,6 +2923,26 @@ function edit_service_for_host(Illuminate\Http\Request $request)
     }
 
     return api_error(500, "Failed to update the service with id $service_id");
+}
+
+/**
+ * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
+ */
+function post_syslogsink(Illuminate\Http\Request $request)
+{
+    $json = $request->json()->all();
+
+    if (is_null($json)) {
+        return api_success_noresult(400, 'Not valid json');
+    }
+
+    $logs = array_is_list($json) ? $json : [$json];
+
+    foreach ($logs as $entry) {
+        process_syslog($entry, 1);
+    }
+
+    return api_success_noresult(200, 'Syslog received: ' . count($logs));
 }
 
 /**

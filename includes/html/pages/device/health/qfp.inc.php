@@ -187,7 +187,8 @@ foreach ($components as $component_id => $tmp_component) {
     /*
      * QFP Memory resources
      */
-    $mem_prec = $tmp_component['memory_used'] * 100 / $tmp_component['memory_total'];
+    $mem_prec = Number::calculatePercent((int) $tmp_component['memory_used'], (int) $tmp_component['memory_total']);
+
     if ($mem_prec < 75) {
         $mem_label = 'label-success';
     } elseif ($mem_prec < 90) {

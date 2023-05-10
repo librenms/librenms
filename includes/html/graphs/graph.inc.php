@@ -33,6 +33,11 @@ $nototal = ! $graph_params->visible('total');
 $nodetails = ! $graph_params->visible('details');
 $noagg = ! $graph_params->visible('aggregate');
 $rrd_options = '';
+$env = [];
+
+if (session('timezone')) {
+    $env['TZ'] = session('timezone');
+}
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
@@ -62,7 +67,7 @@ if (! empty($command_only)) {
     echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
     echo '</pre>';
     try {
-        Rrd::graph($rrd_options);
+        Rrd::graph($rrd_options, $env);
     } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
         echo "<pre class='rrd-pre'>";
@@ -82,7 +87,7 @@ if (empty($rrd_options)) {
 
 // Generating the graph!
 try {
-    $image_data = Rrd::graph($rrd_options);
+    $image_data = Rrd::graph($rrd_options, $env);
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {

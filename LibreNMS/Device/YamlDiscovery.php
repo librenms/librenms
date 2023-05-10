@@ -238,7 +238,7 @@ class YamlDiscovery
                     return current($pre_cache[$name]);
                 } elseif (isset($sub_indexes[$sub_index])) {
                     if ($sub_index_end) {
-                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
+                        $multi_sub_index = implode('.', array_slice($sub_indexes, (int) $sub_index, (int) $sub_index_end));
                         if (isset($pre_cache[$name][$multi_sub_index][$name])) {
                             return $pre_cache[$name][$multi_sub_index][$name];
                         }

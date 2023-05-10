@@ -73,6 +73,7 @@ class UserPreferencesController extends Controller
             'site_style' => UserPref::getPref($user, 'site_style'),
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
+            'timezone' => UserPref::getPref($user, 'timezone'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
         ];
 
@@ -110,6 +111,10 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
+            'timezone' => [
+                'required',
+                Rule::in(array_merge(['default'], timezone_identifiers_list())),
+            ],
             'hide_dashboard_editor' => 'required|integer',
         ];
 
@@ -125,7 +130,7 @@ class UserPreferencesController extends Controller
 
     private function getValidLocales()
     {
-        return array_reduce(glob(resource_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
+        return array_reduce(glob(base_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
             $locale = basename($locale);
             $lang = __('preferences.lang', [], $locale);
             $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);

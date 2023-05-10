@@ -34,9 +34,9 @@ use LibreNMS\OS\Shared\Fortinet;
 use LibreNMS\RRD\RrdDefinition;
 
 class Fortigate extends Fortinet implements
-        OSPolling,
-        WirelessClientsDiscovery,
-        WirelessApCountDiscovery
+    OSPolling,
+    WirelessClientsDiscovery,
+    WirelessApCountDiscovery
 {
     public function discoverOS(Device $device): void
     {

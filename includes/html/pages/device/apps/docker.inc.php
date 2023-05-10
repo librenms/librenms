@@ -28,13 +28,23 @@ foreach ($containers as $index => $container) {
 
 print_optionbar_end();
 
-$graphs = [
+$graphs = [];
+if (! isset($vars['container'])) {
+    $graphs = array_merge($graphs, [
+        'docker_totals' => 'Totals status',
+    ]);
+}
+
+$graphs = array_merge($graphs, [
     'docker_pids' => 'PIDs',
     'docker_mem_limit' => 'Container memory limit',
     'docker_mem_used' => 'Container memory used',
     'docker_cpu_usage' => 'Container CPU usage, %',
     'docker_mem_perc' => 'Container Memory usage, %',
-];
+    'docker_uptime' => 'Container uptime',
+    'docker_size_rw' => 'Container Size RW',
+    'docker_size_root_fs' => 'Container Size Root FS',
+]);
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;

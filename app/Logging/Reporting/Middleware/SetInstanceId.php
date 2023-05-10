@@ -23,14 +23,14 @@
 namespace App\Logging\Reporting\Middleware;
 
 use App\Providers\ErrorReportingProvider;
-use Facade\FlareClient\Report;
+use Spatie\FlareClient\Report;
 
-class SetInstanceId
+class SetInstanceId implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to add instance ID, piggybacks on the "user id" feature.
      *
-     * @param  \Facade\FlareClient\Report  $report
+     * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next
      * @return mixed
      */

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class IsisAdjacenciesNullable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -43,4 +43,4 @@ class IsisAdjacenciesNullable extends Migration
             $table->string('isisISAdjIPAddrAddress', 128)->change();
         });
     }
-}
+};

@@ -35,10 +35,10 @@ foreach ($gpuArray as $index => $gpu) {
 
     if (count($stats) == 19 || count($stats) == 20) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
-        $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
+            $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
     } else {
         [$gpu, $pwr, $temp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
-        $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
+            $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
     }
 
     $sm_total += $sm;

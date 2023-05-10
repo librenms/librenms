@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
@@ -34,6 +35,7 @@ use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
+use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
 {
@@ -64,6 +66,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      */
     public function testDataIsValid($os, $variant, $modules)
@@ -80,6 +83,7 @@ class OSModulesTest extends DBTestCase
      * Test all modules for a particular OS
      *
      * @group os
+     *
      * @dataProvider dumpedDataProvider
      *
      * @param  string  $os  base os
@@ -88,6 +92,8 @@ class OSModulesTest extends DBTestCase
      */
     public function testOS($os, $variant, $modules)
     {
+        // Lock testing time
+        $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
         $this->requireSnmpsim();  // require snmpsim for tests
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
@@ -114,37 +120,24 @@ class OSModulesTest extends DBTestCase
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Discovered $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Discovered $module data does not match that found in $filename"
-            );
+            $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
             if ($module === 'route') {
                 // no route poller module
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] == 'matches discovery') {
-                $expected = $expected_data[$module]['discovery'];
-            } else {
+            if ($expected_data[$module]['poller'] !== 'matches discovery') {
                 $expected = $expected_data[$module]['poller'] ?? [];
             }
             $actual = $results[$module]['poller'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Polled $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Polled $module data does not match that found in $filename"
-            );
+            $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
 
+        $this->assertTrue(true, "Tested $os successfully"); // avoid no asserts error
+
         DeviceCache::flush(); // clear cached devices
+        $this->travelBack();
     }
 
     public function dumpedDataProvider()
@@ -178,5 +171,19 @@ class OSModulesTest extends DBTestCase
 
             return $mock;
         });
+    }
+
+    private function checkTestData(array $expected, array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
+    {
+        // try simple and fast comparison first, if that fails, do a costly/well formatted comparison
+        if ($expected != $actual) {
+            $message = Color::colorize('bg-red', "OS $os: $type $module data does not match that found in $filename");
+            $message .= PHP_EOL;
+            $message .= ($type == 'Discovered'
+                ? $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
+                : $helper->getPollerOutput($phpunit_debug ? null : $module));
+
+            $this->assertSame(Arr::dot($expected), Arr::dot($actual), $message);
+        }
     }
 }

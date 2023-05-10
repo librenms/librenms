@@ -13,7 +13,7 @@ foreach (explode("\n", $psus) as $psu) {
         [$oid, $presence] = explode(' ', $psu, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
-            $current_id = $split_oid[(count($split_oid) - 1)];
+            $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $psu_usage_oid . $current_id;
             $psu_max_oid = $psu_max_usage_oid . $current_id;
             $descr = 'PSU ' . $current_id . ' output';
