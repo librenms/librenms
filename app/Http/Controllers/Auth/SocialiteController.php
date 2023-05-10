@@ -168,7 +168,7 @@ class SocialiteController extends Controller
             foreach ($scopes as $scope) {
                 foreach (Arr::wrap($attributes[$scope] ?? []) as $scope_data) {
                     $user->level = max($user->level,
-                        $this->getRoleAsLevel($groups[$scope_data]['role'] ?? 'none')
+                        $this->getRoleAsLevel($groups[$scope_data]['role'] ?? null)
                     );
                 }
             }
@@ -213,7 +213,7 @@ class SocialiteController extends Controller
         return ! empty($name) ? $name : '';
     }
 
-    private function getRoleAsLevel(string $role = 'none'): int
+    private function getRoleAsLevel(?string $role): int
     {
         return match ($role) {
             'admin' => 10,
