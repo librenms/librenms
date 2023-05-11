@@ -15,7 +15,7 @@ Location resolution happens as follows
    brackets), that is used
 1. If there is a location overide for the device in the WebUI and it
    contains `[lat, lng]` (note the square brackets), that is used.
-1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
+1. Attempt to resolve lat, lng using `lnms config:set geoloc.engine`
 1. Properly formatted addresses in sysLocation or sysLocation
    override, under device settings.
 
@@ -74,10 +74,11 @@ $config['leaflet']['group_radius']                      = 1;
 
 ## Geocode engine config
 
-```php
-$config['geoloc']['engine']  = "google"; // Valid options are google, mapquest or bing
-$config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
-```
+!!! setting "external/location"
+    ```bash
+    lnms config:set geoloc.engine google
+    lnms config:set geoloc.api_key 'abcdefghijklmnopqrstuvwxyz'
+    ```
 
 Google:  
 Pros: fast, accurate  
