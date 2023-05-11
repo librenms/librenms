@@ -179,7 +179,7 @@ function discover_device(&$device, $force_module = false)
         }
     }
 
-    $device_time = round(microtime(true) - $device_start, 3);
+    $device_time = round(microtime(true) - $device_start);
 
     dbUpdate(['last_discovered' => ['NOW()'], 'last_discovered_timetaken' => $device_time], 'devices', '`device_id` = ?', [$device['device_id']]);
 

@@ -123,7 +123,6 @@ class PingCheck implements ShouldQueue
                 continue;
             }
 
-            dump($line);
             if (preg_match_all(
                 '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/m',
                 $line,
@@ -230,7 +229,6 @@ class PingCheck implements ShouldQueue
      */
     private function recordData(string $hostname, string $status, float $rtt = 0): void
     {
-        dump(get_defined_vars());
         if (Debug::isVerbose()) {
             echo "Attempting to record data for $hostname... ";
         }
@@ -247,7 +245,7 @@ class PingCheck implements ShouldQueue
             // mark up only if snmp is not down too
             $device->status = ($status == 'alive' && $device->status_reason != 'snmp');
             $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $rtt;
+            $device->last_ping_timetaken = round($rtt, 2);
 
             if ($device->isDirty('status')) {
                 // if changed, update reason

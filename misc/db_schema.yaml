@@ -530,8 +530,8 @@ devices:
     - { Field: agent_uptime, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: last_polled, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_poll_attempted, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_polled_timetaken, Type: 'double(5,2)', 'Null': true, Extra: '' }
-    - { Field: last_discovered_timetaken, Type: 'double(5,2)', 'Null': true, Extra: '' }
+    - { Field: last_polled_timetaken, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: last_discovered_timetaken, Type: 'smallint unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_ping, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_ping_timetaken, Type: 'double(8,2)', 'Null': true, Extra: '' }

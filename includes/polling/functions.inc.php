@@ -387,7 +387,7 @@ function poll_device($device, $force_module = false)
             $os->enableGraph('ping_perf');
         }
 
-        $device_time = round(microtime(true) - $device_start, 3);
+        $device_time = round(microtime(true) - $device_start);
 
         // Poller performance
         if (! empty($device_time)) {
