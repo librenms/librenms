@@ -1,27 +1,33 @@
 <?php
 
-$physical_name = snmpwalk_cache_oid($device, 'sysObjectID.0', $physical_name, 'SNMPv2-MIB:CALIX-PRODUCT-MIB');
-$serial_number = snmpwalk_cache_oid($device, 'axosSystemChassisSerialNumber', $serial_number, 'Axos-System-MIB');
-$entity_array[] = [
-    'entPhysicalIndex' => 0,
-    'entPhysicalName' => $physical_name['sysObjectID.0'],
-    'entPhysicalSerialNum' => $serial_number['axosSystemChassisSerialNumber.0'],
-    'entPhysicalMfgName' => 'Calix',
+$physical_name = snmpwalk_cache_multi_oid($device, 'sysObjectID.0', $physical_name, 'SNMPv2-MIB:CALIX-PRODUCT-MIB');
+$serial_number = snmpwalk_cache_multi_oid($device, 'axosSystemChassisSerialNumber', $serial_number, 'Axos-System-MIB');
+$physical_index = 1;
+$entity_array[1] = [
+    'entPhysicalIndex'        => $physical_index,
+    'entPhysicalDescr' => $physical_name[0]['sysObjectID'],
     'entPhysicalVendorType' => 'Calix',
-    'entPhysicalParentRelPos' => 0,
+    'entPhysicalContainedIn' => '0',
+    'entPhysicalClass'        => 'chassis',
+    'entPhysicalParentRelPos' => '-1',
+    'entPhysicalName' => $physical_name[0]['sysObjectID'],
+    'entPhysicalSerialNum' => $serial_number[0]['axosSystemChassisSerialNumber'],
+    'entPhysicalMfgName' => 'Calix',
+    'entPhysicalModelName' => $physical_name[0]['sysObjectID'],
 ];
 
 $card_array = snmpwalk_cache_multi_oid($device, 'axosCardTable', $card_array, 'Axos-Card-MIB');
-$id = 1;
 foreach ($card_array as $card) {
-    // Discover the card
+    $physical_index++;
+//    Discover the card
     $entity_array[] = [
-        'entPhysicalIndex'        => $id++,
+        'entPhysicalIndex'        => $physical_index,
         'entPhysicalDescr'        => "Calix {$card['axosCardActualType']}",
-        'entPhysicalClass'        => 'card',
+        'entPhysicalClass'        => 'container',
         'entPhysicalModelName'    => $card['axosCardPartNumber'],
         'entPhysicalSerialNum'    => $card['axosCardSerialNumber'],
-        'entPhysicalContainedIn'  => '0',
+        'entPhysicalContainedIn'  => 1,
+        'entPhysicalParentRelPos'  => $card['axosCardSlot'],
         'entPhysicalSoftwareRev'  => $card['axosCardSoftwareVersion'],
         'entPhysicalIsFRU'        => true,
     ];
