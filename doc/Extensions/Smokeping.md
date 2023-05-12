@@ -124,15 +124,15 @@ file sequence.
 
 ## Configure LibreNMS - All Operating Systems
 
-Edit `/opt/librenms/config.php` and add the following:
+!!! setting "external/smokeping"
+    ```bash
+    lnms config:set smokeping.dir '/var/lib/smokeping'
+    lnms config:set smokeping.pings 20
+    lnms config:set smokeping.probes 2
+    lnms config:set smokeping.integration true
+    lnms config:set smokeping.url 'smokeping/'
+    ```
 
-```php
-$config['smokeping']['dir'] = '/var/lib/smokeping';
-$config['smokeping']['pings'] = 20;
-$config['smokeping']['probes'] = 2;
-$config['smokeping']['integration'] = true;
-$config['smokeping']['url'] = 'smokeping/';  // If you have a specific URL or path for smokeping
-```
 `dir` should match the location that smokeping writes RRD's to
 `pings` should match the default smokeping value, default 20
 `probes` should be the number of processes to spread pings over, default 2
@@ -307,7 +307,7 @@ Finally restart the smokeping service:
 sudo systemctl start smokeping
 ```
 
-Remember to update *config.php* with the new locations.
+Remember to update your config with the new locations.
 
 #### Configure SELinux to allow smokeping to write in LibreNMS directory on Centos / RHEL
 If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:
