@@ -27,12 +27,13 @@ continue to function as normal.
 
 ## Configuration
 
-```php
-$config['prometheus']['enable'] = true;
-$config['prometheus']['url'] = 'http://127.0.0.1:9091';
-$config['prometheus']['job'] = 'librenms'; # Optional
-$config['prometheus']['prefix'] = 'librenms'; # Optional
-```
+!!! setting "poller/prometheus"
+    ```bash
+    lnms config:set prometheus.enable true
+    lnms config:set prometheus.url 'http://127.0.0.1:9091'
+    lnms config:set prometheus.job 'librenms'
+    lnms config:set prometheus.prefix 'librenms'
+    ```
 
 ## Prefix
 
