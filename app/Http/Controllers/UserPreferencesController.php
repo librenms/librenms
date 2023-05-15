@@ -75,6 +75,7 @@ class UserPreferencesController extends Controller
             'site_styles' => $styles,
             'timezone' => UserPref::getPref($user, 'timezone'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
+            'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
         if (Config::get('twofactor')) {
@@ -116,6 +117,7 @@ class UserPreferencesController extends Controller
                 Rule::in(array_merge(['default'], timezone_identifiers_list())),
             ],
             'hide_dashboard_editor' => 'required|integer',
+            'global_search_ctrlf_focus' => 'required|integer',
         ];
 
         $this->validate($request, [
