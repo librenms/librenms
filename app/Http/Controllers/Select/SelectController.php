@@ -57,7 +57,8 @@ abstract class SelectController extends PaginatedAjaxController
         $query = $this->baseQuery($request)->when($request->has('id'), function ($query) {
             return $query->whereKey(request('id'));
         });
-        $query = $this->search($request->get('term'), $query, $this->searchFields($request));
+        $this->filter($request, $query, $this->filterFields($request));
+        $this->search($request->get('term'), $query, $this->searchFields($request));
         $this->sort($request, $query);
         $paginator = $query->simplePaginate($limit);
 

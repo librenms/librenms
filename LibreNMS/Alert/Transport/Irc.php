@@ -37,7 +37,12 @@ class Irc extends Transport
 
     public function contactIrc($obj, $opts)
     {
-        $f = Config::get('install_dir') . '/.ircbot.alert';
+        $container_dir = '/data';
+        if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
+            $f = $container_dir . '/.ircbot.alert';
+        } else {
+            $f = Config::get('install_dir') . '/.ircbot.alert';
+        }
         if (file_exists($f) && filetype($f) == 'fifo') {
             $f = fopen($f, 'w+');
             $r = fwrite($f, json_encode($obj) . "\n");
