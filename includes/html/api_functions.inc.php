@@ -2453,7 +2453,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
                       ->orderBy('ports_fdb.updated_at', 'desc')
                       ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
            })
-           ->get();
+           ->limit(1000)->get();
 
     if (count($fdb) == 0) {
         return api_error(404, 'Fdb do not exist');
