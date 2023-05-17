@@ -2462,8 +2462,8 @@ function list_fdb_detail(Illuminate\Http\Request $request)
 
     foreach ($fdb as $i => $fdb_entry) {
         if ($fdb_entry['updated_at']) {
-           $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
-           $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
+            $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
+            $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
        }
     }
 
