@@ -190,7 +190,7 @@ class OSModulesTest extends DBTestCase
 
             // json will store 43.0 as 43, Number::cast will change those to integers too
             foreach ($actual as $index => $value) {
-                if (is_numeric($value)) {
+                if (is_float($value)) {
                     $actual[$index] = Number::cast($value);
                 }
             }
