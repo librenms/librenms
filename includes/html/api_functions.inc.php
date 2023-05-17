@@ -2460,6 +2460,13 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         return api_error(404, 'Fdb do not exist');
     }
 
+    foreach ($fdb as $i => $fdb_entry) {
+        if ($fdb_entry['updated_at']) {
+           $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
+           $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
+       }
+    }
+
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
