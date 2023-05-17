@@ -2443,8 +2443,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $macOui = Rewrite::readableOUI($macAddress);
-    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => $macOui];
+    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => Rewrite::readableOUI($macAddress)];
 
     $fdb = PortsFdb::hasAccess(Auth::user())
            ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
