@@ -152,6 +152,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
     Route::prefix('resources')->group(function () {
         Route::get('fdb', 'LegacyApiController@list_fdb')->name('list_fdb');
         Route::get('fdb/{mac}', 'LegacyApiController@list_fdb')->name('list_fdb_mac');
+        Route::get('fdb/{mac}/detail', 'LegacyApiController@list_fdb_detail')->name('list_fdb_detail');
         Route::get('links', 'LegacyApiController@list_links')->name('list_links');
         Route::get('sensors', 'LegacyApiController@list_sensors')->name('list_sensors');
         Route::get('vlans', 'LegacyApiController@list_vlans')->name('list_vlans');
