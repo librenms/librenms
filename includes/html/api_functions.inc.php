@@ -2447,8 +2447,8 @@ function list_fdb_detail(Illuminate\Http\Request $request)
     $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => $macOui];
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-           ->when(!empty($macAddress), function(Builder $query) use ($macAddress) {
-               return $query->leftJoin('ports', 'ports_fdb.port_id','ports.port_id')
+           ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
+               return $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
                       ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
                       ->where('mac_address', $macAddress)
                       ->orderBy('ports_fdb.updated_at', 'desc')
