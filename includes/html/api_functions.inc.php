@@ -2430,6 +2430,39 @@ function list_fdb(Illuminate\Http\Request $request)
     return api_success($fdb, 'ports_fdb');
 }
 
+function list_fdb_detail(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('mac'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $macOui = Rewrite::readableOUI($macAddress);
+    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => $macOui];
+
+    $fdb = PortsFdb::hasAccess(Auth::user())
+           ->when(!empty($macAddress), function(Builder $query) use ($macAddress) {
+                   return $query->leftJoin('ports', 'ports_fdb.port_id','ports.port_id')
+                          ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
+                          ->where('mac_address', $macAddress)
+                          ->orderBy('ports_fdb.updated_at', 'desc')
+                          ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
+           })
+           ->get();
+
+    if (count($fdb) == 0) {
+        return api_error(404, 'Fdb do not exist');
+    }
+
+    return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
+}
+
 function list_sensors()
 {
     $sensors = Sensor::hasAccess(Auth::user())->get();
