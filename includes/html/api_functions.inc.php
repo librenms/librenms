@@ -2464,7 +2464,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         if ($fdb_entry['updated_at']) {
             $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
             $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
-       }
+        }
     }
 
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
