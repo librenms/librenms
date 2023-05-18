@@ -16,34 +16,34 @@ try {
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('errors', 'DERIVE', 0)
-    ->addDataset('ignored_host', 'DERIVE', 0)
-    ->addDataset('ignored_ip', 'DERIVE', 0)
-    ->addDataset('ignored_ip_dest', 'DERIVE', 0)
-    ->addDataset('ignored_ip_src', 'DERIVE', 0)
-    ->addDataset('sub', 'DERIVE', 0)
-    ->addDataset('sub_2xx', 'DERIVE', 0)
-    ->addDataset('sub_3xx', 'DERIVE', 0)
-    ->addDataset('sub_4xx', 'DERIVE', 0)
-    ->addDataset('sub_5xx', 'DERIVE', 0)
-    ->addDataset('sub_fail', 'DERIVE', 0)
-    ->addDataset('truncated', 'DERIVE', 0)
-    ->addDataset('zero_sized', 'DERIVE', 0);
+    ->addDataset('errors', 'GAUGE', 0)
+    ->addDataset('ignored_host', 'GAUGE', 0)
+    ->addDataset('ignored_ip', 'GAUGE', 0)
+    ->addDataset('ignored_ip_dest', 'GAUGE', 0)
+    ->addDataset('ignored_ip_src', 'GAUGE', 0)
+    ->addDataset('sub', 'GAUGE', 0)
+    ->addDataset('sub_2xx', 'GAUGE', 0)
+    ->addDataset('sub_3xx', 'GAUGE', 0)
+    ->addDataset('sub_4xx', 'GAUGE', 0)
+    ->addDataset('sub_5xx', 'GAUGE', 0)
+    ->addDataset('sub_fail', 'GAUGE', 0)
+    ->addDataset('truncated', 'GAUGE', 0)
+    ->addDataset('zero_sized', 'GAUGE', 0);
 
 $fields = [
-    'errors' => $data['errors'],
-    'ignored_host' => $data['ignored_host'],
-    'ignored_ip' => $data['ignored_ip'],
-    'ignored_ip_dest' => $data['ignored_ip_dest'],
-    'ignored_ip_src' => $data['ignored_ip_src'],
-    'sub' => $data['sub'],
-    'sub_2xx' => $data['sub_2xx'],
-    'sub_3xx' => $data['sub_3xx'],
-    'sub_4xx' => $data['sub_4xx'],
-    'sub_5xx' => $data['sub_5xx'],
-    'sub_fail' => $data['sub_fail'],
-    'truncated' => $data['truncated'],
-    'zero_sized' => $data['zero_sized'],
+    'errors' => $data['errors_delta'],
+    'ignored_host' => $data['ignored_host_delta'],
+    'ignored_ip' => $data['ignored_ip_delta'],
+    'ignored_ip_dest' => $data['ignored_ip_dest_delta'],
+    'ignored_ip_src' => $data['ignored_ip_src_delta'],
+    'sub' => $data['sub_delta'],
+    'sub_2xx' => $data['sub_2xx_delta'],
+    'sub_3xx' => $data['sub_3xx_delta'],
+    'sub_4xx' => $data['sub_4xx_delta'],
+    'sub_5xx' => $data['sub_5xx_delta'],
+    'sub_fail' => $data['sub_fail_delta'],
+    'truncated' => $data['truncated_delta'],
+    'zero_sized' => $data['zero_sized_delta'],
 ];
 
 if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
