@@ -20,13 +20,6 @@ foreach ($vlansName as $vlansKey => $vlansValue){
     }
 }
 
-// // Dump new VlanId to Vlan Name for debugging.
-//need to modify this to create indice for below
-echo "Vlan Names:";
-foreach ($vlanMapping as $vlanItemKey => $vlanItemValue){
-     echo ("VlanID: {$vlanItemKey} Name: {$vlanItemValue}");
-}
-
 // Create New Array with Port and VlanID
 foreach ($vlansPort as $portIndex => $vlantoport){
     $portIndexArray = explode('.',$portIndex);
@@ -34,19 +27,19 @@ foreach ($vlansPort as $portIndex => $vlantoport){
     echo ("\nportindex: {$portIndexArray[2]}\n");
 }
 
-// Dump New VlanId to Port Mapping for debugging.
+// Creat new VlanId to Port Mapping.
  echo "\nVID to Port Mapping";
  foreach ($vlanidToPort as $vlanPortKey => $vlanPortKeyValue){
 
-     //echo ("Port: {$vlanPortKey} VlanID: {$vlanPortKeyValue}");
      $port_attr = explode(".", $vlanPortKey, 3);
      echo ("\nport number is: {$port_attr[1]}\n");
      echo ("\nVLAN ID is: {$vlanPortKeyValue}\n");
-     //echo ("\nport number is: {$port_attr[2]}\n");
+     
+     //Ciena supplies dot1 ports 1000x for port values need to modify
      $port_to_dot1d = "1000".$port_attr[1];
-     d_echo($port_to_dot1d);
+     
+     //Convert the values to integers
      $port_vlan_map['port'] = (int)$port_to_dot1d;
-     //$port_attr[1];
      $port_vlan_map['vlan'] = (int)$port_attr[0];
      d_echo([$port_vlan_map['port']]);
      $db_a['baseport'] = $port_attr[1];
@@ -54,19 +47,10 @@ foreach ($vlansPort as $portIndex => $vlantoport){
      $db_a['state'] = "unknown";
      $db_a['cost'] = "0";
      $db_a['untagged'] = "0";
-     //$port_to_dot1d = "1000".$port_attr[1];
-     //d_echo($port_to_dot1d);
-     //$port_vlan_map['port'] = (int)$port_to_dot1d;
-     //$port_attr[1];
-     //$port_vlan_map['vlan'] = (int)$port_attr[0];
-     d_echo([$port_vlan_map['port']]);
-     d_echo ([$db_a]);
      $from_db_portid_ifIndex =  dbFetchRow('SELECT `port_id` from ports WHERE ports.device_id = ? AND ifIndex = ?', [$device['device_id'], $port_vlan_map['port']]);
-     d_echo([$from_db_portid_ifIndex]);
      $db_w = [
          'device_id' => $device['device_id'],
          'port_id'   => $from_db_portid_ifIndex['port_id'] ?? null,
-//         'port_id'   => $port_vlan_map['port'] ?? null,
          'vlan'      => $port_vlan_map['vlan'],
      ];
      $db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
@@ -77,18 +61,6 @@ foreach ($vlansPort as $portIndex => $vlantoport){
      $db_updater = dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', [$port_vlan_map['port'],0,"unknown",0,$port_vlan_map['vlan'],$db_id]);
      d_echo([$db_updater]);
 
-     //dbUpdate($db_a,'ports_vlans', '`port_vlan_id` = ?',' [$port_attr[1],$vlanPortKeyValue]);
-     //$port_vlan_array = array("port","vlan");
-
-     //$port_vlan_array = array("port" => $port_attr[1],"vlan" => $vlanPortKeyValue);
-     //$port_vlan_array[0] = $port_attr[1];
-     //$port_vlan_array[1] = $vlanPortKeyValue;
-
-     //echo ("\nport vlan array: {$port_vlan_array}\n";
-
-     //dbUpdate('', 'vlans', '`vlan_id` = ?', '[{$port_attr[1]},{$vlanPortKeyValue}]');
-     //$tagness_by_vlan_index[$vlanPortKeyValue][$port_attr[1]]['tag'] = 0;
-     //echo("\ntaggness maybe: {$tagness_by_vlan_index[$vlanPortKeyValue]["1000".$port_attr[1]]['tag'] = 0;}\n";
 }
 
 foreach ($vlanMapping as $vlanIdKey => $vlan) {
