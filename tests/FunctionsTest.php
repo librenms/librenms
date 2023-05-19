@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
@@ -118,5 +119,17 @@ class FunctionsTest extends TestCase
         $this->assertEquals(0, Time::parseAt('invalid'));
         $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
         $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
+    }
+
+    public function testNumberCast()
+    {
+        $this->assertSame(-14.3, Number::cast(-14.3));
+        $this->assertSame(0, Number::cast('b -35')); // cast must start with the number as old style php cast did
+        $this->assertSame(0, Number::cast('0 43 51'));
+        $this->assertSame(14.35, Number::cast('14.35 a'));
+        $this->assertSame(-43.332, Number::cast('-43.332 a'));
+        $this->assertSame(-12325234523.43, Number::cast('-12325234523.43asdf'));
+        $this->assertSame(1, Number::cast(1.0));
+        $this->assertSame(2, Number::cast('2.000'));
     }
 }
