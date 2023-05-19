@@ -17,8 +17,7 @@
         </span>
     </x-slot>
     <x-slot name="body">
-        <div x-data="{loadGraphs: false}" x-init="$watch('popupShow', shown => {if(shown) loadGraphs = true})">
-        <template x-if="loadGraphs">
+        <template x-if="loadGraphs" x-data="{loadGraphs: false}" x-init="$watch('popupShow', shown => {if(shown) loadGraphs = true})">
             <div>
             @foreach($graphs as $graph)
                 @isset($graph['text'], $graph['graph'])
@@ -27,6 +26,5 @@
             @endforeach
             </div>
         </template>
-        </div>
     </x-slot>
 </x-popup>
