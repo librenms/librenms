@@ -1,7 +1,8 @@
 <?php
 
 $ds = 'truncated';
-$unit_text = 'Truncated Files';
+$unit_text = 'Files';
+$descr = 'Truncated';
 $filename = Rrd::name($device['hostname'], ['app', 'suricata_extract', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

@@ -2,6 +2,7 @@
 
 $ds = 'ignored_ip_src';
 $unit_text = 'Ignored';
+$descr = 'By IP Src';
 $filename = Rrd::name($device['hostname'], ['app', 'suricata_extract', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

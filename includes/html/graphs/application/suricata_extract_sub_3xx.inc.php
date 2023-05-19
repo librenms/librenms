@@ -1,7 +1,8 @@
 <?php
 
 $ds = 'sub_3xx';
-$unit_text = '3xx';
+$unit_text = 'HTML Status';
+$descr = '3xx';
 $filename = Rrd::name($device['hostname'], ['app', 'suricata_extract', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

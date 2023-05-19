@@ -1,7 +1,8 @@
 <?php
 
 $ds = 'zero_sized';
-$unit_text = 'Zero Sized Files';
+$unit_text = 'Files';
+$descr = 'Zero Sized';
 $filename = Rrd::name($device['hostname'], ['app', 'suricata_extract', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

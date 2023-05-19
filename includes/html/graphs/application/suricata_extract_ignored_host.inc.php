@@ -2,6 +2,7 @@
 
 $ds = 'ignored_host';
 $unit_text = 'Ignored';
+$descr = 'By Host';
 $filename = Rrd::name($device['hostname'], ['app', 'suricata_extract', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {
