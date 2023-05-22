@@ -5,7 +5,7 @@ icon: axis
 mib_dir: axis
 discovery:
     -
-        sysDescr_regex: '/AXIS .* (Network Camera|Video Server|Network Video Encoder)/'
+        sysDescr_regex: '/AXIS .* (Network Camera|Security Radar|Video Server|Network Video Encoder)/'
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_temperature, text: 'Device Temperature' }
