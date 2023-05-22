@@ -10,9 +10,9 @@ $vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticRowSta
 $vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')->table(2, $vlans);
 
 foreach ($vlans as $vlan_domain_id => $vlan_domains) {
-    d_echo('Processing vlan domain ID: $vlan_domain_id');
+    d_echo("Processing vlan domain ID: $vlan_domain_id");
     foreach ($vlan_domains as $vlan_id => $vlan) {
-        d_echo('Processing vlan ID: $vlan_id');
+        d_echo("Processing vlan ID: $vlan_id");
         $vlan_name = empty($vlan['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName']) ? "VLAN $vlan_id" : $vlan['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName'];
 
         //try to get existing data from DB
@@ -26,12 +26,14 @@ foreach ($vlans as $vlan_domain_id => $vlan_domains) {
 
         //vlan does not exist
         if (! $vlanDB->exists) {
-            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name", $device['device_id'], 'vlan', 4);
+            d_echo("Vlan added: $vlan_id with name $vlan_name");
         }
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
             \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+            d_echo("Vlan changed: $vlan_id new name $vlan_name");
         }
 
         $vlanDB->save();
