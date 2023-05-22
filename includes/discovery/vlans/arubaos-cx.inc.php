@@ -5,9 +5,9 @@ use App\Models\Vlan;
 echo "ArubaOS-CX VLANs:\n";
 
 $vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts')->table(2);
-$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts')->table(2,$vlans);
-$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticRowStatus')->table(3,$vlans);
-$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')->table(2,$vlans);
+$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts')->table(2, $vlans);
+$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticRowStatus')->table(3, $vlans);
+$vlans = SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')->table(2, $vlans);
 
 foreach ($vlans as $vlan_domain_id => $vlan_domains) {
     d_echo('Processing vlan domain ID: $vlan_domain_id');
