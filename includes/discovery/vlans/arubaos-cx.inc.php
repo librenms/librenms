@@ -14,7 +14,7 @@ foreach ($vlans as $vlan_domain_id => $vlan_domains) {
     foreach ($vlan_domains as $vlan_id => $vlan) {
         d_echo('Processing vlan ID: $vlan_id');
         $vlan_name = empty($vlan['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName']) ? "VLAN $vlan_id" : $vlan['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName'];
- 
+
         //try to get existing data from DB
         $vlanDB = Vlan::firstOrNew([
             'device_id' => $device['device_id'],
