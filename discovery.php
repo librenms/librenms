@@ -37,6 +37,10 @@ if (isset($options['h'])) {
         $new_discovery_lock = Cache::lock('new-discovery', 300);
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
+    } elseif ($options['h'] == 'rebooted') {
+        $new_discovery_lock = Cache::lock('rebooted-discovery', 300);
+        $where = 'AND TIMESTAMPDIFF(SECOND, `last_discovered`, NOW()) > `uptime` and `status`<>0';
+        $doing = 'rebooted';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
             $where = "AND `device_id` = '" . $options['h'] . "'";
@@ -124,7 +128,7 @@ if (! isset($options['q'])) {
 
 logfile($string);
 
-if ($doing !== 'new' && $discovered_devices == 0) {
+if ($doing !== 'new' && $doing !== 'rebooted' && $discovered_devices == 0) {
     // No discoverable devices, either down or disabled
     exit(5);
 }
