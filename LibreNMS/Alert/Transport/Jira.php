@@ -24,73 +24,50 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Jira extends Transport
 {
-    public function deliverAlert($obj, $opts)
-    {
-        if (! empty($this->config)) {
-            $opts['username'] = $this->config['jira-username'];
-            $opts['password'] = $this->config['jira-password'];
-            $opts['prjkey'] = $this->config['jira-key'];
-            $opts['issuetype'] = $this->config['jira-type'];
-            $opts['url'] = $this->config['jira-url'];
-        }
-
-        return $this->contactJira($obj, $opts);
-    }
-
-    public function contactJira($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         // Don't create tickets for resolutions
-        if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
+        if ($alert_data['severity'] == 'recovery') {
             return true;
         }
 
-        $username = $opts['username'];
-        $password = $opts['password'];
-        $prjkey = $opts['prjkey'];
-        $issuetype = $opts['issuetype'];
-        $details = empty($obj['title']) ? 'Librenms alert for: ' . $obj['hostname'] : $obj['title'];
-        $description = $obj['msg'];
-        $url = $opts['url'] . '/rest/api/latest/issue';
-        $curl = curl_init();
+        $prjkey = $this->config['jira-key'];
+        $issuetype = $this->config['jira-type'];
+        $details = empty($alert_data['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
+        $description = $alert_data['msg'];
+        $url = $this->config['jira-url'] . '/rest/api/latest/issue';
 
-        $data = ['project' => ['key' => $prjkey],
-            'summary' => $details,
-            'description' => $description,
-            'issuetype' => ['name' => $issuetype], ];
-        $postdata = ['fields' => $data];
-        $datastring = json_encode($postdata);
+        $data = [
+            'fields' => [
+                'project' => [
+                    'key' => $prjkey,
+                ],
+                'summary' => $details,
+                'description' => $description,
+                'issuetype' => [
+                    'name' => $issuetype,
+                ],
+            ],
+        ];
 
-        Proxy::applyToCurl($curl);
+        $res = Http::client()
+            ->withBasicAuth($this->config['jira-username'], $this->config['jira-password'])
+            ->acceptJson()
+            ->post($url, $data);
 
-        $headers = ['Accept: application/json', 'Content-Type: application/json'];
-
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_VERBOSE, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code == 200 || $code == 201) {
-            $jiraout = json_decode($ret, true);
-            d_echo('Created jira issue ' . $jiraout['key'] . ' for ' . $obj['hostname']);
-
+        if ($res->successful()) {
             return true;
-        } else {
-            d_echo('Jira connection error: ' . serialize($ret));
-
-            return false;
         }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $description, $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

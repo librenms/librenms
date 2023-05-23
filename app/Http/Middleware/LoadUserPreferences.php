@@ -16,7 +16,7 @@ class LoadUserPreferences
      */
     public function handle($request, Closure $next)
     {
-        $preferences = ['locale', 'site_style'];
+        $preferences = ['locale', 'site_style', 'timezone'];
         $this->loadPreferences($request, $preferences);
 
         $this->setPreference($request, 'locale', function ($locale) {
@@ -25,6 +25,10 @@ class LoadUserPreferences
 
         $this->setPreference($request, 'site_style', function ($style) {
             Config::set('applied_site_style', $style);
+        });
+
+        $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+            $request->session()->put('preferences.timezone_static', true);
         });
 
         return $next($request);
