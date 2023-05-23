@@ -1,6 +1,6 @@
 <?php
 /**
- * AlertTransportDeliveryException.php
+ * Http.php
  *
  * -Description-
  *
@@ -23,21 +23,27 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Exceptions;
+namespace LibreNMS\Util;
 
-class AlertTransportDeliveryException extends \Exception
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http as LaravelHttp;
+use LibreNMS\Config;
+
+class Http
 {
-    public function __construct(
-        array $data,
-        int $code = 0,
-        protected string $response = '',
-        protected string $template = '',
-        protected array $params = []
-    ) {
-        $name = $data['transport_name'] ?? '';
-
-        $message = "Transport delivery failed with $code for $name: $response";
-
-        parent::__construct($message, $code);
+    /**
+     * Create a new client with proxy set if appropriate and a distinct User-Agent header
+     */
+    public static function client(): PendingRequest
+    {
+        return LaravelHttp::withOptions([
+            'proxy' => [
+                'http' => Proxy::http(),
+                'https' => Proxy::https(),
+                'no' => Proxy::ignore(),
+            ],
+        ])->withHeaders([
+            'User-Agent' => Config::get('project_name') . '/' . Version::VERSION, // we don't need fine version here, just rough
+        ]);
     }
 }
