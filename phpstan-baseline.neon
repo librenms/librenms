@@ -354,8 +354,3 @@ parameters:
 			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
 			count: 1
 			path: tests/Unit/LocationTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$user of static method App\\\\Models\\\\UserPref\\:\\:getPref\\(\\) expects App\\\\Models\\\\User, Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable given\\.$#"
-			count: 1
-			path: app/Providers/LegacyUserProvider.php
