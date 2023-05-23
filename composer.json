@@ -32,7 +32,6 @@
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
-        "guzzlehttp/guzzle": "^7.2",
         "influxdb/influxdb-php": "^1.15",
         "justinrainbow/json-schema": "^5.2",
         "laravel-notification-channels/webpush": "^7.0",

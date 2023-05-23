@@ -89,17 +89,15 @@
             document.documentElement.classList.remove('tw-dark')
         }
     </script>
-    @if(session('timezone_static') == null || ! session('timezone_static'))
-    <script>
-        $(document).ready(function() {
+    @auth
+        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
+        <script>
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-            if(tz !== '{{ session('timezone') }}') {
+            if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        });
-    </script>
-    @endif
-    @auth
+        </script>
+        @endif
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')

@@ -58,8 +58,8 @@ class LatencyController implements DeviceTab
 
     public function data(Device $device): array
     {
-        $from = Request::get('dtpickerfrom', Carbon::now(session('timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
-        $to = Request::get('dtpickerto', Carbon::now(session('timezone'))->format(Config::get('dateformat.byminute')));
+        $from = Request::get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
+        $to = Request::get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute')));
 
         $dbfrom = Carbon::createFromFormat(Config::get('dateformat.byminute'), $from)->setTimezone(date_default_timezone_get())->format(Config::get('dateformat.byminute'));
         $dbto = Carbon::createFromFormat(Config::get('dateformat.byminute'), $to)->setTimezone(date_default_timezone_get())->format(Config::get('dateformat.byminute'));
@@ -94,7 +94,7 @@ class LatencyController implements DeviceTab
         return DB::table('device_perf')
             ->where('device_id', $device->device_id)
             ->whereBetween('timestamp', [$from, $to])
-            ->selectRaw("DATE_FORMAT(IFNULL(CONVERT_TZ(timestamp, @@global.time_zone, ?), timestamp), '%Y-%m-%d %H:%i') date,xmt,rcv,loss,min,max,avg", [session('timezone')])
+            ->selectRaw("DATE_FORMAT(IFNULL(CONVERT_TZ(timestamp, @@global.time_zone, ?), timestamp), '%Y-%m-%d %H:%i') date,xmt,rcv,loss,min,max,avg", [session('preferences.timezone')])
             ->get();
     }
 
