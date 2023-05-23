@@ -264,8 +264,10 @@ class Poller
         } elseif ($this->device_spec == 'all') {
             return $query;
         } elseif ($this->device_spec == 'even') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 0);
         } elseif ($this->device_spec == 'odd') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 1);
         } elseif (is_numeric($this->device_spec)) {
             return $query->where('device_id', $this->device_spec);

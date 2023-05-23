@@ -26,7 +26,6 @@
 namespace App\Providers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Facades\DB;
