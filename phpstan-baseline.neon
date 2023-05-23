@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Static property LibreNMS\\\\Alert\\\\Transport\\\\Sensu\\:\\:\\$severity is never read, only written\\.$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Sensu.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/MysqlAuthorizer.php
