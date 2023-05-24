@@ -161,7 +161,7 @@ class OSDiscoveryTest extends TestCase
      *
      * @return array
      */
-    public function osProvider()
+    public static function osProvider()
     {
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));

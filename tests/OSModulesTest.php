@@ -141,7 +141,7 @@ class OSModulesTest extends DBTestCase
         $this->travelBack();
     }
 
-    public function dumpedDataProvider()
+    public static function dumpedDataProvider()
     {
         $modules = [];
 

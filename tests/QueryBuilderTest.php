@@ -65,7 +65,7 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($query[1], $qbq->getBindings(), 'Fluent bindings do not match');
     }
 
-    public function loadQueryData()
+    public static function loadQueryData()
     {
         $base = Config::get('install_dir');
         $data = file_get_contents("$base/$this->data_file");

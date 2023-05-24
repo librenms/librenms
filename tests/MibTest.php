@@ -137,7 +137,7 @@ class MibTest extends TestCase
      *
      * @return array path, filename, mib_name
      */
-    public function mibFiles()
+    public static function mibFiles()
     {
         $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
@@ -161,7 +161,7 @@ class MibTest extends TestCase
      *
      * @return array
      */
-    public function mibDirs()
+    public static function mibDirs()
     {
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
