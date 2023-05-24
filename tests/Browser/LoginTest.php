@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Tests\Browser;
 
-use PHPUnit\Framework\Attributes\Group;
 use App\Models\User;
 use App\Models\UserPref;
 use Hash;
@@ -11,6 +10,7 @@ use LibreNMS\Config;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
 use LibreNMS\Tests\DuskTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Class LoginTest

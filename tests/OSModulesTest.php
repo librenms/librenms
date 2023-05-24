@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
@@ -38,6 +36,8 @@ use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
 final class OSModulesTest extends DBTestCase

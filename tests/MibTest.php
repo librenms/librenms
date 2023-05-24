@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -134,10 +134,8 @@ final class MibTest extends TestCase
     /**
      * Get a list of all mib files with the name of the mib.
      * Called for each test that uses it before class setup.
-     *
-     * @return array path, filename, mib_name
      */
-    public static function mibFiles()
+    public static function mibFiles(): array
     {
         $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
@@ -149,7 +147,7 @@ final class MibTest extends TestCase
             $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
-                $this->extractMibName($file->getPathname()),
+                self::extractMibName($file->getPathname()),
             ];
         }
 
@@ -158,10 +156,8 @@ final class MibTest extends TestCase
 
     /**
      * List all directories inside the mib directory
-     *
-     * @return array
      */
-    public static function mibDirs()
+    public static function mibDirs(): array
     {
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
@@ -183,7 +179,7 @@ final class MibTest extends TestCase
      *
      * @throws Exception
      */
-    private function extractMibName($file)
+    private static function extractMibName($file)
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;

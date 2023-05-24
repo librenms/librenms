@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd"
          backupGlobals="true"
-         backupStaticAttributes="false"
+         backupStaticProperties="false"
          bootstrap="tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
-  <coverage processUncoveredFiles="true">
-    <include>
-      <directory suffix=".php">./app</directory>
-    </include>
-  </coverage>
   <testsuites>
     <testsuite name="Application Test Suite">
       <directory>tests/</directory>
@@ -42,4 +35,9 @@
     <env name="DB_CONNECTION" value="testing"/>
     <const name="PHPUNIT_RUNNING" value="true"/>
   </php>
+  <source>
+    <include>
+      <directory suffix=".php">./app</directory>
+    </include>
+  </source>
 </phpunit>

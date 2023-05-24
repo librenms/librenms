@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\Group;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;

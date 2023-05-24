@@ -25,9 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\Group;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -36,6 +33,9 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 
 final class OSDiscoveryTest extends TestCase
 {

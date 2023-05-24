@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\Group;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
