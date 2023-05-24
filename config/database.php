@@ -171,7 +171,7 @@ return [
 
         'testing_persistent' => [
             'driver' => 'sqlite',
-            'database' => storage_path('testing.sqlite'),
+            'database' => database_path('testing.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => true,
         ],
@@ -204,7 +204,7 @@ return [
 
     'redis' => [
 
-        'client' => env('REDIS_CLIENT', 'phpredis'),
+        'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
