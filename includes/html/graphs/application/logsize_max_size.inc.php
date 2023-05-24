@@ -1,7 +1,7 @@
 <?php
 
-$unit_text = 'bytes';
-$descr = 'max size';
+$unit_text = 'Bytes';
+$descr = 'Max Size';
 $ds = 'max_size';
 
 require 'logsize-common.inc.php';

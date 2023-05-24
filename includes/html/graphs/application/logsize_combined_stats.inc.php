@@ -31,7 +31,7 @@ if (Rrd::checkRrdExists($filename)) {
     ];
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'mode_size',
+        'descr'    => 'Mode Size',
         'ds'       => 'mode_size',
     ];
     $rrd_list[] = [

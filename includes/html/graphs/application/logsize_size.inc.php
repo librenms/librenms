@@ -1,7 +1,7 @@
 <?php
 
-$unit_text = 'bytes';
-$descr = 'size';
+$unit_text = 'Bytes';
+$descr = 'Size';
 $ds = 'size';
 
 require 'logsize-common.inc.php';
