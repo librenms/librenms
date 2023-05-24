@@ -121,7 +121,7 @@ class FunctionsTest extends TestCase
         $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
     }
 
-    public function testNumberCast()
+    public function testNumberCast(): void
     {
         $this->assertSame(-14.3, Number::cast(-14.3));
         $this->assertSame(0, Number::cast('b -35')); // cast must start with the number as old style php cast did
