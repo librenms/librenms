@@ -46,3 +46,5 @@ bin/
 lib/
 lib64
 pyvenv.cfg
+
+/public/build
