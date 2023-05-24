@@ -2,16 +2,15 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Rewrite;
 
 class RewriteTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider validMacProvider
-     */
+    #[Test]
+    #[DataProvider('validMacProvider')]
     public function testMacToHex(string $from, string $to): void
     {
         $this->assertEquals($to, Rewrite::macToHex($from));

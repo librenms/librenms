@@ -24,14 +24,13 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use PHPUnit\Framework\Attributes\Group;
 use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
