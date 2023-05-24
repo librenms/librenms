@@ -1,4 +1,4 @@
-os: primekey
+os: primekey-sw
 text: "Software Appliance"
 type: appliance
 icon: primekey
