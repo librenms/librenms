@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Yaml\Yaml;
 
-class DocsTest extends TestCase
+final class DocsTest extends TestCase
 {
     private $hidden_pages = [
         'General/Changelogs/2013.md',

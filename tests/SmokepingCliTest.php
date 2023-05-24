@@ -31,7 +31,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class SmokepingCliTest extends DBTestCase
+final class SmokepingCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 

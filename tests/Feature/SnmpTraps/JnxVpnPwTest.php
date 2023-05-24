@@ -33,7 +33,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class JnxVpnPwTest extends SnmpTrapTestCase
+final class JnxVpnPwTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

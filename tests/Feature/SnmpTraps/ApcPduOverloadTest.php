@@ -22,7 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class ApcPduOverloadTest extends SnmpTrapTestCase
+final class ApcPduOverloadTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcPduNearOverload trap handle

@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
+final class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
 {
     public function testAvOversize(): void
     {

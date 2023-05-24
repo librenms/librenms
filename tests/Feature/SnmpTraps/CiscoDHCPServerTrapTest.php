@@ -23,7 +23,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
+final class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
 {
     /**
      * Test CiscoDHCPServer trap handles

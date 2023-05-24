@@ -35,7 +35,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class OspfIfStateChangeTest extends SnmpTrapTestCase
+final class OspfIfStateChangeTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

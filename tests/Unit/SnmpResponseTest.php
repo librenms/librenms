@@ -29,7 +29,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
-class SnmpResponseTest extends TestCase
+final class SnmpResponseTest extends TestCase
 {
     public function testSimple(): void
     {

@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
 
-class ConfigTest extends TestCase
+final class ConfigTest extends TestCase
 {
     private $config;
 

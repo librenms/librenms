@@ -32,7 +32,7 @@ use App\Models\User;
 use LibreNMS\Tests\TestCase;
 use Mockery\Mock;
 
-class PermissionsTest extends TestCase
+final class PermissionsTest extends TestCase
 {
     private function devicePermissionData($user)
     {

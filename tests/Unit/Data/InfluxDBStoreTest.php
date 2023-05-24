@@ -31,7 +31,7 @@ use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
 
 #[Group('datastores')]
-class InfluxDBStoreTest extends TestCase
+final class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
     {

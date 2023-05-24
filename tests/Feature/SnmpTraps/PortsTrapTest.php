@@ -30,7 +30,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class PortsTrapTest extends SnmpTrapTestCase
+final class PortsTrapTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

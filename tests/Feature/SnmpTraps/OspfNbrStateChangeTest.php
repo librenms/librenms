@@ -34,7 +34,7 @@ use App\Models\OspfNbr;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class OspfNbrStateChangeTest extends SnmpTrapTestCase
+final class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

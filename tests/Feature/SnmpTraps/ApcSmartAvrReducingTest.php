@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class ApcSmartAvrReducingTest extends SnmpTrapTestCase
+final class ApcSmartAvrReducingTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcSmartAvrReducing handle

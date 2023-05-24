@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class RuckusSzEventTest extends SnmpTrapTestCase
+final class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf(): void
     {

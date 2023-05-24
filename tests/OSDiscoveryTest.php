@@ -37,7 +37,7 @@ use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
 
-class OSDiscoveryTest extends TestCase
+final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 

@@ -32,7 +32,7 @@ use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
 
 #[Group('datastores')]
-class PrometheusStoreTest extends TestCase
+final class PrometheusStoreTest extends TestCase
 {
     protected function setUp(): void
     {

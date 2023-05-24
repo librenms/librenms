@@ -30,7 +30,7 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
-class FunctionsTest extends TestCase
+final class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable(): void
     {

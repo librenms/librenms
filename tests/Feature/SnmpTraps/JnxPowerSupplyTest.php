@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class JnxPowerSupplyTest extends SnmpTrapTestCase
+final class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
     public function testJnxPowerSupplyFailureTrap(): void
     {

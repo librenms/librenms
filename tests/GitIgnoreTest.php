@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class GitIgnoreTest extends TestCase
+final class GitIgnoreTest extends TestCase
 {
     private $gitIgnoreFiles = [
         '.gitignore',

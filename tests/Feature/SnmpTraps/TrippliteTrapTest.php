@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class TrippliteTrapTest extends SnmpTrapTestCase
+final class TrippliteTrapTest extends SnmpTrapTestCase
 {
     public function testTlpNotificationsAlarmEntryAdded(): void
     {

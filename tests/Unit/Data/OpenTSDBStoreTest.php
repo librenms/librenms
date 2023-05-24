@@ -31,7 +31,7 @@ use LibreNMS\Data\Store\OpenTSDB;
 use LibreNMS\Tests\TestCase;
 
 #[Group('datastores')]
-class OpenTSDBStoreTest extends TestCase
+final class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;
 

@@ -31,7 +31,7 @@ use LibreNMS\Data\Store\Graphite;
 use LibreNMS\Tests\TestCase;
 
 #[Group('datastores')]
-class GraphiteStoreTest extends TestCase
+final class GraphiteStoreTest extends TestCase
 {
     protected $timestamp = 997464400;
 

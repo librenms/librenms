@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Rewrite;
 
-class RewriteTest extends TestCase
+final class RewriteTest extends TestCase
 {
     #[Test]
     #[DataProvider('validMacProvider')]

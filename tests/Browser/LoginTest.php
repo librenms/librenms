@@ -16,7 +16,7 @@ use LibreNMS\Tests\DuskTestCase;
  * Class LoginTest
  */
 #[Group('browser')]
-class LoginTest extends DuskTestCase
+final class LoginTest extends DuskTestCase
 {
     protected function setUp(): void
     {

@@ -7,7 +7,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http as LaravelHttp;
 use LibreNMS\Tests\TestCase;
 
-class ApiTransportTest extends TestCase
+final class ApiTransportTest extends TestCase
 {
     public function testGetMultilineVariables(): void
     {

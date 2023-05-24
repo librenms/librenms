@@ -30,7 +30,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
+final class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

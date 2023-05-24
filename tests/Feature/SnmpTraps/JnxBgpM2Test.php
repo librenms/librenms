@@ -32,7 +32,7 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class JnxBgpM2Test extends SnmpTrapTestCase
+final class JnxBgpM2Test extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

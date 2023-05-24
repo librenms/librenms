@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class ApcOnBatteryTest extends SnmpTrapTestCase
+final class ApcOnBatteryTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcOnBattery handle

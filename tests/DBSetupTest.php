@@ -29,7 +29,7 @@ use Artisan;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Schema;
 
-class DBSetupTest extends DBTestCase
+final class DBSetupTest extends DBTestCase
 {
     protected $db_name;
     protected $connection = 'testing';

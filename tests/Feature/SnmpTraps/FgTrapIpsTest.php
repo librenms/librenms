@@ -30,7 +30,7 @@ use App\Models\Ipv4Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class FgTrapIpsTest extends SnmpTrapTestCase
+final class FgTrapIpsTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

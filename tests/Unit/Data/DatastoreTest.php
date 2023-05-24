@@ -30,7 +30,7 @@ use LibreNMS\Config;
 use LibreNMS\Tests\TestCase;
 
 #[Group('datastores')]
-class DatastoreTest extends TestCase
+final class DatastoreTest extends TestCase
 {
     protected function setUp(): void
     {

@@ -31,7 +31,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class BgpTrapTest extends SnmpTrapTestCase
+final class BgpTrapTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

@@ -30,7 +30,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-class AuthSSOTest extends DBTestCase
+final class AuthSSOTest extends DBTestCase
 {
     use DatabaseTransactions;
 

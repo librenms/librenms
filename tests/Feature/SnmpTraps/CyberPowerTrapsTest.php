@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class CyberPowerTrapsTest extends SnmpTrapTestCase
+final class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
     public function testCpUpsOverload(): void
     {

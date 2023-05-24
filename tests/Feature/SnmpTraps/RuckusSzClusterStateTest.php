@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class RuckusSzClusterStateTest extends SnmpTrapTestCase
+final class RuckusSzClusterStateTest extends SnmpTrapTestCase
 {
     public function testClusterInMaintenance(): void
     {

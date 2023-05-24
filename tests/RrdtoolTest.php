@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 
-class RrdtoolTest extends TestCase
+final class RrdtoolTest extends TestCase
 {
     public function testBuildCommandLocal(): void
     {

@@ -22,7 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class ApcPduOutletTest extends SnmpTrapTestCase
+final class ApcPduOutletTest extends SnmpTrapTestCase
 {
     public function testOutletOff(): void
     {

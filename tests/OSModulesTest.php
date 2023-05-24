@@ -40,7 +40,7 @@ use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
 use PHPUnit\Util\Color;
 
-class OSModulesTest extends DBTestCase
+final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
 

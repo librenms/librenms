@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
-class RrdDefinitionTest extends TestCase
+final class RrdDefinitionTest extends TestCase
 {
     public function testEmpty(): void
     {

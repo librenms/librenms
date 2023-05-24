@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class SnTrapUserAuthTest extends SnmpTrapTestCase
+final class SnTrapUserAuthTest extends SnmpTrapTestCase
 {
     /**
      * Create snTrapUserLogin trap object

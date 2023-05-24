@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
+final class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
 {
     public function testDyingGasp(): void
     {

@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class ApcPowerRestoredTest extends SnmpTrapTestCase
+final class ApcPowerRestoredTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcPowerRestored handle

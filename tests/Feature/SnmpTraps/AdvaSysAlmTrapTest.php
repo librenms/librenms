@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaSysAlmTrapTest extends SnmpTrapTestCase
+final class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
     public function testCriticalAlarm(): void
     {

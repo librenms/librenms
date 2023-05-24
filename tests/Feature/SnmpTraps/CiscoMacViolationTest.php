@@ -22,7 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class CiscoMacViolationTest extends SnmpTrapTestCase
+final class CiscoMacViolationTest extends SnmpTrapTestCase
 {
     /**
      * Test CiscoMacViolation trap handle

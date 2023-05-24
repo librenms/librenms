@@ -32,7 +32,7 @@ use App\Models\Ipv4Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class JnxLdpLspTest extends SnmpTrapTestCase
+final class JnxLdpLspTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

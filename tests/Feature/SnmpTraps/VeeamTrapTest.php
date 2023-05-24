@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class VeeamTrapTest extends SnmpTrapTestCase
+final class VeeamTrapTest extends SnmpTrapTestCase
 {
     public function testVeeamBackupJobCompleted(): void
     {

@@ -22,7 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class HpFaultTest extends SnmpTrapTestCase
+final class HpFaultTest extends SnmpTrapTestCase
 {
     public function testBadCable(): void
     {

@@ -22,7 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class NetgearFailedUserLoginTest extends SnmpTrapTestCase
+final class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
     public function testManagedSeries(): void
     {

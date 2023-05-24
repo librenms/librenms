@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
+final class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
 {
     public function testElementAlarmCleared(): void
     {

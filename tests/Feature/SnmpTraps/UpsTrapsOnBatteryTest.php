@@ -29,7 +29,7 @@ use App\Models\Sensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
+final class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

@@ -30,7 +30,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
+final class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
     public function testAlarmClear(): void
     {

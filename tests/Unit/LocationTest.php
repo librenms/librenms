@@ -33,7 +33,7 @@ use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Dns;
 use Mockery\MockInterface;
 
-class LocationTest extends TestCase
+final class LocationTest extends TestCase
 {
     public function testCanSetLocation(): void
     {
