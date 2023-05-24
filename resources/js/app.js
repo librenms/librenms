@@ -5,7 +5,7 @@
  */
 
 
-require('./bootstrap');
+import './bootstrap';
 
 window.Vue = require('vue').default;
 import { i18n } from "./plugins/i18n.js"; // translation
