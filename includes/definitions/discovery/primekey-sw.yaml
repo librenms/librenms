@@ -2,7 +2,6 @@ mib: PK-SOFTWARE-APPLIANCE-V2
 modules:
     os:
         version: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-systemVersion.0
-        sysDescr: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-systemHostname.0
     sensors:
         count:
             options:
