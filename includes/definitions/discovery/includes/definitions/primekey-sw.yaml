@@ -1,0 +1,21 @@
+os: primekey
+text: "Software Appliance"
+type: appliance
+icon: primekey
+group: primekey
+mib_dir: primekey
+snmp_bulk: false
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+    mpls: false
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    stp: false
+discovery:
+    - snmpget:
+          oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-systemVersion.0
+          op: "exists"
+          value: true
