@@ -50,12 +50,17 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
 print_optionbar_end();
 
 if (isset($vars['log_file']) && isset($vars['log_set'])){
-   'logsize_size'=>'Log Size',
+    $graphs = [
+       'logsize_size'=>'Log Size',
+    ];
 }elseif(isset($vars['log_set'])){
     $graphs = [
         'logsize_size'=>'Set Size',
         'logsize_log_sizes'=>'Log Sizes, Top 12',
         'logsize_max_size'=>'Max Log Size',
+        'logsize_mean_size'=>'Mean Log Size',
+        'logsize_median_size'=>'Median Log Size',
+        'logsize_mode_size'=>'Mode Log Size',
         'logsize_min_size'=>'Min Log Size',
     ];
 }else{
@@ -63,6 +68,9 @@ if (isset($vars['log_file']) && isset($vars['log_set'])){
         'logsize_size'=>'Total Size',
         'logsize_set_sizes'=>'Set Sizes',
         'logsize_max_size'=>'Max Log Size',
+        'logsize_mean_size'=>'Mean Log Size',
+        'logsize_median_size'=>'Median Log Size',
+        'logsize_mode_size'=>'Mode Log Size',
         'logsize_min_size'=>'Min Log Size',
     ];
 }

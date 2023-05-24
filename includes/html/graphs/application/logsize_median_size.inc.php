@@ -1,7 +1,7 @@
 <?php
 
-$unit_text = 'bytes';
-$descr = 'meidan size';
+$unit_text = 'Bytes';
+$descr = 'Median Size';
 $ds = 'median_size';
 
 require 'logsize-common.inc.php';
