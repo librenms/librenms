@@ -57,6 +57,7 @@ if (isset($vars['log_file']) && isset($vars['log_set'])){
     $graphs = [
         'logsize_size'=>'Set Size',
         'logsize_log_sizes'=>'Log Sizes, Top 12',
+        'logsize_combined_stats' => 'Combined Log Stats',
         'logsize_max_size'=>'Max Log Size',
         'logsize_mean_size'=>'Mean Log Size',
         'logsize_median_size'=>'Median Log Size',
@@ -67,11 +68,12 @@ if (isset($vars['log_file']) && isset($vars['log_set'])){
     $graphs = [
         'logsize_size'=>'Total Size',
         'logsize_set_sizes'=>'Set Sizes',
-        'logsize_max_size'=>'Max Log Size',
-        'logsize_mean_size'=>'Mean Log Size',
-        'logsize_median_size'=>'Median Log Size',
-        'logsize_mode_size'=>'Mode Log Size',
-        'logsize_min_size'=>'Min Log Size',
+        'logsize_combined_stats' => 'Combined Set Stats',
+        'logsize_max_size'=>'Max Set Size',
+        'logsize_mean_size'=>'Mean Set Size',
+        'logsize_median_size'=>'Median Set Size',
+        'logsize_mode_size'=>'Mode Set Size',
+        'logsize_min_size'=>'Min Set Size',
     ];
 }
 
