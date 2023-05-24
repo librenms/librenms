@@ -32,23 +32,23 @@ use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
 {
-    public function testMacCleanToReadable()
+    public function testMacCleanToReadable(): void
     {
         $this->assertEquals('de:ad:be:ef:a0:c3', Rewrite::readableMac('deadbeefa0c3'));
     }
 
-    public function testHex2Str()
+    public function testHex2Str(): void
     {
         $this->assertEquals('Big 10 UP', hex2str('426967203130205550'));
     }
 
-    public function testSnmpHexstring()
+    public function testSnmpHexstring(): void
     {
         $input = '4c 61 72 70 69 6e 67 20 34 20 55 00 0a';
         $this->assertEquals("Larping 4 U\n", snmp_hexstring($input));
     }
 
-    public function testIsHexString()
+    public function testIsHexString(): void
     {
         $this->assertTrue(isHexString('af 28 02'));
         $this->assertTrue(isHexString('aF 28 02 CE'));
@@ -56,7 +56,7 @@ class FunctionsTest extends TestCase
         $this->assertFalse(isHexString('a5fe53'));
     }
 
-    public function testDynamicDiscoveryGetValue()
+    public function testDynamicDiscoveryGetValue(): void
     {
         $pre_cache = [
             'firstdata' => [
@@ -102,7 +102,7 @@ class FunctionsTest extends TestCase
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
-    public function testParseAtTime()
+    public function testParseAtTime(): void
     {
         $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
         $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');

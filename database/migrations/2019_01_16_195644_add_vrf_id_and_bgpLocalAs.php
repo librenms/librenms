@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
             $table->unsignedInteger('vrf_id')->nullable()->after('device_id');
@@ -26,7 +26,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
             $table->dropColumn('vrf_id');

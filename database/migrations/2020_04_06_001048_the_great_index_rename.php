@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // try to run index like this to hopefully allow mysql to optimize away the reindex
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
@@ -164,7 +164,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }

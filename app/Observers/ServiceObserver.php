@@ -12,7 +12,7 @@ class ServiceObserver
      * @param  \App\Models\Service  $service
      * @return void
      */
-    public function created(Service $service)
+    public function created(Service $service): void
     {
         //
     }
@@ -23,7 +23,7 @@ class ServiceObserver
      * @param  \App\Models\Service  $service
      * @return void
      */
-    public function updated(Service $service)
+    public function updated(Service $service): void
     {
         //
     }
@@ -34,7 +34,7 @@ class ServiceObserver
      * @param  \App\Models\Service  $service
      * @return void
      */
-    public function deleted(Service $service)
+    public function deleted(Service $service): void
     {
         //
     }
@@ -45,7 +45,7 @@ class ServiceObserver
      * @param  \App\Models\Service  $service
      * @return void
      */
-    public function restored(Service $service)
+    public function restored(Service $service): void
     {
         //
     }
@@ -56,7 +56,7 @@ class ServiceObserver
      * @param  \App\Models\Service  $service
      * @return void
      */
-    public function forceDeleted(Service $service)
+    public function forceDeleted(Service $service): void
     {
         //
     }
