@@ -74,7 +74,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
 
-        $app_data['sets'][$set_name]['log_sizes'][$log_name]=$log_data['size'];
+        $app_data['sets'][$set_name]['log_sizes'][$log_name] = $log_size;
     }
 
     foreach ($set_data['unseen'] as $log_name ) {
@@ -85,7 +85,8 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
 
-        $app_data['sets'][$set_name]['log_sizes'][$log_name]=$log_data['size'];
+        $app_data['sets'][$set_name]['log_sizes'][$log_name] = 0;
+        $app_data['sets'][$set_name]['files'][] = $log_name;
     }
 
 
