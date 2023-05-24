@@ -261,36 +261,6 @@ parameters:
 			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$deferred is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices \\(Illuminate\\\\Database\\\\Eloquent\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$groups is never read, only written\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$tiered is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
 			count: 1
 			path: app/Models/DeviceRelatedModel.php

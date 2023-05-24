@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('bgpPeers_cbgp', function (Blueprint $table) {
             $table->unsignedInteger('device_id');
@@ -46,7 +46,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('bgpPeers_cbgp');
     }

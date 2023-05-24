@@ -28,6 +28,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -48,11 +49,10 @@ class AuthenticateGraph
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  $relative
-     * @return \Illuminate\Http\Response
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle($request, Closure $next, $relative = null)
+    public function handle(Request $request, Closure $next, $relative = null): Response
     {
         // if user is logged in, allow
         if (\Auth::check()) {

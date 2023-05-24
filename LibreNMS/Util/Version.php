@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Util;
 
-use DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;

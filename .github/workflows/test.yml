@@ -167,7 +167,7 @@ jobs:
           mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
       -
         name: Setup SQLite
-        run: sqlite3 storage/testing.sqlite ""
+        run: sqlite3 database/testing.sqlite ""
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
