@@ -50,50 +50,20 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
 print_optionbar_end();
 
 if (isset($vars['log_file']) && isset($vars['log_set'])){
-    if (!$no_minus_d) {
-        $graphs = [
-            'logsize_size'=>'Log Size',
-            'logsize_1d_size_diff'=>'Log Size Difference, -1 day',
-            'logsize_1d_size_diffp'=>'Log Size Difference Percentage, -1 day',
-            'logsize_2d_size_diff'=>'Log Size Difference, -2 days',
-            'logsize_2d_size_diffp'=>'Log Size Difference Percentage, -2 days',
-            'logsize_3d_size_diff'=>'Log Size Difference, -3 days',
-            'logsize_3d_size_diffp'=>'Log Size Difference Percentage, -3 days',
-            'logsize_4d_size_diff'=>'Log Size Difference, -4 days',
-            'logsize_4d_size_diffp'=>'Log Size Difference Percentage, -4 days',
-            'logsize_5d_size_diff'=>'Log Size Difference, -5 days',
-            'logsize_5d_size_diffp'=>'Log Size Difference Percentage, -5 days',
-            'logsize_6d_size_diff'=>'Log Size Difference, -6 days',
-            'logsize_6d_size_diffp'=>'Log Size Difference Percentage, -6 days',
-            'logsize_7d_size_diff'=>'Log Size Difference, -7 days',
-            'logsize_7d_size_diffp'=>'Log Size Difference Percentage, -7 days',
-        ];
-    }else{
-        $graphs = [
-            'logsize_size'=>'Log Size',
-        ];
-    }
+   'logsize_size'=>'Log Size',
 }elseif(isset($vars['log_set'])){
     $graphs = [
         'logsize_size'=>'Set Size',
         'logsize_log_sizes'=>'Log Sizes, Top 12',
         'logsize_max_size'=>'Max Log Size',
-        'logsize_max_size_diff'=>'Max Size Difference',
-        'logsize_max_size_diffp'=>'Max Size Difference, Percentage ',
         'logsize_min_size'=>'Min Log Size',
-        'logsize_min_size_diff'=>'Min Size Difference',
-        'logsize_min_size_diffp'=>'Min Size Difference, Percentage',
     ];
 }else{
     $graphs = [
         'logsize_size'=>'Total Size',
         'logsize_set_sizes'=>'Set Sizes',
         'logsize_max_size'=>'Max Log Size',
-        'logsize_max_size_diff'=>'Max Size Difference',
-        'logsize_max_size_diffp'=>'Max Size Difference, Percentage ',
         'logsize_min_size'=>'Min Log Size',
-        'logsize_min_size_diff'=>'Min Size Difference',
-        'logsize_min_size_diffp'=>'Min Size Difference, Percentage',
     ];
 }
 

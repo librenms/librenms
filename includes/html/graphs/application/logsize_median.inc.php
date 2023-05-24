@@ -1,8 +1,8 @@
 <?php
 
-$unit_text = 'Percentage';
-$descr = 'size diff%, -1d';
-$ds = '1d_size_diffp';
+$unit_text = 'bytes';
+$descr = 'meidan size';
+$ds = 'median_size';
 
 require 'logsize-common.inc.php';
 

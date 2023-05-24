@@ -1,8 +1,8 @@
 <?php
 
 $unit_text = 'bytes';
-$descr = 'size diff, -4d';
-$ds = '4d_size_diff';
+$descr = 'mean size';
+$ds = 'mean_size';
 
 require 'logsize-common.inc.php';
 
