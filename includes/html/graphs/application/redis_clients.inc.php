@@ -13,6 +13,7 @@ $colours = 'mixed';
 $array = [
     'connected' => 'Connected',
     'blocked'   => 'Blocked',
+    'maxclients'   => 'Maximum',
 ];
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'clients']);
