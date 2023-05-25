@@ -32,6 +32,7 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
 class YamlDiscovery
@@ -180,6 +181,16 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
+                    // allow parsing of InetAddress hex data representing ipv4 or ipv6
+                    // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
+                    // do not use snmp flag -Oa, as it converts Hex-STRING to string, use for exemple:
+                    // snmp_flags: '-OteQUs'
+                    if (str_starts_with($matches[1], 'InetAddress_')) {
+                        $inetaddr = explode('_', $matches[1]);
+                        if (count($inetaddr) == 2) {
+                            return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
+                        }
+                    }
                     \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
 
                     return ''; // remove the unavailable variable
