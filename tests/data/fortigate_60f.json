@@ -14,11 +14,28 @@
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FGT60FTK00000000",
-                    "icon": "fortinet.svg"
+                    "icon": "generic.svg"
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.644",
+                    "sysDescr": "",
+                    "sysContact": "<private>",
+                    "version": "v6.2.7,build1190,201216 (GA)",
+                    "hardware": "FGT_60F",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "fortigate",
+                    "type": "firewall",
+                    "serial": "FGT60FTK00000000",
+                    "icon": "fortinet.svg"
+                }
+            ]
+        }
     },
     "ports": {
         "discovery": {
