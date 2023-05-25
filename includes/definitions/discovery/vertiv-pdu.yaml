@@ -34,5 +34,38 @@ modules:
                    oid: pduPhaseTable
                    value: pduPhaseVoltage
                    num_oid: '.1.3.6.1.4.1.21239.5.2.3.2.1.4.{{ $index }}'
+                   index: 'pduPhaseVoltage.{{ $index }}'
                    descr: pduPhaseName
                    divisor: 10
+        power:
+            data:
+                -
+                   oid: pduMainTable
+                   value: pduTotalRealPower
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.9.{{ $index }}'
+                   index: 'pduTotalRealPower.{{ $index }}'
+                   descr: 'Total Real Power'
+                -
+                   oid: pduMainTable
+                   value: pduTotalApparentPower
+                   index: 'pduTotalApparentPower.{{ $index }}'
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.10.{{ $index }}'
+                   descr: 'Total Apparent Power'
+        power_factor:
+            data:
+                -
+                   oid: pduMainTable
+                   value: pduTotalPowerFactor
+                   index: 'pduTotalPowerFactor.{{ $index }}'
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.11.{{ $index }}'
+                   descr: 'Total Power Factor'
+
+        power_consumed:
+            data:
+                -
+                   oid: pduMainTable
+                   value: pduTotalEnergy
+                   index: 'pduTotalEnergy.{{ $index }}'
+                   num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.12.{{ $index }}'
+                   descr: 'Total Energy'
+
