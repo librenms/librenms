@@ -38,7 +38,7 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token)
+    public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         return null;
     }
@@ -50,7 +50,7 @@ class TokenUserProvider extends LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(Authenticatable $user, $token)
+    public function updateRememberToken(Authenticatable $user, $token): void
     {
     }
 

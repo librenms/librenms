@@ -10,14 +10,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddPrimaryKeyBillPorts extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasColumn('bill_ports', 'id')) {
             Schema::table('bill_ports', function (Blueprint $table) {
@@ -31,7 +31,7 @@ class AddPrimaryKeyBillPorts extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
-}
+};

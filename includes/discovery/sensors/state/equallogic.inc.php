@@ -53,7 +53,7 @@ if (! empty($oids)) {
         if (! empty($data)) {
             [$oid,$current] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
-            $num_index = $split_oid[(count($split_oid) - 1)];
+            $num_index = $split_oid[count($split_oid) - 1];
             $index = (int) cast_number($num_index);
             $low_limit = 0.5;
             $high_limit = 2.5;
@@ -97,9 +97,9 @@ if (! empty($oids1)) {
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
-            $num_index = $split_oid[(count($split_oid) - 1)];
+            $num_index = $split_oid[count($split_oid) - 1];
             $index = (int) cast_number($num_index);
-            $member_id = $split_oid[(count($split_oid) - 2)];
+            $member_id = $split_oid[count($split_oid) - 2];
             $num_index = $member_id . '.' . $num_index;
             $oid = $base_oid . $num_index;
             $extra = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
@@ -142,8 +142,8 @@ if (! empty($oids_disks)) {
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
-            $disk_index = $split_oid[(count($split_oid) - 1)];
-            $member_id = $split_oid[(count($split_oid) - 2)];
+            $disk_index = $split_oid[count($split_oid) - 1];
+            $member_id = $split_oid[count($split_oid) - 2];
             $num_index = $member_id . '.' . $disk_index;
             $oid = $disks_base_oid . $num_index;
             $extra = snmp_get($device, $oid, '-OQne', 'EQLDISK-MIB', 'equallogic');

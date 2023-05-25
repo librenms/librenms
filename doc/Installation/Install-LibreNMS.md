@@ -173,10 +173,13 @@ innodb_file_per_table=1
 lower_case_table_names=0
 ```
 
+Then restart MariaDB
+
 ```
 systemctl enable mariadb
 systemctl restart mariadb
 ```
+Start MariaDB client
 
 ```
 mysql -u root
@@ -188,7 +191,6 @@ mysql -u root
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
-FLUSH PRIVILEGES;
 exit
 ```
 
@@ -229,7 +231,7 @@ user = librenms
 group = librenms
 ```
 
-Change `listen` to a unique name:
+Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
 ```
 listen = /run/php-fpm-librenms.sock
 ```
@@ -590,7 +592,7 @@ systemctl restart snmpd
 ## Cron job
 
 ```
-cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
 > NOTE: Keep in mind  that cron, by default, only uses a very limited
@@ -600,6 +602,15 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
 > <@= config.site_url =@/Support/Configuration/#proxy-support>
+
+## Enable the scheduler
+
+```
+cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/
+
+systemctl enable librenms-scheduler.timer
+systemctl start librenms-scheduler.timer
+```
 
 ## Copy logrotate config
 

@@ -432,6 +432,34 @@ extend certificate /etc/snmp/certificate.py
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+## CAPEv2
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/cape -O /etc/snmp/cape
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/cape
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend cape /etc/snmp/cape
+```
+
+4. Install the required packages.
+```
+apt-get install libfile-readbackwards-perl libjson-perl libconfig-tiny-perl libdbi-perl libfile-slurp-perl libstatistics-lite-perl
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## C.H.I.P
 
 C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
@@ -460,30 +488,36 @@ Extend` heading top of page.
 
 ## Docker Stats
 
-It allows you to know which container docker run and their stats.
+It gathers metrics about the docker containers, including:
+- cpu percentage 
+- memory usage 
+- container size
+- uptime 
+- Totals per status
 
-This script require: jq
+This script requires python3 and the pip module python-dateutil 
 
 ### SNMP Extend
 
-1. Install jq
+1. Install pip module
 ```
-sudo apt install jq
+pip3 install python-dateutil
 ```
 
 2. Copy the shell script to the desired host.
+By default, it will only show the status for containers that are running. To include all containers modify the constant in the script at the top of the file and change it to `ONLY_RUNNING_CONTAINERS = False`
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh -O /etc/snmp/docker-stats.sh
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.py -O /etc/snmp/docker-stats.py
 ```
 
 3. Make the script executable
 ```
-chmod +x /etc/snmp/docker-stats.sh
+chmod +x /etc/snmp/docker-stats.py
 ```
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend docker /etc/snmp/docker-stats.sh
+extend docker /etc/snmp/docker-stats.py
 ```
 
 5. If your run Debian, you need to add the Debian-snmp user to the docker group
@@ -927,6 +961,41 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## linux_config_files
+
+linux_config_files is an application intended to monitor a Linux distribution's configuration files via that distribution's configuration management tool/system.  At this time, ONLY RPM-based (Fedora/RHEL) SYSTEMS ARE SUPPORTED utilizing the rpmconf tool.  The linux_config_files application collects and graphs the total count of configuration files that are out of sync and graphs that number.
+
+Fedora/RHEL: Rpmconf is a utility that analyzes rpm configuration files using the RPM Package Manager.  Rpmconf reports when a new configuration file standard has been issued for an upgraded/downgraded piece of software.  Typically, rpmconf is used to provide a diff of the current configuration file versus the new, standard configuration file.  The administrator can then choose to install the new configuration file or keep the old one.
+
+### SNMP Extend
+
+1. Copy the python script, linux_config_files.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/linux_config_files.py -O /etc/snmp/linux_config_files.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/linux_config_files.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend linux_config_files /etc/snmp/linux_config_files.py
+```
+
+4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
+a.) "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+```
+{
+    "pkg_system": "rpm",
+    "pkg_tool_cmd": "/bin/rpmconf",
+}
+```
+
+5. Restart snmpd.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend
@@ -1209,7 +1278,28 @@ chmod +x /etc/snmp/nginx
 extend nginx /etc/snmp/nginx
 ```
 
-4. Restart snmpd on your host
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can request /nginx-status:
+```
+cat << EOF > snmpd_nginx.te
+module snmpd_nginx 1.0;
+
+require {
+        type httpd_t;
+        type http_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t http_port_t:tcp_socket name_connect;
+EOF
+checkmodule -M -m -o snmpd_nginx.mod snmpd_nginx.te
+semodule_package -o snmpd_nginx.pp -m snmpd_nginx.mod
+semodule -i snmpd_nginx.pp
+```
+
+5. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -1473,6 +1563,11 @@ chances are that packages are already updated periodically .
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
 
 ## PHP-FPM
 
@@ -2158,6 +2253,29 @@ chmod +x /etc/snmp/redis.py
 extend redis /etc/snmp/redis.py
 ```
 
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
+```
+cat << EOF > snmpd_redis.te
+module snmpd_redis 1.0;
+
+require {
+        type tmp_t;
+        type redis_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+        class dir { add_name write };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t redis_port_t:tcp_socket name_connect;
+allow snmpd_t tmp_t:dir { write add_name };
+EOF
+checkmodule -M -m -o snmpd_redis.mod snmpd_redis.te
+semodule_package -o snmpd_redis.pp -m snmpd_redis.mod
+semodule -i snmpd_redis.pp
+```
+
 ### Agent
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
@@ -2553,7 +2671,31 @@ extend systemd /etc/snmp/systemd.py
 }
 ```
 
-5. Restart snmpd.
+5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access systemd state:
+```
+cat << EOF > snmpd_systemctl.te
+module snmpd_systemctl 1.0;
+
+require {
+        type snmpd_t;
+        type systemd_systemctl_exec_t;
+        type init_t;
+        class file { execute execute_no_trans map open read };
+        class unix_stream_socket connectto;
+        class system status;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t init_t:system status;
+allow snmpd_t init_t:unix_stream_socket connectto;
+allow snmpd_t systemd_systemctl_exec_t:file { execute execute_no_trans map open read };
+EOF
+checkmodule -M -m -o snmpd_systemctl.mod snmpd_systemctl.te
+semodule_package -o snmpd_systemctl.pp -m snmpd_systemctl.mod
+semodule -i snmpd_systemctl.pp
+```
+
+6. Restart snmpd.
 
 
 ## TinyDNS aka djbdns

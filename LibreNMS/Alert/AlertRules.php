@@ -39,7 +39,6 @@ class AlertRules
 {
     public function runRules($device_id)
     {
-
         //Check to see if under maintenance
         if (AlertUtil::isMaintenance($device_id) > 0) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
@@ -77,7 +76,7 @@ class AlertRules
                     $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
                 }
             }
-            $s = sizeof($qry);
+            $s = count($qry);
             if ($s == 0 && $inv === false) {
                 $doalert = false;
             } elseif ($s > 0 && $inv === false) {

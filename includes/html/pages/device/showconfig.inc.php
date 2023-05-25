@@ -81,7 +81,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         if (Config::get('rancid_repo_type') == 'svn') {
             if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-                [$diff, $errors] = svn_diff($rancid_file, ($vars['rev'] - 1), $rancid_file, $vars['rev']);
+                [$diff, $errors] = svn_diff($rancid_file, $vars['rev'] - 1, $rancid_file, $vars['rev']);
                 if (! $diff) {
                     $text = 'No Difference';
                 } else {

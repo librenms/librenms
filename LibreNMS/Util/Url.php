@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
@@ -141,7 +142,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities(optional($port->device)->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($port->device?->displayName() . ' - ' . $label)) . '</div>';
         if ($description = $port->getDescription()) {
             $content .= addslashes(htmlentities($description)) . '<br />';
         }
@@ -630,7 +631,7 @@ class Url
                 $vars['page'] = $segment;
             } else {
                 [$name, $value] = array_pad(explode('=', $segment), 2, null);
-                if (! $value) {
+                if ($value === null) {
                     if ($vars['page'] == 'device' && $pos < 3) {
                         // translate laravel device routes properly
                         $vars[$pos === 1 ? 'device' : 'tab'] = $name;

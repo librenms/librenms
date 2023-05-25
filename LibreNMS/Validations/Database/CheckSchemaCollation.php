@@ -79,7 +79,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
                 }, $collation_columns));
         }
 
-        return ValidationResult::ok('');
+        return ValidationResult::ok(trans('validation.validations.database.CheckSchemaCollation.ok'));
     }
 
     /**

@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AlertScheduleUtc extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             DB::table('alert_schedule')->update([
@@ -30,7 +30,7 @@ class AlertScheduleUtc extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('alert_schedule', function (Blueprint $table) {
             $table->date('start_recurring_dt')->nullable(false)->default('1970-01-01')->after('end');
@@ -51,4 +51,4 @@ class AlertScheduleUtc extends Migration
             ]);
         }
     }
-}
+};

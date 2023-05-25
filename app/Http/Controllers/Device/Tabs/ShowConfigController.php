@@ -104,7 +104,7 @@ class ShowConfigController extends Controller implements DeviceTab
         if (Config::has('rancid_configs.0')) {
             $device = DeviceCache::getPrimary();
             foreach (Config::get('rancid_configs') as $configs) {
-                if ($configs[(strlen($configs) - 1)] != '/') {
+                if ($configs[strlen($configs) - 1] != '/') {
                     $configs .= '/';
                 }
 

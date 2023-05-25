@@ -183,19 +183,6 @@ You need a token you can find on your personnal space.
 | API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
 | Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br/> Originator=ORIGINATOR<br />MessageText={{ $msg }} |
 
-## Boxcar
-
-Copy your access token from the Boxcar app or from the Boxcar.io
-website and setup the transport.
-
-[Boxcar Docs](http://developer.boxcar.io/api/publisher/)
-
-**Example:**
-
-| Config | Example |
-| ------ | ------- |
-| Access Token | i23f23mr23rwerw |
-
 ## Browser Push
 
 Browser push notifications can send a notification to the user's
@@ -322,9 +309,9 @@ for details on acceptable values.
 | API URL | <https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj> |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
-| Options | color = red <br/> notify = 1 <br/> message_format = text |
+| Options | color=red |
 
-At present the following options are supported: `color`, `notify` and `message_format`.
+At present the following options are supported: `color`.
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
@@ -536,7 +523,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 
 | Config | Example |
 | ------ | ------- |
-| PlaySMS | <https://localhost/index.php?app=ws> |
+| PlaySMS | <https://localhost/index.php> |
 | User | user1 |
 | Token | MYFANCYACCESSTOKEN |
 | From | My Name |
@@ -923,3 +910,26 @@ They can be in international dialling format only.
 | Password | smsfeedback_password |
 | Mobiles | 71234567890 |
 | Sender name| CIA |
+
+## Zenduty
+
+Leveraging LibreNMS<>Zenduty Integration, users can send new LibreNMS 
+alerts to the right team and notify them based on on-call schedules
+via email, SMS, Phone Calls, Slack, Microsoft Teams and mobile push
+notifications. Zenduty provides engineers with detailed context around 
+the LibreNMS alert along with playbooks and a complete incident command
+framework to triage, remediate and resolve incidents with speed.
+
+Create a [LibreNMS
+Integration](https://docs.zenduty.com/docs/librenms) from inside 
+[Zenduty](https://www.zenduty.com), then copy the Webhook URL from Zenduty
+to LibreNMS.
+
+For a detailed guide with screenshots, refer to the 
+[LibreNMS documentation at Zenduty](https://docs.zenduty.com/docs/librenms).
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://www.zenduty.com/api/integration/librenms/integration-key/> |

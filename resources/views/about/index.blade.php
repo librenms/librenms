@@ -71,6 +71,7 @@
             <a target="_blank" href="https://www.librenms.org/shop">{{ __('Merch Shop') }}</a> |
             <a target="_blank" href="https://community.librenms.org">{{ __('Community Forum') }}</a> |
             <a target="_blank" href="https://twitter.com/librenms">{{ __('Twitter') }}</a> |
+            <a target="_blank" href="https://www.linkedin.com/company/librenms">{{ __('LinkedIn') }}</a> |
             <a target="_blank" href="https://www.librenms.org/changelog.html">{{ __('Changelog') }}</a> |
             <a href="#" data-toggle="modal" data-target="#git_log">{{ __('Local git log') }}</a>
           </p>

@@ -64,10 +64,10 @@ class OutagesController extends TableController
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
             ->when($request->from, function ($query) use ($request) {
-                $query->where('going_down', '>=', strtotime($request->from));
+                $query->where('going_down', '>=', Carbon::parse($request->from, session('preferences.timezone'))->getTimestamp());
             })
             ->when($request->to, function ($query) use ($request) {
-                $query->where('going_down', '<=', strtotime($request->to));
+                $query->where('going_down', '<=', Carbon::parse($request->to, session('preferences.timezone'))->getTimestamp());
             });
     }
 
@@ -113,7 +113,7 @@ class OutagesController extends TableController
         }
 
         $output = "<span style='display:inline;'>";
-        $output .= (Carbon::createFromTimestamp($timestamp))->format(Config::get('dateformat.compact')); // Convert epoch to local time
+        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
         $output .= '</span>';
 
         return $output;

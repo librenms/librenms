@@ -1,0 +1,149 @@
+CORERO-CMS-CLUSTERS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, Unsigned32, Counter64, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    coreroCMSMIBObjects, coreroCMSMIBCompliances, coreroCMSMIBGroups
+        FROM CORERO-CMS-MIB;
+
+
+clusters MODULE-IDENTITY
+    LAST-UPDATED "201806290000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "info@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201708240000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION      "201805030000Z"
+    DESCRIPTION
+            "Add ingressSampleRate field"
+    REVISION      "201805230000Z"
+    DESCRIPTION
+            "Add optimizeForScrubbing field"
+    REVISION      "201806290000Z"
+    DESCRIPTION
+            "Updated clusterOptimizeForScrubbing description"
+    ::= { coreroCMSMIBObjects 3 }
+
+clusterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of Clusters"
+    ::= { clusters 1 }
+
+clusterEntry OBJECT-TYPE
+    SYNTAX      ClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Cluster table which represents a single Cluster"
+    INDEX { clusterIndex }
+    ::= { clusterTable 1 }
+
+ClusterEntry ::= SEQUENCE {
+    clusterIndex                INTEGER (1..2147483647),
+    clusterName                 OCTET STRING (SIZE(1..64)),
+    clusterDescription          OCTET STRING,
+    clusterProtectionProfile    OCTET STRING,
+    clusterIngressSampleRate    INTEGER (1..4096),
+    clusterOptimizeForScrubbing INTEGER
+}
+
+clusterIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of the Cluster"
+    ::= { clusterEntry 1 }
+
+clusterName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Cluster"
+    ::= { clusterEntry 2 }
+
+clusterDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of the Cluster. If no description is entered, this is blank."
+    ::= { clusterEntry 3 }
+
+clusterProtectionProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Protection Profile associated with this Cluster"
+    ::= { clusterEntry 4 }
+
+clusterIngressSampleRate OBJECT-TYPE
+    SYNTAX      INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External ingress sampling rate for all devices in the cluster"
+    ::= { clusterEntry 5 }
+
+clusterOptimizeForScrubbing OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the devices in the cluster are optimized for scrubbing deployments"
+    ::= { clusterEntry 6 }
+
+-- compliance statements
+
+coreroCMSMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   coreroClusterGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { coreroCMSMIBCompliances 3 }
+
+
+-- units of conformance
+
+coreroClusterGroup OBJECT-GROUP
+    OBJECTS {
+                clusterIndex,
+                clusterName,
+                clusterDescription,
+                clusterProtectionProfile,
+                clusterIngressSampleRate,
+                clusterOptimizeForScrubbing
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status and statistics for the site."
+    ::= { coreroCMSMIBGroups 3 }
+
+
+END

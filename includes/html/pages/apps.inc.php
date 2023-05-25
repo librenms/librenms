@@ -399,6 +399,14 @@ $graphs['chronyd'] = [
     'frequency',
     'root',
 ];
+$graphs['cape'] = [
+    'status',
+    'pending',
+    'run_stats',
+    'lines',
+    'malscore_stats',
+    'pkg_tasks_all',
+];
 $graphs['sagan'] = [
     'after',
     'bytes_ignored',
@@ -444,6 +452,9 @@ $graphs['systemd'] = [
 $graphs['wireguard'] = [
     'traffic',
     'time',
+];
+$graphs['linux_config_files'] = [
+    'number_of_confs',
 ];
 
 echo '<div class="panel panel-default">';

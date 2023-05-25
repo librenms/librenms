@@ -26,62 +26,47 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Victorops extends Transport
 {
-    protected $name = 'VictorOps';
+    protected string $name = 'Splunk On-Call';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $opts['url'] = $this->config['victorops-url'];
-        }
-
-        return $this->contactVictorops($obj, $opts);
-    }
-
-    public function contactVictorops($obj, $opts)
-    {
-        $url = $opts['url'];
-
+        $url = $this->config['victorops-url'];
         $protocol = [
-            'entity_id' => strval($obj['id'] ? $obj['id'] : $obj['uid']),
-            'state_start_time' => strtotime($obj['timestamp']),
-            'entity_display_name' => $obj['title'],
-            'state_message' => $obj['msg'],
+            'entity_id' => strval($alert_data['id'] ?: $alert_data['uid']),
+            'state_start_time' => strtotime($alert_data['timestamp']),
+            'entity_display_name' => $alert_data['title'],
+            'state_message' => $alert_data['msg'],
             'monitoring_tool' => 'librenms',
         ];
-        if ($obj['state'] == AlertState::RECOVERED) {
-            $protocol['message_type'] = 'recovery';
-        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
-            $protocol['message_type'] = 'acknowledgement';
-        } elseif ($obj['state'] == AlertState::ACTIVE) {
-            $protocol['message_type'] = 'critical';
-        }
+        $protocol['message_type'] = match ($alert_data['state']) {
+            AlertState::RECOVERED => 'RECOVERY',
+            AlertState::ACKNOWLEDGED => 'ACKNOWLEDGEMENT',
+            default => match ($alert_data['severity']) {
+                'ok' => 'INFO',
+                'warning' => 'WARNING',
+                default => 'CRITICAL',
+            },
+        };
 
-        foreach ($obj['faults'] as $fault => $data) {
+        foreach ($alert_data['faults'] as $fault => $data) {
             $protocol['state_message'] .= $data['string'];
         }
 
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type' => 'application/json']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($protocol));
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump('VictorOps returned Error, retry later'); //FIXME: propper debuging
+        $res = Http::client()->post($url, $protocol);
 
-            return false;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $protocol);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
