@@ -45,7 +45,7 @@ class Telegram extends Transport
         ];
 
         if ($format) {
-            $params['format'] = $this->config['telegram-format'];
+            $params['parse_mode'] = $this->config['telegram-format'];
         }
 
         if (! empty($this->config['message-thread-id'])) {
