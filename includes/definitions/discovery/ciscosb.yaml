@@ -73,15 +73,6 @@ modules:
                     user_func: fahrenheit_to_celsius
                     high_limit: 50 # true for all switches
                     low_limit: -5 # true for nearly all switches except CBS250-8T-D and CBS250-8PP-D, they would like 0°C
-                    skip_values:
-                        -
-                            oid: rlEnvFanDataTemp
-                            op: '=='
-                            value: 0               
-                        -
-                            oid: rlEnvFanDataTemp
-                            op: '=='
-                            value: -17.78 # Fahrenheit = 0     
         fanspeed:
             data:
                 -
@@ -92,8 +83,3 @@ modules:
                     descr: 'FAN {{ $index }} Speed'
                     high_limit: 10000
                     low_limit: 500
-                    skip_values:
-                        -
-                            oid: rlEnvFanDataSpeed
-                            op: '=='
-                            value: 0 
