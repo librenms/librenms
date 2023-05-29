@@ -1191,7 +1191,7 @@ function cache_mac_oui()
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
 
-            $oui_db = array();
+            $oui_db = [];
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
@@ -1218,7 +1218,7 @@ function cache_mac_oui()
                     Cache::put($key, $vendor, $mac_oui_cache_time);
 
                     // Store the OUI for the vendor in the associative array
-                    if (!isset($oui_db[$vendor])) {
+                    if (! isset($oui_db[$vendor])) {
                         $oui_db[$vendor] = [];
                     }
                     $oui_db[$vendor][] = $oui;
@@ -1242,7 +1242,6 @@ function cache_mac_oui()
 
     return 0;
 }
-
 
 /**
  * Function to generate PeeringDB Cache
