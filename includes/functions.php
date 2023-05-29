@@ -1190,12 +1190,15 @@ function cache_mac_oui()
             $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
+
+            $oui_db = array();
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
 
                 $length = strlen($entry[0]);
                 $prefix = strtolower(str_replace(':', '', $entry[0]));
+                $vendor = $entry[2];
 
                 if (is_array($entry) && count($entry) >= 3 && $length == 8) {
                     // We have a standard OUI xx:xx:xx
@@ -1208,12 +1211,24 @@ function cache_mac_oui()
                         $oui = substr($prefix, 0, 9);
                     }
                 }
+
                 if (isset($oui)) {
-                    echo "Adding $oui, $entry[2]" . PHP_EOL;
+                    // Store the OUI for the vendor as individual keys
                     $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry[2], $mac_oui_cache_time);
+                    Cache::put($key, $vendor, $mac_oui_cache_time);
+
+                    // Store the OUI for the vendor in the associative array
+                    if (!isset($oui_db[$vendor])) {
+                        $oui_db[$vendor] = [];
+                    }
+                    $oui_db[$vendor][] = $oui;
+
+                    echo "Adding $oui for $vendor" . PHP_EOL;
                 }
             }
+
+            Cache::forget('OUIDB');
+            Cache::put('OUIDB', $oui_db, $mac_oui_cache_time);
         } catch (Exception $e) {
             echo 'Error processing Mac OUI :' . PHP_EOL;
             echo 'Exception: ' . get_class($e) . PHP_EOL;
@@ -1227,6 +1242,7 @@ function cache_mac_oui()
 
     return 0;
 }
+
 
 /**
  * Function to generate PeeringDB Cache
