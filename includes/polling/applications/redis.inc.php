@@ -37,12 +37,10 @@ $category = 'clients';
 $fields = [
     'connected' => $client_data['connected_clients'],
     'blocked'   => $client_data['blocked_clients'],
-    'maxclients'   => $client_data['maxclients'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('connected', 'GAUGE', 0)
-    ->addDataset('blocked', 'GAUGE', 0)
-    ->addDataset('maxclients', 'GAUGE', 0);
+    ->addDataset('blocked', 'GAUGE', 0);
 $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
