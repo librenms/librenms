@@ -36,7 +36,6 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-
 class FdbTablesController extends TableController
 {
     protected $macCountCache = [];
@@ -95,6 +94,7 @@ class FdbTablesController extends TableController
                     return $query->whereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search));
                 case 'vendor':
                     $vendor_ouis = $this->ouisFromVendor($search);
+
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search) {
@@ -305,9 +305,9 @@ class FdbTablesController extends TableController
     /**
      * Get the OUI list for a specific vendor
      *
-     * @param string $vendor
+     * @param  string  $vendor
      * @return array
-    */
+     */
     protected function ouisFromVendor($vendor)
     {
         $oui_db = Cache::get('OUIDB');
@@ -317,11 +317,13 @@ class FdbTablesController extends TableController
         $matching_ouis = array_reduce($matching_vendors, function ($carry, $vendor) use ($oui_db) {
             return array_merge($carry, $oui_db[$vendor]);
         }, []);
+
         return $matching_ouis;
     }
+
     /**
      * Get all port ids from vendor OUIs
-     * 
+     *
      * @param  array  $vendor_ouis
      * @return array
      */
@@ -335,6 +337,6 @@ class FdbTablesController extends TableController
         $condition = rtrim($condition, ' OR');
         $query->whereRaw($condition);
 
-        return $query; // Return the query builder instance 
+        return $query; // Return the query builder instance
     }
 }
