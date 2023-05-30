@@ -84,7 +84,7 @@ class Syslog extends Transport
 
         $syslog_prefix = '<'
             . $priority
-            . '> '
+            . '>'
             . date('M d H:i:s ')
             . gethostname()
             . ' librenms'
