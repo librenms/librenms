@@ -1,13 +1,13 @@
 <?php
 
 $graphs = [
-    'linux_softnet_stat_cpu_collision' => 'CPU Collision',
-    'linux_softnet_stat_flow_limit_count' => 'Flow Limit Count',
-    'linux_softnet_stat_packet_drop' => 'Packet Drop',
-    'linux_softnet_stat_packet_process' => 'Packet Process',
-    'linux_softnet_stat_received_rps' => 'Received RPS',
-    'linux_softnet_stat_softnet_backlog_len' => 'Backlog Len',
-    'linux_softnet_stat_time_squeeze' => 'Time Squeeze',
+    'linux_softnet_stat_packets' => 'Packets Per Second',
+    'linux_softnet_stat_backlog_length' => 'Backlog Lenght',
+    'linux_softnet_stat_packet_dropped' => 'Packets Dropped Per Second',
+    'linux_softnet_stat_cpu_collision' => 'CPU Collisions Per Second',
+    'linux_softnet_stat_flow_limit' => 'Flow Limit Hit Per Second',
+    'linux_softnet_stat_received_rps' => 'Received RPS Per Second',
+    'linux_softnet_stat_time_squeeze' => 'Time Squeezes Per Second',
 ];
 
 foreach ($graphs as $key => $text) {

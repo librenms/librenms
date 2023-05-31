@@ -456,6 +456,15 @@ $graphs['wireguard'] = [
 $graphs['linux_config_files'] = [
     'number_of_confs',
 ];
+$graphs['linux_softnet_stat'] = [
+    'packets',
+    'backlog_length',
+    'packet_dropped',
+    'cpu_collision',
+    'flow_limit',
+    'received_rps',
+    'time_squeeze',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

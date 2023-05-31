@@ -1,7 +1,7 @@
 <?php
 
 $ds = 'received_rps';
-$unit_text = 'Received RPS';
+$unit_text = 'RPS/Sec';
 $filename = Rrd::name($device['hostname'], ['app', 'linux_softnet_stat', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

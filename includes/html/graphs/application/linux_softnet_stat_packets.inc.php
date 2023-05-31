@@ -1,7 +1,7 @@
 <?php
 
-$ds = 'flow_limit_count';
-$unit_text = 'Flow Limit Count';
+$ds = 'packets';
+$unit_text = 'Pkts/Sec';
 $filename = Rrd::name($device['hostname'], ['app', 'linux_softnet_stat', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {

@@ -1,7 +1,7 @@
 <?php
 
-$ds = 'softnet_backlog_len';
-$unit_text = 'Backlog Len';
+$ds = 'packet_dropped';
+$unit_text = 'Pkt Drops/Sec';
 $filename = Rrd::name($device['hostname'], ['app', 'linux_softnet_stat', $app->app_id]);
 
 if (! Rrd::checkRrdExists($filename)) {
