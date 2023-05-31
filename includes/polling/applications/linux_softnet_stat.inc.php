@@ -24,13 +24,13 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('time_squeeze', 'DERIVE');
 
 $fields = [
-    'cpu_collision' => $data['cpu_collision'],
-    'flow_limit_count' => $data['flow_limit_count'],
-    'packet_drop' => $data['packet_drop'],
-    'packet_process' => $data['packet_process'],
-    'received_rps' => $data['received_rps'],
-    'softnet_backlog_len' => $data['softnet_backlog_len'],
-    'time_squeeze' => $data['time_squeeze'],
+    'cpu_collision' => $data['totals']['cpu_collision'],
+    'flow_limit_count' => $data['totals']['flow_limit_count'],
+    'packet_drop' => $data['totals']['packet_drop'],
+    'packet_process' => $data['totals']['packet_process'],
+    'received_rps' => $data['totals']['received_rps'],
+    'softnet_backlog_len' => $data['totals']['softnet_backlog_len'],
+    'time_squeeze' => $data['totals']['time_squeeze'],
 ];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
