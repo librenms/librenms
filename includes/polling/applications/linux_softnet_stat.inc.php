@@ -17,8 +17,8 @@ $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu_collision', 'DERIVE')
     ->addDataset('flow_limit_count', 'DERIVE')
-    ->addDataset('flow_limit_found', 'DERIVE')
     ->addDataset('packet_drop', 'DERIVE')
+    ->addDataset('packet_process', 'DERIVE')
     ->addDataset('received_rps', 'DERIVE')
     ->addDataset('softnet_backlog_len', 'DERIVE')
     ->addDataset('time_squeeze', 'DERIVE');
@@ -26,7 +26,6 @@ $rrd_def = RrdDefinition::make()
 $fields = [
     'cpu_collision' => $data['cpu_collision'],
     'flow_limit_count' => $data['flow_limit_count'],
-    'flow_limit_found' => $data['flow_limit_found'],
     'packet_drop' => $data['packet_drop'],
     'packet_process' => $data['packet_process'],
     'received_rps' => $data['received_rps'],
