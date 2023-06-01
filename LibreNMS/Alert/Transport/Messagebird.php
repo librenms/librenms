@@ -42,7 +42,7 @@ class Messagebird extends Transport
     public function deliverAlert(array $alert_data): bool
     {
 
-        $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, ($this->config['messagebird-limit'] - 3), '...');
+        $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, $this->config['messagebird-limit'] - 3, '...');
         $fields = [
             'recipients' => $this->config['messagebird-recipient'],
             'originator' => $this->config['messagebird-origin'],
@@ -70,8 +70,8 @@ class Messagebird extends Transport
                     'title' => 'Messagebird API URL',
                     'name' => 'messagebird-url',
                     'descr' => 'Messagebird API URL',
-		    'type' => 'text',
-		    'default' => 'https://rest.messagebird.com/messages'
+                    'type' => 'text',
+                    'default' => 'https://rest.messagebird.com/messages'
                 ],
                 [
                     'title' => 'Messagebird API key',
