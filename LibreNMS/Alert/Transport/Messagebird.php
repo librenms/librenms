@@ -43,13 +43,13 @@ class Messagebird extends Transport
     {
 
         $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, ($this->config['messagebird-limit'] - 3), '...');
-	$fields = [
+        $fields = [
             'recipients' => $this->config['messagebird-recipient'],
             'originator' => $this->config['messagebird-origin'],
             'body' => $messagebird_msg,
         ];
 
-	$res = Http::client()
+        $res = Http::client()
             ->withHeaders([
                 'Authorization' => 'AccessKey ' . $this->config['messagebird-key'],
             ])
@@ -95,16 +95,16 @@ class Messagebird extends Transport
                     'title' => 'Limit characters in text message',
                     'name' => 'messagebird-limit',
                     'descr' => 'Limit max characters',
-		    'type' => 'text',
-		    'default' => 120,
+                    'type' => 'text',
+                    'default' => 120,
                 ],
             ],
             'validation' => [
                 'messagebird-url' => 'required|url',
                 'messagebird-key' => 'required',
                 'messagebird-origin' => 'required',
-		'messagebird-recipient' => 'required',
-		'messagebird-limit' => 'integer|between:1,480',
+                'messagebird-recipient' => 'required',
+                'messagebird-limit' => 'integer|between:1,480',
             ],
         ];
     }
