@@ -38,10 +38,8 @@ use LibreNMS\Util\Http;
 
 class Messagebird extends Transport
 {
-
     public function deliverAlert(array $alert_data): bool
     {
-
         $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, $this->config['messagebird-limit'] - 3, '...');
         $fields = [
             'recipients' => $this->config['messagebird-recipient'],
@@ -71,7 +69,7 @@ class Messagebird extends Transport
                     'name' => 'messagebird-url',
                     'descr' => 'Messagebird API URL',
                     'type' => 'text',
-                    'default' => 'https://rest.messagebird.com/messages'
+                    'default' => 'https://rest.messagebird.com/messages',
                 ],
                 [
                     'title' => 'Messagebird API key',
