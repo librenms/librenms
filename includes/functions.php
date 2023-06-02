@@ -1175,6 +1175,7 @@ function mac_oui_to_database()
 
     if (Config::get('mac_oui.enabled') !== true) {
         echo 'Mac OUI integration disabled' . PHP_EOL;
+
         return 0;
     }
 

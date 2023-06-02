@@ -31,10 +31,11 @@ use App\Models\PortsFdb;
 use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
-use Illuminate\Support\Facades\DB;
+
 
 class FdbTablesController extends TableController
 {
