@@ -1230,8 +1230,6 @@ function mac_oui_to_database()
 
             return 1;
         }
-
-        $lock->release(); // Release the lock after the caching process is complete
     }
 
     return 0;
