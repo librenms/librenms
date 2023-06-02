@@ -1312,13 +1312,6 @@ ospf_ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_ports_device_id_ospf_port_id_context_name_unique: { Name: ospf_ports_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
-ouis:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
