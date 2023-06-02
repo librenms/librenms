@@ -36,7 +36,6 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-
 class FdbTablesController extends TableController
 {
     protected $macCountCache = [];
