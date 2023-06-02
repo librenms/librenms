@@ -29,12 +29,12 @@ use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortsFdb;
 use App\Models\Vlan;
-use Cache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use Illuminate\Support\Facades\DB;
 
 class FdbTablesController extends TableController
 {
@@ -310,13 +310,10 @@ class FdbTablesController extends TableController
      */
     protected function ouisFromVendor($vendor)
     {
-        $oui_db = Cache::get('OUIDB');
-        $matching_vendors = array_filter(array_keys($oui_db), function ($name) use ($vendor) {
-            return preg_match("/$vendor/i", $name);
-        });
-        $matching_ouis = array_reduce($matching_vendors, function ($carry, $vendor) use ($oui_db) {
-            return array_merge($carry, $oui_db[$vendor]);
-        }, []);
+        $matching_ouis = DB::table('vendor_ouis')
+            ->where('vendor', 'LIKE', '%' . $vendor . '%')
+            ->pluck('oui')
+            ->toArray();
 
         return $matching_ouis;
     }
