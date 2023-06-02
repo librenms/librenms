@@ -16,12 +16,12 @@ try {
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('backlog_length', 'GAUGE')
-    ->addDataset('cpu_collision', 'DERIVE')
-    ->addDataset('flow_limit', 'DERIVE')
-    ->addDataset('packet_dropped', 'DERIVE')
-    ->addDataset('packets', 'DERIVE')
-    ->addDataset('received_rps', 'DERIVE')
-    ->addDataset('time_squeeze', 'DERIVE');
+    ->addDataset('cpu_collision', 'COUNTER')
+    ->addDataset('flow_limit', 'COUNTER')
+    ->addDataset('packet_dropped', 'COUNTER')
+    ->addDataset('packets', 'COUNTER')
+    ->addDataset('received_rps', 'COUNTER')
+    ->addDataset('time_squeeze', 'COUNTER');
 
 $fields = [
     'backlog_length' => $data['totals']['backlog_length'],
