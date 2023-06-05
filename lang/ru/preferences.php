@@ -11,7 +11,7 @@ return [
     | lang: is the display name for this language in the language select dialog
     |
     */
-
-    'lang' => 'русский',
+    'title' => 'Настройки',
+    'lang' => 'Русский',
 
 ];
