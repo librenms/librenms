@@ -43,4 +43,5 @@ return [
     'snmp_version_unsupported' => [
         'message' => 'Неподдерживаемая версия SNMP ":snmpver". Должна быть v1, v2c или v3',
     ],
+
 ];
