@@ -21,4 +21,3 @@ return [
     'bridge_hello_time' => 'Время hello моста (сек)',
     'bridge_forward_delay' => 'Задержка пересылки моста (сек)',
 ];
-
