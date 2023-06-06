@@ -183,8 +183,9 @@ class YamlDiscovery
                 if (is_null($replace)) {
                     // allow parsing of InetAddress hex data representing ipv4 or ipv6
                     // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
-                    // do not use snmp flag -Oa, as it converts Hex-STRING to string, use for exemple:
-                    // snmp_flags: '-OteQUs'
+                    // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
+                    // snmp_flags: '-OteQUsax'
+                    // snmp_no_Ih_flag: ''
                     if (str_starts_with($matches[1], 'InetAddress_')) {
                         $inetaddr = explode('_', $matches[1]);
                         if (count($inetaddr) == 2) {
@@ -310,7 +311,10 @@ class YamlDiscovery
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
                                 }
-                                $snmp_flag[] = '-Ih';
+
+                                if (! isset($data['snmp_no_Ih_flag'])) {
+                                    $snmp_flag[] = '-Ih';
+                                }
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
