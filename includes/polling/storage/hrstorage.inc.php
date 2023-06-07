@@ -22,7 +22,7 @@ $entry = $storage_cache['hrstorage'][$storage['storage_index']];
  *
  */
 
-if( $entry['hrStorageDescr'] !== $descr ){
+if( $entry['hrStorageDescr'] !== $descr && is_array( $storage_cache['hrstorage'] ) ){
     d_echo( '🚨 We are after [' . $descr . '] but hrStorageIndex entry has [' . $entry['hrStorageDescr'] . '] ' );
     d_echo( 'Before: ' . var_export( $entry, true ));
     $entry = array_values( array_filter( $storage_cache['hrstorage'], function($entry) use ($descr) {
