@@ -1,0 +1,8 @@
+os: christie-projector
+text: 'Christie Projector'
+type: collaboration
+icon: christie
+group: christie
+discovery:
+    - sysObjectID:
+        - '.1.3.6.1.4.1.25766.'
