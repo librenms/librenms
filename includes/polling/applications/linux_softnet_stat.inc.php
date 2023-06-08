@@ -21,7 +21,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('packet_dropped', 'COUNTER')
     ->addDataset('packets', 'COUNTER')
     ->addDataset('received_rps', 'COUNTER')
-    ->addDataset('time_squeeze', 'COUNTER');
+    ->addDataset('time_squeeze', 'COUNTER')
+    ->addDataset('budget', 'GAUGE')
+    ->addDataset('budget_usecs', 'GAUGE');
 
 $fields = [
     'backlog_length' => $data['totals']['backlog_length'],
@@ -31,6 +33,8 @@ $fields = [
     'packets' => $data['totals']['packets'],
     'received_rps' => $data['totals']['received_rps'],
     'time_squeeze' => $data['totals']['time_squeeze'],
+    'budget' => $data['budget'],
+    'budget_usecs' => $data['budget_usecs'],
 ];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');

@@ -16,6 +16,7 @@ $graphs = [
     'linux_softnet_stat_cpu_collision' => 'CPU Collisions Per Second',
     'linux_softnet_stat_flow_limit' => 'Flow Limit Hit Per Second',
     'linux_softnet_stat_received_rps' => 'Received RPS Per Second',
+    'linux_softnet_stat_budget' => 'Budget Sysctl Values',
 ];
 
 foreach ($graphs as $key => $text) {
