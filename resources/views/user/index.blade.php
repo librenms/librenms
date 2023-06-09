@@ -63,7 +63,7 @@
 
 @section('javascript')
     <script type="application/javascript">
-        $(document).ready(function () {
+        $(document).ready(function(){
             var user_grid = $("#users");
             user_grid.bootgrid({
                 formatters: {
@@ -75,17 +75,17 @@
                         }
                     },
                     text: function (column, row) {
-                        return row[column.id];
+                        let div = document.createElement('div');
+                        div.innerText = row[column.id];
+                        return div.innerHTML;
                     },
                     twofactor: function (column, row) {
-                        if (row['twofactor'] == 1) {
+                        if(row['twofactor'] == 1) {
                             return '<span class="fa fa-fw fa-check text-success"></span>';
-                        } else {
-                            return '';
                         }
                     },
                     actions: function (column, row) {
-                        var edit_button = '<form action="{{ route('users.edit', [':user_id']) }}" method="GET">' +
+                        var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
                             '@csrf' +
                             '<button type="submit" title="{{ __('Edit') }}" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></button>' +
                             '</form> ';
@@ -96,7 +96,7 @@
                         var manage_button = '<form action="{{ url('edituser') }}/" method="GET"';
 
                         if (row['level'] >= 5) {
-                            manage_button += ' style="visibility:hidden;"';
+                            manage_button += ' style="visibility:hidden;"'
                         }
 
                         manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
@@ -108,7 +108,7 @@
                             output += delete_button;
                         }
 
-                        return output;
+                        return output
                     },
                     level: function (column, row) {
                         var level = row[column.id];
@@ -118,47 +118,40 @@
                             return '{{ __('Global Read') }}';
                         } else if (level == 11) {
                             return '{{ __('Demo') }}';
-                        } else if (level == 4) {
-                            return '{{ __('Limited Write') }}';
                         }
 
                         return '{{ __('Normal') }}';
-
                     }
                 }
-            })
-
+            });
 
             @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
-            $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
+                $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
             @endif
 
             user_grid.css('display', 'table'); // done loading, show
-        })
+        });
 
-        function delete_user(user_id, username, url) {
-            if (confirm('
-                {{ __('Are you sure you want to delete ') }}' + username + '?')) {
+        function delete_user(user_id, username, url)
+        {
+            if (confirm('{{ __('Are you sure you want to delete ') }}' + username + '?')) {
                 $.ajax({
-                    url: '{{ route('users.destroy', [':user_id']) }}'.replace(':user_id', user_id),
-                    'DELETE',
+                    url: '{{ route('users.destroy', ':user_id') }}'.replace(':user_id', user_id),
+                    type: 'DELETE',
                     success: function (msg) {
                         $("#users").bootgrid("remove", [user_id]);
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('
-                        {{ __('The user could not be deleted') }}');
+                        toastr.error('{{ __('The user could not be deleted') }}');
                     }
-                })
+                });
             }
 
             return false;
         }
     </script>
-
 @endsection
-
 
 @section('css')
 <style>
