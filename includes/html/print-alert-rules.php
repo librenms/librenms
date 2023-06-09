@@ -23,7 +23,7 @@
  * @author     Original Author <unknown>
  * @author     Joseph Tingiris <joseph.tingiris@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     exit('ERROR: You need to be admin');
 }
 
