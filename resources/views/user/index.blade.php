@@ -118,39 +118,44 @@
                             return '{{ __('Global Read') }}';
                         } else if (level == 11) {
                             return '{{ __('Demo') }}';
+                        } else if (level == 4) {
+                            return '{{ __('Limited Write') }}';
                         }
 
                         return '{{ __('Normal') }}';
                     }
                 }
-            });
+            })
+
 
             @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
                 $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
             @endif
 
             user_grid.css('display', 'table'); // done loading, show
-        });
+        })
 
-        function delete_user(user_id, username, url)
-        {
-            if (confirm('{{ __('Are you sure you want to delete ') }}' + username + '?')) {
+        function delete_user(user_id, username, url) {
+            if (confirm('
+                {{ __('Are you sure you want to delete ') }}' + username + '?')) {
                 $.ajax({
                     url: '{{ route('users.destroy', ':user_id') }}'.replace(':user_id', user_id),
-                    type: 'DELETE',
+                    'DELETE',
                     success: function (msg) {
                         $("#users").bootgrid("remove", [user_id]);
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('{{ __('The user could not be deleted') }}');
+                        toastr.error('
+                        {{ __('The user could not be deleted') }}');
                     }
-                });
+                })
             }
 
             return false;
         }
     </script>
+
 @endsection
 
 @section('css')
