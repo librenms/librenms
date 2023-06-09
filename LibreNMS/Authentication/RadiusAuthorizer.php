@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Models\User;
 use Dapphp\Radius\Radius;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -38,6 +39,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
             $filter_id_attribute = $this->radius->getAttribute(11);
             $level = match ($filter_id_attribute) {
                 'librenms_role_admin' => 10,
+                'librenms_role_limited-write' => 4,
                 'librenms_role_normal' => 1,
                 'librenms_role_global-read' => 5,
                 default => Config::get('radius.default_level', 1)
@@ -45,7 +47,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
             // if Filter-Id was given and the user exists, update the level
             if ($filter_id_attribute && $this->userExists($credentials['username'])) {
-                $user = \App\Models\User::find($this->getUserid($credentials['username']));
+                $user = User::find($this->getUserid($credentials['username']));
                 $user->level = $level;
                 $user->save();
 
