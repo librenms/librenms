@@ -36,7 +36,6 @@
         <div class="col-sm-9">
             <select class="form-control" id="level" name="level">
                 <option value="1">{{ __('Normal') }}</option>
-                <option value="4" @if(old('level', $user->level) == 4) selected @endif>{{ __('Limited Write') }}</option>
                 <option value="5" @if(old('level', $user->level) == 5) selected @endif>{{ __('Global Read') }}</option>
                 <option value="10" @if(old('level', $user->level) == 10) selected @endif>{{ __('Admin') }}</option>
                 @if(old('level', $user->level) == 11)<option value="11" selected>{{ __('Demo') }}</option>@endif
