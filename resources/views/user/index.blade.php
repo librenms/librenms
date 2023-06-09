@@ -118,6 +118,8 @@
                             return '{{ __('Global Read') }}';
                         } else if (level == 11) {
                             return '{{ __('Demo') }}';
+                        } else if (level == 4) {
+                            return '{{ __('Limited Write') }}';
                         }
 
                         return '{{ __('Normal') }}';
