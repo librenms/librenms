@@ -31,7 +31,7 @@ use Illuminate\Support\Str;
 
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin',

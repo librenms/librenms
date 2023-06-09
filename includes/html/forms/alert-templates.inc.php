@@ -22,7 +22,7 @@
  */
 $status = 'error';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     header('Content-Type: application/json');
     $response = ['status' => $status, 'message' => 'You need to be admin'];
     exit(json_encode($response));

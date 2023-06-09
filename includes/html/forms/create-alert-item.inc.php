@@ -14,7 +14,7 @@
 
 use LibreNMS\Alert\AlertDB;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     exit('ERROR: You need to be admin');
 }
 

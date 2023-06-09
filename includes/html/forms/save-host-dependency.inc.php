@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     $parent_ids = (array) $_POST['parent_ids'];

@@ -22,7 +22,7 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     $device_id = $_POST['device_id'];

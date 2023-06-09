@@ -14,7 +14,7 @@
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     header('Content-type: text/plain');
     exit('ERROR: You need to be admin');
 }
