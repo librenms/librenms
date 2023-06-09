@@ -35,8 +35,8 @@ $noagg = ! $graph_params->visible('aggregate');
 $rrd_options = '';
 $env = [];
 
-if (session('timezone')) {
-    $env['TZ'] = session('timezone');
+if (session('preferences.timezone')) {
+    $env['TZ'] = session('preferences.timezone');
 }
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";

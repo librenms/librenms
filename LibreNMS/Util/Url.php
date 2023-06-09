@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;

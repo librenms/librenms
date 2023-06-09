@@ -12,7 +12,7 @@ class UserObserver
      * @param  \App\Models\User  $user
      * @return void
      */
-    public function deleted(User $user)
+    public function deleted(User $user): void
     {
         $user->apiTokens()->delete();
         $user->notificationAttribs()->delete();

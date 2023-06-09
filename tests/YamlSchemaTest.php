@@ -41,7 +41,7 @@ class YamlSchemaTest extends TestCase
         '/includes/definitions/ping.yaml',
     ];
 
-    public function testConfigSchema()
+    public function testConfigSchema(): void
     {
         $this->validateFileAgainstSchema('/misc/config_definitions.json', '/misc/config_schema.json');
     }
@@ -49,7 +49,7 @@ class YamlSchemaTest extends TestCase
     /**
      * @group os
      */
-    public function testOSDefinitionSchema()
+    public function testOSDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
     }
@@ -57,7 +57,7 @@ class YamlSchemaTest extends TestCase
     /**
      * @group os
      */
-    public function testOSMatchFilename()
+    public function testOSMatchFilename(): void
     {
         foreach ($this->listFiles('/includes/definitions/*.yaml') as $filename => $file) {
             $this->assertEquals(
@@ -71,7 +71,7 @@ class YamlSchemaTest extends TestCase
     /**
      * @group os
      */
-    public function testDiscoveryDefinitionSchema()
+    public function testDiscoveryDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
     }

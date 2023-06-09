@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Util;
 
-use DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -34,7 +34,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '23.4.0';
+    public const VERSION = '23.5.0';
 
     /** @var Git convenience instance */
     public $git;

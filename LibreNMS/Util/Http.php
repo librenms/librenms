@@ -1,8 +1,8 @@
 <?php
 /**
- * Application.php
+ * Http.php
  *
- * Extension of base application class
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +19,31 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App;
+namespace LibreNMS\Util;
 
-class Application extends \Illuminate\Foundation\Application
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Facades\Http as LaravelHttp;
+use LibreNMS\Config;
+
+class Http
 {
-    public function publicPath()
+    /**
+     * Create a new client with proxy set if appropriate and a distinct User-Agent header
+     */
+    public static function client(): PendingRequest
     {
-        // override the public path
-        return $this->basePath . DIRECTORY_SEPARATOR . 'html';
+        return LaravelHttp::withOptions([
+            'proxy' => [
+                'http' => Proxy::http(),
+                'https' => Proxy::https(),
+                'no' => Proxy::ignore(),
+            ],
+        ])->withHeaders([
+            'User-Agent' => Config::get('project_name') . '/' . Version::VERSION, // we don't need fine version here, just rough
+        ]);
     }
 }

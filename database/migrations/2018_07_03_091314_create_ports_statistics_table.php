@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('ports_statistics', function (Blueprint $table) {
             $table->unsignedInteger('port_id')->primary();
@@ -58,7 +58,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('ports_statistics');
     }
