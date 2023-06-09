@@ -1,6 +1,6 @@
 <?php
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     $response = [
         'status'  => 'error',
         'message' => 'Need to be admin',
