@@ -1,7 +1,7 @@
 <?php
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasLimitedWrite()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $ipmi_hostname = $_POST['ipmi_hostname'];
         $ipmi_port = (int) $_POST['ipmi_port'];
         $ipmi_username = $_POST['ipmi_username'];

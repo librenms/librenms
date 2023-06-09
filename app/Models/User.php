@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Events\UserCreated;
-use Auth;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,7 +15,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
 
 /**
- * @method static UserFactory factory(...$parameters)
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
@@ -48,10 +46,7 @@ class User extends Authenticatable
     }
 
     // ---- Helper Functions ----
-    public function hasLimitedWrite()
-    {
-        return $this->hasGlobalRead() || $this->level == 4;
-    }
+
     /**
      * Test if this user has global read access
      * these users have a level of 5, 10 or 11 (demo).
@@ -141,7 +136,7 @@ class User extends Authenticatable
      */
     public function hasBrowserPushTransport(): bool
     {
-        $user_id = Auth::id();
+        $user_id = \Auth::id();
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
@@ -216,7 +211,7 @@ class User extends Authenticatable
 
     public function apiTokens(): HasMany
     {
-        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
     public function devices()
@@ -229,7 +224,7 @@ class User extends Authenticatable
 
     public function deviceGroups(): BelongsToMany
     {
-        return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -238,13 +233,13 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
+            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
         }
     }
 
     public function dashboards(): HasMany
     {
-        return $this->hasMany(Dashboard::class, 'user_id');
+        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
     }
 
     public function notificationAttribs(): HasMany
@@ -254,11 +249,11 @@ class User extends Authenticatable
 
     public function preferences(): HasMany
     {
-        return $this->hasMany(UserPref::class, 'user_id');
+        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
     }
 
     public function widgets(): HasMany
     {
-        return $this->hasMany(UserWidget::class, 'user_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }
 }

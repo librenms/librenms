@@ -191,13 +191,6 @@
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
         @elseif(auth()->user()->hasGlobalRead())
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
-        @elseif(auth()->user()->hasLimitedWrite())
-            <strong class="green">{{ __('Limited Write Access') }}</strong>
-            @forelse($devices as $device)
-                <x-device-link :device="$device" /><br />
-            @empty
-                <strong class="red">{{ __('No access!') }}</strong>
-            @endforelse
         @else
             @forelse($devices as $device)
                 <x-device-link :device="$device" /><br />

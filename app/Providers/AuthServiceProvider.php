@@ -3,20 +3,6 @@
 namespace App\Providers;
 
 use App\Guards\ApiTokenGuard;
-use App\Models\Dashboard;
-use App\Models\Device;
-use App\Models\DeviceGroup;
-use App\Models\PollerCluster;
-use App\Models\Port;
-use App\Models\ServiceTemplate;
-use App\Models\User;
-use App\Policies\DashboardPolicy;
-use App\Policies\DeviceGroupPolicy;
-use App\Policies\DevicePolicy;
-use App\Policies\PollerClusterPolicy;
-use App\Policies\PortPolicy;
-use App\Policies\ServiceTemplatePolicy;
-use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -29,13 +15,13 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        User::class => UserPolicy::class,
-        Dashboard::class => DashboardPolicy::class,
-        Device::class => DevicePolicy::class,
-        DeviceGroup::class => DeviceGroupPolicy::class,
-        PollerCluster::class => PollerClusterPolicy::class,
-        Port::class => PortPolicy::class,
-        ServiceTemplate::class => ServiceTemplatePolicy::class,
+        \App\Models\User::class => \App\Policies\UserPolicy::class,
+        \App\Models\Dashboard::class => \App\Policies\DashboardPolicy::class,
+        \App\Models\Device::class => \App\Policies\DevicePolicy::class,
+        \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
+        \App\Models\PollerCluster::class => \App\Policies\PollerClusterPolicy::class,
+        \App\Models\Port::class => \App\Policies\PortPolicy::class,
+        \App\Models\ServiceTemplate::class => \App\Policies\ServiceTemplatePolicy::class,
     ];
 
     /**
@@ -68,9 +54,6 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('global-read', function ($user) {
             return $user->hasGlobalRead();
-        });
-        Gate::define('limited-write', function ($user) {
-            return $user->hasLimitedWrite();
         });
         Gate::define('device', function ($user, $device) {
             return $user->canAccessDevice($device);

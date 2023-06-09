@@ -27,18 +27,14 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
 use App\Models\Location;
-use DB;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
-use Request;
 
 class DeviceController extends TableController
 {
@@ -82,7 +78,7 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'hardware' => 'hardware',
             'os' => 'os',
-            'uptime' => DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
+            'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
         ];
@@ -92,7 +88,7 @@ class DeviceController extends TableController
      * Defines the base query for this resource
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return Builder|\Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
     {
@@ -138,7 +134,7 @@ class DeviceController extends TableController
     private function isDetailed()
     {
         if (is_null($this->detailed)) {
-            $this->detailed = Request::get('format', 'list_detail') == 'list_detail';
+            $this->detailed = \Request::get('format', 'list_detail') == 'list_detail';
         }
 
         return $this->detailed;
@@ -146,7 +142,7 @@ class DeviceController extends TableController
 
     /**
      * @param  Device  $device
-     * @return array|Model|Collection
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
      */
     public function formatItem($device)
     {
@@ -200,7 +196,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = Config::get('uptime_warning', 84600);
+            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }
@@ -313,7 +309,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (\Auth::user()->hasLimitedWrite()) {
+        if (\Auth::user()->hasGlobalAdmin()) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),
