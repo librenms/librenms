@@ -69,6 +69,7 @@ class AddUserCommand extends LnmsCommand
 
         $roles = [
             'normal' => 1,
+            'limited-write'=>4,
             'global-read' => 5,
             'admin' => 10,
         ];

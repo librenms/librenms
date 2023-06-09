@@ -116,8 +116,8 @@
                             return '{{ __('Admin') }}';
                         } else if (level == 5) {
                             return '{{ __('Global Read') }}';
-                        else if (level == 4) {
-                                return '{{ __('Limited Write') }}';
+                        } else if (level == 4) {
+                            return '{{ __('Limited Write') }}';
                         } else if (level == 11) {
                             return '{{ __('Demo') }}';
                         }
