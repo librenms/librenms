@@ -1,8 +1,10 @@
 <?php
 
-if (Auth::user()->hasGlobalRead()) {
+use LibreNMS\Config;
+
+if (Auth::user()->hasLimitedWrite()) {
     if ($vars['addsrv']) {
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasLimitedWrite()) {
             $updated = '1';
 
             $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, $vars['name']);
@@ -14,7 +16,7 @@ if (Auth::user()->hasGlobalRead()) {
     }
 
     // Build the types list.
-    foreach (scandir(\LibreNMS\Config::get('nagios_plugins')) as $file) {
+    foreach (scandir(Config::get('nagios_plugins')) as $file) {
         if (substr($file, 0, 6) === 'check_') {
             $check_name = substr($file, 6);
             $servicesform .= "<option value='$check_name'>$check_name</option>";

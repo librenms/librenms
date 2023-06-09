@@ -1,12 +1,14 @@
 <?php
 
+use LibreNMS\Config;
+
 $no_refresh = true;
 
 $link_array = ['page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit', ];
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasLimitedWrite()) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
@@ -19,7 +21,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['routing'] = 'Routing';
     }
 
-    if (count(\LibreNMS\Config::get("os.{$device['os']}.icons", []))) {
+    if (count(Config::get("os.{$device['os']}.icons", []))) {
         $panes['icon'] = 'Icon';
     }
 
@@ -31,7 +33,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['modules'] = 'Modules';
     }
 
-    if (\LibreNMS\Config::get('show_services')) {
+    if (Config::get('show_services')) {
         $panes['services'] = 'Services';
     }
 

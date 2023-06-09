@@ -50,7 +50,7 @@ class AddUserCommand extends LnmsCommand
 
         $this->addArgument('username', InputArgument::REQUIRED);
         $this->addOption('password', 'p', InputOption::VALUE_REQUIRED);
-        $this->addOption('role', 'r', InputOption::VALUE_REQUIRED, __('commands.user:add.options.role', ['roles' => '[normal, global-read, admin]']), 'normal');
+        $this->addOption('role', 'r', InputOption::VALUE_REQUIRED, __('commands.user:add.options.role', ['roles' => '[normal, limited-write, global-read, admin]']), 'normal');
         $this->addOption('email', 'e', InputOption::VALUE_REQUIRED);
         $this->addOption('full-name', 'l', InputOption::VALUE_REQUIRED);
         $this->addOption('descr', 's', InputOption::VALUE_REQUIRED);
