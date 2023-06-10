@@ -22,9 +22,8 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
-                },
-                "data": "{\"budget\":\"300\",\"budget_usecs\":\"8000\"}"
+                    "data": "{\"budget\":\"300\",\"budget_usecs\":\"8000\"}"
+                }
             },
             "application_metrics": [
                 {
