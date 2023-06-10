@@ -7,7 +7,6 @@ print_optionbar_start();
 echo 'Current Budget: ' . $budget . "<br>\nCurrent Budget usecs:" . $budget_usecs . "\n<br>";
 print_optionbar_end();
 
-
 $graphs = [
     'linux_softnet_stat_packets' => 'Packets Per Second',
     'linux_softnet_stat_time_squeeze' => 'Time Squeezes Per Second',
