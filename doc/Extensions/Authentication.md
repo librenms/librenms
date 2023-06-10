@@ -41,6 +41,10 @@ the same time.
 - 1: **Normal User**: You will need to assign device / port
   permissions for users at this level.
 
+- 4: **Limited Write**: You will need to assign a permission group / device / port 
+  to users at that level. Allows writing only in the assigned groups, 
+  devices, or ports.
+
 - 5: **Global Read**: Read only Administrator.
 
 - 10: **Administrator**: This is a global read/write admin account.
@@ -303,6 +307,7 @@ can be assigned a value which translates into a userlevel in LibreNMS.
 The strings to send in `Filter-ID` reply attribute is *one* of the following:
 
 - `librenms_role_normal` - Sets the value `1`, which is the normal user level.
+- `librenms_role_limited-write` - Sets the value `4`, which is the manager level.
 - `librenms_role_admin` - Sets the value `5`, which is the administrator level.
 - `librenms_role_global-read` - Sets the value `10`, which is the global read level.
 
