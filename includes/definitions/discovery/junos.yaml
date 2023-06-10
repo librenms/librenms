@@ -30,7 +30,7 @@ modules:
                 descr: jnxOperatingDescr
                 skip_values:
                     -
-                        oid: jnxOperatingBuffer
+                        oid: jnxOperatingMemory
                         op: '='
                         value: 0
                     -

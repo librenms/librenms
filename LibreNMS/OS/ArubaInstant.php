@@ -138,7 +138,7 @@ class ArubaInstant extends OS implements
             // fetch the MAC addresses of currently connected clients, then count them to get an overall total
             $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
-            $total_clients = sizeof($client_data);
+            $total_clients = count($client_data);
 
             $combined_oid = sprintf('%s::%s', $ai_mib, 'aiClientMACAddress');
             $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
@@ -161,7 +161,7 @@ class ArubaInstant extends OS implements
         $ai_mib = 'AI-AP-MIB';
         $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
-        $total_aps = sizeof($ap_data);
+        $total_aps = count($ap_data);
 
         $combined_oid = sprintf('%s::%s', $ai_mib, 'aiAPSerialNum');
         $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
@@ -311,14 +311,14 @@ class ArubaInstant extends OS implements
                 }
             } else {
                 // version is lower than 8.4.0.0
-                if (! empty($sensors) && sizeof($sensors) == 1) {
+                if (! empty($sensors) && count($sensors) == 1) {
                     $ai_mib = 'AI-AP-MIB';
                     $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
                     if (empty($client_data)) {
                         $total_clients = 0;
                     } else {
-                        $total_clients = sizeof($client_data);
+                        $total_clients = count($client_data);
                     }
 
                     $data[$sensors[0]['sensor_id']] = $total_clients;
@@ -339,14 +339,14 @@ class ArubaInstant extends OS implements
     public function pollWirelessApCount(array $sensors)
     {
         $data = [];
-        if (! empty($sensors) && sizeof($sensors) == 1) {
+        if (! empty($sensors) && count($sensors) == 1) {
             $ai_mib = 'AI-AP-MIB';
             $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
             $total_aps = 0;
 
             if (! empty($ap_data)) {
-                $total_aps = sizeof($ap_data);
+                $total_aps = count($ap_data);
             }
 
             $data[$sensors[0]['sensor_id']] = $total_aps;

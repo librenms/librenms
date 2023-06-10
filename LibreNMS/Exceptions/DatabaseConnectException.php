@@ -26,6 +26,7 @@
 namespace LibreNMS\Exceptions;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Response;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 
 class DatabaseConnectException extends \Exception implements UpgradeableException

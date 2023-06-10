@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoadUserPreferences
 {
@@ -12,11 +14,10 @@ class LoadUserPreferences
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        $preferences = ['locale', 'site_style'];
+        $preferences = ['locale', 'site_style', 'timezone'];
         $this->loadPreferences($request, $preferences);
 
         $this->setPreference($request, 'locale', function ($locale) {
@@ -25,6 +26,10 @@ class LoadUserPreferences
 
         $this->setPreference($request, 'site_style', function ($style) {
             Config::set('applied_site_style', $style);
+        });
+
+        $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+            $request->session()->put('preferences.timezone_static', true);
         });
 
         return $next($request);

@@ -71,10 +71,10 @@ abstract class LnmsCommand extends Command
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function addArgument($name, $mode = null, $description = null, $default = null)
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
@@ -96,10 +96,10 @@ abstract class LnmsCommand extends Command
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption($name, $shortcut = null, $mode = null, $description = null, $default = null)
+    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 

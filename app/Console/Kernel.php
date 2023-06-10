@@ -4,30 +4,21 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 
 class Kernel extends ConsoleKernel
 {
     /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-        //
-    ];
-
-    /**
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $this->scheduleMarkWorking($schedule);
     }
 
     /**
@@ -35,7 +26,7 @@ class Kernel extends ConsoleKernel
      *
      * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__ . '/Commands');
 
@@ -70,5 +61,16 @@ class Kernel extends ConsoleKernel
         }
 
         return parent::handle($input, $output);
+    }
+
+    /**
+     * Store in the cache that the schedule is triggered.
+     * Used for Validation.
+     */
+    private function scheduleMarkWorking(Schedule $schedule): void
+    {
+        $schedule->call(function () {
+            Cache::put('scheduler_working', now(), now()->addMinutes(6));
+        })->everyFiveMinutes();
     }
 }
