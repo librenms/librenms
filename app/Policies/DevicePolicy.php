@@ -14,7 +14,7 @@ class DevicePolicy
     /**
      * Determine whether the user can view any devices.
      *
-     * @param User $user
+     * @param  User  $user
      */
     public function viewAny(User $user): bool
     {
@@ -24,8 +24,8 @@ class DevicePolicy
     /**
      * Determine whether the user can view the device.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function view(User $user, Device $device): bool
     {
@@ -35,7 +35,7 @@ class DevicePolicy
     /**
      * Determine whether the user can create devices.
      *
-     * @param User $user
+     * @param  User  $user
      */
     public function create(User $user): bool
     {
@@ -45,19 +45,19 @@ class DevicePolicy
     /**
      * Determine whether the user can update the device.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function update(User $user, Device $device): bool
     {
-        return $user->isAdmin()|| $user->hasLimitedWrite();
+        return $user->isAdmin() || $user->hasLimitedWrite();
     }
 
     /**
      * Determine whether the user can delete the device.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function delete(User $user, Device $device): bool
     {
@@ -67,8 +67,8 @@ class DevicePolicy
     /**
      * Determine whether the user can restore the device.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function restore(User $user, Device $device): bool
     {
@@ -78,8 +78,8 @@ class DevicePolicy
     /**
      * Determine whether the user can permanently delete the device.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function forceDelete(User $user, Device $device): bool
     {
@@ -90,22 +90,22 @@ class DevicePolicy
      * Determine whether the user can view the stored configuration of the device
      * from Oxidized or Rancid
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function showConfig(User $user, Device $device): bool
     {
-        return $user->isAdmin()|| Permissions::canAccessDevice($device, $user);
+        return $user->isAdmin() || Permissions::canAccessDevice($device, $user);
     }
 
     /**
      * Determine whether the user can update device notes.
      *
-     * @param User $user
-     * @param Device $device
+     * @param  User  $user
+     * @param  Device  $device
      */
     public function updateNotes(User $user, Device $device): bool
     {
-        return $user->isAdmin()|| $user->hasLimitedWrite();
+        return $user->isAdmin() || $user->hasLimitedWrite();
     }
 }
