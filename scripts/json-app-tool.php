@@ -210,7 +210,7 @@ if (isset($options['t'])) {
             system('jsonlint ' . escapeshellarg($options['j']));
             exit(3);
         }
-        $test_data['applications']['poller']['applications']['data'] = json_encode($app_data);
+        $test_data['applications']['poller']['applications']['0']['data'] = json_encode($app_data);
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT) . "\n";
     exit(0);
