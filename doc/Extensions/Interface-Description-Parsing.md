@@ -48,13 +48,14 @@ This requires an additional script to be [setup](#setup)
 
 The following config options can be set to enable more custom types:
 
-```php
-$config['customers_descr'][]         = 'cust';
-$config['transit_descr'][]           = "transit";
-$config['peering_descr'][]           = "peering";
-$config['core_descr'][]              = "core";
-$config['custom_descr'][]            = "something_made_up";
-```
+!!! setting "webui/port-descr"
+    ```bash
+    lnms config:set customers_descr.+ 'cust'
+    lnms config:set transit_descr.+ 'transit'
+    lnms config:set peering_descr.+ 'peering'";'
+    lnms config:set core_descr.+ 'core'
+    lnms config:set custom_descr.+ 'something_made_up'
+    ```
 
 ## Custom interface parser
 

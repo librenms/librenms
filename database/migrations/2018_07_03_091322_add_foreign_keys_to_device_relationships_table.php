@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddForeignKeysToDeviceRelationshipsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('device_relationships', function (Blueprint $table) {
             $table->foreign('child_device_id', 'device_relationship_child_device_id_fk')->references('device_id')->on('devices')->onUpdate('RESTRICT')->onDelete('CASCADE');
@@ -23,7 +23,7 @@ class AddForeignKeysToDeviceRelationshipsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('device_relationships', function (Blueprint $table) {
@@ -32,4 +32,4 @@ class AddForeignKeysToDeviceRelationshipsTable extends Migration
             });
         }
     }
-}
+};

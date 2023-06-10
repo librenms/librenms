@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
 {
@@ -104,7 +105,7 @@ class GlobeController extends WidgetController
                     $location->lat,
                     $location->lng,
                     $location->location,
-                    (1 - $up / $count) * 100, // percent down
+                    Number::calculatePercent($count - $up, $count), // percent down
                     $count,
                     $down_items->implode(',<br/> '),
                 ]);

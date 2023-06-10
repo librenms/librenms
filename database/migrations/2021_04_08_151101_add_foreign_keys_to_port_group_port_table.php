@@ -5,14 +5,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddForeignKeysToPortGroupPortTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('port_group_port', function (Blueprint $table) {
             // check existing foreign key constraints because initially was in one migration
@@ -36,7 +36,7 @@ class AddForeignKeysToPortGroupPortTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('port_group_port', function (Blueprint $table) {
@@ -45,4 +45,4 @@ class AddForeignKeysToPortGroupPortTable extends Migration
             });
         }
     }
-}
+};

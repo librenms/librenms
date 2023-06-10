@@ -402,7 +402,7 @@ vprn services are up when the service is administratively up however routing fun
             $operstate_status_color = 'danger';
         }
 
-        $fdb_usage_perc = $svc['svcTlsFdbNumEntries'] / $svc['svcTlsFdbTableSize'] * 100;
+        $fdb_usage_perc = Number::calculatePercent($svc['svcTlsFdbNumEntries'], $svc['svcTlsFdbTableSize']);
         if ($fdb_usage_perc > 95) {
             $fdb_status_color = 'danger';
         } elseif ($fdb_usage_perc > 75) {

@@ -13,12 +13,11 @@ modules:
     processors:
         data:
             -
-                oid: raisecomTotalCPUUtilization
-                value: raisecomTotalCPUUtilizationOneMin
+                oid: raisecomTotalCPUUtilization.oneMin
+                value: raisecomTotalCPUUtilization
                 num_oid: '.1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.{{ $index }}'
                 snmp_flags: ['-OeQUsb', '-Pu'] # workaround for underscores in mib
                 descr: 'Processor'
-                index: 3
     sensors:
         fanspeed:
             data:

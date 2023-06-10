@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 use LibreNMS\Config;
 use Validator;
 
+#[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
     public $name;
@@ -225,7 +226,7 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return isset($this->$offset) ? $this->$offset : null;
     }

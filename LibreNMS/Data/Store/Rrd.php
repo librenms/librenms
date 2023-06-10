@@ -272,13 +272,13 @@ class Rrd extends BaseDatastore
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport)
     {
-        $pmxcdir = join('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
+        $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
         // this is not needed for remote rrdcached
         if (! is_dir($pmxcdir)) {
             mkdir($pmxcdir, 0775, true);
         }
 
-        return join('/', [$pmxcdir, self::safeName($vmid . '_netif_' . $vmport . '.rrd')]);
+        return implode('/', [$pmxcdir, self::safeName($vmid . '_netif_' . $vmport . '.rrd')]);
     }
 
     /**
@@ -561,9 +561,9 @@ class Rrd extends BaseDatastore
      *
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public function graph(string $options): string
+    public function graph(string $options, array $env = null): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 

@@ -30,7 +30,7 @@ use Symfony\Component\Process\Process;
 
 class FpingTest extends TestCase
 {
-    public function testUpPing()
+    public function testUpPing(): void
     {
         $output = "192.168.1.3 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\n";
         $this->mockFpingProcess($output, 0);
@@ -59,7 +59,7 @@ class FpingTest extends TestCase
         $this->assertEquals(0, $actual->exit_code);
     }
 
-    public function testPartialDownPing()
+    public function testPartialDownPing(): void
     {
         $output = "192.168.1.7 : xmt/rcv/%loss = 5/3/40%, min/avg/max = 0.13/0.23/0.32\n";
         $this->mockFpingProcess($output, 0);
@@ -77,7 +77,7 @@ class FpingTest extends TestCase
         $this->assertEquals(0, $actual->exit_code);
     }
 
-    public function testDownPing()
+    public function testDownPing(): void
     {
         $output = "192.168.53.1 : xmt/rcv/%loss = 3/0/100%\n";
         $this->mockFpingProcess($output, 1);
@@ -95,7 +95,7 @@ class FpingTest extends TestCase
         $this->assertEquals(1, $actual->exit_code);
     }
 
-    public function testDuplicatePing()
+    public function testDuplicatePing(): void
     {
         $output = <<<'OUT'
 192.168.1.2 : duplicate for [0], 84 bytes, 0.91 ms

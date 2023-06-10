@@ -1,5 +1,19 @@
 mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING:FIREBRICK-L2TP-MIB:FIREBRICK-VOIP-MIB
 modules:
+    processors:
+        data:
+            -
+                oid: fbCpuAll.5
+                num_oid: '.1.3.6.1.4.1.24693.100.2.1.1.2.{{ $index }}'
+                index: '5.{{ $index }}'
+                value: "fbCpuAll"
+                precision: 100
+    mempools:
+        data:
+            -
+                free: .1.3.6.1.4.1.24693.100.4.1.2
+                total: .1.3.6.1.4.1.24693.100.4.1.1
+                precision: 1024
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
     sensors:

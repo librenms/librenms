@@ -453,6 +453,9 @@ $graphs['wireguard'] = [
     'traffic',
     'time',
 ];
+$graphs['linux_config_files'] = [
+    'number_of_confs',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

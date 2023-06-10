@@ -200,6 +200,17 @@ class DeviceController extends Controller
             'onclick' => 'http_fallback(this); return false;',
         ];
 
+        // IPMI
+        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
+            $device_links['ipmi'] = [
+                'icon' => 'fa-microchip',
+                'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
+                'title' => __('IPMI'),
+                'external' => true,
+                'onclick' => 'http_fallback(this); return false;',
+            ];
+        }
+
         // SSH
         $ssh_url = Config::has('gateone.server')
             ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']

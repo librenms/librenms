@@ -150,7 +150,7 @@ class IRCBot
             }
         }
 
-        return $this->log('Cached ' . sizeof($this->external) . ' commands.');
+        return $this->log('Cached ' . count($this->external) . ' commands.');
     }
 
     //end load_external()
@@ -218,7 +218,12 @@ class IRCBot
 
     private function connectAlert()
     {
-        $f = $this->config['install_dir'] . '/.ircbot.alert';
+        $container_dir = '/data';
+        if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
+            $f = $container_dir . '/.ircbot.alert';
+        } else {
+            $f = $this->config['install_dir'] . '/.ircbot.alert';
+        }
         if ((file_exists($f) && filetype($f) != 'fifo' && ! unlink($f)) || (! file_exists($f) && ! shell_exec("mkfifo $f && echo 1"))) {
             $this->log('Error - Cannot create Alert-File');
 
@@ -678,7 +683,7 @@ class IRCBot
 
     private function ircRaw($params)
     {
-        return fputs($this->socket['irc'], $params . "\r\n");
+        return fwrite($this->socket['irc'], $params . "\r\n");
     }
 
     //end irc_raw()
@@ -775,9 +780,9 @@ class IRCBot
 
     private function _help($params)
     {
-        $msg = join(', ', $this->commands);
+        $msg = implode(', ', $this->commands);
         if (count($this->external) > 0) {
-            $msg .= ', ' . join(', ', array_keys($this->external));
+            $msg .= ', ' . implode(', ', array_keys($this->external));
         }
 
         return $this->respond("Available commands: $msg");
