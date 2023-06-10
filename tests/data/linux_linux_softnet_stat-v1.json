@@ -1,0 +1,477 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "linux_softnet_stat",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": {
+                "0": {
+                    "app_type": "linux_softnet_stat",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                },
+                "data": "{\"budget\":\"300\",\"budget_usecs\":\"8000\"}"
+            },
+            "application_metrics": [
+                {
+                    "metric": "budget",
+                    "value": "300",
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "budget_usecs",
+                    "value": "8000",
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "core_count",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_core",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_packets",
+                    "value": 57034657,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_0_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_core",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_packets",
+                    "value": 46472929,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_1_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_core",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_packets",
+                    "value": 49364298,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_2_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_core",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_packets",
+                    "value": 47457052,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_3_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_core",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_packets",
+                    "value": 35914860,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_4_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_core",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_packets",
+                    "value": 53512986,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_5_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_core",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_packets",
+                    "value": 39852557,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_6_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_core",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_packets",
+                    "value": 65772686,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cores_7_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_backlog_length",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_packets",
+                    "value": 395382025,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "totals_time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                }
+            ]
+        }
+    }
+}
