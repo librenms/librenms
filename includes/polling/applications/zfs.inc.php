@@ -135,8 +135,8 @@ $fields = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-# name choosen based on this is the second group of variables
-$rrd_name = ['app', $name, $app->app_id,'_____group2'];
+// name choosen based on this is the second group of variables
+$rrd_name = ['app', $name, $app->app_id, '_____group2'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('l2_abort_lowmem', 'DERIVE', 0)
     ->addDataset('l2_access_total', 'DERIVE', 0)
@@ -274,21 +274,21 @@ foreach ($zfs['pools'] as $pool) {
 $old_health = $app->data['health'] ?? 1;
 if (isset($zfs['health'])) {
     $health = $zfs['health'];
-    if ($old_health != $zfs['health']){
+    if ($old_health != $zfs['health']) {
         if ($zfs['health'] == 1) {
             log_event('ZFS pool(s) now healthy', $device, 'application', 1);
-        }else{
+        } else {
             log_event('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', 5);
         }
     }
-}else{
-    $health=1;
+} else {
+    $health = 1;
 }
 
 // gets the l2 error status
 $old_l2_errors = $app->data['l2_errors'] ?? 0;
 if (isset($zfs['l2_errors'])) {
-    if ($old_l2_errors != $zfs['l2_errors']){
+    if ($old_l2_errors != $zfs['l2_errors']) {
         log_event('ZFS L2 cache has experienced errors', $device, 'application', 5);
     }
 }

@@ -10,7 +10,7 @@ $link_array = [
 print_optionbar_start();
 
 echo generate_link('ARC', $link_array);
-echo ' | '.generate_link('L2', $link_array, ['zfs_page'=>'l2']);
+echo ' | ' . generate_link('L2', $link_array, ['zfs_page'=>'l2']);
 echo ' | Pools: ';
 
 $pools = $app->data['pools'] ?? [];
