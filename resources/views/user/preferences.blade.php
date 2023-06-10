@@ -188,11 +188,11 @@
 
     <x-panel title="{{ __('Device Permissions') }}">
         @if(auth()->user()->hasGlobalAdmin())
-            <strong class="blue">{{ __('Global Administrative Access') }}</strong>
+            <strong class="red">{{ __('Global Administrative Access') }}</strong>
         @elseif(auth()->user()->hasGlobalRead())
-            <strong class="green">{{ __('Global Viewing Access') }}</strong>
+            <strong class="blue">{{ __('Global Viewing Access') }}</strong>
         @elseif(auth()->user()->hasLimitedWrite())
-            <strong class="green">{{ __('Limited Write Access') }}</strong>
+            <strong class="orange">{{ __('Limited Write Access:') }}</strong>
             </br>
             @forelse($devices as $device)
                 <x-device-link :device="$device" /><br />
@@ -200,6 +200,7 @@
                 <strong class="red">{{ __('No access!') }}</strong>
             @endforelse
         @else
+            <strong class="gree">{{ __('Normal User Access:') }}</strong>
             @forelse($devices as $device)
                 <x-device-link :device="$device" /><br />
             @empty
