@@ -574,7 +574,7 @@
                 },
                 {
                     "metric": "pools_0_altroot",
-                    "value": -,
+                    "value": "-",
                     "value_prev": null,
                     "app_type": "zfs"
                 },
