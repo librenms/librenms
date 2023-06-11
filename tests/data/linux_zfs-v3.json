@@ -76,7 +76,7 @@
                 },
                 {
                     "metric": "cache_hits_per",
-                    "value": 96.1661790181536,
+                    "value": 96.166179018154,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -694,7 +694,7 @@
                 },
                 {
                     "metric": "target_size_arat",
-                    "value": "0.032260897504717",
+                    "value": 0.032260897504717,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
