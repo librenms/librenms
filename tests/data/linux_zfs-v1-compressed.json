@@ -22,7 +22,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"pools\":[\"arc\"]}"
+                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"l2_errors\":null}"
                 }
             ],
             "application_metrics": [

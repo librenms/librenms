@@ -135,6 +135,102 @@ $fields = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
+// name choosen based on this is the second group of variables
+$rrd_name = ['app', $name, $app->app_id, '_____group2'];
+$rrd_def = RrdDefinition::make()
+    ->addDataset('l2_abort_lowmem', 'DERIVE', 0)
+    ->addDataset('l2_access_total', 'DERIVE', 0)
+    ->addDataset('l2_asize', 'GAUGE', 0)
+    ->addDataset('l2_bufc_d_asize', 'GAUGE', 0)
+    ->addDataset('l2_bufc_m_asize', 'GAUGE', 0)
+    ->addDataset('l2_cksum_bad', 'DERIVE', 0)
+    ->addDataset('l2_d_to_m_ratio', 'GAUGE', 0)
+    ->addDataset('l2_errors', 'DERIVE', 0)
+    ->addDataset('l2_evict_l1cached', 'DERIVE', 0)
+    ->addDataset('l2_evict_l_retry', 'DERIVE', 0)
+    ->addDataset('l2_evict_reading', 'DERIVE', 0)
+    ->addDataset('l2_feeds', 'DERIVE', 0)
+    ->addDataset('l2_free_on_write', 'DERIVE', 0)
+    ->addDataset('l2_hdr_size', 'GAUGE', 0)
+    ->addDataset('l2_hits', 'DERIVE', 0)
+    ->addDataset('l2_io_error', 'DERIVE', 0)
+    ->addDataset('l2_log_blk_asize', 'GAUGE', 0)
+    ->addDataset('l2_log_blk_avg_as', 'DERIVE', 0)
+    ->addDataset('l2_log_blk_count', 'DERIVE', 0)
+    ->addDataset('l2_log_blk_writes', 'DERIVE', 0)
+    ->addDataset('l2_mfu_asize', 'GAUGE', 0)
+    ->addDataset('l2_misses', 'DERIVE', 0)
+    ->addDataset('l2_mru_asize', 'GAUGE', 0)
+    ->addDataset('l2_prefetch_asize', 'GAUGE', 0)
+    ->addDataset('l2_read_bytes', 'DERIVE', 0)
+    ->addDataset('l2_rb_asize', 'GAUGE', 0)
+    ->addDataset('l2_rb_bufs', 'DERIVE', 0)
+    ->addDataset('l2_rb_bufs_prec', 'DERIVE', 0)
+    ->addDataset('l2_rb_csum_lb_err', 'DERIVE', 0)
+    ->addDataset('l2_rb_dh_err', 'DERIVE', 0)
+    ->addDataset('l2_rb_io_errors', 'DERIVE', 0)
+    ->addDataset('l2_rb_log_blks', 'DERIVE', 0)
+    ->addDataset('l2_rb_lowmem', 'DERIVE', 0)
+    ->addDataset('l2_rb_size', 'GAUGE', 0)
+    ->addDataset('l2_rb_success', 'DERIVE', 0)
+    ->addDataset('l2_rb_unsup', 'DERIVE', 0)
+    ->addDataset('l2_rw_clash', 'DERIVE', 0)
+    ->addDataset('l2_size', 'GAUGE', 0)
+    ->addDataset('l2_write_bytes', 'DERIVE', 0)
+    ->addDataset('l2_writes_done', 'DERIVE', 0)
+    ->addDataset('l2_writes_error', 'DERIVE', 0)
+    ->addDataset('l2_writes_l_retry', 'DERIVE', 0)
+    ->addDataset('l2_writes_sent', 'DERIVE', 0);
+
+$fields = [
+    'l2_abort_lowmem' => $zfs['l2_abort_lowmem'],
+    'l2_access_total' => $zfs['l2_access_total'],
+    'l2_asize' => $zfs['l2_asize'],
+    'l2_bufc_d_asize' => $zfs['l2_bufc_data_asize'],
+    'l2_bufc_m_asize' => $zfs['l2_bufc_metadata_asize'],
+    'l2_cksum_bad' => $zfs['l2_cksum_bad'],
+    'l2_d_to_m_ratio' => $zfs['l2_data_to_meta_ratio'],
+    'l2_errors' => $zfs['l2_errors'],
+    'l2_evict_l1cached' => $zfs['l2_evict_l1cached'],
+    'l2_evict_l_retry' => $zfs['l2_evict_lock_retry'],
+    'l2_evict_reading' => $zfs['l2_evict_reading'],
+    'l2_feeds' => $zfs['l2_feeds'],
+    'l2_free_on_write' => $zfs['l2_free_on_write'],
+    'l2_hdr_size' => $zfs['l2_hdr_size'],
+    'l2_hits' => $zfs['l2_hits'],
+    'l2_io_error' => $zfs['l2_io_error'],
+    'l2_log_blk_asize' => $zfs['l2_log_blk_asize'],
+    'l2_log_blk_avg_as' => $zfs['l2_log_blk_avg_asize'],
+    'l2_log_blk_count' => $zfs['l2_log_blk_count'],
+    'l2_log_blk_writes' => $zfs['l2_log_blk_writes'],
+    'l2_mfu_asize' => $zfs['l2_mfu_asize'],
+    'l2_misses' => $zfs['l2_misses'],
+    'l2_mru_asize' => $zfs['l2_mru_asize'],
+    'l2_prefetch_asize' => $zfs['l2_prefetch_asize'],
+    'l2_read_bytes' => $zfs['l2_read_bytes'],
+    'l2_rb_asize' => $zfs['l2_rebuild_asize'],
+    'l2_rb_bufs' => $zfs['l2_rebuild_bufs'],
+    'l2_rb_bufs_prec' => $zfs['l2_rebuild_bufs_precached'],
+    'l2_rb_csum_lb_err' => $zfs['l2_rebuild_cksum_lb_errors'],
+    'l2_rb_dh_err' => $zfs['l2_rebuild_dh_errors'],
+    'l2_rb_io_errors' => $zfs['l2_rebuild_io_errors'],
+    'l2_rb_log_blks' => $zfs['l2_rebuild_log_blks'],
+    'l2_rb_lowmem' => $zfs['l2_rebuild_lowmem'],
+    'l2_rb_size' => $zfs['l2_rebuild_size'],
+    'l2_rb_success' => $zfs['l2_rebuild_success'],
+    'l2_rb_unsup' => $zfs['l2_rebuild_unsupported'],
+    'l2_rw_clash' => $zfs['l2_rw_clash'],
+    'l2_size' => $zfs['l2_size'],
+    'l2_write_bytes' => $zfs['l2_write_bytes'],
+    'l2_writes_done' => $zfs['l2_writes_done'],
+    'l2_writes_error' => $zfs['l2_writes_error'],
+    'l2_writes_l_retry' => $zfs['l2_writes_lock_retry'],
+    'l2_writes_sent' => $zfs['l2_writes_sent'],
+];
+
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, $fields);
+
 //
 // process additional info returned
 //
@@ -174,6 +270,29 @@ foreach ($zfs['pools'] as $pool) {
     }
 }
 
+// gets the pool health status
+$old_health = $app->data['health'] ?? 1;
+if (isset($zfs['health'])) {
+    $health = $zfs['health'];
+    if ($old_health != $zfs['health']) {
+        if ($zfs['health'] == 1) {
+            log_event('ZFS pool(s) now healthy', $device, 'application', 1);
+        } else {
+            log_event('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', 5);
+        }
+    }
+} else {
+    $health = 1;
+}
+
+// gets the l2 error status
+$old_l2_errors = $app->data['l2_errors'] ?? 0;
+if (isset($zfs['l2_errors'])) {
+    if ($old_l2_errors != $zfs['l2_errors']) {
+        log_event('ZFS L2 cache has experienced errors', $device, 'application', 5);
+    }
+}
+
 // check for added or removed pools
 $old_pools = $app->data['pools'] ?? [];
 $added_pools = array_diff($pools, $old_pools);
@@ -181,11 +300,11 @@ $removed_pools = array_diff($old_pools, $pools);
 
 // if we have any source pools, save and log
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
-    $app->data = ['pools' => $pools];
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
     log_event($log_message, $device, 'application');
 }
+$app->data = ['pools' => $pools, 'health' => $health, 'l2_errors' => $zfs['l2_errors']];
 
 update_application($app, 'OK', $metrics);

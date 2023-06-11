@@ -2905,32 +2905,22 @@ b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publick
 
 ### SNMP Extend
 
-`zfs-linux` requires python3 >=python3.5.
-
-The installation steps are:
-
-1. Copy the polling script to the desired host (the host must be added
-   to LibreNMS devices)
-2. Make the script executable
-3. Edit snmpd.conf to include ZFS stats
-
-#### FreeBSD
+1: Install the depends.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
-chmod +x /etc/snmp/zfs-freebsd
-echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
+### FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+### Debian
+apt-get install -y cpanminus zlib1g-dev
+cpanm Mime::Base64 JSON Gzip::Faster
 ```
 
-#### Linux
+2: Fetch the script in question and make it executable.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
-chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
-```
-
-Edit your sudo users (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp/zfs
+chmod +x /etc/snmp/zfs
 ```
 
-Now restart snmpd and you're all set.
+3: Add the following to snmpd.conf and restart snmpd.
+```
+extend zfs /etc/snmp/zfs
+```
