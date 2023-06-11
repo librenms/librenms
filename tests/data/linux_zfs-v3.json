@@ -28,7 +28,7 @@
             "application_metrics": [
                 {
                     "metric": "actual_hit_per",
-                    "value": 96.0991720802101,
+                    "value": 96.09917208021,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -40,7 +40,7 @@
                 },
                 {
                     "metric": "anon_hits_per",
-                    "value": -0.214439437178926,
+                    "value": -0.21443943717893,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -52,19 +52,19 @@
                 },
                 {
                     "metric": "arc_hits",
-                    "value": "1137826620",
+                    "value": 1137826620,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "arc_misses",
-                    "value": "45361307",
+                    "value": 45361307,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "arc_size",
-                    "value": "1048270624",
+                    "value": 1048270624,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -94,7 +94,7 @@
                 },
                 {
                     "metric": "data_pre_per",
-                    "value": 8.27188069702892,
+                    "value": 8.2718806970289,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -106,19 +106,19 @@
                 },
                 {
                     "metric": "deleted",
-                    "value": "42382148",
+                    "value": 42382148,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "demand_data_hits",
-                    "value": "1015682",
+                    "value": 1015682,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "demand_data_misses",
-                    "value": "48292",
+                    "value": 48292,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -136,7 +136,7 @@
                 },
                 {
                     "metric": "demand_meta_hits",
-                    "value": "1133980912",
+                    "value": 1133980912,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -154,43 +154,43 @@
                 },
                 {
                     "metric": "evict_l2_cached",
-                    "value": "227948678144",
+                    "value": 227948678144,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_l2_eligible",
-                    "value": "128654282240",
+                    "value": 128654282240,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_l2_eligible_mfu",
-                    "value": "28666240512",
+                    "value": 28666240512,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_l2_eligible_mru",
-                    "value": "99988041728",
+                    "value": 99988041728,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_l2_ineligible",
-                    "value": "94654349824",
+                    "value": 94654349824,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_l2_skip",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "evict_skip",
-                    "value": "133213142",
+                    "value": 133213142,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -202,7 +202,7 @@
                 },
                 {
                     "metric": "freq_used_per",
-                    "value": 32.9774702901707,
+                    "value": 32.977470290171,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -214,7 +214,7 @@
                 },
                 {
                     "metric": "l2_abort_lowmem",
-                    "value": "2264908",
+                    "value": 2264908,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -226,31 +226,31 @@
                 },
                 {
                     "metric": "l2_asize",
-                    "value": "59218449920",
+                    "value": 59218449920,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_bufc_data_asize",
-                    "value": "33123006976",
+                    "value": 33123006976,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_bufc_metadata_asize",
-                    "value": "26095442944",
+                    "value": 26095442944,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_cksum_bad",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_data_to_meta_ratio",
-                    "value": "374",
+                    "value": 374,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -262,211 +262,211 @@
                 },
                 {
                     "metric": "l2_evict_l1cached",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_evict_lock_retry",
-                    "value": "1",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_evict_reading",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_feeds",
-                    "value": "27311",
+                    "value": 27311,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_free_on_write",
-                    "value": "112",
+                    "value": 112,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_hdr_size",
-                    "value": "808407552",
+                    "value": 808407552,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_hits",
-                    "value": "30337921",
+                    "value": 30337921,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_io_error",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_log_blk_asize",
-                    "value": "120487424",
+                    "value": 120487424,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_log_blk_avg_asize",
-                    "value": "11287",
+                    "value": 11287,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_log_blk_count",
-                    "value": "8863",
+                    "value": 8863,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_log_blk_writes",
-                    "value": "586",
+                    "value": 586,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_mfu_asize",
-                    "value": "29688845824",
+                    "value": 29688845824,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_misses",
-                    "value": "15023366",
+                    "value": 15023366,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_mru_asize",
-                    "value": "29442406400",
+                    "value": 29442406400,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_prefetch_asize",
-                    "value": "87197696",
+                    "value": 87197696,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_read_bytes",
-                    "value": "26255805440",
+                    "value": 26255805440,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_asize",
-                    "value": "61671941120",
+                    "value": 61671941120,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_bufs",
-                    "value": "8478512",
+                    "value": 8478512,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_bufs_precached",
-                    "value": "1510",
+                    "value": 1510,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_cksum_lb_errors",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_dh_errors",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_io_errors",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_log_blks",
-                    "value": "8296",
+                    "value": 8296,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_lowmem",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_size",
-                    "value": "162050568192",
+                    "value": 162050568192,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_success",
-                    "value": "1",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rebuild_unsupported",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_rw_clash",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_size",
-                    "value": "159099220992",
+                    "value": 159099220992,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_write_bytes",
-                    "value": "2453267968",
+                    "value": 2453267968,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_writes_done",
-                    "value": "3537",
+                    "value": 3537,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_writes_error",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_writes_lock_retry",
-                    "value": "5",
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "l2_writes_sent",
-                    "value": "3537",
+                    "value": 3537,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -478,13 +478,13 @@
                 },
                 {
                     "metric": "meta_misses_per",
-                    "value": 69.1713622801918,
+                    "value": 69.171362280192,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "mfu_ghost_hits",
-                    "value": "2064593",
+                    "value": 2064593,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -496,13 +496,13 @@
                 },
                 {
                     "metric": "mfu_hits",
-                    "value": "859725964",
+                    "value": 859725964,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "mfu_per",
-                    "value": 75.5586087448016,
+                    "value": 75.558608744802,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -520,7 +520,7 @@
                 },
                 {
                     "metric": "mru_ghost_hits",
-                    "value": "1168174",
+                    "value": 1168174,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -532,7 +532,7 @@
                 },
                 {
                     "metric": "mru_hits",
-                    "value": "277307838",
+                    "value": 277307838,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -544,7 +544,7 @@
                 },
                 {
                     "metric": "mutex_skip",
-                    "value": "4047053",
+                    "value": 4047053,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -562,19 +562,19 @@
                 },
                 {
                     "metric": "p",
-                    "value": "717695178",
+                    "value": 717695178,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
-                    "metric": "pools_0_alloc",
+                    "metric": "pool_arc_alloc",
                     "value": "14344697704448",
                     "value_prev": null,
                     "app_type": "zfs"
                 },
                 {
                     "metric": "pools_0_altroot",
-                    "value": "-",
+                    "value": -,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
