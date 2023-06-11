@@ -18,7 +18,7 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 if (! isset($munge)) {
-    $munge = FALSE;
+    $munge = false;
 }
 
 if (! isset($colours)) {
@@ -114,18 +114,18 @@ if ($height > 25) {
 
 $id = 'ds0';
 if ($munge) {
-    $id='dsm0';
+    $id = 'dsm0';
 }
 
 $rrd_options .= ' DEF:ds0' . "=$filename:$ds:AVERAGE";
 
-$munge_helper='';
+$munge_helper = '';
 if ($munge) {
-    if (!isset($munge_opts)) {
-        $munge_opts='86400,/';
+    if (! isset($munge_opts)) {
+        $munge_opts = '86400,/';
     }
     $rrd_options .= ' CDEF:dsm0=ds0,' . $munge_opts;
-    $munge_helper='ds';
+    $munge_helper = 'ds';
 }
 
 $rrd_optionsb .= ' AREA:' . $id . '#' . $colourA . $colourAalpha;
