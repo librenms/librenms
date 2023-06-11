@@ -996,6 +996,33 @@ b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
 
 5. Restart snmpd.
 
+## Linux Softnet Stat
+
+### SNMP Extend
+
+1: Install the depends, which on a Debian based system would be as below.
+```
+apt-get install -y cpanminus zlib1g-dev
+cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+```
+
+2. Download the script into the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_softnet_stat -O /etc/snmp/linux_softnet_stat
+```
+
+3. Make the script executable
+```
+chmod +x /etc/snmp/linux_softnet_stat
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend linux_softnet_stat /etc/snmp/linux_softnet_stat -b
+```
+
+Then either enable the application Linux Softnet Stat or wait for it to be re-discovered.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend
