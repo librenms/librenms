@@ -9,8 +9,13 @@ $ds = 'uptime';
 $colours = 'greens';
 $float_precision = 3;
 
-$munge=TRUE;
+$descr = 'Uptime';
 
-$descr = '';
+$munge=\LibreNMS\Config::get('graph_uptime_days');
+
+$unit_text='Days';
+if (!$munge) {
+    $unit_text='Seconds';
+}
 
 require 'includes/html/graphs/generic_stats.inc.php';
