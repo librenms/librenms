@@ -471,6 +471,7 @@ $graphs['suricata_extract'] = [
     'sub_fail',
     'truncated',
     'zero_sized',
+    'sub_size',
 ];
 
 echo '<div class="panel panel-default">';

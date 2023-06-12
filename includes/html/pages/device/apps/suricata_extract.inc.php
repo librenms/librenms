@@ -10,6 +10,7 @@ $graphs = [
     'suricata_extract_errors'  => 'Errors',
     'suricata_extract_truncated'  => 'File Truncated',
     'suricata_extract_zero_sized'  => 'File Zero Sized',
+    'suricata_extract_sub_size'  => 'Total Size Of Submissions',
     'suricata_extract_sub_codes'  => 'HTTP Submission Result Codes',
     'suricata_extract_sub_2xx'  => 'HTTP Submission Result Code, 2xx',
     'suricata_extract_sub_3xx'  => 'HTTP Submission Result Code, 3xx',
