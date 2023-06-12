@@ -28,7 +28,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('sub_5xx', 'GAUGE', 0)
     ->addDataset('sub_fail', 'GAUGE', 0)
     ->addDataset('truncated', 'GAUGE', 0)
-    ->addDataset('zero_sized', 'GAUGE', 0);
+    ->addDataset('zero_sized', 'GAUGE', 0)
+    ->addDataset('sub_size', 'GAUGE', 0);
 
 $fields = [
     'errors' => $data['errors_delta'],
@@ -44,6 +45,7 @@ $fields = [
     'sub_fail' => $data['sub_fail_delta'],
     'truncated' => $data['truncated_delta'],
     'zero_sized' => $data['zero_sized_delta'],
+    'sub_size' => $data['sub_size_delta'],
 ];
 
 if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
