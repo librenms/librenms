@@ -503,7 +503,7 @@ function dbRollbackTransaction()
  * Generate a string of placeholders to pass to fill in a list
  * result will look like this: (?, ?, ?, ?)
  *
- * @param $count
+ * @param  $count
  * @return string placholder list
  *
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent

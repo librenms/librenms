@@ -847,10 +847,10 @@ function ignore_storage($os, $descr)
 }
 
 /**
- * @param $valid
+ * @param  $valid
  * @param  OS  $os
- * @param $sensor_type
- * @param $pre_cache
+ * @param  $sensor_type
+ * @param  $pre_cache
  */
 function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
@@ -1003,7 +1003,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 }
 
 /**
- * @param $types
+ * @param  $types
  * @param  OS  $os
  * @param  array  $pre_cache
  */
@@ -1200,7 +1200,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 /**
  * check if we should skip this sensor from discovery
  *
- * @param $device
+ * @param  $device
  * @param  string  $sensor_class
  * @param  string  $sensor_descr
  * @return bool
