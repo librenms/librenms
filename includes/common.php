@@ -833,7 +833,7 @@ function mw_to_dbm($value)
 }
 
 /**
- * @param $value
+ * @param  $value
  * @param  null  $default
  * @param  int  $min
  * @return null

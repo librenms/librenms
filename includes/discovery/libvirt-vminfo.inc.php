@@ -132,7 +132,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                         ) {
                             dbUpdate(['vmwVmState' => $vmwVmState, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus], 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", [$device['device_id'], $dom_id]);
                             echo 'U';
-                        // FIXME eventlog
+                            // FIXME eventlog
                         } else {
                             echo '.';
                         }
