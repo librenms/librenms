@@ -445,9 +445,9 @@ function rrd_get_color($code, $line = true)
 /**
  * Draw RRD file based on it's structure
  *
- * @param $host
- * @param $plugin
- * @param $type
+ * @param  $host
+ * @param  $plugin
+ * @param  $type
  * @param  null  $pinst
  * @param  null  $tinst
  * @param  array  $opts
@@ -618,10 +618,10 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
 /**
  * Draw RRD file based on it's structure
  *
- * @param $timespan
- * @param $host
- * @param $plugin
- * @param $type
+ * @param  $timespan
+ * @param  $host
+ * @param  $plugin
+ * @param  $type
  * @param  null  $pinst
  * @param  null  $tinst
  * @return false|string Commandline to call RRDGraph in order to generate the final graph* @internal param $

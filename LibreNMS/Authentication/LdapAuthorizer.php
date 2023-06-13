@@ -3,7 +3,6 @@
 namespace LibreNMS\Authentication;
 
 use ErrorException;
-use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
