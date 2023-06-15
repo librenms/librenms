@@ -50,7 +50,7 @@ class PortPolicy
      */
     public function update(User $user, Port $port): bool
     {
-        return $user->hasGlobalAdmin();
+        return $user->hasGlobalAdmin() || $user->hasLimitedWrite();
     }
 
     /**

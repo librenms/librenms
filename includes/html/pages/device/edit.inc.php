@@ -6,7 +6,7 @@ $link_array = ['page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit', ];
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin() || ! Auth::user()->hasLimitedWrite()) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';

@@ -55,6 +55,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('global-read', function ($user) {
             return $user->hasGlobalRead();
         });
+        Gate::define('limited-write', function ($user) {
+            return $user->hasLimitedWrite();
+        });
         Gate::define('device', function ($user, $device) {
             return $user->canAccessDevice($device);
         });

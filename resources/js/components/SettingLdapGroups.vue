@@ -35,6 +35,7 @@
             <span class="input-group-btn" style=" width:0;"></span>
             <select class="form-control" @change="updateLevel(group, $event.target.value)">
                 <option value="1" :selected="data.level === 1">{{ $t('Normal') }}</option>
+                <option value="4" :selected="data.level === 4">{{ $t('Limited Write') }}</option>
                 <option value="5" :selected="data.level === 5">{{ $t('Global Read') }}</option>
                 <option value="10" :selected="data.level === 10">{{ $t('Admin') }}</option>
             </select>
@@ -48,6 +49,7 @@
                 <span class="input-group-btn" style="width:0;"></span>
                 <select class="form-control" v-model="newItemLevel">
                     <option value="1">{{ $t('Normal') }}</option>
+                    <option value="4">{{ $t('Limited Write') }}</option>
                     <option value="5">{{ $t('Global Read') }}</option>
                     <option value="10">{{ $t('Admin') }}</option>
                 </select>

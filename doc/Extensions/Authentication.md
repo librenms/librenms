@@ -41,6 +41,9 @@ the same time.
 - 1: **Normal User**: You will need to assign device / port
   permissions for users at this level.
 
+- 4: **Limited Write**: You will need to assign a device / port / group permission 
+ to users at this level for limited edit rights.
+
 - 5: **Global Read**: Read only Administrator.
 
 - 10: **Administrator**: This is a global read/write admin account.
@@ -303,8 +306,9 @@ can be assigned a value which translates into a userlevel in LibreNMS.
 The strings to send in `Filter-ID` reply attribute is *one* of the following:
 
 - `librenms_role_normal` - Sets the value `1`, which is the normal user level.
-- `librenms_role_admin` - Sets the value `5`, which is the administrator level.
-- `librenms_role_global-read` - Sets the value `10`, which is the global read level.
+- `librenms_role_limited-write` - Sets the value `4`, which is the limited write level.
+- `librenms_role_global-read` - Sets the value `5`, which is the global read level.
+- `librenms_role_admin` - Sets the value `10`, which is the administrator level.
 
 LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
 userlevel that is set in your config.
@@ -410,6 +414,7 @@ $config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';   // appended to u
 $config['auth_ldap_groupbase'] = 'ou=groups,dc=example,dc=com'; // all groups must be inside this
 $config['auth_ldap_groups']['admin']['level'] = 10;             // set admin group to admin level
 $config['auth_ldap_groups']['pfy']['level'] = 5;                // set pfy group to global read only level
+$config['auth_ldap_groups']['regionManager']['level'] = 4;      // set regionManager group to limited write only region level
 $config['auth_ldap_groups']['support']['level'] = 1;            // set support group as a normal user
 ```
 

@@ -40,6 +40,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 'librenms_role_admin' => 10,
                 'librenms_role_normal' => 1,
                 'librenms_role_global-read' => 5,
+                'librenms_role_limited-write' => 4,
                 default => Config::get('radius.default_level', 1)
             };
 

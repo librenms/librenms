@@ -7,7 +7,7 @@ require_once 'includes/html/modal/device_maintenance.inc.php';
 $device_model = Device::find($device['device_id']);
 
 if (! empty($_POST['editing'])) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin() || Auth::user()->hasLimitedWrite()) {
         $reload = false;
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array) $_POST['parent_id'], ['0']);
@@ -54,7 +54,7 @@ if (! empty($_POST['editing'])) {
         }
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (Auth::user()->hasGlobalAdmin()) {
+            if (Auth::user()->hasGlobalAdmin() || Auth::user()->hasLimitedWrite()) {
                 $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
                 if ($result == '') {
                     flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");

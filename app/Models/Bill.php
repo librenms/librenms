@@ -42,6 +42,8 @@ class Bill extends Model
     {
         if ($user->hasGlobalRead()) {
             return $query;
+        } elseif ($user->hasLimitedWrite()) {
+            return $query;
         }
 
         return $query->join('bill_perms', 'bill_perms.bill_id', 'bills.bill_id')

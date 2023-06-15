@@ -50,7 +50,7 @@ class DevicePolicy
      */
     public function update(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->hasLimitedWrite();
     }
 
     /**
@@ -95,7 +95,7 @@ class DevicePolicy
      */
     public function showConfig(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->hasLimitedWrite();
     }
 
     /**
@@ -106,6 +106,6 @@ class DevicePolicy
      */
     public function updateNotes(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->hasLimitedWrite();
     }
 }

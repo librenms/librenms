@@ -48,6 +48,17 @@ class User extends Authenticatable
     // ---- Helper Functions ----
 
     /**
+     * Test if this user has limited write access
+     * these users have a level of 4, 5, 10 or 11 (demo).
+     *
+     * @return bool
+     */
+    public function hasLimitedWrite()
+    {
+        return $this->hasGlobalRead() || $this->level == 4;
+    }
+
+    /**
      * Test if this user has global read access
      * these users have a level of 5, 10 or 11 (demo).
      *

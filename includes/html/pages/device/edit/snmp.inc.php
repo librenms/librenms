@@ -4,7 +4,7 @@ use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin() || Auth::user()->hasLimitedWrite()) {
         $force_save = ($_POST['force_save'] == 'on');
         $poller_group = isset($_POST['poller_group']) ? $_POST['poller_group'] : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');

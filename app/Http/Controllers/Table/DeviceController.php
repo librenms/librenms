@@ -309,7 +309,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (\Auth::user()->hasGlobalAdmin()) {
+        if (\Auth::user()->hasGlobalAdmin() || \Auth::user()->hasLimitedWrite()) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),
