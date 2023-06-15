@@ -1,4 +1,4 @@
-os: eltex-mes
+os: eltex-mes23xx
 text: Eltex
 ifname: true
 type: network
