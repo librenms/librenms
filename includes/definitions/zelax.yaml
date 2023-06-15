@@ -3,7 +3,7 @@ text: 'Zelax OS'
 group: zelax
 type: network
 icon: zelax
-mib_dir: snr
+mib_dir: zelax
 over:
   - { graph: device_bits, text: 'Device Traffic' }
   - { graph: device_processor, text: 'CPU Usage' }
