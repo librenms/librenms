@@ -44,21 +44,21 @@ class GitIgnoreTest extends TestCase
         'storage/logs/.gitignore',
     ];
 
-    public function testGitIgnoresExist()
+    public function testGitIgnoresExist(): void
     {
         foreach ($this->gitIgnoreFiles as $file) {
             $this->assertFileExists($file);
         }
     }
 
-    public function testGitIgnoresMode()
+    public function testGitIgnoresMode(): void
     {
         foreach ($this->gitIgnoreFiles as $file) {
             $this->assertFalse(is_executable($file), "$file should not be executable");
         }
     }
 
-    public function testGitIgnoresNotEmpty()
+    public function testGitIgnoresNotEmpty(): void
     {
         foreach ($this->gitIgnoreFiles as $file) {
             $this->assertGreaterThan(4, filesize($file), "$file is empty, it should not be");

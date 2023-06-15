@@ -14,7 +14,7 @@ class PackageObserver
      * @param  \App\Models\Package  $package
      * @return void
      */
-    public function created(Package $package)
+    public function created(Package $package): void
     {
         Eventlog::log('Package installed: ' . $package, $package->device_id, 'package', 3);
         Log::info("+ $package");
@@ -26,7 +26,7 @@ class PackageObserver
      * @param  \App\Models\Package  $package
      * @return void
      */
-    public function updated(Package $package)
+    public function updated(Package $package): void
     {
         if ($package->getOriginal('version') !== $package->version || $package->getOriginal('build') !== $package->build) {
             $message = $package . ' from ' . $package->getOriginal('version') . ($package->getOriginal('build') ? '-' . $package->getOriginal('build') : '');
@@ -41,7 +41,7 @@ class PackageObserver
      * @param  \App\Models\Package  $package
      * @return void
      */
-    public function deleted(Package $package)
+    public function deleted(Package $package): void
     {
         Eventlog::log('Package removed: ' . $package, $package->device_id, 'package', 3);
         Log::info("- $package");
@@ -53,7 +53,7 @@ class PackageObserver
      * @param  \App\Models\Package  $package
      * @return void
      */
-    public function restored(Package $package)
+    public function restored(Package $package): void
     {
         //
     }
@@ -64,7 +64,7 @@ class PackageObserver
      * @param  \App\Models\Package  $package
      * @return void
      */
-    public function forceDeleted(Package $package)
+    public function forceDeleted(Package $package): void
     {
         //
     }

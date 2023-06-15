@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         //Remove the old route table, as it is not used anymore.
         Schema::drop('route');
@@ -40,7 +40,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('route');
         // Create the old route table to reverse this.
