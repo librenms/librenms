@@ -55,13 +55,13 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe' || $device['os'] == 'nxos
             $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
 
             if (
-                !$remote_device_id &&
-                !can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
+                ! $remote_device_id &&
+                ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
                 Config::get('autodiscovery.xdp') === true
             ) {
                 $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
-                if (!$remote_device_id && Config::get('discovery_by_ip', false)) {
+                if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
                     $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
                 }
             }
