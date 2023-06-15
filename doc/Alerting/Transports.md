@@ -183,19 +183,6 @@ You need a token you can find on your personnal space.
 | API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
 | Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br/> Originator=ORIGINATOR<br />MessageText={{ $msg }} |
 
-## Boxcar
-
-Copy your access token from the Boxcar app or from the Boxcar.io
-website and setup the transport.
-
-[Boxcar Docs](http://developer.boxcar.io/api/publisher/)
-
-**Example:**
-
-| Config | Example |
-| ------ | ------- |
-| Access Token | i23f23mr23rwerw |
-
 ## Browser Push
 
 Browser push notifications can send a notification to the user's
@@ -322,9 +309,9 @@ for details on acceptable values.
 | API URL | <https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj> |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
-| Options | color = red <br/> notify = 1 <br/> message_format = text |
+| Options | color=red |
 
-At present the following options are supported: `color`, `notify` and `message_format`.
+At present the following options are supported: `color`.
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
@@ -416,6 +403,18 @@ beginning of the ``_matrix/client/r0/...`` API-part.
 | Room | !ajPbbPalmVbNuQoBDK:example.com |
 | Auth_token: | MDAyYmxvY2F0aW9uI...z1DCn6lz_uOhtW3XRICg |
 | Message: | Alert: {{ $msg }} https://librenms.example.com |
+
+## Messagebird
+
+LibreNMS can send text messages through Messagebird Rest API transport.
+
+| Config | Example |
+| ------ | ------- |
+| Api URL | https://rest.messagebird.com/messages |
+| Api Key | Api rest key given in the messagebird dashboard |
+| Originator | E.164 formatted originator |
+| Recipient | E.164 formatted recipient for multi recipents comma separated |
+| Character limit | Range 1..480 (max 3 split messages)  |
 
 ## Microsoft Teams
 
@@ -536,7 +535,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 
 | Config | Example |
 | ------ | ------- |
-| PlaySMS | <https://localhost/index.php?app=ws> |
+| PlaySMS | <https://localhost/index.php> |
 | User | user1 |
 | Token | MYFANCYACCESSTOKEN |
 | From | My Name |

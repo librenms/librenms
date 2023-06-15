@@ -92,7 +92,7 @@ class SmokepingCliTest extends DBTestCase
         parent::setUp();
     }
 
-    public function testNonsense()
+    public function testNonsense(): void
     {
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --single-process'));
@@ -105,7 +105,7 @@ class SmokepingCliTest extends DBTestCase
         \Artisan::call('smokeping:generate --foobar');
     }
 
-    public function testBuildHeader()
+    public function testBuildHeader(): void
     {
         $warnings = ['rpPvjwdI0M0hlg6ZgZA', '2aUjOMql6ZWN7H0DthWDOyCvkXs0kVShhnASnc', 'HYMWbDplSW9PLNK9o9tySeJF4Ac61uTRHUUxxBXHiCl'];
 
@@ -125,7 +125,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals($this->instance->buildHeader(true, false), []);
     }
 
-    public function testAssembleProbes()
+    public function testAssembleProbes(): void
     {
         $tests = [0, -1];
 
@@ -134,7 +134,7 @@ class SmokepingCliTest extends DBTestCase
         }
     }
 
-    public function testBuildProbe()
+    public function testBuildProbe(): void
     {
         $saved = ['+ Pl0JnP2vfE',
             '  binary = /usr/bin/G28F3fFeew',
@@ -151,7 +151,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testBuildTargets()
+    public function testBuildTargets(): void
     {
         $saved = [
             '+ Le23HKVMvN',
@@ -245,7 +245,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testSingleProccess()
+    public function testSingleProccess(): void
     {
         $saved = [
             '+ Le23HKVMvN',
@@ -327,7 +327,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testCompareLegacy()
+    public function testCompareLegacy(): void
     {
         $data = [];
 

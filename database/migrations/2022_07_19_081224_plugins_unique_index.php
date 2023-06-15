@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // cleanup duplicates
         $plugins = DB::table('plugins')->groupBy(['version', 'plugin_name'])->select(['version', 'plugin_name'])->get();
@@ -36,7 +36,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('plugins', function (Blueprint $table) {
             $table->dropUnique('plugins_version_plugin_name_unique');

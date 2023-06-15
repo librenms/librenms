@@ -51,7 +51,7 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong> </label>
+                        <label for="recurring" class="col-sm-4 control-label">Recurring </label>
                         <div class="col-sm-8">
                             <input type="checkbox" id="recurring" name="recurring" data-size="small" data-on-text="Yes" data-off-text="No" onChange="recurring_switch();" value=0 />
                         </div>

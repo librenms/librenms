@@ -41,7 +41,7 @@ class DatastoreServiceProvider extends ServiceProvider
         'LibreNMS\Data\Store\Rrd',
     ];
 
-    public function register()
+    public function register(): void
     {
         // set up bindings
         foreach ($this->stores as $store) {

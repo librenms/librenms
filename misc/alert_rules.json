@@ -594,6 +594,16 @@
     "severity": "warning"
   },
   {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"l2_errors\" && application_metrics.value >= \"1\"",
+    "name": "ZFS L2 errors present",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"health\" && application_metrics.value = \"0\"",
+    "name": "ZFS has one or more pool DEGRADED, FAULTED, UNAVAIL, REMOVED, or other",
+    "severity": "critical"
+  },
+  {
     "rule": "applications.app_type = \"linux_config_files\" && application_metrics.metric = \"number_of_confs\" && application_metrics.value > \"0\"",
     "name": "linux_config_files Configuration Files Out-Of-Sync > 0",
     "severity": "warning"

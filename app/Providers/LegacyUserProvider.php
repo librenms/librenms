@@ -26,10 +26,9 @@
 namespace App\Providers;
 
 use App\Models\User;
-use App\Models\UserPref;
-use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
@@ -72,7 +71,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token)
+    public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         $user = new User();
         $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
@@ -98,7 +97,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(Authenticatable $user, $token)
+    public function updateRememberToken(Authenticatable $user, $token): void
     {
         /** @var User $user */
         $user->setRememberToken($token);
@@ -129,13 +128,6 @@ class LegacyUserProvider implements UserProvider
 
             if (empty($credentials['username']) || ! $authorizer->authenticate($credentials)) {
                 throw new AuthenticationException();
-            }
-
-            if ($tz = UserPref::getPref($user, 'timezone')) {
-                session([
-                    'timezone' => $tz,
-                    'timezone_static' => true,
-                ]);
             }
 
             return true;

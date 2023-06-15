@@ -35,7 +35,7 @@ class DefaultLegacySchemaSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         // insert version 1000 to prevent legacy schema code from running.
         // additionally prevents seeder from being run again by includes/sql-schema/update.php.

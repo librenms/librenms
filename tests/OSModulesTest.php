@@ -35,6 +35,7 @@ use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
+use LibreNMS\Util\Number;
 use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
@@ -69,7 +70,7 @@ class OSModulesTest extends DBTestCase
      *
      * @dataProvider dumpedDataProvider
      */
-    public function testDataIsValid($os, $variant, $modules)
+    public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
         if ($os === false) {
@@ -90,7 +91,7 @@ class OSModulesTest extends DBTestCase
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
-    public function testOS($os, $variant, $modules)
+    public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
@@ -183,7 +184,18 @@ class OSModulesTest extends DBTestCase
                 ? $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 : $helper->getPollerOutput($phpunit_debug ? null : $module));
 
-            $this->assertSame(Arr::dot($expected), Arr::dot($actual), $message);
+            // convert to dot notation so the array is flat and easier to compare visually
+            $expected = Arr::dot($expected);
+            $actual = Arr::dot($actual);
+
+            // json will store 43.0 as 43, Number::cast will change those to integers too
+            foreach ($actual as $index => $value) {
+                if (is_float($value)) {
+                    $actual[$index] = Number::cast($value);
+                }
+            }
+
+            $this->assertSame($expected, $actual, $message);
         }
     }
 }
