@@ -2535,7 +2535,7 @@ metrics below are provided.
 | unknown             | Total UNKNOWN checks                                                                                                  |
 | errored             | Total checks that errored                                                                                             |
 | time_to_polling     | Differnce in seconds between when polling data was generated and when polled                                          |
-| time_to_polling_abs | The aboslute value of time_to_polling.                                                                                |
+| time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
 | check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
 
 The standard Nagios/Icinga style exit codes are used and those are as
