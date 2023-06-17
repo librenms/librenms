@@ -1,0 +1,1507 @@
+TIMETRA-DOT3-OAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    EightOTwoOui, dot3OamEntry,
+    dot3OamEventConfigEntry,
+    dot3OamEventLogEntry,
+    dot3OamEventLogEventTotal,
+    dot3OamEventLogLocation,
+    dot3OamEventLogOui,
+    dot3OamEventLogRunningTotal,
+    dot3OamEventLogThresholdHi,
+    dot3OamEventLogThresholdLo,
+    dot3OamEventLogTimestamp,
+    dot3OamEventLogType,
+    dot3OamEventLogValue,
+    dot3OamEventLogWindowHi,
+    dot3OamEventLogWindowLo,
+    dot3OamLoopbackEntry, dot3OamPeerEntry,
+    dot3OamPeerMacAddress
+                                                         FROM DOT3-OAM-MIB
+    CounterBasedGauge64
+                                                         FROM HCNUM-TC
+    ifIndex
+                                                         FROM IF-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TmnxEnabledDisabled
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraDOT3OAMMIBModule          MODULE-IDENTITY
+    LAST-UPDATED "201601010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision Ethernet
+         OAM (802.3ah) functionality for the Nokia SROS device. This includes
+         extensions to the DOT3-OAM-MIB defined in IEEE 802.3ah to allow
+         transmit interval configuration and other locally configured
+         modifications.
+
+         Copyright 2006-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               01 Jan 2016 00:00
+         14.0 release of the TIMETRA-DOT3-OAM-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               01 Jan 2015 00:00
+         13.0 release of the TIMETRA-DOT3-OAM-MIB."
+
+    REVISION    "201207010000Z"
+    DESCRIPTION
+        "Rev 11.0               01 Jul 2012 00:00
+         11.0 release of the TIMETRA-DOT3-OAM-MIB."
+
+    REVISION    "200807010000Z"
+    DESCRIPTION
+        "Rev 6.1                01 Jul 2008 00:00
+         6.1 release of the TIMETRA-DOT3-OAM-MIB."
+
+    REVISION    "200801010000Z"
+    DESCRIPTION
+        "Rev 6.0                01 Jan 2008 00:00
+         6.0 release of the TIMETRA-DOT3-OAM-MIB."
+
+    REVISION    "200608010000Z"
+    DESCRIPTION
+        "Rev 0.1                01 Aug 2006 00:00
+         Initial version of the TIMETRA-DOT3-OAM-MIB."
+
+    ::= { timetraSRMIBModules 42 }
+
+TmnxLocalPortAction              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxLocalPortAction specifies the action which the local port will
+         take when receiving an event that has occurred at the Ethernet OAM
+         level. These events include both locally and remotely detected events.
+
+         Code point descriptions:
+             logOnly      (1) - the port will remain operational
+             outOfService (2) - the port will enter a non-operational state
+                                where it will not be available to service data,
+                                but it will continue to carry Link OAM traffic
+                                to ensure the link is monitored"
+    SYNTAX      INTEGER {
+        logOnly      (1),
+        outOfService (2)
+    }
+
+tmnxDot3OamObjs                  OBJECT IDENTIFIER ::= { tmnxSRObjs 42 }
+
+tmnxDot3OamEntryObjs             OBJECT IDENTIFIER ::= { tmnxDot3OamObjs 1 }
+
+tmnxDot3OamTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamTable is used to store proprietary configuration
+         information on a particular Ethernet like interface (OAM entity) in
+         the system that supports the OAM functions defined in [802.3ah]."
+    ::= { tmnxDot3OamEntryObjs 1 }
+
+tmnxDot3OamEntry                 OBJECT-TYPE
+    SYNTAX      TmnxDot3OamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxDot3OamTable containing configuration information
+         applicable to an OAM entity."
+    AUGMENTS    { dot3OamEntry }
+    ::= { tmnxDot3OamTable 1 }
+
+TmnxDot3OamEntry                 ::= SEQUENCE
+{
+    tmnxDot3OamLastChanged           TimeStamp,
+    tmnxDot3OamInterval              Unsigned32,
+    tmnxDot3OamMultiplier            Unsigned32,
+    tmnxDot3OamTunneling             TruthValue,
+    tmnxDot3OamLooped                TruthValue,
+    tmnxDot3OamHoldTime              Unsigned32,
+    tmnxDot3OamIgnoreEfmState        TruthValue,
+    tmnxDot3OamGraceTxEnabled        TruthValue,
+    tmnxDot3OamGraceTxState          TruthValue,
+    tmnxDot3OamPrRdiRxDyingGasp      TmnxLocalPortAction,
+    tmnxDot3OamPrRdiRxCriticalEvent  TmnxLocalPortAction,
+    tmnxDot3OamPrRdiRxLinkFault      TmnxLocalPortAction,
+    tmnxDot3OamPrRdiRxEventNotif     TmnxLocalPortAction,
+    tmnxDot3OamDiscAdCapLinkMon      TruthValue,
+    tmnxDot3OamVendorOui             EightOTwoOui,
+    tmnxDot3OamVendorInfo            Unsigned32,
+    tmnxDot3OamGraceVendorOui        EightOTwoOui,
+    tmnxDot3OamDyingGaspOnReset      TruthValue,
+    tmnxDot3OamDyingGaspOnResetState TruthValue,
+    tmnxDot3OamTriggerFault          INTEGER,
+    tmnxDot3OamSoftResetAction       INTEGER
+}
+
+tmnxDot3OamLastChanged           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLastChanged indicates the sysUpTime value when
+         this row was last modified."
+    ::= { tmnxDot3OamEntry 1 }
+
+tmnxDot3OamInterval              OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..600)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamInterval specifies the number of 100ms
+         time intervals between each periodic OAMPDU transmit and receive.
+         A lower value implies that OAMPDUs will be transmitted more
+         frequently to the peer, and OAMPDUs must be received more frequently
+         from the peer.  The default is set to 10, meaning 1 second between
+         transmits and receives."
+    DEFVAL      { 10 }
+    ::= { tmnxDot3OamEntry 2 }
+
+tmnxDot3OamMultiplier            OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamMultiplier specifies how many receive
+         intervals may expire with no OAMPDU receive.  After the configured
+         number of intervals with OAMPDU receive have passed, the OAM
+         negotiation process will restart."
+    DEFVAL      { 5 }
+    ::= { tmnxDot3OamEntry 3 }
+
+tmnxDot3OamTunneling             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamTunneling specifies if OAMPDUs should
+         be passed transparently through the OAM entity for processing
+         by another OAM entity across the network, or if OAMPDUs should be
+         terminated and processed at the local OAM entity.  This object
+         can only be set to 'true' if dot3OamAdminState is set to 'disabled'.
+         Likewise, dot3OamAdminState can only be set to 'enabled' if this
+         object is set to 'false'.  It is not valid to try and enable both
+         OAMPDU processing and OAMPDU tunneling on the same OAM entity."
+    DEFVAL      { false }
+    ::= { tmnxDot3OamEntry 4 }
+
+tmnxDot3OamLooped                OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLooped indicates if the OAM entity
+         is receiving OAMPDUs that it transmitted.  A value of 'true'
+         indicates that the OAM entity is receiving it's own OAMPDUs while
+         a value of 'false' indicates it is not."
+    DEFVAL      { false }
+    ::= { tmnxDot3OamEntry 5 }
+
+tmnxDot3OamHoldTime              OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..50)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamHoldTime specifies the number of seconds
+         the efm-oam protocol should wait after dot3OamOperStatus transitions
+         from 'operational (9)' to a non-operational state before going back
+         to the 'operational (9)' state again.  Note that a transition to the
+         'linkFault (2)' state does not cause tmnxDot3OamHoldTime to be used
+         if dot3OamOperStatus was previously in the 'operational (9)' state."
+    DEFVAL      { 0 }
+    ::= { tmnxDot3OamEntry 6 }
+
+tmnxDot3OamIgnoreEfmState        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamIgnoreEfmState specifies whether the efm-oam
+         status (dot3OamOperStatus) on a port will affect the operational
+         state of the port it is running on when efm-oam is enabled.  If
+         tmnxDot3OamIgnoreEfmState is set to 'true' then efm-oam status will
+         have no effect on the port state."
+    DEFVAL      { false }
+    ::= { tmnxDot3OamEntry 7 }
+
+tmnxDot3OamGraceTxEnabled        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamGraceTxEnabled specifies whether the efm-oam
+         entity on a port will transmit grace-period messages.
+
+         When the value of tmnxDot3OamGraceTxEnabled is 'true (1)', and
+         tmnxDot3OamDyingGaspOnReset is 'true (1)', the grace functionality
+         will take precedence when a soft reset is invoked provided that the
+         value of dot3OamPeerVendorOui matches tmnxDot3OamVendorOui or
+         tmnxDot3OamGraceVendorOui."
+    DEFVAL      { true }
+    ::= { tmnxDot3OamEntry 8 }
+
+tmnxDot3OamGraceTxState          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamGraceTxState indicates whether or not the node
+         is locally executing a grace period. A value of 'true' indicates that
+         all peer timeouts are extended locally and an eligible EFM-OAM entity
+         is transmitting grace period information. A value of 'false' indicates
+         no grace period information is transmitted and standard values are
+         used for timing out remote peers.
+
+         Note that for a local EFM-OAM entity to be eligible for grace period
+         transmission it must be admin up and active, and the port level
+         tmnxDot3OamGraceTxEnabled and global level
+         tmnxDot3OamSystemGraceTxEnable values must be set to 'true'."
+    ::= { tmnxDot3OamEntry 9 }
+
+tmnxDot3OamPrRdiRxDyingGasp      OBJECT-TYPE
+    SYNTAX      TmnxLocalPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamPrRdiRxDyingGasp specifies how the local port
+         will be impacted when it receives an Information OAMPDU from the peer
+         with the dying gasp flag set."
+    DEFVAL      { outOfService }
+    ::= { tmnxDot3OamEntry 10 }
+
+tmnxDot3OamPrRdiRxCriticalEvent  OBJECT-TYPE
+    SYNTAX      TmnxLocalPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamPrRdiRxCriticalEvent specifies how the local
+         port will be impacted when it receives an Information OAMPDU from the
+         peer with the critical event flag set."
+    DEFVAL      { outOfService }
+    ::= { tmnxDot3OamEntry 11 }
+
+tmnxDot3OamPrRdiRxLinkFault      OBJECT-TYPE
+    SYNTAX      TmnxLocalPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamPrRdiRxLinkFault specifies how the local port
+         will be impacted when it receives an Information OAMPDU from the peer
+         with the link fault flag set."
+    DEFVAL      { outOfService }
+    ::= { tmnxDot3OamEntry 12 }
+
+tmnxDot3OamPrRdiRxEventNotif     OBJECT-TYPE
+    SYNTAX      TmnxLocalPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamPrRdiRxEventNotif specifies how the local port
+         will be impacted when it receives an Event Notification OAMPDU from
+         the peer. The Event TLVs contained in the Event Notification OAMPDU
+         will be analysed to determine if the OAM peer has crossed the error
+         threshold for the window. The analysis does not consider any local
+         signal degrade or signal failure thresholds. The analysis is based
+         solely on the information received from the OAM peer. The analysis is
+         performed on all supported Event TLVs without regard for support of a
+         specific error counter or local configuration of any thresholds."
+    DEFVAL      { logOnly }
+    ::= { tmnxDot3OamEntry 13 }
+
+tmnxDot3OamDiscAdCapLinkMon      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamDiscAdCapLinkMon specifies whether or not the
+         link monitoring capabilities will be advertised to the OAM peer when
+         tmnxDot3OamLinkMonEnabled is set to 'enabled (1)'."
+    DEFVAL      { true }
+    ::= { tmnxDot3OamEntry 14 }
+
+tmnxDot3OamVendorOui             OBJECT-TYPE
+    SYNTAX      EightOTwoOui
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamVendorOui indicates the Organizationally
+         Unique Identifier (OUI) which can be used to identify the vendor of
+         the local EFM-OAM entity. This OUI is included in the Local
+         Information TLV of every Information OAMPDU transmitted by the local
+         EFM-OAM entity."
+    ::= { tmnxDot3OamEntry 15 }
+
+tmnxDot3OamVendorInfo            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamVendorInfo indicates the information that is
+         included in the Vendor Information field of the Local Information TLV
+         of every Information OAMPDU transmitted by the local EFM-OAM entity.
+         The semantics of the Vendor Information field are proprietary and
+         specific to the vendor (identified by tmnxDot3OamVendorOui)."
+    ::= { tmnxDot3OamEntry 16 }
+
+tmnxDot3OamGraceVendorOui        OBJECT-TYPE
+    SYNTAX      EightOTwoOui
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamGraceVendorOui specifies an additional vendor
+         OUI which indicates support for the vendor specific EFM-OAM grace
+         functionality which is invoked during soft reset activities.
+
+         When the value of tmnxDot3OamGraceTxEnabled is 'true (1)', and
+         tmnxDot3OamDyingGaspOnReset is 'true (1)', the grace functionality
+         will take precedence when a soft reset is invoked provided that the
+         value of dot3OamPeerVendorOui matches tmnxDot3OamVendorOui or
+         tmnxDot3OamGraceVendorOui."
+    DEFVAL      { '00164D'H }
+    ::= { tmnxDot3OamEntry 17 }
+
+tmnxDot3OamDyingGaspOnReset      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamDyingGaspOnReset specifies whether the EFM-OAM
+         entity will transmit dying gasp messages on the port when a reset
+         condition occurs.
+
+         Dying gasp messages are only transmitted if the value of
+         tmnxDot3OamDyingGaspOnReset is 'true (1)' and the value of
+         tmnxDot3OamSystemDyingGaspOnRst is 'true (1)'.
+
+         When the value of tmnxDot3OamGraceTxEnabled is 'true (1)', and
+         tmnxDot3OamDyingGaspOnReset is 'true (1)', the grace functionality
+         will take precedence when a soft reset is invoked provided that the
+         value of dot3OamPeerVendorOui matches tmnxDot3OamVendorOui or
+         tmnxDot3OamGraceVendorOui."
+    DEFVAL      { true }
+    ::= { tmnxDot3OamEntry 18 }
+
+tmnxDot3OamDyingGaspOnResetState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamDyingGaspOnResetState indicates whether or not
+         the node is transmitting Information OAMPDUs to the peer with the
+         dying-gasp flag set.
+
+         Dying gasp messages are only transmitted if the value of
+         tmnxDot3OamDyingGaspOnReset is 'true (1)' and the value of
+         tmnxDot3OamSystemDyingGaspOnRst is 'true (1)'."
+    ::= { tmnxDot3OamEntry 19 }
+
+tmnxDot3OamTriggerFault          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none          (1),
+        dyingGasp     (2),
+        criticalEvent (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamTriggerFault specifies the type of fault which
+         is triggered.
+
+         If the value of tmnxDot3OamTriggerFault is set to a value other than
+         'none (1)', EFM-OAM will bring the port operationally down (if it was
+         not already), and set the appropriate fault flag in all subsequent
+         Information OAMPDUs transmitted to the peer.
+
+         If the value of tmnxDot3OamTriggerFault is set to 'none (1)', EFM-OAM
+         will affect the port state as it would during normal operation and
+         will not set the configured fault flags in the Information OAMPDUs
+         transmitted to the peer unless some other configuration or state
+         causes it to do so."
+    DEFVAL      { none }
+    ::= { tmnxDot3OamEntry 20 }
+
+tmnxDot3OamSoftResetAction       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        grace     (2),
+        dyingGasp (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSoftResetAction indicates which functionality
+         is executed when a soft reset is invoked.
+
+         Values:
+             none      (1) - no messages are sent
+             grace     (2) - grace messages are sent
+             dyingGasp (3) - dying-gasp messages are sent"
+    ::= { tmnxDot3OamEntry 21 }
+
+tmnxDot3OamLoopbackObjs          OBJECT IDENTIFIER ::= { tmnxDot3OamObjs 2 }
+
+tmnxDot3OamLoopbackTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamLoopbackTable is used to store proprietary loopback
+         configuration information on a particular Ethernet like interface (OAM
+         entity) in the system that supports the OAM functions defined in
+         [802.3ah]."
+    ::= { tmnxDot3OamLoopbackObjs 1 }
+
+tmnxDot3OamLoopbackEntry         OBJECT-TYPE
+    SYNTAX      TmnxDot3OamLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxDot3OamLoopbackTable containing configuration
+         information applicable to an OAM entity."
+    AUGMENTS    { dot3OamLoopbackEntry }
+    ::= { tmnxDot3OamLoopbackTable 1 }
+
+TmnxDot3OamLoopbackEntry         ::= SEQUENCE
+{
+    tmnxDot3OamLoopbackLastChanged   TimeStamp,
+    tmnxDot3OamLoopbackLocalStatus   INTEGER
+}
+
+tmnxDot3OamLoopbackLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLoopbackLastChanged indicates the sysUpTime
+         value when this row was last modified."
+    ::= { tmnxDot3OamLoopbackEntry 1 }
+
+tmnxDot3OamLoopbackLocalStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noLoopback    (1),
+        localLoopback (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLoopbackLocalStatus specifies the local
+         loopback status of the OAM entity.  This attribute allows the user
+         to manually set the local OAM entity loopback mode overriding the
+         802.3ah protocol for loopback.  Setting the value to 'localLoopback'
+         can only be done if dot3OamLoopbackStatus is set to 'noLoopback'.
+         If dot3OamLoopbackStatus is any value other than 'noLoopback', the
+         changes to tmnxDot3OamLoopbackLocalStatus will have no effect.  If
+         dot3OamLoopbackStatus is set to 'localLoopback', the OAM entity will
+         act as if its peer put the OAM entity into local loopback.  This
+         entry allows the user to put an OAM entity into local loopback mode,
+         even if dot3OamLoopbackIgnoreRx is set to 'ignore'."
+    DEFVAL      { noLoopback }
+    ::= { tmnxDot3OamLoopbackEntry 2 }
+
+tmnxDot3OamGlobalObjs            OBJECT IDENTIFIER ::= { tmnxDot3OamObjs 3 }
+
+tmnxDot3OamSystemScalarsGroup    OBJECT IDENTIFIER ::= { tmnxDot3OamGlobalObjs 1 }
+
+tmnxDot3OamSystemGraceTxEnable   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSystemGraceTxEnable specifies whether or not
+         grace period notifications will be sent to the EFM-OAM remote peers.
+         The value 'true' enables grace period notifications, and the value
+         'false' suppresses the notifications.
+
+         During an outage, the modification of this object from 'true' to
+         'false' will cause an immediate clear of all grace period
+         notifications, after which no further notifications will be sent. A
+         modification of this object from 'false' to 'true' will not enable the
+         transmission of grace period for any outages currently in progress but
+         will take effect for subsequent outages."
+    DEFVAL      { false }
+    ::= { tmnxDot3OamSystemScalarsGroup 1 }
+
+tmnxDot3OamSystemDyingGaspOnRst  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSystemDyingGaspOnRst specifies whether or not
+         Information OAMPDUs with the dying gasp flag set may be sent to the
+         EFM-OAM remote peers when a reset condition occurs.
+
+         If the value is 'true (1)' and a reset condition occurs, Information
+         OAMPDUs with the dying gasp flag set will only be sent to local ports
+         when the value of tmnxDot3OamDyingGaspOnReset is also 'true (1)' for
+         that local port.
+
+         If the value is 'false (2)' and a reset condition occurs, no
+         Information OAMPDUs with the dying gasp flag set will be sent
+         regardless of the value of tmnxDot3OamDyingGaspOnReset on the local
+         port."
+    DEFVAL      { false }
+    ::= { tmnxDot3OamSystemScalarsGroup 2 }
+
+tmnxDot3OamPeerTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamPeerTable is used to store proprietary configuration
+         information on a particular Ethernet like interface (OAM entity) in
+         the system that supports the OAM functions defined in [802.3ah]."
+    ::= { tmnxDot3OamObjs 4 }
+
+tmnxDot3OamPeerEntry             OBJECT-TYPE
+    SYNTAX      TmnxDot3OamPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxDot3OamPeerTable containing configuration
+         information applicable to an OAM entity."
+    AUGMENTS    { dot3OamPeerEntry }
+    ::= { tmnxDot3OamPeerTable 1 }
+
+TmnxDot3OamPeerEntry             ::= SEQUENCE
+{ tmnxDot3OamPeerGraceRx           TruthValue }
+
+tmnxDot3OamPeerGraceRx           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamPeerGraceRx indicates that the OAM entity is
+         receiving 'grace-period' notifications through this peer."
+    ::= { tmnxDot3OamPeerEntry 1 }
+
+tmnxDot3OamEventObjs             OBJECT IDENTIFIER ::= { tmnxDot3OamObjs 5 }
+
+tmnxDot3OamEventCfgTblLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamEventCfgTblLastChange indicates the time,
+         since system startup that a configuration changed state in the
+         tmnxDot3OamEventConfigTable."
+    ::= { tmnxDot3OamEventObjs 1 }
+
+tmnxDot3OamEventConfigTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamEventConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamEventConfigTable contains the proprietary objects to
+         configure the Event Notifications for Ethernet OAM events. There is
+         one entry in the table for every entry in dot3OamTable that supports
+         OAM events (where dot3OamFunctionsSupported includes the eventSupport
+         bit set). The values in the table are maintained across changes to
+         dot3OamOperStatus."
+    ::= { tmnxDot3OamEventObjs 2 }
+
+tmnxDot3OamEventConfigEntry      OBJECT-TYPE
+    SYNTAX      TmnxDot3OamEventConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A tmnxDot3OamEventConfigEntry is automatically created/deleted
+         whenever an entry in dot3OamEventConfigTable is created/deleted.
+
+         Event configuration controls when the local management entity sends
+         Event Notification OAMPDUs to its OAM peer, and when certain event
+         flags are set or cleared in OAMPDUs."
+    AUGMENTS    { dot3OamEventConfigEntry }
+    ::= { tmnxDot3OamEventConfigTable 1 }
+
+TmnxDot3OamEventConfigEntry      ::= SEQUENCE
+{
+    tmnxDot3OamEventCfgLastChanged   TimeStamp,
+    tmnxDot3OamLinkMonEnabled        TmnxEnabledDisabled,
+    tmnxDot3OamLocalSfActEventBurst  Unsigned32,
+    tmnxDot3OamLocalSfActPortAction  TmnxLocalPortAction,
+    tmnxDot3OamErrFrmEnabled         TmnxEnabledDisabled,
+    tmnxDot3OamErrFrmSdThreshold     Unsigned32,
+    tmnxDot3OamErrFrmPrdEnabled      TmnxEnabledDisabled,
+    tmnxDot3OamErrFrmPrdSdThreshold  Unsigned32,
+    tmnxDot3OamErrFrmSecEnabled      TmnxEnabledDisabled,
+    tmnxDot3OamErrFrmSecSdThreshold  Unsigned32,
+    tmnxDot3OamErrSymPrdEnabled      TmnxEnabledDisabled,
+    tmnxDot3OamErrSymPrdSdThreshold  Unsigned32,
+    tmnxDot3OamErrSymPrdWindowTime   Unsigned32
+}
+
+tmnxDot3OamEventCfgLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamEventCfgLastChanged indicates the sysUpTime
+         value when this row was last modified."
+    ::= { tmnxDot3OamEventConfigEntry 1 }
+
+tmnxDot3OamLinkMonEnabled        OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLinkMonEnabled specifies whether or not link
+         monitoring is enabled on the port. When this object's value is set to
+         'enabled (1)', the eventSupport bit in dot3OamFunctionsSupported is
+         set, otherwise the eventSupport bit is cleared."
+    DEFVAL      { disabled }
+    ::= { tmnxDot3OamEventConfigEntry 2 }
+
+tmnxDot3OamLocalSfActEventBurst  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLocalSfActEventBurst specifies the number of
+         Event Notification OAMPDUs to send the OAM peer to notify when a local
+         Signal Failure (SF) threshold crossing event occurs. This occurs when
+         a locally monitored error count is equal to or greater than the
+         threshold set for that error type within the window (E.g. burst the
+         peer when the number of errored frames within dot3OamErrFrameWindow is
+         equal to or greater than dot3OamErrFrameThreshold and
+         tmnxDot3OamErrFrmEnabled is set to 'enabled (1)')."
+    DEFVAL      { 1 }
+    ::= { tmnxDot3OamEventConfigEntry 3 }
+
+tmnxDot3OamLocalSfActPortAction  OBJECT-TYPE
+    SYNTAX      TmnxLocalPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamLocalSfActPortAction specifies how the local
+         port will be affected when a local Signal Failure (SF) threshold
+         crossing event occurs. This occurs when a locally monitored error
+         count is equal to or greater than the threshold set for that error
+         type within the window (E.g. take the specified action when the number
+         of errored frames within dot3OamErrFrameWindow is equal to or greater
+         than dot3OamErrFrameThreshold and tmnxDot3OamErrFrmEnabled is set to
+         'enabled (1)')."
+    DEFVAL      { outOfService }
+    ::= { tmnxDot3OamEventConfigEntry 4 }
+
+tmnxDot3OamErrFrmEnabled         OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmEnabled specifies whether or not Errored
+         Frame events are monitored on the port."
+    DEFVAL      { disabled }
+    ::= { tmnxDot3OamEventConfigEntry 5 }
+
+tmnxDot3OamErrFrmSdThreshold     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000)
+    UNITS       "frames"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmSdThreshold specifies the Signal Degrade
+         (SD) threshold for frame errors over a period of time. This object's
+         value must be lower than the Signal Failure (SF) threshold,
+         dot3OamErrFrameThreshold.
+
+         If the number of errored frames within dot3OamErrFrameWindow is equal
+         to or greater than tmnxDot3OamErrFrmSdThreshold and
+         tmnxDot3OamErrFrmEnabled is set to 'enabled (1)', the port is
+         considered degraded but still functional, and a
+         tmnxDot3OamSdThresholdEvent notification is generated.
+
+         A value of 0 indicates this SD threshold is ignored."
+    DEFVAL      { 0 }
+    ::= { tmnxDot3OamEventConfigEntry 6 }
+
+tmnxDot3OamErrFrmPrdEnabled      OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmPrdEnabled specifies whether or not
+         Errored Frame Period events are monitored on the port."
+    DEFVAL      { disabled }
+    ::= { tmnxDot3OamEventConfigEntry 7 }
+
+tmnxDot3OamErrFrmPrdSdThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000)
+    UNITS       "frames"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmPrdSdThreshold specifies the Signal
+         Degrade (SD) threshold for errored frame period (frame errors over a
+         number of received frames). This object's value must be lower than the
+         Signal Failure (SF) threshold, dot3OamErrFramePeriodThreshold.
+
+         If the number of errored frames within dot3OamErrFramePeriodWindow is
+         equal to or greater than tmnxDot3OamErrFrmPrdSdThreshold and
+         tmnxDot3OamErrFrmPrdEnabled is set to 'enabled (1)', the port is
+         considered degraded but still functional, and a
+         tmnxDot3OamSdThresholdEvent notification is generated.
+
+         A value of 0 indicates this SD threshold is ignored."
+    DEFVAL      { 0 }
+    ::= { tmnxDot3OamEventConfigEntry 8 }
+
+tmnxDot3OamErrFrmSecEnabled      OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmSecEnabled specifies whether or not
+         Errored Frame Seconds Summary events are monitored on the port."
+    DEFVAL      { disabled }
+    ::= { tmnxDot3OamEventConfigEntry 9 }
+
+tmnxDot3OamErrFrmSecSdThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..900)
+    UNITS       "errored frame seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrFrmSecSdThreshold specifies the Signal
+         Degrade (SD) threshold for errored frame seconds. This object's value
+         must be lower than the Signal Failure (SF) threshold,
+         dot3OamErrFramePeriodThreshold.
+
+         If the number of errored frame seconds within
+         dot3OamErrFrameSecsSummaryWindow is equal to or greater than
+         tmnxDot3OamErrFrmSecSdThreshold and tmnxDot3OamErrFrmSecEnabled is set
+         to 'enabled (1)', the port is considered degraded but still
+         functional, and a tmnxDot3OamSdThresholdEvent notification is
+         generated.
+
+         A value of 0 indicates this SD threshold is ignored."
+    DEFVAL      { 0 }
+    ::= { tmnxDot3OamEventConfigEntry 10 }
+
+tmnxDot3OamErrSymPrdEnabled      OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrSymPrdEnabled specifies whether or not
+         Errored Symbol Period events are monitored on the port."
+    DEFVAL      { disabled }
+    ::= { tmnxDot3OamEventConfigEntry 11 }
+
+tmnxDot3OamErrSymPrdSdThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000)
+    UNITS       "symbols"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrSymPrdSdThreshold specifies the Signal
+         Degrade (SD) threshold for symbol period errors. This object's value
+         must be lower than the Signal Failure (SF) threshold,
+         dot3OamErrFramePeriodThresholdLo.
+
+         If the number of symbol errors within dot3OamErrSymPeriodWindowLo is
+         equal to or greater than tmnxDot3OamErrSymPrdSdThreshold and
+         tmnxDot3OamErrSymPrdEnabled is set to 'enabled (1)', the port is
+         considered degraded but still functional, and a
+         tmnxDot3OamSdThresholdEvent notification is generated.
+
+         A value of 0 indicates this SD threshold is ignored."
+    DEFVAL      { 0 }
+    ::= { tmnxDot3OamEventConfigEntry 12 }
+
+tmnxDot3OamErrSymPrdWindowTime   OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..600)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamErrSymPrdWindowTime specifies the window of
+         time over which the threshold for symbol period errors is defined.
+         This object's value must be specified in increments of 10."
+    DEFVAL      { 10 }
+    ::= { tmnxDot3OamEventConfigEntry 13 }
+
+tmnxDot3OamEventLogTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamEventLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamEventLogTable contains additional information for the
+         entries in dot3OamEventLogTable."
+    ::= { tmnxDot3OamEventObjs 3 }
+
+tmnxDot3OamEventLogEntry         OBJECT-TYPE
+    SYNTAX      TmnxDot3OamEventLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A tmnxDot3OamEventLogEntry is automatically created/deleted whenever
+         an entry in dot3OamEventLogTable is created/deleted."
+    AUGMENTS    { dot3OamEventLogEntry }
+    ::= { tmnxDot3OamEventLogTable 1 }
+
+TmnxDot3OamEventLogEntry         ::= SEQUENCE
+{ tmnxDot3OamEventLogCleared       TruthValue }
+
+tmnxDot3OamEventLogCleared       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamEventLogCleared indicates whether or not this
+         event has been cleared. If this object's value is set to 'true (1)',
+         this is considered a historic event and is no longer a potential cause
+         for the port to restrict user traffic. If the value is 'false (2)',
+         this is an active event which may impact dot3OamOperStatus."
+    ::= { tmnxDot3OamEventLogEntry 1 }
+
+tmnxDot3OamSdEventLogTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDot3OamSdEventLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamSdEventLogTable records a history of the Signal
+         Degraded (SD) threshold crossing events that have occurred at the
+         Ethernet OAM level. These events can include locally detected events
+         (which may result in locally generated OAMPDUs) and remotely detected
+         events (which are detected by the OAM peer entity and signaled to the
+         local entity via Ethernet OAM). Ethernet OAM events can be signaled by
+         Event Notification OAMPDUs or by the flags field in any OAMPDU."
+    ::= { tmnxDot3OamEventObjs 4 }
+
+tmnxDot3OamSdEventLogEntry       OBJECT-TYPE
+    SYNTAX      TmnxDot3OamSdEventLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A tmnxDot3OamSdEventLogEntry is automatically created whenever SD
+         threshold crossing events occur at the local OAM entity, and when
+         Event Notification OAMPDUs are received at the local OAM entity
+         (indicating that events of this nature have occurred at the peer OAM
+         entity). The size of the table is implementation dependent, but when
+         the table becomes full, older events are automatically deleted to make
+         room for newer events. The table index tmnxDot3OamSdEventLogIndex
+         increments for each new entry, and when the maximum value is reached,
+         the value restarts at zero."
+    INDEX       {
+        ifIndex,
+        tmnxDot3OamSdEventLogIndex
+    }
+    ::= { tmnxDot3OamSdEventLogTable 1 }
+
+TmnxDot3OamSdEventLogEntry       ::= SEQUENCE
+{
+    tmnxDot3OamSdEventLogIndex       Unsigned32,
+    tmnxDot3OamSdEventLogTimestamp   TimeStamp,
+    tmnxDot3OamSdEventLogOui         EightOTwoOui,
+    tmnxDot3OamSdEventLogType        Unsigned32,
+    tmnxDot3OamSdEventLogLocation    INTEGER,
+    tmnxDot3OamSdEventLogWindowHi    Unsigned32,
+    tmnxDot3OamSdEventLogWindowLo    Unsigned32,
+    tmnxDot3OamSdEventLogThresholdHi Unsigned32,
+    tmnxDot3OamSdEventLogThresholdLo Unsigned32,
+    tmnxDot3OamSdEventLogValue       CounterBasedGauge64,
+    tmnxDot3OamSdEventLogRunTotal    CounterBasedGauge64,
+    tmnxDot3OamSdEventLogEventTotal  Unsigned32,
+    tmnxDot3OamSdEventLogCleared     TruthValue
+}
+
+tmnxDot3OamSdEventLogIndex       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogIndex specifies an arbitrary integer
+         for identifying individual SD threshold crossing events within the
+         event log."
+    ::= { tmnxDot3OamSdEventLogEntry 1 }
+
+tmnxDot3OamSdEventLogTimestamp   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogTimestamp indicates the sysUpTime at
+         the time of the logged event. For locally generated events, the time
+         of the event can be accurately retrieved from sysUpTime. For remotely
+         generated events, the time of the event is indicated by the reception
+         of the Event Notification OAMPDU indicating that the event occurred on
+         the peer. A system may attempt to adjust the timestamp value to more
+         accurately reflect the time of the event at the peer OAM entity by
+         using other information, such as that found in the timestamp of the
+         Event Notification TLVs, which provides an indication of the relative
+         time between events at the peer entity."
+    ::= { tmnxDot3OamSdEventLogEntry 2 }
+
+tmnxDot3OamSdEventLogOui         OBJECT-TYPE
+    SYNTAX      EightOTwoOui
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogOui indicates the Organizationally
+         Unique Identifier (OUI) of the entity defining the object type. All
+         IEEE 802.3 defined events (as appearing in [802.3ah] except for the
+         Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of
+         0x0180C2. Organizations defining their own Event Notification TLVs
+         include their OUI in the Event Notification TLV that gets reflected
+         here."
+    ::= { tmnxDot3OamSdEventLogEntry 3 }
+
+tmnxDot3OamSdEventLogType        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogType indicates the type of SD
+         threshold crossing event. When the OUI is the IEEE 802.3 OUI of
+         0x0180C2, the following event types are defined:
+             erroredSymbolEvent(1),
+             erroredFramePeriodEvent(2),
+             erroredFrameEvent(3),
+             erroredFrameSecondsEvent(4)
+
+         When the OUI is not 71874 (0x0180C2 in hex), then some other
+         organization has defined the event space.  If event subtyping is known
+         to the implementation, it may be reflected here. Otherwise, this value
+         should return all F's (2^32 - 1)."
+    ::= { tmnxDot3OamSdEventLogEntry 4 }
+
+tmnxDot3OamSdEventLogLocation    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        local  (1),
+        remote (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogLocation indicates the location
+         where the SD event occurred.
+
+         Code point descriptions:
+             local  (1) - event occurred locally
+             remote (2) - event received from the OAM peer via Ethernet OAM"
+    ::= { tmnxDot3OamSdEventLogEntry 5 }
+
+tmnxDot3OamSdEventLogWindowHi    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "2^32 deciseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogWindowHi indicates the most
+         significant four bytes of the unsigned 64-bit window over which the
+         value was measured for the SD threshold crossing event.
+
+         The window (in deciseconds) for an SD event is calculated as:
+             ((2^32) * tmnxDot3OamSdEventLogWindowHi)
+                     + tmnxDot3OamSdEventLogWindowLo"
+    ::= { tmnxDot3OamSdEventLogEntry 6 }
+
+tmnxDot3OamSdEventLogWindowLo    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogWindowLo indicates the least
+         significant four bytes of the unsigned 64-bit window over which the
+         value was measured for the SD threshold crossing event.
+
+         The window (in deciseconds) for an SD event is calculated as:
+             ((2^32) * tmnxDot3OamSdEventLogWindowHi)
+                     + tmnxDot3OamSdEventLogWindowLo"
+    ::= { tmnxDot3OamSdEventLogEntry 7 }
+
+tmnxDot3OamSdEventLogThresholdHi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogThresholdHi indicates the most
+         significant four bytes of the unsigned 64-bit threshold over which the
+         value was measured for the SD threshold crossing event.
+
+         The threshold (in frames or symbols) for an SD event is calculated as:
+             ((2^32) * tmnxDot3OamSdEventLogThresholdHi)
+                     + tmnxDot3OamSdEventLogThresholdLo"
+    ::= { tmnxDot3OamSdEventLogEntry 8 }
+
+tmnxDot3OamSdEventLogThresholdLo OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogThresholdLo indicates the least
+         significant four bytes of the unsigned 64-bit threshold over which the
+         value was measured for the SD threshold crossing event.
+
+         The threshold (in frames or symbols) for an SD event is calculated as:
+             ((2^32) * tmnxDot3OamSdEventLogThresholdHi)
+                     + tmnxDot3OamSdEventLogThresholdLo"
+    ::= { tmnxDot3OamSdEventLogEntry 9 }
+
+tmnxDot3OamSdEventLogValue       OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogValue indicates the value of the
+         parameter within the given window that generated this event."
+    ::= { tmnxDot3OamSdEventLogEntry 10 }
+
+tmnxDot3OamSdEventLogRunTotal    OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogRunTotal indicates the running total
+         of the number of times this SD threshold crossing event has occurred
+         since the last reset."
+    ::= { tmnxDot3OamSdEventLogEntry 11 }
+
+tmnxDot3OamSdEventLogEventTotal  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogEventTotal indicates the total
+         number of times an Event Notification for this SD threshold crossing
+         event has been transmitted."
+    ::= { tmnxDot3OamSdEventLogEntry 12 }
+
+tmnxDot3OamSdEventLogCleared     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot3OamSdEventLogCleared indicates whether or not
+         this SD threshold crossing event has been cleared. If this object's
+         value is 'true (1)', this event is no longer a potential cause for the
+         port to restrict user traffic, and is considered a historical event.
+         If the value is 'false (2)', this is an active event which may impact
+         dot3OamOperStatus."
+    ::= { tmnxDot3OamSdEventLogEntry 13 }
+
+tmnxDot3OamMIBConformance        OBJECT IDENTIFIER ::= { tmnxSRConfs 42 }
+
+tmnxDot3OamMIBCompliances        OBJECT IDENTIFIER ::= { tmnxDot3OamMIBConformance 1 }
+
+tmnxDot3OamMIBCompliance         MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 5.0 of TIMETRA-DOT3-OAM-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamGroup,
+            tmnxDot3OamLoopbackGroup,
+            tmnxDot3OamNotificationGroup
+        }
+    ::= { tmnxDot3OamMIBCompliances 1 }
+
+tmnxDot3OamMIBV6v0Compliance     MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 6.0 of TIMETRA-DOT3-OAM-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamV6v0Group,
+            tmnxDot3OamLoopbackGroup,
+            tmnxDot3OamNotificationV6v0Group
+        }
+    ::= { tmnxDot3OamMIBCompliances 2 }
+
+tmnxDot3OamMIBV6v1Compliance     MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 6.1 of TIMETRA-DOT3-OAM-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamV6v0Group,
+            tmnxDot3OamV6v1Group,
+            tmnxDot3OamLoopbackGroup,
+            tmnxDot3OamNotificationV6v0Group
+        }
+    ::= { tmnxDot3OamMIBCompliances 3 }
+
+tmnxDot3OamMIBV11v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 11.0 of TIMETRA-DOT3-OAM-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamV6v0Group,
+            tmnxDot3OamV6v1Group,
+            tmnxDot3OamV11v0Group,
+            tmnxDot3OamLoopbackGroup,
+            tmnxDot3OamNotificationV6v0Group,
+            tmnxDot3OamGraceGroup
+        }
+    ::= { tmnxDot3OamMIBCompliances 4 }
+
+tmnxDot3OamMIBV12v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of Ethernet OAM for
+         Release 12.0 on SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamLinkMonGroupV12v0
+        }
+    ::= { tmnxDot3OamMIBCompliances 5 }
+
+tmnxDot3OamMIBV13v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of Ethernet OAM for
+         Release 13.0 on SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamLinkMonGroupV13v0,
+            tmnxDot3OamNotificationGrpV13v0
+        }
+    ::= { tmnxDot3OamMIBCompliances 6 }
+
+tmnxDot3OamMIBV14v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of Ethernet OAM for
+         Release 14.0 on SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDot3OamGroupV14v0
+        }
+    ::= { tmnxDot3OamMIBCompliances 7 }
+
+tmnxDot3OamMIBGroups             OBJECT IDENTIFIER ::= { tmnxDot3OamMIBConformance 2 }
+
+tmnxDot3OamGroup                 OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamLastChanged,
+        tmnxDot3OamInterval,
+        tmnxDot3OamMultiplier,
+        tmnxDot3OamTunneling
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects providing for management an Ethernet OAM entity
+         on Nokia 7750 SR series systems."
+    ::= { tmnxDot3OamMIBGroups 1 }
+
+tmnxDot3OamLoopbackGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamLoopbackLastChanged,
+        tmnxDot3OamLoopbackLocalStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing for loopback management an Ethernet OAM
+         entity on Nokia 7750 SR series systems."
+    ::= { tmnxDot3OamMIBGroups 2 }
+
+tmnxDot3OamNotificationGroup     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxDot3OamPeerChanged
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting Ethernet OAM in on Nokia 7x50 SR
+         series systems."
+    ::= { tmnxDot3OamMIBGroups 3 }
+
+tmnxDot3OamNotificationV6v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxDot3OamPeerChanged,
+        tmnxDot3OamLoopDetected,
+        tmnxDot3OamLoopCleared
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting Ethernet OAM in on Nokia 7x50 SR
+         series systems release 6.0."
+    ::= { tmnxDot3OamMIBGroups 4 }
+
+tmnxDot3OamV6v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamLastChanged,
+        tmnxDot3OamInterval,
+        tmnxDot3OamMultiplier,
+        tmnxDot3OamTunneling,
+        tmnxDot3OamLooped
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing management for an Ethernet OAM entity
+         on Nokia 7750 SR series systems release 6.0."
+    ::= { tmnxDot3OamMIBGroups 5 }
+
+tmnxDot3OamV6v1Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamHoldTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing management for an Ethernet OAM entity
+         on Nokia 7750 SR series systems release 6.1."
+    ::= { tmnxDot3OamMIBGroups 6 }
+
+tmnxDot3OamV11v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamIgnoreEfmState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects providing management for an Ethernet
+         OAM entity on Nokia SROS series systems release 11.0."
+    ::= { tmnxDot3OamMIBGroups 7 }
+
+tmnxDot3OamGraceGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamSystemGraceTxEnable,
+        tmnxDot3OamGraceTxEnabled,
+        tmnxDot3OamGraceTxState,
+        tmnxDot3OamPeerGraceRx
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects providing management for an Ethernet
+         OAM entity to support 'grace-period' messages on Nokia SROS series
+         systems release 11.0."
+    ::= { tmnxDot3OamMIBGroups 8 }
+
+tmnxDot3OamLinkMonGroupV12v0     OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamEventCfgTblLastChange,
+        tmnxDot3OamEventCfgLastChanged,
+        tmnxDot3OamLinkMonEnabled,
+        tmnxDot3OamErrFrmEnabled,
+        tmnxDot3OamLocalSfActEventBurst,
+        tmnxDot3OamLocalSfActPortAction,
+        tmnxDot3OamPrRdiRxDyingGasp,
+        tmnxDot3OamPrRdiRxCriticalEvent,
+        tmnxDot3OamPrRdiRxLinkFault,
+        tmnxDot3OamPrRdiRxEventNotif,
+        tmnxDot3OamDiscAdCapLinkMon,
+        tmnxDot3OamEventLogCleared
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Ethernet OAM link monitoring on Nokia
+         SROS series systems release in 12.0."
+    ::= { tmnxDot3OamMIBGroups 9 }
+
+tmnxDot3OamLinkMonGroupV13v0     OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamSdEventLogTimestamp,
+        tmnxDot3OamSdEventLogOui,
+        tmnxDot3OamSdEventLogType,
+        tmnxDot3OamSdEventLogLocation,
+        tmnxDot3OamSdEventLogWindowHi,
+        tmnxDot3OamSdEventLogWindowLo,
+        tmnxDot3OamSdEventLogThresholdHi,
+        tmnxDot3OamSdEventLogThresholdLo,
+        tmnxDot3OamSdEventLogValue,
+        tmnxDot3OamSdEventLogRunTotal,
+        tmnxDot3OamSdEventLogEventTotal,
+        tmnxDot3OamSdEventLogCleared,
+        tmnxDot3OamErrFrmSdThreshold,
+        tmnxDot3OamErrFrmPrdEnabled,
+        tmnxDot3OamErrFrmPrdSdThreshold,
+        tmnxDot3OamErrFrmSecEnabled,
+        tmnxDot3OamErrFrmSecSdThreshold,
+        tmnxDot3OamErrSymPrdEnabled,
+        tmnxDot3OamErrSymPrdSdThreshold,
+        tmnxDot3OamErrSymPrdWindowTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Ethernet OAM link monitoring on Nokia
+         SROS series systems release in 13.0."
+    ::= { tmnxDot3OamMIBGroups 10 }
+
+tmnxDot3OamNotificationGrpV13v0  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxDot3OamSdThresholdEvent,
+        tmnxDot3OamThresholdEventClr,
+        tmnxDot3OamNonThresholdEventClr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional notifications supporting Ethernet OAM on Nokia
+         SROS series systems in release 13.0."
+    ::= { tmnxDot3OamMIBGroups 11 }
+
+tmnxDot3OamGroupV14v0            OBJECT-GROUP
+    OBJECTS     {
+        tmnxDot3OamVendorOui,
+        tmnxDot3OamVendorInfo,
+        tmnxDot3OamSystemDyingGaspOnRst,
+        tmnxDot3OamGraceVendorOui,
+        tmnxDot3OamDyingGaspOnReset,
+        tmnxDot3OamDyingGaspOnResetState,
+        tmnxDot3OamTriggerFault,
+        tmnxDot3OamSoftResetAction
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting Ethernet OAM on Nokia SROS
+         series systems in release 14.0."
+    ::= { tmnxDot3OamMIBGroups 12 }
+
+tmnxDot3OamNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 42 }
+
+tmnxDot3OamNotificationsPrefix   OBJECT IDENTIFIER ::= { tmnxDot3OamNotifyPrefix 42 }
+
+tmnxDot3OamNotifications         OBJECT IDENTIFIER ::= { tmnxDot3OamNotificationsPrefix 0 }
+
+tmnxDot3OamPeerChanged           NOTIFICATION-TYPE
+    OBJECTS     {
+        dot3OamPeerMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamPeerChanged notification is generated
+         when the peer information (specifically the Peer MAC address)
+         changes.  Note that this notification will only be sent out
+         if the peer information was previously available and the
+         information changed, and not when the peer information
+         is first learned or becomes unavailable."
+    ::= { tmnxDot3OamNotifications 1 }
+
+tmnxDot3OamLoopDetected          NOTIFICATION-TYPE
+    OBJECTS     {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamLoopDetected notification is generated when a port
+         receives an 802.3ah PDU with a source MAC address that matches the MAC
+         address of that port."
+    ::= { tmnxDot3OamNotifications 2 }
+
+tmnxDot3OamLoopCleared           NOTIFICATION-TYPE
+    OBJECTS     {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamLoopCleared notification is generated when a port is no
+         longer receiving 802.3ah PDUs with a source MAC address that matches
+         the MAC address of that port."
+    ::= { tmnxDot3OamNotifications 3 }
+
+tmnxDot3OamSdThresholdEvent      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxDot3OamSdEventLogTimestamp,
+        tmnxDot3OamSdEventLogOui,
+        tmnxDot3OamSdEventLogType,
+        tmnxDot3OamSdEventLogLocation,
+        tmnxDot3OamSdEventLogWindowHi,
+        tmnxDot3OamSdEventLogWindowLo,
+        tmnxDot3OamSdEventLogThresholdHi,
+        tmnxDot3OamSdEventLogThresholdLo,
+        tmnxDot3OamSdEventLogValue,
+        tmnxDot3OamSdEventLogRunTotal,
+        tmnxDot3OamSdEventLogEventTotal,
+        tmnxDot3OamSdEventLogCleared
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDot3OamSdThresholdEvent notification is generated when a local
+         or remote threshold crossing event for signal degradation is detected.
+         A local SD threshold crossing event is detected by the local entity,
+         while a remote threshold crossing event is detected by the reception
+         of an Ethernet OAM Event Notification OAMPDU that indicates an SD
+         threshold event.
+
+         This notification will not be sent more than once per second.
+
+         The OAM entity can be derived from extracting the ifIndex from the
+         variable bindings. The objects in the notification correspond to the
+         values in a row instance in the tmnxDot3OamSdEventLogTable.
+
+         The management entity should periodically check
+         tmnxDot3OamSdEventLogTable to detect any missed events."
+    ::= { tmnxDot3OamNotifications 4 }
+
+tmnxDot3OamThresholdEventClr     NOTIFICATION-TYPE
+    OBJECTS     {
+        dot3OamEventLogTimestamp,
+        dot3OamEventLogOui,
+        dot3OamEventLogType,
+        dot3OamEventLogLocation,
+        dot3OamEventLogWindowHi,
+        dot3OamEventLogWindowLo,
+        dot3OamEventLogThresholdHi,
+        dot3OamEventLogThresholdLo,
+        dot3OamEventLogValue,
+        dot3OamEventLogRunningTotal,
+        dot3OamEventLogEventTotal
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxDot3OamThresholdEventClr notification is generated
+         when the local or remote signal failure (SF) threshold crossing event
+         is cleared on the port.
+
+         [EFFECT] This SF threshold crossing event is no longer a potential
+         cause for the port to restrict user traffic.
+
+         [RECOVERY] There is no recovery for this notification."
+    ::= { tmnxDot3OamNotifications 5 }
+
+tmnxDot3OamNonThresholdEventClr  NOTIFICATION-TYPE
+    OBJECTS     {
+        dot3OamEventLogTimestamp,
+        dot3OamEventLogOui,
+        dot3OamEventLogType,
+        dot3OamEventLogLocation,
+        dot3OamEventLogEventTotal
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxDot3OamNonThresholdEventClr notification is generated
+         when the local or remote non-threshold crossing event
+         (DOT3-OAM-MIB::dot3OamNonThresholdEvent) is cleared on the port.
+
+         [EFFECT] This non-threshold crossing event is no longer a potential
+         cause for the port to restrict user traffic.
+
+         [RECOVERY] There is no recovery for this notification."
+    ::= { tmnxDot3OamNotifications 6 }
+
+END

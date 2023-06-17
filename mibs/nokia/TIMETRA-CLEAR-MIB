@@ -1,0 +1,254 @@
+TIMETRA-CLEAR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE
+                                                         FROM SNMPv2-SMI
+    TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    tmnxEventAppIndex
+                                                         FROM TIMETRA-LOG-MIB
+    TNamedItem, TmnxActionType
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraClearMIBModule            MODULE-IDENTITY
+    LAST-UPDATED "200501240000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the Nokia
+         7x50 system clear functions.
+
+         Copyright 2003-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "200501240000Z"
+    DESCRIPTION
+        "Rev 2.1                24 Jan 2005 00:00
+         2.1 release of the TIMETRA-CLEAR-MIB."
+
+    REVISION    "200406020000Z"
+    DESCRIPTION
+        "Rev 2.0R4              02 Jun 2004 00:00
+         2.0R4 release of the TIMETRA-CLEAR-MIB."
+
+    REVISION    "200401150000Z"
+    DESCRIPTION
+        "Rev 2.0                15 Jan 2004 00:00
+         2.0 release of the TIMETRA-CLEAR-MIB."
+
+    REVISION    "200308150000Z"
+    DESCRIPTION
+        "Rev 1.2                15 Aug 2003 00:00
+         1.2 release of the TIMETRA-CLEAR-MIB."
+
+    REVISION    "200301200000Z"
+    DESCRIPTION
+        "Rev 1.0                20 Jan 2003 00:00
+         1.0 Revision of the TIMETRA-CLEAR-MIB."
+
+    REVISION    "200202270000Z"
+    DESCRIPTION
+        "Rev 0.1                27 Feb 2002 00:00
+         Initial version of the TIMETRA-CLEAR-MIB."
+
+    ::= { timetraSRMIBModules 13 }
+
+tmnxClearObjs                    OBJECT IDENTIFIER ::= { tmnxSRObjs 13 }
+
+tmnxClearTable                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxClearTable provides the Nokia 7x50 SR series EMS a way to
+         execute the operational clear functions."
+    ::= { tmnxClearObjs 1 }
+
+tmnxClearEntry                   OBJECT-TYPE
+    SYNTAX      TmnxClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the tmnxClearTable represents an operational clear
+         function.  Rows in this table are created by the agent when the
+         system is initialized.  They can be neither created nor destroyed
+         by SNMP SET requests."
+    INDEX       {
+        tmnxEventAppIndex,
+        tmnxClearIndex
+    }
+    ::= { tmnxClearTable 1 }
+
+TmnxClearEntry                   ::= SEQUENCE
+{
+    tmnxClearIndex                   Integer32,
+    tmnxClearName                    TNamedItem,
+    tmnxClearParams                  OCTET STRING,
+    tmnxClearAction                  TmnxActionType,
+    tmnxClearLastClearedTime         TimeStamp,
+    tmnxClearResult                  INTEGER,
+    tmnxClearErrorText               OCTET STRING
+}
+
+tmnxClearIndex                   OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxClearIndex specifies a unique clear function
+         within an application group.  The application group indexes,
+         tmnxEventAppIndex, are given in the tmnxEventAppTable in the
+         TIMETRA-LOG-MIB."
+    ::= { tmnxClearEntry 1 }
+
+tmnxClearName                    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the application clear function associated with this row
+         entry."
+    ::= { tmnxClearEntry 2 }
+
+tmnxClearParams                  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..1024))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tmnxClearParams string is a sequence of parameter name value pairs
+         to be used to determine the managed object to which to apply the
+         application clear function associated with this row entry."
+    DEFVAL      { ''H }
+    ::= { tmnxClearEntry 3 }
+
+tmnxClearAction                  OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting tmnxClearAction to 'doAction (1)' causes the application clear
+         function associated with this row entry to be enacted."
+    DEFVAL      { notApplicable }
+    ::= { tmnxClearEntry 4 }
+
+tmnxClearLastClearedTime         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxClearLastClearedTime variable contains the sysUpTime value
+         when tmnxClearAction was last set to 'doAction (1)' to run the
+         application clear function associated with this row entry."
+    ::= { tmnxClearEntry 5 }
+
+tmnxClearResult                  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        success (1),
+        failure (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The result of the last attempt to enact the application clear function
+         associated with this row entry."
+    ::= { tmnxClearEntry 6 }
+
+tmnxClearErrorText               OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the result of the last attempt to enact the application clear
+         function associated with this row entry failed, tmnxClearResult is
+         'failure (2)', tmnxClearErrorText contains a text string to further
+         explain the cause of the failure."
+    ::= { tmnxClearEntry 7 }
+
+tmnxClearConformance             OBJECT IDENTIFIER ::= { tmnxSRConfs 13 }
+
+tmnxClearCompliances             OBJECT IDENTIFIER ::= { tmnxClearConformance 1 }
+
+tmnxClearCompliance              MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of object clearing operations
+         on Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxClearGroup,
+            tmnxClearNotificationGroup
+        }
+    ::= { tmnxClearCompliances 1 }
+
+tmnxClearGroups                  OBJECT IDENTIFIER ::= { tmnxClearConformance 2 }
+
+tmnxClearGroup                   OBJECT-GROUP
+    OBJECTS     {
+        tmnxClearName,
+        tmnxClearParams,
+        tmnxClearAction,
+        tmnxClearLastClearedTime,
+        tmnxClearResult,
+        tmnxClearErrorText
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of object clearing
+         capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxClearGroups 1 }
+
+tmnxClearNotificationGroup       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxClear
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the object clearing feature on
+         Nokia 7x50 SR series systems."
+    ::= { tmnxClearGroups 2 }
+
+tmnxClearNotificationsPrefix     OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 13 }
+
+tmnxClearNotifications           OBJECT IDENTIFIER ::= { tmnxClearNotificationsPrefix 0 }
+
+tmnxClear                        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxClearName,
+        tmnxClearParams,
+        tmnxClearLastClearedTime,
+        tmnxClearResult,
+        tmnxClearErrorText
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxClear notification is generated to report the results of the
+         clear function that was run as a result of setting tmnxClearAction to
+         'doAction'. "
+    ::= { tmnxClearNotifications 1 }
+
+END

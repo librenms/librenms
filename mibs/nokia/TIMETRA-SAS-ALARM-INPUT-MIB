@@ -1,0 +1,546 @@
+TIMETRA-SAS-ALARM-INPUT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    TimeTicks
+                                                         FROM SNMPv2-SMI
+    tmnxChassisNotifyHwIndex, tmnxHwClass,
+    tmnxHwID
+                                                         FROM TIMETRA-CHASSIS-MIB
+    tmnxBasedProducts
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemLongDescription
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+tmnxSasAlarmInputMIBModule       MODULE-IDENTITY
+    LAST-UPDATED "201507080000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7x50 Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of Alarm Contact Inputs.
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license
+         to  use and distribute an unmodified copy of this Specification
+         in connection with management of Nokia products, and without
+         fee, provided this copyright notice and license appear on all
+         copies.
+
+         This Specification is  supplied `as is', and Nokia makes no
+         warranty, either express or implied, as to the use, operation,
+         condition, or performance of the Specification."
+
+    REVISION    "201507080000Z"
+    DESCRIPTION
+        "Rev 2.0                08 Jul 2015 00:00
+         2.0 release of the TIMETRA-SAS-ALARM-INPUT-MIB."
+
+    REVISION    "201004080000Z"
+    DESCRIPTION
+        "Rev 2.0                08 Apr 2010 00:00
+         2.0 release of the TIMETRA-SAS-ALARM-INPUT-MIB."
+
+    ::= { timetraSASModules 10 }
+
+timetraServiceAccessSwitches     OBJECT IDENTIFIER ::= { tmnxBasedProducts 2 }
+
+timetraSASRegistry               OBJECT IDENTIFIER ::= { timetraServiceAccessSwitches 1 }
+
+timetraSASModules                OBJECT IDENTIFIER ::= { timetraSASRegistry 1 }
+
+timetraSASMIB                    OBJECT IDENTIFIER ::= { timetraServiceAccessSwitches 2 }
+
+timetraSASConfs                  OBJECT IDENTIFIER ::= { timetraSASMIB 1 }
+
+tmnxSASAlarmInputConformance     OBJECT IDENTIFIER ::= { timetraSASConfs 6 }
+
+tmnxSASAlarmInputCompliances     OBJECT IDENTIFIER ::= { tmnxSASAlarmInputConformance 1 }
+
+tmnxSASAlarmInputComp7210V2v0    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSASAlarmInputComp7210V2v0 identifies compliance
+         statement for external equipment alarm inputs in Nokia 7210 series
+         system, release 2.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSASAlarmInputV2v0Group,
+            tmnxAlmInpV2v0NotifyObjsGroup,
+            tmnxAlarmInputNotificationV2v0Group
+        }
+    ::= { tmnxSASAlarmInputCompliances 1 }
+
+tmnxSASAlarmInputComp7X50V13v0   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSASAlarmInputComp7X50V13v0 identifies compliance
+         statement for external equipment alarm inputs in Nokia 7X50 series
+         system, release 13.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxAlInpV13v0NotificationGroup
+        }
+    ::= { tmnxSASAlarmInputCompliances 2 }
+
+tmnxSASAlarmInputGroups          OBJECT IDENTIFIER ::= { tmnxSASAlarmInputConformance 2 }
+
+tmnxSASAlarmInputV2v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tmnxSasAlarmInputDescription,
+        tmnxSasAlarmInputAdminState,
+        tmnxSasAlarmInputPolarity,
+        tmnxSasAlarmOutputSeverity,
+        tmnxSasAlarmInputStatus,
+        tmnxSasAlarmInputLastChange,
+        tmnxSasAlarmInputTriggerMessage,
+        tmnxSasAlarmInputClearMessage,
+        tmnxSasAlarmInputPowerStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the alarm input configuration on Nokia
+         7210 Release 2.0."
+    ::= { tmnxSASAlarmInputGroups 1 }
+
+tmnxAlarmInputNotificationV2v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSasAlarminput1StateChanged,
+        tmnxSasAlarminput2StateChanged,
+        tmnxSasAlarminput3StateChanged,
+        tmnxSasAlarminput4StateChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the the alarm input capabilities
+         on Nokia 7210 Release 2.0."
+    ::= { tmnxSASAlarmInputGroups 2 }
+
+tmnxAlmInpV2v0NotifyObjsGroup    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSasAlarmInputNotifyId,
+        tmnxSasAlarmInputNotifyMessage
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting the the alarm input
+         capabilities on Nokia 7210 Release 2.0."
+    ::= { tmnxSASAlarmInputGroups 3 }
+
+tmnxAlInpV13v0NotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxAlarmInputVoltageFailure
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the alarm input configuration on Nokia
+         7X50 Release 13.0."
+    ::= { tmnxSASAlarmInputGroups 5 }
+
+timetraSASObjs                   OBJECT IDENTIFIER ::= { timetraSASMIB 2 }
+
+tmnxSASChassisObjs               OBJECT IDENTIFIER ::= { timetraSASObjs 6 }
+
+tmnxSASChassisNotification       OBJECT IDENTIFIER ::= { tmnxSASChassisObjs 2 }
+
+tmnxAlarmInputVoltageFailure     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxSasAlarmInputPowerStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxAlarmInputVoltageFailure notification is sent when  the
+         internal power supply for alarm inputs fails. The value of
+         tmnxSasAlarmInputPowerStatus indicates whether the power to external
+         alarm inputs is on or off.
+
+         [EFFECT] If the alarm inputs use the internal power supply, then a
+          failure in the power supply will cause state change event
+          alarms to not be raised.
+
+         [RECOVERY] Check the internal power source for alarm inputs and
+         rectify the problem."
+    ::= { tmnxSASChassisNotification 10 }
+
+tmnxSasAlarmInputObjs            OBJECT IDENTIFIER ::= { timetraSASObjs 9 }
+
+tmnxSasAlarmInputInfoTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSasAlarmInputInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxSasAlarmInputInfoTable contains alarm input
+         configuration.
+
+         This table contains information about alarm inputs driven by external
+         equipment."
+    ::= { tmnxSasAlarmInputObjs 1 }
+
+tmnxSasAlarmInputInfoEntry       OBJECT-TYPE
+    SYNTAX      TmnxSasAlarmInputInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry tmnxSasAlarmInputInfoEntry represents one alarm input
+         contact.
+
+         Rows in this table are created at startup by SROS. Rows in this table
+         are never destroyed."
+    INDEX       { tmnxSasAlarmInputId }
+    ::= { tmnxSasAlarmInputInfoTable 1 }
+
+TmnxSasAlarmInputInfoEntry       ::= SEQUENCE
+{
+    tmnxSasAlarmInputId              Integer32,
+    tmnxSasAlarmInputDescription     TItemLongDescription,
+    tmnxSasAlarmInputAdminState      INTEGER,
+    tmnxSasAlarmInputPolarity        INTEGER,
+    tmnxSasAlarmOutputSeverity       INTEGER,
+    tmnxSasAlarmInputStatus          INTEGER,
+    tmnxSasAlarmInputLastChange      TimeTicks
+}
+
+tmnxSasAlarmInputId              OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputId specifies the alarm contact
+         identifier."
+    ::= { tmnxSasAlarmInputInfoEntry 1 }
+
+tmnxSasAlarmInputDescription     OBJECT-TYPE
+    SYNTAX      TItemLongDescription (SIZE (0..160))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputDescription specifies the description of
+         this alarm input entry."
+    DEFVAL      { "" }
+    ::= { tmnxSasAlarmInputInfoEntry 2 }
+
+tmnxSasAlarmInputAdminState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputAdminState specifies the administrative
+         state of the alarm input.
+
+          Values:
+             up   (1) - Specifies that a given alarm-input is operational.
+             down (2) - Specifies that a given alarm-input is not operational."
+    DEFVAL      { down }
+    ::= { tmnxSasAlarmInputInfoEntry 3 }
+
+tmnxSasAlarmInputPolarity        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        normallyOpen   (1),
+        normallyClosed (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputPolarity specifies the polarity of the
+         alarm input circuit. This value specifies if the state of alram input
+         when it is in normal operation (i.e. when there is no alarm).
+
+         Values:
+             normallyOpen   (1) - Specifies that a given alarm-input is open
+                                   when normal.
+             normallyClosed (2) - Specifies that a given alarm-input is closed
+                                   when normal."
+    DEFVAL      { normallyOpen }
+    ::= { tmnxSasAlarmInputInfoEntry 4 }
+
+tmnxSasAlarmOutputSeverity       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (1),
+        minor    (2),
+        major    (3),
+        critical (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmOutputSeverity specifies the configured
+         output severity of the alarm.
+
+         Values:
+             none     (1) - Specifies that severity of the alarm is none.
+             minor    (2) - Specifies that severity of the alarm is minor.
+             major    (3) - Specifies that severity of the alarm is major.
+             critical (4) - Specifies that severity of the alarm is critical."
+    DEFVAL      { major }
+    ::= { tmnxSasAlarmInputInfoEntry 5 }
+
+tmnxSasAlarmInputStatus          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noAlarm (1),
+        alarm   (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputStatus indicates the current status of
+         the alarm.
+
+         Values:
+             noAlarm  (1) - Indicates that there was no alarm raised.
+             alarm    (2) - Indicates that there was an alarm raised."
+    ::= { tmnxSasAlarmInputInfoEntry 6 }
+
+tmnxSasAlarmInputLastChange      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputLastChange indicates the value of
+         sysUpTime at the time of the last configuration change an object in
+         the specified row."
+    ::= { tmnxSasAlarmInputInfoEntry 7 }
+
+tmnxSasAlarmInputMessageTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSasAlarmInputMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxSasAlarmInputMessageTable contains user defined messages
+         that are configured to be sent out with notifications.
+
+         This table contains information about the messages that have been
+         configured to be sent out in the alarm for each alarm input. This
+         table permits the trigger message and clear message to be defined
+         independently."
+    ::= { tmnxSasAlarmInputObjs 2 }
+
+tmnxSasAlarmInputMessageEntry    OBJECT-TYPE
+    SYNTAX      TmnxSasAlarmInputMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputMessageEntry represents one alarm input
+         contact.
+
+         Rows in the table tmnxSasAlarmInputMessageTable are created at SROS
+         startup and are never destroyed."
+    INDEX       { tmnxSasAlarmInputId }
+    ::= { tmnxSasAlarmInputMessageTable 1 }
+
+TmnxSasAlarmInputMessageEntry    ::= SEQUENCE
+{
+    tmnxSasAlarmInputTriggerMessage  OCTET STRING,
+    tmnxSasAlarmInputClearMessage    OCTET STRING
+}
+
+tmnxSasAlarmInputTriggerMessage  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputTriggerMessage specifies the user
+         defined alarm trigger event description, for a given alarm input, to
+         be sent out to NMS in a SNMP trap when the alarm triggers."
+    DEFVAL      { "" }
+    ::= { tmnxSasAlarmInputMessageEntry 1 }
+
+tmnxSasAlarmInputClearMessage    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputClearMessage specifies the user defined
+         alarm clear event description, for a given alarm input, to be sent out
+         to NMS in a SNMP trap when the alarm clears."
+    DEFVAL      { "" }
+    ::= { tmnxSasAlarmInputMessageEntry 2 }
+
+tmnxSasAlarmInputPowerStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off (0),
+        on  (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value of tmnxSasAlarmInputPowerStatus specifies the configuration
+         to turn the power on or off, to all the external alarm input devices.
+
+         Values:
+             off (0) - Turns off the output power supply to all alarm-inputs.
+             on  (1) - Turns on the output power supply to all alarm-inputs."
+    DEFVAL      { off }
+    ::= { tmnxSasAlarmInputObjs 3 }
+
+tmnxSasAlarmInputNotifyObjs      OBJECT IDENTIFIER ::= { timetraSASObjs 10 }
+
+tmnxSasAlarmInputNotifyId        OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputNotifyId indicates the identifier of
+         alarm input contact associated with the notification."
+    ::= { tmnxSasAlarmInputNotifyObjs 1 }
+
+tmnxSasAlarmInputNotifyMessage   OBJECT-TYPE
+    SYNTAX      TItemLongDescription (SIZE (0..160))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSasAlarmInputNotifyMessage indicates the message to
+         be sent out with the alarm input state changed event.
+         tmnxSasAlarmInputNotifyMessage message is composed using
+         tmnxSasAlarmInputTriggerMessage or tmnxSasAlarmInputTriggerMessage."
+    ::= { tmnxSasAlarmInputNotifyObjs 2 }
+
+timetraSASNotifyPrefix           OBJECT IDENTIFIER ::= { timetraSASMIB 3 }
+
+tmnxSasAlarmInputNotifications   OBJECT IDENTIFIER ::= { timetraSASNotifyPrefix 10 }
+
+tmnxSasAlarminput1StateChanged   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSasAlarmInputNotifyId,
+        tmnxSasAlarmInputDescription,
+        tmnxSasAlarmInputStatus,
+        tmnxSasAlarmOutputSeverity,
+        tmnxSasAlarmInputNotifyMessage,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxSasAlarminput1StateChanged notification is sent when
+         status of the alarm input on pin one(1) changes.
+
+
+         When this notification is sent, the field
+         tmnxSasAlarmInputNotifyMessage is populated with either the
+         tmnxSasAlarmInputTriggerMessage when the alarm is raised, or the
+         tmnxSasAlarmInputClearMessage when the alarm is cleared.
+
+         The trigger or clear actions depend on the polarity of the input as
+         defined in tmnxSasAlarmInputPolarity.
+
+         [EFFECT] A desirable or undesirable event has occurred in the external
+         equipment connected to the alarm input. Hence the characteristics of
+         effect and the associated risks vary depending on the nature of the
+         external equipment being monitored over the alarm input.
+
+         [RECOVERY] Check the external equipment, connected to the alarm input
+         pin one(1), that resulted in this alarm and rectify the problem."
+    ::= { tmnxSasAlarmInputNotifications 1 }
+
+tmnxSasAlarminput2StateChanged   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSasAlarmInputNotifyId,
+        tmnxSasAlarmInputDescription,
+        tmnxSasAlarmInputStatus,
+        tmnxSasAlarmOutputSeverity,
+        tmnxSasAlarmInputNotifyMessage,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxSasAlarminput2StateChanged notification is sent when
+         status of the alarm input on pin two(2) changes.
+
+         When this notification is sent, the field
+         tmnxSasAlarmInputNotifyMessage is populated with either the
+         tmnxSasAlarmInputTriggerMessage when the alarm is raised, or the
+         tmnxSasAlarmInputClearMessage when the alarm is cleared.
+
+         The trigger or clear actions depend on the polarity of the input as
+         defined in tmnxSasAlarmInputPolarity.
+
+         [EFFECT] A desirable or undesirable event has occurred in the external
+         equipment connected to the alarm input. Hence the characteristics of
+         effect and the associated risks vary depending on the nature of the
+         external equipment being monitored over the alarm input.
+
+         [RECOVERY] Check the external equipment, connected to the alarm input
+         pin two(2), that resulted in this alarm and rectify the problem."
+    ::= { tmnxSasAlarmInputNotifications 2 }
+
+tmnxSasAlarminput3StateChanged   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSasAlarmInputNotifyId,
+        tmnxSasAlarmInputDescription,
+        tmnxSasAlarmInputStatus,
+        tmnxSasAlarmOutputSeverity,
+        tmnxSasAlarmInputNotifyMessage,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxSasAlarminput3StateChanged notification is sent when
+         status of the alarm input on pin three(3) changes.
+
+         When this notification is sent, the field
+         tmnxSasAlarmInputNotifyMessage is populated with either the
+         tmnxSasAlarmInputTriggerMessage when the alarm is raised, or the
+         tmnxSasAlarmInputClearMessage when the alarm is cleared.
+
+         The trigger or clear actions depend on the polarity of the input as
+         defined in tmnxSasAlarmInputPolarity.
+
+         [EFFECT] A desirable or undesirable event has occurred in the external
+         equipment connected to the alarm input. Hence the characteristics of
+         effect and the associated risks vary depending on the nature of the
+         external equipment being monitored over the alarm input.
+
+         [RECOVERY] Check the external equipment, connected to the alarm input
+         pin three(3), that resulted in this alarm and rectify the problem."
+    ::= { tmnxSasAlarmInputNotifications 3 }
+
+tmnxSasAlarminput4StateChanged   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSasAlarmInputNotifyId,
+        tmnxSasAlarmInputDescription,
+        tmnxSasAlarmInputStatus,
+        tmnxSasAlarmOutputSeverity,
+        tmnxSasAlarmInputNotifyMessage,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxSasAlarminput4StateChanged notification is sent when
+         status of the alarm input on pin four(4) changes.
+
+         When this notification is sent, the field
+         tmnxSasAlarmInputNotifyMessage is populated with either the
+         tmnxSasAlarmInputTriggerMessage when the alarm is raised, or the
+         tmnxSasAlarmInputClearMessage when the alarm is cleared.
+
+         The trigger or clear actions depend on the polarity of the input as
+         defined in tmnxSasAlarmInputPolarity.
+
+         [EFFECT] A desirable or undesirable event has occurred in the external
+         equipment connected to the alarm input. Hence the characteristics of
+         effect and the associated risks vary depending on the nature of the
+         external equipment being monitored over the alarm input.
+
+         [RECOVERY] Check the external equipment, connected to the alarm input
+         pin four(4), that resulted in this alarm and rectify the problem."
+    ::= { tmnxSasAlarmInputNotifications 4 }
+
+END

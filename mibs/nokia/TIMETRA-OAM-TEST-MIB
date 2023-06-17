@@ -70,10 +70,10 @@ timetraOamTestMIBModule          MODULE-IDENTITY
          Web: http://www.nokia.com"
     DESCRIPTION
         "This document is the SNMP MIB module to manage and provision most
-         Nokia SROS OAM tests and all Nokia SROS Service Assurance Agent (SAA)
-         tests.
+         Nokia SROS OAM tests, all Nokia SROS Service Assurance Agent (SAA)
+         tests, and related functionality.
 
-         Copyright 2003-2018 Nokia.  All rights reserved.
+         Copyright 2003-2022 Nokia.  All rights reserved.
          Reproduction of this document is authorized on the condition that
          the foregoing copyright notice is included.
 
@@ -234,6 +234,28 @@ TmnxOamBuildPktHeaderType        ::= TEXTUAL-CONVENTION
         udp          (14)
     }
 
+TmnxOamIcmpOrigDatagramHdrType   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value of type TmnxOamIcmpOrigDatagramHdrType indicates the type of a
+         header within an Original Datagram field within an ICMP response.
+
+         Values:
+            ipV6Header(1)
+                An IPv6 header (RFC 8200).
+            segmentRoutingHeader(2)
+                A Segment Routing Header (SRH; RFC 8754).
+                RFC 8754 defines an SRH as IPv6 only."
+    REFERENCE
+        "RFC 8200, 'Internet Protocol, Version 6 (IPv6) Specification', Section 3,
+         'IPv6 Header Format'.
+         RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    SYNTAX      INTEGER {
+        ipV6Header           (1),
+        segmentRoutingHeader (2)
+    }
+
 TmnxOamLspAssocChannel           ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -265,40 +287,105 @@ TmnxOamLspAssocChannel           ::= TEXTUAL-CONVENTION
         ipv4          (4)
     }
 
-TmnxOamLspTestSubMode            ::= TEXTUAL-CONVENTION
+TmnxOamLspPingTestSubMode        ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "A value of type TmnxOamLspTestSubMode specifies the type of LSP ping
-         or LSP trace route test to perform.
+        "A value of type TmnxOamLspPingTestSubMode specifies the sub-type of
+         the LSP ping test.
 
          LSP test types:
+             unspecified(1)
+                 The test's sub-type is not configured.
+                 Deprecated usage:   LDP and RSVP-TE lsp-ping tests use
+                 unspecified(1) under some circumstances, for backward compatibility.
+                 ldp(9) and rsvpTe(10) are the preferred code points.
              static(2)
-                 Perform an LSP ping or LSP trace route test using the RFC 6426
-                 'Target FEC Stack' code point 'Static LSP'.
+                 Deprecated.
+                 Perform an LSP ping test using the RFC 6426 'Target FEC Stack'
+                 code point 'Static LSP'.
              bgpLabeledPrefix(3)
-                 Perform an LSP ping or LSP trace route test using the RFC 4379
+                 Perform an LSP ping test using the RFC 4379
                  'Target FEC Stack' code point 'BGP labeled IPv4 prefix'.  In
                  future, 'bgpLabeledPrefix(3)' will also be used for the RFC
                  4379 'Target FEC Stack' code point 'BGP labeled IPv6 prefix'.
              srIsis(4)
-                 Perform an LSP ping or LSP trace route test in the Segment
-                 Routing (SR) case, where the Interior Gateway Protocol (IGP)
-                 is Intermediate System to Intermediate System (IS-IS).
+                 Perform an LSP ping test in the Segment Routing (SR) case,
+                 where the Interior Gateway Protocol (IGP) is Intermediate
+                 System to Intermediate System (IS-IS).
              srOspf(5)
-                 Perform an LSP ping or LSP trace route test in the Segment
-                 Routing (SR) case, where the Interior Gateway Protocol (IGP)
-                 is Open Shortest Path First (OSPF).
+                 Perform an LSP ping test in the Segment Routing (SR) case,
+                 where the Interior Gateway Protocol (IGP) is Open Shortest
+                 Path First (OSPF).
              srTe(6)
-                 Perform an LSP ping or LSP trace route test in the Segment
-                 Routing Traffic Engineering (SR-TE) case.
+                 Perform an LSP ping test in the Segment Routing Traffic
+                 Engineering (SR-TE) case.
              srPolicy(7)
-                 Perform an LSP ping or LSP trace route test using a Segment
-                 Routing policy.
+                 Perform an LSP ping test using a Segment Routing policy.
              srOspf3(8)
-                 Perform an LSP ping or LSP trace route test in the SR case,
-                 where the IGP is OSPFv3.
+                 Perform an LSP ping test in the SR case, where the IGP is
+                 OSPFv3.
+             ldp(9)
+                 Perform an LSP ping test using the RFC 4379 'Target FEC Stack'
+                 code point 'LDP IPv4 prefix'.
+             rsvpTe(10)
+                 Perform an LSP ping test using the RFC 4379 'Target FEC Stack'
+                 code point 'RSVP IPv4 LSP'."
+    REFERENCE
+        "IETF draft-ietf-mpls-spring-lsp-ping-00, 'Label Switched Path (LSP)
+         Ping/Trace for Segment Routing Networks Using MPLS Dataplane'.
+         RFC 4379, 'Detecting Multi-Protocol Label Switched (MPLS) Data Plane
+         Failures', Section 3.2 ('Target FEC Stack').
+         RFC 6426, 'MPLS On-Demand Connectivity Verification and Route Tracing',
+         Section 2.3.1 ('Static LSP Sub-TLV').
+         IETF draft-ietf-spring-segment-routing-policy-03, 'Segment Routing
+         Policy Architecture', Section 2.1, 'Identification of an SR Policy'."
+    SYNTAX      INTEGER {
+        unspecified      (1),
+        static           (2),
+        bgpLabeledPrefix (3),
+        srIsis           (4),
+        srOspf           (5),
+        srTe             (6),
+        srPolicy         (7),
+        srOspf3          (8),
+        ldp              (9),
+        rsvpTe           (10)
+    }
+
+TmnxOamLspTrTestSubMode          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value of type TmnxOamLspTrTestSubMode specifies the type of LSP
+         trace route test to perform.
+
+         LSP test types:
+             static(2)
+                 Deprecated.
+                 Perform an LSP trace route test using the RFC 6426 'Target FEC
+                 Stack' code point 'Static LSP'.
+             bgpLabeledPrefix(3)
+                 Perform an LSP trace route test using the RFC 4379
+                 'Target FEC Stack' code point 'BGP labeled IPv4 prefix'.  In
+                 future, 'bgpLabeledPrefix(3)' will also be used for the RFC
+                 4379 'Target FEC Stack' code point 'BGP labeled IPv6 prefix'.
+             srIsis(4)
+                 Perform an LSP trace route test in the Segment Routing (SR)
+                 case, where the Interior Gateway Protocol (IGP) is
+                 Intermediate System to Intermediate System (IS-IS).
+             srOspf(5)
+                 Perform an LSP trace route test in the Segment Routing (SR)
+                 case, where the Interior Gateway Protocol (IGP) is Open
+                 Shortest Path First (OSPF).
+             srTe(6)
+                 Perform an LSP trace route test in the Segment Routing Traffic
+                 Engineering (SR-TE) case.
+             srPolicy(7)
+                 Perform an LSP trace route test using a Segment Routing policy.
+             srOspf3(8)
+                 Perform an LSP trace route test in the SR case, where the IGP
+                 is OSPFv3.
              unspecified(1)
-                 Perform any other supported type of LSP ping or trace route
+                 Perform any other supported type of LSP trace route
                  test.  Examples:  an LSP ping or trace route test using the RFC
                  4379 'Target FEC Stack' code point 'LDP IPv4 prefix'; an LSP
                  ping or trace route test using the RFC 4379 'Target FEC Stack'
@@ -837,7 +924,12 @@ TmnxOamResponseStatus            ::= TEXTUAL-CONVENTION
          invalidRouterInstance(193) - a probe cannot be sent because the
             test's router-instance is invalid.
          mtrace2OperDown(194) - An mtrace2 probe cannot be sent because
-            mtrace2 is operationally down at the system level."
+            mtrace2 is operationally down at the system level.
+         invalidIgpInstance(195) - The OAM test cannot be performed because the
+            IGP instance is not valid for the protocol.
+         p2mpLspPingRsvpLspTypeNoSupport(196) - P2MP LSP Ping not supported on
+            RSVP LSPs of type 'p2mp-lsp'.
+         greOverIpv6NoSupport(197) - The OAM test does not support GRE over IPv6"
     SYNTAX      INTEGER {
         responseReceived                 (1),
         unknown                          (2),
@@ -1032,7 +1124,10 @@ TmnxOamResponseStatus            ::= TEXTUAL-CONVENTION
         srcAddrTypeMismatch              (191),
         nhAddrTypeMismatch               (192),
         invalidRouterInstance            (193),
-        mtrace2OperDown                  (194)
+        mtrace2OperDown                  (194),
+        invalidIgpInstance               (195),
+        p2mpLspPingRsvpLspTypeNoSupport  (196),
+        greOverIpv6NoSupport             (197)
     }
 
 TmnxOamSignalProtocol            ::= TEXTUAL-CONVENTION
@@ -1349,7 +1444,8 @@ TmnxOamPingCtlEntry              ::= SEQUENCE
     tmnxOamPingCtlDNSRecord          INTEGER,
     tmnxOamPingCtlIntervalUnits      INTEGER,
     tmnxOamPingCtlSubscriberName     TLNamedItemOrEmpty,
-    tmnxOamPingCtlRouterInstanceName TLNamedItemOrEmpty
+    tmnxOamPingCtlRouterInstanceName TLNamedItemOrEmpty,
+    tmnxOamPingCtlNewestRunIndex     Unsigned32
 }
 
 tmnxOamPingCtlOwnerIndex         OBJECT-TYPE
@@ -2460,6 +2556,16 @@ tmnxOamPingCtlRouterInstanceName OBJECT-TYPE
     DEFVAL      { ''H }
     ::= { tmnxOamPingCtlEntry 42 }
 
+tmnxOamPingCtlNewestRunIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamPingCtlNewestRunIndex indicates the most recent
+         run of this test in tmnxOamPingResultsTable via its index,
+         tmnxOamPingResultsTestRunIndex."
+    ::= { tmnxOamPingCtlEntry 44 }
+
 tmnxOamPingResultsTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxOamPingResultsEntry
     MAX-ACCESS  not-accessible
@@ -3484,7 +3590,7 @@ TmnxOamMacPingCtlEntry           ::= SEQUENCE
 
 tmnxOamMacPingCtlTargetMacAddr   OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlTargetMacAddr is a 6-octet value that
@@ -3499,7 +3605,7 @@ tmnxOamMacPingCtlTargetMacAddr   OBJECT-TYPE
 
 tmnxOamMacPingCtlSourceMacAddr   OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlSourceMacAddr is a 6-octet value
@@ -3514,7 +3620,7 @@ tmnxOamMacPingCtlSourceMacAddr   OBJECT-TYPE
 
 tmnxOamMacPingCtlSendControl     OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlSendControl specifies whether the
@@ -3532,7 +3638,7 @@ tmnxOamMacPingCtlSendControl     OBJECT-TYPE
 
 tmnxOamMacPingCtlReplyControl    OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamMacPingCtlReplyControl is 'true', the OAM
@@ -3546,7 +3652,7 @@ tmnxOamMacPingCtlReplyControl    OBJECT-TYPE
 tmnxOamMacPingCtlTtl             OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
     UNITS       "time-to-live value"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "Specifies the vc-label time-to-live value.
@@ -3561,7 +3667,7 @@ tmnxOamMacPingCtlTtl             OBJECT-TYPE
 
 tmnxOamMacPingCtlRegister        OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamMacPingCtlRegister is 'true', the OAM ping
@@ -3578,7 +3684,7 @@ tmnxOamMacPingCtlRegister        OBJECT-TYPE
 
 tmnxOamMacPingCtlFlood           OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamMacPingCtlFlood is 'true', the OAM ping
@@ -3594,7 +3700,7 @@ tmnxOamMacPingCtlFlood           OBJECT-TYPE
 
 tmnxOamMacPingCtlForce           OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlForce specifies whether or not to add an
@@ -3617,7 +3723,7 @@ tmnxOamMacPingCtlForce           OBJECT-TYPE
 tmnxOamMacPingCtlAge             OBJECT-TYPE
     SYNTAX      Unsigned32 (1..65535)
     UNITS       "seconds"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlAge specifies the number of seconds to
@@ -3630,7 +3736,7 @@ tmnxOamMacPingCtlAge             OBJECT-TYPE
 
 tmnxOamMacPingCtlSapPortId       OBJECT-TYPE
     SYNTAX      TmnxPortID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlSapPortId is the ID of the access port
@@ -3643,7 +3749,7 @@ tmnxOamMacPingCtlSapPortId       OBJECT-TYPE
 
 tmnxOamMacPingCtlSapEncapValue   OBJECT-TYPE
     SYNTAX      TmnxEncapVal
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacPingCtlSapEncapValue is the label used to
@@ -3657,7 +3763,7 @@ tmnxOamMacPingCtlSapEncapValue   OBJECT-TYPE
 
 tmnxOamMacPingCtlFibEntryName    OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 11.0 R1."
@@ -4031,21 +4137,23 @@ tmnxOamLspPingCtlTable           OBJECT-TYPE
          ping test.  The rest of the configuration information needed to launch
          the test resides in the corresponding row of tmnxOamPingCtlTable.
 
-         Seven types of LSP ping tests are supported.  An abbreviated name for
+         Nine types of LSP ping tests are supported.  An abbreviated name for
          each test type is defined in the following table (for use in a
          subsequent table).  The test type's tmnxOamLspPingCtlTestSubMode code
          point is shown as well.
 
-         Test Sub Mode           Abbreviated Test Type Name(s)
-         ---------------------   -------------------------------
-         'unspecified     (1)'   LDP, RSVP
-         'static          (2)'   TPST (Transport Profile Static)
-         'bgpLabeledPrefix(3)'   BGP
-         'srIsis          (4)'   ISIS
-         'srOspf          (5)'   OSPF
-         'srTe            (6)'   SRTE
-         'srPolicy        (7)'   SRPL
-         'srOspf3         (8)'   OSP3
+         Test Sub Mode            Abbreviated Test Type Name(s)
+         ----------------------   -------------------------------
+         'unspecified     ( 1)'   LDP, RSVP (deprecated)
+         'static          ( 2)'   TPST (Transport Profile Static)
+         'bgpLabeledPrefix( 3)'   BGP
+         'srIsis          ( 4)'   ISIS
+         'srOspf          ( 5)'   OSPF
+         'srTe            ( 6)'   SRTE
+         'srPolicy        ( 7)'   SRPL
+         'srOspf3         ( 8)'   OSP3
+         'ldp             ( 9)'   LDP   (preferred over 'unspecified(1)')
+         'rsvpTe          (10)'   RSVP  (preferred over 'unspecified(1)')
 
          The following table has a row for each LSP ping test type, showing the
          mandatory and optional objects applicable to the test type.
@@ -4065,11 +4173,10 @@ tmnxOamLspPingCtlTable           OBJECT-TYPE
               tmnxOamLspPingCtlTestSubMode      tmnxOamLspPingCtlNhIntfName
                                                #tmnxOamLspPingCtlPathDestType
                                                #tmnxOamLspPingCtlPathDest
-
          LDP  tmnxOamLspPingCtlLdpPrefixType   *tmnxOamLspPingCtlNhAddressType
               tmnxOamLspPingCtlLdpPrefix       *tmnxOamLspPingCtlNhAddress
               tmnxOamLspPingCtlLdpPrefixLen     tmnxOamLspPingCtlNhIntfName
-                                               #tmnxOamLspPingCtlPathDestType
+              tmnxOamLspPingCtlTestSubMode     #tmnxOamLspPingCtlPathDestType
                                                #tmnxOamLspPingCtlPathDest
 
          OSPF tmnxOamLspPingCtlLdpPrefixType    tmnxOamLspPingCtlIgpInstance
@@ -4087,11 +4194,14 @@ tmnxOamLspPingCtlTable           OBJECT-TYPE
                                                #tmnxOamLspPingCtlPathDest
 
          RSVP tmnxOamLspPingCtlLspName          tmnxOamLspPingCtlPathName
+              tmnxOamLspPingCtlTestSubMode
 
          SRPL tmnxOamLspPingCtlSrPlcyColor      tmnxOamLspPingCtlSrPlcySegList
-              tmnxOamLspPingCtlSrPlcyEndPtAddr
-              tmnxOamLspPingCtlSrPlcyEndPtAddT
-              tmnxOamLspPingCtlTestSubMode
+              tmnxOamLspPingCtlSrPlcyEndPtAddr *tmnxOamLspPingCtlNhAddressType
+              tmnxOamLspPingCtlSrPlcyEndPtAddT *tmnxOamLspPingCtlNhAddress
+              tmnxOamLspPingCtlTestSubMode      tmnxOamLspPingCtlNhIntfName
+                                               #tmnxOamLspPingCtlPathDestType
+                                               #tmnxOamLspPingCtlPathDest
 
          SRTE tmnxOamLspPingCtlLspName         *tmnxOamLspPingCtlNhAddressType
               tmnxOamLspPingCtlTestSubMode     *tmnxOamLspPingCtlNhAddress
@@ -4180,7 +4290,7 @@ TmnxOamLspPingCtlEntry           ::= SEQUENCE
     tmnxOamLspPingCtlNhIntfName      TNamedItemOrEmpty,
     tmnxOamLspPingCtlNhAddressType   InetAddressType,
     tmnxOamLspPingCtlNhAddress       InetAddress,
-    tmnxOamLspPingCtlTestSubMode     TmnxOamLspTestSubMode,
+    tmnxOamLspPingCtlTestSubMode     TmnxOamLspPingTestSubMode,
     tmnxOamLspPingCtlMplsTpPathType  TmnxOamMplsTpPathType,
     tmnxOamLspPingCtlMplsTpGlobalId  TmnxMplsTpGlobalID,
     tmnxOamLspPingCtlMplsTpNodeId    TmnxMplsTpNodeID,
@@ -4195,7 +4305,7 @@ TmnxOamLspPingCtlEntry           ::= SEQUENCE
 
 tmnxOamLspPingCtlVRtrID          OBJECT-TYPE
     SYNTAX      TmnxVRtrID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 6.0R15 and replaced
@@ -4205,7 +4315,7 @@ tmnxOamLspPingCtlVRtrID          OBJECT-TYPE
 
 tmnxOamLspPingCtlLspName         OBJECT-TYPE
     SYNTAX      TLNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlLspName specifies the name of the LSP
@@ -4227,7 +4337,7 @@ tmnxOamLspPingCtlLspName         OBJECT-TYPE
 
 tmnxOamLspPingCtlReturnLsp       OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 4.0."
@@ -4237,7 +4347,7 @@ tmnxOamLspPingCtlReturnLsp       OBJECT-TYPE
 tmnxOamLspPingCtlTtl             OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
     UNITS       "time-to-live value"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlTtl specifies the outermost label time-
@@ -4250,7 +4360,7 @@ tmnxOamLspPingCtlTtl             OBJECT-TYPE
 
 tmnxOamLspPingCtlPathName        OBJECT-TYPE
     SYNTAX      TLNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlPathName specifies the name of the Path
@@ -4267,7 +4377,7 @@ tmnxOamLspPingCtlPathName        OBJECT-TYPE
 
 tmnxOamLspPingCtlLdpIpPrefix     OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 4.0 and replaced with
@@ -4278,7 +4388,7 @@ tmnxOamLspPingCtlLdpIpPrefix     OBJECT-TYPE
 
 tmnxOamLspPingCtlLdpIpPrefixLen  OBJECT-TYPE
     SYNTAX      IpAddressPrefixLength
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 4.0 and replaced with
@@ -4288,7 +4398,7 @@ tmnxOamLspPingCtlLdpIpPrefixLen  OBJECT-TYPE
 
 tmnxOamLspPingCtlLdpPrefixType   OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlLdpPrefixType specifies the type of
@@ -4301,7 +4411,7 @@ tmnxOamLspPingCtlLdpPrefixType   OBJECT-TYPE
 
 tmnxOamLspPingCtlLdpPrefix       OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlLdpPrefix, along with
@@ -4316,7 +4426,7 @@ tmnxOamLspPingCtlLdpPrefix       OBJECT-TYPE
 tmnxOamLspPingCtlLdpPrefixLen    OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
     UNITS       "bits"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlLdpPrefixLen specifies the Internet
@@ -4329,7 +4439,7 @@ tmnxOamLspPingCtlLdpPrefixLen    OBJECT-TYPE
 
 tmnxOamLspPingCtlPathDestType    OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlPathDestType specifies the type of
@@ -4342,7 +4452,7 @@ tmnxOamLspPingCtlPathDestType    OBJECT-TYPE
 
 tmnxOamLspPingCtlPathDest        OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlPathDest specifies a unique path for
@@ -4357,7 +4467,7 @@ tmnxOamLspPingCtlPathDest        OBJECT-TYPE
 
 tmnxOamLspPingCtlNhIntfName      OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlNhIntfName specifies the name of the
@@ -4377,7 +4487,7 @@ tmnxOamLspPingCtlNhIntfName      OBJECT-TYPE
 
 tmnxOamLspPingCtlNhAddressType   OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlNhAddressType specifies the type of
@@ -4390,7 +4500,7 @@ tmnxOamLspPingCtlNhAddressType   OBJECT-TYPE
 
 tmnxOamLspPingCtlNhAddress       OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlNhAddress specifies the interface
@@ -4402,8 +4512,8 @@ tmnxOamLspPingCtlNhAddress       OBJECT-TYPE
     ::= { tmnxOamLspPingCtlEntry 15 }
 
 tmnxOamLspPingCtlTestSubMode     OBJECT-TYPE
-    SYNTAX      TmnxOamLspTestSubMode
-    MAX-ACCESS  read-create
+    SYNTAX      TmnxOamLspPingTestSubMode
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlTestSubMode specifies the type of LSP
@@ -4427,7 +4537,7 @@ tmnxOamLspPingCtlTestSubMode     OBJECT-TYPE
 
 tmnxOamLspPingCtlMplsTpPathType  OBJECT-TYPE
     SYNTAX      TmnxOamMplsTpPathType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlMplsTpPathType specifies the type of the
@@ -4440,7 +4550,7 @@ tmnxOamLspPingCtlMplsTpPathType  OBJECT-TYPE
 
 tmnxOamLspPingCtlMplsTpGlobalId  OBJECT-TYPE
     SYNTAX      TmnxMplsTpGlobalID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlMplsTpGlobalId specifies the target
@@ -4453,7 +4563,7 @@ tmnxOamLspPingCtlMplsTpGlobalId  OBJECT-TYPE
 
 tmnxOamLspPingCtlMplsTpNodeId    OBJECT-TYPE
     SYNTAX      TmnxMplsTpNodeID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlMplsTpNodeId specifies the target
@@ -4468,7 +4578,7 @@ tmnxOamLspPingCtlMplsTpNodeId    OBJECT-TYPE
 
 tmnxOamLspPingCtlAssocChannel    OBJECT-TYPE
     SYNTAX      TmnxOamLspAssocChannel
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlAssocChannel specifies the launched echo
@@ -4485,7 +4595,7 @@ tmnxOamLspPingCtlAssocChannel    OBJECT-TYPE
 
 tmnxOamLspPingCtlForce           OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlForce specifies whether or not to force
@@ -4506,7 +4616,7 @@ tmnxOamLspPingCtlForce           OBJECT-TYPE
 
 tmnxOamLspPingCtlIgpInstance     OBJECT-TYPE
     SYNTAX      TmnxIgpInstance
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlIgpInstance specifies the Interior
@@ -4519,7 +4629,7 @@ tmnxOamLspPingCtlIgpInstance     OBJECT-TYPE
 
 tmnxOamLspPingCtlSrPlcyColor     OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlSrPlcyColor specifies the Segment Routing
@@ -4548,7 +4658,7 @@ tmnxOamLspPingCtlSrPlcyColor     OBJECT-TYPE
 
 tmnxOamLspPingCtlSrPlcyEndPtAddT OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlSrPlcyEndPtAddT specifies the type of IP
@@ -4561,7 +4671,7 @@ tmnxOamLspPingCtlSrPlcyEndPtAddT OBJECT-TYPE
 
 tmnxOamLspPingCtlSrPlcyEndPtAddr OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlSrPlcyEndPtAddr specifies the Segment
@@ -4591,7 +4701,7 @@ tmnxOamLspPingCtlSrPlcyEndPtAddr OBJECT-TYPE
 
 tmnxOamLspPingCtlSrPlcySegList   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..32)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspPingCtlSrPlcySegList specifies the Segment
@@ -4643,7 +4753,7 @@ TmnxOamVprnPingCtlEntry          ::= SEQUENCE
 
 tmnxOamVprnPingCtlSourceIpAddr   OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 4.0 and replaced with
@@ -4654,7 +4764,7 @@ tmnxOamVprnPingCtlSourceIpAddr   OBJECT-TYPE
 
 tmnxOamVprnPingCtlReplyControl   OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamVprnPingCtlReplyControl is 'true', the
@@ -4669,7 +4779,7 @@ tmnxOamVprnPingCtlReplyControl   OBJECT-TYPE
 tmnxOamVprnPingCtlTtl            OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
     UNITS       "time-to-live value"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "Specifies the vc-label time-to-live value.
@@ -4684,7 +4794,7 @@ tmnxOamVprnPingCtlTtl            OBJECT-TYPE
 
 tmnxOamVprnPingCtlSrcAddrType    OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVprnPingCtlSrcAddrType specifies the Internet
@@ -4694,7 +4804,7 @@ tmnxOamVprnPingCtlSrcAddrType    OBJECT-TYPE
 
 tmnxOamVprnPingCtlSrcAddress     OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVprnPingCtlSrcAddress specifies the Internet
@@ -4708,16 +4818,17 @@ tmnxOamVprnPingCtlSrcAddress     OBJECT-TYPE
 tmnxOamAtmPingCtlTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxOamAtmPingCtlEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
-        "tmnxOamAtmPingCtlTable contains configuration information for
+        "This object was marked obsolete in SROS Release 23.3.
+         tmnxOamAtmPingCtlTable contains configuration information for
          'atmPing' tests."
     ::= { tmnxOamPingObjs 11 }
 
 tmnxOamAtmPingCtlEntry           OBJECT-TYPE
     SYNTAX      TmnxOamAtmPingCtlEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "tmnxOamAtmPingCtlEntry contains configuration information for one
          'atmPing' test.
@@ -4744,7 +4855,7 @@ TmnxOamAtmPingCtlEntry           ::= SEQUENCE
 tmnxOamAtmPingCtlPortId          OBJECT-TYPE
     SYNTAX      TmnxPortID
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamAtmPingCtlPortId is the ID of the access port of
          the target VC. This parameter is required."
@@ -4754,7 +4865,7 @@ tmnxOamAtmPingCtlPortId          OBJECT-TYPE
 tmnxOamAtmPingCtlVpi             OBJECT-TYPE
     SYNTAX      AtmVpIdentifier
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamAtmPingCtlVpi is the VPI of the VC used to
          send the OAM ATM ping.  This is a required parameter."
@@ -4764,7 +4875,7 @@ tmnxOamAtmPingCtlVpi             OBJECT-TYPE
 tmnxOamAtmPingCtlVci             OBJECT-TYPE
     SYNTAX      AtmVcIdentifier
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamAtmPingCtlVci is the VCI of the VC used to
          send the OAM ATM ping.  This is a required parameter."
@@ -4774,7 +4885,7 @@ tmnxOamAtmPingCtlVci             OBJECT-TYPE
 tmnxOamAtmPingCtlLpbkLocation    OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (16))
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamAtmPingCtlLpbkLocation specifies the Loopback
          Location ID used in the ATM OAM loopback cell.  If all bits in the
@@ -4792,7 +4903,7 @@ tmnxOamAtmPingCtlSegment         OBJECT-TYPE
         segment  (2)
     }
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamAtmPingCtlSegment determines if the ATM OAM
          loopback cell is destined to the first segment going in the line
@@ -5515,7 +5626,7 @@ TmnxOamVccvPingCtlEntry          ::= SEQUENCE
 
 tmnxOamVccvPingCtlSdpIdVcId      OBJECT-TYPE
     SYNTAX      SdpBindId
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSdpIdVcId specifies the SDP binding of
@@ -5533,7 +5644,7 @@ tmnxOamVccvPingCtlReplyMode      OBJECT-TYPE
         ip             (2),
         controlChannel (4)
     }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlReplyMode specifies the band to be used
@@ -5551,7 +5662,7 @@ tmnxOamVccvPingCtlReplyMode      OBJECT-TYPE
 
 tmnxOamVccvPingCtlPwId           OBJECT-TYPE
     SYNTAX      TmnxVcIdOrNone
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlPwId specifies the pseudowire
@@ -5569,7 +5680,7 @@ tmnxOamVccvPingCtlPwId           OBJECT-TYPE
 tmnxOamVccvPingCtlTtl            OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
     UNITS       "time-to-live value"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlTtl specifies the time-to-live value for
@@ -5583,7 +5694,7 @@ tmnxOamVccvPingCtlTtl            OBJECT-TYPE
 
 tmnxOamVccvPingCtlSpokeSdpId     OBJECT-TYPE
     SYNTAX      TmnxSpokeSdpIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSpokeSdpId specifies the spoke SDP
@@ -5600,7 +5711,7 @@ tmnxOamVccvPingCtlSpokeSdpId     OBJECT-TYPE
 
 tmnxOamVccvPingCtlSaiiGlobalId   OBJECT-TYPE
     SYNTAX      TmnxPwGlobalIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSaiiGlobalId specifies the global
@@ -5620,7 +5731,7 @@ tmnxOamVccvPingCtlSaiiGlobalId   OBJECT-TYPE
 
 tmnxOamVccvPingCtlSaiiPrefix     OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSaiiPrefix specifies the prefix of the
@@ -5639,7 +5750,7 @@ tmnxOamVccvPingCtlSaiiPrefix     OBJECT-TYPE
 
 tmnxOamVccvPingCtlSaiiAcId       OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSaiiAcId specifies the attachment
@@ -5659,7 +5770,7 @@ tmnxOamVccvPingCtlSaiiAcId       OBJECT-TYPE
 
 tmnxOamVccvPingCtlTaiiGlobalId   OBJECT-TYPE
     SYNTAX      TmnxPwGlobalIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlTaiiGlobalId specifies the global
@@ -5679,7 +5790,7 @@ tmnxOamVccvPingCtlTaiiGlobalId   OBJECT-TYPE
 
 tmnxOamVccvPingCtlTaiiPrefix     OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlTaiiPrefix specifies the prefix of the
@@ -5698,7 +5809,7 @@ tmnxOamVccvPingCtlTaiiPrefix     OBJECT-TYPE
 
 tmnxOamVccvPingCtlTaiiAcId       OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlTaiiAcId specifies the attachment
@@ -5718,7 +5829,7 @@ tmnxOamVccvPingCtlTaiiAcId       OBJECT-TYPE
 
 tmnxOamVccvPingCtlMplsTpGlobalId OBJECT-TYPE
     SYNTAX      TmnxMplsTpGlobalID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlMplsTpGlobalId specifies the target
@@ -5731,7 +5842,7 @@ tmnxOamVccvPingCtlMplsTpGlobalId OBJECT-TYPE
 
 tmnxOamVccvPingCtlMplsTpNodeId   OBJECT-TYPE
     SYNTAX      TmnxMplsTpNodeID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlMplsTpNodeId specifies the target
@@ -5746,7 +5857,7 @@ tmnxOamVccvPingCtlMplsTpNodeId   OBJECT-TYPE
 
 tmnxOamVccvPingCtlTestSubMode    OBJECT-TYPE
     SYNTAX      TmnxOamVccvTestSubMode
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlTestSubMode specifies the type of VCCV
@@ -5769,7 +5880,7 @@ tmnxOamVccvPingCtlTestSubMode    OBJECT-TYPE
 
 tmnxOamVccvPingCtlAssocChannel   OBJECT-TYPE
     SYNTAX      TmnxOamVccvAssocChannel
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlAssocChannel specifies the launched
@@ -5786,7 +5897,7 @@ tmnxOamVccvPingCtlAssocChannel   OBJECT-TYPE
 
 tmnxOamVccvPingCtlSwitTgtFecType OBJECT-TYPE
     SYNTAX      TmnxOamVccvSwitTgtFecType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvPingCtlSwitTgtFecType specifies the type of
@@ -5847,7 +5958,7 @@ TmnxOamIcmpPingCtlEntry          ::= SEQUENCE
 
 tmnxOamIcmpPingCtlRapid          OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlRapid specifies whether or not to send
@@ -5870,7 +5981,7 @@ tmnxOamIcmpPingCtlRapid          OBJECT-TYPE
 
 tmnxOamIcmpPingCtlTtl            OBJECT-TYPE
     SYNTAX      Unsigned32 (1..128)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlTtl specifies the initial time-to-live
@@ -5880,7 +5991,7 @@ tmnxOamIcmpPingCtlTtl            OBJECT-TYPE
 
 tmnxOamIcmpPingCtlDSField        OBJECT-TYPE
     SYNTAX      Unsigned32 (0..255)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlDSField specifies the value to load in
@@ -5905,7 +6016,7 @@ tmnxOamIcmpPingCtlDSField        OBJECT-TYPE
 
 tmnxOamIcmpPingCtlPattern        OBJECT-TYPE
     SYNTAX      Integer32 (-1 | 0..65535)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlPattern specifies a two-octet value to
@@ -5921,7 +6032,7 @@ tmnxOamIcmpPingCtlPattern        OBJECT-TYPE
 
 tmnxOamIcmpPingCtlNhAddrType     OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlNhAddrType specifies the address type
@@ -5931,7 +6042,7 @@ tmnxOamIcmpPingCtlNhAddrType     OBJECT-TYPE
 
 tmnxOamIcmpPingCtlNhAddress      OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlNhAddress specifies the Internet
@@ -5945,7 +6056,7 @@ tmnxOamIcmpPingCtlNhAddress      OBJECT-TYPE
 
 tmnxOamIcmpPingCtlEgrIfIndex     OBJECT-TYPE
     SYNTAX      InterfaceIndexOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS release 21.2 R1. The
@@ -5955,7 +6066,7 @@ tmnxOamIcmpPingCtlEgrIfIndex     OBJECT-TYPE
 
 tmnxOamIcmpPingCtlBypassRouting  OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlBypassRouting specifies whether or not
@@ -5970,7 +6081,7 @@ tmnxOamIcmpPingCtlBypassRouting  OBJECT-TYPE
 
 tmnxOamIcmpPingCtlDoNotFragment  OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlDoNotFragment specifies whether or not
@@ -5991,7 +6102,7 @@ tmnxOamIcmpPingCtlDoNotFragment  OBJECT-TYPE
 
 tmnxOamIcmpPingCtlEgrIfName      OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamIcmpPingCtlEgrIfName specifies the name of the
@@ -6047,7 +6158,7 @@ tmnxOamAncpTestTarget            OBJECT-TYPE
         subscriberId (1),
         ancpString   (2)
     }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The object tmnxOamAncpTestTarget specifies how to interpret the value
@@ -6063,21 +6174,21 @@ tmnxOamAncpTestTarget            OBJECT-TYPE
 
 tmnxOamAncpTestTargetId          OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..63))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The object tmnxOamAncpTestTargetId contains the ID of the subscriber
          for which the ANCP loopback test must be performed. The content of the
          field is interpreted as being a subscriber-id of max 32 chars (in case
          the object tmnxOamAncpTestTarget is set to 'subscriberId'), or as
-         being an acnp-string of max 63 chars (in case the object
+         being an ancp-string of max 63 chars (in case the object
          tmnxOamAncpTestTarget is set to 'ancpString')."
     DEFVAL      { "" }
     ::= { tmnxOamAncpTestCtlEntry 2 }
 
 tmnxOamAncpTestcount             OBJECT-TYPE
     SYNTAX      Integer32 (0..32)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamAncpTestcount specifies the number of messages the
@@ -6094,7 +6205,7 @@ tmnxOamAncpTestcount             OBJECT-TYPE
 tmnxOamAncpTestTimeout           OBJECT-TYPE
     SYNTAX      Integer32 (0..255)
     UNITS       "seconds"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamAncpTestTimeout specifies the number of seconds
@@ -6568,7 +6679,7 @@ TmnxOamEthCfmPingCtlEntry        ::= SEQUENCE
 
 tmnxOamEthCfmPingCtlTgtMacAddr   OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmPingCtlTgtMacAddr specifies the destination
@@ -6588,7 +6699,7 @@ tmnxOamEthCfmPingCtlTgtMacAddr   OBJECT-TYPE
 
 tmnxOamEthCfmPingCtlSrcMdIndex   OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmPingCtlSrcMdIndex specifies the source CFM
@@ -6599,7 +6710,7 @@ tmnxOamEthCfmPingCtlSrcMdIndex   OBJECT-TYPE
 
 tmnxOamEthCfmPingCtlSrcMaIndex   OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmPingCtlSrcMaIndex specifies the source CFM
@@ -6610,7 +6721,7 @@ tmnxOamEthCfmPingCtlSrcMaIndex   OBJECT-TYPE
 
 tmnxOamEthCfmPingCtlSrcMepId     OBJECT-TYPE
     SYNTAX      Dot1agCfmMepIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmPingCtlSrcMepId specifies the source
@@ -6621,7 +6732,7 @@ tmnxOamEthCfmPingCtlSrcMepId     OBJECT-TYPE
 
 tmnxOamEthCfmPingCtlRemoteMepId  OBJECT-TYPE
     SYNTAX      Dot1agCfmMepIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmPingCtlRemoteMepId specifies the remote
@@ -8434,10 +8545,16 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
          'bierTrace'            tmnxOamBierTrProbeHistoryTable
          'ethCfmLinkTrace'      tmnxOamEthCfmTrPrHistTable
          'icmpTraceRoute'       tmnxOamIcmpTrLabelStackTable
+                                tmnxOamIcmpTrOrDgHdrTable
+                                tmnxOamIcmpTrOrDgIPv6Table
+                                tmnxOamIcmpTrOrDgSrhSgListTable
+                                tmnxOamIcmpTrOrDgSrhTable
          'ldpTreeTrace'         tmnxOamLTtraceHopInfoTable
                                 tmnxOamLTtraceResultsTable
          'lspTraceRoute'        tmnxOamLspTrDSLabelTable
                                 tmnxOamLspTrFecStackTable
+                                tmnxOamLspTrInitDSLabelTable
+                                tmnxOamLspTrInitMapTable
                                 tmnxOamLspTrMapTable
          'macTraceRoute'        tmnxOamMacTrL2MapTable
          'mcastTraceRoute'      tmnxOamMcastTrRespTable
@@ -9110,8 +9227,8 @@ tmnxOamTrResultsEntry            OBJECT-TYPE
          2.  Results are cleared for the test (using
          TIMETRA-CLEAR-MIB::tmnxClearAction), or
          3.  A new run result is available, and the limit on the number of
-         run results retained (3, currently) has been reached.  In that case,
-         the oldest run result row is destroyed."
+         run results retained per test (3, currently) has been reached.
+         In that case, the oldest run result row is destroyed."
     INDEX       {
         tmnxOamTrCtlOwnerIndex,
         tmnxOamTrCtlTestIndex,
@@ -9131,7 +9248,10 @@ TmnxOamTrResultsEntry            ::= SEQUENCE
     tmnxOamTrResultsTestRunIndex     Unsigned32,
     tmnxOamTrResultsTgtAddrType      InetAddressType,
     tmnxOamTrResultsTgtAddress       InetAddress,
-    tmnxOamTrResultsTestRunResult    TmnxOamTestResult
+    tmnxOamTrResultsTestRunResult    TmnxOamTestResult,
+    tmnxOamTrResultsSrcAddrType      InetAddressType,
+    tmnxOamTrResultsSrcAddress       InetAddress,
+    tmnxOamTrResultsSize             Unsigned32
 }
 
 tmnxOamTrResultsOperStatus       OBJECT-TYPE
@@ -9153,12 +9273,9 @@ tmnxOamTrResultsCurHopCount      OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Reflects the current TTL value (range from 0 to 255) for an Nokia SROS
-         OAM Trace Route operation. Maximum TTL value is determined by
-         tmnxOamTrCtlMaxTtl.
-
-         Zero is returned only in the case of an aborted 'ethCfmLinkTrace'
-         test."
+        "The value of tmnxOamTrResultsCurHopCount indicates
+         1.  For a running test, the TTL currently being probed.
+         2.  For a completed test, the final TTL probed."
     ::= { tmnxOamTrResultsEntry 2 }
 
 tmnxOamTrResultsCurProbeCount    OBJECT-TYPE
@@ -9167,9 +9284,11 @@ tmnxOamTrResultsCurProbeCount    OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Reflects the current probe count (1..10) for an Nokia SROS OAM Trace
-         Route operation. The maximum probe count is determined by
-         tmnxOamTrCtlProbesPerHop."
+        "The value of tmnxOamTrResultsCurProbeCount indicates
+         1.  For a running test, the current probe number.
+         2.  For a completed test, the final probe number.
+
+         The value is in the range 1..tmnxOamTrCtlProbesPerHop."
     ::= { tmnxOamTrResultsEntry 3 }
 
 tmnxOamTrResultsIpTgtAddr        OBJECT-TYPE
@@ -9229,8 +9348,8 @@ tmnxOamTrResultsTgtAddrType      OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrResultsTgtAddrType indicates the Internet
-         address type stored in tmnxOamTrResultsTgtAddress."
+        "The value of tmnxOamTrResultsTgtAddrType indicates the address type of
+         tmnxOamTrResultsTgtAddress."
     ::= { tmnxOamTrResultsEntry 9 }
 
 tmnxOamTrResultsTgtAddress       OBJECT-TYPE
@@ -9239,7 +9358,7 @@ tmnxOamTrResultsTgtAddress       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrResultsTgtAddress indicates the IP destination
-         address of the test.
+         address of the test run.
 
          If the configured destination address of the test has type 'dns(16)',
          this is the corresponding IPv4 or IPv6 address (if available).
@@ -9256,6 +9375,45 @@ tmnxOamTrResultsTestRunResult    OBJECT-TYPE
         "The value of tmnxOamTrResultsTestRunResult indicates the result of the
          specified test run."
     ::= { tmnxOamTrResultsEntry 11 }
+
+tmnxOamTrResultsSrcAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamTrResultsSrcAddrType indicates the address type of
+         tmnxOamTrResultsSrcAddress."
+    ::= { tmnxOamTrResultsEntry 12 }
+
+tmnxOamTrResultsSrcAddress       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamTrResultsSrcAddress indicates the IP source
+         address of the test run.
+
+         tmnxOamTrResultsSrcAddrType is 'unknown(0)' when
+         1.  The test type is not 'lspTraceRoute', or
+         2.  The test type is 'lspTraceRoute', and the test's source address
+             cannot be determined."
+    ::= { tmnxOamTrResultsEntry 13 }
+
+tmnxOamTrResultsSize             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamTrResultsSize indicates the size of each request
+         packet sent for the test run.
+
+         Zero is returned when the test type is not 'lspTraceRoute'.
+
+         Related objects:
+             tmnxOamTrCtlDataSize,
+             tmnxOamTrProbeHistorySize."
+    ::= { tmnxOamTrResultsEntry 14 }
 
 tmnxOamTrProbeHistoryTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxOamTrProbeHistoryEntry
@@ -9324,18 +9482,27 @@ tmnxOamTrProbeHistoryIndex       OBJECT-TYPE
         "The value of tmnxOamTrProbeHistoryIndex specifies a probe belonging to
          an OAM Trace Route test run.
 
-         The probes are numbered sequentially, starting at one.
+         The probes are numbered sequentially across the whole test run,
+         starting at one.
 
-         Two indexing methods for uniquely identifying a probe are provided:
-         1.  tmnxOamTrCtlOwnerIndex,
-             tmnxOamTrCtlTestIndex,
-             tmnxOamTrResultsTestRunIndex,
-             tmnxOamTrProbeHistoryIndex.
-         2.  tmnxOamTrCtlOwnerIndex,
-             tmnxOamTrCtlTestIndex,
-             tmnxOamTrResultsTestRunIndex,
-             tmnxOamTrProbeHistoryHopIndex,
-             tmnxOamTrProbeHistoryProbeIndex."
+         Here is an example of a test run that uses tmnxOamTrProbeHistoryIndex to
+         ensure each probe has a unique INDEX.
+             Configuration:
+                 tmnxOamTrCtlTestMode = lspTraceRoute(2)
+                 tmnxOamLspTrCtlTestSubMode = srTe(6)
+                 tmnxOamLspTrCtlDownstreamMapTlv = ddmap(2)
+                 tmnxOamTrCtlProbesPerHop = 2
+             Probes (note there are 4 probes (not 2) for hop 1, for example):
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.1.1.1  = 1803 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.2.1.2  = 1593 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.3.1.1  = 2405 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.4.1.2  = 1890 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.5.2.1  = 2579 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.6.2.2  = 2729 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.7.2.1  = 2744 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.8.2.2  = 2487 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.9.3.1  = 2983 microsec
+                 tmnxOamTrProbeHistoryResponse.'a'.'z'.2.10.3.2 = 2182 microsec"
     ::= { tmnxOamTrProbeHistoryEntry 1 }
 
 tmnxOamTrProbeHistoryHopIndex    OBJECT-TYPE
@@ -9356,19 +9523,11 @@ tmnxOamTrProbeHistoryProbeIndex  OBJECT-TYPE
         "The value of tmnxOamTrProbeHistoryProbeIndex specifies a trace route
          reply, in the context of a hop.
 
-         Two indexing methods for uniquely identifying a probe are provided:
-         1.  tmnxOamTrCtlOwnerIndex,
-             tmnxOamTrCtlTestIndex,
-             tmnxOamTrResultsTestRunIndex,
-             tmnxOamTrProbeHistoryIndex.
-         2.  tmnxOamTrCtlOwnerIndex,
-             tmnxOamTrCtlTestIndex,
-             tmnxOamTrResultsTestRunIndex,
-             tmnxOamTrProbeHistoryHopIndex,
-             tmnxOamTrProbeHistoryProbeIndex.
-
          The number of probes per hop for a particular test is configured using
-         tmnxOamTrCtlProbesPerHop."
+         tmnxOamTrCtlProbesPerHop.
+
+         See the DESCRIPTION of tmnxOamTrProbeHistoryIndex for more
+         information."
     ::= { tmnxOamTrProbeHistoryEntry 3 }
 
 tmnxOamTrProbeHistoryIpAddr      OBJECT-TYPE
@@ -9556,9 +9715,10 @@ tmnxOamTrProbeHistorySize        OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrProbeHistorySize indicates the size in octets
-         of the user payload in the probe request packet.  It does not
-         include the service encapsulation.
+        "The value of tmnxOamTrProbeHistorySize indicates the size (in octets)
+         of some or all of the request packet sent.  The encapsulation counted
+         (e.g. including the Ethernet header?) varies with the test type (i.e.
+         tmnxOamTrCtlTestMode), and/or the test sub-type.
 
          Zero is returned if no probe was transmitted."
     ::= { tmnxOamTrProbeHistoryEntry 18 }
@@ -10127,7 +10287,7 @@ TmnxOamMacTrCtlEntry             ::= SEQUENCE
 
 tmnxOamMacTrCtlTargetMacAddr     OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacTrCtlTargetMacAddr is a 6-octet value that
@@ -10141,7 +10301,7 @@ tmnxOamMacTrCtlTargetMacAddr     OBJECT-TYPE
 
 tmnxOamMacTrCtlSourceMacAddr     OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacTrCtlSourceMacAddr is a 6-octet value that
@@ -10155,7 +10315,7 @@ tmnxOamMacTrCtlSourceMacAddr     OBJECT-TYPE
 
 tmnxOamMacTrCtlSendControl       OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMacTrCtlSendControl specifies whether the outbound
@@ -10173,7 +10333,7 @@ tmnxOamMacTrCtlSendControl       OBJECT-TYPE
 
 tmnxOamMacTrCtlReplyControl      OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamMacTrCtlReplyControl is 'true', the OAM Mac
@@ -10348,7 +10508,7 @@ tmnxOamLspTrCtlTable             OBJECT-TYPE
          trace route test.  The rest of the configuration information needed to
          launch the test resides in the corresponding row of tmnxOamTrCtlTable.
 
-         Seven types of LSP trace route tests are supported.  An abbreviated
+         Nine types of LSP trace route tests are supported.  An abbreviated
          name for each test type is defined in the following table (for use in a
          subsequent table).  The test type's tmnxOamLspTrCtlTestSubMode code
          point is shown as well.
@@ -10383,7 +10543,6 @@ tmnxOamLspTrCtlTable             OBJECT-TYPE
               tmnxOamLspTrCtlTestSubMode        tmnxOamLspTrCtlNhIntfName
                                                #tmnxOamLspTrCtlPathDestType
                                                #tmnxOamLspTrCtlPathDest
-
          LDP  tmnxOamLspTrCtlLdpPrefixType     *tmnxOamLspTrCtlNhAddressType
               tmnxOamLspTrCtlLdpPrefix         *tmnxOamLspTrCtlNhAddress
               tmnxOamLspTrCtlLdpPrefixLen       tmnxOamLspTrCtlNhIntfName
@@ -10407,9 +10566,11 @@ tmnxOamLspTrCtlTable             OBJECT-TYPE
          RSVP tmnxOamLspTrCtlLspName            tmnxOamLspTrCtlPathName
 
          SRPL tmnxOamLspTrCtlSrPlcyColor        tmnxOamLspTrCtlSrPlcySegList
-              tmnxOamLspTrCtlSrPlcyEndPtAddr
-              tmnxOamLspTrCtlSrPlcyEndPtAddT
-              tmnxOamLspTrCtlTestSubMode
+              tmnxOamLspTrCtlSrPlcyEndPtAddr   *tmnxOamLspTrCtlNhAddressType
+              tmnxOamLspTrCtlSrPlcyEndPtAddT   *tmnxOamLspTrCtlNhAddress
+              tmnxOamLspTrCtlTestSubMode        tmnxOamLspTrCtlNhIntfName
+                                               #tmnxOamLspTrCtlPathDestType
+                                               #tmnxOamLspTrCtlPathDest
 
          SRTE tmnxOamLspTrCtlLspName           *tmnxOamLspTrCtlNhAddressType
               tmnxOamLspTrCtlTestSubMode       *tmnxOamLspTrCtlNhAddress
@@ -10498,7 +10659,7 @@ TmnxOamLspTrCtlEntry             ::= SEQUENCE
     tmnxOamLspTrCtlNhAddressType     InetAddressType,
     tmnxOamLspTrCtlNhAddress         InetAddress,
     tmnxOamLspTrCtlDownstreamMapTlv  TmnxOamMplsEchoDownMapTlvOrNone,
-    tmnxOamLspTrCtlTestSubMode       TmnxOamLspTestSubMode,
+    tmnxOamLspTrCtlTestSubMode       TmnxOamLspTrTestSubMode,
     tmnxOamLspTrCtlMplsTpPathType    TmnxOamMplsTpPathType,
     tmnxOamLspTrCtlAssocChannel      TmnxOamLspAssocChannel,
     tmnxOamLspTrCtlForce             TruthValue,
@@ -10511,7 +10672,7 @@ TmnxOamLspTrCtlEntry             ::= SEQUENCE
 
 tmnxOamLspTrCtlVRtrID            OBJECT-TYPE
     SYNTAX      TmnxVRtrID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamLspTrCtlVRtrID was marked obsolete in SROS Release 6.0R15 and
@@ -10521,7 +10682,7 @@ tmnxOamLspTrCtlVRtrID            OBJECT-TYPE
 
 tmnxOamLspTrCtlLspName           OBJECT-TYPE
     SYNTAX      TLNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlLspName specifies the name of the LSP for
@@ -10543,7 +10704,7 @@ tmnxOamLspTrCtlLspName           OBJECT-TYPE
 
 tmnxOamLspTrCtlPathName          OBJECT-TYPE
     SYNTAX      TLNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlPathName specifies the name of the Path
@@ -10560,7 +10721,7 @@ tmnxOamLspTrCtlPathName          OBJECT-TYPE
 
 tmnxOamLspTrCtlLdpIpPrefix       OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamLspTrCtlLdpIpPrefix was marked obsolete in SROS Release 4.0 and
@@ -10571,7 +10732,7 @@ tmnxOamLspTrCtlLdpIpPrefix       OBJECT-TYPE
 
 tmnxOamLspTrCtlLdpIpPrefixLen    OBJECT-TYPE
     SYNTAX      IpAddressPrefixLength
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamLspTrCtlLdpIpPrefixLen was marked obsolete in SROS Release 4.0
@@ -10581,7 +10742,7 @@ tmnxOamLspTrCtlLdpIpPrefixLen    OBJECT-TYPE
 
 tmnxOamLspTrCtlLdpPrefixType     OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlLdpPrefixType specifies the type of
@@ -10594,7 +10755,7 @@ tmnxOamLspTrCtlLdpPrefixType     OBJECT-TYPE
 
 tmnxOamLspTrCtlLdpPrefix         OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlLdpPrefix, along with
@@ -10609,7 +10770,7 @@ tmnxOamLspTrCtlLdpPrefix         OBJECT-TYPE
 tmnxOamLspTrCtlLdpPrefixLen      OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
     UNITS       "bits"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlLdpPrefixLen specifies the Internet
@@ -10622,7 +10783,7 @@ tmnxOamLspTrCtlLdpPrefixLen      OBJECT-TYPE
 
 tmnxOamLspTrCtlPathDestType      OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlPathDestType specifies the type of
@@ -10635,7 +10796,7 @@ tmnxOamLspTrCtlPathDestType      OBJECT-TYPE
 
 tmnxOamLspTrCtlPathDest          OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlPathDest specifies a unique path in a
@@ -10650,7 +10811,7 @@ tmnxOamLspTrCtlPathDest          OBJECT-TYPE
 
 tmnxOamLspTrCtlNhIntfName        OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlNhIntfName specifies the name of the next
@@ -10670,7 +10831,7 @@ tmnxOamLspTrCtlNhIntfName        OBJECT-TYPE
 
 tmnxOamLspTrCtlNhAddressType     OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlNhAddressType specifies the type of
@@ -10683,7 +10844,7 @@ tmnxOamLspTrCtlNhAddressType     OBJECT-TYPE
 
 tmnxOamLspTrCtlNhAddress         OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlNhAddress specifies the interface address
@@ -10696,7 +10857,7 @@ tmnxOamLspTrCtlNhAddress         OBJECT-TYPE
 
 tmnxOamLspTrCtlDownstreamMapTlv  OBJECT-TYPE
     SYNTAX      TmnxOamMplsEchoDownMapTlvOrNone
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlDownstreamMapTlv specifies the type of
@@ -10712,8 +10873,8 @@ tmnxOamLspTrCtlDownstreamMapTlv  OBJECT-TYPE
     ::= { tmnxOamLspTrCtlEntry 14 }
 
 tmnxOamLspTrCtlTestSubMode       OBJECT-TYPE
-    SYNTAX      TmnxOamLspTestSubMode
-    MAX-ACCESS  read-create
+    SYNTAX      TmnxOamLspTrTestSubMode
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlTestSubMode specifies the type of LSP
@@ -10737,7 +10898,7 @@ tmnxOamLspTrCtlTestSubMode       OBJECT-TYPE
 
 tmnxOamLspTrCtlMplsTpPathType    OBJECT-TYPE
     SYNTAX      TmnxOamMplsTpPathType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlMplsTpPathType specifies the type of the
@@ -10750,7 +10911,7 @@ tmnxOamLspTrCtlMplsTpPathType    OBJECT-TYPE
 
 tmnxOamLspTrCtlAssocChannel      OBJECT-TYPE
     SYNTAX      TmnxOamLspAssocChannel
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlAssocChannel specifies the launched echo
@@ -10767,7 +10928,7 @@ tmnxOamLspTrCtlAssocChannel      OBJECT-TYPE
 
 tmnxOamLspTrCtlForce             OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlForce specifies whether or not to force
@@ -10788,7 +10949,7 @@ tmnxOamLspTrCtlForce             OBJECT-TYPE
 
 tmnxOamLspTrCtlIgpInstance       OBJECT-TYPE
     SYNTAX      TmnxIgpInstance
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlIgpInstance specifies the Interior Gateway
@@ -10801,7 +10962,7 @@ tmnxOamLspTrCtlIgpInstance       OBJECT-TYPE
 
 tmnxOamLspTrCtlSrPlcyColor       OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlSrPlcyColor specifies the Segment Routing
@@ -10830,7 +10991,7 @@ tmnxOamLspTrCtlSrPlcyColor       OBJECT-TYPE
 
 tmnxOamLspTrCtlSrPlcyEndPtAddT   OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlSrPlcyEndPtAddT specifies the type of IP
@@ -10843,7 +11004,7 @@ tmnxOamLspTrCtlSrPlcyEndPtAddT   OBJECT-TYPE
 
 tmnxOamLspTrCtlSrPlcyEndPtAddr   OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlSrPlcyEndPtAddr specifies the Segment
@@ -10873,7 +11034,7 @@ tmnxOamLspTrCtlSrPlcyEndPtAddr   OBJECT-TYPE
 
 tmnxOamLspTrCtlSrPlcySegList     OBJECT-TYPE
     SYNTAX      Unsigned32 (0..32)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLspTrCtlSrPlcySegList specifies the Segment
@@ -10894,7 +11055,9 @@ tmnxOamLspTrMapTable             OBJECT-TYPE
     DESCRIPTION
         "tmnxOamLspTrMapTable contains the information obtained from RFC 4379
          Downstream Mapping TLVs and/or RFC 6424 Downstream Detailed Mapping
-         TLVs within reply PDUs for active 'lspTraceRoute' tests."
+         TLVs within reply PDUs for active 'lspTraceRoute' tests.
+
+         tmnxOamLspTrInitMapTable contains related information."
     REFERENCE
         "RFC 4379, 'Detecting Multi-Protocol Label Switched (MPLS) Data Plane
          Failures', Section 3.3, 'Downstream Mapping'.
@@ -11181,7 +11344,7 @@ TmnxOamVprnTrCtlEntry            ::= SEQUENCE
 
 tmnxOamVprnTrCtlSourceIpAddr     OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 4.0 and replaced with
@@ -11192,7 +11355,7 @@ tmnxOamVprnTrCtlSourceIpAddr     OBJECT-TYPE
 
 tmnxOamVprnTrCtlReplyControl     OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "When the value of tmnxOamVprnTrCtlReplyControl is 'true', the OAM
@@ -11206,7 +11369,7 @@ tmnxOamVprnTrCtlReplyControl     OBJECT-TYPE
 
 tmnxOamVprnTrCtlSrcAddrType      OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVprnTrCtlSrcAddrType specifies the type of
@@ -11216,7 +11379,7 @@ tmnxOamVprnTrCtlSrcAddrType      OBJECT-TYPE
 
 tmnxOamVprnTrCtlSrcAddress       OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVprnTrCtlSrcAddress specifies the Internet
@@ -11662,7 +11825,9 @@ tmnxOamLspTrDSLabelTable         OBJECT-TYPE
          'lspTraceRoute' probe is determined.
 
          An entry is removed from this table when its corresponding
-         tmnxOamLspTrMapEntry is deleted."
+         tmnxOamLspTrMapEntry is deleted.
+
+         tmnxOamLspTrInitDSLabelTable contains related information."
     ::= { tmnxOamTraceRouteObjs 15 }
 
 tmnxOamLspTrDSLabelEntry         OBJECT-TYPE
@@ -11782,7 +11947,7 @@ TmnxOamMcastTrCtlEntry           ::= SEQUENCE
 
 tmnxOamMcastTrCtlVRtrID          OBJECT-TYPE
     SYNTAX      TmnxVRtrID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlVRtrID specifies the virtual router to be
@@ -11809,7 +11974,7 @@ tmnxOamMcastTrCtlVRtrID          OBJECT-TYPE
 
 tmnxOamMcastTrCtlSrcIpAddr       OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamMcastTrCtlSrcIpAddr was marked obsolete in SROS Release 4.0 and
@@ -11819,7 +11984,7 @@ tmnxOamMcastTrCtlSrcIpAddr       OBJECT-TYPE
 
 tmnxOamMcastTrCtlDestIpAddr      OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamMcastTrCtlDestIpAddr was marked obsolete in SROS Release 4.0
@@ -11830,7 +11995,7 @@ tmnxOamMcastTrCtlDestIpAddr      OBJECT-TYPE
 
 tmnxOamMcastTrCtlRespIpAddr      OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamMcastTrCtlRespIpAddr was marked obsolete in SROS Release 4.0
@@ -11840,7 +12005,7 @@ tmnxOamMcastTrCtlRespIpAddr      OBJECT-TYPE
 
 tmnxOamMcastTrCtlGrpIpAddr       OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "tmnxOamMcastTrCtlGrpIpAddr was marked obsolete in SROS Release 4.0 and
@@ -11850,7 +12015,7 @@ tmnxOamMcastTrCtlGrpIpAddr       OBJECT-TYPE
 
 tmnxOamMcastTrCtlHops            OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlHops specifies the maximum number of
@@ -11872,7 +12037,7 @@ tmnxOamMcastTrQueryId            OBJECT-TYPE
 
 tmnxOamMcastTrCtlSrcAddrType     OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlSrcAddrType specifies the type of IP
@@ -11882,7 +12047,7 @@ tmnxOamMcastTrCtlSrcAddrType     OBJECT-TYPE
 
 tmnxOamMcastTrCtlSrcAddress      OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlSrcAddress specifies the IP address to
@@ -11894,7 +12059,7 @@ tmnxOamMcastTrCtlSrcAddress      OBJECT-TYPE
 
 tmnxOamMcastTrCtlDestAddrType    OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlDestAddrType specifies the type of IP
@@ -11904,7 +12069,7 @@ tmnxOamMcastTrCtlDestAddrType    OBJECT-TYPE
 
 tmnxOamMcastTrCtlDestAddress     OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlDestAddress specifies the IP address to
@@ -11938,7 +12103,7 @@ tmnxOamMcastTrCtlRespAddress     OBJECT-TYPE
 
 tmnxOamMcastTrCtlGrpAddrType     OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlGrpAddrType specifies the type of IP
@@ -11948,7 +12113,7 @@ tmnxOamMcastTrCtlGrpAddrType     OBJECT-TYPE
 
 tmnxOamMcastTrCtlGrpAddress      OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlGrpAddress specifies the IP multicast
@@ -11963,7 +12128,7 @@ tmnxOamMcastTrCtlTestSubMode     OBJECT-TYPE
         mcastTraceRouteV1 (1),
         mcastTraceRouteV2 (2)
     }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMcastTrCtlTestSubMode specifies the type of IP
@@ -12683,7 +12848,7 @@ TmnxOamLTtraceCtlEntry           ::= SEQUENCE
 
 tmnxOamLTtraceCtlLdpPrefixType   OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLTtraceCtlLdpPrefixType specifies the type of
@@ -12693,7 +12858,7 @@ tmnxOamLTtraceCtlLdpPrefixType   OBJECT-TYPE
 
 tmnxOamLTtraceCtlLdpPrefix       OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLTtraceCtlLdpPrefix specifies the Internet address
@@ -12704,7 +12869,7 @@ tmnxOamLTtraceCtlLdpPrefix       OBJECT-TYPE
 tmnxOamLTtraceCtlLdpPrefixLen    OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
     UNITS       "bits"
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLTtraceCtlLdpPrefixLen specifies the Internet
@@ -12718,7 +12883,7 @@ tmnxOamLTtraceCtlLdpPrefixLen    OBJECT-TYPE
 
 tmnxOamLTtraceCtlMaxPath         OBJECT-TYPE
     SYNTAX      Unsigned32 (1..255)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLTtraceCtlMaxPath specifies the maximum number of
@@ -12729,7 +12894,7 @@ tmnxOamLTtraceCtlMaxPath         OBJECT-TYPE
 
 tmnxOamLTtraceCtlDownstreamMpTlv OBJECT-TYPE
     SYNTAX      TmnxOamMplsEchoDownMapTlv
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamLTtraceCtlDownstreamMpTlv specifies the type of
@@ -12778,8 +12943,8 @@ tmnxOamLTtraceResultsEntry       OBJECT-TYPE
          2.  Results are cleared for the test (using
          TIMETRA-CLEAR-MIB::tmnxClearAction), or
          3.  A new run result is available, and the limit on the number of
-         run results retained (3, currently) has been reached.  In that case,
-         the oldest run result row is destroyed."
+         run results retained per test (3, currently) has been reached.
+         In that case, the oldest run result row is destroyed."
     INDEX       {
         tmnxOamTrCtlOwnerIndex,
         tmnxOamTrCtlTestIndex
@@ -13972,7 +14137,7 @@ TmnxOamVccvTrCtlEntry            ::= SEQUENCE
 
 tmnxOamVccvTrCtlSdpIdVcId        OBJECT-TYPE
     SYNTAX      SdpBindId
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSdpIdVcId specifies the SDP binding of
@@ -13990,7 +14155,7 @@ tmnxOamVccvTrCtlReplyMode        OBJECT-TYPE
         ip             (2),
         controlChannel (4)
     }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlReplyMode specifies the band to be used by
@@ -14008,7 +14173,7 @@ tmnxOamVccvTrCtlReplyMode        OBJECT-TYPE
 
 tmnxOamVccvTrCtlSpokeSdpId       OBJECT-TYPE
     SYNTAX      TmnxSpokeSdpIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSpokeSdpId specifies the spoke SDP
@@ -14025,7 +14190,7 @@ tmnxOamVccvTrCtlSpokeSdpId       OBJECT-TYPE
 
 tmnxOamVccvTrCtlSaiiGlobalId     OBJECT-TYPE
     SYNTAX      TmnxPwGlobalIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSaiiGlobalId specifies the global
@@ -14045,7 +14210,7 @@ tmnxOamVccvTrCtlSaiiGlobalId     OBJECT-TYPE
 
 tmnxOamVccvTrCtlSaiiPrefix       OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSaiiPrefix specifies the prefix of the
@@ -14064,7 +14229,7 @@ tmnxOamVccvTrCtlSaiiPrefix       OBJECT-TYPE
 
 tmnxOamVccvTrCtlSaiiAcId         OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSaiiAcId specifies the attachment circuit
@@ -14084,7 +14249,7 @@ tmnxOamVccvTrCtlSaiiAcId         OBJECT-TYPE
 
 tmnxOamVccvTrCtlTaiiGlobalId     OBJECT-TYPE
     SYNTAX      TmnxPwGlobalIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlTaiiGlobalId specifies the global
@@ -14104,7 +14269,7 @@ tmnxOamVccvTrCtlTaiiGlobalId     OBJECT-TYPE
 
 tmnxOamVccvTrCtlTaiiPrefix       OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlTaiiPrefix specifies the prefix of the
@@ -14123,7 +14288,7 @@ tmnxOamVccvTrCtlTaiiPrefix       OBJECT-TYPE
 
 tmnxOamVccvTrCtlTaiiAcId         OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlTaiiAcId specifies the attachment circuit
@@ -14143,7 +14308,7 @@ tmnxOamVccvTrCtlTaiiAcId         OBJECT-TYPE
 
 tmnxOamVccvTrCtlTestSubMode      OBJECT-TYPE
     SYNTAX      TmnxOamVccvTestSubMode
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlTestSubMode specifies the type of VCCV
@@ -14167,7 +14332,7 @@ tmnxOamVccvTrCtlTestSubMode      OBJECT-TYPE
 
 tmnxOamVccvTrCtlAssocChannel     OBJECT-TYPE
     SYNTAX      TmnxOamVccvAssocChannel
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlAssocChannel specifies the launched echo
@@ -14184,7 +14349,7 @@ tmnxOamVccvTrCtlAssocChannel     OBJECT-TYPE
 
 tmnxOamVccvTrCtlSwitTgtFecType   OBJECT-TYPE
     SYNTAX      TmnxOamVccvSwitTgtFecType
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamVccvTrCtlSwitTgtFecType specifies the type of
@@ -14851,7 +15016,7 @@ TmnxOamEthCfmTrCtlEntry          ::= SEQUENCE
 
 tmnxOamEthCfmTrCtlTgtMacAddr     OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmTrCtlTgtMacAddr specifies the destination
@@ -14871,7 +15036,7 @@ tmnxOamEthCfmTrCtlTgtMacAddr     OBJECT-TYPE
 
 tmnxOamEthCfmTrCtlSrcMdIndex     OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmTrCtlSrcMdIndex specifies the source CFM
@@ -14882,7 +15047,7 @@ tmnxOamEthCfmTrCtlSrcMdIndex     OBJECT-TYPE
 
 tmnxOamEthCfmTrCtlSrcMaIndex     OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmTrCtlSrcMaIndex specifies the source CFM
@@ -14893,7 +15058,7 @@ tmnxOamEthCfmTrCtlSrcMaIndex     OBJECT-TYPE
 
 tmnxOamEthCfmTrCtlSrcMepId       OBJECT-TYPE
     SYNTAX      Dot1agCfmMepIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmTrCtlSrcMepId specifies the source
@@ -14904,7 +15069,7 @@ tmnxOamEthCfmTrCtlSrcMepId       OBJECT-TYPE
 
 tmnxOamEthCfmTrCtlRemoteMepId    OBJECT-TYPE
     SYNTAX      Dot1agCfmMepIdOrZero
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamEthCfmTrCtlRemoteMepId specifies the remote
@@ -16053,7 +16218,54 @@ tmnxOamIcmpTrCtlTable            OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "tmnxOamIcmpTrCtlTable (along with tmnxOamTrCtlTable) contains the
-         configuration information for 'icmpTraceRoute' tests."
+         configuration information for 'icmpTraceRoute' tests.
+
+         Two types of 'icmpTraceRoute' tests are supported, as configured
+         using tmnxOamIcmpTrCtlTestSubMode.  The objects which can be
+         configured away from default for each type are shown in the following
+         table.
+
+         Test Sub Mode      Configurable Objects
+         ----------------   --------------------------------
+         'unspecified(1)'   tmnxOamIcmpTrCtlDestTcpUdpPort
+                            tmnxOamIcmpTrCtlDestUdpPortFixed
+                            tmnxOamIcmpTrCtlPadSize
+                            tmnxOamIcmpTrCtlProtocol
+                            tmnxOamTrCtlAdminStatus
+                            tmnxOamTrCtlDSField
+                            tmnxOamTrCtlInitialTtl
+                            tmnxOamTrCtlMaxTtl
+                            tmnxOamTrCtlProbesPerHop
+                            tmnxOamTrCtlRouterInstanceName
+                            tmnxOamTrCtlRowStatus
+                            tmnxOamTrCtlServiceId
+                            tmnxOamTrCtlSrcAddrType
+                            tmnxOamTrCtlSrcAddress
+                            tmnxOamTrCtlTestMode
+                            tmnxOamTrCtlTgtAddrType
+                            tmnxOamTrCtlTgtAddress
+                            tmnxOamTrCtlTrapGeneration
+                            tmnxOamTrCtlVRtrID
+                            tmnxOamTrCtlWaitMilliSec
+         'srv6Policy(2)'    tmnxOamIcmpTrCtlDestTcpUdpPort
+                            tmnxOamIcmpTrCtlDestUdpPortFixed
+                            tmnxOamIcmpTrCtlPadSize
+                            tmnxOamIcmpTrCtlSrV6PlcyColor
+                            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd
+                            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT
+                            tmnxOamIcmpTrCtlSrV6PlcySegList
+                            tmnxOamIcmpTrCtlTestSubMode
+                            tmnxOamTrCtlAdminStatus
+                            tmnxOamTrCtlInitialTtl
+                            tmnxOamTrCtlMaxTtl
+                            tmnxOamTrCtlProbesPerHop
+                            tmnxOamTrCtlRowStatus
+                            tmnxOamTrCtlTestMode
+                            tmnxOamTrCtlTrapGeneration
+                            tmnxOamTrCtlWaitMilliSec
+
+         None of the objects in this table can be changed away from DEFVAL for
+         SAA tests (as created using tmnxOamSaaCtlRowStatus)."
     ::= { tmnxOamTraceRouteObjs 39 }
 
 tmnxOamIcmpTrCtlEntry            OBJECT-TYPE
@@ -16083,7 +16295,12 @@ TmnxOamIcmpTrCtlEntry            ::= SEQUENCE
     tmnxOamIcmpTrCtlProtocol         INTEGER,
     tmnxOamIcmpTrCtlDestTcpUdpPort   Unsigned32,
     tmnxOamIcmpTrCtlDestUdpPortFixed TruthValue,
-    tmnxOamIcmpTrCtlPadSize          Unsigned32
+    tmnxOamIcmpTrCtlPadSize          Unsigned32,
+    tmnxOamIcmpTrCtlTestSubMode      INTEGER,
+    tmnxOamIcmpTrCtlSrV6PlcyColor    Unsigned32,
+    tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT InetAddressType,
+    tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd InetAddress,
+    tmnxOamIcmpTrCtlSrV6PlcySegList  Unsigned32
 }
 
 tmnxOamIcmpTrCtlProtocol         OBJECT-TYPE
@@ -16102,8 +16319,8 @@ tmnxOamIcmpTrCtlProtocol         OBJECT-TYPE
 
          'tcp' specifies the transmission of TCP SYN packets.
 
-         If the 'icmpTraceRoute' test is an SAA test (as created using
-         tmnxOamSaaCtlRowStatus), only 'udp' is supported."
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
     DEFVAL      { udp }
     ::= { tmnxOamIcmpTrCtlEntry 1 }
 
@@ -16140,8 +16357,8 @@ tmnxOamIcmpTrCtlDestTcpUdpPort   OBJECT-TYPE
          for mtrace may result in conflicts between 'icmpTraceRoute' tests and
          mtrace.
 
-         If the 'icmpTraceRoute' test is an SAA test (as created using
-         tmnxOamSaaCtlRowStatus), only 33434 is supported."
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
     REFERENCE
         "https://www.iana.org/assignments/service-names-port-numbers/
          service-names-port-numbers.txt"
@@ -16158,8 +16375,8 @@ tmnxOamIcmpTrCtlDestUdpPortFixed OBJECT-TYPE
          a UDP 'icmpTraceRoute' test.  Details are in the
          tmnxOamIcmpTrCtlDestTcpUdpPort DESCRIPTION clause.
 
-         If the 'icmpTraceRoute' test is an SAA test (as created using
-         tmnxOamSaaCtlRowStatus), only 'false' is supported."
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
     DEFVAL      { false }
     ::= { tmnxOamIcmpTrCtlEntry 3 }
 
@@ -16181,12 +16398,720 @@ tmnxOamIcmpTrCtlPadSize          OBJECT-TYPE
              tmnxOamIcmpTrCtlProtocol = 'tcp'
          is not supported by some third party far end nodes.
 
-         If the 'icmpTraceRoute' test is an SAA test (as created using
-         tmnxOamSaaCtlRowStatus), only zero is supported.
+         tmnxOamTrCtlDataSize is ignored for 'icmpTraceRoute' tests.
 
-         tmnxOamTrCtlDataSize is ignored for 'icmpTraceRoute' tests."
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
     DEFVAL      { 0 }
     ::= { tmnxOamIcmpTrCtlEntry 4 }
+
+tmnxOamIcmpTrCtlTestSubMode      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unspecified (1),
+        srv6Policy  (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrCtlTestSubMode specifies the type of
+         'icmpTraceRoute' test to perform.
+
+         'srv6Policy' specifies each launched packet contains an IPv6 Segment
+          Routing Header (SRH; RFC 8754).
+
+         'unspecified' specifies any other 'icmpTraceRoute' test.
+
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
+    REFERENCE
+        "RFC 8754, IPv6 Segment Routing Header (SRH).
+         RFC 9259, Operations, Administration, and Maintenance (OAM) in Segment
+         Routing over IPv6 (SRv6)."
+    DEFVAL      { unspecified }
+    ::= { tmnxOamIcmpTrCtlEntry 5 }
+
+tmnxOamIcmpTrCtlSrV6PlcyColor    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrCtlSrV6PlcyColor specifies the Segment Routing
+         (SR) policy color to be used for the test.  A color associates an
+         SR policy with an intent (e.g. low latency).
+
+         tmnxOamIcmpTrCtlSrV6PlcyColor, tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT, and
+         tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd must identify a known SR policy.
+         Otherwise, the test will fail.  The color of a static SR policy is
+         defined using TIMETRA-SR-POLICY-MIB::vRtrSrStaticPlcyColor.
+
+         When configuring an SR policy 'icmpTraceRoute' test, the following
+         objects must all be set in one snmpset PDU:
+            tmnxOamIcmpTrCtlTestSubMode = 'srv6Policy(2)',
+            tmnxOamIcmpTrCtlSrV6PlcyColor,
+            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT = 'ipv6(2)',
+            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd.
+
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
+    REFERENCE
+        "RFC 9256, 'Segment Routing Policy Architecture', Section 2.1,
+         'Identification of an SR Policy'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamIcmpTrCtlEntry 6 }
+
+tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT specifies the type of IP
+         address stored in tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd.
+
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
+    DEFVAL      { unknown }
+    ::= { tmnxOamIcmpTrCtlEntry 7 }
+
+tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd specifies the Segment
+         Routing (SR) policy endpoint address to be used for the test.
+
+         IPv4 addresses are not supported in this release.
+
+         tmnxOamIcmpTrCtlSrV6PlcyColor, tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT, and
+         tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd must identify a known SR policy.
+         Otherwise, the test will fail.  The endpoint of a static SR policy
+         is defined using
+             TIMETRA-SR-POLICY-MIB::vRtrSrStaticPlcyEndPtAddrType
+             TIMETRA-SR-POLICY-MIB::vRtrSrStaticPlcyEndPtAddr.
+
+         When configuring an SR policy 'icmpTraceRoute' test, the following
+         objects must all be set in one snmpset PDU:
+            tmnxOamIcmpTrCtlTestSubMode = 'srv6Policy(2)',
+            tmnxOamIcmpTrCtlSrV6PlcyColor,
+            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT = 'ipv6(2)',
+            tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd.
+
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
+    REFERENCE
+        "RFC 9256, 'Segment Routing Policy Architecture', Section 2.1,
+         'Identification of an SR Policy'."
+    DEFVAL      { ''H }
+    ::= { tmnxOamIcmpTrCtlEntry 8 }
+
+tmnxOamIcmpTrCtlSrV6PlcySegList  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrCtlSrV6PlcySegList specifies the Segment
+         Routing (SR) policy segment list to be used for the test.
+
+         Zero specifies no segment list is configured.  If zero is specified,
+         SROS picks the first usable segment list when the test is started.
+
+         The supported object combinations for 'icmpTraceRoute' tests are
+         listed in the tmnxOamIcmpTrCtlTable DESCRIPTION clause."
+    REFERENCE
+        "RFC 9256, 'Segment Routing Policy Architecture', Section 2.2,
+         'Candidate Path and Segment List'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamIcmpTrCtlEntry 9 }
+
+tmnxOamLspTrInitMapTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamLspTrInitMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamLspTrInitMapTable contains information copied into the RFC 4379
+         Downstream Mapping TLVs or RFC 6424 Downstream Detailed Mapping TLVs
+         of 'lspTraceRoute' request packets.
+
+         tmnxOamLspTrMapTable contains related information."
+    REFERENCE
+        "RFC 4379, 'Detecting Multi-Protocol Label Switched (MPLS) Data Plane
+         Failures', Section 3.3, 'Downstream Mapping'.
+         RFC 6424, 'Mechanism for Performing Label Switched Path Ping (LSP Ping)
+         over MPLS Tunnels', Section 3.3, 'Downstream Detailed Mapping TLV'."
+    ::= { tmnxOamTraceRouteObjs 40 }
+
+tmnxOamLspTrInitMapEntry         OBJECT-TYPE
+    SYNTAX      TmnxOamLspTrInitMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamLspTrInitMapEntry contains information copied by the
+         originating node into the specified RFC 4379 Downstream Mapping TLV or
+         RFC 6424 Downstream Detailed Mapping TLV of the first request packet
+         of the 'lspTraceRoute' test run.
+
+         The first three indices specify an 'lspTraceRoute' test run.  The
+         fourth index specifies one TLV in a request packet.
+
+         Rows are created when an 'lspTraceRoute' is started (using
+         tmnxOamTrCtlAdminStatus).
+
+         Rows are destroyed when the parent tmnxOamTrResultsTable row is
+         destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamLspTrInitMapIndex
+    }
+    ::= { tmnxOamLspTrInitMapTable 1 }
+
+TmnxOamLspTrInitMapEntry         ::= SEQUENCE
+{
+    tmnxOamLspTrInitMapIndex         Unsigned32,
+    tmnxOamLspTrInitMapAddrType      TmnxOamAddressType,
+    tmnxOamLspTrInitMapMTU           Unsigned32,
+    tmnxOamLspTrInitMapDsEgrIfNum    Unsigned32,
+    tmnxOamLspTrInitMapDsIpAddrType  InetAddressType,
+    tmnxOamLspTrInitMapDsIpAddr      InetAddress,
+    tmnxOamLspTrInitMapDsIfAddrType  InetAddressType,
+    tmnxOamLspTrInitMapDsIfAddr      InetAddress
+}
+
+tmnxOamLspTrInitMapIndex         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapIndex specifies one RFC 4379
+         Downstream Mapping TLV (or one RFC 6424 Downstream Detailed Mapping
+         TLV) within the first request packet sent for the specified test run.
+
+         The agent starts assigning tmnxOamLspTrInitMapIndex values at 1 for
+         each tmnxOamTrResultsTestRunIndex."
+    ::= { tmnxOamLspTrInitMapEntry 1 }
+
+tmnxOamLspTrInitMapAddrType      OBJECT-TYPE
+    SYNTAX      TmnxOamAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapAddrType indicates the value copied
+         into the Address Type field of the specified RFC 4379 Downstream
+         Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV within the
+         test run's first request packet.
+
+         This numbering is proprietary.  The proprietary value is mapped to the
+         standard value before being copied into the request packet.
+
+         See the DESCRIPTION clause for tmnxOamLspTrMapAddrType for more
+         information."
+    ::= { tmnxOamLspTrInitMapEntry 2 }
+
+tmnxOamLspTrInitMapMTU           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapMTU indicates the value copied into
+         the Maximum Transmission Unit (MTU) field of the specified RFC 4379
+         Downstream Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV
+         within the test run's first request packet."
+    ::= { tmnxOamLspTrInitMapEntry 3 }
+
+tmnxOamLspTrInitMapDsEgrIfNum    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapDsEgrIfNum indicates the interface
+         number copied into the Downstream IP Address field of the specified
+         RFC 4379 Downstream Mapping TLV or RFC 6424 Downstream Detailed
+         Mapping TLV within the test run's first request packet.
+
+         Zero indicates no interface number is available."
+    ::= { tmnxOamLspTrInitMapEntry 4 }
+
+tmnxOamLspTrInitMapDsIpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapDsIpAddrType indicates the type of
+         address in tmnxOamLspTrInitMapDsIpAddr."
+    ::= { tmnxOamLspTrInitMapEntry 5 }
+
+tmnxOamLspTrInitMapDsIpAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapDsIpAddr indicates the value copied
+         into the Downstream Address field of the specified RFC 4379 Downstream
+         Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV within the
+         test run's first request packet."
+    ::= { tmnxOamLspTrInitMapEntry 6 }
+
+tmnxOamLspTrInitMapDsIfAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapDsIfAddrType indicates the type of
+         address in tmnxOamLspTrInitMapDsIfAddr."
+    ::= { tmnxOamLspTrInitMapEntry 7 }
+
+tmnxOamLspTrInitMapDsIfAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitMapDsIfAddr indicates the value copied
+         into the Downstream Interface Address field of the specified RFC 4379
+         Downstream Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV
+         within the test run's first request packet."
+    ::= { tmnxOamLspTrInitMapEntry 8 }
+
+tmnxOamLspTrInitDSLabelTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamLspTrInitDSLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamLspTrInitDSLabelTable contains MPLS downstream label
+         information copied into the RFC 4379 Downstream Mapping TLVs or RFC
+         6424 Downstream Detailed Mapping TLVs of 'lspTraceRoute' request
+         packets.
+
+         tmnxOamLspTrDSLabelTable contains related information."
+    REFERENCE
+        "RFC 4379, 'Detecting Multi-Protocol Label Switched (MPLS) Data Plane
+         Failures', Section 3.3, 'Downstream Mapping'.
+         RFC 6424, 'Mechanism for Performing Label Switched Path Ping (LSP Ping)
+         over MPLS Tunnels', Section 3.3, 'Downstream Detailed Mapping TLV'.
+         RFC 6424, 'Mechanism for Performing Label Switched Path Ping (LSP Ping)
+         over MPLS Tunnels', Section 3.3.1.2, 'Label Stack Sub-TLV'."
+    ::= { tmnxOamTraceRouteObjs 41 }
+
+tmnxOamLspTrInitDSLabelEntry     OBJECT-TYPE
+    SYNTAX      TmnxOamLspTrInitDSLabelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamLspTrInitDSLabelEntry contains MPLS downstream label
+         information copied by the originating node into the specified RFC 4379
+         Downstream Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV of
+         the first request packet of the 'lspTraceRoute' test run.
+
+         The first three indices specify an 'lspTraceRoute' test run.  The
+         fourth index specifies one TLV in the request packet.  The fifth index
+         specifies a {Downstream Label, Protocol} pair within the TLV.
+
+         Rows are created/destroyed when the parent tmnxOamLspTrInitMapTable
+         row is created/destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamLspTrInitMapIndex,
+        tmnxOamLspTrInitDSLabelIndex
+    }
+    ::= { tmnxOamLspTrInitDSLabelTable 1 }
+
+TmnxOamLspTrInitDSLabelEntry     ::= SEQUENCE
+{
+    tmnxOamLspTrInitDSLabelIndex     Unsigned32,
+    tmnxOamLspTrInitDSLabel          Unsigned32,
+    tmnxOamLspTrInitDSLabelProtocol  Unsigned32
+}
+
+tmnxOamLspTrInitDSLabelIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitDSLabelIndex specifies one RFC 4379
+         Downstream Mapping (or one RFC 6424 Downstream Detailed Mapping)
+         {Downstream Label, Protocol} pair.
+
+         The agent starts assigning tmnxOamLspTrInitDSLabelIndex values at 1
+         for each tmnxOamLspTrInitMapIndex."
+    ::= { tmnxOamLspTrInitDSLabelEntry 1 }
+
+tmnxOamLspTrInitDSLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitDSLabel indicates the value copied into
+         the specified Downstream Label field of the specified RFC 4379
+         Downstream Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV."
+    ::= { tmnxOamLspTrInitDSLabelEntry 2 }
+
+tmnxOamLspTrInitDSLabelProtocol  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLspTrInitDSLabelProtocol indicates the value
+         copied into the specified Protocol field of the specified RFC 4379
+         Downstream Mapping TLV or RFC 6424 Downstream Detailed Mapping TLV."
+    ::= { tmnxOamLspTrInitDSLabelEntry 3 }
+
+tmnxOamIcmpTrOrDgHdrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamIcmpTrOrDgHdrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgHdrTable contains the types of the headers within
+         Original Datagram fields within ICMPv6 responses triggered by
+         'icmpTraceRoute' tests.
+
+         More detailed information read from Original Datagram fields is available
+         in
+             tmnxOamIcmpTrOrDgIPv6Table
+             tmnxOamIcmpTrOrDgSrhTable
+             tmnxOamIcmpTrOrDgSrhSgListTable."
+    REFERENCE
+        "RFC 4443, 'Internet Control Message Protocol (ICMPv6) for the
+         Internet Protocol Version 6 (IPv6) Specification'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages'.
+         RFC 8200, 'Internet Protocol, Version 6 (IPv6) Specification'.
+         RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    ::= { tmnxOamTraceRouteObjs 42 }
+
+tmnxOamIcmpTrOrDgHdrEntry        OBJECT-TYPE
+    SYNTAX      TmnxOamIcmpTrOrDgHdrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgHdrEntry contains the type of one header within one
+         Original Datagram field within one ICMPv6 response triggered by one
+         'icmpTraceRoute' request probe.
+
+         The first six indices specify an 'icmpTraceRoute' ICMPv6 response.  The
+         seventh index specifies one header within the Original Datagram field
+         of the response.
+
+         Rows are created when a managed 'icmpTraceRoute' ICMPv6 response
+         arrives with a parseable Original Datagram field.
+
+         Rows are destroyed when the parent tmnxOamTrProbeHistoryTable row is
+         destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamTrProbeHistoryIndex,
+        tmnxOamTrProbeHistoryHopIndex,
+        tmnxOamTrProbeHistoryProbeIndex,
+        tmnxOamIcmpTrOrDgHdrIndex
+    }
+    ::= { tmnxOamIcmpTrOrDgHdrTable 1 }
+
+TmnxOamIcmpTrOrDgHdrEntry        ::= SEQUENCE
+{
+    tmnxOamIcmpTrOrDgHdrIndex        Unsigned32,
+    tmnxOamIcmpTrOrDgHdrType         TmnxOamIcmpOrigDatagramHdrType
+}
+
+tmnxOamIcmpTrOrDgHdrIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgHdrIndex specifies one header within one
+         Original Datagram field within one ICMPv6 response.
+
+         For each Original Datagram field received, SROS starts assigning
+         tmnxOamIcmpTrOrDgHdrIndex values at 1."
+    ::= { tmnxOamIcmpTrOrDgHdrEntry 1 }
+
+tmnxOamIcmpTrOrDgHdrType         OBJECT-TYPE
+    SYNTAX      TmnxOamIcmpOrigDatagramHdrType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgHdrType indicates the type of the
+         specified header within one Original Datagram field within one ICMPv6
+         response."
+    ::= { tmnxOamIcmpTrOrDgHdrEntry 2 }
+
+tmnxOamIcmpTrOrDgIPv6Table       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamIcmpTrOrDgIPv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgIPv6Table contains the fields of IPv6 headers within
+         Original Datagram fields within ICMPv6 responses triggered by
+         'icmpTraceRoute' tests."
+    REFERENCE
+        "RFC 4443, 'Internet Control Message Protocol (ICMPv6) for the
+         Internet Protocol Version 6 (IPv6) Specification'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages'.
+         RFC 8200, 'Internet Protocol, Version 6 (IPv6) Specification'."
+    ::= { tmnxOamTraceRouteObjs 43 }
+
+tmnxOamIcmpTrOrDgIPv6Entry       OBJECT-TYPE
+    SYNTAX      TmnxOamIcmpTrOrDgIPv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgIPv6Entry contains the fields of one IPv6 header
+         within one Original Datagram field within one ICMPv6 response
+         triggered by one 'icmpTraceRoute' request probe.
+
+         The first six indices specify an 'icmpTraceRoute' ICMPv6 response. The
+         seventh index specifies one IPv6 header within the Original Datagram
+         field of the response.
+
+         Rows are created when a managed 'icmpTraceRoute' ICMPv6 response
+         arrives with a parseable Original Datagram field, containing one or
+         more IPv6 headers.
+
+         A row is destroyed when the parent tmnxOamIcmpTrOrDgHdrTable row is
+         destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamTrProbeHistoryIndex,
+        tmnxOamTrProbeHistoryHopIndex,
+        tmnxOamTrProbeHistoryProbeIndex,
+        tmnxOamIcmpTrOrDgHdrIndex
+    }
+    ::= { tmnxOamIcmpTrOrDgIPv6Table 1 }
+
+TmnxOamIcmpTrOrDgIPv6Entry       ::= SEQUENCE
+{
+    tmnxOamIcmpTrOrDgIPv6DscpName    TDSCPName,
+    tmnxOamIcmpTrOrDgIPv6HopLimit    Unsigned32,
+    tmnxOamIcmpTrOrDgIPv6SrcAddrType InetAddressType,
+    tmnxOamIcmpTrOrDgIPv6SrcAddress  InetAddress,
+    tmnxOamIcmpTrOrDgIPv6DstAddrType InetAddressType,
+    tmnxOamIcmpTrOrDgIPv6DstAddress  InetAddress
+}
+
+tmnxOamIcmpTrOrDgIPv6DscpName    OBJECT-TYPE
+    SYNTAX      TDSCPName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6DscpName indicates a DSCP name
+         derived from the Traffic Class field in the specified IPv6 header."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 1 }
+
+tmnxOamIcmpTrOrDgIPv6HopLimit    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6HopLimit indicates the Hop Limit
+         field in the specified IPv6 header."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 2 }
+
+tmnxOamIcmpTrOrDgIPv6SrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6SrcAddrType indicates the address
+         type of tmnxOamIcmpTrOrDgIPv6SrcAddress.
+
+         'ipv6(2)' is always returned."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 3 }
+
+tmnxOamIcmpTrOrDgIPv6SrcAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6SrcAddress indicates the Source
+         Address (SA) field in the specified IPv6 header."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 4 }
+
+tmnxOamIcmpTrOrDgIPv6DstAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6DstAddrType indicates the address
+         type of tmnxOamIcmpTrOrDgIPv6DstAddress.
+
+         'ipv6(2)' is always returned."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 5 }
+
+tmnxOamIcmpTrOrDgIPv6DstAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgIPv6DstAddress indicates the Destination
+         Address (DA) field in the specified IPv6 header."
+    ::= { tmnxOamIcmpTrOrDgIPv6Entry 6 }
+
+tmnxOamIcmpTrOrDgSrhTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamIcmpTrOrDgSrhEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgSrhTable contains the fields of Segment Routing
+         Headers within Original Datagram fields within ICMPv6 responses
+         triggered by 'icmpTraceRoute' tests.
+
+         The SRH Segment List addresses are available in
+         tmnxOamIcmpTrOrDgSrhSgListTable."
+    REFERENCE
+        "RFC 4443, 'Internet Control Message Protocol (ICMPv6) for the
+         Internet Protocol Version 6 (SRv6) Specification'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages'.
+         RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    ::= { tmnxOamTraceRouteObjs 44 }
+
+tmnxOamIcmpTrOrDgSrhEntry        OBJECT-TYPE
+    SYNTAX      TmnxOamIcmpTrOrDgSrhEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgSrhEntry contains the fields of one SRH within one
+         Original Datagram field within one ICMPv6 response triggered by one
+         'icmpTraceRoute' request probe.
+
+         The first six indices specify an 'icmpTraceRoute' ICMPv6 response. The
+         seventh index specifies one SRH within the Original Datagram field of
+         the response.
+
+         Rows are created when a managed 'icmpTraceRoute' ICMPv6 response
+         arrives with a parseable Original Datagram field, containing one or
+         more Segment Routing Headers.
+
+         A row is destroyed when the parent tmnxOamIcmpTrOrDgHdrTable row is
+         destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamTrProbeHistoryIndex,
+        tmnxOamTrProbeHistoryHopIndex,
+        tmnxOamTrProbeHistoryProbeIndex,
+        tmnxOamIcmpTrOrDgHdrIndex
+    }
+    ::= { tmnxOamIcmpTrOrDgSrhTable 1 }
+
+TmnxOamIcmpTrOrDgSrhEntry        ::= SEQUENCE
+{ tmnxOamIcmpTrOrDgSrhSegmntsLeft  Unsigned32 }
+
+tmnxOamIcmpTrOrDgSrhSegmntsLeft  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgSrhSegmntsLeft indicates the Segments
+         Left field in the specified SRH."
+    ::= { tmnxOamIcmpTrOrDgSrhEntry 1 }
+
+tmnxOamIcmpTrOrDgSrhSgListTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamIcmpTrOrDgSrhSgListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgSrhSgListTable contains the Segment List addresses
+         within Segment Routing Headers within Original Datagram fields within
+         ICMPv6 responses triggered by 'icmpTraceRoute' tests.
+
+         tmnxOamIcmpTrOrDgSrhTable contains other SRH information."
+    REFERENCE
+        "RFC 4443, 'Internet Control Message Protocol (ICMPv6) for the
+         Internet Protocol Version 6 (SRv6) Specification'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages'.
+         RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    ::= { tmnxOamTraceRouteObjs 45 }
+
+tmnxOamIcmpTrOrDgSrhSgListEntry  OBJECT-TYPE
+    SYNTAX      TmnxOamIcmpTrOrDgSrhSgListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamIcmpTrOrDgSrhSgListEntry contains one Segment List address
+         within one SRH within one Original Datagram field within one ICMPv6
+         response triggered by one 'icmpTraceRoute' request probe.
+
+         The first six indices specify an 'icmpTraceRoute' ICMPv6 response.
+
+         The seventh index specifies one SRH within the Original Datagram field
+         of the response.
+
+         The eighth index specifies one Segment List address within tne SRH.
+
+         Rows are created when a managed 'icmpTraceRoute' ICMPv6 response
+         arrives with a parseable Original Datagram field, containing one or
+         more Segment Routing Headers with Segment List addresses.
+
+         Rows are destroyed when the parent tmnxOamIcmpTrOrDgSrhTable row is
+         destroyed."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamTrProbeHistoryIndex,
+        tmnxOamTrProbeHistoryHopIndex,
+        tmnxOamTrProbeHistoryProbeIndex,
+        tmnxOamIcmpTrOrDgHdrIndex,
+        tmnxOamIcmpTrOrDgSrhSgListIndex
+    }
+    ::= { tmnxOamIcmpTrOrDgSrhSgListTable 1 }
+
+TmnxOamIcmpTrOrDgSrhSgListEntry  ::= SEQUENCE
+{
+    tmnxOamIcmpTrOrDgSrhSgListIndex  Unsigned32,
+    tmnxOamIcmpTrOrDgSrhSgListAddrT  InetAddressType,
+    tmnxOamIcmpTrOrDgSrhSgListAddr   InetAddress
+}
+
+tmnxOamIcmpTrOrDgSrhSgListIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgSrhSgListIndex specifies one RFC 8754
+         Segment List entry within one SRH within one Original Datagram field
+         within one ICMPv6 response.
+
+         For each SRH received, SROS starts assigning
+         tmnxOamIcmpTrOrDgSrhSgListIndex values at 1.
+
+         RFC 8754 numbers the Segment List entries from 0. Numbering from 1 is
+         used here to meet the SNMP table indexing convention."
+    REFERENCE
+        "RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    ::= { tmnxOamIcmpTrOrDgSrhSgListEntry 1 }
+
+tmnxOamIcmpTrOrDgSrhSgListAddrT  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgSrhSgListAddrT indicates the address
+         type of tmnxOamIcmpTrOrDgSrhSgListAddr.
+
+         'ipv6(2)' is always returned."
+    ::= { tmnxOamIcmpTrOrDgSrhSgListEntry 2 }
+
+tmnxOamIcmpTrOrDgSrhSgListAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamIcmpTrOrDgSrhSgListAddr indicates one RFC 8754
+         Segment List address."
+    REFERENCE
+        "RFC 8754, 'IPv6 Segment Routing Header (SRH)', Section 2, 'Segment
+         Routing Header'."
+    ::= { tmnxOamIcmpTrOrDgSrhSgListEntry 3 }
 
 tmnxOamSaaObjs                   OBJECT IDENTIFIER ::= { tmnxOamTestObjs 3 }
 
@@ -16744,7 +17669,7 @@ tmnxOamMobGtpPingRefPointType    OBJECT-TYPE
         s2au (15),
         gnu  (16)
     }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMobGtpPingRefPointType specifies the reference
@@ -16755,7 +17680,7 @@ tmnxOamMobGtpPingRefPointType    OBJECT-TYPE
 
 tmnxOamMobGtpPingVRtrId          OBJECT-TYPE
     SYNTAX      TmnxVRtrID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      obsolete
     DESCRIPTION
         "This object was marked obsolete in SROS Release 16.0 R1.  The replacement object is
@@ -16764,7 +17689,7 @@ tmnxOamMobGtpPingVRtrId          OBJECT-TYPE
 
 tmnxOamMobGtpPingPort            OBJECT-TYPE
     SYNTAX      InetPortNumber
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMobGtpPingPort specifies the UDP port number of
@@ -16775,7 +17700,7 @@ tmnxOamMobGtpPingPort            OBJECT-TYPE
 
 tmnxOamMobGtpPingGateway         OBJECT-TYPE
     SYNTAX      TmnxMobGwId
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamMobGtpPingGateway specifies the mobile gateway id.
@@ -16917,7 +17842,7 @@ tmnxOamSysPerfLocalTestTx        OBJECT-TYPE
          3.  Background ICMP Bridged Residential Gateway ping test.
          4.  Filter redirect policy ping test.
          5.  SDP keep-alive.
-         6.  Static route CPE check.
+         6.  Static Route CPE-Check ping test.
          7.  VRRP policy host unreachable ping test."
     ::= { tmnxOamGeneralStats 5 }
 
@@ -17178,9 +18103,9 @@ tmnxOamSysTestCount              OBJECT-TYPE
          number of tests with the following test types:
          1.  Filter redirect policy ping test.
          2.  SDP keep-alive.
-         3.  Static route CPE check.
-         4.  VRRP policy host unreachable ping test.
-         5.  Any OAM or SAA test configured using TIMETRA-OAM-TEST-MIB.
+         3.  VRRP policy host unreachable ping test.
+         4.  Any OAM or SAA test configured using TIMETRA-OAM-TEST-MIB.
+         5.  Static route CPE-Check ping test.
 
          tmnxOamSysTestCount will not exceed tmnxOamSysTestLimit.
 
@@ -17216,9 +18141,9 @@ tmnxOamSysTxTotal                OBJECT-TYPE
          1.  Background ICMP Bridged Residential Gateway ping test.
          2.  Filter redirect policy ping test.
          3.  SDP keep-alive.
-         4.  Static route CPE check.
-         5.  VRRP policy host unreachable ping test.
-         6.  SAA continuous test (see tmnxOamSaaCtlContinuous).
+         4.  VRRP policy host unreachable ping test.
+         5.  SAA continuous test (see tmnxOamSaaCtlContinuous).
+         6.  Static route CPE-Check ping test.
 
          The value of tmnxOamSysTxTotal will not exceed the value of
          tmnxOamSysTxLimit."
@@ -17245,7 +18170,7 @@ tmnxOamSysShareTestCount         OBJECT-TYPE
          number of tests with the following test types:
          1.  Filter redirect policy ping test.
          2.  SDP keep-alive.
-         3.  Static route CPE check.
+         3.  Static Route CPE-Check ping test.
          4.  VRRP policy host unreachable ping test.
          5.  Any OAM or SAA test configured using TIMETRA-OAM-TEST-MIB.
          6.  Any test configured using TIMETRA-OAM-PM-MIB.
@@ -17284,7 +18209,7 @@ tmnxOamSysShareTxTotal           OBJECT-TYPE
          1.  Background ICMP Bridged Residential Gateway ping test.
          2.  Filter redirect policy ping test.
          3.  SDP keep-alive.
-         4.  Static route CPE check.
+         4.  Static Route CPE-Check ping test.
          5.  VRRP policy host unreachable ping test.
          6.  SAA continuous test (see tmnxOamSaaCtlContinuous).
          7.  OAM-PM proactive tests (e.g. a test created using
@@ -17294,6 +18219,149 @@ tmnxOamSysShareTxTotal           OBJECT-TYPE
          The value of tmnxOamSysShareTxTotal will not exceed the value of
          tmnxOamSysShareTxLimit."
     ::= { tmnxOamGeneralStats 25 }
+
+tmnxOamSysCpeCheckStRtSessLimit  OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "sessions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCpeCheckStRtSessLimit indicates the maximum
+         number of static route Customer Premises Equipment (CPE) Check
+         sessions available on this node.
+
+         Sessions are allocated as described in the
+         tmnxOamSysCpeCheckStRtSessCount DESCRIPTION clause."
+    ::= { tmnxOamGeneralStats 26 }
+
+tmnxOamSysCpeCheckStRtSessCount  OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "sessions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCpeCheckStRtSessCount indicates the number of
+         static route Customer Premises Equipment (CPE) Check sessions
+         currently allocated on this node.
+
+         One session is allocated by setting
+         TIMETRA-VRTR-MIB::vRtrInetStaticRouteCpeAddrType to a non-default
+         value.
+
+         tmnxOamSysCpeCheckStRtSessCount will not exceed
+         tmnxOamSysCpeCheckStRtSessLimit.
+
+         Creating a static route CPE-Check session will fail when
+         tmnxOamSysCpeCheckStRtSessCount equals
+         tmnxOamSysCpeCheckStRtSessLimit."
+    ::= { tmnxOamGeneralStats 27 }
+
+tmnxOamSysCfgCpeCheckStRtTxLimit OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "echo request packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCfgCpeCheckStRtTxLimit indicates this node's
+         upper bound on the total configured echo request packet transmission
+         rate for Customer Premises Equipment (CPE) Check pings on static
+         routes.
+
+         The upper bound is enforced to avoid echo request packet transmit
+         overload, i.e.  to ensure each enabled test can transmit echo request
+         packets at the test's configured rate.
+
+         Echo reply packets are not affected by this limit."
+    ::= { tmnxOamGeneralStats 28 }
+
+tmnxOamSysCfgCpeCheckStRtTxTotal OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "echo request packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCfgCpeCheckStRtTxTotal indicates this node's
+         current total configured echo request packet transmission rate for
+         Customer Premises Equipment (CPE) Check pings on static routes.
+
+         CPE Check pings on static routes are started by setting
+         TIMETRA-VRTR-MIB::vRtrInetStaticRouteCpeAddrType to a non-default
+         value.
+
+         The value of tmnxOamSysCfgCpeCheckStRtTxTotal will not exceed the
+         value of tmnxOamSysCfgCpeCheckStRtTxLimit."
+    ::= { tmnxOamGeneralStats 29 }
+
+tmnxOamBackgSharedTxLimit        OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "echo request packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBackgSharedTxLimit indicates this node's
+         upper bound on the total configured echo request packet transmission
+         rate for the test types listed in the tmnxOamBackgSharedTxTotal DESCRIPTION
+         clause.  The upper bound is enforced to avoid echo
+         request packet transmit overload, i.e. to ensure each enabled test can
+         transmit echo request packets at the test's configured rate.
+
+         Echo reply packets are not affected by this limit."
+    ::= { tmnxOamGeneralStats 30 }
+
+tmnxOamBackgSharedTxTotal        OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "echo request packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBackgSharedTxTotal indicates this node's current
+         total configured echo request packet transmission rate, for the
+         following 'always on' test types:
+         1.  Background ICMP Bridged Residential Gateway ping test.
+         2.  Filter redirect policy ping test.
+         3.  SDP keep-alive.
+         4.  VRRP policy host unreachable ping test.
+         5.  SAA continuous test (see tmnxOamSaaCtlContinuous).
+         6.  Static Route CPE-Check ping test.
+
+         The value of tmnxOamBackgSharedTxTotal will not exceed the value of
+         tmnxOamBackgSharedTxLimit."
+    ::= { tmnxOamGeneralStats 31 }
+
+tmnxOamSysCpeCheckStHstSessLimit OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "sessions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCpeCheckStHstSessLimit indicates the maximum
+         number of static host Customer Premises Equipment (CPE) Check sessions
+         available on this node.
+
+         Sessions are allocated as described in the
+         tmnxOamSysCpeCheckStHstSessCount DESCRIPTION clause."
+    ::= { tmnxOamGeneralStats 32 }
+
+tmnxOamSysCpeCheckStHstSessCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "sessions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSysCpeCheckStHstSessCount indicates the number of
+         static host Customer Premises Equipment (CPE) Check sessions currently
+         allocated on this node.
+
+         One session is allocated by setting
+         TIMETRA-SAP-MIB::tmnxSapMRtCpeChkRowStatus to 'createAndGo'.
+
+         tmnxOamSysCpeCheckStHstSessCount will not exceed
+         tmnxOamSysCpeCheckStHstSessLimit.
+
+         Creating a static host CPE-Check session will fail when
+         tmnxOamSysCpeCheckStHstSessCount equals
+         tmnxOamSysCpeCheckStHstSessLimit."
+    ::= { tmnxOamGeneralStats 33 }
 
 tmnxOamMplsEchoDownstreamMapTlv  OBJECT-TYPE
     SYNTAX      TmnxOamMplsEchoDownMapTlv
@@ -17331,6 +18399,67 @@ tmnxOamMplsEchoDownstreamMapTlv  OBJECT-TYPE
          objects need not be set when creating tests."
     DEFVAL      { dsmap }
     ::= { tmnxOamGeneralObjs 3 }
+
+tmnxOamICMPv6ErrorMsgLengthField OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamICMPv6ErrorMsgLengthField specifies how to set the
+         Length field when building an RFC 4884 ICMPv6 Destination Unreachable
+         Message or an RFC 4884 ICMPv6 Time Exceeded Message.
+
+         When tmnxOamICMPv6ErrorMsgLengthField='false', the Length field is set
+         to zero. This setting provides less functionality, but may be required
+         for backward compatibility.
+
+         When tmnxOamICMPv6ErrorMsgLengthField='true', the Length field is set
+         to the length of the response's Original Datagram field.
+
+         When the originating node of an IPv6 'icmpTraceRoute(5)' test receives
+         an ICMPv6 response with the Length field set to a non-zero value, it
+         can find more information in the response, and can therefore generate
+         more results for the test.
+
+         See tmnxOamICMPv6ErrorMsgMaxOrigData and tmnxOamIcmpTrOrDgHdrTable for
+         related information."
+    REFERENCE
+        "RFC 4884, 'Extended ICMP to Support Multi-Part Messages', Section 4.4,
+         'ICMPv6 Destination Unreachable'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages', Section 4.5,
+         'ICMPv6 Time Exceeded'."
+    DEFVAL      { false }
+    ::= { tmnxOamGeneralObjs 4 }
+
+tmnxOamICMPv6ErrorMsgMaxOrigData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamICMPv6ErrorMsgMaxOrigData specifies the amount of
+         information to copy from the request packet when building an RFC 4884
+         ICMPv6 Destination Unreachable Message or an RFC 4884 ICMPv6 Time
+         Exceeded Message.
+
+         When tmnxOamICMPv6ErrorMsgMaxOrigData='true', the Original Datagram
+         field of the ICMPv6 Message built is made as large as possible (while
+         ensuring the Message does not need to be fragmented).  This setting
+         provides as much information as possible to the originator of an IPv6
+         'icmpTraceRoute' test.
+
+         When tmnxOamICMPv6ErrorMsgMaxOrigData='false', the Original Datagram
+         field of the ICMPv6 Message built may be smaller. This setting
+         provides less functionality, but may be required for backward
+         compatibility.
+
+         See tmnxOamICMPv6ErrorMsgLengthField and tmnxOamIcmpTrOrDgHdrTable for
+         related information."
+    REFERENCE
+        "RFC 4443, 'Internet Control Message Protocol (ICMPv6) for the
+         Internet Protocol Version 6 (IPv6) Specification'.
+         RFC 4884, 'Extended ICMP to Support Multi-Part Messages'."
+    DEFVAL      { false }
+    ::= { tmnxOamGeneralObjs 5 }
 
 tmnxOamDiagObjs                  OBJECT IDENTIFIER ::= { tmnxOamTestObjs 6 }
 
@@ -17499,7 +18628,7 @@ tmnxOamFindEgrDiagCtlLastChanged OBJECT-TYPE
 
 tmnxOamFindEgrDiagCtlPacketNum   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..65535)
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagCtlPacketNum specifies the packet
@@ -17514,7 +18643,7 @@ tmnxOamFindEgrDiagCtlPacketNum   OBJECT-TYPE
 
 tmnxOamFindEgrDiagCtlIngPortId   OBJECT-TYPE
     SYNTAX      TmnxPortID
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagCtlIngPortId specifies the ingress port
@@ -17606,12 +18735,10 @@ tmnxOamFindEgrDiagEgressPort     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagEgressPort indicates the egress port
-         selected by SROS for the specified test.  This is the main test result
-         of the OAM Egress Finder.
+         selected by SROS for the specified test run.
 
-         The null port identifier 0x1e000000 is returned when:
-         1.  The test run is not complete (see tmnxOamFindEgrDiagOperState), or
-         2.  The test run failed."
+         The NULL port identifier (i.e. 0x1E000000) is returned when no port is
+         available."
     ::= { tmnxOamFindEgrDiagResultsEntry 3 }
 
 tmnxOamFindEgrDiagEgrRtrInstName OBJECT-TYPE
@@ -17621,7 +18748,7 @@ tmnxOamFindEgrDiagEgrRtrInstName OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagEgrRtrInstName indicates the name of
          the egress service or egress router instance selected by SROS for the
-         specified test.
+         specified test run.
 
          SROS provides one of the following values:
          1.  '' (i.e. the empty string),
@@ -17629,8 +18756,7 @@ tmnxOamFindEgrDiagEgrRtrInstName OBJECT-TYPE
          3.  A VPRN service name (i.e. a TIMETRA-SERV-MIB::svcName, with
              TIMETRA-SERV-MIB::svcType = 'vprn(4)').
 
-         The empty string is returned when the egress service or egress router
-         instance was not found (e.g. because the test failed)."
+         The empty string is returned when no router instance is available."
     ::= { tmnxOamFindEgrDiagResultsEntry 4 }
 
 tmnxOamFindEgrDiagEgressIfName   OBJECT-TYPE
@@ -17639,13 +18765,12 @@ tmnxOamFindEgrDiagEgressIfName   OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagEgressIfName indicates the egress
-         interface name selected by SROS for the specified test.
+         interface name selected by SROS for the specified test run.
 
          tmnxOamFindEgrDiagEgrRtrInstName and tmnxOamFindEgrDiagEgressIfName
          uniquely identify an interface.
 
-         The empty string is returned when the egress interface name was not
-         found (e.g. because the test failed)."
+         The empty string is returned when no interface name is available."
     ::= { tmnxOamFindEgrDiagResultsEntry 5 }
 
 tmnxOamFindEgrDiagNextHopAddrTyp OBJECT-TYPE
@@ -17656,8 +18781,7 @@ tmnxOamFindEgrDiagNextHopAddrTyp OBJECT-TYPE
         "The value of tmnxOamFindEgrDiagNextHopAddrTyp indicates the address
          type of tmnxOamFindEgrDiagNextHopAddress.
 
-         'unknown(0)' is returned when the next hop address was not found (e.g.
-         because the test failed)."
+         'unknown(0)' is returned when no next hop address is available."
     ::= { tmnxOamFindEgrDiagResultsEntry 6 }
 
 tmnxOamFindEgrDiagNextHopAddress OBJECT-TYPE
@@ -17666,7 +18790,7 @@ tmnxOamFindEgrDiagNextHopAddress OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamFindEgrDiagNextHopAddress indicates the next hop
-         address selected by SROS for the specified test."
+         address selected by SROS for the specified test run."
     ::= { tmnxOamFindEgrDiagResultsEntry 7 }
 
 tmnxOamBuildPktCtlTable          OBJECT-TYPE
@@ -19494,7 +20618,15 @@ TmnxOamLnkMeasTmplCtlEntry       ::= SEQUENCE
     tmnxOamLnkMeasTmplCtlASWIntgrity Unsigned32,
     tmnxOamLnkMeasTmplCtlASWThrldRel Unsigned32,
     tmnxOamLnkMeasTmplCtlASWThrldAbs Unsigned32,
-    tmnxOamLnkMeasTmplCtlAdminState  TmnxEnabledDisabledAdminState
+    tmnxOamLnkMeasTmplCtlAdminState  TmnxEnabledDisabledAdminState,
+    tmnxOamLnkMeasTmplCtlTwl6DscItvl Unsigned32,
+    tmnxOamLnkMeasTmplCtlTwl6DscTimr Unsigned32,
+    tmnxOamLnkMeasTmplCtlTwl6UpdItvl Unsigned32,
+    tmnxOamLnkMeasTmplCtlTwl6AdmSta  TmnxEnabledDisabledAdminState,
+    tmnxOamLnkMeasTmplCtlSrcUdpPort  InetPortNumber,
+    tmnxOamLnkMeasTmplCtlReporting   TmnxEnabledDisabled,
+    tmnxOamLnkMeasTmplCtlPadTlvSize  Unsigned32,
+    tmnxOamLnkMeasTmplCtlRetPathLink TruthValue
 }
 
 tmnxOamLnkMeasTmplCtlName        OBJECT-TYPE
@@ -19926,6 +21058,131 @@ tmnxOamLnkMeasTmplCtlAdminState  OBJECT-TYPE
     DEFVAL      { disabled }
     ::= { tmnxOamLnkMeasTmplCtlEntry 25 }
 
+tmnxOamLnkMeasTmplCtlTwl6DscItvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlTwl6DscItvl specifies the
+         transmission frequency of the discovery packet on the all-routers
+         multicast group (ff02::2) during the discovery of a peer's link-local
+         address. The probe packets will be transmitted at this frequency for
+         the duration of the initial discovery phase as defined by
+         tmnxOamLnkMeasTmplCtlTwl6DscTimr. The probe packets are sent when the
+         test-oam link-measurement protocol is set to IPv6 and no destination
+         address has been configured."
+    DEFVAL      { 10 }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 26 }
+
+tmnxOamLnkMeasTmplCtlTwl6DscTimr OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlTwl6DscTimr specifies the length of
+         time the discovery process remains in its initial phase following a
+         link-measurement transition to operational up. The expiration of this
+         timer causes an exit of the initial discovery. The
+         tmnxOamLnkMeasTmplCtlTwl6UpdItvl frequency is used after this timer
+         expires."
+    DEFVAL      { 60 }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 27 }
+
+tmnxOamLnkMeasTmplCtlTwl6UpdItvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlTwl6UpdItvl specifies the frequency
+         used for probe packets once tmnxOamLnkMeasTmplCtlTwl6DscTimr timer
+         expires. This is typically for maintaining and discovering changes to
+         a previously discovered peer. The frequency for maintaining the peer
+         should be much less aggressive than that used for the
+         initial-discovery phase."
+    DEFVAL      { 600 }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 28 }
+
+tmnxOamLnkMeasTmplCtlTwl6AdmSta  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlTwl6AdmSta specifies the enabling
+         and disabling of the IPv6 peer discovery. If the protocol for the
+         test-oam link-measurement interface test is IPv6, and there is no peer
+         specified, tmnxOamLnkMeasTmplCtlTwl6AdmSta set to 'enabled' will
+         enable IPv6 peer discovery and the link-local peer will be
+         auto-learned."
+    DEFVAL      { disabled }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 29 }
+
+tmnxOamLnkMeasTmplCtlSrcUdpPort  OBJECT-TYPE
+    SYNTAX      InetPortNumber (0 | 64374..64383)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlSrcUdpPort specifies an optional
+         configuration to specify the source UDP port for the test. If this is
+         configured, the source UDP port must be associated with the
+         link-measurement pool. Only values associated with the
+         link-measurement pool can be configured for link-measurement tests.
+         The default of unconfigured for tmnxOamLnkMeasTmplCtlSrcUdpPort means
+         a source UDP port will be automatically allocated from the dynamic
+         range (49152..65535, excluding reserved ranges like 64374..64383)."
+    DEFVAL      { 0 }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 30 }
+
+tmnxOamLnkMeasTmplCtlReporting   OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlReporting specifies whether values
+         that cross a configured threshold should be reported to the routing
+         engine. When reporting is enabled, values that cross thresholds will
+         report changes to the routing engine. When reporting is disabled,
+         values that cross thresholds are not reported to the routing engine.
+         In both case the sample window and aggregate sample window information
+         and computed values are stored on the node until overwriting occurs."
+    DEFVAL      { enabled }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 31 }
+
+tmnxOamLnkMeasTmplCtlPadTlvSize  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 4..9714)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlPadTlvSize specifies a pad TLV be
+         included when the value is non-zero. The length of pad TLV is equal to
+         the configured value."
+    REFERENCE
+        "RFC 8972, 'Simple Two-Way Active Measurement Protocol Optional
+         Extensions'"
+    DEFVAL      { 0 }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 32 }
+
+tmnxOamLnkMeasTmplCtlRetPathLink OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasTmplCtlRetPathLink specifies whether the
+         return-path TLV is included with the test packet. The Return Path TLV
+         contains one or more sub-TLVs to carry the information for the
+         requested return path. The control code is a 32-bit field. Support has
+         been introduced for control-code 0x1 (the presence of control-code 0x1
+         is equivalent to tmnxOamLnkMeasTmplCtlRetPathLink = true). This
+         control code instructs the reflector to use the link the test packet
+         arrived on for the reflected packet. The destination IP address of the
+         reflected packet must be reachable from this interface, or the packet
+         will be discarded on the reflector."
+    DEFVAL      { false }
+    ::= { tmnxOamLnkMeasTmplCtlEntry 33 }
+
 tmnxOamLnkMeasIfResTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxOamLnkMeasIfResEntry
     MAX-ACCESS  not-accessible
@@ -19975,7 +21232,10 @@ TmnxOamLnkMeasIfResEntry         ::= SEQUENCE
     tmnxOamLnkMeasIfResTimestampUTC  DateAndTime,
     tmnxOamLnkMeasIfResTriggeredBy   INTEGER,
     tmnxOamLnkMeasIfResNewestASWIdx  Unsigned32,
-    tmnxOamLnkMeasIfResNewestSWIdx   Unsigned32
+    tmnxOamLnkMeasIfResNewestSWIdx   Unsigned32,
+    tmnxOamLnkMeasIfResSrcUdpPort    InetPortNumber,
+    tmnxOamLnkMeasIfResDstUdpPort    InetPortNumber,
+    tmnxOamLnkMeasIfResStampSessId   Unsigned32
 }
 
 tmnxOamLnkMeasIfResSrcIpAddrTy   OBJECT-TYPE
@@ -20179,7 +21439,8 @@ tmnxOamLnkMeasIfResTriggeredBy   OBJECT-TYPE
         sampleThresholdRelative    (3),
         aggregateThresholdAbsolute (4),
         aggregateThresholdRelative (5),
-        expired                    (6)
+        expired                    (6),
+        reportingDisabled          (7)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -20190,7 +21451,11 @@ tmnxOamLnkMeasIfResTriggeredBy   OBJECT-TYPE
          window threshold (absolute or relative), has not yet been triggered
          (none) or has been discarded because the age of the last reported
          delay (tmnxOamLnkMeasIfResDelayReported) exceeded the value configured
-         by tmnxOamLnkMeasTmplCtlLastRepHold."
+         by tmnxOamLnkMeasTmplCtlLastRepHold.
+
+         'reportingDisabled' indicates that the clear value for
+         tmnxOamLnkMeasIfResDelayReported was sent to the routing engine
+         because one or more link measurement parameters were deconfigured."
     ::= { tmnxOamLnkMeasIfResEntry 13 }
 
 tmnxOamLnkMeasIfResNewestASWIdx  OBJECT-TYPE
@@ -20218,6 +21483,33 @@ tmnxOamLnkMeasIfResNewestSWIdx   OBJECT-TYPE
          A value of zero indicates there are no sample window results for this
          interface."
     ::= { tmnxOamLnkMeasIfResEntry 15 }
+
+tmnxOamLnkMeasIfResSrcUdpPort    OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResSrcUdpPort indicates the source UDP
+         port in use for this interface."
+    ::= { tmnxOamLnkMeasIfResEntry 16 }
+
+tmnxOamLnkMeasIfResDstUdpPort    OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResDstUdpPort indicates the destination
+         UDP port in use for this interface."
+    ::= { tmnxOamLnkMeasIfResEntry 17 }
+
+tmnxOamLnkMeasIfResStampSessId   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResStampSessId indicates the
+         autogenerated session-ID assigned to the session."
+    ::= { tmnxOamLnkMeasIfResEntry 18 }
 
 tmnxOamLnkMeasIfResASWTable      OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxOamLnkMeasIfResASWEntry
@@ -20446,7 +21738,11 @@ TmnxOamLnkMeasIfResSWEntry       ::= SEQUENCE
     tmnxOamLnkMeasIfResSWAvg         Unsigned32,
     tmnxOamLnkMeasIfResSWErrors      Unsigned32,
     tmnxOamLnkMeasIfResSWIntegrity   TruthValue,
-    tmnxOamLnkMeasIfResSWResult      Unsigned32
+    tmnxOamLnkMeasIfResSWResult      Unsigned32,
+    tmnxOamLnkMeasIfResSWStampUFlag  Unsigned32,
+    tmnxOamLnkMeasIfResSWStampMFlag  Unsigned32,
+    tmnxOamLnkMeasIfResSWZeroNegErr  Unsigned32,
+    tmnxOamLnkMeasIfResSWDuplicatErr Unsigned32
 }
 
 tmnxOamLnkMeasIfResSWIndex       OBJECT-TYPE
@@ -20589,6 +21885,141 @@ tmnxOamLnkMeasIfResSWResult      OBJECT-TYPE
          being evaluated for report according to
          tmnxOamLnkMeasTmplCtlDelayMeasTy when this sample window was open."
     ::= { tmnxOamLnkMeasIfResSWEntry 11 }
+
+tmnxOamLnkMeasIfResSWStampUFlag  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResSWStampUFlag indicates the count of
+         packets in this sample window with the U (Unrecognized) bit set in the
+         flags field of the TLV."
+    ::= { tmnxOamLnkMeasIfResSWEntry 12 }
+
+tmnxOamLnkMeasIfResSWStampMFlag  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResSWStampMFlag indicates the count of
+         packets in this sample window with the M (Malformed) bit set in the
+         flags field of the TLV."
+    ::= { tmnxOamLnkMeasIfResSWEntry 13 }
+
+tmnxOamLnkMeasIfResSWZeroNegErr  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResSWZeroNegErr indicates the count of
+         packets that have a zero or negative computed delay. Both conditions
+         are anomalous. Incrementing the counters for unidirectional=actual
+         occurs when either direction (FWD=T2-T1 or BW=T4-T3) report the
+         condition. A negative or zero in either direction calls in to question
+         the value of the measurement in general. When using unidirectional
+         derived tmnxOamLnkMeasIfResSWZeroNegErr will only be incremented if
+         the round-trip result was negative."
+    ::= { tmnxOamLnkMeasIfResSWEntry 14 }
+
+tmnxOamLnkMeasIfResSWDuplicatErr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamLnkMeasIfResSWDuplicatErr indicates the count of
+         duplicate packets that have arrived during this sample window."
+    ::= { tmnxOamLnkMeasIfResSWEntry 15 }
+
+tmnxOamTwlSrcUdpPoolsTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamTwlSrcUdpPoolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamTwlSrcUdpPoolsTable allows OAM source UDP ports to be assigned
+         to one of two pools, OAM-PM or link-measurement."
+    ::= { tmnxOamLnkMeasObjs 5 }
+
+tmnxOamTwlSrcUdpPoolsEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamTwlSrcUdpPoolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamTwlSrcUdpPoolsEntry contains reserved source UDP port pool
+         assignment information. The ports in this pool are in the range of
+         64374..64383. All rows in this table exist on boot. Rows cannot be
+         created or destroyed."
+    INDEX       { tmnxOamTwlSrcUdpPoolsPort }
+    ::= { tmnxOamTwlSrcUdpPoolsTable 1 }
+
+TmnxOamTwlSrcUdpPoolsEntry       ::= SEQUENCE
+{
+    tmnxOamTwlSrcUdpPoolsPort        InetPortNumber,
+    tmnxOamTwlSrcUdpPoolsPoolType    INTEGER
+}
+
+tmnxOamTwlSrcUdpPoolsPort        OBJECT-TYPE
+    SYNTAX      InetPortNumber (64374..64383)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamTwlSrcUdpPoolsPort specifies the source UDP port
+         used by the TWAMP Light test PDU in the reserved range 64374..64383.
+         Which application this source UDP port is allocated is based on
+         tmnxOamTwlSrcUdpPoolsPoolType."
+    ::= { tmnxOamTwlSrcUdpPoolsEntry 1 }
+
+tmnxOamTwlSrcUdpPoolsPoolType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        oamPm           (1),
+        linkMeasurement (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamTwlSrcUdpPoolsPoolType specifies the application
+         (link-measurement or oam-pm) that may configure tests or sessions for
+         the corresponding source UDP port. Only source UDP ports assigned to
+         the application may make use of this source UDP port. A source UDP
+         port cannot be allocated to a different application if it is part of a
+         configured test or session, regardless of that test's or session's
+         administrative or operational state."
+    DEFVAL      { oamPm }
+    ::= { tmnxOamTwlSrcUdpPoolsEntry 2 }
+
+tmnxOamStsTwlSrcUdpPoolsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamStsTwlSrcUdpPoolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamStsTwlSrcUdpPoolsTable contains OAM source UDP port usage data."
+    ::= { tmnxOamLnkMeasObjs 6 }
+
+tmnxOamStsTwlSrcUdpPoolsEntry    OBJECT-TYPE
+    SYNTAX      TmnxOamStsTwlSrcUdpPoolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamStsTwlSrcUdpPoolsEntry contains OAM source UDP port usage data."
+    INDEX       { tmnxOamTwlSrcUdpPoolsPort }
+    ::= { tmnxOamStsTwlSrcUdpPoolsTable 1 }
+
+TmnxOamStsTwlSrcUdpPoolsEntry    ::= SEQUENCE
+{ tmnxOamStsTwlSrcUdpPoolsInUse    TruthValue }
+
+tmnxOamStsTwlSrcUdpPoolsInUse    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamStsTwlSrcUdpPoolsInUse indicates whether this
+         source UDP port is in use under the application to which it is
+         allocated. When tmnxOamStsTwlSrcUdpPoolsInUse is true, at least one
+         test or session under the application to which it has been allocated
+         has configured this source UDP port. If tmnxOamStsTwlSrcUdpPoolsInUse
+         is false, no tests or sessions under that application is configured to
+         use this source UDP port. A source UDP port cannot be allocated to a
+         different application when this value is true."
+    ::= { tmnxOamStsTwlSrcUdpPoolsEntry 1 }
 
 tmnxOamTestConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 11 }
 
@@ -20958,7 +22389,7 @@ tmnxOamPing7xx0V15v0Compliance   MODULE-COMPLIANCE
     ::= { tmnxOamPingCompliances 20 }
 
 tmnxOamPing7xx0V16v0Compliance   MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for OAM ping OBJECT-GROUPs added in Nokia
          SROS series systems, release 16.0."
@@ -21015,6 +22446,52 @@ tmnxOamPing7xx0V20v0Compliance   MODULE-COMPLIANCE
         }
     ::= { tmnxOamPingCompliances 23 }
 
+tmnxOamPing7xx0V22v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM ping OBJECT-GROUPs added in Nokia
+         SROS series systems, release 22."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamPingV22v0Group
+        }
+    ::= { tmnxOamPingCompliances 24 }
+
+tmnxOamPing7xx0V23v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM ping OBJECT-GROUPs added in Nokia
+         SROS series systems, release 23.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamPingNotificationV7v0Group,
+            tmnxOamAncpTestV5v0Group,
+            tmnxOamCpePingV4v0Group,
+            tmnxOamEthCfmPingV8v0Group,
+            tmnxOamIcmpPingGroup,
+            tmnxOamLspPingV11v0Group,
+            tmnxOamMRInfoV4v0Group,
+            tmnxOamMacPingCtlV11v0Group,
+            tmnxOamMacPingHistoryV11v0Group,
+            tmnxOamMfibPingV6v0Group,
+            tmnxOamMobilePingV16v0Group,
+            tmnxOamP2mpLspPingGroup,
+            tmnxOamP2mpLspPingV8v0Group,
+            tmnxOamP2mpLspPingV10v0Group,
+            tmnxOamPingCtlV10v0Group,
+            tmnxOamPingGeneralV10v0Group,
+            tmnxOamPingObsoletedV16v0Group,
+            tmnxOamPingV11v0Group,
+            tmnxOamPingV12v0Group,
+            tmnxOamPingV16v0Group,
+            tmnxOamTrV16v0Group,
+            tmnxOamVccvPingV5v0Group,
+            tmnxOamVccvPingV9v0Group,
+            tmnxOamVccvPingV11v0Group,
+            tmnxOamVprnPingV4v0Group
+        }
+    ::= { tmnxOamPingCompliances 25 }
+
 tmnxOamPingGroups                OBJECT IDENTIFIER ::= { tmnxOamPingConformance 2 }
 
 tmnxOamMacPingL2MapGroup         OBJECT-GROUP
@@ -21041,7 +22518,7 @@ tmnxOamAtmPingR2r1Group          OBJECT-GROUP
         tmnxOamAtmPingCtlLpbkLocation,
         tmnxOamAtmPingCtlSegment
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of OAM ATM Ping tests on
          Nokia SROS series systems."
@@ -22251,6 +23728,35 @@ tmnxOamBierPingV20v0Group        OBJECT-GROUP
          tests on Nokia SROS series systems running release 20."
     ::= { tmnxOamPingV20v0ObjGroups 1 }
 
+tmnxOamPingV22v0ObjGroups        OBJECT IDENTIFIER ::= { tmnxOamPingGroups 65 }
+
+tmnxOamPingV22v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamPingCtlNewestRunIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of OAM Ping
+         tests on Nokia SROS series systems running release 22."
+    ::= { tmnxOamPingV22v0ObjGroups 1 }
+
+tmnxOamPingV23v0ObjGroups        OBJECT IDENTIFIER ::= { tmnxOamPingGroups 66 }
+
+tmnxOamPingObsoletedV23v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamAtmPingCtlPortId,
+        tmnxOamAtmPingCtlVpi,
+        tmnxOamAtmPingCtlVci,
+        tmnxOamAtmPingCtlLpbkLocation,
+        tmnxOamAtmPingCtlSegment
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of OAM ATM Ping tests
+         operations on Nokia SR series systems that were made obsolete in
+         release 23."
+    ::= { tmnxOamPingV23v0ObjGroups 2 }
+
 tmnxOamIfPingObjGroups           OBJECT IDENTIFIER ::= { tmnxOamPingConformance 3 }
 
 tmnxOamIfPingV20v0Group          OBJECT-GROUP
@@ -22368,6 +23874,32 @@ tmnxOamLnkMeasV21v0Group         OBJECT-GROUP
         "The group of objects supporting the OAM Link Measurement functionality
          on Nokia SROS Release 21.0."
     ::= { tmnxOamLnkMeasObjsGroups 1 }
+
+tmnxOamLnkMeasV22v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamLnkMeasTmplCtlPadTlvSize,
+        tmnxOamLnkMeasTmplCtlReporting,
+        tmnxOamLnkMeasTmplCtlRetPathLink,
+        tmnxOamLnkMeasTmplCtlSrcUdpPort,
+        tmnxOamLnkMeasTmplCtlTwl6AdmSta,
+        tmnxOamLnkMeasTmplCtlTwl6DscItvl,
+        tmnxOamLnkMeasTmplCtlTwl6DscTimr,
+        tmnxOamLnkMeasTmplCtlTwl6UpdItvl,
+        tmnxOamLnkMeasIfResSrcUdpPort,
+        tmnxOamLnkMeasIfResDstUdpPort,
+        tmnxOamLnkMeasIfResStampSessId,
+        tmnxOamLnkMeasIfResSWStampUFlag,
+        tmnxOamLnkMeasIfResSWStampMFlag,
+        tmnxOamLnkMeasIfResSWZeroNegErr,
+        tmnxOamLnkMeasIfResSWDuplicatErr,
+        tmnxOamTwlSrcUdpPoolsPoolType,
+        tmnxOamStsTwlSrcUdpPoolsInUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects adding STAMP performance measurement to OAM Link
+         Measurement functionality on Nokia SROS Release 22.0."
+    ::= { tmnxOamLnkMeasObjsGroups 2 }
 
 tmnxOamTraceRouteConformance     OBJECT IDENTIFIER ::= { tmnxOamTestConformance 2 }
 
@@ -22650,6 +24182,29 @@ tmnxOamTr7xx0V21v0Compliance     MODULE-COMPLIANCE
             tmnxOamIcmpTrV21v0Group
         }
     ::= { tmnxOamTrCompliances 20 }
+
+tmnxOamTr7xx0V22v0Compliance     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM trace OBJECT-GROUPs added in Nokia
+         SROS series systems, release 22."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamIcmpTrV22v0Group,
+            tmnxOamLspTrV22v0Group
+        }
+    ::= { tmnxOamTrCompliances 21 }
+
+tmnxOamTr7xx0V23v0Compliance     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM trace OBJECT-GROUPs added in Nokia
+         SROS series systems, release 23."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamIcmpTrV23v0Group
+        }
+    ::= { tmnxOamTrCompliances 22 }
 
 tmnxOamTrGroups                  OBJECT IDENTIFIER ::= { tmnxOamTraceRouteConformance 2 }
 
@@ -23738,6 +25293,68 @@ tmnxOamIcmpTrV21v0Group          OBJECT-GROUP
          tests on Nokia SROS series systems running release 21."
     ::= { tmnxOamTrV21v0ObjGroups 1 }
 
+tmnxOamTrV22v0ObjGroups          OBJECT IDENTIFIER ::= { tmnxOamTrGroups 49 }
+
+tmnxOamLspTrV22v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamLspTrInitDSLabel,
+        tmnxOamLspTrInitDSLabelProtocol,
+        tmnxOamLspTrInitMapAddrType,
+        tmnxOamLspTrInitMapDsEgrIfNum,
+        tmnxOamLspTrInitMapDsIfAddr,
+        tmnxOamLspTrInitMapDsIfAddrType,
+        tmnxOamLspTrInitMapDsIpAddr,
+        tmnxOamLspTrInitMapDsIpAddrType,
+        tmnxOamLspTrInitMapMTU,
+        tmnxOamTrResultsSize,
+        tmnxOamTrResultsSrcAddrType,
+        tmnxOamTrResultsSrcAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of
+         'lspTraceRoute' tests on Nokia SROS series systems running release 22."
+    ::= { tmnxOamTrV22v0ObjGroups 1 }
+
+tmnxOamIcmpTrV22v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamICMPv6ErrorMsgLengthField,
+        tmnxOamICMPv6ErrorMsgMaxOrigData,
+        tmnxOamIcmpTrOrDgHdrType,
+        tmnxOamIcmpTrOrDgIPv6DscpName,
+        tmnxOamIcmpTrOrDgIPv6DstAddrType,
+        tmnxOamIcmpTrOrDgIPv6DstAddress,
+        tmnxOamIcmpTrOrDgIPv6HopLimit,
+        tmnxOamIcmpTrOrDgIPv6SrcAddrType,
+        tmnxOamIcmpTrOrDgIPv6SrcAddress,
+        tmnxOamIcmpTrOrDgSrhSegmntsLeft,
+        tmnxOamIcmpTrOrDgSrhSgListAddr,
+        tmnxOamIcmpTrOrDgSrhSgListAddrT
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of
+         'icmpTraceRoute' tests on Nokia SROS series systems running release
+         22."
+    ::= { tmnxOamTrV22v0ObjGroups 2 }
+
+tmnxOamTrV23v0ObjGroups          OBJECT IDENTIFIER ::= { tmnxOamTrGroups 50 }
+
+tmnxOamIcmpTrV23v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamIcmpTrCtlSrV6PlcyColor,
+        tmnxOamIcmpTrCtlSrV6PlcyEndPtAdd,
+        tmnxOamIcmpTrCtlSrV6PlcyEndPtAdT,
+        tmnxOamIcmpTrCtlSrV6PlcySegList,
+        tmnxOamIcmpTrCtlTestSubMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of
+         'icmpTraceRoute' tests on Nokia SROS series systems running release
+         23."
+    ::= { tmnxOamTrV23v0ObjGroups 1 }
+
 tmnxOamSaaConformance            OBJECT IDENTIFIER ::= { tmnxOamTestConformance 3 }
 
 tmnxOamSaaCompliances            OBJECT IDENTIFIER ::= { tmnxOamSaaConformance 1 }
@@ -23968,6 +25585,19 @@ tmnxOamGeneralV20v0Compliance    MODULE-COMPLIANCE
         }
     ::= { tmnxOamGeneralCompliances 10 }
 
+tmnxOamGeneralV22v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of OAM general capabilities
+         added in Nokia SROS series systems for Release 22."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamGenSessPoolStHstV22v0Grp,
+            tmnxOamGenSessPoolStRtV22v0Group,
+            tmnxOamGenTxPoolV22v0Group
+        }
+    ::= { tmnxOamGeneralCompliances 12 }
+
 tmnxOamGeneralGroups             OBJECT IDENTIFIER ::= { tmnxOamGeneralConformance 2 }
 
 tmnxOamGeneralV8v0Group          OBJECT-GROUP
@@ -24073,6 +25703,41 @@ tmnxOamGenObsoletedV21v0Group    OBJECT-GROUP
         "The group of OAM general objects obsoleted in release 21."
     ::= { tmnxOamGeneralGroups 12 }
 
+tmnxOamGenSessPoolStRtV22v0Group OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamSysCpeCheckStRtSessCount,
+        tmnxOamSysCpeCheckStRtSessLimit
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of additional objects supporting management of general OAM
+         test capabilities on Nokia SROS systems, release 22."
+    ::= { tmnxOamGeneralGroups 13 }
+
+tmnxOamGenTxPoolV22v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamBackgSharedTxLimit,
+        tmnxOamBackgSharedTxTotal,
+        tmnxOamSysCfgCpeCheckStRtTxLimit,
+        tmnxOamSysCfgCpeCheckStRtTxTotal
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of additional objects supporting management of general OAM
+         test capabilities on Nokia SROS systems, release 22."
+    ::= { tmnxOamGeneralGroups 14 }
+
+tmnxOamGenSessPoolStHstV22v0Grp  OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamSysCpeCheckStHstSessCount,
+        tmnxOamSysCpeCheckStHstSessLimit
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of additional objects supporting management of general OAM
+         test capabilities on Nokia SROS systems, release 22."
+    ::= { tmnxOamGeneralGroups 15 }
+
 tmnxOamDiagConformance           OBJECT IDENTIFIER ::= { tmnxOamTestConformance 6 }
 
 tmnxOamDiagCompliances           OBJECT IDENTIFIER ::= { tmnxOamDiagConformance 1 }
@@ -24174,6 +25839,8 @@ tmnxOamDiagNotifyObjsV16v0Group  OBJECT-GROUP
          release 16.0."
     ::= { tmnxOamDiagGroups 3 }
 
+tmnxOamDiagV23v0Groups           OBJECT IDENTIFIER ::= { tmnxOamDiagGroups 8 }
+
 tmnxOamIfPingConformance         OBJECT IDENTIFIER ::= { tmnxOamTestConformance 7 }
 
 tmnxOamIfPingCompliances         OBJECT IDENTIFIER ::= { tmnxOamIfPingConformance 1 }
@@ -24203,6 +25870,17 @@ tmnxOamLnkMeasV21v0Compliance    MODULE-COMPLIANCE
             tmnxOamLnkMeasV21v0Group
         }
     ::= { tmnxOamLnkMeasCompliances 1 }
+
+tmnxOamLnkMeasV22v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the OAM Link Measurement functionality on
+         Nokia SROS Release 22.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamLnkMeasV22v0Group
+        }
+    ::= { tmnxOamLnkMeasCompliances 2 }
 
 tmnxOamTestNotifications         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 11 }
 

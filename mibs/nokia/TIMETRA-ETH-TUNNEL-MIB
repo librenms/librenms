@@ -1,0 +1,1279 @@
+TIMETRA-ETH-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndexOrZero
+                                                         FROM IF-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    TmnxChassisIndex
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    sapEncapValue, sapPortId
+                                                         FROM TIMETRA-SAP-MIB
+    svcId
+                                                         FROM TIMETRA-SERV-MIB
+    TItemDescription, TmnxAdminState,
+    TmnxEncapVal, TmnxOperState
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraEthTunnelMIBModule        MODULE-IDENTITY
+    LAST-UPDATED "201402010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         Ethernet Tunnel components of the Nokia SROS device.
+
+         Copyright (c) 2009-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201402010000Z"
+    DESCRIPTION
+        "Rev 12.0                1 Feb 2014 00:00
+         12.0 release of the TIMETRA-ETH-TUNNEL-MIB."
+
+    REVISION    "200902280000Z"
+    DESCRIPTION
+        "Rev 7.0                28 Feb 2009 00:00
+         7.0 release of the TIMETRA-ETH-TUNNEL-MIB."
+
+    ::= { timetraSRMIBModules 64 }
+
+TmnxEthTunnelIndex               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthTunnelIndex specifies the unique Ethernet Tunnel Identifier
+         for an Ethernet Tunnel Group.
+
+         The value of zero (0) is only used by objects which may reference a
+         tmnxEthTunnelConfigEntry. The value zero (0) is an invalid index that
+         specifies that the object is not associated with any Ethernet Tunnel
+         Group."
+    SYNTAX      Unsigned32
+
+TmnxEthTunnelMemberIndex         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthTunnelMemberIndex specifies the unique Ethernet Tunnel
+         Member Identifier.
+
+         Along with an Object of type TmnxEthTunnelIndex, an Object of this
+         type references a specific member on a specific ethernet tunnel group.
+
+         The value of zero (0), is only used by objects which may reference a
+         tmnxEthTunnelMemberEntry. The value of zero (0) is an invalid index
+         that specifies that the object is not associated with any Ethernet
+         Tunnel Member."
+    SYNTAX      Unsigned32
+
+TmnxEthTunnelMemberList          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthTunnelMemberList specifies a bit-mask of the members
+         associated with a particular object. Each bit represents a specific
+         tmnxEthTunnelMemberEntry. Bit 0 (first bit) represents the member
+         with the tmnxEthTunnelMemberIndex value of 1. Bit 1, represents the
+         member with the tmnxEthTunnelMemberIndex value of 2, and so forth.
+                 member1 (0)  -- represents member 1.
+                 member2 (1)  -- represents member 2.
+                 etc."
+    SYNTAX      BITS {
+        member1  (0),
+        member2  (1),
+        member3  (2),
+        member4  (3),
+        member5  (4),
+        member6  (5),
+        member7  (6),
+        member8  (7),
+        member9  (8),
+        member10 (9),
+        member11 (10),
+        member12 (11),
+        member13 (12),
+        member14 (13),
+        member15 (14),
+        member16 (15)
+    }
+
+TmnxEthTunnelApsPduType          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthTunnelApsPduType specifies the 4 byte APS-specific
+         information within each APS PDU.
+
+         The information is encoded as shown below.
+
+              32    29|28     25|24    17|16     9|8      1|
+              +-------+---------+--------+--------+--------+
+              |Request|Prot.Type|Request |Bridge  |Reserved|
+              |  State| A|B|D|R |  Signal|  Signal|        |
+              +-------+---------+--------+--------+--------+"
+    SYNTAX      Unsigned32
+
+tmnxEthTunnelObjs                OBJECT IDENTIFIER ::= { tmnxSRObjs 64 }
+
+tmnxEthTunnelConfigTimeStamps    OBJECT IDENTIFIER ::= { tmnxEthTunnelObjs 0 }
+
+tmnxEthTunnelCfgTblLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelCfgTblLastChanged indicates the time, since system
+         startup, when a row in the tmnxEthTunnelConfigTable last changed."
+    ::= { tmnxEthTunnelConfigTimeStamps 1 }
+
+tmnxEthTunnelMbrTblLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMbrTblLastChanged indicates the time, since system
+         startup, when a row in the tmnxEthTunnelMemberTable last changed."
+    ::= { tmnxEthTunnelConfigTimeStamps 2 }
+
+tmnxEthTunnelLETableChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelLETableChanged indicates the time, since
+         system startup, when a row in the tmnxEthTunnelLETable last changed."
+    ::= { tmnxEthTunnelConfigTimeStamps 3 }
+
+tmnxEthTunnelSAPMbrTblChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelSAPMbrTblChanged indicates the time, since system
+         startup, when a row in the tmnxEthTunnelSAPMemberTable last changed."
+    ::= { tmnxEthTunnelConfigTimeStamps 4 }
+
+tmnxEthTunnelConfigurations      OBJECT IDENTIFIER ::= { tmnxEthTunnelObjs 1 }
+
+tmnxEthTunnelConfigTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelConfigTable consists of the Ethernet Tunnel Group
+         configuration information."
+    ::= { tmnxEthTunnelConfigurations 1 }
+
+tmnxEthTunnelConfigEntry         OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelConfigEntry contains information pertaining to an
+         individual Ethernet Tunnel Group.
+
+         Rows in this table are created and destroyed using the
+         tmnxEthTunnelRowStatus object.
+
+         A corresponding row in the tmnxPortTable will exist for each row in
+         this table, based on the tmnxEthTunnelOperEntry
+         tmnxEthTunnelChassisIndex and tmnxEthTunnelIfIndex object pair.
+
+         The tmnxPortEntry corresponding to this entry manages the
+         administration, description, MAC address and other port related
+         configuration."
+    INDEX       { tmnxEthTunnelIndex }
+    ::= { tmnxEthTunnelConfigTable 1 }
+
+TmnxEthTunnelConfigEntry         ::= SEQUENCE
+{
+    tmnxEthTunnelIndex               TmnxEthTunnelIndex,
+    tmnxEthTunnelRowStatus           RowStatus,
+    tmnxEthTunnelTimeStamp           TimeStamp,
+    tmnxEthTunnelHoldDownTimeMember  Unsigned32,
+    tmnxEthTunnelProtectionType      INTEGER,
+    tmnxEthTunnelRevertTime          Unsigned32,
+    tmnxEthTunnelHoldUpTimeMember    Unsigned32
+}
+
+tmnxEthTunnelIndex               OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelIndex (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelIndex specifies the row index of the Ethernet Tunnel
+         Group."
+    ::= { tmnxEthTunnelConfigEntry 1 }
+
+tmnxEthTunnelRowStatus           OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelRowStatus controls the creation and deletion of row
+         entries in the tmnxEthTunnelConfigTable.
+
+         A corresponding row in the tmnxPortTable is created by the system when
+         a tmnxEthTunnelRowStatus value of 'createAndGo (4)' is issued on a new
+         row in the tmnxEthTunnelConfigTable. The corresponding row in the
+         tmnxPortTable will be destroyed by the system when the
+         tmnxEthTunnelRowStatus value of 'destroy (6)' is issued."
+    ::= { tmnxEthTunnelConfigEntry 2 }
+
+tmnxEthTunnelTimeStamp           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelTimeStamp indicates the time, since system startup,
+         of the last change to this row."
+    ::= { tmnxEthTunnelConfigEntry 3 }
+
+tmnxEthTunnelHoldDownTimeMember  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelHoldDownTimeMember specifies the time, in
+         centiseconds, used for the hold-timer for associated Continuity Check
+         (CC) Session down event dampening. This guards against reporting
+         excessive member operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         CC state to the Ethernet Tunnel Group until the configured timer has
+         expired.
+
+         A value of zero (0) specifies that a down transition is reported
+         immediately."
+    DEFVAL      { 0 }
+    ::= { tmnxEthTunnelConfigEntry 4 }
+
+tmnxEthTunnelProtectionType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        g8031-1to1  (1),
+        loadsharing (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelProtectionType specifies the model used for
+         determining which members are actively receiving and transmitting
+         data.
+
+         When the value is set to 'g8031-1to1 (1)', as per G.8031 spec, only
+         two members are allowed, and only one of them can be active at one
+         point in time.
+
+         When the value is set to 'loadsharing (2)', multiple members can be
+         active at one point in time.
+
+         The value of tmnxEthTunnelProtectionType can only be changed when the
+         corresponding tmnxPortEntry row object tmnxPortAdminStatus is set to
+         'outOfService (3)'"
+    DEFVAL      { g8031-1to1 }
+    ::= { tmnxEthTunnelConfigEntry 5 }
+
+tmnxEthTunnelRevertTime          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..720)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelRevertTime specifies the time, in seconds,
+         that the tunnel waits to restore the working member.
+
+         A value of zero (0) sets the behavior of the Ethernet Tunnel Group to
+         be non-revertive, while a positive value specifies the wait time.
+
+         After clearing of a condition that necessitated an automatic switch,
+         the wait to restore period, indicated by reading the
+         tmnxEthTunnelRevertTimeCountDn object, must elapse before reverting.
+         This is intended to avoid rapid switch oscillations.
+
+         This object is only applicable when the tmnxEthTunnelProtectionType is
+         set to 'g8031-1to1 (1)'."
+    DEFVAL      { 0 }
+    ::= { tmnxEthTunnelConfigEntry 6 }
+
+tmnxEthTunnelHoldUpTimeMember    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5000)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelHoldUpTimeMember specifies the time, in
+         deciseconds, used for the hold-timer for associated Continuity
+         Check (CC)  Session up event dampening. This guards against reporting
+         excessive member operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         CC state to the Ethernet Tunnel Group until the configured timer has
+         expired.
+
+         A value of zero (0) specifies that an up transition is reported
+         immediately."
+    DEFVAL      { 20 }
+    ::= { tmnxEthTunnelConfigEntry 7 }
+
+tmnxEthTunnelOperTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelOperTable consists of the Ethernet Tunnel Group
+         operational information.
+
+         This table augments the tmnxEthTunnelConfigTable."
+    ::= { tmnxEthTunnelConfigurations 2 }
+
+tmnxEthTunnelOperEntry           OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelOperEntry contains information pertaining to an
+         individual Ethernet Tunnel Group's operational state."
+    AUGMENTS    { tmnxEthTunnelConfigEntry }
+    ::= { tmnxEthTunnelOperTable 1 }
+
+TmnxEthTunnelOperEntry           ::= SEQUENCE
+{
+    tmnxEthTunnelChassisIndex        TmnxChassisIndex,
+    tmnxEthTunnelIfIndex             InterfaceIndexOrZero,
+    tmnxEthTunnelMgmtMemberIfIndex   InterfaceIndexOrZero,
+    tmnxEthTunnelActiveMembers       TmnxEthTunnelMemberList,
+    tmnxEthTunnelRevertTimeCountDn   Unsigned32
+}
+
+tmnxEthTunnelChassisIndex        OBJECT-TYPE
+    SYNTAX      TmnxChassisIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelChassisIndex indicates the chassis index for the
+         Ethernet Tunnel Group. The tmnxEthTunnelChassisIndex along with the
+         tmnxEthTunnelIfIndex specifies the row in tmnxPortEntry that
+         corresponds to the Ethernet Tunnel Group."
+    ::= { tmnxEthTunnelOperEntry 1 }
+
+tmnxEthTunnelIfIndex             OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelIfIndex indicates the tmnxPortPortID for the Ethernet
+         Tunnel Group.  The tmnxEthTunnelChassisIndex along with the
+         tmnxEthTunnelIfIndex specifies the row in tmnxPortEntry that
+         corresponds to the Ethernet Tunnel Group."
+    ::= { tmnxEthTunnelOperEntry 2 }
+
+tmnxEthTunnelMgmtMemberIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMgmtMemberIfIndex indicates the
+         tmnxEthTunnelMemberIfIndex of the Ethernet Tunnel Group member with
+         which the Ethernet Tunnel Group port (tmnxEthTunnelIfIndex) inherits
+         its port configurations.
+
+         The management member is set to the first member added to the Ethernet
+         Tunnel or the next higher member in the case of removing the first
+         member from the group. If no members are configured for the group, the
+         tmnxEthTunnelMgmtMemberIfIndex is set to zero (0)."
+    ::= { tmnxEthTunnelOperEntry 3 }
+
+tmnxEthTunnelActiveMembers       OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelMemberList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelActiveMembers indicates which members are actively
+         receiving and transmitting data for the Ethernet Tunnel Group."
+    DEFVAL      { {} }
+    ::= { tmnxEthTunnelOperEntry 4 }
+
+tmnxEthTunnelRevertTimeCountDn   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelRevertTimeCountDn indicates the remaining time, in
+         seconds, before the Ethernet Tunnel Group reverts back to the working
+         member.
+
+         A tmnxEthTunnelRevertTimeCountDn value of '0' indicates that the
+         Ethernet Tunnel Group is not in a revertive wait state."
+    ::= { tmnxEthTunnelOperEntry 5 }
+
+tmnxEthTunnelMemberTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMemberTable consists of the members associated with
+         the corresponding tmnxEthTunnelConfigEntry."
+    ::= { tmnxEthTunnelConfigurations 3 }
+
+tmnxEthTunnelMemberEntry         OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMemberEntry contains information pertaining to an
+         individual member interface associated with a
+         tmnxEthTunnelConfigEntry.
+
+         Rows in this table are created and destroyed using the
+         tmnxEthTunnelMemberRowStatus object."
+    INDEX       {
+        tmnxEthTunnelIndex,
+        tmnxEthTunnelMemberIndex
+    }
+    ::= { tmnxEthTunnelMemberTable 1 }
+
+TmnxEthTunnelMemberEntry         ::= SEQUENCE
+{
+    tmnxEthTunnelMemberIndex         TmnxEthTunnelMemberIndex,
+    tmnxEthTunnelMemberRowStatus     RowStatus,
+    tmnxEthTunnelMemberTimeStamp     TimeStamp,
+    tmnxEthTunnelMemberIfIndex       InterfaceIndexOrZero,
+    tmnxEthTunnelMemberIfCtlTag      TmnxEncapVal,
+    tmnxEthTunnelMemberDescription   TItemDescription,
+    tmnxEthTunnelMemberAdminStatus   TmnxAdminState,
+    tmnxEthTunnelMemberOperStatus    TmnxOperState,
+    tmnxEthTunnelMemberPrecedence    Unsigned32
+}
+
+tmnxEthTunnelMemberIndex         OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelMemberIndex (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMemberIndex specifies the row index of the member."
+    ::= { tmnxEthTunnelMemberEntry 1 }
+
+tmnxEthTunnelMemberRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMemberRowStatus controls the creation and deletion of
+         row entries in the tmnxEthTunnelMemberTable."
+    ::= { tmnxEthTunnelMemberEntry 2 }
+
+tmnxEthTunnelMemberTimeStamp     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberTimeStamp indicates the time, since
+         system startup, of the last change to this row."
+    ::= { tmnxEthTunnelMemberEntry 3 }
+
+tmnxEthTunnelMemberIfIndex       OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberIfIndex specifies the member's port
+         tmnxPortPortID associated with the tmnxEthTunnelConfigEntry.
+
+         Once specified, the tmnxEthTunnelMemberIfIndex can not be changed; the
+         row must be destroyed and recreated."
+    DEFVAL      { 0 }
+    ::= { tmnxEthTunnelMemberEntry 4 }
+
+tmnxEthTunnelMemberIfCtlTag      OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberIfCtlTag specifies the member's
+         encapsulation.
+
+         Once specified, the tmnxEthTunnelMemberIfCtlTag can not be changed;
+         the row must be destroyed and recreated.
+
+         The default value of all ones (0xFFFFFFFF) represents an invalid,
+         unspecified, control tag."
+    DEFVAL      { 'FFFFFFFF'H }
+    ::= { tmnxEthTunnelMemberEntry 5 }
+
+tmnxEthTunnelMemberDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberDescription specifies a detailed
+         description of the Ethernet Tunnel member."
+    ::= { tmnxEthTunnelMemberEntry 6 }
+
+tmnxEthTunnelMemberAdminStatus   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberAdminStatus specifies the
+         administrative state of the member. 'outOfService (3)' specifies that
+         the member will not partake in Tunnel Redundancy or load sharing."
+    DEFVAL      { outOfService }
+    ::= { tmnxEthTunnelMemberEntry 7 }
+
+tmnxEthTunnelMemberOperStatus    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelMemberOperStatus indicates the operational state of
+         of the member. The tmnxEthTunnelMemberOperStatus supports the
+         following two TmnxOperState values:
+               inService    (2)
+               outOfService (3)"
+    ::= { tmnxEthTunnelMemberEntry 8 }
+
+tmnxEthTunnelMemberPrecedence    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelMemberPrecedence specifies the precedence
+         level of the Member.
+
+         When tmnxEthTunnelProtectionType of the group is set to
+         'g8031-1to1 (1)', only two precedence values are valid, and each member
+         MUST have a different precedence.
+                 0     - This is considered the primary member, or the
+                         working member.
+                 1     - This is considered the secondary member, or the
+                         protection member.
+
+         When tmnxEthTunnelProtectionType is set to the value 'loadsharing (2)'
+         the precedence of all members should be the same."
+    DEFVAL      { 1 }
+    ::= { tmnxEthTunnelMemberEntry 9 }
+
+tmnxEthTunnelAPSConfigs          OBJECT IDENTIFIER ::= { tmnxEthTunnelConfigurations 4 }
+
+tmnxEthTunnelApsTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelApsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsTable consists of APS configuration for Ethernet
+         Tunnel Groups configured with a tmnxEthTunnelProtectionType set to
+         'g8031-1to1 (1)'."
+    ::= { tmnxEthTunnelAPSConfigs 1 }
+
+tmnxEthTunnelApsEntry            OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelApsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsEntry contains APS information for an individual
+         Ethernet Tunnel Group.
+
+         Entries in the tmnxEthTunnelApsTable are created and destroyed by the
+         system by changing the tmnxEthTunnelProtectionType object."
+    INDEX       { tmnxEthTunnelIndex }
+    ::= { tmnxEthTunnelApsTable 1 }
+
+TmnxEthTunnelApsEntry            ::= SEQUENCE
+{
+    tmnxEthTunnelApsRxPdu            TmnxEthTunnelApsPduType,
+    tmnxEthTunnelApsTxPdu            TmnxEthTunnelApsPduType,
+    tmnxEthTunnelApsDefectStatus     BITS,
+    tmnxEthTunnelApsSwitchoverTime   TimeStamp
+}
+
+tmnxEthTunnelApsRxPdu            OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelApsPduType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsRxPdu indicates the PDU last received on
+         the Ethernet Tunnel Group."
+    ::= { tmnxEthTunnelApsEntry 1 }
+
+tmnxEthTunnelApsTxPdu            OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelApsPduType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsTxPdu indicates the PDU last transmitted
+         on the Ethernet Tunnel Group."
+    ::= { tmnxEthTunnelApsEntry 2 }
+
+tmnxEthTunnelApsDefectStatus     OBJECT-TYPE
+    SYNTAX      BITS {
+        dFopCM (0),
+        dFopPM (1),
+        dFopNR (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsDefectStatus indicates what defects are
+         active on the Ethernet Tunnel Group.
+
+         The Defects are defined as:
+                dFopCM  -- Configuration Mismatch
+                dFopPM  -- Provisioning Mismatch
+                dFopNR  -- Protocol No Response"
+    ::= { tmnxEthTunnelApsEntry 3 }
+
+tmnxEthTunnelApsSwitchoverTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsSwitchoverTime indicates the time that
+         the Ethernet Tunnel Group last experienced an APS switchover."
+    ::= { tmnxEthTunnelApsEntry 4 }
+
+tmnxEthTunnelApsMemberTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelApsMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsMemberTable consists of Ethernet Tunnel Group
+         members which are associated with an Ethernet Tunnel Group where the
+         tmnxEthTunnelProtectionType is set to 'g8031-1to1 (1)'."
+    ::= { tmnxEthTunnelAPSConfigs 2 }
+
+tmnxEthTunnelApsMemberEntry      OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelApsMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsMemberEntry contains the APS information
+         pertaining to an Ethernet Tunnel Group member.
+
+         Entries in the tmnxEthTunnelApsMemberTable are created and destroyed
+         by the system, when the Ethernet Tunnel Group object
+         tmnxEthTunnelProtectionType is changed."
+    INDEX       {
+        tmnxEthTunnelIndex,
+        tmnxEthTunnelMemberIndex
+    }
+    ::= { tmnxEthTunnelApsMemberTable 1 }
+
+TmnxEthTunnelApsMemberEntry      ::= SEQUENCE
+{
+    tmnxEthTunnelApsMemberActCount   Counter32,
+    tmnxEthTunnelApsMemberActTime    Counter32
+}
+
+tmnxEthTunnelApsMemberActCount   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsMemberActCount indicates the number of
+         times, since system startup, that the Ethernet Tunnel Group member has
+         been active."
+    ::= { tmnxEthTunnelApsMemberEntry 1 }
+
+tmnxEthTunnelApsMemberActTime    OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsMemberActTime indicates the accumulative
+         time (in seconds) that the Ethernet Tunnel Group member has been
+         active."
+    ::= { tmnxEthTunnelApsMemberEntry 2 }
+
+tmnxEthTunnelApsCommandTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelApsCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsCommandTable consists of the one-shot action
+         commands that effect state of Ethernet Tunnel APS configuration."
+    ::= { tmnxEthTunnelAPSConfigs 3 }
+
+tmnxEthTunnelApsCommandEntry     OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelApsCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsCommandEntry contains the commands available to
+         exist on an existing Ethernet Tunnel APS Group Member.
+
+         Rows in this table are created and destroyed by the system."
+    AUGMENTS    { tmnxEthTunnelApsMemberEntry }
+    ::= { tmnxEthTunnelApsCommandTable 1 }
+
+TmnxEthTunnelApsCommandEntry     ::= SEQUENCE
+{
+    tmnxEthTunnelApsCommandSwitch    INTEGER,
+    tmnxEthTunnelApsCommandExsResult INTEGER
+}
+
+tmnxEthTunnelApsCommandSwitch    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noCmd                          (0),
+        clear                          (1),
+        lockoutOfSecondary             (2),
+        forceSwitchPrimaryToSecondary  (3),
+        manualSwitchPrimaryToSecondary (4),
+        exercise                       (5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsCommandSwitch specifies the switch
+         command to initiate on an Ethernet Tunnel APS Group.
+
+         When read, this object returns the last command written or 'noCmd (0)'
+         if no command has been written to this Ethernet Tunnel APS Group since
+         initialization. The return of the last command written does not imply
+         that this command is currently in effect. This request may be
+         preempted by a higher priority local or remote request. In order to
+         determine the current state of the group it is necessary to read the
+         objects tmnxEthTunnelApsRxPdu and tmnxEthTunnelApsTxPdu.
+
+         The value 'noCmd (0)' may not be used in a write command.
+
+         The value 'clear (1)' clears all the switch commands listed below for
+         the specified member. In addition, if tmnxEthTunnelRevertTime is a
+         non-zero value (revertive mode) the active WTR (Wait To Restore) state
+         is also cleared.
+
+         The value 'lockoutOfSecondary (2)' prevents the primary (working)
+         member from switching to the secondary (protection) member. The
+         specified member should be the secondary member index, otherwise an
+         inconsistentValue error is returned.
+
+         The value 'forceSwitchPrimaryToSecondary (3)' switches the primary
+         member to the secondary member. If the secondary member is specified
+         an inconsistentValue error is returned.
+
+         The value 'manualSwitchPrimaryToSecondary (4)' switches the specified
+         primary member to the secondary member. If the secondary member is
+         specified an inconsistentValue error is returned.
+
+         The value 'exercise (5)' exercises the protocol for a protection
+         switch of the specified member by issuing an Exercise request for that
+         member and checking the response on the APS member."
+    DEFVAL      { noCmd }
+    ::= { tmnxEthTunnelApsCommandEntry 1 }
+
+tmnxEthTunnelApsCommandExsResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+        passed    (1),
+        failed    (2),
+        preempted (3),
+        unknown   (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelApsCommandExsResult indicates the result of
+         the last 'exercise (5)' command issued from the
+         tmnxEthTunnelApsCommandSwitch object.
+
+         When this object returns 'unknown (4)' no 'exercise (5)' command has
+         been written to this Ethernet Tunnel Group Member since
+         initialization."
+    DEFVAL      { unknown }
+    ::= { tmnxEthTunnelApsCommandEntry 2 }
+
+tmnxEthTunnelLEConfigs           OBJECT IDENTIFIER ::= { tmnxEthTunnelConfigurations 5 }
+
+tmnxEthTunnelLETable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelLETable consists of the configuration for Ethernet
+         Tunnel Groups that have tmnxEthTunnelProtectionType set to
+         'loadsharing (2)'."
+    ::= { tmnxEthTunnelLEConfigs 1 }
+
+tmnxEthTunnelLEEntry             OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelLEEntry contains the load sharing information
+         pertaining to an Ethernet Tunnel Group.
+
+         Entries in the tmnxEthTunnelLETable are created or destroyed by
+         setting the tmnxEthTunnelProtectionType to or from 'loadsharing (2)'."
+    INDEX       { tmnxEthTunnelIndex }
+    ::= { tmnxEthTunnelLETable 1 }
+
+TmnxEthTunnelLEEntry             ::= SEQUENCE
+{
+    tmnxEthTunnelLEAccessAdaptQos    INTEGER,
+    tmnxEthTunnelLEPerFpIngQueueing  TruthValue,
+    tmnxEthTunnelLEMbrThreshold      Unsigned32
+}
+
+tmnxEthTunnelLEAccessAdaptQos    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        link       (1),
+        distribute (2),
+        portFair   (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelLEAccessAdaptQos specifies how the Ethernet
+         Tunnel Group SAP queue and virtual scheduler buffering and rate
+         parameters are adapted over multiple active MDAs.
+            link      (1) - The Ethernet Tunnel Group will create the SAP queues
+                            and virtual schedulers with the actual parameters on
+                            each MDA.
+            distribute(2) - Each MDA will receive a fraction of the SAP and
+                            scheduler parameters.
+         portFair       (3) - The LAG will create the SAP queues and virtual
+                              schedulers with actual configuration parameters
+                              on each port members in the LAG. The bandwidth is
+                              distributed among the ports based on each port's
+                              bandwidth relative to the total active bandwidth."
+    DEFVAL      { distribute }
+    ::= { tmnxEthTunnelLEEntry 1 }
+
+tmnxEthTunnelLEPerFpIngQueueing  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelLEPerFpIngQueueing specifies whether a more
+         efficient method of queue allocation for Ethernet Tunnel Group SAPs
+         should be utilized.
+
+         An 'inconsistentValue' error is returned if this object is set to a
+         different value when there are existing members in the Ethernet Tunnel
+         Group."
+    DEFVAL      { false }
+    ::= { tmnxEthTunnelLEEntry 2 }
+
+tmnxEthTunnelLEMbrThreshold      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelLEMbrThreshold specifies the threshold for
+         the Ethernet Tunnel Group.
+
+         When a physical port member state changes and the number of
+         operational physical port members is less than or equal to
+         tmnxEthTunnelLEMbrThreshold, the Ethernet Tunnel Group is set
+         operationally down.
+
+         When the number of operational physical members become greater than
+         tmnxEthTunnelLEMbrThreshold, the Ethernet Tunnel Group is set
+         operationally up
+
+         The value of zero specifies to bring the Ethernet Tunnel Group
+         operationally down only when all members are operationally down, and
+         bring the Ethernet Tunnel Group operationally up when at least one
+         member is operationally up."
+    DEFVAL      { 0 }
+    ::= { tmnxEthTunnelLEEntry 3 }
+
+tmnxEthTunnelSAPConfigs          OBJECT IDENTIFIER ::= { tmnxEthTunnelConfigurations 6 }
+
+tmnxEthTunnelSAPMemberTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthTunnelSAPMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelSAPMemberTable consists of the configuration for
+         Ethernet Tunnel Group members associated to SAPs."
+    ::= { tmnxEthTunnelSAPConfigs 1 }
+
+tmnxEthTunnelSAPMemberEntry      OBJECT-TYPE
+    SYNTAX      TmnxEthTunnelSAPMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelSAPMemberEntry contains the SAP information
+         pertaining to an Ethernet Tunnel Group member.
+
+         Entries in the tmnxEthTunnelSAPMemberTable are created and destroyed
+         by setting the tmnxEthTunnelSAPMemberRowStatus object.
+
+         Entries in this table corresponding to control SAPs, those with the
+         index sapEncapValue set to 8191 (0x1FFF), are not writable.
+
+         For a data SAP that is sharing the fate of a control SAP, these
+         entries allow the configuration of the tag values for the
+         corresponding path in the Ethernet Tunnel port."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue,
+        tmnxEthTunnelMemberIndex
+    }
+    ::= { tmnxEthTunnelSAPMemberTable 1 }
+
+TmnxEthTunnelSAPMemberEntry      ::= SEQUENCE
+{
+    tmnxEthTunnelSAPMemberRowStatus  RowStatus,
+    tmnxEthTunnelSAPMemberTagValue   TmnxEncapVal
+}
+
+tmnxEthTunnelSAPMemberRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelSAPMemberRowStatus controls the creation and deletion
+         of row entries in the tmnxEthTunnelSAPMemberTable."
+    ::= { tmnxEthTunnelSAPMemberEntry 1 }
+
+tmnxEthTunnelSAPMemberTagValue   OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthTunnelSAPMemberTagValue specifies the members'
+         encapsulation for the SAP.
+
+         The default value of all ones (0xFFFFFFFF) represents an invalid or
+         unspecified tag."
+    DEFVAL      { 'FFFFFFFF'H }
+    ::= { tmnxEthTunnelSAPMemberEntry 2 }
+
+tmnxEthTunnelStatistics          OBJECT IDENTIFIER ::= { tmnxEthTunnelObjs 2 }
+
+tmnxEthTunnelConformance         OBJECT IDENTIFIER ::= { tmnxSRConfs 64 }
+
+tmnxEthTunnelCompliances         OBJECT IDENTIFIER ::= { tmnxEthTunnelConformance 1 }
+
+tmnxEthTunnelCompliance          MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 1.0 of TIMETRA-ETH-TUNNEL-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxEthTunnelTimeStampGroup,
+            tmnxEthTunnelBaseConfigGroup,
+            tmnxEthTunnelBaseOperGroup,
+            tmnxEthTunnelBaseMemberGroup,
+            tmnxEthTunnelBaseAPSGroup,
+            tmnxEthTunnelAPSNotifyGroup
+        }
+    ::= { tmnxEthTunnelCompliances 1 }
+
+tmnxEthTunnelV8v0Compliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 2.0 of TIMETRA-ETH-TUNNEL-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxEthTunnelTimeStampGroup,
+            tmnxEthTunnelTimeStampV8v0Group,
+            tmnxEthTunnelBaseConfigGroup,
+            tmnxEthTunnelBaseConfigV8v0Group,
+            tmnxEthTunnelBaseOperGroup,
+            tmnxEthTunnelBaseMemberGroup,
+            tmnxEthTunnelBaseAPSGroup,
+            tmnxEthTunnelBaseAPSV8v0Group,
+            tmnxEthTunnelAPSNotifyGroup,
+            tmnxEthTunnelLEGroup,
+            tmnxEthTunnelSAPMemberGroup
+        }
+    ::= { tmnxEthTunnelCompliances 2 }
+
+tmnxEthTunnelGroups              OBJECT IDENTIFIER ::= { tmnxEthTunnelConformance 2 }
+
+tmnxEthTunnelTSGroups            OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 0 }
+
+tmnxEthTunnelTimeStampGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelCfgTblLastChanged,
+        tmnxEthTunnelTimeStamp,
+        tmnxEthTunnelMbrTblLastChanged,
+        tmnxEthTunnelMemberTimeStamp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that track configuration changes for the
+         maintenance of Ethernet Tunnels for the 7x50."
+    ::= { tmnxEthTunnelTSGroups 1 }
+
+tmnxEthTunnelTimeStampV8v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelSAPMbrTblChanged,
+        tmnxEthTunnelLETableChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that track configuration changes for the
+         maintenance of Ethernet Tunnels for Release 8.0 of the 7x50."
+    ::= { tmnxEthTunnelTSGroups 2 }
+
+tmnxEthTunnelConfigGroups        OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 1 }
+
+tmnxEthTunnelBaseConfigGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelChassisIndex,
+        tmnxEthTunnelRowStatus,
+        tmnxEthTunnelHoldDownTimeMember,
+        tmnxEthTunnelProtectionType,
+        tmnxEthTunnelRevertTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group
+         configurations for the 7x50."
+    ::= { tmnxEthTunnelConfigGroups 1 }
+
+tmnxEthTunnelBaseConfigV8v0Group OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelHoldUpTimeMember
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group
+         configurations for Release 8.0 of the 7x50."
+    ::= { tmnxEthTunnelConfigGroups 2 }
+
+tmnxEthTunnelOperGroups          OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 2 }
+
+tmnxEthTunnelBaseOperGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelIfIndex,
+        tmnxEthTunnelMgmtMemberIfIndex,
+        tmnxEthTunnelActiveMembers,
+        tmnxEthTunnelRevertTimeCountDn
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group
+         operations for the 7x50."
+    ::= { tmnxEthTunnelOperGroups 1 }
+
+tmnxEthTunnelMemberGroups        OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 3 }
+
+tmnxEthTunnelBaseMemberGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelMemberRowStatus,
+        tmnxEthTunnelMemberIfIndex,
+        tmnxEthTunnelMemberIfCtlTag,
+        tmnxEthTunnelMemberDescription,
+        tmnxEthTunnelMemberAdminStatus,
+        tmnxEthTunnelMemberOperStatus,
+        tmnxEthTunnelMemberPrecedence
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group Member
+         configurations for the 7x50."
+    ::= { tmnxEthTunnelMemberGroups 1 }
+
+tmnxEthTunnelAPSGroups           OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 4 }
+
+tmnxEthTunnelBaseAPSGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelApsRxPdu,
+        tmnxEthTunnelApsTxPdu,
+        tmnxEthTunnelApsDefectStatus,
+        tmnxEthTunnelApsSwitchoverTime,
+        tmnxEthTunnelApsMemberActCount,
+        tmnxEthTunnelApsMemberActTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group APS
+         configurations for the 7x50."
+    ::= { tmnxEthTunnelAPSGroups 1 }
+
+tmnxEthTunnelBaseAPSV8v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelApsCommandSwitch,
+        tmnxEthTunnelApsCommandExsResult
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Tunnel Group APS
+         configurations for the 7x50 in release 8.0."
+    ::= { tmnxEthTunnelAPSGroups 2 }
+
+tmnxEthTunnelNotifyGroups        OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 5 }
+
+tmnxEthTunnelAPSNotifyGroup      NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEthTunnelApsCfgRaiseAlarm,
+        tmnxEthTunnelApsCfgClearAlarm,
+        tmnxEthTunnelApsPrvsnRaiseAlarm,
+        tmnxEthTunnelApsPrvsnClearAlarm,
+        tmnxEthTunnelApsNoRspRaiseAlarm,
+        tmnxEthTunnelApsNoRspClearAlarm,
+        tmnxEthTunnelApsSwitchoverAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the management of Ethernet
+         Tunnel Group configuration for the 7x50."
+    ::= { tmnxEthTunnelNotifyGroups 1 }
+
+tmnxEthTunnelSAPGroups           OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 6 }
+
+tmnxEthTunnelSAPMemberGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelSAPMemberRowStatus,
+        tmnxEthTunnelSAPMemberTagValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 8.0 to support configuration and
+         maintenance of Ethernet Tunnel Groups on SAPs for the 7x50."
+    ::= { tmnxEthTunnelSAPGroups 1 }
+
+tmnxEthTunnelLEGroups            OBJECT IDENTIFIER ::= { tmnxEthTunnelGroups 7 }
+
+tmnxEthTunnelLEGroup             OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthTunnelLEAccessAdaptQos,
+        tmnxEthTunnelLEPerFpIngQueueing,
+        tmnxEthTunnelLEMbrThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 8.0 to support configuration and
+         maintenance of Ethernet Tunnel Groups for loadsharing (LAG) for the
+         7x50."
+    ::= { tmnxEthTunnelLEGroups 1 }
+
+tmnxEthTunnelNotifyPrefix        OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 64 }
+
+tmnxEthTunnelNotifications       OBJECT IDENTIFIER ::= { tmnxEthTunnelNotifyPrefix 0 }
+
+tmnxEthTunnelApsNotifications    OBJECT IDENTIFIER ::= { tmnxEthTunnelNotifications 2 }
+
+tmnxEthTunnelApsCfgRaiseAlarm    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsCfgRaiseAlarm is generated when an Ethernet Tunnel
+         Group working and protection configuration mismatch is detected, at
+         the ETH layer, by detecting the reception of APS protocol from the
+         working transport entity."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.3"
+    ::= { tmnxEthTunnelApsNotifications 1 }
+
+tmnxEthTunnelApsCfgClearAlarm    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsCfgClearAlarm is generated when an Ethernet Tunnel
+         Group working and protection configuration mismatch is cleared."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.3"
+    ::= { tmnxEthTunnelApsNotifications 2 }
+
+tmnxEthTunnelApsPrvsnRaiseAlarm  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus,
+        tmnxEthTunnelApsRxPdu,
+        tmnxEthTunnelApsTxPdu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsPrvsnRaiseAlarm is generated when an Ethernet
+         Tunnel Group provisioning mismatch is detected, at the ETH layer, by
+         comparing A, B and D bits of the transmitted and received APS
+         protocol.
+
+         The provision mismatch state is considered as if there is a signal
+         failure on the protection member. This ensures that the working member
+         is kept as active member in the provision mismatch state."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.1"
+    ::= { tmnxEthTunnelApsNotifications 3 }
+
+tmnxEthTunnelApsPrvsnClearAlarm  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus,
+        tmnxEthTunnelApsRxPdu,
+        tmnxEthTunnelApsTxPdu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsPrvsnClearAlarm is generated when an Ethernet
+         Tunnel Group provisioning mismatch is cleared."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.1"
+    ::= { tmnxEthTunnelApsNotifications 4 }
+
+tmnxEthTunnelApsNoRspRaiseAlarm  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsNoRspRaiseAlarm is generated when an Ethernet
+         Tunnel Group experiences an incompletion of protection switching, at
+         the ETH layer, by comparing the transmitted 'Requested Signal' values
+         and the received 'Bridged Signal' in the APS protocol."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.2"
+    ::= { tmnxEthTunnelApsNotifications 5 }
+
+tmnxEthTunnelApsNoRspClearAlarm  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelApsDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsNoRspClearAlarm is generated when an Ethernet
+         Tunnel Group no longer experiences an incompletion of protection
+         switching at the ETH layer."
+    REFERENCE
+        "ITU-T Rec G.8021/Y.1341 (12/2007) Section 6.1.4.3.2"
+    ::= { tmnxEthTunnelApsNotifications 6 }
+
+tmnxEthTunnelApsSwitchoverAlarm  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthTunnelMemberPrecedence
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthTunnelApsSwitchoverAlarm is generated when an Ethernet
+         Tunnel Group experiences a member activity switchover.
+
+         The tmnxEthTunnelMemberPrecedence always specifies the active member."
+    ::= { tmnxEthTunnelApsNotifications 7 }
+
+END

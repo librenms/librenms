@@ -5,65 +5,65 @@ IMPORTS
     tmnxBasedProducts                   FROM TIMETRA-GLOBAL-MIB;
 
 aluSARGlobalMIBModule  MODULE-IDENTITY
-    LAST-UPDATED    "0801090000Z"
+    LAST-UPDATED    "201305061000Z"
 
-    ORGANIZATION    "Alcatel-Lucent"
+    ORGANIZATION    "Nokia"
     CONTACT-INFO    
-        "Alcatel 7x50 Support
-         Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+        "Nokia 7x50 Support
+         Web: http://www.nokia.com"
     DESCRIPTION
         "This  document  is the SNMP MIB module for central registration
-        of object identifiers defined under the Alcatel 'timetra' branch
-        for the Alcatel 7705 SAR series SNMP MIBs.
+        of object identifiers defined under the Nokia 'timetra' branch
+        for the Nokia 7705 SAR series SNMP MIBs.
 
-        Copyright  2003-2014  Alcatel-Lucent. All rights reserved.
+        Copyright  2003-2018  Nokia. All rights reserved.
         Reproduction of  this document is  authorized  on  the condition
         that the foregoing copyright notice is included.
 
-        This   SNMP   MIB   module  (Specification)  embodies  Alcatel's
-        proprietary intellectual property. Alcatel retains all title and
+        This   SNMP   MIB   module  (Specification)  embodies  Nokia's
+        proprietary intellectual property. Nokia retains all title and
         ownership in the Specification, including any revisions.
 
-        Alcatel grants all interested parties a non-exclusive license to
+        Nokia grants all interested parties a non-exclusive license to
         use  and  distribute an unmodified copy of this Specification in
-        connection with management of Alcatel products, and without fee,
+        connection with management of Nokia products, and without fee,
         provided this copyright notice and license appear on all copies.
 
-        This  Specification  is  supplied  `as is', and Alcatel makes no
+        This  Specification  is  supplied  `as is', and Nokia makes no
         warranty,  either  express or implied, as to the use, operation,
         condition, or performance of the Specification."
 --
 --  Revision History
 --
-        REVISION        "1112061000Z"
+        REVISION        "201305061000Z"
         DESCRIPTION     "Rev 6.1                06 May 2013 00:00
                 This is the 6.1 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "1112060000Z"
+        REVISION        "201112060000Z"
         DESCRIPTION     "Rev 6.0                06 Dec 2011 00:00
                 This is the 6.0 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "1012200000Z"
+        REVISION        "201012200000Z"
         DESCRIPTION     "Rev 5.0                20 Dec 2010 00:00
                 This is the 5.0 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "1008130000Z"
+        REVISION        "201008130000Z"
         DESCRIPTION     "Rev 4.0                13 Aug 2010 00:00
                 This is the 4.0 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "0801230000Z"
+        REVISION        "200901230000Z"
         DESCRIPTION     "Rev 2.1                23 Jan 2009 00:00
                 This is the 2.1 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "0808270000Z"
+        REVISION        "200808270000Z"
         DESCRIPTION     "Rev 2.0                27 Aug 2008 00:00
                 This is the 2.0 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "0806030000Z"
+        REVISION        "200806030000Z"
         DESCRIPTION     "Rev 1.1                03 Jun 2008 00:00
                 This is the 1.1 release of the ALU-SAR-GLOBAL-MIB."
 
-        REVISION        "0801090000Z"
+        REVISION        "200801090000Z"
         DESCRIPTION     "Rev 1.0                09 Jan 2008 00:00
                 This is the 1.0 release of the ALU-SAR-GLOBAL-MIB."
         ::= { aluSARModules 1 }
@@ -125,14 +125,14 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
 -- ----------------------------------------------
 -- aluSARRegistry 2  : SAR Hardware Products
 -- ----------------------------------------------
---  Sub-trees for registration of Alcatel-Lucent SAR series hardware products
+--  Sub-trees for registration of Nokia SAR series hardware products
 --
     aluSAR7705ServiceAggrRouters   OBJECT IDENTIFIER ::= { aluSARRegistry 2 }
         aluSARModel7705SAR8Reg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-8 (2 Control/Switch Modules
+                 identify the Nokia 7705 SAR-8 (2 Control/Switch Modules
                  and 6 MDA slots) device."
         ::= { aluSAR7705ServiceAggrRouters 1 }
 
@@ -140,35 +140,35 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-F device."
+                 identify the Nokia 7705 (deprecated) SAR-F device."
         ::= { aluSAR7705ServiceAggrRouters 2 }
         
         aluSARModel7705SAR18Reg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-18 device."
+                 identify the Nokia 7705 SAR-18 device."
         ::= { aluSAR7705ServiceAggrRouters 3 }
 
         aluSARModel7705SARmReg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M device."
+                 identify the Nokia 7705 SAR-M device."
         ::= { aluSAR7705ServiceAggrRouters 4 }
         
         aluSARModel7705SARmeReg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-ME device."
+                 identify the Nokia 7705 SAR-ME device."
         ::= { aluSAR7705ServiceAggrRouters 5 }
    
         aluSARModel7705SARmlAReg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M lite Alpha
+                 identify the Nokia 7705 SAR-M lite Alpha
                  (aka SAR-A) device."
         ::= { aluSAR7705ServiceAggrRouters 6 }
         
@@ -176,7 +176,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M lite Beta
+                 identify the Nokia 7705 SAR-M lite Beta
                  device."
         ::= { aluSAR7705ServiceAggrRouters 7 }   
 
@@ -184,7 +184,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M lite Charlie
+                 identify the Nokia 7705 SAR-M lite Charlie
                  device."
         ::= { aluSAR7705ServiceAggrRouters 8 }
 
@@ -192,7 +192,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M lite Delta
+                 identify the Nokia 7705 SAR-M lite Delta
                  device."
         ::= { aluSAR7705ServiceAggrRouters 9 }
 
@@ -200,7 +200,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-M lite Echo
+                 identify the Nokia 7705 SAR-M lite Echo
                  (aka SAR-W) device."
         ::= { aluSAR7705ServiceAggrRouters 10 }  
         
@@ -208,21 +208,21 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-H device."
+                 identify the Nokia 7705 SAR-H device."
         ::= { aluSAR7705ServiceAggrRouters 11 } 
         
         aluSARModel7705SARHCReg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Hc device."
+                 identify the Nokia 7705 SAR-Hc device."
         ::= { aluSAR7705ServiceAggrRouters 12 } 
         
         aluSARModel7705SARWxAReg    OBJECT-IDENTITY
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'A'
+                 identify the Nokia 7705 SAR-Wx 'A'
                  device (5 GigE)."
         ::= { aluSAR7705ServiceAggrRouters 13 }
         
@@ -230,7 +230,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'B'
+                 identify the Nokia 7705 SAR-Wx 'B'
                  device (5 GigE, GPS)."
         ::= { aluSAR7705ServiceAggrRouters 14 }
        
@@ -238,7 +238,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'C'
+                 identify the Nokia 7705 SAR-Wx 'C'
                  device (5 GigE, power ethernet)."
         ::= { aluSAR7705ServiceAggrRouters 15 }
         
@@ -246,7 +246,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'D'
+                 identify the Nokia 7705 SAR-Wx 'D'
                  device (5 GigE, power ethernet, GPS Rx)."
         ::= { aluSAR7705ServiceAggrRouters 16 }
         
@@ -254,7 +254,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'E'
+                 identify the Nokia 7705 SAR-Wx 'E'
                  device (4 GigE, 4p xDSL)."
         ::= { aluSAR7705ServiceAggrRouters 17 }
         
@@ -262,7 +262,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'F'
+                 identify the Nokia 7705 SAR-Wx 'F'
                  device (4 GigE, 4p xDSL, GPS Rx)."
         ::= { aluSAR7705ServiceAggrRouters 18 }
         
@@ -270,7 +270,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-X
+                 identify the Nokia 7705 SAR-X
                  device."
         ::= { aluSAR7705ServiceAggrRouters 19 }
         
@@ -278,7 +278,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'G'
+                 identify the Nokia 7705 SAR-Wx 'G'
                  device (5 GigE, GNSS Rx)."
         ::= { aluSAR7705ServiceAggrRouters 20 }
        
@@ -286,7 +286,7 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'H'
+                 identify the Nokia 7705 SAR-Wx 'H'
                  device (5 GigE, power ethernet, GNSS Rx)."
         ::= { aluSAR7705ServiceAggrRouters 21 }
         
@@ -294,9 +294,25 @@ aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
             STATUS  current
             DESCRIPTION
                 "This objectID is to be used as the mib-2 sysObjID to
-                 identify the Alcatel-Lucent 7705 SAR-Wx 'I'
+                 identify the Nokia 7705 SAR-Wx 'I'
                  device (4 GigE, 4p xDSL, GNSS Rx)."
         ::= { aluSAR7705ServiceAggrRouters 22 }
+        
+        aluSARModel7705TSATSReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia 7705 TSAT-S
+                 device (2 GigE, 4p OC3)."
+        ::= { aluSAR7705ServiceAggrRouters 23 }
+        
+        aluSARModel7705SARmlAxReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia 7705 SAR-M lite Alpha-X
+                 device."
+        ::= { aluSAR7705ServiceAggrRouters 24 }
         
 --
 -- ----------------------------------------------

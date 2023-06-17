@@ -1,0 +1,480 @@
+TIMETRA-CONN-PROF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemDescription, TmnxEncapVal
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraConnProfMIBModule         MODULE-IDENTITY
+    LAST-UPDATED "201601010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage connection profiles
+         associated with VLL services of the Nokia SROS system.
+
+         Copyright (c) 2011-2018 Nokia. All rights reserved. Reproduction of
+         this document is authorized on the condition that the foregoing
+         copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied `as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               01 Jan 2016 00:00
+         14.0 release of the TIMETRA-CONN-PROF-MIB."
+
+    REVISION    "201102010000Z"
+    DESCRIPTION
+        "Rev 1.0                1 Feb 2011 00:00
+         Initial Release of the TIMETRA-CONN-PROF-MIB
+         in SROS 9.0."
+
+    ::= { timetraSRMIBModules 75 }
+
+TmnxConnProfId                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A number used to identify a connection profile. The value 0 is used as
+         the null ID."
+    SYNTAX      Unsigned32 (0..8000)
+
+tmnxConnProfObjs                 OBJECT IDENTIFIER ::= { tmnxSRObjs 75 }
+
+tmnxConnProfConfigTimeStamps     OBJECT IDENTIFIER ::= { tmnxConnProfObjs 1 }
+
+tmnxConnProfTblLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfTblLastChanged indicates the time, since
+         system startup, when the tmnxConnProfTable last changed state."
+    ::= { tmnxConnProfConfigTimeStamps 1 }
+
+tmnxConnProfAtmMemberTblLastChgd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfAtmMemberTblLastChgd indicates the time,
+         since system startup, when the tmnxConnProfAtmMemberTable last changed
+         state."
+    ::= { tmnxConnProfConfigTimeStamps 2 }
+
+tmnxConnProfVlanTblLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanTblLastChanged indicates the time, since
+         system startup, when the tmnxConnProfVlanTable last changed state."
+    ::= { tmnxConnProfConfigTimeStamps 3 }
+
+tmnxConnProfVlanEthTblLastChgd   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanEthTblLastChgd indicates the time, since
+         system startup, when the tmnxConnProfVlanEthTable last changed state."
+    ::= { tmnxConnProfConfigTimeStamps 4 }
+
+tmnxConnProfConfigObjs           OBJECT IDENTIFIER ::= { tmnxConnProfObjs 2 }
+
+tmnxConnProfTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxConnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxConnProfTable contains an entry for each connection profile."
+    ::= { tmnxConnProfConfigObjs 1 }
+
+tmnxConnProfEntry                OBJECT-TYPE
+    SYNTAX      TmnxConnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each tmnxConnProfEntry contains connection profile specific
+         configuration."
+    INDEX       { tmnxConnProfId }
+    ::= { tmnxConnProfTable 1 }
+
+TmnxConnProfEntry                ::= SEQUENCE
+{
+    tmnxConnProfId                   TmnxConnProfId,
+    tmnxConnProfRowStatus            RowStatus,
+    tmnxConnProfLastChanged          TimeStamp,
+    tmnxConnProfDescription          TItemDescription
+}
+
+tmnxConnProfId                   OBJECT-TYPE
+    SYNTAX      TmnxConnProfId
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfId specifies the index to a specific
+         connection profile. tmnxConnProfId is system unique."
+    ::= { tmnxConnProfEntry 1 }
+
+tmnxConnProfRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfRowStatus specifies the row status. It allows
+         entries to be created and deleted in the tmnxConnProfTable.
+
+         Rows are created by specifying the value of 'createAndGo(4)' and
+         deleted by specifying the value of 'destroy(6)'.
+
+         To delete an entry, all references to the connection profile in
+         existing SAPs and in tmnxConnProfAtmMemberTable must be deleted."
+    ::= { tmnxConnProfEntry 2 }
+
+tmnxConnProfLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfLastChanged indicates the time, since system
+         startup, that the connection profile was created or modified."
+    ::= { tmnxConnProfEntry 3 }
+
+tmnxConnProfDescription          OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfDescription specifies the description of this
+         connection profile."
+    DEFVAL      { "" }
+    ::= { tmnxConnProfEntry 4 }
+
+tmnxConnProfAtmMemberTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxConnProfAtmMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxConnProfAtmMemberTable contains an entry for each ATM
+         connection profile member.
+
+         Each ATM connection profile member is a VPI/VCI value to be assigned
+         to an ATM SAP of an APIPE VLL service with TIMETRA-SERV-MIB:svcVllType
+         set to a value of 'atmCell(7)'.
+
+         Up to a maximum of 16 ATM connection profile members can be added to a
+         connection profile."
+    ::= { tmnxConnProfConfigObjs 2 }
+
+tmnxConnProfAtmMemberEntry       OBJECT-TYPE
+    SYNTAX      TmnxConnProfAtmMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each tmnxConnProfAtmMemberEntry contains ATM connection profile member
+         specific configuration."
+    INDEX       {
+        tmnxConnProfId,
+        tmnxConnProfAtmMemberEncapValue
+    }
+    ::= { tmnxConnProfAtmMemberTable 1 }
+
+TmnxConnProfAtmMemberEntry       ::= SEQUENCE
+{
+    tmnxConnProfAtmMemberEncapValue  TmnxEncapVal,
+    tmnxConnProfAtmMemberRowStatus   RowStatus
+}
+
+tmnxConnProfAtmMemberEncapValue  OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfAtmMemberEncapValue specifies, along with
+         tmnxConnProfId, the index to a specific ATM connection profile member.
+         The TmnxEncapVal supported is ATM VC, for which the top 3 bits are
+         000."
+    ::= { tmnxConnProfAtmMemberEntry 1 }
+
+tmnxConnProfAtmMemberRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxConnProfAtmMemberRowStatus specifies the row status.
+         It allows entries to be created and deleted in the
+         tmnxConnProfAtmMemberTable.
+
+         Rows are created by specifying the value of 'createAndGo(4)' and
+         deleted by specifying the value of 'destroy(6)'."
+    ::= { tmnxConnProfAtmMemberEntry 2 }
+
+tmnxConnProfVlanTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxConnProfVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxConnProfVlanTable contains an entry for each connection
+         profile."
+    ::= { tmnxConnProfConfigObjs 3 }
+
+tmnxConnProfVlanEntry            OBJECT-TYPE
+    SYNTAX      TmnxConnProfVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxConnProfVlanEntry contains connection profile specific
+         configuration."
+    INDEX       { tmnxConnProfVlanId }
+    ::= { tmnxConnProfVlanTable 1 }
+
+TmnxConnProfVlanEntry            ::= SEQUENCE
+{
+    tmnxConnProfVlanId               TmnxConnProfId,
+    tmnxConnProfVlanRowStatus        RowStatus,
+    tmnxConnProfVlanLastChanged      TimeStamp,
+    tmnxConnProfVlanDescription      TItemDescription
+}
+
+tmnxConnProfVlanId               OBJECT-TYPE
+    SYNTAX      TmnxConnProfId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanId specifies the index to a specific
+         connection profile. tmnxConnProfVlanId is unique within the system."
+    ::= { tmnxConnProfVlanEntry 1 }
+
+tmnxConnProfVlanRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanRowStatus specifies the row status. It
+         allows entries to be created and deleted in the tmnxConnProfVlanTable.
+
+         Rows are created by specifying the value of 'createAndGo(4)' and
+         deleted by specifying the value of 'destroy(6)'.
+
+         To delete an entry, all references to the connection profile in
+         existing SAPs and in tmnxConnProfVlanEthTable must be deleted."
+    ::= { tmnxConnProfVlanEntry 2 }
+
+tmnxConnProfVlanLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanLastChanged indicates the time, since
+         system startup, that the connection profile was created or modified."
+    ::= { tmnxConnProfVlanEntry 3 }
+
+tmnxConnProfVlanDescription      OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanDescription specifies the description of
+         this connection profile."
+    DEFVAL      { "" }
+    ::= { tmnxConnProfVlanEntry 4 }
+
+tmnxConnProfVlanEthTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxConnProfVlanEthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxConnProfVlanEthTable contains an entry for each connection
+         profile ethernet specific VLAN range entry."
+    ::= { tmnxConnProfConfigObjs 4 }
+
+tmnxConnProfVlanEthEntry         OBJECT-TYPE
+    SYNTAX      TmnxConnProfVlanEthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxConnProfVlanEthEntry contains connection profile ethernet
+         specific VLAN range configuration."
+    INDEX       {
+        tmnxConnProfVlanId,
+        tmnxConnProfVlanEthRangeStart
+    }
+    ::= { tmnxConnProfVlanEthTable 1 }
+
+TmnxConnProfVlanEthEntry         ::= SEQUENCE
+{
+    tmnxConnProfVlanEthRangeStart    Integer32,
+    tmnxConnProfVlanEthRowStatus     RowStatus,
+    tmnxConnProfVlanEthRangeEnd      Integer32,
+    tmnxConnProfVlanEthLastChanged   TimeStamp
+}
+
+tmnxConnProfVlanEthRangeStart    OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanEthRangeStart specifies the start vlan
+         range of this connection profile."
+    DEFVAL      { 0 }
+    ::= { tmnxConnProfVlanEthEntry 1 }
+
+tmnxConnProfVlanEthRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanEthRowStatus specifies the row status. It
+         allows entries to be created and deleted in the
+         tmnxConnProfVlanEthTable."
+    ::= { tmnxConnProfVlanEthEntry 2 }
+
+tmnxConnProfVlanEthRangeEnd      OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanEthRangeEnd specifies the end vlan range
+         of this connection profile."
+    DEFVAL      { 0 }
+    ::= { tmnxConnProfVlanEthEntry 3 }
+
+tmnxConnProfVlanEthLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxConnProfVlanEthLastChanged indicates the time, since
+         system startup, that the connection profile was created or modified."
+    ::= { tmnxConnProfVlanEthEntry 4 }
+
+tmnxConnProfConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 75 }
+
+tmnxConnProfCompliances          OBJECT IDENTIFIER ::= { tmnxConnProfConformance 1 }
+
+tmnxConnProfV9v0Compliance       MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of connection profiles on
+         Nokia SROS series systems for release 9.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxConnProfTimeStampGroup,
+            tmnxConnProfGroup,
+            tmnxConnProfAtmMemberGroup
+        }
+    ::= { tmnxConnProfCompliances 1 }
+
+tmnxConnProfV14v0Compliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services on Nokia SROS
+         series systems release 14.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxConnProfVlanGroup
+        }
+    ::= { tmnxConnProfCompliances 2 }
+
+tmnxConnProfGroups               OBJECT IDENTIFIER ::= { tmnxConnProfConformance 2 }
+
+tmnxConnV9v0Groups               OBJECT IDENTIFIER ::= { tmnxConnProfGroups 1 }
+
+tmnxConnProfTimeStampGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxConnProfTblLastChanged,
+        tmnxConnProfAtmMemberTblLastChgd
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects maintaining table/row statistics for connection
+         profile tables on Nokia SROS series systems."
+    ::= { tmnxConnV9v0Groups 1 }
+
+tmnxConnProfGroup                OBJECT-GROUP
+    OBJECTS     {
+        tmnxConnProfRowStatus,
+        tmnxConnProfLastChanged,
+        tmnxConnProfDescription
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of connection profiles on
+         Nokia SROS series systems."
+    ::= { tmnxConnV9v0Groups 2 }
+
+tmnxConnProfAtmMemberGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxConnProfAtmMemberRowStatus
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of ATM connection profile
+         members on Nokia SROS series systems."
+    ::= { tmnxConnV9v0Groups 3 }
+
+tmnxConnV14v0Groups              OBJECT IDENTIFIER ::= { tmnxConnProfGroups 2 }
+
+tmnxConnProfVlanGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxConnProfVlanRowStatus,
+        tmnxConnProfVlanLastChanged,
+        tmnxConnProfVlanDescription,
+        tmnxConnProfVlanEthRangeEnd,
+        tmnxConnProfVlanEthRowStatus,
+        tmnxConnProfVlanEthLastChanged,
+        tmnxConnProfVlanEthTblLastChgd,
+        tmnxConnProfVlanTblLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of connection profiles on
+         Nokia SROS series systems."
+    ::= { tmnxConnV14v0Groups 1 }
+
+tmnxConnV23v0Groups              OBJECT IDENTIFIER ::= { tmnxConnProfGroups 3 }
+
+tmnxConnProfAtmMemberObsoleteGrp OBJECT-GROUP
+    OBJECTS     {
+        tmnxConnProfAtmMemberRowStatus,
+        tmnxConnProfTblLastChanged,
+        tmnxConnProfAtmMemberTblLastChgd,
+        tmnxConnProfRowStatus,
+        tmnxConnProfLastChanged,
+        tmnxConnProfDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted objects supporting management of ATM connection
+         profile members on Nokia SROS series systems."
+    ::= { tmnxConnV23v0Groups 1 }
+
+tmnxConnProfNtfyPrefix           OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 75 }
+
+tmnxConnProfNotifications        OBJECT IDENTIFIER ::= { tmnxConnProfNtfyPrefix 0 }
+
+END

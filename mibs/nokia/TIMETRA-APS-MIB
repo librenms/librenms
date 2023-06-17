@@ -1,0 +1,774 @@
+TIMETRA-APS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    apsChanConfigEntry, apsCommandEntry,
+    apsCommandSwitch, apsConfigEntry,
+    apsStatusCurrent, apsStatusK1K2Rcv,
+    apsStatusK1K2Trans,
+    apsStatusSwitchedChannel
+                                                         FROM APS-MIB
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    ;
+
+timetraAPSMIBModule              MODULE-IDENTITY
+    LAST-UPDATED "201102010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision APS
+         functionality for the Nokia SROS products. This includes extensions to
+         the APS MIB defined in RFC 3498.
+
+         Copyright 2004-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201102010000Z"
+    DESCRIPTION
+        "Rev 9.0                1 Feb 2011 00:00
+         9.0 release of the TIMETRA-APS-MIB."
+
+    REVISION    "200603230000Z"
+    DESCRIPTION
+        "Rev 4.0                23 Mar 2006 00:00
+         4.0 release of the TIMETRA-APS-MIB."
+
+    REVISION    "200508310000Z"
+    DESCRIPTION
+        "Rev 3.0                31 Aug 2005 00:00
+         3.0 release of the TIMETRA-APS-MIB."
+
+    REVISION    "200501240000Z"
+    DESCRIPTION
+        "Rev 2.1                24 Jan 2005 00:00
+         2.1 release of the TIMETRA-APS-MIB."
+
+    REVISION    "200410280000Z"
+    DESCRIPTION
+        "Rev 1.0                28 Oct 2004 00:00
+         Initial version of the TIMETRA-APS-MIB."
+
+    ::= { timetraSRMIBModules 29 }
+
+tApsMIBObjs                      OBJECT IDENTIFIER ::= { tmnxSRObjs 29 }
+
+tApsCommandTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments the apsCommandTable of the APS-MIB"
+    ::= { tApsMIBObjs 1 }
+
+tApsCommandEntry                 OBJECT-TYPE
+    SYNTAX      TApsCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the tApsCommandTable. This row exists only if the
+         associated apsConfigEntry is active."
+    AUGMENTS    { apsCommandEntry }
+    ::= { tApsCommandTable 1 }
+
+TApsCommandEntry                 ::= SEQUENCE
+{ tApsExerciseCommandResult        INTEGER }
+
+tApsExerciseCommandResult        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        passed    (1),
+        failed    (2),
+        preempted (3),
+        unknown   (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stores the result of the last exercise command on the APS group and
+         channel specified by the index values.
+
+         When read this object returns 4(unknown) if no exercise command has
+         been written to this channel since initialization."
+    ::= { tApsCommandEntry 1 }
+
+tApsChanStatusTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsChanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments the apsChanConfigTable of the APS-MIB. It contains
+         status information in addition to those mentioned in
+         apsChanStatusTable of the APS MIB."
+    ::= { tApsMIBObjs 2 }
+
+tApsChanStatusEntry              OBJECT-TYPE
+    SYNTAX      TApsChanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the tApsChanStatusTable. This row exists only if
+         the associated apsChanConfigEntry exists."
+    AUGMENTS    { apsChanConfigEntry }
+    ::= { tApsChanStatusTable 1 }
+
+TApsChanStatusEntry              ::= SEQUENCE
+{ tApsChanTxLaisState              INTEGER }
+
+tApsChanTxLaisState              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        clear      (0),
+        momentary  (1),
+        persistent (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the 7x50 APS forced Tx-LAIS on the specified APS
+         channel.
+
+         Note that the 7x50 products always receive and transmit on the same
+         (active) APS channel. For a Multi-Chassis (MC) APS or a unidirectional
+         APS group, the 7x50 product may transmit (Tx) L-AIS on the inactive
+         APS channel to force the remote end to receive traffic on the 7x50
+         selected active APS channel.
+
+         The state clear indicates that the 7x50 product currently doesn't
+         transmit any forced LAIS on the APS channel. The state momentary
+         indicates that the 7x50 product has transmitted forced LAIS on the APS
+         channel for a moment(e.g. 100 msec). The state persistent indicates
+         that the 7x50 product has been persistently transmitting forced LAIS
+         on the APS channel."
+    ::= { tApsChanStatusEntry 1 }
+
+tApsMcConfigTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsMcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments the apsConfigTable of the APS-MIB."
+    ::= { tApsMIBObjs 3 }
+
+tApsMcConfigEntry                OBJECT-TYPE
+    SYNTAX      TApsMcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the tApsMcConfigTable. This row exists only if the
+         associated apsConfigEntry is active."
+    AUGMENTS    { apsConfigEntry }
+    ::= { tApsMcConfigTable 1 }
+
+TApsMcConfigEntry                ::= SEQUENCE
+{
+    tApsMcNeighborAddrType           InetAddressType,
+    tApsMcNeighborAddr               InetAddress,
+    tApsMcAdvertiseInterval          Unsigned32,
+    tApsMcHoldTime                   Unsigned32
+}
+
+tApsMcNeighborAddrType           OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of object tApsMcNeighborAddrType specifies the address type
+         of the neighbor's IP address as specified by tApsMcNeighborAddr in the
+         case of Multi-Chassis APS architecture."
+    ::= { tApsMcConfigEntry 1 }
+
+tApsMcNeighborAddr               OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsMcNeighborAddr variable specifies the neighbor's IP
+         address only on a Multi-Chassis APS where the working and protect
+         circuits are configured on different routers. The value of
+         tApsMcNeighborAddr set to 0.0.0.0, implies that this APS group is
+         configured as a Single-Chassis APS group.
+
+         The route to the neighbor must not traverse the MC-APS member (working
+         or protect) circuits. It is recommended that the address configured
+         here is on a shared network between the routers that own the working
+         and protect circuits. By default no neighbor address is configured and
+         both the working and protect circuits are to be configured on the same
+         router (i.e. Single-Chassis APS)."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tApsMcConfigEntry 2 }
+
+tApsMcAdvertiseInterval          OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..650)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsMcAdvertiseInterval specifies the time interval, in
+         deciseconds, between 'I am operational' messages sent by both protect
+         and working circuits to their neighbor for Multi-Chassis APS. The
+         value of tApsMcAdvertiseInterval is valid only for a Multi-Chassis APS
+         as indicated by the value of tApsMcNeighborAddr not set to 0.0.0.0."
+    DEFVAL      { 10 }
+    ::= { tApsMcConfigEntry 3 }
+
+tApsMcHoldTime                   OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..650)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsMcHoldTime specifies how much time can pass, in 100s
+         of milliseconds, without receiving an advertise packet from the
+         neighbor before the Multi-Chassis signaling link is considered not
+         operational.  It is usually 3 times the value of
+         tApsMcAdvertiseInterval. The value of tApsMcAdvertiseInterval is valid
+         only for a Multi-Chassis APS as indicated by the value of
+         tApsMcNeighborAddr not set to 0.0.0.0."
+    DEFVAL      { 30 }
+    ::= { tApsMcConfigEntry 4 }
+
+tApsMcStatusTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsMcStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tApsMcStatusTable augments the apsConfigTable of the APS-MIB. It
+         contains status information in addition to those mentioned in
+         apsStatusTable of the APS MIB."
+    ::= { tApsMIBObjs 4 }
+
+tApsMcStatusEntry                OBJECT-TYPE
+    SYNTAX      TApsMcStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the tApsMcStatusTable. This row exists only if the
+         associated apsConfigEntry exists."
+    AUGMENTS    { apsConfigEntry }
+    ::= { tApsMcStatusTable 1 }
+
+TApsMcStatusEntry                ::= SEQUENCE
+{ tApsMcApsCtlLinkState            INTEGER }
+
+tApsMcApsCtlLinkState            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up                 (0),
+        dnSignalingFailure (1),
+        dnIncompatibleNbr  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsMcApsCtlLinkState indicates the current state of the
+         7x50 Multi-Chassis (MC) APS Group Control Link.
+
+         Note that for a Single-Chassis APS group the state is always up.
+
+         The state 'up' indicates that the 7x50 MC-APS controller has received
+         a valid control message from its neighboring router within the last
+         tApsMcHoldTime interval, and the MC-APS control link is considered as
+         operational.
+
+         The state 'dnSignalingFailure' indicates that the 7x50 MC-APS
+         controller hasn't received any control message from its neighboring
+         router or vice versa within the last tApsMcHoldTime interval. The
+         MC-APS control link is considered as operationally down.
+
+         The state 'dnIncompatibleNbr' indicates that the 7x50 MC-APS
+         controller has received a control message from a neighboring router
+         within the last tApsMcHoldTime interval, but the member circuit type
+         (i.e. working/protection) of the neighboring router is not compatible
+         with that of the local router. The MC-APS control link is considered
+         as operationally down."
+    ::= { tApsMcStatusEntry 1 }
+
+tApsConfigTable                  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tApsConfigTable augments the apsConfigTable of the APS-MIB. It
+         contains configuration information in addition to those mentioned in
+         apsConfigTable of the APS MIB."
+    ::= { tApsMIBObjs 5 }
+
+tApsConfigEntry                  OBJECT-TYPE
+    SYNTAX      TApsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the tApsConfigTable. This row exists only if the
+         associated apsConfigEntry exists."
+    AUGMENTS    { apsConfigEntry }
+    ::= { tApsConfigTable 1 }
+
+TApsConfigEntry                  ::= SEQUENCE
+{
+    tApsProtectionType               INTEGER,
+    tApsLineSFHoldTime               Unsigned32,
+    tApsLineSDHoldTime               Unsigned32,
+    tApsRdiAlarmGeneration           INTEGER
+}
+
+tApsProtectionType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        onePlusOneSignalling (1),
+        onePlusOne           (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsProtectionType specifies the protection type of the
+         APS group.
+         The valid options are:
+                onePlusOneSignalling (1) -- Signalling is 1+1,  data is 1:1.
+                onePlusOne           (2) -- Both signalling and data is 1+1."
+    DEFVAL      { onePlusOneSignalling }
+    ::= { tApsConfigEntry 1 }
+
+tApsLineSFHoldTime               OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsLineSFHoldTime specifies the time, in 100s of
+         milliseconds, that the APS group will remain operational up before
+         reporting a Line Signal Failure due to lais or b2err-sf."
+    DEFVAL      { 0 }
+    ::= { tApsConfigEntry 2 }
+
+tApsLineSDHoldTime               OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsLineSDHoldTime specifies the time, in 100s of
+         milliseconds, that the APS group will remain operational up before
+         reporting a Line Signal Degradation due to b2err-sd."
+    DEFVAL      { 0 }
+    ::= { tApsConfigEntry 3 }
+
+tApsRdiAlarmGeneration           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        suppress (0),
+        circuit  (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsRdiAlarmGeneration specifies the method used to
+         generate RDI alarms on all levels (line, path) for the APS physical
+         protecting/working ports referenced by apsChanConfigIfIndex.
+
+         The modification of the tApsRdiAlarmGeneration value is limited to an
+         APS port with no protecting/working ports, otherwise an INCONSISTENT
+         VALUE error is returned.
+
+         The available enumerations for tApsRdiAlarmGeneration are:
+                - suppress   - RDI alarms are not generated on any level.
+                - circuit    - RDI alarms are H/W generated independently on
+                               each working and protect circuit on RX failure of
+                               that circuit."
+    DEFVAL      { circuit }
+    ::= { tApsConfigEntry 4 }
+
+tApsGroupCommandTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TApsGroupCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tApsGroupCommandTable augments APS-MIB::apsConfigTable. It contains
+         command information in addition to the configuration information in
+         APS-MIB::apsConfigTable."
+    ::= { tApsMIBObjs 6 }
+
+tApsGroupCommandEntry            OBJECT-TYPE
+    SYNTAX      TApsGroupCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in tApsGroupCommandTable. This row exists only if the
+         associated apsConfigEntry exists."
+    AUGMENTS    { apsConfigEntry }
+    ::= { tApsGroupCommandTable 1 }
+
+TApsGroupCommandEntry            ::= SEQUENCE
+{ tApsAnnexBCommandSwitch          INTEGER }
+
+tApsAnnexBCommandSwitch          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noCmd        (1),
+        lockout      (2),
+        clearLockout (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tApsAnnexBCommandSwitch specifies the Annex B supported
+         APS switch command applied to the APS group.
+
+         The supported values:
+
+         'noCmd(1)'        -- no command was applied to the group since system
+                           -- initialization.
+         'lockout(2)'      -- lockout the APS group.
+         'clearLockout(3)' -- clear the lockout.
+
+         Sets to value 'lockout(2)' or 'clearLockout(3)' will be rejected with
+         error inconsistentValue if APS-MIB::apsConfigMode is not equal to
+         'onePlusOneOptimized(4)'. If 'noCmd(1)' is used in a write operation a
+         wrongValue error is returned.
+
+         When read this object returns the last command written or 'noCmd(1)'."
+    ::= { tApsGroupCommandEntry 1 }
+
+tApsMIBConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 29 }
+
+tmnxApsMIBCompliances            OBJECT IDENTIFIER ::= { tApsMIBConformance 1 }
+
+tApsMIBCompliance                MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 1.0 of TIMETRA-APS-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxApsSwitchCommand,
+            tmnxApsChanStatus,
+            tmnxApsNotifications
+        }
+    ::= { tmnxApsMIBCompliances 1 }
+
+tApsMIBComplianceV4v0            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 4.0 of the Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxApsSwitchCommand,
+            tmnxApsChanStatus,
+            tmnxApsMcGroup,
+            tmnxApsNotificationsV4v0
+        }
+    ::= { tmnxApsMIBCompliances 2 }
+
+tApsMIBComplianceV7v0            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 7.0 of the Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxApsSwitchCommand,
+            tmnxApsChanStatus,
+            tmnxApsMcGroup,
+            tmnxApsNotificationsV4v0,
+            tmnxApsConfigGroup
+        }
+    ::= { tmnxApsMIBCompliances 3 }
+
+tApsMIBComplianceV8v0            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 8.0 of the Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxApsSwitchCommand,
+            tmnxApsChanStatus,
+            tmnxApsMcGroup,
+            tmnxApsNotificationsV4v0,
+            tmnxApsConfigGroup,
+            tmnxApsConfigV8v0Group
+        }
+    ::= { tmnxApsMIBCompliances 4 }
+
+tApsMIBComplianceV9v0            MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for release 9.0 of Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxApsSwitchCommand,
+            tmnxApsChanStatus,
+            tmnxApsMcGroup,
+            tmnxApsNotificationsV4v0,
+            tmnxApsConfigGroup,
+            tmnxApsConfigV8v0Group,
+            tmnxApsGroupCommandV9v0Group,
+            tmnxApsNotificationsV9v0Group
+        }
+    ::= { tmnxApsMIBCompliances 5 }
+
+tmnxApsMIBGroups                 OBJECT IDENTIFIER ::= { tApsMIBConformance 2 }
+
+tmnxApsSwitchCommand             OBJECT-GROUP
+    OBJECTS     {
+        tApsExerciseCommandResult
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects  for management of aps switch command
+         applicable to the aps groups implementing linear APS 1+1 architecture."
+    ::= { tmnxApsMIBGroups 1 }
+
+tmnxApsChanStatus                OBJECT-GROUP
+    OBJECTS     {
+        tApsChanTxLaisState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects  for management of status information applicable
+         to the APS channels implementing linear APS 1+1 architecture."
+    ::= { tmnxApsMIBGroups 2 }
+
+tmnxApsNotifications             NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tApsModeMismatchClear,
+        tApsChannelMismatchClear,
+        tApsPSBFClear,
+        tApsFEPLFClear,
+        tApsLocalSwitchCommandSet,
+        tApsLocalSwitchCommandClear,
+        tApsRemoteSwitchCommandSet,
+        tApsRemoteSwitchCommandClear
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of SONET liner APS notifications."
+    ::= { tmnxApsMIBGroups 3 }
+
+tmnxApsNotificationsV4v0         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tApsModeMismatchClear,
+        tApsChannelMismatchClear,
+        tApsPSBFClear,
+        tApsFEPLFClear,
+        tApsLocalSwitchCommandSet,
+        tApsLocalSwitchCommandClear,
+        tApsRemoteSwitchCommandSet,
+        tApsRemoteSwitchCommandClear,
+        tApsMcApsCtlLinkStateChange,
+        tApsChanTxLaisStateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of SONET liner APS notifications for revision 4.0 of the
+         Nokia SROS series systems."
+    ::= { tmnxApsMIBGroups 4 }
+
+tmnxApsMcGroup                   OBJECT-GROUP
+    OBJECTS     {
+        tApsMcNeighborAddrType,
+        tApsMcNeighborAddr,
+        tApsMcAdvertiseInterval,
+        tApsMcHoldTime,
+        tApsMcApsCtlLinkState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the configuration of a Multi-Chassis APS
+         group."
+    ::= { tmnxApsMIBGroups 5 }
+
+tmnxApsConfigGroup               OBJECT-GROUP
+    OBJECTS     {
+        tApsProtectionType,
+        tApsLineSFHoldTime,
+        tApsLineSDHoldTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the configuration of APS groups added for
+         revision 7.0 of the Nokia SROS series systems."
+    ::= { tmnxApsMIBGroups 6 }
+
+tmnxApsConfigV8v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tApsRdiAlarmGeneration
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the configuration of APS groups added for
+         revision 8.0 of the Nokia SROS series systems."
+    ::= { tmnxApsMIBGroups 7 }
+
+tmnxApsGroupCommandV9v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tApsAnnexBCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of APS group command objects for release 9.0 of Nokia SROS
+         series systems."
+    ::= { tmnxApsMIBGroups 8 }
+
+tmnxApsNotificationsV9v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tApsPrimaryChannelChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of APS notifications for release 9.0 of Nokia SROS series
+         systems."
+    ::= { tmnxApsMIBGroups 9 }
+
+tApsNotificationsPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 29 }
+
+tApsNotifications                OBJECT IDENTIFIER ::= { tApsNotificationsPrefix 0 }
+
+tApsModeMismatchClear            NOTIFICATION-TYPE
+    OBJECTS     {
+        apsStatusCurrent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsModeMismatchClear notification is generated when a mode
+         mismatch condition, indicated by the 'modeMismatch(0)' bit of
+         APS-MIB::apsStatusCurrent, is cleared."
+    ::= { tApsNotifications 1 }
+
+tApsChannelMismatchClear         NOTIFICATION-TYPE
+    OBJECTS     {
+        apsStatusCurrent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsChannelMismatchClear notification is generated when a channel
+         mismatch condition, indicated by the 'channelMismatch(1)' bit of
+         APS-MIB::apsStatusCurrent, is cleared."
+    ::= { tApsNotifications 2 }
+
+tApsPSBFClear                    NOTIFICATION-TYPE
+    OBJECTS     {
+        apsStatusCurrent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsPSBFClear notification is generated when a PSBF (Protection
+         Switch Byte Failure) condition, indicated by the 'psbf(2)' bit of
+         APS-MIB::apsStatusCurrent, is cleared."
+    ::= { tApsNotifications 3 }
+
+tApsFEPLFClear                   NOTIFICATION-TYPE
+    OBJECTS     {
+        apsStatusCurrent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsFEPLFClear notification is generated when a FEPLF (Far-End
+         Protection-Line Failure) condition, indicated by the 'feplf(3)' bit of
+         APS-MIB::apsStatusCurrent, is cleared."
+    ::= { tApsNotifications 4 }
+
+tApsLocalSwitchCommandSet        NOTIFICATION-TYPE
+    OBJECTS     {
+        apsCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsLocalSwitchCommandSet is generated when any of the following
+         APS switch commands are set on APS-MIB::apsCommandSwitch in the local
+         node.  The switch commands are 'lockoutOfProtection',
+         'forcedSwitchWorkToProtect', 'forcedSwitchProtectToWork',
+         'manualSwitchWorkToProtect', 'manualSwitchProtectToWork'."
+    ::= { tApsNotifications 5 }
+
+tApsLocalSwitchCommandClear      NOTIFICATION-TYPE
+    OBJECTS     {
+        apsCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsLocalSwitchCommandClear notification is generated when an APS
+         switch command in the local node gets cleared. Note that a switch
+         command in the local node can be cleared either due to set of the
+         'clear' switch command on APS-MIB::apsCommandSwitch in the local node,
+         or due to presence of a higher priority condition in the local or
+         remote node."
+    ::= { tApsNotifications 6 }
+
+tApsRemoteSwitchCommandSet       NOTIFICATION-TYPE
+    OBJECTS     {
+        apsCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsRemoteSwitchCommandSet is generated when the received K1 byte
+         (APS-MIB::apsStatusK1K2Rcv) from a peer indicates that an APS switch
+         command just got set on APS-MIB::apsCommandSwitch in the remote (peer)
+         node."
+    ::= { tApsNotifications 7 }
+
+tApsRemoteSwitchCommandClear     NOTIFICATION-TYPE
+    OBJECTS     {
+        apsCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tApsRemoteSwitchCommandClear is generated when the received K1
+         byte (APS-MIB::apsStatusK1K2Rcv) from a peer indicates that an APS
+         switch command just got cleared on an APS channel in the remote (peer)
+         node."
+    ::= { tApsNotifications 8 }
+
+tApsMcApsCtlLinkStateChange      NOTIFICATION-TYPE
+    OBJECTS     {
+        tApsMcApsCtlLinkState
+    }
+    STATUS      current
+    DESCRIPTION
+        "tApsMcApsCtlLinkStateChange notification is generated when there is a
+         change in the value of tApsMcApsCtlLinkState."
+    ::= { tApsNotifications 9 }
+
+tApsChanTxLaisStateChange        NOTIFICATION-TYPE
+    OBJECTS     {
+        tApsChanTxLaisState
+    }
+    STATUS      current
+    DESCRIPTION
+        "tApsChanTxLaisStateChange notification is generated when there is a
+         change in the value of tApsChanTxLaisState."
+    ::= { tApsNotifications 10 }
+
+tApsPrimaryChannelChange         NOTIFICATION-TYPE
+    OBJECTS     {
+        apsStatusSwitchedChannel,
+        apsStatusK1K2Trans,
+        apsStatusK1K2Rcv
+    }
+    STATUS      current
+    DESCRIPTION
+        "tApsPrimaryChannelChange notification is generated when there is a
+         switch of the primary APS channel. Object apsStatusK1K2Trans indicates
+         the new primary APS channel."
+    ::= { tApsNotifications 11 }
+
+END

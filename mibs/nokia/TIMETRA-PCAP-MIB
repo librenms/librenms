@@ -1,0 +1,492 @@
+TIMETRA-PCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TLNamedItemOrEmpty, TNamedItemOrEmpty,
+    TmnxDisplayStringURL
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraPcapMIBModule             MODULE-IDENTITY
+    LAST-UPDATED "201710170000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of Packet Capture (PCAP).
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201710170000Z"
+    DESCRIPTION
+        "Rev 0.1        17 Oct 2017 00:00
+         Initial Version of the TIMETRA-PCAP-MIB."
+
+    ::= { timetraSRMIBModules 119 }
+
+tmnxPcapObjects                  OBJECT IDENTIFIER ::= { tmnxSRObjs 119 }
+
+tmnxPcapConfigTimestamps         OBJECT IDENTIFIER ::= { tmnxPcapObjects 1 }
+
+tmnxPcapSessionTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionTableLastChanged indicates the time, since
+         system startup, when tmnxPcapSessionTable last changed configuration."
+    ::= { tmnxPcapConfigTimestamps 1 }
+
+tmnxPcapConfigurations           OBJECT IDENTIFIER ::= { tmnxPcapObjects 2 }
+
+tmnxPcapSessionTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcapSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcapSessionTable contains information for Packet Capture
+         (PCAP) sessions."
+    ::= { tmnxPcapConfigurations 1 }
+
+tmnxPcapSessionEntry             OBJECT-TYPE
+    SYNTAX      TmnxPcapSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcapSessionEntry contains information for the specified PCAP
+         session."
+    INDEX       {
+        tmnxPcapApplicationType,
+        tmnxPcapApplicationName,
+        tmnxPcapSessionName
+    }
+    ::= { tmnxPcapSessionTable 1 }
+
+TmnxPcapSessionEntry             ::= SEQUENCE
+{
+    tmnxPcapApplicationType          INTEGER,
+    tmnxPcapApplicationName          TLNamedItemOrEmpty,
+    tmnxPcapSessionName              TNamedItemOrEmpty,
+    tmnxPcapSessionRowStatus         RowStatus,
+    tmnxPcapSessionEntryLastChanged  TimeStamp,
+    tmnxPcapSessionFileUrl           TmnxDisplayStringURL,
+    tmnxPcapSessionCapture           INTEGER,
+    tmnxPcapSessionState             INTEGER,
+    tmnxPcapApplicationIdIxr         Unsigned32
+}
+
+tmnxPcapApplicationType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        mirror-dest (1)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapApplicationType specifies unique value which
+         identifies the type of application that created this PCAP session."
+    ::= { tmnxPcapSessionEntry 1 }
+
+tmnxPcapApplicationName          OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapApplicationName specifies a unique name which
+         identifies the application that created this PCAP session."
+    ::= { tmnxPcapSessionEntry 2 }
+
+tmnxPcapSessionName              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionName specifies a unique name which
+         identifies the PCAP session."
+    ::= { tmnxPcapSessionEntry 3 }
+
+tmnxPcapSessionRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionRowStatus specifies the row status. It
+         allows the creation and deletion of rows in tmnxPcapSessionTable."
+    ::= { tmnxPcapSessionEntry 4 }
+
+tmnxPcapSessionEntryLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionEntryLastChanged indicates the time, since
+         system startup, that the configuration of the row was last modified."
+    ::= { tmnxPcapSessionEntry 5 }
+
+tmnxPcapSessionFileUrl           OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionFileUrl specifies the full path of the
+         file which the capture will write to, which can either be local, or
+         remote. Actions to start, or stop the file capture are controlled by
+         tmnxPcapSessionCapture."
+    DEFVAL      { ''H }
+    ::= { tmnxPcapSessionEntry 6 }
+
+tmnxPcapSessionCapture           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        start (1),
+        stop  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionCapture specifies the action to be taken
+         by the PCAP session on the file specified by tmnxPcapSessionFileUrl.
+
+            start (1) - Start capturing packets to the file.
+            stop  (2) - Stop capturing packets to the file.
+            purge (3) - Purge the contents of the file."
+    DEFVAL      { stop }
+    ::= { tmnxPcapSessionEntry 7 }
+
+tmnxPcapSessionState             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        failed                (0),
+        init                  (1),
+        ready                 (2),
+        start                 (3),
+        in-progress           (4),
+        stopped               (5),
+        file-error            (6),
+        buffer-full           (7),
+        buffer-high-watermark (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionState indicates the capture state of the
+         PCAP session.
+
+            failed                (0) - Packet capture has failed on the PCAP session.
+            init                  (1) - The PCAP session is initializing.
+            ready                 (2) - The PCAP session is ready for capture.
+            start                 (3) - The PCAP session is in the start state waiting
+                                        to commence capture.
+            in-progress           (4) - Packet capture is in progress on the PCAP
+                                        session.
+            stopped               (5) - Packet capture has stopped on the PCAP session.
+            file-error            (6) - Issues performing file operation on the PCAP
+                                        session.
+            buffer-full           (7) - The PCAP session is running out of memory on its
+                                        packet capture buffer.
+            buffer-high-watermark (8) - The PCAP session is reaching the operating buffer
+                                        limit on the packet capture buffer. This may
+                                        trigger a write to file operation."
+    ::= { tmnxPcapSessionEntry 8 }
+
+tmnxPcapApplicationIdIxr         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapApplicationIdIxr indicates the unique ID for the
+         IXR PCAP session application."
+    ::= { tmnxPcapSessionEntry 9 }
+
+tmnxPcapStatistics               OBJECT IDENTIFIER ::= { tmnxPcapObjects 3 }
+
+tmnxPcapSessionStatsTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcapSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcapSessionStatsTable contains statistics for Packet Capture
+         (PCAP) sessions."
+    ::= { tmnxPcapStatistics 1 }
+
+tmnxPcapSessionStatsEntry        OBJECT-TYPE
+    SYNTAX      TmnxPcapSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcapSessionStatsEntry contains statistics for the specified
+         PCAP session."
+    AUGMENTS    { tmnxPcapSessionEntry }
+    ::= { tmnxPcapSessionStatsTable 1 }
+
+TmnxPcapSessionStatsEntry        ::= SEQUENCE
+{
+    tmnxPcapSessionBufferSize        Unsigned32,
+    tmnxPcapSessionFileSize          Unsigned32,
+    tmnxPcapSessionLastFileWriteTime TimeStamp,
+    tmnxPcapSessionBufWriteFailures  Unsigned32,
+    tmnxPcapSessionBufReadFailures   Unsigned32,
+    tmnxPcapSessionDroppedPackets    Unsigned32,
+    tmnxPcapSessionProcTimeBailouts  Unsigned32,
+    tmnxPcapSessionCapturedPackets   Unsigned32
+}
+
+tmnxPcapSessionBufferSize        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionBufferSize indicates the total buffer
+         size, in bytes, currently in use by the PCAP session."
+    ::= { tmnxPcapSessionStatsEntry 1 }
+
+tmnxPcapSessionFileSize          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionFileSize indicates the total number of
+         bytes that have been written to the file specified by
+         tmnxPcapSessionFileUrl."
+    ::= { tmnxPcapSessionStatsEntry 2 }
+
+tmnxPcapSessionLastFileWriteTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionLastFileWriteTime indicates the last time
+         that the file specified by tmnxPcapSessionFileUrl was last written to."
+    ::= { tmnxPcapSessionStatsEntry 3 }
+
+tmnxPcapSessionBufWriteFailures  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionBufWriteFailures indicates the total
+         number of failed attempts to write to the buffer used by the PCAP
+         session."
+    ::= { tmnxPcapSessionStatsEntry 4 }
+
+tmnxPcapSessionBufReadFailures   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionBufReadFailures indicates the total number
+         of failed attempts to read the buffer used by the PCAP session."
+    ::= { tmnxPcapSessionStatsEntry 5 }
+
+tmnxPcapSessionDroppedPackets    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionDroppedPackets indicates the total number
+         of received packets that were dropped by the PCAP session."
+    ::= { tmnxPcapSessionStatsEntry 6 }
+
+tmnxPcapSessionProcTimeBailouts  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionProcTimeBailouts indicates the total
+         number of processing time bailouts that have occurred for the PCAP
+         session."
+    ::= { tmnxPcapSessionStatsEntry 7 }
+
+tmnxPcapSessionCapturedPackets   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcapSessionCapturedPackets indicated the total number
+         of received packets that were captured by the PCAP sesison."
+    ::= { tmnxPcapSessionStatsEntry 8 }
+
+tmnxPcapConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 119 }
+
+tmnxPcapCompliances              OBJECT IDENTIFIER ::= { tmnxPcapConformance 1 }
+
+tmnxPcapComplianceV16v0          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PCAPs for release 16.0 on
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPcapSessionGroupV16v0,
+            tmnxPcapSessionNotifGroupV16v0
+        }
+    ::= { tmnxPcapCompliances 1 }
+
+tmnxPcapComplianceV22v0          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PCAPs for release 22.0 on
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPcapSessionGroupV22v0,
+            tmnxPcapSessionStatsGroupV22v0
+        }
+    ::= { tmnxPcapCompliances 2 }
+
+tmnxPcapGroups                   OBJECT IDENTIFIER ::= { tmnxPcapConformance 2 }
+
+tmnxPcapSessionGroupV16v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcapSessionTableLastChanged,
+        tmnxPcapSessionRowStatus,
+        tmnxPcapSessionEntryLastChanged,
+        tmnxPcapSessionFileUrl,
+        tmnxPcapSessionCapture,
+        tmnxPcapSessionState,
+        tmnxPcapSessionBufferSize,
+        tmnxPcapSessionFileSize,
+        tmnxPcapSessionLastFileWriteTime,
+        tmnxPcapSessionBufWriteFailures,
+        tmnxPcapSessionBufReadFailures,
+        tmnxPcapSessionDroppedPackets,
+        tmnxPcapSessionProcTimeBailouts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining PCAP sessions on Nokia SROS series
+         systems for release 16.0."
+    ::= { tmnxPcapGroups 1 }
+
+tmnxPcapSessionNotifGroupV16v0   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPcapFileError,
+        tmnxPcapBufferFull,
+        tmnxPcapBufferReadWriteFailure,
+        tmnxPcapSoftwareFailure
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional notifications supporting management of PCAP
+         session on Nokia SROS series systems for release 16.0."
+    ::= { tmnxPcapGroups 2 }
+
+tmnxPcapSessionGroupV22v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcapApplicationIdIxr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining PCAP sessions on Nokia SROS series
+         systems for release 22.0."
+    ::= { tmnxPcapGroups 3 }
+
+tmnxPcapSessionStatsGroupV22v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcapSessionCapturedPackets
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining PCAP sessions on Nokia SROS series
+         systems for release 22.0."
+    ::= { tmnxPcapGroups 4 }
+
+tmnxPcapNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 119 }
+
+tmnxPcapNofitications            OBJECT IDENTIFIER ::= { tmnxPcapNotifyPrefix 1 }
+
+tmnxPcapFileError                NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPcapSessionState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxPcapFileError notification is generated when a PCAP
+         session encounters a capture file operation related error.
+
+         [EFFECT] The packet capture may not be uploaded to the PCAP file
+         anymore, or the capture may be inaccurate.
+
+         [RECOVERY] Check the file-url, and user-permissions specified. Stop
+         the packet capture, remove and re-configure a new file-url, and start
+         the capture again."
+    ::= { tmnxPcapNofitications 1 }
+
+tmnxPcapBufferFull               NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPcapSessionBufferSize,
+        tmnxPcapSessionDroppedPackets
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxPcapBufferFull notification is generated when the PCAP
+         session allocated buffer is full, indicating a higher traffic rate.
+
+         [EFFECT] May result in dropping packets, if not recoverable.
+
+         [RECOVERY] The software will eventually recover when all the buffer
+         contents are uploaded to the capture file. No action required."
+    ::= { tmnxPcapNofitications 2 }
+
+tmnxPcapBufferReadWriteFailure   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPcapSessionBufReadFailures,
+        tmnxPcapSessionBufWriteFailures
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxPcapBufferReadWriteFailure notification is generated
+         when a read or write operation to the PCAP session buffer fails.
+
+         [EFFECT] Will result in dropping packets.
+
+         [RECOVERY] The software will potentially recover. No action may be
+         required. However, if the problem persists stop the packet capture,
+         delete and re-configure a new PCAP session."
+    ::= { tmnxPcapNofitications 3 }
+
+tmnxPcapSoftwareFailure          NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPcapSessionState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxPcapSoftwareFailure notification is generated when a
+         software failure occurs, affecting the ability of the PCAP session to
+         perform its task.
+
+         [EFFECT] Will result in dropping packets.
+
+         [RECOVERY] Stop the packet capture, delete and re-configure a new PCAP
+         session."
+    ::= { tmnxPcapNofitications 4 }
+
+END

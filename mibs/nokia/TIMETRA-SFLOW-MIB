@@ -1,0 +1,766 @@
+TIMETRA-SFLOW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    sFlowCpDataSource, sFlowCpInstance,
+    sFlowCpReceiver, sFlowRcvrEntry,
+    sFlowRcvrIndex
+                                                         FROM SFLOW-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TEgrPolicerId, TEgressQueueId,
+    TIngPolicerId, TIngressQueueId
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraSflowMIBModule            MODULE-IDENTITY
+    LAST-UPDATED "201312110000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the sFlow
+         components of the Nokia SROS.
+
+         Copyright (c) 2013-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201312110000Z"
+    DESCRIPTION
+        "Rev 1.0                10 Dec 2013 00:00
+         Initial release of the TIMETRA-SFLOW-MIB."
+
+    ::= { timetraSRMIBModules 95 }
+
+TmnxSflowCounterMapTrafficType   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxSflowCounterMapTrafficType is an enumerated integer that
+         identifies the traffic type of the counter map."
+    SYNTAX      INTEGER {
+        unicast   (1),
+        multicast (2),
+        broadcast (3)
+    }
+
+tmnxSflowObjs                    OBJECT IDENTIFIER ::= { tmnxSRObjs 95 }
+
+tmnxSflowConfigTimeStamps        OBJECT IDENTIFIER ::= { tmnxSflowObjs 1 }
+
+tmnxSflowRcvrTableLastChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrTableLastChanged indicates the time, since
+         system startup, when the tmnxSflowRcvrTable last changed state."
+    ::= { tmnxSflowConfigTimeStamps 1 }
+
+tmnxSflowCpTableLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowCpTableLastChanged indicates the time, since
+         system startup, when the tmnxSflowCpTable last changed state."
+    ::= { tmnxSflowConfigTimeStamps 2 }
+
+tmnxSflowIngCMapPlcrTableLstCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapPlcrTableLstCh indicates the time, since
+         system startup, when the tmnxSflowIngCMapPlcrTable last changed state."
+    ::= { tmnxSflowConfigTimeStamps 3 }
+
+tmnxSflowEgrCMapPlcrTableLstCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapPlcrTableLstCh indicates the time, since
+         system startup, when the tmnxSflowEgrCMapPlcrTable last changed state."
+    ::= { tmnxSflowConfigTimeStamps 4 }
+
+tmnxSflowIngCMapQueueTableLstCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapQueueTableLstCh indicates the time, since
+         system startup, when the tmnxSflowIngCMapQueueTable last changed
+         state."
+    ::= { tmnxSflowConfigTimeStamps 5 }
+
+tmnxSflowEgrCMapQueueTableLstCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapQueueTableLstCh indicates the time, since
+         system startup, when the tmnxSflowEgrCMapQueueTable last changed
+         state."
+    ::= { tmnxSflowConfigTimeStamps 6 }
+
+tmnxSflowConfigurations          OBJECT IDENTIFIER ::= { tmnxSflowObjs 2 }
+
+tmnxSflowRcvrTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowRcvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowRcvrTable contains configuration attributes for the
+         receivers of sFlow information, in addition to what is contained in
+         SFLOW-MIB:sFlowRcvrTable."
+    ::= { tmnxSflowConfigurations 1 }
+
+tmnxSflowRcvrEntry               OBJECT-TYPE
+    SYNTAX      TmnxSflowRcvrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowRcvrEntry consists of configuration for the receivers of
+         sFlow information. For every entry in table SFLOW-MIB:sFlowRcvrTable
+         there is an entry in tmnxSflowRcvrTable."
+    AUGMENTS    { sFlowRcvrEntry }
+    ::= { tmnxSflowRcvrTable 1 }
+
+TmnxSflowRcvrEntry               ::= SEQUENCE
+{
+    tmnxSflowRcvrLastChanged         TimeStamp,
+    tmnxSflowRcvrBackupAddressType   InetAddressType,
+    tmnxSflowRcvrBackupAddress       InetAddress,
+    tmnxSflowRcvrBackupDstPort       Integer32
+}
+
+tmnxSflowRcvrLastChanged         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrLastChanged indicates the time, since system
+         startup, that the sFlow receiver was created or modified."
+    ::= { tmnxSflowRcvrEntry 1 }
+
+tmnxSflowRcvrBackupAddressType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrBackupAddressType specifies the IP address
+         type of the backup sFlow receiver."
+    DEFVAL      { ipv4 }
+    ::= { tmnxSflowRcvrEntry 2 }
+
+tmnxSflowRcvrBackupAddress       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrBackupAddress specifies the IP address of
+         the backup sFlow receiver."
+    DEFVAL      { ''H }
+    ::= { tmnxSflowRcvrEntry 3 }
+
+tmnxSflowRcvrBackupDstPort       OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrBackupDstPort specifies the backup
+         destination port of the sFlow receiver."
+    DEFVAL      { 6343 }
+    ::= { tmnxSflowRcvrEntry 4 }
+
+tmnxSflowCpTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowCpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowCpTable contains the configuration attributes for the
+         sFlow counter poller information."
+    ::= { tmnxSflowConfigurations 2 }
+
+tmnxSflowCpEntry                 OBJECT-TYPE
+    SYNTAX      TmnxSflowCpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowCpEntry consists of configuration for an sFlow counter
+         poller. This is an sFlow counter data polling instance, against a
+         particular entity instance, from which counter statistics are pulled
+         by the sFlow agent. The creation of an entry in tmnxSflowCpTable will
+         trigger the system to populate an associated entry in
+         SFLOW-MIB:sFlowCpTable. The removal of an entry in tmnxSflowCpTable
+         will trigger the system to remove the associated entry in
+         SFLOW-MIB:sFlowCpTable."
+    INDEX       {
+        sFlowCpDataSource,
+        sFlowCpInstance
+    }
+    ::= { tmnxSflowCpTable 1 }
+
+TmnxSflowCpEntry                 ::= SEQUENCE
+{
+    tmnxSflowCpRowStatus             RowStatus,
+    tmnxSflowCpLastChanged           TimeStamp
+}
+
+tmnxSflowCpRowStatus             OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowCpRowStatus specifies the row status of the
+         sFlow counter poller entry."
+    ::= { tmnxSflowCpEntry 1 }
+
+tmnxSflowCpLastChanged           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowCpLastChanged indicates the time, since system
+         startup, that the sFlow counter poller was created or modified."
+    ::= { tmnxSflowCpEntry 2 }
+
+tmnxSflowIngCMapPlcrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowIngCMapPlcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sflow ingress counter map policer table
+         (tmnxSflowIngCMapPlcrTable) contains the configuration of the mapping
+         of sFlow ingress counters to policers."
+    ::= { tmnxSflowConfigurations 3 }
+
+tmnxSflowIngCMapPlcrEntry        OBJECT-TYPE
+    SYNTAX      TmnxSflowIngCMapPlcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in tmnxSflowIngCMapPlcrTable contains sFlow ingress counter
+         configuration information for a given policer.
+
+         Entries are created by setting tmnxSflowIngCMapPlcrRowStatus to
+         'createAndGo(4)' and are destroyed by setting
+         tmnxSflowIngCMapPlcrRowStatus to 'destroy(6)'."
+    INDEX       { tmnxSflowIngCMapPlcrId }
+    ::= { tmnxSflowIngCMapPlcrTable 1 }
+
+TmnxSflowIngCMapPlcrEntry        ::= SEQUENCE
+{
+    tmnxSflowIngCMapPlcrId           TIngPolicerId,
+    tmnxSflowIngCMapPlcrRowStatus    RowStatus,
+    tmnxSflowIngCMapPlcrLastChange   TimeStamp,
+    tmnxSflowIngCMapPlcrTrafficType  TmnxSflowCounterMapTrafficType
+}
+
+tmnxSflowIngCMapPlcrId           OBJECT-TYPE
+    SYNTAX      TIngPolicerId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapPlcrId specifies the policer ID of the
+         sFlow ingress counter map policer entry."
+    ::= { tmnxSflowIngCMapPlcrEntry 1 }
+
+tmnxSflowIngCMapPlcrRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapPlcrRowStatus specifies the row status of
+         the sFlow ingress counter map policer entry."
+    ::= { tmnxSflowIngCMapPlcrEntry 2 }
+
+tmnxSflowIngCMapPlcrLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapPlcrLastChange indicates the time, since
+         system startup, that the sFlow ingress counter map policer entry was
+         created or modified."
+    ::= { tmnxSflowIngCMapPlcrEntry 3 }
+
+tmnxSflowIngCMapPlcrTrafficType  OBJECT-TYPE
+    SYNTAX      TmnxSflowCounterMapTrafficType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapPlcrTrafficType specifies the traffic
+         type of the sFlow ingress counter map policer entry."
+    DEFVAL      { unicast }
+    ::= { tmnxSflowIngCMapPlcrEntry 4 }
+
+tmnxSflowEgrCMapPlcrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowEgrCMapPlcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sflow egress counter map policer table (tmnxSflowEgrCMapPlcrTable)
+         contains the configuration of the mapping of sFlow egress counters to
+         policers."
+    ::= { tmnxSflowConfigurations 4 }
+
+tmnxSflowEgrCMapPlcrEntry        OBJECT-TYPE
+    SYNTAX      TmnxSflowEgrCMapPlcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in tmnxSflowEgrCMapPlcrTable contains sFlow egress counter
+         configuration information for a given map type and policer.
+
+         Entries are created by setting tmnxSflowEgrCMapPlcrRowStatus to
+         'createAndGo(4)' and are destroyed by setting
+         tmnxSflowEgrCMapPlcrRowStatus to 'destroy(6)'."
+    INDEX       { tmnxSflowEgrCMapPlcrId }
+    ::= { tmnxSflowEgrCMapPlcrTable 1 }
+
+TmnxSflowEgrCMapPlcrEntry        ::= SEQUENCE
+{
+    tmnxSflowEgrCMapPlcrId           TEgrPolicerId,
+    tmnxSflowEgrCMapPlcrRowStatus    RowStatus,
+    tmnxSflowEgrCMapPlcrLastChange   TimeStamp,
+    tmnxSflowEgrCMapPlcrTrafficType  TmnxSflowCounterMapTrafficType
+}
+
+tmnxSflowEgrCMapPlcrId           OBJECT-TYPE
+    SYNTAX      TEgrPolicerId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapPlcrId specifies the policer ID of the
+         sFlow egress counter map policer entry."
+    ::= { tmnxSflowEgrCMapPlcrEntry 1 }
+
+tmnxSflowEgrCMapPlcrRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapPlcrRowStatus specifies the row status of
+         the sFlow egress counter map policer entry."
+    ::= { tmnxSflowEgrCMapPlcrEntry 2 }
+
+tmnxSflowEgrCMapPlcrLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapPlcrLastChange indicates the time, since
+         system startup, that the sFlow egress counter map policer entry was
+         created or modified."
+    ::= { tmnxSflowEgrCMapPlcrEntry 3 }
+
+tmnxSflowEgrCMapPlcrTrafficType  OBJECT-TYPE
+    SYNTAX      TmnxSflowCounterMapTrafficType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapPlcrTrafficType specifies the traffic
+         type of the sFlow egress counter map policer entry."
+    DEFVAL      { unicast }
+    ::= { tmnxSflowEgrCMapPlcrEntry 4 }
+
+tmnxSflowIngCMapQueueTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowIngCMapQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sflow ingress counter map queue table (tmnxSflowIngCMapQueueTable)
+         contains the configuration of the mapping of sFlow ingress counters to
+         queues."
+    ::= { tmnxSflowConfigurations 5 }
+
+tmnxSflowIngCMapQueueEntry       OBJECT-TYPE
+    SYNTAX      TmnxSflowIngCMapQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in tmnxSflowIngCMapQueueTable contains sFlow ingress counter
+         configuration information for a given queue.
+
+         Entries are created by setting tmnxSflowIngCMapQueueRowStatus to
+         'createAndGo(4)' and are destroyed by setting
+         tmnxSflowIngCMapQueueRowStatus to 'destroy(6)'."
+    INDEX       { tmnxSflowIngCMapQueueId }
+    ::= { tmnxSflowIngCMapQueueTable 1 }
+
+TmnxSflowIngCMapQueueEntry       ::= SEQUENCE
+{
+    tmnxSflowIngCMapQueueId          TIngressQueueId,
+    tmnxSflowIngCMapQueueRowStatus   RowStatus,
+    tmnxSflowIngCMapQueueLastChange  TimeStamp,
+    tmnxSflowIngCMapQueueTrafficType TmnxSflowCounterMapTrafficType
+}
+
+tmnxSflowIngCMapQueueId          OBJECT-TYPE
+    SYNTAX      TIngressQueueId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapQueueId specifies the queue ID of the
+         sFlow ingress counter map queue entry."
+    ::= { tmnxSflowIngCMapQueueEntry 1 }
+
+tmnxSflowIngCMapQueueRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapQueueRowStatus specifies the row status
+         of the sFlow ingress counter map queue entry."
+    ::= { tmnxSflowIngCMapQueueEntry 2 }
+
+tmnxSflowIngCMapQueueLastChange  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapQueueLastChange indicates the time, since
+         system startup, that the sFlow ingress counter map queue entry was
+         created or modified."
+    ::= { tmnxSflowIngCMapQueueEntry 3 }
+
+tmnxSflowIngCMapQueueTrafficType OBJECT-TYPE
+    SYNTAX      TmnxSflowCounterMapTrafficType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowIngCMapQueueTrafficType specifies the traffic
+         type of the sFlow ingress counter map queue entry."
+    DEFVAL      { unicast }
+    ::= { tmnxSflowIngCMapQueueEntry 4 }
+
+tmnxSflowEgrCMapQueueTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowEgrCMapQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sflow egress counter map queue table (tmnxSflowEgrCMapQueueTable)
+         contains the configuration of the mapping of sFlow egress counters to
+         queues."
+    ::= { tmnxSflowConfigurations 6 }
+
+tmnxSflowEgrCMapQueueEntry       OBJECT-TYPE
+    SYNTAX      TmnxSflowEgrCMapQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in tmnxSflowEgrCMapQueueTable contains sFlow egress counter
+         configuration information for a given queue.
+
+         Entries are created by setting tmnxSflowEgrCMapQueueRowStatus to
+         'createAndGo(4)' and are destroyed by setting
+         tmnxSflowEgrCMapQueueRowStatus to 'destroy(6)'."
+    INDEX       { tmnxSflowEgrCMapQueueId }
+    ::= { tmnxSflowEgrCMapQueueTable 1 }
+
+TmnxSflowEgrCMapQueueEntry       ::= SEQUENCE
+{
+    tmnxSflowEgrCMapQueueId          TEgressQueueId,
+    tmnxSflowEgrCMapQueueRowStatus   RowStatus,
+    tmnxSflowEgrCMapQueueLastChange  TimeStamp,
+    tmnxSflowEgrCMapQueueTrafficType TmnxSflowCounterMapTrafficType
+}
+
+tmnxSflowEgrCMapQueueId          OBJECT-TYPE
+    SYNTAX      TEgressQueueId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapQueueId specifies the queue ID of the
+         sFlow egress counter map queue entry."
+    ::= { tmnxSflowEgrCMapQueueEntry 1 }
+
+tmnxSflowEgrCMapQueueRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapQueueRowStatus specifies the row status
+         of the sFlow egress counter map queue entry."
+    ::= { tmnxSflowEgrCMapQueueEntry 2 }
+
+tmnxSflowEgrCMapQueueLastChange  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapQueueLastChange indicates the time, since
+         system startup, that the sFlow egress counter map queue entry was
+         created or modified."
+    ::= { tmnxSflowEgrCMapQueueEntry 3 }
+
+tmnxSflowEgrCMapQueueTrafficType OBJECT-TYPE
+    SYNTAX      TmnxSflowCounterMapTrafficType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowEgrCMapQueueTrafficType specifies the traffic
+         type of the sFlow egress counter map queue entry."
+    DEFVAL      { unicast }
+    ::= { tmnxSflowEgrCMapQueueEntry 4 }
+
+tmnxSflowStatistics              OBJECT IDENTIFIER ::= { tmnxSflowObjs 3 }
+
+tmnxSflowRcvrStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSflowRcvrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowRcvrStatsTable contains statistics objects for the sFlow
+         receivers."
+    ::= { tmnxSflowStatistics 1 }
+
+tmnxSflowRcvrStatsEntry          OBJECT-TYPE
+    SYNTAX      TmnxSflowRcvrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSflowRcvrStatsEntry consists of statistics of sFlow
+         information for the given receiver.
+
+         For every entry in the SFLOW-MIB::sFlowRcvrTable, there is one entry
+         for each tmnxSflowRcvrType in the tmnxSflowRcvrStatsTable."
+    INDEX       {
+        sFlowRcvrIndex,
+        tmnxSflowRcvrType
+    }
+    ::= { tmnxSflowRcvrStatsTable 1 }
+
+TmnxSflowRcvrStatsEntry          ::= SEQUENCE
+{
+    tmnxSflowRcvrType                INTEGER,
+    tmnxSflowRcvrLastPacketSent      TimeStamp,
+    tmnxSflowRcvrPacketsSent         Counter32,
+    tmnxSflowRcvrPacketErrors        Counter32
+}
+
+tmnxSflowRcvrType                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary (1),
+        backup  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrType specifies the receiver type."
+    ::= { tmnxSflowRcvrStatsEntry 1 }
+
+tmnxSflowRcvrLastPacketSent      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrLastPacketSent indicates the time, since
+         system startup, when the last packet was sent from the given receiver.
+
+         Zero indicates that no packets have been sent yet."
+    ::= { tmnxSflowRcvrStatsEntry 2 }
+
+tmnxSflowRcvrPacketsSent         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrPacketsSent indicates the number of packets
+         sent from the given receiver."
+    ::= { tmnxSflowRcvrStatsEntry 3 }
+
+tmnxSflowRcvrPacketErrors        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowRcvrPacketErrors indicates the number of packet
+         errors that have been detected by the given receiver."
+    ::= { tmnxSflowRcvrStatsEntry 4 }
+
+tmnxSflowNotifyObjects           OBJECT IDENTIFIER ::= { tmnxSflowObjs 4 }
+
+tmnxSflowNotifyRcvrIndex         OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowNotifyRcvrIndex indicates the index into
+         SFLOW-MIB::sFlowRcvrTable."
+    ::= { tmnxSflowNotifyObjects 1 }
+
+tmnxSflowNotifyFlowFailReason    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        udpSendFailure  (1),
+        cpSequenceReset (2),
+        cpUnreachable   (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSflowNotifyFlowFailReason indicates the sFlow flow
+         failure reason:
+
+         udpSendFailure  (1) - UDP transmit failure
+         cpSequenceReset (2) - counter poller sequence reset
+         cpUnreachable   (3) - counter poller unreachable"
+    ::= { tmnxSflowNotifyObjects 2 }
+
+tmnxSflowConformance             OBJECT IDENTIFIER ::= { tmnxSRConfs 95 }
+
+tmnxSflowCompliances             OBJECT IDENTIFIER ::= { tmnxSflowConformance 1 }
+
+tmnxSflowV12v0Compliance         MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the sFlow feature for
+         release 12.0 on SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSflowTimeStampV12v0Group,
+            tmnxSflowConfigV12v0Group,
+            tmnxSflowNotifyObjsV12v0Group,
+            tmnxSflowNotifV12v0Group,
+            tmnxSflowRcvrStatsV12v0Group
+        }
+    ::= { tmnxSflowCompliances 1 }
+
+tmnxSflowGroups                  OBJECT IDENTIFIER ::= { tmnxSflowConformance 2 }
+
+tmnxSflowV12v0Groups             OBJECT IDENTIFIER ::= { tmnxSflowGroups 1 }
+
+tmnxSflowTimeStampV12v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxSflowRcvrTableLastChanged,
+        tmnxSflowCpTableLastChanged,
+        tmnxSflowIngCMapPlcrTableLstCh,
+        tmnxSflowEgrCMapPlcrTableLstCh,
+        tmnxSflowIngCMapQueueTableLstCh,
+        tmnxSflowEgrCMapQueueTableLstCh
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining sFlow table statistics for release
+         12.0 on SROS series system."
+    ::= { tmnxSflowV12v0Groups 1 }
+
+tmnxSflowConfigV12v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tmnxSflowRcvrLastChanged,
+        tmnxSflowRcvrBackupAddressType,
+        tmnxSflowRcvrBackupAddress,
+        tmnxSflowRcvrBackupDstPort,
+        tmnxSflowCpRowStatus,
+        tmnxSflowCpLastChanged,
+        tmnxSflowIngCMapPlcrRowStatus,
+        tmnxSflowEgrCMapPlcrRowStatus,
+        tmnxSflowIngCMapPlcrLastChange,
+        tmnxSflowEgrCMapPlcrLastChange,
+        tmnxSflowIngCMapPlcrTrafficType,
+        tmnxSflowEgrCMapPlcrTrafficType,
+        tmnxSflowIngCMapQueueRowStatus,
+        tmnxSflowEgrCMapQueueRowStatus,
+        tmnxSflowIngCMapQueueLastChange,
+        tmnxSflowEgrCMapQueueLastChange,
+        tmnxSflowIngCMapQueueTrafficType,
+        tmnxSflowEgrCMapQueueTrafficType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining sFlow configuration for release 12.0
+         on SROS series systems."
+    ::= { tmnxSflowV12v0Groups 2 }
+
+tmnxSflowNotifyObjsV12v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSflowNotifyRcvrIndex,
+        tmnxSflowNotifyFlowFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects used in notifications generated by sFlow for
+         release 12.0 on SROS series systems."
+    ::= { tmnxSflowV12v0Groups 3 }
+
+tmnxSflowNotifV12v0Group         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSflowCpEntrySampling,
+        tmnxSflowPacketTxFailure
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications generated by sFlow for release 12.0 on SROS
+         series systems."
+    ::= { tmnxSflowV12v0Groups 4 }
+
+tmnxSflowRcvrStatsV12v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxSflowRcvrLastPacketSent,
+        tmnxSflowRcvrPacketsSent,
+        tmnxSflowRcvrPacketErrors
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining sFlow receiver statistics for release
+         12.0 on SROS series systems."
+    ::= { tmnxSflowV12v0Groups 5 }
+
+tmnxSflowNotifyPrefix            OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 95 }
+
+tmnxSflowNotifications           OBJECT IDENTIFIER ::= { tmnxSflowNotifyPrefix 0 }
+
+tmnxSflowCpEntrySampling         NOTIFICATION-TYPE
+    OBJECTS     {
+        sFlowCpReceiver,
+        tmnxSflowNotifyFlowFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSflowCpEntrySampling event is generated when the
+         sampling of an sFlow counter poller is interrupted or started.
+
+         [EFFECT] Counter sampling may not be available."
+    ::= { tmnxSflowNotifications 1 }
+
+tmnxSflowPacketTxFailure         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSflowNotifyRcvrIndex,
+        tmnxSflowNotifyFlowFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSflowPacketTxFailure event is generated when an sFlow
+         packet fails to transmit from an active sFlow receiver.
+
+         [EFFECT] Flow data may be lost."
+    ::= { tmnxSflowNotifications 2 }
+
+END

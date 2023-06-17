@@ -1,0 +1,375 @@
+TIMETRA-IPFIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemDescription, TNamedItem,
+    TmnxAdminState
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraIpfixMIBModule            MODULE-IDENTITY
+    LAST-UPDATED "201202280000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the IP
+         Flow Information Export (IPFIX) Protocol for the Exchange of  IP
+         Traffic Flow Information for the Nokia 7xxx device.
+
+         Copyright 2011-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201202280000Z"
+    DESCRIPTION
+        "Rev 10.0                28 Februari 2012 12:00
+         10.0 release of the TIMETRA-IPFIX-MIB."
+
+    ::= { timetraSRMIBModules 78 }
+
+tmnxIpfix                        OBJECT IDENTIFIER ::= { tmnxSRObjs 78 }
+
+tmnxIpfixObjs                    OBJECT IDENTIFIER ::= { tmnxIpfix 1 }
+
+tmnxIpfixExportObjs              OBJECT IDENTIFIER ::= { tmnxIpfixObjs 1 }
+
+tmnxIpfixExpPlcyTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxIpfixExpPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxIpfixExpPlcyTable contains objects to configure  the IPFIX
+         Export policies of this system."
+    ::= { tmnxIpfixExportObjs 1 }
+
+tmnxIpfixExpPlcyEntry            OBJECT-TYPE
+    SYNTAX      TmnxIpfixExpPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about  a particular IPFIX
+         Export policy.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       { IMPLIED tmnxIpfixExpPlcyName }
+    ::= { tmnxIpfixExpPlcyTable 1 }
+
+TmnxIpfixExpPlcyEntry            ::= SEQUENCE
+{
+    tmnxIpfixExpPlcyName             TNamedItem,
+    tmnxIpfixExpPlcyLastCh           TimeStamp,
+    tmnxIpfixExpPlcyRowStatus        RowStatus,
+    tmnxIpfixExpPlcyDescription      TItemDescription,
+    tmnxIpfixExpPlcyTemplateFormat   INTEGER
+}
+
+tmnxIpfixExpPlcyName             OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyName specifies the name of this IPFIX
+         Export policy."
+    ::= { tmnxIpfixExpPlcyEntry 1 }
+
+tmnxIpfixExpPlcyLastCh           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxIpfixExpPlcyEntry 2 }
+
+tmnxIpfixExpPlcyRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyRowStatus specifies the row status of
+         this row."
+    ::= { tmnxIpfixExpPlcyEntry 3 }
+
+tmnxIpfixExpPlcyDescription      OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyDescription specifies the description of
+         this IPFIX Export policy."
+    DEFVAL      { "" }
+    ::= { tmnxIpfixExpPlcyEntry 4 }
+
+tmnxIpfixExpPlcyTemplateFormat   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        format1 (1),
+        format2 (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyTemplateFormat specifies the template
+         format used by the IPFIX collectors  associated with this IPFIX Export
+         policy."
+    DEFVAL      { format1 }
+    ::= { tmnxIpfixExpPlcyEntry 5 }
+
+tmnxIpfixExpPlcyColTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxIpfixExpPlcyColEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxIpfixExpPlcyColTable contains objects to configure the
+         Transport Sessions between this system and the IPFIX collectors
+         associated with the IPFIX Export policies."
+    ::= { tmnxIpfixExportObjs 2 }
+
+tmnxIpfixExpPlcyColEntry         OBJECT-TYPE
+    SYNTAX      TmnxIpfixExpPlcyColEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents a particular IPFIX Export policy's
+         configuration for the Transport Sessions towards a specific collector.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       {
+        tmnxIpfixExpPlcyName,
+        vRtrID,
+        tmnxIpfixExpPlcyColAddrType,
+        tmnxIpfixExpPlcyColAddr
+    }
+    ::= { tmnxIpfixExpPlcyColTable 1 }
+
+TmnxIpfixExpPlcyColEntry         ::= SEQUENCE
+{
+    tmnxIpfixExpPlcyColAddrType      InetAddressType,
+    tmnxIpfixExpPlcyColAddr          InetAddress,
+    tmnxIpfixExpPlcyColRowStatus     RowStatus,
+    tmnxIpfixExpPlcyColLastCh        TimeStamp,
+    tmnxIpfixExpPlcyColAdminState    TmnxAdminState,
+    tmnxIpfixExpPlcyColSrcAddrType   InetAddressType,
+    tmnxIpfixExpPlcyColSrcAddr       InetAddress,
+    tmnxIpfixExpPlcyColMtu           Unsigned32,
+    tmnxIpfixExpPlcyColTmplRefrshTo  Unsigned32
+}
+
+tmnxIpfixExpPlcyColAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColAddrType specifies the address type of
+         tmnxIpfixExpPlcyColAddr.
+
+         The only value supported is 'ipv4'."
+    ::= { tmnxIpfixExpPlcyColEntry 1 }
+
+tmnxIpfixExpPlcyColAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColAddrType specifies the IP address of
+         the collector.
+
+         Only IPv4 addresses are supported."
+    ::= { tmnxIpfixExpPlcyColEntry 2 }
+
+tmnxIpfixExpPlcyColRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColRowStatus specifies  the row status of
+         this row."
+    ::= { tmnxIpfixExpPlcyColEntry 3 }
+
+tmnxIpfixExpPlcyColLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxIpfixExpPlcyColEntry 4 }
+
+tmnxIpfixExpPlcyColAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColAdminState specifies the
+         administrative state of this IPFIX Export policy."
+    DEFVAL      { outOfService }
+    ::= { tmnxIpfixExpPlcyColEntry 5 }
+
+tmnxIpfixExpPlcyColSrcAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColSrcAddrType specifies the address type
+         of tmnxIpfixExpPlcyColSrcAddr.
+
+         When setting the value of this object, the value of
+         tmnxIpfixExpPlcyColSrcAddr must be set as well in the same SNMP SET
+         PDU.
+
+         The only value supported is 'ipv4'."
+    DEFVAL      { unknown }
+    ::= { tmnxIpfixExpPlcyColEntry 6 }
+
+tmnxIpfixExpPlcyColSrcAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColSrcAddr specifies the IP address of
+         the collector.
+
+         When setting the value of this object, the value of
+         tmnxIpfixExpPlcyColSrcAddrType must be set as well in the same SNMP
+         SET PDU.
+
+         Only IPv4 addresses are supported."
+    DEFVAL      { "" }
+    ::= { tmnxIpfixExpPlcyColEntry 7 }
+
+tmnxIpfixExpPlcyColMtu           OBJECT-TYPE
+    SYNTAX      Unsigned32 (512..9212)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxIpfixExpPlcyColMtu specifies the MTU for
+         this IPFIX collector."
+    DEFVAL      { 1500 }
+    ::= { tmnxIpfixExpPlcyColEntry 8 }
+
+tmnxIpfixExpPlcyColTmplRefrshTo  OBJECT-TYPE
+    SYNTAX      Unsigned32 (240..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpfixExpPlcyColTmplRefrshTo specifies  the time in
+         seconds after which IPFIX Templates are resent by the Exporter."
+    REFERENCE
+        "RFC 5101, Specification of the IP Flow Information Export
+         (IPFIX) Protocol for the Exchange of IP Traffic Flow
+         Information, Sections 10.3.6 and 10.3.7."
+    DEFVAL      { 600 }
+    ::= { tmnxIpfixExpPlcyColEntry 9 }
+
+tmnxIpfixExpPlcyTableCh          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxIpfixExpPlcyTableCh indicates the value of
+         sysUpTime at the time of the last modification of an entry in the
+         tmnxIpfixExpPlcyTable."
+    ::= { tmnxIpfixObjs 100 }
+
+tmnxIpfixExpPlcyColTableCh       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxIpfixExpPlcyColTableCh indicates the value
+         of sysUpTime at the time of the last modification of an entry in the
+         tmnxIpfixExpPlcyColTable."
+    ::= { tmnxIpfixObjs 101 }
+
+tmnxIpfixConformance             OBJECT IDENTIFIER ::= { tmnxSRConfs 78 }
+
+tmnxIpfixCompliances             OBJECT IDENTIFIER ::= { tmnxIpfixConformance 1 }
+
+tmnxIpfixCompliance              MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of IPFIX on Nokia 7xxx series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxIpfixExportGroup
+        }
+    ::= { tmnxIpfixCompliances 1 }
+
+tmnxIpfixV15v0Compliance         MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of IPFIX on Nokia 7xxx series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxIpfixExportGroup,
+            tmnxIpfixExportGroupV15v0
+        }
+    ::= { tmnxIpfixCompliances 2 }
+
+tmnxIpfixGroups                  OBJECT IDENTIFIER ::= { tmnxIpfixConformance 2 }
+
+tmnxIpfixExportGroup             OBJECT-GROUP
+    OBJECTS     {
+        tmnxIpfixExpPlcyTableCh,
+        tmnxIpfixExpPlcyLastCh,
+        tmnxIpfixExpPlcyRowStatus,
+        tmnxIpfixExpPlcyDescription,
+        tmnxIpfixExpPlcyColTableCh,
+        tmnxIpfixExpPlcyColRowStatus,
+        tmnxIpfixExpPlcyColLastCh,
+        tmnxIpfixExpPlcyColAdminState,
+        tmnxIpfixExpPlcyColSrcAddrType,
+        tmnxIpfixExpPlcyColSrcAddr,
+        tmnxIpfixExpPlcyColMtu,
+        tmnxIpfixExpPlcyColTmplRefrshTo
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of IPFIX policies  on
+         Nokia SROS series systems."
+    ::= { tmnxIpfixGroups 1 }
+
+tmnxIpfixExportGroupV15v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxIpfixExpPlcyTemplateFormat
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of IPFIX policies  added
+         in release 15.0 of Nokia SROS series systems."
+    ::= { tmnxIpfixGroups 2 }
+
+tmnxIpfixNotifyPrefix            OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 78 }
+
+tmnxIpfixNotifications           OBJECT IDENTIFIER ::= { tmnxIpfixNotifyPrefix 0 }
+
+END

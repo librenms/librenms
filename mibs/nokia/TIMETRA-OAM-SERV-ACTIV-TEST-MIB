@@ -1,0 +1,2430 @@
+TIMETRA-OAM-SERV-ACTIV-TEST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Dot1agCfmMepId, Dot1agCfmMepIdOrZero
+                                                         FROM IEEE8021-CFM-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DateAndTime, DisplayString, MacAddress,
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemDescription, TLNamedItem,
+    TLNamedItemOrEmpty, TNamedItemOrEmpty,
+    TmnxEnabledDisabled,
+    TmnxEnabledDisabledAdminState,
+    TmnxStrSapId
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraOamServActivTestMIBModule MODULE-IDENTITY
+    LAST-UPDATED "202011160000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of Y.1564 Service Activation Tests.
+
+         Copyright 2020 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains all title
+         and ownership in the Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied `as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification.
+
+         Terminology Used in this MIB
+         ----------------------------
+
+         A 'service test' owns 0..8 'service streams'.
+
+         A service stream owns 0..4 'tests' (e.g. a CIR test, a CIR-PIR test, a
+         policing test, and a performance test).
+
+         A service test can be started to create a 'run', which generates
+         results that are visible using SNMP or in an accounting policy file.
+
+         'Sath' is used to abbreviate 'Service Activation Test Head'."
+
+    REVISION    "202011160000Z"
+    DESCRIPTION
+        "Rev 21.0                16 Nov 2020 00:00
+         TIMETRA-OAM-SERV-ACTIV-TEST-MIB for SROS Release 21."
+
+    ::= { timetraSRMIBModules 127 }
+
+TmnxOamSathSvcTestStrRunOrder    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type TmnxOamSathSvcTestStrRunOrder indicates, for
+         example, whether or not all the CIR tests belonging to a
+         service test run in parallel.  Similarly, the other test
+         types."
+    SYNTAX      INTEGER {
+        sequential (1),
+        parallel   (2)
+    }
+
+TmnxOamSathSvcTestRunOprState    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type TmnxOamSathSvcTestRunOprState indicates the
+         operational state of a run for a service test, service stream, or
+         test.
+
+         'stoppedByFault(6)' indicates the service-test was stopped because
+         a fatal error occurred.
+         For example:
+         1.  A CPM activity switch occurred after the test started.
+         2.  The IOM hosting one of the service-test's service streams
+             was extracted."
+    SYNTAX      INTEGER {
+        none           (1),
+        running        (2),
+        stoppedByUser  (3),
+        passed         (4),
+        failed         (5),
+        stoppedByFault (6)
+    }
+
+TmnxOamSathTestType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type TmnxOamSathTestType specifies the type of a
+         particular test belonging to a service stream."
+    SYNTAX      INTEGER {
+        cir         (1),
+        cirPir      (2),
+        policing    (3),
+        performance (4)
+    }
+
+TmnxOamSathTestOprState          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type TmnxOamSathTestOprState indicates the operational
+         state of a test with respect to a particular acceptance criteria."
+    SYNTAX      INTEGER {
+        unknown (1),
+        pass    (2),
+        fail    (3)
+    }
+
+tmnxOamSathObjs                  OBJECT IDENTIFIER ::= { tmnxSRObjs 127 }
+
+tmnxOamSathCfgObjs               OBJECT IDENTIFIER ::= { tmnxOamSathObjs 1 }
+
+tmnxOamSathCfgScalarObjs         OBJECT IDENTIFIER ::= { tmnxOamSathCfgObjs 1 }
+
+tmnxOamSathCfgReportRetentionCnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..500)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxOamSathCfgReportRetentionCnt was marked obsolete in
+         SROS Release 22.2.  There is no replacement object.  The
+         maximum number of Service Activation test runs retained
+         is now hard-coded."
+    DEFVAL      { 500 }
+    ::= { tmnxOamSathCfgScalarObjs 1 }
+
+tmnxOamSathTableLastChgObjs      OBJECT IDENTIFIER ::= { tmnxOamSathCfgObjs 2 }
+
+tmnxOamSathCfgTableObjs          OBJECT IDENTIFIER ::= { tmnxOamSathCfgObjs 3 }
+
+tmnxOamSathCfgSvcTestTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathCfgSvcTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgSvcTestTable contains the configuration information for
+         service tests."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathCfgTableObjs 1 }
+
+tmnxOamSathCfgSvcTestEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathCfgSvcTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgSvcTestEntry contains the configuration information for
+         one service test.
+
+         Rows are created or destroyed using tmnxOamSathCfgSvcTestRowStatus."
+    INDEX       { tmnxOamSathCfgSvcTestName }
+    ::= { tmnxOamSathCfgSvcTestTable 1 }
+
+TmnxOamSathCfgSvcTestEntry       ::= SEQUENCE
+{
+    tmnxOamSathCfgSvcTestName        TLNamedItem,
+    tmnxOamSathCfgSvcTestRowStatus   RowStatus,
+    tmnxOamSathCfgSvcTestLastChanged TimeStamp,
+    tmnxOamSathCfgSvcTestAdminState  TmnxEnabledDisabledAdminState,
+    tmnxOamSathCfgSvcTestRunOprState INTEGER,
+    tmnxOamSathCfgSvcTestDescription TItemDescription,
+    tmnxOamSathCfgSvcTestAccntPolicy Unsigned32,
+    tmnxOamSathCfgSvcTestComplNotif  TmnxEnabledDisabled,
+    tmnxOamSathCfgSvcTestStrRunOrder TmnxOamSathSvcTestStrRunOrder,
+    tmnxOamSathCfgSvcTestDrCirMin    Unsigned32,
+    tmnxOamSathCfgSvcTestDrCirSec    Unsigned32,
+    tmnxOamSathCfgSvcTestDrCirPirMin Unsigned32,
+    tmnxOamSathCfgSvcTestDrCirPirSec Unsigned32,
+    tmnxOamSathCfgSvcTestDrPoliceMin Unsigned32,
+    tmnxOamSathCfgSvcTestDrPoliceSec Unsigned32,
+    tmnxOamSathCfgSvcTestDrPerfHours Unsigned32,
+    tmnxOamSathCfgSvcTestDrPerfMin   Unsigned32,
+    tmnxOamSathCfgSvcTestDrPerfSec   Unsigned32
+}
+
+tmnxOamSathCfgSvcTestName        OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestName specifies the name of the
+         service test to be configured or read."
+    ::= { tmnxOamSathCfgSvcTestEntry 1 }
+
+tmnxOamSathCfgSvcTestRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestRowStatus specifies the status of
+         the configuration row for the service test."
+    ::= { tmnxOamSathCfgSvcTestEntry 2 }
+
+tmnxOamSathCfgSvcTestLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestLastChanged indicates the most
+         recent time the value of a settable object in this row was changed."
+    ::= { tmnxOamSathCfgSvcTestEntry 3 }
+
+tmnxOamSathCfgSvcTestAdminState  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestAdminState specifies the
+         administrative state of the service test.
+
+         When this value is 'enabled(1)', only the following objects in the row
+         can be changed:
+             tmnxOamSathCfgSvcTestAdminState,
+             tmnxOamSathCfgSvcTestDescription,
+             tmnxOamSathCfgSvcTestRunOprState.
+
+         Setting this value to 'disabled(2)' has an operational side effect:
+         the service-test's active run (if any) is stopped."
+    DEFVAL      { disabled }
+    ::= { tmnxOamSathCfgSvcTestEntry 4 }
+
+tmnxOamSathCfgSvcTestRunOprState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none    (1),
+        running (2),
+        start   (3),
+        stop    (4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestRunOprState specifies the
+         operational state of the service test.
+
+         'none(1)' indicates there is no currently active run for this service
+         test.
+
+         'running(2)' indicates there is a currently active run for this
+         service test.
+
+         'start(3)' requests a run be started for this service test.  A
+         service test can have at most one active run at a time.
+
+         'stop(4)' requests the currently active run for this service test be
+         stopped.
+
+         The following table specifies:
+         a) if the code point can be returned by snmpget, and
+         b) if snmpset can be used to change the value to the
+            specified code point.
+
+         Code Point     snmpget   snmpset
+         ------------   -------   -------
+         'none   (1)'      Y         N
+         'running(2)'      Y         N
+         'start  (3)'      N         Y
+         'stop   (4)'      N         Y "
+    DEFVAL      { none }
+    ::= { tmnxOamSathCfgSvcTestEntry 5 }
+
+tmnxOamSathCfgSvcTestDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDescription specifies the
+         descriptive text for the service test."
+    DEFVAL      { "" }
+    ::= { tmnxOamSathCfgSvcTestEntry 6 }
+
+tmnxOamSathCfgSvcTestAccntPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..99)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestAccntPolicy specifies the
+         accounting policy for the service test.  Zero specifies that
+         no accounting policy has been assigned.
+
+         The assigned accounting policy must have
+         TIMETRA-LOG-MIB::tmnxLogApRecord = 'completeSvcActivTestHead(76)'.
+
+         An accounting policy is used to record the results of the service test
+         in a file."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 7 }
+
+tmnxOamSathCfgSvcTestComplNotif  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestComplNotif specifies whether or not
+         to raise a tmnxOamSathSvcTestCompleted trap when the service test
+         completes."
+    DEFVAL      { disabled }
+    ::= { tmnxOamSathCfgSvcTestEntry 8 }
+
+tmnxOamSathCfgSvcTestStrRunOrder OBJECT-TYPE
+    SYNTAX      TmnxOamSathSvcTestStrRunOrder
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestStrRunOrder specifies the run order
+         for the tests owned by the service test."
+    DEFVAL      { parallel }
+    ::= { tmnxOamSathCfgSvcTestEntry 9 }
+
+tmnxOamSathCfgSvcTestDrCirMin    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrCirMin specifies the 'minutes'
+         component of the duration of CIR tests owned by the service test."
+    DEFVAL      { 5 }
+    ::= { tmnxOamSathCfgSvcTestEntry 10 }
+
+tmnxOamSathCfgSvcTestDrCirSec    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrCirSec specifies the 'seconds'
+         component of the duration of CIR tests owned by the service test."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 11 }
+
+tmnxOamSathCfgSvcTestDrCirPirMin OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrCirPirMin specifies the 'minutes'
+         component of the duration of CIR-PIR tests owned by the service test."
+    DEFVAL      { 10 }
+    ::= { tmnxOamSathCfgSvcTestEntry 12 }
+
+tmnxOamSathCfgSvcTestDrCirPirSec OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrCirPirSec specifies the 'seconds'
+         component of the duration of CIR-PIR tests owned by the service test."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 13 }
+
+tmnxOamSathCfgSvcTestDrPoliceMin OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrPoliceMin specifies the 'minutes'
+         component of the duration of policing tests owned by the service test."
+    DEFVAL      { 10 }
+    ::= { tmnxOamSathCfgSvcTestEntry 14 }
+
+tmnxOamSathCfgSvcTestDrPoliceSec OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrPoliceSec specifies the 'seconds'
+         component of the duration of policing tests owned by the service test."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 15 }
+
+tmnxOamSathCfgSvcTestDrPerfHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..24)
+    UNITS       "hours"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrPerfHours specifies the 'hours'
+         component of the duration of performance tests owned by the service
+         test."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 16 }
+
+tmnxOamSathCfgSvcTestDrPerfMin   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrPerfMin specifies the 'minutes'
+         component of the duration of performance tests owned by the service
+         test."
+    DEFVAL      { 15 }
+    ::= { tmnxOamSathCfgSvcTestEntry 17 }
+
+tmnxOamSathCfgSvcTestDrPerfSec   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcTestDrPerfSec specifies the 'seconds'
+         component of the duration of performance tests owned by the service
+         test."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcTestEntry 18 }
+
+tmnxOamSathCfgSvcStrmTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathCfgSvcStrmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgSvcStrmTable contains the configuration information for
+         service streams."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathCfgTableObjs 2 }
+
+tmnxOamSathCfgSvcStrmEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathCfgSvcStrmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgSvcStrmEntry contains the configuration information for
+         one service stream.
+
+         Rows are created or destroyed using tmnxOamSathCfgSvcStrmRowStatus."
+    INDEX       {
+        tmnxOamSathCfgSvcTestName,
+        tmnxOamSathCfgSvcStrmNum
+    }
+    ::= { tmnxOamSathCfgSvcStrmTable 1 }
+
+TmnxOamSathCfgSvcStrmEntry       ::= SEQUENCE
+{
+    tmnxOamSathCfgSvcStrmNum         Unsigned32,
+    tmnxOamSathCfgSvcStrmRowStatus   RowStatus,
+    tmnxOamSathCfgSvcStrmLastChanged TimeStamp,
+    tmnxOamSathCfgSvcStrmAdminState  TmnxEnabledDisabledAdminState,
+    tmnxOamSathCfgSvcStrmDescription TItemDescription,
+    tmnxOamSathCfgSvcStrmCIR         TruthValue,
+    tmnxOamSathCfgSvcStrmCirPir      TruthValue,
+    tmnxOamSathCfgSvcStrmPolicing    TruthValue,
+    tmnxOamSathCfgSvcStrmPerformance TruthValue,
+    tmnxOamSathCfgSvcStrmTxCIR       Unsigned32,
+    tmnxOamSathCfgSvcStrmTxPIR       Unsigned32,
+    tmnxOamSathCfgSvcStrmDestMacAddr MacAddress,
+    tmnxOamSathCfgSvcStrmSrcMepId    Dot1agCfmMepIdOrZero,
+    tmnxOamSathCfgSvcStrmSrcMdIndex  Unsigned32,
+    tmnxOamSathCfgSvcStrmSrcMaIndex  Unsigned32,
+    tmnxOamSathCfgSvcStrmCustTagPrio Unsigned32,
+    tmnxOamSathCfgSvcStrmCustTagDEI  INTEGER,
+    tmnxOamSathCfgSvcStrmSvcTagPrio  Unsigned32,
+    tmnxOamSathCfgSvcStrmSvcTagDEI   INTEGER,
+    tmnxOamSathCfgSvcStrmPadPattern  Unsigned32,
+    tmnxOamSathCfgSvcStrmFrmSizeSeq  DisplayString,
+    tmnxOamSathCfgSvcStrmFrmSizeTmpl TLNamedItemOrEmpty,
+    tmnxOamSathCfgSvcStrmAcpCritTmpl TLNamedItemOrEmpty,
+    tmnxOamSathCfgSvcStrmComplNotif  TmnxEnabledDisabled
+}
+
+tmnxOamSathCfgSvcStrmNum         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmNum specifies the number of the
+         service stream to be configured or read.  The service stream
+         number influences the execution order of tests belonging to the
+         parent service test."
+    ::= { tmnxOamSathCfgSvcStrmEntry 1 }
+
+tmnxOamSathCfgSvcStrmRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmRowStatus specifies the status of
+         the configuration row for the service stream."
+    ::= { tmnxOamSathCfgSvcStrmEntry 2 }
+
+tmnxOamSathCfgSvcStrmLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmLastChanged indicates the most
+         recent time the value of a settable object in this row was changed."
+    ::= { tmnxOamSathCfgSvcStrmEntry 3 }
+
+tmnxOamSathCfgSvcStrmAdminState  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmAdminState specifies the
+         administrative state of the service stream.
+
+         When this value is 'enabled(1)', only the following objects in the row
+         can be changed:
+             tmnxOamSathCfgSvcStrmAdminState,
+             tmnxOamSathCfgSvcStrmDescription."
+    DEFVAL      { disabled }
+    ::= { tmnxOamSathCfgSvcStrmEntry 4 }
+
+tmnxOamSathCfgSvcStrmDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmDescription specifies the
+         descriptive text for the service stream."
+    DEFVAL      { "" }
+    ::= { tmnxOamSathCfgSvcStrmEntry 5 }
+
+tmnxOamSathCfgSvcStrmCIR         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmCIR specifies whether or not to run
+         a CIR test for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 6 }
+
+tmnxOamSathCfgSvcStrmCirPir      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmCirPir specifies whether or not to
+         run a CIR-PIR test for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 7 }
+
+tmnxOamSathCfgSvcStrmPolicing    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmPolicing specifies whether or not to
+         run a Policing test for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 8 }
+
+tmnxOamSathCfgSvcStrmPerformance OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmPerformance specifies whether or not
+         to run a Performance test for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 9 }
+
+tmnxOamSathCfgSvcStrmTxCIR       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmTxCIR specifies the CIR transmit
+         rate for this service stream."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 10 }
+
+tmnxOamSathCfgSvcStrmTxPIR       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmTxPIR specifies the PIR transmit
+         rate for this service stream."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 11 }
+
+tmnxOamSathCfgSvcStrmDestMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmDestMacAddr specifies the
+         destination MAC address for this service stream.
+
+         00:00:00:00:00:00 indicates a destination MAC address is not
+         available."
+    DEFVAL      { '000000000000'H }
+    ::= { tmnxOamSathCfgSvcStrmEntry 12 }
+
+tmnxOamSathCfgSvcStrmSrcMepId    OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmSrcMepId specifies the source
+         Ethernet Maintenance association End Point (MEP) identifier for this
+         service stream.
+
+         The MEP/domain/association triple
+             tmnxOamSathCfgSvcStrmSrcMepId
+             tmnxOamSathCfgSvcStrmSrcMdIndex
+             tmnxOamSathCfgSvcStrmSrcMaIndex
+         must refer to an Eth-CFM endpoint on a SAP on an EPIPE or VPLS
+         service.
+
+         Zero indicates a MEP is not available."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 13 }
+
+tmnxOamSathCfgSvcStrmSrcMdIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmSrcMdIndex specifies the source
+         Eth-CFM domain for this service stream.
+
+         Zero indicates a domain is not available."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 14 }
+
+tmnxOamSathCfgSvcStrmSrcMaIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmSrcMaIndex specifies the source
+         Eth-CFM association for this service stream.
+
+         Zero indicates an association is not available."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 15 }
+
+tmnxOamSathCfgSvcStrmCustTagPrio OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmCustTagPrio specifies the Priority
+         Code Point (PCP) to be copied into the IEEE 802.1q Customer Tag
+         (C-Tag) header sent for this service stream."
+    DEFVAL      { 7 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 16 }
+
+tmnxOamSathCfgSvcStrmCustTagDEI  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        true  (1),
+        false (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmCustTagDEI specifies the Drop
+         Eligible Indicator (DEI) to be formatted into the IEEE 802.1q Customer
+         Tag (C-Tag) header sent for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 17 }
+
+tmnxOamSathCfgSvcStrmSvcTagPrio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmSvcTagPrio specifies the Priority
+         Code Point (PCP) to be copied into the IEEE 802.1q Service Tag (S-Tag)
+         header sent for this service stream."
+    DEFVAL      { 7 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 18 }
+
+tmnxOamSathCfgSvcStrmSvcTagDEI   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        true  (1),
+        false (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmSvcTagDEI specifies the Drop
+         Eligible Indicator (DEI) to be formatted into the IEEE 802.1q Service
+         Tag (S-Tag) header sent for this service stream."
+    DEFVAL      { false }
+    ::= { tmnxOamSathCfgSvcStrmEntry 19 }
+
+tmnxOamSathCfgSvcStrmPadPattern  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmPadPattern specifies the four byte
+         pattern used (repeatedly) to pad each packet sent by the tests
+         belonging to this service stream."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgSvcStrmEntry 20 }
+
+tmnxOamSathCfgSvcStrmFrmSizeSeq  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmFrmSizeSeq specifies the sequence of
+         frame sizes to be sent by the tests belonging to this service stream.
+
+         For example, 'aua' specifies the frames sent must cycle
+         through the sizes
+             tmnxOamSathCfgFrmSizeA,
+             tmnxOamSathCfgFrmSizeU,
+             tmnxOamSathCfgFrmSizeA.
+
+         In this release, only a single letter (e.g. 'u') is supported."
+    DEFVAL      { "a" }
+    ::= { tmnxOamSathCfgSvcStrmEntry 21 }
+
+tmnxOamSathCfgSvcStrmFrmSizeTmpl OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmFrmSizeTmpl specifies the frame size
+         template used by this service stream.
+
+         The value must match the INDEX of a row in tmnxOamSathCfgFrmSizeTable
+         (i.e. tmnxOamSathCfgFrmSizeName)."
+    DEFVAL      { "default" }
+    ::= { tmnxOamSathCfgSvcStrmEntry 22 }
+
+tmnxOamSathCfgSvcStrmAcpCritTmpl OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmAcpCritTmpl specifies the acceptance
+         criteria template used by this service stream.
+
+         The value must match the INDEX of a row in tmnxOamSathCfgAcpCritTable
+         (i.e. tmnxOamSathCfgAcpCritName)."
+    DEFVAL      { "default" }
+    ::= { tmnxOamSathCfgSvcStrmEntry 23 }
+
+tmnxOamSathCfgSvcStrmComplNotif  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgSvcStrmComplNotif specifies whether or not
+         to raise a tmnxOamSathSvcStrmCompleted trap when the service stream
+         completes."
+    DEFVAL      { disabled }
+    ::= { tmnxOamSathCfgSvcStrmEntry 24 }
+
+tmnxOamSathCfgAcpCritTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathCfgAcpCritEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgAcpCritTable contains the configuration information for
+         Y.1564 acceptance criteria templates."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathCfgTableObjs 3 }
+
+tmnxOamSathCfgAcpCritEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathCfgAcpCritEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgAcpCritEntry contains the configuration information for
+         one Y.1564 acceptance criteria template.
+
+         Rows are created or destroyed using tmnxOamSathCfgAcpCritRowStatus.
+
+         At CPM start up, SROS creates a row for the acceptance criteria
+         template 'default'.  The row cannot be deleted or changed.
+
+         If a row is referenced by an administratively enabled service stream,
+         objects in the row cannot be changed."
+    INDEX       { tmnxOamSathCfgAcpCritName }
+    ::= { tmnxOamSathCfgAcpCritTable 1 }
+
+TmnxOamSathCfgAcpCritEntry       ::= SEQUENCE
+{
+    tmnxOamSathCfgAcpCritName        TLNamedItem,
+    tmnxOamSathCfgAcpCritRowStatus   RowStatus,
+    tmnxOamSathCfgAcpCritLastChanged TimeStamp,
+    tmnxOamSathCfgAcpCritDescription TItemDescription,
+    tmnxOamSathCfgAcpCritThldCIR     Unsigned32,
+    tmnxOamSathCfgAcpCritThldPIR     Unsigned32,
+    tmnxOamSathCfgAcpCritThldFLR     Integer32,
+    tmnxOamSathCfgAcpCritThldFlrPol  Integer32,
+    tmnxOamSathCfgAcpCritThldDelay   Unsigned32,
+    tmnxOamSathCfgAcpCritThldDelayVr Unsigned32,
+    tmnxOamSathCfgAcpCritMFactor     Unsigned32
+}
+
+tmnxOamSathCfgAcpCritName        OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritName specifies the name of the
+         acceptance criteria template to be configured or read."
+    ::= { tmnxOamSathCfgAcpCritEntry 1 }
+
+tmnxOamSathCfgAcpCritRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritRowStatus specifies the status of
+         the configuration row for the acceptance criteria template."
+    ::= { tmnxOamSathCfgAcpCritEntry 2 }
+
+tmnxOamSathCfgAcpCritLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritLastChanged indicates the most
+         recent time the value of a settable object in this row was changed."
+    ::= { tmnxOamSathCfgAcpCritEntry 3 }
+
+tmnxOamSathCfgAcpCritDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritDescription specifies the
+         descriptive text for the acceptance criteria template."
+    DEFVAL      { "" }
+    ::= { tmnxOamSathCfgAcpCritEntry 4 }
+
+tmnxOamSathCfgAcpCritThldCIR     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldCIR specifies the threshold for
+         accepting the measured CIR (mCIR) for a test.
+
+         If mCIR >= tmnxOamSathCfgAcpCritThldCIR, the test passed the CIR
+         criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldCIR = 1 specifies the
+         test will pass the CIR criteria if mCIR >= 1 kilobps.
+
+         Zero specifies no CIR threshold is in effect."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgAcpCritEntry 5 }
+
+tmnxOamSathCfgAcpCritThldPIR     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldPIR specifies the threshold for
+         accepting the measured PIR (mPIR) for a test.
+
+         If mPIR >= tmnxOamSathCfgAcpCritThldPIR, the test passed the PIR
+         criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldPIR = 1 specifies the
+         test will pass the PIR criteria if mPIR >= 1 kilobps.
+
+         Zero specifies no PIR threshold is in effect."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgAcpCritEntry 6 }
+
+tmnxOamSathCfgAcpCritThldFLR     OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "ten-thousandth of a percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldFLR specifies the
+         threshold for accepting the measured Frame Loss Ratio
+         (mFLR) for the following test types:
+             'cir        (1)'
+             'cirPir     (2)'
+             'performance(4)'.
+
+         If mFLR <= tmnxOamSathCfgAcpCritThldFLR, the test passed the FLR
+         criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldFLR = 0 (i.e. 0.0000%)
+         requires the test to run with zero frame loss.
+
+         Negative one specifies no FLR threshold is in effect.
+
+         tmnxOamSathCfgAcpCritThldFlrPol has the same role for a 'policing(3)'
+         test."
+    DEFVAL      { -1 }
+    ::= { tmnxOamSathCfgAcpCritEntry 7 }
+
+tmnxOamSathCfgAcpCritThldFlrPol  OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "ten-thousandth of a percent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldFlrPol specifies the threshold
+         for accepting the measured Frame Loss Ratio (mFLR) for a 'policing(3)'
+         test.
+
+         If mFLR <= tmnxOamSathCfgAcpCritThldFlrPol, the test passed the FLR
+         policing criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldFlrPol = 250000 (i.e. 25.0000%)
+         requires the test to run with (at most) the 25% frame loss
+         expected in a policing test.
+
+         Negative one specifies no FLR policing threshold is in effect.
+
+         tmnxOamSathCfgAcpCritThldFLR has the same role for the other test
+         types."
+    DEFVAL      { -1 }
+    ::= { tmnxOamSathCfgAcpCritEntry 8 }
+
+tmnxOamSathCfgAcpCritThldDelay   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..100000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldDelay specifies the threshold
+         for accepting the measured average delay (mDELAY) for a test.
+
+         If mDELAY <= tmnxOamSathCfgAcpCritThldDelay, the test passed the delay
+         criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldDelay = 1 requires the test
+         to run with mDELAY <= 1 microsecond.
+
+         Zero specifies no delay threshold is in effect."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgAcpCritEntry 9 }
+
+tmnxOamSathCfgAcpCritThldDelayVr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..100000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritThldDelayVr specifies the threshold
+         for accepting the measured average delay variation (mDV) for a test.
+
+         If mDV <= tmnxOamSathCfgAcpCritThldDelayVr, the test passed the delay
+         variation criteria.
+
+         Example:  tmnxOamSathCfgAcpCritThldDelayVr = 1 requires the test
+         to run with mDV <= 1 microsecond.
+
+         Zero specifies no delay variation threshold is in effect."
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgAcpCritEntry 10 }
+
+tmnxOamSathCfgAcpCritMFactor     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgAcpCritMFactor specifies the throughput
+         margin for the acceptance criteria template.
+
+         Configuring a non-zero margin allows a test to pass when the measured
+         throughput is less than the expected throughput.
+
+         For example, a CIR test will pass under the following conditions:
+             tmnxOamSathCfgAcpCritThldCIR     :  3000 kilobps
+             tmnxOamSathCfgAcpCritMFactor     :   500 kilobps
+             tmnxOamSathStsTestMeasThroughput :  2500 kilobps"
+    DEFVAL      { 0 }
+    ::= { tmnxOamSathCfgAcpCritEntry 11 }
+
+tmnxOamSathCfgFrmSizeTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathCfgFrmSizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgFrmSizeTable contains the configuration information for
+         frame size templates."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathCfgTableObjs 4 }
+
+tmnxOamSathCfgFrmSizeEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathCfgFrmSizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathCfgFrmSizeEntry contains the configuration information for
+         one frame size template.
+
+         Rows are created or destroyed using tmnxOamSathCfgFrmSizeRowStatus.
+
+         At CPM start up, SROS creates a row for the frame size template
+         'default'. The row cannot be deleted or changed.
+
+         If a row is referenced by an administratively enabled service stream,
+         objects in the row cannot be changed."
+    INDEX       { tmnxOamSathCfgFrmSizeName }
+    ::= { tmnxOamSathCfgFrmSizeTable 1 }
+
+TmnxOamSathCfgFrmSizeEntry       ::= SEQUENCE
+{
+    tmnxOamSathCfgFrmSizeName        TLNamedItem,
+    tmnxOamSathCfgFrmSizeRowStatus   RowStatus,
+    tmnxOamSathCfgFrmSizeLastChanged TimeStamp,
+    tmnxOamSathCfgFrmSizeA           Unsigned32,
+    tmnxOamSathCfgFrmSizeB           Unsigned32,
+    tmnxOamSathCfgFrmSizeC           Unsigned32,
+    tmnxOamSathCfgFrmSizeD           Unsigned32,
+    tmnxOamSathCfgFrmSizeE           Unsigned32,
+    tmnxOamSathCfgFrmSizeF           Unsigned32,
+    tmnxOamSathCfgFrmSizeG           Unsigned32,
+    tmnxOamSathCfgFrmSizeH           Unsigned32,
+    tmnxOamSathCfgFrmSizeU           Unsigned32
+}
+
+tmnxOamSathCfgFrmSizeName        OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeName specifies the name of the frame
+         size template to be configured or read."
+    ::= { tmnxOamSathCfgFrmSizeEntry 1 }
+
+tmnxOamSathCfgFrmSizeRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeRowStatus specifies the status of
+         the configuration row for the frame size template."
+    ::= { tmnxOamSathCfgFrmSizeEntry 2 }
+
+tmnxOamSathCfgFrmSizeLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeLastChanged indicates the most
+         recent time the value of a settable object in this row was changed."
+    ::= { tmnxOamSathCfgFrmSizeEntry 3 }
+
+tmnxOamSathCfgFrmSizeA           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeA specifies the Y.1564 frame size
+         size-a."
+    DEFVAL      { 64 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 4 }
+
+tmnxOamSathCfgFrmSizeB           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeB specifies the Y.1564 frame size
+         size-b."
+    DEFVAL      { 128 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 5 }
+
+tmnxOamSathCfgFrmSizeC           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeC specifies the Y.1564 frame size
+         size-c."
+    DEFVAL      { 256 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 6 }
+
+tmnxOamSathCfgFrmSizeD           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeD specifies the Y.1564 frame size
+         size-d."
+    DEFVAL      { 512 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 7 }
+
+tmnxOamSathCfgFrmSizeE           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeE specifies the Y.1564 frame size
+         size-e."
+    DEFVAL      { 1024 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 8 }
+
+tmnxOamSathCfgFrmSizeF           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeF specifies the Y.1564 frame size
+         size-f."
+    DEFVAL      { 1280 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 9 }
+
+tmnxOamSathCfgFrmSizeG           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeG specifies the Y.1564 frame size
+         size-g."
+    DEFVAL      { 1518 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 10 }
+
+tmnxOamSathCfgFrmSizeH           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeH specifies the Y.1564 frame size
+         size-h."
+    DEFVAL      { 9212 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 11 }
+
+tmnxOamSathCfgFrmSizeU           OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathCfgFrmSizeU specifies the Y.1564 frame size
+         size-u."
+    DEFVAL      { 2000 }
+    ::= { tmnxOamSathCfgFrmSizeEntry 12 }
+
+tmnxOamSathStatsObjs             OBJECT IDENTIFIER ::= { tmnxOamSathObjs 2 }
+
+tmnxOamSathStatsScalarObjs       OBJECT IDENTIFIER ::= { tmnxOamSathStatsObjs 1 }
+
+tmnxOamSathStsSvcTestLimit       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestLimit indicates the maximum number
+         of configured service tests.
+
+         See the tmnxOamSathStsSvcTestCount DESCRIPTION clause for more
+         information."
+    ::= { tmnxOamSathStatsScalarObjs 1 }
+
+tmnxOamSathStsSvcTestCount       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestCount indicates the current number
+         of configured service tests.
+
+         The count is incremented when a service test is created (using
+         tmnxOamSathCfgSvcTestRowStatus).
+
+         The count is decremented when a service test is destroyed.
+
+         Creation of a service test fails when tmnxOamSathStsSvcTestCount
+         equals tmnxOamSathStsSvcTestLimit."
+    ::= { tmnxOamSathStatsScalarObjs 2 }
+
+tmnxOamSathStatsTableObjs        OBJECT IDENTIFIER ::= { tmnxOamSathStatsObjs 2 }
+
+tmnxOamSathStsSvcTestTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathStsSvcTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsSvcTestTable contains the status information for service
+         test runs."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathStatsTableObjs 1 }
+
+tmnxOamSathStsSvcTestEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathStsSvcTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsSvcTestEntry contains the status information for one
+         service test run."
+    INDEX       {
+        tmnxOamSathCfgSvcTestName,
+        tmnxOamSathStsSvcTestRun
+    }
+    ::= { tmnxOamSathStsSvcTestTable 1 }
+
+TmnxOamSathStsSvcTestEntry       ::= SEQUENCE
+{
+    tmnxOamSathStsSvcTestRun         Unsigned32,
+    tmnxOamSathStsSvcTestDescription TItemDescription,
+    tmnxOamSathStsSvcTestOprState    TmnxOamSathSvcTestRunOprState,
+    tmnxOamSathStsSvcTestTimeStart   DateAndTime,
+    tmnxOamSathStsSvcTestTimeEnd     DateAndTime,
+    tmnxOamSathStsSvcTestAccntPolicy Unsigned32,
+    tmnxOamSathStsSvcTestAccntOprSta INTEGER,
+    tmnxOamSathStsSvcTestComplNotif  TmnxEnabledDisabled,
+    tmnxOamSathStsSvcTestStrRunOrder TmnxOamSathSvcTestStrRunOrder,
+    tmnxOamSathStsSvcTestDrCirMin    Unsigned32,
+    tmnxOamSathStsSvcTestDrCirSec    Unsigned32,
+    tmnxOamSathStsSvcTestDrCirPirMin Unsigned32,
+    tmnxOamSathStsSvcTestDrCirPirSec Unsigned32,
+    tmnxOamSathStsSvcTestDrPoliceMin Unsigned32,
+    tmnxOamSathStsSvcTestDrPoliceSec Unsigned32,
+    tmnxOamSathStsSvcTestDrPerfHours Unsigned32,
+    tmnxOamSathStsSvcTestDrPerfMin   Unsigned32,
+    tmnxOamSathStsSvcTestDrPerfSec   Unsigned32
+}
+
+tmnxOamSathStsSvcTestRun         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestRun specifies the run number of the
+         service test run to be read."
+    ::= { tmnxOamSathStsSvcTestEntry 1 }
+
+tmnxOamSathStsSvcTestDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDescription indicates the value of
+         tmnxOamSathCfgSvcTestDescription when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 2 }
+
+tmnxOamSathStsSvcTestOprState    OBJECT-TYPE
+    SYNTAX      TmnxOamSathSvcTestRunOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestOprState indicates the operational
+         state of the service test run.
+
+         'none(1)' will not be returned."
+    ::= { tmnxOamSathStsSvcTestEntry 3 }
+
+tmnxOamSathStsSvcTestTimeStart   OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    UNITS       "UTC"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestTimeStart indicates the start time
+         of the service test run.
+
+         1970/01/01 00:00:00.0 is returned if a start time is not available."
+    ::= { tmnxOamSathStsSvcTestEntry 4 }
+
+tmnxOamSathStsSvcTestTimeEnd     OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    UNITS       "UTC"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestTimeEnd indicates the end time of
+         the service test run.
+
+         1970/01/01 00:00:00.0 is returned if an end time is not available."
+    ::= { tmnxOamSathStsSvcTestEntry 5 }
+
+tmnxOamSathStsSvcTestAccntPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestAccntPolicy indicates the value of
+         tmnxOamSathCfgSvcTestAccntPolicy when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 6 }
+
+tmnxOamSathStsSvcTestAccntOprSta OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (1),
+        readyToSend  (2),
+        sent         (3),
+        unableToSend (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestAccntOprSta indicates the
+         operational status of the transfer of the service-test run's results
+         to the accounting log."
+    ::= { tmnxOamSathStsSvcTestEntry 7 }
+
+tmnxOamSathStsSvcTestComplNotif  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestComplNotif indicates the value of
+         tmnxOamSathCfgSvcTestComplNotif when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 8 }
+
+tmnxOamSathStsSvcTestStrRunOrder OBJECT-TYPE
+    SYNTAX      TmnxOamSathSvcTestStrRunOrder
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestStrRunOrder indicates the value of
+         tmnxOamSathCfgSvcTestStrRunOrder when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 9 }
+
+tmnxOamSathStsSvcTestDrCirMin    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrCirMin indicates the value of
+         tmnxOamSathCfgSvcTestDrCirMin when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 10 }
+
+tmnxOamSathStsSvcTestDrCirSec    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrCirSec indicates the value of
+         tmnxOamSathCfgSvcTestDrCirSec when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 11 }
+
+tmnxOamSathStsSvcTestDrCirPirMin OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrCirPirMin indicates the value of
+         tmnxOamSathCfgSvcTestDrCirPirMin when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 12 }
+
+tmnxOamSathStsSvcTestDrCirPirSec OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrCirPirSec indicates the value of
+         tmnxOamSathCfgSvcTestDrCirPirSec when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 13 }
+
+tmnxOamSathStsSvcTestDrPoliceMin OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrPoliceMin indicates the value of
+         tmnxOamSathCfgSvcTestDrPoliceMin when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 14 }
+
+tmnxOamSathStsSvcTestDrPoliceSec OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrPoliceSec indicates the value of
+         tmnxOamSathCfgSvcTestDrPoliceSec when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 15 }
+
+tmnxOamSathStsSvcTestDrPerfHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..24)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrPerfHours indicates the value of
+         tmnxOamSathCfgSvcTestDrPerfHours when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 16 }
+
+tmnxOamSathStsSvcTestDrPerfMin   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrPerfMin indicates the value of
+         tmnxOamSathCfgSvcTestDrPerfMin when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 17 }
+
+tmnxOamSathStsSvcTestDrPerfSec   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcTestDrPerfSec indicates the value of
+         tmnxOamSathCfgSvcTestDrPerfSec when the run started."
+    ::= { tmnxOamSathStsSvcTestEntry 18 }
+
+tmnxOamSathStsSvcStrmTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathStsSvcStrmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsSvcStrmTable contains the status information for service
+         stream runs."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathStatsTableObjs 2 }
+
+tmnxOamSathStsSvcStrmEntry       OBJECT-TYPE
+    SYNTAX      TmnxOamSathStsSvcStrmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsSvcStrmEntry contains the status information for one
+         service stream run."
+    INDEX       {
+        tmnxOamSathCfgSvcTestName,
+        tmnxOamSathStsSvcTestRun,
+        tmnxOamSathCfgSvcStrmNum
+    }
+    ::= { tmnxOamSathStsSvcStrmTable 1 }
+
+TmnxOamSathStsSvcStrmEntry       ::= SEQUENCE
+{
+    tmnxOamSathStsSvcStrmOprState    TmnxOamSathSvcTestRunOprState,
+    tmnxOamSathStsSvcStrmSrcSAP      TmnxStrSapId,
+    tmnxOamSathStsSvcStrmDescription TItemDescription,
+    tmnxOamSathStsSvcStrmCIR         TruthValue,
+    tmnxOamSathStsSvcStrmCirPir      TruthValue,
+    tmnxOamSathStsSvcStrmPolicing    TruthValue,
+    tmnxOamSathStsSvcStrmPerformance TruthValue,
+    tmnxOamSathStsSvcStrmTxCIR       Unsigned32,
+    tmnxOamSathStsSvcStrmTxPIR       Unsigned32,
+    tmnxOamSathStsSvcStrmSrcMacAddr  MacAddress,
+    tmnxOamSathStsSvcStrmDestMacAddr MacAddress,
+    tmnxOamSathStsSvcStrmSrcMepId    Dot1agCfmMepId,
+    tmnxOamSathStsSvcStrmSrcMdIndex  Unsigned32,
+    tmnxOamSathStsSvcStrmSrcMaIndex  Unsigned32,
+    tmnxOamSathStsSvcStrmCustTagPrio Unsigned32,
+    tmnxOamSathStsSvcStrmCustTagDEI  TruthValue,
+    tmnxOamSathStsSvcStrmSvcTagPrio  Unsigned32,
+    tmnxOamSathStsSvcStrmSvcTagDEI   TruthValue,
+    tmnxOamSathStsSvcStrmPadPattern  Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeSeq  DisplayString,
+    tmnxOamSathStsSvcStrmFrmSizeTmpl TLNamedItem,
+    tmnxOamSathStsSvcStrmAcpCritTmpl TLNamedItem,
+    tmnxOamSathStsSvcStrmComplNotif  TmnxEnabledDisabled,
+    tmnxOamSathStsSvcStrmAcThldCIR   Unsigned32,
+    tmnxOamSathStsSvcStrmAcThldPIR   Unsigned32,
+    tmnxOamSathStsSvcStrmAcThldFLR   Integer32,
+    tmnxOamSathStsSvcStrmAcThldFlrPl Integer32,
+    tmnxOamSathStsSvcStrmAcThldDelay Unsigned32,
+    tmnxOamSathStsSvcStrmAcThldDlyVr Unsigned32,
+    tmnxOamSathStsSvcStrmAcMFactor   Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeA    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeB    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeC    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeD    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeE    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeF    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeG    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeH    Unsigned32,
+    tmnxOamSathStsSvcStrmFrmSizeU    Unsigned32,
+    tmnxOamSathStsSvcStrmSrcRtrInst  TNamedItemOrEmpty,
+    tmnxOamSathStsSvcStrmSrcRtrIf    TNamedItemOrEmpty,
+    tmnxOamSathStsSvcStrmSrcRtrPort  TNamedItemOrEmpty
+}
+
+tmnxOamSathStsSvcStrmOprState    OBJECT-TYPE
+    SYNTAX      TmnxOamSathSvcTestRunOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmOprState indicates the operational
+         state of the service stream run.
+
+         'stoppedByUser(3)' and 'stoppedByFault(6)' will not be returned.
+         tmnxOamSathStsSvcTestOprState indicates if the service-test was
+         stopped."
+    ::= { tmnxOamSathStsSvcStrmEntry 1 }
+
+tmnxOamSathStsSvcStrmSrcSAP      OBJECT-TYPE
+    SYNTAX      TmnxStrSapId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcSAP indicates the Service Access
+         Point (SAP) which hosts the Eth-CFM MEP, Domain, and Association
+         configured for the service stream."
+    ::= { tmnxOamSathStsSvcStrmEntry 2 }
+
+tmnxOamSathStsSvcStrmDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmDescription indicates the value of
+         tmnxOamSathCfgSvcStrmDescription when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 3 }
+
+tmnxOamSathStsSvcStrmCIR         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmCIR indicates the value of
+         tmnxOamSathCfgSvcStrmCIR when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 4 }
+
+tmnxOamSathStsSvcStrmCirPir      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmCirPir indicates the value of
+         tmnxOamSathCfgSvcStrmCirPir when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 5 }
+
+tmnxOamSathStsSvcStrmPolicing    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmPolicing indicates the value of
+         tmnxOamSathCfgSvcStrmPolicing when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 6 }
+
+tmnxOamSathStsSvcStrmPerformance OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmPerformance indicates the value of
+         tmnxOamSathCfgSvcStrmPerformance when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 7 }
+
+tmnxOamSathStsSvcStrmTxCIR       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmTxCIR indicates the value of
+         tmnxOamSathCfgSvcStrmTxCIR when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 8 }
+
+tmnxOamSathStsSvcStrmTxPIR       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmTxPIR indicates the value of
+         tmnxOamSathCfgSvcStrmTxPIR when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 9 }
+
+tmnxOamSathStsSvcStrmSrcMacAddr  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcMacAddr indicates the source MAC
+         address for the service stream.
+
+         00:00:00:00:00:00 is returned if a source MAC address is not
+         available."
+    ::= { tmnxOamSathStsSvcStrmEntry 10 }
+
+tmnxOamSathStsSvcStrmDestMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmDestMacAddr indicates the value of
+         tmnxOamSathCfgSvcStrmDestMacAddr when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 11 }
+
+tmnxOamSathStsSvcStrmSrcMepId    OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcMepId indicates the value of
+         tmnxOamSathCfgSvcStrmSrcMepId when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 12 }
+
+tmnxOamSathStsSvcStrmSrcMdIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcMdIndex indicates the value of
+         tmnxOamSathCfgSvcStrmSrcMdIndex when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 13 }
+
+tmnxOamSathStsSvcStrmSrcMaIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcMaIndex indicates the value of
+         tmnxOamSathCfgSvcStrmSrcMaIndex when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 14 }
+
+tmnxOamSathStsSvcStrmCustTagPrio OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmCustTagPrio indicates the value of
+         tmnxOamSathCfgSvcStrmCustTagPrio when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 15 }
+
+tmnxOamSathStsSvcStrmCustTagDEI  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmCustTagDEI indicates the value of
+         tmnxOamSathCfgSvcStrmCustTagDEI when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 16 }
+
+tmnxOamSathStsSvcStrmSvcTagPrio  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSvcTagPrio indicates the value of
+         tmnxOamSathCfgSvcStrmSvcTagPrio when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 17 }
+
+tmnxOamSathStsSvcStrmSvcTagDEI   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSvcTagDEI indicates the value of
+         tmnxOamSathCfgSvcStrmSvcTagDEI when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 18 }
+
+tmnxOamSathStsSvcStrmPadPattern  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmPadPattern indicates the value of
+         tmnxOamSathCfgSvcStrmPadPattern when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 19 }
+
+tmnxOamSathStsSvcStrmFrmSizeSeq  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeSeq indicates the value of
+         tmnxOamSathCfgSvcStrmFrmSizeSeq when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 20 }
+
+tmnxOamSathStsSvcStrmFrmSizeTmpl OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeTmpl indicates the value of
+         tmnxOamSathCfgSvcStrmFrmSizeTmpl when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 21 }
+
+tmnxOamSathStsSvcStrmAcpCritTmpl OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcpCritTmpl indicates the value of
+         tmnxOamSathCfgSvcStrmAcpCritTmpl when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 22 }
+
+tmnxOamSathStsSvcStrmComplNotif  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmComplNotif indicates the value of
+         tmnxOamSathCfgSvcStrmComplNotif when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 23 }
+
+tmnxOamSathStsSvcStrmAcThldCIR   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldCIR indicates the value of
+         tmnxOamSathCfgAcpCritThldCIR when the run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 24 }
+
+tmnxOamSathStsSvcStrmAcThldPIR   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldPIR indicates the value of
+         tmnxOamSathCfgAcpCritThldPIR when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 25 }
+
+tmnxOamSathStsSvcStrmAcThldFLR   OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "ten-thousandth of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldFLR indicates the value of
+         tmnxOamSathCfgAcpCritThldFLR when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 26 }
+
+tmnxOamSathStsSvcStrmAcThldFlrPl OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "ten-thousandth of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldFlrPl indicates the value of
+         tmnxOamSathCfgAcpCritThldFlrPol when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 27 }
+
+tmnxOamSathStsSvcStrmAcThldDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..100000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldDelay indicates the value of
+         tmnxOamSathCfgAcpCritThldDelay when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 28 }
+
+tmnxOamSathStsSvcStrmAcThldDlyVr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..100000000)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcThldDlyVr indicates the value of
+         tmnxOamSathCfgAcpCritThldDelayVr when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 29 }
+
+tmnxOamSathStsSvcStrmAcMFactor   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..400000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmAcMFactor indicates the value of
+         tmnxOamSathCfgAcpCritMFactor when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 30 }
+
+tmnxOamSathStsSvcStrmFrmSizeA    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeA indicates the value of
+         tmnxOamSathCfgFrmSizeA when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 31 }
+
+tmnxOamSathStsSvcStrmFrmSizeB    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeB indicates the value of
+         tmnxOamSathCfgFrmSizeB when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 32 }
+
+tmnxOamSathStsSvcStrmFrmSizeC    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeC indicates the value of
+         tmnxOamSathCfgFrmSizeC when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 33 }
+
+tmnxOamSathStsSvcStrmFrmSizeD    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeD indicates the value of
+         tmnxOamSathCfgFrmSizeD when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 34 }
+
+tmnxOamSathStsSvcStrmFrmSizeE    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeE indicates the value of
+         tmnxOamSathCfgFrmSizeE when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 35 }
+
+tmnxOamSathStsSvcStrmFrmSizeF    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeF indicates the value of
+         tmnxOamSathCfgFrmSizeF when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 36 }
+
+tmnxOamSathStsSvcStrmFrmSizeG    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeG indicates the value of
+         tmnxOamSathCfgFrmSizeG when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 37 }
+
+tmnxOamSathStsSvcStrmFrmSizeH    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeH indicates the value of
+         tmnxOamSathCfgFrmSizeH when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 38 }
+
+tmnxOamSathStsSvcStrmFrmSizeU    OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..9212)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmFrmSizeU indicates the value of
+         tmnxOamSathCfgFrmSizeU when the test run started."
+    ::= { tmnxOamSathStsSvcStrmEntry 39 }
+
+tmnxOamSathStsSvcStrmSrcRtrInst  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcRtrInst indicates the router
+         which hosts the Eth-CFM MEP, Domain, and Association configured for
+         the service stream.
+
+         The empty string indicates the MEP does not reside on a router.
+
+         The following two sets of results are mutually exclusive
+         (i.e. at most one set will contain non-empty strings):
+             { tmnxOamSathStsSvcStrmSrcRtrInst,
+               tmnxOamSathStsSvcStrmSrcRtrIf,
+               tmnxOamSathStsSvcStrmSrcRtrPort }
+         and
+             { tmnxOamSathStsSvcStrmSrcSAP }."
+    ::= { tmnxOamSathStsSvcStrmEntry 40 }
+
+tmnxOamSathStsSvcStrmSrcRtrIf    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcRtrIf indicates the router
+         interface which hosts the Eth-CFM MEP, Domain, and Association
+         configured for the service stream.
+
+         The empty string indicates the MEP does not reside on an interface."
+    ::= { tmnxOamSathStsSvcStrmEntry 41 }
+
+tmnxOamSathStsSvcStrmSrcRtrPort  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsSvcStrmSrcRtrPort indicates the port
+         configured for the interface which hosts the Eth-CFM MEP, Domain, and
+         Association configured for the service stream.
+
+         The empty string indicates no port is available."
+    ::= { tmnxOamSathStsSvcStrmEntry 42 }
+
+tmnxOamSathStsTestTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamSathStsTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsTestTable contains the status information for test runs."
+    REFERENCE
+        "ITU-T Y.1564, 'Ethernet Service Activation Test Methodology', 02/2016"
+    ::= { tmnxOamSathStatsTableObjs 3 }
+
+tmnxOamSathStsTestEntry          OBJECT-TYPE
+    SYNTAX      TmnxOamSathStsTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamSathStsTestEntry contains the status information for one test
+         run (e.g. a CIR test run, within a service stream, within a service
+         test)."
+    INDEX       {
+        tmnxOamSathCfgSvcTestName,
+        tmnxOamSathStsSvcTestRun,
+        tmnxOamSathCfgSvcStrmNum,
+        tmnxOamSathStsTestType
+    }
+    ::= { tmnxOamSathStsTestTable 1 }
+
+TmnxOamSathStsTestEntry          ::= SEQUENCE
+{
+    tmnxOamSathStsTestType           TmnxOamSathTestType,
+    tmnxOamSathStsTestOprState       TmnxOamSathSvcTestRunOprState,
+    tmnxOamSathStsTestTimeStart      DateAndTime,
+    tmnxOamSathStsTestTimeEnd        DateAndTime,
+    tmnxOamSathStsTestTimeLeft       Unsigned32,
+    tmnxOamSathStsTestOprStThroughpt TmnxOamSathTestOprState,
+    tmnxOamSathStsTestOprStFLR       TmnxOamSathTestOprState,
+    tmnxOamSathStsTestOprStDelay     TmnxOamSathTestOprState,
+    tmnxOamSathStsTestOprStDelayVar  TmnxOamSathTestOprState,
+    tmnxOamSathStsTestMeasDelayMin   Integer32,
+    tmnxOamSathStsTestMeasDelayMax   Integer32,
+    tmnxOamSathStsTestMeasDelayAvg   Integer32,
+    tmnxOamSathStsTestMeasDelayVrMin Integer32,
+    tmnxOamSathStsTestMeasDelayVrMax Integer32,
+    tmnxOamSathStsTestMeasDelayVrAvg Integer32,
+    tmnxOamSathStsTestMeasThroughput Unsigned32,
+    tmnxOamSathStsTestMeasFLR        Unsigned32,
+    tmnxOamSathStsTestMeasFramesTx   Counter64,
+    tmnxOamSathStsTestMeasFramesRx   Counter64
+}
+
+tmnxOamSathStsTestType           OBJECT-TYPE
+    SYNTAX      TmnxOamSathTestType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestType specifies the test type to be
+         read."
+    ::= { tmnxOamSathStsTestEntry 1 }
+
+tmnxOamSathStsTestOprState       OBJECT-TYPE
+    SYNTAX      TmnxOamSathSvcTestRunOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestOprState indicates the operational
+         state of the test run.
+
+         'stoppedByUser(3)' and 'stoppedByFault(6)' will not be returned.
+         tmnxOamSathStsSvcTestOprState indicates if the service-test was
+         stopped."
+    ::= { tmnxOamSathStsTestEntry 2 }
+
+tmnxOamSathStsTestTimeStart      OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    UNITS       "UTC"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestTimeStart indicates the start time of
+         the test run.
+
+         1970/01/01 00:00:00.0 is returned if a start time is not available."
+    ::= { tmnxOamSathStsTestEntry 3 }
+
+tmnxOamSathStsTestTimeEnd        OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    UNITS       "UTC"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestTimeEnd indicates the end time of the
+         test run.
+
+         1970/01/01 00:00:00.0 is returned if an end time is not available."
+    ::= { tmnxOamSathStsTestEntry 4 }
+
+tmnxOamSathStsTestTimeLeft       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestTimeLeft indicates the execution time
+         remaining for the test run."
+    ::= { tmnxOamSathStsTestEntry 5 }
+
+tmnxOamSathStsTestOprStThroughpt OBJECT-TYPE
+    SYNTAX      TmnxOamSathTestOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestOprStThroughpt indicates the test run's
+         operational status, with respect to the throughput acceptance
+         criteria."
+    ::= { tmnxOamSathStsTestEntry 6 }
+
+tmnxOamSathStsTestOprStFLR       OBJECT-TYPE
+    SYNTAX      TmnxOamSathTestOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestOprStFLR indicates the test run's
+         operational status, with respect to the FLR acceptance criteria."
+    ::= { tmnxOamSathStsTestEntry 7 }
+
+tmnxOamSathStsTestOprStDelay     OBJECT-TYPE
+    SYNTAX      TmnxOamSathTestOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestOprStDelay indicates the test run's
+         operational status, with respect to the delay acceptance criteria."
+    ::= { tmnxOamSathStsTestEntry 8 }
+
+tmnxOamSathStsTestOprStDelayVar  OBJECT-TYPE
+    SYNTAX      TmnxOamSathTestOprState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestOprStDelayVar indicates the test run's
+         operational status, with respect to the delay variation acceptance
+         criteria."
+    ::= { tmnxOamSathStsTestEntry 9 }
+
+tmnxOamSathStsTestMeasDelayMin   OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayMin indicates the minimum
+         delay measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 10 }
+
+tmnxOamSathStsTestMeasDelayMax   OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayMax indicates the maximum
+         delay measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 11 }
+
+tmnxOamSathStsTestMeasDelayAvg   OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayAvg indicates the average
+         delay measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 12 }
+
+tmnxOamSathStsTestMeasDelayVrMin OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayVrMin indicates the minimum
+         delay variation measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 13 }
+
+tmnxOamSathStsTestMeasDelayVrMax OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayVrMax indicates the maximum
+         delay variation measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 14 }
+
+tmnxOamSathStsTestMeasDelayVrAvg OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasDelayVrAvg indicates the average
+         delay variation measured for the test run."
+    ::= { tmnxOamSathStsTestEntry 15 }
+
+tmnxOamSathStsTestMeasThroughput OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasThroughput indicates the measured
+         throughput for the test run."
+    ::= { tmnxOamSathStsTestEntry 16 }
+
+tmnxOamSathStsTestMeasFLR        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000000)
+    UNITS       "ten-thousandth of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasFLR indicates the measured FLR for
+         the test run."
+    ::= { tmnxOamSathStsTestEntry 17 }
+
+tmnxOamSathStsTestMeasFramesTx   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasFramesTx indicates the number of
+         frames transmitted during the test run."
+    ::= { tmnxOamSathStsTestEntry 18 }
+
+tmnxOamSathStsTestMeasFramesRx   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamSathStsTestMeasFramesRx indicates the number of
+         frames received during the test run."
+    ::= { tmnxOamSathStsTestEntry 19 }
+
+tmnxOamSathNotificationObjs      OBJECT IDENTIFIER ::= { tmnxOamSathObjs 3 }
+
+tmnxOamSathConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 127 }
+
+tmnxOamSathCompliances           OBJECT IDENTIFIER ::= { tmnxOamSathConformance 1 }
+
+tmnxOamSathComplianceV21v0       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of OAM Service Activation
+         Tests on Nokia SROS Release 21."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamSathNotifGroupV21v0,
+            tmnxOamSathObjGroupV21v0
+        }
+    ::= { tmnxOamSathCompliances 1 }
+
+tmnxOamSathComplianceV22v0       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of OAM Service Activation
+         Tests on Nokia SROS Release 22."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamSathObjGroupV22v0
+        }
+    ::= { tmnxOamSathCompliances 2 }
+
+tmnxOamSathObjGroups             OBJECT IDENTIFIER ::= { tmnxOamSathConformance 2 }
+
+tmnxOamSathObjGroupsV21v0        OBJECT IDENTIFIER ::= { tmnxOamSathObjGroups 1 }
+
+tmnxOamSathObjGroupV21v0         OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamSathCfgAcpCritDescription,
+        tmnxOamSathCfgAcpCritLastChanged,
+        tmnxOamSathCfgAcpCritMFactor,
+        tmnxOamSathCfgAcpCritRowStatus,
+        tmnxOamSathCfgAcpCritThldCIR,
+        tmnxOamSathCfgAcpCritThldDelay,
+        tmnxOamSathCfgAcpCritThldDelayVr,
+        tmnxOamSathCfgAcpCritThldFLR,
+        tmnxOamSathCfgAcpCritThldFlrPol,
+        tmnxOamSathCfgAcpCritThldPIR,
+        tmnxOamSathCfgFrmSizeA,
+        tmnxOamSathCfgFrmSizeB,
+        tmnxOamSathCfgFrmSizeC,
+        tmnxOamSathCfgFrmSizeD,
+        tmnxOamSathCfgFrmSizeE,
+        tmnxOamSathCfgFrmSizeF,
+        tmnxOamSathCfgFrmSizeG,
+        tmnxOamSathCfgFrmSizeH,
+        tmnxOamSathCfgFrmSizeLastChanged,
+        tmnxOamSathCfgFrmSizeRowStatus,
+        tmnxOamSathCfgFrmSizeU,
+        tmnxOamSathCfgReportRetentionCnt,
+        tmnxOamSathCfgSvcStrmAcpCritTmpl,
+        tmnxOamSathCfgSvcStrmAdminState,
+        tmnxOamSathCfgSvcStrmCIR,
+        tmnxOamSathCfgSvcStrmCirPir,
+        tmnxOamSathCfgSvcStrmComplNotif,
+        tmnxOamSathCfgSvcStrmCustTagDEI,
+        tmnxOamSathCfgSvcStrmCustTagPrio,
+        tmnxOamSathCfgSvcStrmDescription,
+        tmnxOamSathCfgSvcStrmDestMacAddr,
+        tmnxOamSathCfgSvcStrmFrmSizeSeq,
+        tmnxOamSathCfgSvcStrmFrmSizeTmpl,
+        tmnxOamSathCfgSvcStrmLastChanged,
+        tmnxOamSathCfgSvcStrmPadPattern,
+        tmnxOamSathCfgSvcStrmPerformance,
+        tmnxOamSathCfgSvcStrmPolicing,
+        tmnxOamSathCfgSvcStrmRowStatus,
+        tmnxOamSathCfgSvcStrmSrcMaIndex,
+        tmnxOamSathCfgSvcStrmSrcMdIndex,
+        tmnxOamSathCfgSvcStrmSrcMepId,
+        tmnxOamSathCfgSvcStrmSvcTagDEI,
+        tmnxOamSathCfgSvcStrmSvcTagPrio,
+        tmnxOamSathCfgSvcStrmTxCIR,
+        tmnxOamSathCfgSvcStrmTxPIR,
+        tmnxOamSathCfgSvcTestAccntPolicy,
+        tmnxOamSathCfgSvcTestAdminState,
+        tmnxOamSathCfgSvcTestComplNotif,
+        tmnxOamSathCfgSvcTestDescription,
+        tmnxOamSathCfgSvcTestDrCirMin,
+        tmnxOamSathCfgSvcTestDrCirPirMin,
+        tmnxOamSathCfgSvcTestDrCirPirSec,
+        tmnxOamSathCfgSvcTestDrCirSec,
+        tmnxOamSathCfgSvcTestDrPerfHours,
+        tmnxOamSathCfgSvcTestDrPerfMin,
+        tmnxOamSathCfgSvcTestDrPerfSec,
+        tmnxOamSathCfgSvcTestDrPoliceMin,
+        tmnxOamSathCfgSvcTestDrPoliceSec,
+        tmnxOamSathCfgSvcTestLastChanged,
+        tmnxOamSathCfgSvcTestRowStatus,
+        tmnxOamSathCfgSvcTestRunOprState,
+        tmnxOamSathCfgSvcTestStrRunOrder,
+        tmnxOamSathStsSvcStrmAcMFactor,
+        tmnxOamSathStsSvcStrmAcThldCIR,
+        tmnxOamSathStsSvcStrmAcThldDelay,
+        tmnxOamSathStsSvcStrmAcThldDlyVr,
+        tmnxOamSathStsSvcStrmAcThldFLR,
+        tmnxOamSathStsSvcStrmAcThldFlrPl,
+        tmnxOamSathStsSvcStrmAcThldPIR,
+        tmnxOamSathStsSvcStrmAcpCritTmpl,
+        tmnxOamSathStsSvcStrmCIR,
+        tmnxOamSathStsSvcStrmCirPir,
+        tmnxOamSathStsSvcStrmComplNotif,
+        tmnxOamSathStsSvcStrmCustTagDEI,
+        tmnxOamSathStsSvcStrmCustTagPrio,
+        tmnxOamSathStsSvcStrmDescription,
+        tmnxOamSathStsSvcStrmDestMacAddr,
+        tmnxOamSathStsSvcStrmFrmSizeA,
+        tmnxOamSathStsSvcStrmFrmSizeB,
+        tmnxOamSathStsSvcStrmFrmSizeC,
+        tmnxOamSathStsSvcStrmFrmSizeD,
+        tmnxOamSathStsSvcStrmFrmSizeE,
+        tmnxOamSathStsSvcStrmFrmSizeF,
+        tmnxOamSathStsSvcStrmFrmSizeG,
+        tmnxOamSathStsSvcStrmFrmSizeH,
+        tmnxOamSathStsSvcStrmFrmSizeSeq,
+        tmnxOamSathStsSvcStrmFrmSizeTmpl,
+        tmnxOamSathStsSvcStrmFrmSizeU,
+        tmnxOamSathStsSvcStrmOprState,
+        tmnxOamSathStsSvcStrmPadPattern,
+        tmnxOamSathStsSvcStrmPerformance,
+        tmnxOamSathStsSvcStrmPolicing,
+        tmnxOamSathStsSvcStrmSrcMaIndex,
+        tmnxOamSathStsSvcStrmSrcMacAddr,
+        tmnxOamSathStsSvcStrmSrcMdIndex,
+        tmnxOamSathStsSvcStrmSrcMepId,
+        tmnxOamSathStsSvcStrmSrcSAP,
+        tmnxOamSathStsSvcStrmSvcTagDEI,
+        tmnxOamSathStsSvcStrmSvcTagPrio,
+        tmnxOamSathStsSvcStrmTxCIR,
+        tmnxOamSathStsSvcStrmTxPIR,
+        tmnxOamSathStsSvcTestAccntOprSta,
+        tmnxOamSathStsSvcTestAccntPolicy,
+        tmnxOamSathStsSvcTestComplNotif,
+        tmnxOamSathStsSvcTestCount,
+        tmnxOamSathStsSvcTestDescription,
+        tmnxOamSathStsSvcTestDrCirMin,
+        tmnxOamSathStsSvcTestDrCirPirMin,
+        tmnxOamSathStsSvcTestDrCirPirSec,
+        tmnxOamSathStsSvcTestDrCirSec,
+        tmnxOamSathStsSvcTestDrPerfHours,
+        tmnxOamSathStsSvcTestDrPerfMin,
+        tmnxOamSathStsSvcTestDrPerfSec,
+        tmnxOamSathStsSvcTestDrPoliceMin,
+        tmnxOamSathStsSvcTestDrPoliceSec,
+        tmnxOamSathStsSvcTestLimit,
+        tmnxOamSathStsSvcTestOprState,
+        tmnxOamSathStsSvcTestStrRunOrder,
+        tmnxOamSathStsSvcTestTimeEnd,
+        tmnxOamSathStsSvcTestTimeStart,
+        tmnxOamSathStsTestMeasDelayAvg,
+        tmnxOamSathStsTestMeasDelayMax,
+        tmnxOamSathStsTestMeasDelayMin,
+        tmnxOamSathStsTestMeasDelayVrAvg,
+        tmnxOamSathStsTestMeasDelayVrMax,
+        tmnxOamSathStsTestMeasDelayVrMin,
+        tmnxOamSathStsTestMeasFLR,
+        tmnxOamSathStsTestMeasFramesRx,
+        tmnxOamSathStsTestMeasFramesTx,
+        tmnxOamSathStsTestMeasThroughput,
+        tmnxOamSathStsTestOprStDelay,
+        tmnxOamSathStsTestOprStDelayVar,
+        tmnxOamSathStsTestOprStFLR,
+        tmnxOamSathStsTestOprStThroughpt,
+        tmnxOamSathStsTestOprState,
+        tmnxOamSathStsTestTimeEnd,
+        tmnxOamSathStsTestTimeLeft,
+        tmnxOamSathStsTestTimeStart
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting OAM Service Activation Tests on Nokia
+         SROS Release 21."
+    ::= { tmnxOamSathObjGroupsV21v0 1 }
+
+tmnxOamSathObjGroupsV22v0        OBJECT IDENTIFIER ::= { tmnxOamSathObjGroups 2 }
+
+tmnxOamSathObsoleteObjGroupV22v0 OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamSathCfgReportRetentionCnt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting OAM Service Activation Tests marked
+         obsolete in Nokia SROS Release 22."
+    ::= { tmnxOamSathObjGroupsV22v0 1 }
+
+tmnxOamSathObjGroupV22v0         OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamSathStsSvcStrmSrcRtrIf,
+        tmnxOamSathStsSvcStrmSrcRtrInst,
+        tmnxOamSathStsSvcStrmSrcRtrPort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting OAM Service Activation
+         Tests in Nokia SROS Release 22."
+    ::= { tmnxOamSathObjGroupsV22v0 2 }
+
+tmnxOamSathNotifGroups           OBJECT IDENTIFIER ::= { tmnxOamSathConformance 3 }
+
+tmnxOamSathNotifGroupsV21v0      OBJECT IDENTIFIER ::= { tmnxOamSathNotifGroups 1 }
+
+tmnxOamSathNotifGroupV21v0       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxOamSathSvcStrmCompleted,
+        tmnxOamSathSvcTestCompleted
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting OAM Service Activation Tests on
+         Nokia SROS Release 21."
+    ::= { tmnxOamSathNotifGroupsV21v0 1 }
+
+tmnxOamSathNfyObjGroups          OBJECT IDENTIFIER ::= { tmnxOamSathConformance 4 }
+
+tmnxOamSathNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 127 }
+
+tmnxOamSathNotifications         OBJECT IDENTIFIER ::= { tmnxOamSathNotifyPrefix 0 }
+
+tmnxOamSathSvcTestCompleted      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxOamSathStsSvcTestOprState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxOamSathSvcTestCompleted notification is (optionally)
+         sent at the end of a Y.1564 service test run.
+
+         [EFFECT] Informational.  If the service test run failed, a live
+         deployment of the services owned by the service test may fail.
+
+         [RECOVERY] If the service test run failed, investigate the cause."
+    ::= { tmnxOamSathNotifications 1 }
+
+tmnxOamSathSvcStrmCompleted      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxOamSathStsSvcStrmOprState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxOamSathSvcStrmCompleted notification is (optionally)
+         sent at the end of a Y.1564 service stream run.
+
+         [EFFECT] Informational.  If the service stream run failed, a live
+         deployment of the services owned by the service stream may fail.
+
+         [RECOVERY] If the service stream run failed, investigate the cause."
+    ::= { tmnxOamSathNotifications 2 }
+
+END

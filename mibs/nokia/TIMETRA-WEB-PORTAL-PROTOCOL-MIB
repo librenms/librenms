@@ -1,0 +1,2193 @@
+TIMETRA-WEB-PORTAL-PROTOCOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType,
+    InetPortNumber
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Gauge32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, MacAddress, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    iesIfIndex, svcId
+                                                         FROM TIMETRA-SERV-MIB
+    tmnxSubIpoeIndex
+                                                         FROM TIMETRA-SUBSCRIBER-MGMT-MIB
+    TItemDescription, TNamedItem,
+    TNamedItemOrEmpty, TmnxAdminState,
+    TmnxEnabledDisabled, TmnxServId,
+    TmnxVRtrIDOrZero
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraWppMIBModule              MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the Web
+         Portal Protocol for the Nokia 7xxx device.
+
+         Copyright 2011-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0                01 Jan 2017 00:00
+         15.0 release of the TIMETRA-WEB-PORTAL-PROTOCOL-MIB.mib."
+
+    REVISION    "201401010000Z"
+    DESCRIPTION
+        "Rev 12.0                01 Jan 2014 00:00
+         12.0 release of the TIMETRA-WEB-PORTAL-PROTOCOL-MIB.mib."
+
+    REVISION    "201202280000Z"
+    DESCRIPTION
+        "Rev 10.0                28 Feb 2012 12:00
+         10.0 release of the TIMETRA-WEB-PORTAL-PROTOCOL-MIB.mib."
+
+    ::= { timetraSRMIBModules 80 }
+
+TmnxWppStatsType                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxWppStatsType data type is an enumerated integer that describes
+         the values used to identify the WPP statistics."
+    SYNTAX      INTEGER {
+        event                      (1),
+        droppedMsgType             (2),
+        acceptedMsgType            (3),
+        originalTransmittedMsgType (4),
+        retransmittedMsgType       (5),
+        forwardedToPeerMsgType     (6),
+        receivedFromPeerMsgType    (7)
+    }
+
+TmnxWppUserName                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxWppUserName represents the user name of a WPP host."
+    SYNTAX      DisplayString (SIZE (0..253))
+
+tmnxWpp                          OBJECT IDENTIFIER ::= { tmnxSRObjs 80 }
+
+tmnxWppObjs                      OBJECT IDENTIFIER ::= { tmnxWpp 1 }
+
+tmnxWppPortalObjs                OBJECT IDENTIFIER ::= { tmnxWppObjs 1 }
+
+tmnxWppPortalTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalTable contains objects to configure the WPP portals
+         of this system."
+    ::= { tmnxWppPortalObjs 1 }
+
+tmnxWppPortalEntry               OBJECT-TYPE
+    SYNTAX      TmnxWppPortalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a particular WPP
+         portal.
+
+         Entries in this table can be created or deleted via SNMP operations.
+
+         In order to create a conceptual row in this table, a row in the
+         tmnxWppTable with the same value of the object vRtrID must exist."
+    INDEX       {
+        vRtrID,
+        IMPLIED tmnxWppPortalName
+    }
+    ::= { tmnxWppPortalTable 1 }
+
+TmnxWppPortalEntry               ::= SEQUENCE
+{
+    tmnxWppPortalName                TNamedItem,
+    tmnxWppPortalLastCh              TimeStamp,
+    tmnxWppPortalRowStatus           RowStatus,
+    tmnxWppPortalAddrType            InetAddressType,
+    tmnxWppPortalAddr                InetAddress,
+    tmnxWppPortalAdminState          TmnxAdminState,
+    tmnxWppPortalSecret              DisplayString,
+    tmnxWppPortalVersion             Unsigned32,
+    tmnxWppPortalRetryInterval       Unsigned32,
+    tmnxWppPortalNtfLogoutRetries    Unsigned32,
+    tmnxWppPortalAckAuthRetries      Unsigned32,
+    tmnxWppPortalAckInfoPortFormat   INTEGER
+}
+
+tmnxWppPortalName                OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalName specifies the name of this WPP portal."
+    ::= { tmnxWppPortalEntry 1 }
+
+tmnxWppPortalLastCh              OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalLastCh indicates the sysUpTime at the time
+         of the most recent management-initiated change to this table row."
+    ::= { tmnxWppPortalEntry 2 }
+
+tmnxWppPortalRowStatus           OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalRowStatus specifies the row status of this
+         row."
+    ::= { tmnxWppPortalEntry 3 }
+
+tmnxWppPortalAddrType            OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalAddrType specifies the address type of
+         tmnxWppPortalAddr.
+
+         A value for this object must be specified when the row is created."
+    ::= { tmnxWppPortalEntry 4 }
+
+tmnxWppPortalAddr                OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalAddr specifies the IP address of the WPP
+         portal.
+
+         A value for this object must be specified when the row is created."
+    ::= { tmnxWppPortalEntry 5 }
+
+tmnxWppPortalAdminState          OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalAdminState specifies the administrative
+         state of this WPP portal."
+    DEFVAL      { outOfService }
+    ::= { tmnxWppPortalEntry 6 }
+
+tmnxWppPortalSecret              OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalSecret specifies the secret that is used by
+         WPPv2 to authenticate the messages between portal and BRAS.
+
+         A get request on this object always returns an empty string."
+    DEFVAL      { ''H }
+    ::= { tmnxWppPortalEntry 7 }
+
+tmnxWppPortalVersion             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 | 2)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalVersion specifies the protocol version that
+         is expected by the WPP portal."
+    DEFVAL      { 1 }
+    ::= { tmnxWppPortalEntry 8 }
+
+tmnxWppPortalRetryInterval       OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..2000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalRetryInterval specifies the time interval
+         between two consecutive retransmissions."
+    DEFVAL      { 2000 }
+    ::= { tmnxWppPortalEntry 9 }
+
+tmnxWppPortalNtfLogoutRetries    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalNtfLogoutRetries specifies the number of
+         retransmissions of an NTF_LOGOUT message."
+    DEFVAL      { 5 }
+    ::= { tmnxWppPortalEntry 10 }
+
+tmnxWppPortalAckAuthRetries      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalAckAuthRetries specifies the number of
+         retransmissions of an ACK_OUT message."
+    DEFVAL      { 5 }
+    ::= { tmnxWppPortalEntry 11 }
+
+tmnxWppPortalAckInfoPortFormat   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        standard       (1),
+        vendorSpecific (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalAckInfoPortFormat specifies the formatting
+         of the port attribute in the ACK_INFO WPP message.
+
+         Some vendor-specific port types can only be represented  using the
+         'vendorSpecific' formatting."
+    DEFVAL      { standard }
+    ::= { tmnxWppPortalEntry 12 }
+
+tmnxWppPortalStatTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalStatTable contains objects to monitor the WPP portals
+         of this system."
+    ::= { tmnxWppPortalObjs 2 }
+
+tmnxWppPortalStatEntry           OBJECT-TYPE
+    SYNTAX      TmnxWppPortalStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents status information about a particular
+         WPP portal.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    AUGMENTS    { tmnxWppPortalEntry }
+    ::= { tmnxWppPortalStatTable 1 }
+
+TmnxWppPortalStatEntry           ::= SEQUENCE
+{
+    tmnxWppPortalStateControlledRtr  TmnxVRtrIDOrZero,
+    tmnxWppPortalStateNumInterfaces  Gauge32,
+    tmnxWppPortalStateTriggeredHosts TmnxEnabledDisabled
+}
+
+tmnxWppPortalStateControlledRtr  OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalStateControlledRtr indicates the identifier
+         of the virtual router instance being controlled by this portal.
+
+         The value zero indicates that this portal is currently not controlling
+         any router instance."
+    ::= { tmnxWppPortalStatEntry 1 }
+
+tmnxWppPortalStateNumInterfaces  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalStateNumInterfaces indicates the number of
+         interfaces associated with this portal that are administratively
+         enabled."
+    ::= { tmnxWppPortalStatEntry 2 }
+
+tmnxWppPortalStateTriggeredHosts OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalStateTriggeredHosts indicates whether
+         triggered hosts are enabled on this portal.
+
+         When tmnxWppPortalStateTriggeredHosts is enabled hosts are created
+         when a host trigger is received from the WPP portal.
+
+         When tmnxWppPortalStateTriggeredHosts is disabled, host triggers are
+         ignored."
+    ::= { tmnxWppPortalStatEntry 3 }
+
+tmnxWppPortalStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalStatsTable shows protocol statistics information of
+         WPP portals."
+    ::= { tmnxWppPortalObjs 3 }
+
+tmnxWppPortalStatsEntry          OBJECT-TYPE
+    SYNTAX      TmnxWppPortalStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents protocol statistics of a specific type.
+
+         Entries in this table are created and destroyed by the system.
+
+         Rows are only created where the statistics value is nonzero; this
+         allows faster walking through this table; hence, it is recommended to
+         perform only get-next-request operations to retrieve information from
+         this table."
+    INDEX       {
+        vRtrID,
+        tmnxWppPortalName,
+        tmnxWppPortalStatsType,
+        tmnxWppPortalStatsInstance
+    }
+    ::= { tmnxWppPortalStatsTable 1 }
+
+TmnxWppPortalStatsEntry          ::= SEQUENCE
+{
+    tmnxWppPortalStatsType           TmnxWppStatsType,
+    tmnxWppPortalStatsInstance       Unsigned32,
+    tmnxWppPortalStatsName           DisplayString,
+    tmnxWppPortalStatsVal            Counter32
+}
+
+tmnxWppPortalStatsType           OBJECT-TYPE
+    SYNTAX      TmnxWppStatsType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppPortalStatsType indicates the type of
+         WPP statistics contained in this conceptual row."
+    ::= { tmnxWppPortalStatsEntry 1 }
+
+tmnxWppPortalStatsInstance       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..40)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppPortalStatsInstance indicates the
+         instance identifier of the statistics contained in this conceptual
+         row.
+
+         Together with the value of tmnxWppPortalStatsType it indicates
+         unambiguously what the value of tmnxWppPortalStatsVal means.
+
+         For example: if the value of the object tmnxWppPortalStatsType is
+         equal to 'event', the value of tmnxWppPortalStatsInstance indicates
+         the identifier of the type of event that this conceptual row refers
+         to, for example 'noResources', and the value of tmnxWppPortalStatsVal
+         indicates the number of times a 'no resources' event occurred for this
+         WPP portal."
+    ::= { tmnxWppPortalStatsEntry 2 }
+
+tmnxWppPortalStatsName           OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppPortalStatsName indicates the
+         human-readable identifier of the statistics contained in this
+         conceptual row.
+
+         In the same example, the value of tmnxWppPortalStatsName is '(SCCRP)
+         Start-Control-Connection-Reply'."
+    ::= { tmnxWppPortalStatsEntry 3 }
+
+tmnxWppPortalStatsVal            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppPortalStatsVal indicates the value of
+         the statistics contained in this conceptual row."
+    ::= { tmnxWppPortalStatsEntry 4 }
+
+tmnxWppHostTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppHostTable contains status information about WPP hosts."
+    ::= { tmnxWppPortalObjs 4 }
+
+tmnxWppHostEntry                 OBJECT-TYPE
+    SYNTAX      TmnxWppHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a particular WPP
+         host.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       {
+        vRtrID,
+        tmnxWppPortalName,
+        tmnxWppHostAddrType,
+        tmnxWppHostAddr
+    }
+    ::= { tmnxWppHostTable 1 }
+
+TmnxWppHostEntry                 ::= SEQUENCE
+{
+    tmnxWppHostAddrType              InetAddressType,
+    tmnxWppHostAddr                  InetAddress,
+    tmnxWppHostStatus                INTEGER,
+    tmnxWppHostSerialNumber          Unsigned32,
+    tmnxWppHostRequestId             Unsigned32,
+    tmnxWppHostPortalRemotePort      InetPortNumber,
+    tmnxWppHostPortalLclIpAddrType   InetAddressType,
+    tmnxWppHostPortalLclIpAddr       InetAddress,
+    tmnxWppHostUserName              TmnxWppUserName,
+    tmnxWppHostService               TmnxServId,
+    tmnxWppHostMacAddress            MacAddress,
+    tmnxWppHostIsTriggered           TruthValue,
+    tmnxWppHostTrackSrrpInst         Unsigned32,
+    tmnxWppHostIsMCBackup            TruthValue
+}
+
+tmnxWppHostAddrType              OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostAddrType specifies the address type of
+         tmnxWppHostAddr."
+    ::= { tmnxWppHostEntry 1 }
+
+tmnxWppHostAddr                  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostAddr specifies the IP address of the WPP host."
+    ::= { tmnxWppHostEntry 2 }
+
+tmnxWppHostStatus                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle           (1),
+        challenged     (2),
+        authenticating (3),
+        authenticated  (4),
+        established    (5),
+        loggingOut     (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostStatus indicates the state of the WPP host."
+    ::= { tmnxWppHostEntry 3 }
+
+tmnxWppHostSerialNumber          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostSerialNumber indicates the serial number of
+         the WPP host.
+
+         The value zero indicates that the serial number is unknown or
+         irrelevant."
+    ::= { tmnxWppHostEntry 4 }
+
+tmnxWppHostRequestId             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostRequestId indicates the request ID of the WPP
+         host.
+
+         The value zero indicates that the request ID is unknown or irrelevant."
+    ::= { tmnxWppHostEntry 5 }
+
+tmnxWppHostPortalRemotePort      OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostPortalRemotePort indicates the UDP source port
+         used by the portal while sending WPP protocol messages about this host
+         to this system.
+
+         The value zero indicates that the port is not yet known."
+    ::= { tmnxWppHostEntry 6 }
+
+tmnxWppHostPortalLclIpAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostPortalLclIpAddrType indicates the address type
+         of tmnxWppHostPortalLclIpAddr."
+    ::= { tmnxWppHostEntry 7 }
+
+tmnxWppHostPortalLclIpAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostPortalLclIpAddr indicates the destination IP
+         address used by the portal while sending WPP protocol messages about
+         this host to this system."
+    ::= { tmnxWppHostEntry 8 }
+
+tmnxWppHostUserName              OBJECT-TYPE
+    SYNTAX      TmnxWppUserName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostUserName indicates the WPP user name of this
+         WPP host."
+    ::= { tmnxWppHostEntry 9 }
+
+tmnxWppHostService               OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostService indicates the service ID of the
+         service to which this WPP host belongs."
+    ::= { tmnxWppHostEntry 10 }
+
+tmnxWppHostMacAddress            OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostMacAddress indicates the MAC address of this
+         WPP host."
+    ::= { tmnxWppHostEntry 11 }
+
+tmnxWppHostIsTriggered           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostIsTriggered indicates whether the creation of
+         the host is triggered by the portal.
+
+         If the host creation is not triggered by the portal, the
+         tmnxWppHostIsTriggered value is FALSE."
+    ::= { tmnxWppHostEntry 12 }
+
+tmnxWppHostTrackSrrpInst         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostTrackSrrpInst indicates the SRRP instance
+         whose state is tracked by this WPP host to determine if it is on the
+         MCS master or backup node."
+    ::= { tmnxWppHostEntry 13 }
+
+tmnxWppHostIsMCBackup            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppHostIsMCBackup indicates whether the WPP host is
+         on the MCS backup node or not."
+    ::= { tmnxWppHostEntry 14 }
+
+tmnxWppSessTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppSessTable contains status information about WPP sessions."
+    ::= { tmnxWppPortalObjs 5 }
+
+tmnxWppSessEntry                 OBJECT-TYPE
+    SYNTAX      TmnxWppSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a particular WPP
+         session. Entries in this table are created and destroyed automatically
+         by the system."
+    INDEX       {
+        vRtrID,
+        tmnxWppPortalName,
+        tmnxSubIpoeIndex
+    }
+    ::= { tmnxWppSessTable 1 }
+
+TmnxWppSessEntry                 ::= SEQUENCE
+{
+    tmnxWppSessStatus                INTEGER,
+    tmnxWppSessSerialNumber          Unsigned32,
+    tmnxWppSessRequestId             Unsigned32,
+    tmnxWppSessPortalRemotePort      InetPortNumber,
+    tmnxWppSessPortalLclIpAddrType   InetAddressType,
+    tmnxWppSessPortalLclIpAddr       InetAddress,
+    tmnxWppSessUserName              TmnxWppUserName,
+    tmnxWppSessService               TmnxServId,
+    tmnxWppSessMacAddress            MacAddress,
+    tmnxWppSessIsTriggered           TruthValue,
+    tmnxWppSessTrackSrrpInst         Unsigned32,
+    tmnxWppSessIsMCBackup            TruthValue,
+    tmnxWppSessClientAddrType        InetAddressType,
+    tmnxWppSessClientAddr            InetAddress
+}
+
+tmnxWppSessStatus                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle           (1),
+        challenged     (2),
+        authenticating (3),
+        authenticated  (4),
+        established    (5),
+        loggingOut     (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessStatus indicates the state of the WPP session."
+    ::= { tmnxWppSessEntry 1 }
+
+tmnxWppSessSerialNumber          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessSerialNumber indicates the serial number of
+         the WPP session.
+
+         The value zero indicates that the serial number is unknown or
+         irrelevant."
+    ::= { tmnxWppSessEntry 2 }
+
+tmnxWppSessRequestId             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessRequestId indicates the request ID of the WPP
+         session.
+
+         The value zero indicates that the request ID is unknown or irrelevant."
+    ::= { tmnxWppSessEntry 3 }
+
+tmnxWppSessPortalRemotePort      OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessPortalRemotePort indicates the UDP source port
+         used by the portal while sending WPP protocol messages about this
+         session to this system.
+
+         The value zero indicates that the port is not yet known."
+    ::= { tmnxWppSessEntry 4 }
+
+tmnxWppSessPortalLclIpAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessPortalLclIpAddrType indicates the address type
+         of tmnxWppSessPortalLclIpAddr."
+    ::= { tmnxWppSessEntry 5 }
+
+tmnxWppSessPortalLclIpAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessPortalLclIpAddr indicates the destination IP
+         address used by the portal while sending WPP protocol messages about
+         this session to this system."
+    ::= { tmnxWppSessEntry 6 }
+
+tmnxWppSessUserName              OBJECT-TYPE
+    SYNTAX      TmnxWppUserName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessUserName indicates the WPP user name of this
+         WPP session."
+    ::= { tmnxWppSessEntry 7 }
+
+tmnxWppSessService               OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessService indicates the service ID of the
+         service to which this WPP session belongs."
+    ::= { tmnxWppSessEntry 8 }
+
+tmnxWppSessMacAddress            OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessMacAddress indicates the MAC address of this
+         WPP session."
+    ::= { tmnxWppSessEntry 9 }
+
+tmnxWppSessIsTriggered           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessIsTriggered indicates whether the creation of
+         the session is triggered by the portal.
+
+         If the session creation is not triggered by the portal, the
+         tmnxWppSessIsTriggered value is FALSE."
+    ::= { tmnxWppSessEntry 10 }
+
+tmnxWppSessTrackSrrpInst         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessTrackSrrpInst indicates the SRRP instance
+         whose state is tracked by this WPP session to determine if it is on
+         the MCS master or backup node."
+    ::= { tmnxWppSessEntry 11 }
+
+tmnxWppSessIsMCBackup            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessIsMCBackup indicates whether the WPP session
+         is on the MCS backup node or not."
+    ::= { tmnxWppSessEntry 12 }
+
+tmnxWppSessClientAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessClientAddrType specifies the address type of
+         tmnxWppSessClientAddr."
+    ::= { tmnxWppSessEntry 13 }
+
+tmnxWppSessClientAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSessClientAddr specifies the source address the
+         client used to contact the WPP portal."
+    ::= { tmnxWppSessEntry 14 }
+
+tmnxWppTable                     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppTable allows configuration of the Web Portal Protocol (WPP)
+         in a virtual router instance."
+    ::= { tmnxWppObjs 2 }
+
+tmnxWppEntry                     OBJECT-TYPE
+    SYNTAX      TmnxWppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for WPP in a particular
+         virtual router instance.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxWppRowStatus.
+
+         A corresponding row in the TIMETRA-VRTR-MIB::vRtrConfTable must exist
+         in order to create a row in this table."
+    INDEX       { vRtrID }
+    ::= { tmnxWppTable 1 }
+
+TmnxWppEntry                     ::= SEQUENCE
+{
+    tmnxWppRowStatus                 RowStatus,
+    tmnxWppLastCh                    TimeStamp,
+    tmnxWppAdminState                TmnxAdminState
+}
+
+tmnxWppRowStatus                 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppRowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { tmnxWppEntry 1 }
+
+tmnxWppLastCh                    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppLastCh indicates the sysUpTime at the time of the
+         most recent management-initiated change to this WPP portal."
+    ::= { tmnxWppEntry 2 }
+
+tmnxWppAdminState                OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppAdminState specifies the administrative state of
+         the WPP in this virtual router instance."
+    DEFVAL      { outOfService }
+    ::= { tmnxWppEntry 3 }
+
+tmnxWppStatsTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppStatsTable shows WPP statistics."
+    ::= { tmnxWppObjs 3 }
+
+tmnxWppStatsEntry                OBJECT-TYPE
+    SYNTAX      TmnxWppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents protocol statistics of a specific type.
+
+         Entries in this table are created and destroyed by the system.
+
+         Rows are only created where the statistics value is nonzero; this
+         allows faster walking through this table; hence, it is recommended to
+         perform only get-next-request operations to retrieve information from
+         this table."
+    INDEX       {
+        vRtrID,
+        tmnxWppStatsType,
+        tmnxWppStatsInstance
+    }
+    ::= { tmnxWppStatsTable 1 }
+
+TmnxWppStatsEntry                ::= SEQUENCE
+{
+    tmnxWppStatsType                 TmnxWppStatsType,
+    tmnxWppStatsInstance             Unsigned32,
+    tmnxWppStatsName                 DisplayString,
+    tmnxWppStatsVal                  Counter32
+}
+
+tmnxWppStatsType                 OBJECT-TYPE
+    SYNTAX      TmnxWppStatsType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppStatsType indicates the type of WPP
+         statistics contained in this conceptual row."
+    ::= { tmnxWppStatsEntry 1 }
+
+tmnxWppStatsInstance             OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..40)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppStatsInstance indicates the instance
+         identifier of the statistics contained in this conceptual row.
+
+         Together with the value of tmnxWppStatsType it indicates unambiguously
+         what the value of tmnxWppStatsVal means.
+
+         For example: if the value of the object tmnxWppStatsType is equal to
+         'event', the value of tmnxWppStatsInstance indicates the identifier of
+         the type of event that this conceptual row refers to, for example
+         'noResources', and the value of tmnxWppStatsVal indicates the number
+         of times a 'no resources' event occurred for this WPP portal."
+    ::= { tmnxWppStatsEntry 2 }
+
+tmnxWppStatsName                 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppStatsName indicates the human-readable
+         identifier of the statistics contained in this conceptual row.
+
+         In the same example, the value of tmnxWppStatsName is '(SCCRP)
+         Start-Control-Connection-Reply'."
+    ::= { tmnxWppStatsEntry 3 }
+
+tmnxWppStatsVal                  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppStatsVal indicates the value of the
+         statistics contained in this conceptual row."
+    ::= { tmnxWppStatsEntry 4 }
+
+tmnxWppIfTable                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppIfTable contains objects to configure the WPP for the IES
+         group interfaces of this system."
+    ::= { tmnxWppObjs 4 }
+
+tmnxWppIfEntry                   OBJECT-TYPE
+    SYNTAX      TmnxWppIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents WPP information about a particular IES
+         group interface.
+
+         Entries in this table can be created or deleted via SNMP operations.
+
+         In order to create a conceptual row in this table, a row in the
+         TIMETRA-SERV-MIB::iesGrpIfTable with the same index must exist."
+    INDEX       {
+        svcId,
+        iesIfIndex
+    }
+    ::= { tmnxWppIfTable 1 }
+
+TmnxWppIfEntry                   ::= SEQUENCE
+{
+    tmnxWppIfLastCh                  TimeStamp,
+    tmnxWppIfRowStatus               RowStatus,
+    tmnxWppIfAdminState              TmnxAdminState,
+    tmnxWppIfPortalRouter            TmnxVRtrIDOrZero,
+    tmnxWppIfPortalName              TNamedItemOrEmpty,
+    tmnxWppIfSubProfile              TNamedItemOrEmpty,
+    tmnxWppIfSLAProfile              TNamedItemOrEmpty,
+    tmnxWppIfAppProfile              TNamedItemOrEmpty,
+    tmnxWppIfRestoreDisconnected     TruthValue,
+    tmnxWppIfUserDb                  TNamedItemOrEmpty,
+    tmnxWppIfLeaseTime               Unsigned32,
+    tmnxWppIfEnableTriggeredHosts    TruthValue,
+    tmnxWppIfPortalGroupName         TNamedItemOrEmpty
+}
+
+tmnxWppIfLastCh                  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfLastCh indicates the sysUpTime at the time of
+         the most recent management-initiated change to this table row."
+    ::= { tmnxWppIfEntry 1 }
+
+tmnxWppIfRowStatus               OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfRowStatus specifies the row status of this row."
+    ::= { tmnxWppIfEntry 2 }
+
+tmnxWppIfAdminState              OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfAdminState specifies the administrative state of
+         the WPP for hosts using this IES group interface."
+    DEFVAL      { outOfService }
+    ::= { tmnxWppIfEntry 3 }
+
+tmnxWppIfPortalRouter            OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfPortalRouter specifies the virtual router
+         instance ID of the WPP portal for the hosts using this IES group
+         interface.
+
+         An corresponding row must exist in the
+         TIMETRA-VRTR-MIB::vRtrConfTable.
+
+         When that row is removed while the value of tmnxWppIfAdminState is
+         equal to outOfService, the system resets the value of this object to
+         its default value, zero, and the value of tmnxWppIfPortalName to
+         empty.
+
+         A row corresponding to tmnxWppIfPortalRouter and tmnxWppIfPortalName
+         must exist in the tmnxWppPortalTable while the value of
+         tmnxWppIfAdminState is equal to 'inService'.
+
+         The values of the objects tmnxWppIfPortalRouter and
+         tmnxWppIfPortalName must be either both equal to their default values
+         (zero/empty) or both not equal to their default values."
+    DEFVAL      { 0 }
+    ::= { tmnxWppIfEntry 4 }
+
+tmnxWppIfPortalName              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfPortalName specifies the name of the WPP portal
+         for the hosts using this IES group interface.
+
+         A row corresponding to tmnxWppIfPortalRouter and tmnxWppIfPortalName
+         must exist in the tmnxWppPortalTable while the value of
+         tmnxWppIfAdminState is equal to 'inService'.
+
+         The values of the objects tmnxWppIfPortalRouter and
+         tmnxWppIfPortalName must be either both equal to their default values
+         (zero/empty) or both not equal to their default values."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 5 }
+
+tmnxWppIfSubProfile              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfSubProfile specifies the initial subscriber
+         profile, to be used during the WPP authentication phase of hosts using
+         this IES group interface."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 6 }
+
+tmnxWppIfSLAProfile              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfSLAProfile specifies the initial SLA profile, to
+         be used during the WPP authentication phase of hosts using this IES
+         group interface."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 7 }
+
+tmnxWppIfAppProfile              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfAppProfile specifies the initial application
+         profile, to be used during the WPP authentication phase of hosts using
+         this IES group interface.
+
+         The application profile is configured in
+         TIMETRA-BSX-NG-MIB.mib::tmnxBsxAppProfTable."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 8 }
+
+tmnxWppIfRestoreDisconnected     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfRestoreDisconnected specifies if the initial
+         profiles must be restored after a host has disconnected."
+    DEFVAL      { true }
+    ::= { tmnxWppIfEntry 9 }
+
+tmnxWppIfUserDb                  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfUserDb specifies the user database that will be
+         used to retrieve the WPP information for the hosts using this IES
+         group interface.
+
+         If tmnxWppIfUserDb is configured, the WPP information configured on
+         this particular IES group interface is only used in case no
+         corresponding value is returned from LUDB lookup."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 10 }
+
+tmnxWppIfLeaseTime               OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..315446399)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppIfLeaseTime specifies, in seconds, the
+         lease time of hosts using this IES group interface."
+    DEFVAL      { 600 }
+    ::= { tmnxWppIfEntry 11 }
+
+tmnxWppIfEnableTriggeredHosts    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppIfEnableTriggeredHosts specifies
+         whether triggered hosts are enabled on this IES group interface.
+
+         When tmnxWppIfEnableTriggeredHosts is set to true hosts are created
+         when a host trigger is received from the WPP portal.
+
+         When tmnxWppIfEnableTriggeredHosts is set to false, host triggers are
+         ignored.
+
+         The value 'true' is only effective if this interface is associated
+         with a port where on one of its SAPs, a row can be created in the
+         TIMETRA-SAP-MIB::sapDefHostTable."
+    DEFVAL      { false }
+    ::= { tmnxWppIfEntry 12 }
+
+tmnxWppIfPortalGroupName         OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppIfPortalGroupName specifies the name of the WPP
+         portal group."
+    DEFVAL      { ''H }
+    ::= { tmnxWppIfEntry 13 }
+
+tmnxWppPortalGroupTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalGroupTable contains the objects to configure the WPP
+         portal groups."
+    ::= { tmnxWppObjs 5 }
+
+tmnxWppPortalGroupEntry          OBJECT-TYPE
+    SYNTAX      TmnxWppPortalGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents the configuration of a particular WPP
+         portal group."
+    INDEX       { IMPLIED tmnxWppPortalGroupName }
+    ::= { tmnxWppPortalGroupTable 1 }
+
+TmnxWppPortalGroupEntry          ::= SEQUENCE
+{
+    tmnxWppPortalGroupName           TNamedItem,
+    tmnxWppPortalGroupLastCh         TimeStamp,
+    tmnxWppPortalGroupRowStatus      RowStatus,
+    tmnxWppPortalGroupDescription    TItemDescription,
+    tmnxWppPortalGroupAdminState     TmnxAdminState
+}
+
+tmnxWppPortalGroupName           OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupName specifies the name of the WPP
+         portal group."
+    ::= { tmnxWppPortalGroupEntry 1 }
+
+tmnxWppPortalGroupLastCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to the WPP portal
+         group."
+    ::= { tmnxWppPortalGroupEntry 2 }
+
+tmnxWppPortalGroupRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxWppPortalGroupEntry 3 }
+
+tmnxWppPortalGroupDescription    OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupDescription specifies a user provided
+         description for the WPP portal group."
+    DEFVAL      { "" }
+    ::= { tmnxWppPortalGroupEntry 4 }
+
+tmnxWppPortalGroupAdminState     OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupAdminState specifies the administrative
+         state of the WPP portal group."
+    DEFVAL      { outOfService }
+    ::= { tmnxWppPortalGroupEntry 5 }
+
+tmnxWppPortalGroupPortalTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalGroupPortalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalGroupPortalTable contains the objects to configure
+         the portals which are part of the WPP portal groups."
+    ::= { tmnxWppObjs 6 }
+
+tmnxWppPortalGroupPortalEntry    OBJECT-TYPE
+    SYNTAX      TmnxWppPortalGroupPortalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents the configuration of a particular
+         portal which is part of a WPP portal group."
+    INDEX       {
+        tmnxWppPortalGroupName,
+        vRtrID,
+        IMPLIED tmnxWppPortalGroupPortalName
+    }
+    ::= { tmnxWppPortalGroupPortalTable 1 }
+
+TmnxWppPortalGroupPortalEntry    ::= SEQUENCE
+{
+    tmnxWppPortalGroupPortalName     TNamedItem,
+    tmnxWppPortalGroupPortalLastCh   TimeStamp,
+    tmnxWppPortalGroupPortalRowStat  RowStatus
+}
+
+tmnxWppPortalGroupPortalName     OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupPortalName specifies the name of the
+         portal which is part of a WPP portal group."
+    ::= { tmnxWppPortalGroupPortalEntry 1 }
+
+tmnxWppPortalGroupPortalLastCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupPortalLastCh indicates the sysUpTime at
+         the time of the most recent management-initiated change to the portal
+         configuration."
+    ::= { tmnxWppPortalGroupPortalEntry 2 }
+
+tmnxWppPortalGroupPortalRowStat  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupPortalRowStat controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxWppPortalGroupPortalEntry 3 }
+
+tmnxWppPortalGroupStatTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPortalGroupStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPortalGroupStatTable contains objects to monitor the WPP
+         portal groups of this system."
+    ::= { tmnxWppObjs 7 }
+
+tmnxWppPortalGroupStatEntry      OBJECT-TYPE
+    SYNTAX      TmnxWppPortalGroupStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents status information about a particular
+         WPP portal group.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    AUGMENTS    { tmnxWppPortalGroupEntry }
+    ::= { tmnxWppPortalGroupStatTable 1 }
+
+TmnxWppPortalGroupStatEntry      ::= SEQUENCE
+{
+    tmnxWppPortalGroupStateContrRtr  TmnxVRtrIDOrZero,
+    tmnxWppPortalGroupStateNumItfs   Gauge32,
+    tmnxWppPortalGroupStateTrigHosts TmnxEnabledDisabled
+}
+
+tmnxWppPortalGroupStateContrRtr  OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupStateContrRtr indicates the identifier
+         of the virtual router instance being controlled by this portal group.
+
+         The value zero indicates that this portal group is currently not
+         controlling any router instance."
+    ::= { tmnxWppPortalGroupStatEntry 1 }
+
+tmnxWppPortalGroupStateNumItfs   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupStateNumItfs indicates the number of
+         interfaces associated with this portal group that are administratively
+         enabled."
+    ::= { tmnxWppPortalGroupStatEntry 2 }
+
+tmnxWppPortalGroupStateTrigHosts OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPortalGroupStateTrigHosts indicates whether
+         triggered hosts are enabled on this portal group.
+
+         When tmnxWppPortalGroupStateTrigHosts is enabled, hosts are created
+         when a host trigger is received from the WPP portal group.
+
+         When tmnxWppPortalGroupStateTrigHosts is disabled, host triggers are
+         ignored."
+    ::= { tmnxWppPortalGroupStatEntry 3 }
+
+tmnxWppPGHostTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPGHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPGHostTable contains status information about WPP portal
+         group hosts."
+    ::= { tmnxWppObjs 8 }
+
+tmnxWppPGHostEntry               OBJECT-TYPE
+    SYNTAX      TmnxWppPGHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a particular WPP
+         portal group host.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       {
+        tmnxWppPortalGroupName,
+        tmnxWppPGHostAddrType,
+        tmnxWppPGHostAddr
+    }
+    ::= { tmnxWppPGHostTable 1 }
+
+TmnxWppPGHostEntry               ::= SEQUENCE
+{
+    tmnxWppPGHostAddrType            InetAddressType,
+    tmnxWppPGHostAddr                InetAddress,
+    tmnxWppPGHostStatus              INTEGER,
+    tmnxWppPGHostSerialNumber        Unsigned32,
+    tmnxWppPGHostRequestId           Unsigned32,
+    tmnxWppPGHostPortalRemotePort    InetPortNumber,
+    tmnxWppPGHostPortalLclIpAddrType InetAddressType,
+    tmnxWppPGHostPortalLclIpAddr     InetAddress,
+    tmnxWppPGHostUserName            TmnxWppUserName,
+    tmnxWppPGHostService             TmnxServId,
+    tmnxWppPGHostMacAddress          MacAddress,
+    tmnxWppPGHostIsTriggered         TruthValue,
+    tmnxWppPGHostTrackSrrpInst       Unsigned32,
+    tmnxWppPGHostIsMCBackup          TruthValue,
+    tmnxWppPGHostActivePortalRouter  TmnxVRtrIDOrZero,
+    tmnxWppPGHostActivePortalName    TNamedItemOrEmpty
+}
+
+tmnxWppPGHostAddrType            OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostAddrType specifies the address type of
+         tmnxWppPGHostAddr."
+    ::= { tmnxWppPGHostEntry 1 }
+
+tmnxWppPGHostAddr                OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostAddr specifies the IP address of the WPP
+         portal group host."
+    ::= { tmnxWppPGHostEntry 2 }
+
+tmnxWppPGHostStatus              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle           (1),
+        challenged     (2),
+        authenticating (3),
+        authenticated  (4),
+        established    (5),
+        loggingOut     (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostStatus indicates the state of the WPP portal
+         group host."
+    ::= { tmnxWppPGHostEntry 3 }
+
+tmnxWppPGHostSerialNumber        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostSerialNumber indicates the serial number of
+         the WPP portal group host.
+
+         The value zero indicates that the serial number is unknown or
+         irrelevant."
+    ::= { tmnxWppPGHostEntry 4 }
+
+tmnxWppPGHostRequestId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostRequestId indicates the request ID of the
+         WPP portal group host.
+
+         The value zero indicates that the request ID is unknown or irrelevant."
+    ::= { tmnxWppPGHostEntry 5 }
+
+tmnxWppPGHostPortalRemotePort    OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostPortalRemotePort indicates the UDP source
+         port used by the portal group while sending WPP protocol messages
+         about this host to this system.
+
+         The value zero indicates that the port is not yet known."
+    ::= { tmnxWppPGHostEntry 6 }
+
+tmnxWppPGHostPortalLclIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostPortalLclIpAddrType indicates the address
+         type of tmnxWppPGHostPortalLclIpAddr."
+    ::= { tmnxWppPGHostEntry 7 }
+
+tmnxWppPGHostPortalLclIpAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostPortalLclIpAddr indicates the destination IP
+         address used by the portal while sending WPP protocol messages about
+         this host to this system."
+    ::= { tmnxWppPGHostEntry 8 }
+
+tmnxWppPGHostUserName            OBJECT-TYPE
+    SYNTAX      TmnxWppUserName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostUserName indicates the WPP user name of this
+         WPP portal group host."
+    ::= { tmnxWppPGHostEntry 9 }
+
+tmnxWppPGHostService             OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostService indicates the service ID of the
+         service to which this WPP portal group host belongs."
+    ::= { tmnxWppPGHostEntry 10 }
+
+tmnxWppPGHostMacAddress          OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostMacAddress indicates the MAC address of this
+         WPP portal group host."
+    ::= { tmnxWppPGHostEntry 11 }
+
+tmnxWppPGHostIsTriggered         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostIsTriggered indicates whether the creation
+         of the host is triggered by the portal group.
+
+         If the host creation is not triggered by the portal group, the
+         tmnxWppPGHostIsTriggered value is FALSE."
+    ::= { tmnxWppPGHostEntry 12 }
+
+tmnxWppPGHostTrackSrrpInst       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostTrackSrrpInst indicates the SRRP instance
+         whose state is tracked by this WPP portal group host to determine if
+         it is on the MCS master or backup node."
+    ::= { tmnxWppPGHostEntry 13 }
+
+tmnxWppPGHostIsMCBackup          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostIsMCBackup indicates whether the WPP portal
+         group host is on the MCS backup node or not."
+    ::= { tmnxWppPGHostEntry 14 }
+
+tmnxWppPGHostActivePortalRouter  OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostActivePortalRouter indicates the router of
+         the active portal.
+
+         This value is only applicable when tmnxWppPGHostStatus is
+         'authenticating' or 'loggingOut'."
+    ::= { tmnxWppPGHostEntry 15 }
+
+tmnxWppPGHostActivePortalName    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGHostActivePortalName indicates the portal name
+         of the active portal.
+
+         This value is only applicable when tmnxWppPGHostStatus is
+         'authenticating' or 'loggingOut'."
+    ::= { tmnxWppPGHostEntry 16 }
+
+tmnxWppPGSessTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxWppPGSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxWppPGSessTable contains status information about WPP portal
+         group sessions."
+    ::= { tmnxWppObjs 9 }
+
+tmnxWppPGSessEntry               OBJECT-TYPE
+    SYNTAX      TmnxWppPGSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a particular WPP
+         portal group session.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       {
+        tmnxWppPortalGroupName,
+        tmnxSubIpoeIndex
+    }
+    ::= { tmnxWppPGSessTable 1 }
+
+TmnxWppPGSessEntry               ::= SEQUENCE
+{
+    tmnxWppPGSessStatus              INTEGER,
+    tmnxWppPGSessSerialNumber        Unsigned32,
+    tmnxWppPGSessRequestId           Unsigned32,
+    tmnxWppPGSessPortalRemotePort    InetPortNumber,
+    tmnxWppPGSessPortalLclIpAddrType InetAddressType,
+    tmnxWppPGSessPortalLclIpAddr     InetAddress,
+    tmnxWppPGSessUserName            TmnxWppUserName,
+    tmnxWppPGSessService             TmnxServId,
+    tmnxWppPGSessMacAddress          MacAddress,
+    tmnxWppPGSessIsTriggered         TruthValue,
+    tmnxWppPGSessTrackSrrpInst       Unsigned32,
+    tmnxWppPGSessIsMCBackup          TruthValue,
+    tmnxWppPGSessActivePortalRouter  TmnxVRtrIDOrZero,
+    tmnxWppPGSessActivePortalName    TNamedItemOrEmpty,
+    tmnxWppPGSessClientAddrType      InetAddressType,
+    tmnxWppPGSessClientAddr          InetAddress
+}
+
+tmnxWppPGSessStatus              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle           (1),
+        challenged     (2),
+        authenticating (3),
+        authenticated  (4),
+        established    (5),
+        loggingOut     (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessStatus indicates the state of the WPP portal
+         group session."
+    ::= { tmnxWppPGSessEntry 1 }
+
+tmnxWppPGSessSerialNumber        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessSerialNumber indicates the serial number of
+         the WPP portal group session.
+
+         The value zero indicates that the serial number is unknown or
+         irrelevant."
+    ::= { tmnxWppPGSessEntry 2 }
+
+tmnxWppPGSessRequestId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessRequestId indicates the request ID of the
+         WPP portal group session.
+
+         The value zero indicates that the request ID is unknown or irrelevant."
+    ::= { tmnxWppPGSessEntry 3 }
+
+tmnxWppPGSessPortalRemotePort    OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessPortalRemotePort indicates the UDP source
+         port used by the portal group while sending WPP protocol messages
+         about this session to this system.
+
+         The value zero indicates that the port is not yet known."
+    ::= { tmnxWppPGSessEntry 4 }
+
+tmnxWppPGSessPortalLclIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessPortalLclIpAddrType indicates the address
+         type of tmnxWppPGSessPortalLclIpAddr."
+    ::= { tmnxWppPGSessEntry 5 }
+
+tmnxWppPGSessPortalLclIpAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessPortalLclIpAddr indicates the destination IP
+         address used by the portal while sending WPP protocol messages about
+         this session to this system."
+    ::= { tmnxWppPGSessEntry 6 }
+
+tmnxWppPGSessUserName            OBJECT-TYPE
+    SYNTAX      TmnxWppUserName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessUserName indicates the WPP user name of this
+         WPP portal group session."
+    ::= { tmnxWppPGSessEntry 7 }
+
+tmnxWppPGSessService             OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessService indicates the service ID of the
+         service to which this WPP portal group session belongs."
+    ::= { tmnxWppPGSessEntry 8 }
+
+tmnxWppPGSessMacAddress          OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessMacAddress indicates the MAC address of this
+         WPP portal group session."
+    ::= { tmnxWppPGSessEntry 9 }
+
+tmnxWppPGSessIsTriggered         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessIsTriggered indicates whether the creation
+         of the session is triggered by the portal group.
+
+         If the session creation is not triggered by the portal group, the
+         tmnxWppPGSessIsTriggered value is FALSE."
+    ::= { tmnxWppPGSessEntry 10 }
+
+tmnxWppPGSessTrackSrrpInst       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessTrackSrrpInst indicates the SRRP instance
+         whose state is tracked by this WPP portal group session to determine
+         if it is on the MCS master or backup node."
+    ::= { tmnxWppPGSessEntry 11 }
+
+tmnxWppPGSessIsMCBackup          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessIsMCBackup indicates whether the WPP portal
+         group session is on the MCS backup node or not."
+    ::= { tmnxWppPGSessEntry 12 }
+
+tmnxWppPGSessActivePortalRouter  OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessActivePortalRouter indicates the router of
+         the active portal.
+
+         This value is only applicable when tmnxWppPGSessStatus is
+         'authenticating' or 'loggingOut'."
+    ::= { tmnxWppPGSessEntry 13 }
+
+tmnxWppPGSessActivePortalName    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessActivePortalName indicates the portal name
+         of the active portal.
+
+         This value is only applicable when tmnxWppPGSessStatus is
+         'authenticating' or 'loggingOut'."
+    ::= { tmnxWppPGSessEntry 14 }
+
+tmnxWppPGSessClientAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessClientAddrType specifies the address type of
+         tmnxWppPGSessClientAddr."
+    ::= { tmnxWppPGSessEntry 15 }
+
+tmnxWppPGSessClientAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppPGSessClientAddr specifies the source address the
+         client used to contact the WPP portal."
+    ::= { tmnxWppPGSessEntry 16 }
+
+tmnxWppSysObjs                   OBJECT IDENTIFIER ::= { tmnxWppObjs 99 }
+
+tmnxWppSysName                   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxWppSysName specifies the system name to be used in
+         WPP messages."
+    DEFVAL      { "" }
+    ::= { tmnxWppSysObjs 1 }
+
+tmnxWppTableLastCh               OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppTableLastCh indicates the value of
+         sysUpTime at the time of the last modification of an entry in the
+         tmnxWppTable."
+    ::= { tmnxWppObjs 100 }
+
+tmnxWppPortalTableLastCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppPortalTableLastCh indicates the value
+         of sysUpTime at the time of the last modification of an entry in the
+         tmnxWppPortalTable."
+    ::= { tmnxWppObjs 101 }
+
+tmnxWppIfTableLastCh             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxWppIfTableLastCh indicates the value of
+         sysUpTime at the time of the last modification of an entry in the
+         tmnxWppIfTable."
+    ::= { tmnxWppObjs 102 }
+
+tmnxWppNotificationObjs          OBJECT IDENTIFIER ::= { tmnxWpp 2 }
+
+tmnxWppNotifyDescription         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxWppNotifyDescription is a printable character string."
+    ::= { tmnxWppNotificationObjs 1 }
+
+tmnxWppConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 80 }
+
+tmnxWppCompliances               OBJECT IDENTIFIER ::= { tmnxWppConformance 1 }
+
+tmnxWppCompliance                MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Web Portal Protocol on
+         Nokia 7xxx series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxWppGroup
+        }
+    ::= { tmnxWppCompliances 1 }
+
+tmnxWppNotifyCompliance          MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for Web Portal Protocol notifications on
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxWppNotifyGroup
+        }
+    ::= { tmnxWppCompliances 2 }
+
+tmnxWppV12v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Web Portal Protocol on
+         Nokia 7xxx series systems in release 12.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxWppGroup,
+            tmnxWppV12v0Group,
+            tmnxWppNtfLogoutGroup,
+            tmnxWppNotifyGroup
+        }
+    ::= { tmnxWppCompliances 3 }
+
+tmnxWppV15v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Web Portal Protocol on
+         Nokia 7xxx series systems in release 15.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxWppGroup,
+            tmnxWppV12v0Group,
+            tmnxWppV15v0Group,
+            tmnxWppNtfLogoutGroup,
+            tmnxWppNotifyGroup
+        }
+    ::= { tmnxWppCompliances 4 }
+
+tmnxWppV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Web Portal Protocol on
+         Nokia 7xxx series systems in release 20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxWppV20v0Group,
+            tmnxWppNotifyV16v0Group
+        }
+    ::= { tmnxWppCompliances 5 }
+
+tmnxWppGroups                    OBJECT IDENTIFIER ::= { tmnxWppConformance 2 }
+
+tmnxWppGroup                     OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppRowStatus,
+        tmnxWppLastCh,
+        tmnxWppAdminState,
+        tmnxWppStatsName,
+        tmnxWppStatsVal,
+        tmnxWppPortalLastCh,
+        tmnxWppPortalRowStatus,
+        tmnxWppPortalAddrType,
+        tmnxWppPortalAddr,
+        tmnxWppPortalAdminState,
+        tmnxWppPortalStateControlledRtr,
+        tmnxWppPortalStateNumInterfaces,
+        tmnxWppPortalStatsName,
+        tmnxWppPortalStatsVal,
+        tmnxWppHostStatus,
+        tmnxWppHostSerialNumber,
+        tmnxWppHostRequestId,
+        tmnxWppHostPortalRemotePort,
+        tmnxWppHostPortalLclIpAddrType,
+        tmnxWppHostPortalLclIpAddr,
+        tmnxWppHostUserName,
+        tmnxWppHostService,
+        tmnxWppHostMacAddress,
+        tmnxWppIfLastCh,
+        tmnxWppIfRowStatus,
+        tmnxWppIfAdminState,
+        tmnxWppIfPortalRouter,
+        tmnxWppIfPortalName,
+        tmnxWppIfSubProfile,
+        tmnxWppIfSLAProfile,
+        tmnxWppIfAppProfile,
+        tmnxWppIfRestoreDisconnected,
+        tmnxWppTableLastCh,
+        tmnxWppPortalTableLastCh,
+        tmnxWppIfTableLastCh
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the management of the Web Portal Protocol
+         (WPP) on Nokia SROS series systems."
+    ::= { tmnxWppGroups 1 }
+
+tmnxWppV12v0Group                OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppPortalSecret,
+        tmnxWppPortalVersion,
+        tmnxWppIfUserDb,
+        tmnxWppIfLeaseTime,
+        tmnxWppIfEnableTriggeredHosts,
+        tmnxWppHostIsTriggered,
+        tmnxWppPortalStateTriggeredHosts,
+        tmnxWppHostTrackSrrpInst,
+        tmnxWppHostIsMCBackup
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects for the management of the Web Portal
+         Protocol (WPP) on Nokia SROS release 12.0 series systems."
+    ::= { tmnxWppGroups 2 }
+
+tmnxWppNtfLogoutGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppPortalRetryInterval,
+        tmnxWppPortalNtfLogoutRetries,
+        tmnxWppPortalAckAuthRetries
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects for the management of the Web Portal
+         Protocol (WPP) on Nokia SROS release 12.0 series systems."
+    ::= { tmnxWppGroups 3 }
+
+tmnxWppV15v0Group                OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppPortalGroupLastCh,
+        tmnxWppPortalGroupRowStatus,
+        tmnxWppPortalGroupDescription,
+        tmnxWppPortalGroupAdminState,
+        tmnxWppPortalGroupPortalLastCh,
+        tmnxWppPortalGroupPortalRowStat,
+        tmnxWppIfPortalGroupName,
+        tmnxWppPortalGroupStateContrRtr,
+        tmnxWppPortalGroupStateNumItfs,
+        tmnxWppPortalGroupStateTrigHosts,
+        tmnxWppPGHostStatus,
+        tmnxWppPGHostSerialNumber,
+        tmnxWppPGHostRequestId,
+        tmnxWppPGHostPortalRemotePort,
+        tmnxWppPGHostPortalLclIpAddrType,
+        tmnxWppPGHostPortalLclIpAddr,
+        tmnxWppPGHostUserName,
+        tmnxWppPGHostService,
+        tmnxWppPGHostMacAddress,
+        tmnxWppPGHostIsTriggered,
+        tmnxWppPGHostTrackSrrpInst,
+        tmnxWppPGHostIsMCBackup,
+        tmnxWppPGHostActivePortalRouter,
+        tmnxWppPGHostActivePortalName,
+        tmnxWppPortalAckInfoPortFormat,
+        tmnxWppSysName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects for the management of the Web Portal
+         Protocol (WPP) on Nokia SROS release 15.0 series systems."
+    ::= { tmnxWppGroups 4 }
+
+tmnxWppV20v0Group                OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppSessStatus,
+        tmnxWppSessSerialNumber,
+        tmnxWppSessRequestId,
+        tmnxWppSessPortalRemotePort,
+        tmnxWppSessPortalLclIpAddrType,
+        tmnxWppSessPortalLclIpAddr,
+        tmnxWppSessUserName,
+        tmnxWppSessService,
+        tmnxWppSessMacAddress,
+        tmnxWppSessIsTriggered,
+        tmnxWppSessTrackSrrpInst,
+        tmnxWppSessIsMCBackup,
+        tmnxWppSessClientAddrType,
+        tmnxWppSessClientAddr,
+        tmnxWppPGSessStatus,
+        tmnxWppPGSessSerialNumber,
+        tmnxWppPGSessRequestId,
+        tmnxWppPGSessPortalRemotePort,
+        tmnxWppPGSessPortalLclIpAddrType,
+        tmnxWppPGSessPortalLclIpAddr,
+        tmnxWppPGSessUserName,
+        tmnxWppPGSessService,
+        tmnxWppPGSessMacAddress,
+        tmnxWppPGSessIsTriggered,
+        tmnxWppPGSessTrackSrrpInst,
+        tmnxWppPGSessIsMCBackup,
+        tmnxWppPGSessActivePortalRouter,
+        tmnxWppPGSessActivePortalName,
+        tmnxWppPGSessClientAddrType,
+        tmnxWppPGSessClientAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects for the management of the Web Portal
+         Protocol (WPP) on Nokia SROS release 20.0 series systems."
+    ::= { tmnxWppGroups 5 }
+
+tmnxWppNotifyObjsGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxWppNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting NAT notifications on
+         Nokia SROS series systems."
+    ::= { tmnxWppGroups 99 }
+
+tmnxWppNotifyGroup               NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxWppPortalStatChanged,
+        tmnxWppHostAuthenticationFailed,
+        tmnxWppPortalUnreachable,
+        tmnxWppPortalGroupStatChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting WPP on Nokia SROS series
+         systems."
+    ::= { tmnxWppGroups 100 }
+
+tmnxWppNotifyV16v0Group          NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxWppPGHostAuthFailed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting WPP on Nokia SROS series systems
+         added in release 16.0."
+    ::= { tmnxWppGroups 101 }
+
+tmnxWppNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 80 }
+
+tmnxWppNotifications             OBJECT IDENTIFIER ::= { tmnxWppNotifyPrefix 0 }
+
+tmnxWppPortalStatChanged         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxWppPortalStateControlledRtr,
+        tmnxWppPortalStateNumInterfaces
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxWppPortalStatChanged notification is sent when the
+         value of one of the objects in the tmnxWppPortalStatTable changes.
+         [EFFECT] No effect on the service. [RECOVERY] No recovery required."
+    ::= { tmnxWppNotifications 1 }
+
+tmnxWppHostAuthenticationFailed  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxWppHostStatus,
+        tmnxWppNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxWppHostAuthenticationFailed notification is sent when
+         a WPP host could not be authenticated.
+
+         More detailed information is supplied in the object
+         tmnxWppNotifyDescription.
+
+         [EFFECT] The corresponding row in the tmnxWppHostTable disappears if
+         the value of the object tmnxWppIfRestoreDisconnected is equal to
+         'false'; otherwise, the value of the object tmnxWppHostStatus is set
+         to 'idle'.
+
+         [RECOVERY] The recovery action will depend on the exact failure cause,
+         as given by the value of tmnxWppNotifyDescription."
+    ::= { tmnxWppNotifications 2 }
+
+tmnxWppPortalUnreachable         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxWppPortalLastCh,
+        tmnxWppNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxWppPortalUnreachable notification is generated when
+         WPP protocol messages must be sent out after a node is restarted, but
+         when no route is available yet towards it. This notification is sent
+         every minute as long as the portal is not reachable yet.
+
+         [EFFECT] The WPP portal is unreachable and finally the messages will
+         be dropped.
+
+         [RECOVERY] Initially no recovery is required as it is expected that
+         the WPP portal can be unreachable for some time after a node restart.
+         When however the problem remains the operator should check the routing
+         table."
+    ::= { tmnxWppNotifications 3 }
+
+tmnxWppPortalGroupStatChanged    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxWppPortalGroupStateContrRtr,
+        tmnxWppPortalGroupStateNumItfs
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxWppPortalGroupStatChanged notification is sent when
+         the value of one of the objects in the tmnxWppPortalGroupStatTable
+         changes. [EFFECT] No effect on the service. [RECOVERY] No recovery
+         required."
+    ::= { tmnxWppNotifications 4 }
+
+tmnxWppPGHostAuthFailed          NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxWppPGHostStatus,
+        tmnxWppNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxWppPGHostAuthFailed notification is sent when a WPP
+         host could not be authenticated.
+
+         More detailed information is supplied in the object
+         tmnxWppNotifyDescription.
+
+         [EFFECT] The corresponding row in the tmnxWppPGHostTable disappears if
+         the value of the object tmnxWppIfRestoreDisconnected is equal to
+         'false'; otherwise, the value of the object tmnxWppPGHostStatus is set
+         to 'idle'.
+
+         [RECOVERY] The recovery action will depend on the exact failure cause,
+         as given by the value of tmnxWppNotifyDescription."
+    ::= { tmnxWppNotifications 5 }
+
+END

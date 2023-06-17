@@ -1,0 +1,4288 @@
+TIMETRA-PIM-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    vxlanVNI, vxlanVTEPAddr
+                                                         FROM ALCATEL-IGMP-SNOOPING-MIB
+    InterfaceIndexOrZero
+                                                         FROM IF-MIB
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Gauge32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    tmnxCardHwIndex
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    vRtrPimNgAFGenAFType
+                                                         FROM TIMETRA-PIM-NG-MIB
+    svcId
+                                                         FROM TIMETRA-SERV-MIB
+    ServiceOperStatus, TNamedItemOrEmpty,
+    TmnxAdminState, TmnxEncapVal, TmnxPortID
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID, vRtrIfIndex
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraPimSnoopingMIBModule      MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         extensions to the PIM snooping feature protocol for the Nokia SROS
+         device.
+
+         Copyright 2008-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0               01 Jan 2017 00:00
+         15.0 release of the TIMETRA-PIM-SNOOPING-MIB."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               01 Jan 2016 00:00
+         14.0 release of the TIMETRA-PIM-SNOOPING-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               01 Jan 2015 00:00
+         13.0 release of the TIMETRA-PIM-SNOOPING-MIB."
+
+    REVISION    "200902280000Z"
+    DESCRIPTION
+        "Rev 7.0                28 Feb 2009 00:00
+         7.0 release of the TIMETRA-PIM-SNOOPING-MIB."
+
+    REVISION    "200801010000Z"
+    DESCRIPTION
+        "Rev 0.1                01 Jan 2008 00:00
+         Initial version of the TIMETRA-PIM-SNOOPING-MIB."
+
+    ::= { timetraSRMIBModules 53 }
+
+TmnxPimSnpgOperState             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxPimSnpgOperState data type is an enumerated integer that
+         describes the values used to identify the operational state."
+    SYNTAX      INTEGER {
+        down  (1),
+        snoop (2),
+        proxy (3)
+    }
+
+tmnxPimSnpgObjs                  OBJECT IDENTIFIER ::= { tmnxSRObjs 53 }
+
+tmnxPimSnpgProtocolObjs          OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 1 }
+
+tmnxPimSnpgGenTableLstChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenTableLstChanged indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPimSnpgGeneralTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPimSnpgProtocolObjs 1 }
+
+tmnxPimSnpgGeneralTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPimSnpgGeneralTable contains objects for general control and
+         management of the PIM protocol instance within a virtual router."
+    ::= { tmnxPimSnpgProtocolObjs 2 }
+
+tmnxPimSnpgGeneralEntry          OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an instance of the PIM snooping running
+         within a virtual router. An entry in this table can be created or
+         destroyed by an SNMP SET request to tmnxPimSnpgGenRowStatus."
+    INDEX       {
+        svcId,
+        vRtrPimNgAFGenAFType
+    }
+    ::= { tmnxPimSnpgGeneralTable 1 }
+
+TmnxPimSnpgGeneralEntry          ::= SEQUENCE
+{
+    tmnxPimSnpgGenRowStatus          RowStatus,
+    tmnxPimSnpgGenRowLastChanged     TimeStamp,
+    tmnxPimSnpgGenAdminState         TmnxAdminState,
+    tmnxPimSnpgGenOperState          TmnxPimSnpgOperState,
+    tmnxPimSnpgGenHoldTime           Unsigned32,
+    tmnxPimSnpgGenDRType             InetAddressType,
+    tmnxPimSnpgGenDR                 InetAddress,
+    tmnxPimSnpgGenTrackingSupport    TruthValue,
+    tmnxPimSnpgGenUpTime             Unsigned32,
+    tmnxPimSnpgGenMode               INTEGER,
+    tmnxPimSnpgGenGroupPolicy1       TNamedItemOrEmpty,
+    tmnxPimSnpgGenGroupPolicy2       TNamedItemOrEmpty,
+    tmnxPimSnpgGenGroupPolicy3       TNamedItemOrEmpty,
+    tmnxPimSnpgGenGroupPolicy4       TNamedItemOrEmpty,
+    tmnxPimSnpgGenGroupPolicy5       TNamedItemOrEmpty,
+    tmnxPimSnpgNbrCount              Unsigned32
+}
+
+tmnxPimSnpgGenRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenRowStatus is used to create or delete an
+         entry in this table."
+    ::= { tmnxPimSnpgGeneralEntry 1 }
+
+tmnxPimSnpgGenRowLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenRowLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { tmnxPimSnpgGeneralEntry 2 }
+
+tmnxPimSnpgGenAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenAdminState specifies the current
+         administrative state of this PIM snooping protocol instance on this
+         virtual router.
+
+         If the value of tmnxPimSnpgGenAdminState is 'inService', PIM snooping
+         is enabled."
+    DEFVAL      { inService }
+    ::= { tmnxPimSnpgGeneralEntry 3 }
+
+tmnxPimSnpgGenOperState          OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenOperState indicates the current operational
+         state of this PIM snooping protocol instance on this virtual router."
+    DEFVAL      { down }
+    ::= { tmnxPimSnpgGeneralEntry 4 }
+
+tmnxPimSnpgGenHoldTime           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenHoldTime specifies the duration that allows
+         the PIM-snooping switch to snoop all the PIM states in the VPLS.
+
+         During this duration, multicast traffic is flooded in the VPLS. At the
+         end of this duration, multicast traffic is forwarded using the snooped
+         states.
+
+         PIM snooping is enabled when value of tmnxPimSnpgGenAdminState is
+         'inService'. When PIM snooping is enabled in VPLS, there is a period
+         of time when the PIM snooping switch may not have built complete
+         snooping state. The switch cannot build states until the routers
+         connected to the VPLS refresh their PIM messages. The value of
+         tmnxPimSnpgGenHoldTime is in effect only if PIM snooping is enabled."
+    DEFVAL      { 90 }
+    ::= { tmnxPimSnpgGeneralEntry 5 }
+
+tmnxPimSnpgGenDRType             OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenDRType indicates the type of the address of
+         the designated Router."
+    ::= { tmnxPimSnpgGeneralEntry 6 }
+
+tmnxPimSnpgGenDR                 OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenDR indicates the address of the designated
+         router."
+    ::= { tmnxPimSnpgGeneralEntry 7 }
+
+tmnxPimSnpgGenTrackingSupport    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenTrackingSupport indicates the router's
+         capability to disable Join message suppression.
+
+         The value of tmnxPimSnpgGenTrackingSupport is 'true' if all CE routers
+         advertise tracking support in the PIM Hellos they send. If one or more
+         CE routers does not advertise tracking support in the PIM Hellos they
+         send, then the value of tmnxPimSnpgGenTrackingSupport is set to
+         'false'. If the value of tmnxPimSnpgGenTrackingSupport is 'true', then
+         it implies Join Suppression is disabled in the VPLS; and vice versa.
+         This is used to determine the operational state of
+         tmnxPimSnpgGenOperState. If the value of tmnxPimSnpgGenTrackingSupport
+         is 'true', then the value of tmnxPimSnpgGenOperState is 'snoop',
+         otherwise it is 'proxy'."
+    ::= { tmnxPimSnpgGeneralEntry 8 }
+
+tmnxPimSnpgGenUpTime             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenUpTime indicates the time elapsed since PIM
+         snooping was enabled on this router instance."
+    ::= { tmnxPimSnpgGeneralEntry 9 }
+
+tmnxPimSnpgGenMode               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        proxy (1),
+        snoop (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenMode specifies PIM snooping mode. Only if
+         the value of tmnxPimSnpgGenMode is 'snoop', PIM snooping is in a
+         snooping mode else it is in proxy mode."
+    DEFVAL      { proxy }
+    ::= { tmnxPimSnpgGeneralEntry 10 }
+
+tmnxPimSnpgGenGroupPolicy1       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenGroupPolicy1 specifies the first group
+         policy name to be used for PIM snooping or PIM proxy.
+
+         The group policy name list, tmnxPimSnpgGenGroupPolicy1
+         through tmnxPimSnpgGenGroupPolicy5, is handled by the SNMP
+         agent as a single entity.  When an SNMP SET request is received
+         to modify one or more of the policy names, all the policy
+         variables are first set to the empty string, ''H, and then the
+         new names are set into the specified policy variables within a
+         single SNMP SET PDU."
+    DEFVAL      { ''H }
+    ::= { tmnxPimSnpgGeneralEntry 11 }
+
+tmnxPimSnpgGenGroupPolicy2       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenGroupPolicy2 specifies the second group
+         policy name to be used for PIM snooping or PIM proxy.
+
+         The group policy name list, tmnxPimSnpgGenGroupPolicy1
+         through tmnxPimSnpgGenGroupPolicy5, is handled by the SNMP
+         agent as a single entity.  When an SNMP SET request is received
+         to modify one or more of the policy names, all the policy
+         variables are first set to the empty string, ''H, and then the
+         new names are set into the specified policy variables within a
+         single SNMP SET PDU."
+    DEFVAL      { ''H }
+    ::= { tmnxPimSnpgGeneralEntry 12 }
+
+tmnxPimSnpgGenGroupPolicy3       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenGroupPolicy3 specifies the third group
+         policy name to be used for PIM snooping or PIM proxy.
+
+         The group policy name list, tmnxPimSnpgGenGroupPolicy1
+         through tmnxPimSnpgGenGroupPolicy5, is handled by the SNMP
+         agent as a single entity.  When an SNMP SET request is received
+         to modify one or more of the policy names, all the policy
+         variables are first set to the empty string, ''H, and then the
+         new names are set into the specified policy variables within a
+         single SNMP SET PDU."
+    DEFVAL      { ''H }
+    ::= { tmnxPimSnpgGeneralEntry 13 }
+
+tmnxPimSnpgGenGroupPolicy4       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenGroupPolicy4 specifies the fourth group
+         policy name to be used for PIM snooping or PIM proxy.
+
+         The group policy name list, tmnxPimSnpgGenGroupPolicy1
+         through tmnxPimSnpgGenGroupPolicy5, is handled by the SNMP
+         agent as a single entity.  When an SNMP SET request is received
+         to modify one or more of the policy names, all the policy
+         variables are first set to the empty string, ''H, and then the
+         new names are set into the specified policy variables within a
+         single SNMP SET PDU."
+    DEFVAL      { ''H }
+    ::= { tmnxPimSnpgGeneralEntry 14 }
+
+tmnxPimSnpgGenGroupPolicy5       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenGroupPolicy5 specifies the fifth group
+         policy name to be used for PIM snooping or PIM proxy.
+
+         The group policy name list, tmnxPimSnpgGenGroupPolicy1
+         through tmnxPimSnpgGenGroupPolicy5, is handled by the SNMP
+         agent as a single entity.  When an SNMP SET request is received
+         to modify one or more of the policy names, all the policy
+         variables are first set to the empty string, ''H, and then the
+         new names are set into the specified policy variables within a
+         single SNMP SET PDU."
+    DEFVAL      { ''H }
+    ::= { tmnxPimSnpgGeneralEntry 15 }
+
+tmnxPimSnpgNbrCount              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgNbrCount indicates the number of neighbors
+         attached to the instance."
+    ::= { tmnxPimSnpgGeneralEntry 16 }
+
+tmnxPimSnpgGrpSrcTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the IP multicast sources corresponding to the IP
+         multicast groups. This table represents the global PIM snooping
+         source, group database."
+    ::= { tmnxPimSnpgProtocolObjs 3 }
+
+tmnxPimSnpgGrpSrcEntry           OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgGrpSrcTable. Each entry represents a source
+         address from which receivers are interested or not interested in
+         receiving multicast traffic."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgGrpSrcGrpAddrType,
+        tmnxPimSnpgGrpSrcGroupAddress,
+        tmnxPimSnpgGrpSrcSrcAddrType,
+        tmnxPimSnpgGrpSrcSourceAddress
+    }
+    ::= { tmnxPimSnpgGrpSrcTable 1 }
+
+TmnxPimSnpgGrpSrcEntry           ::= SEQUENCE
+{
+    tmnxPimSnpgGrpSrcGrpAddrType     InetAddressType,
+    tmnxPimSnpgGrpSrcGroupAddress    InetAddress,
+    tmnxPimSnpgGrpSrcSrcAddrType     InetAddressType,
+    tmnxPimSnpgGrpSrcSourceAddress   InetAddress,
+    tmnxPimSnpgGrpSrcRpfNbrAddrType  InetAddressType,
+    tmnxPimSnpgGrpSrcRpfNbrAddr      InetAddress,
+    tmnxPimSnpgGrpSrcRpfIfIndex      InterfaceIndexOrZero,
+    tmnxPimSnpgGrpSrcRptRpfNbrAdrTp  InetAddressType,
+    tmnxPimSnpgGrpSrcRptRpfNbrAddr   InetAddress,
+    tmnxPimSnpgGrpSrcUstrmJpState    INTEGER,
+    tmnxPimSnpgGrpSrcUstrmJpTimer    Unsigned32,
+    tmnxPimSnpgGrpSrcUstrmRptJpSt    INTEGER,
+    tmnxPimSnpgGrpSrcUstrmRptOvdTmr  Unsigned32,
+    tmnxPimSnpgGrpSrcNumJoinOif      Gauge32,
+    tmnxPimSnpgGrpSrcNumImdiateOif   Gauge32,
+    tmnxPimSnpgGrpSrcNumInhritedOif  Gauge32,
+    tmnxPimSnpgGrpSrcNumInherRptOif  Gauge32,
+    tmnxPimSnpgGrpSrcNumIif          Gauge32,
+    tmnxPimSnpgGrpSrcUpTime          Unsigned32
+}
+
+tmnxPimSnpgGrpSrcGrpAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcGrpAddrType indicates the type of IP
+         multicast group address represented by tmnxPimSnpgGrpSrcGroupAddress."
+    ::= { tmnxPimSnpgGrpSrcEntry 1 }
+
+tmnxPimSnpgGrpSrcGroupAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcGroupAddress indicates the IP multicast
+         group address for which this entry contains information."
+    ::= { tmnxPimSnpgGrpSrcEntry 2 }
+
+tmnxPimSnpgGrpSrcSrcAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcSrcAddrType indicates the type of IP
+         multicast source address represented by
+         tmnxPimSnpgGrpSrcSourceAddress."
+    ::= { tmnxPimSnpgGrpSrcEntry 3 }
+
+tmnxPimSnpgGrpSrcSourceAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcSourceAddress indicates the source
+         address for which this entry contains information."
+    ::= { tmnxPimSnpgGrpSrcEntry 4 }
+
+tmnxPimSnpgGrpSrcRpfNbrAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcRpfNbrAddrType indicates the type of the
+         address of the Reverse Path Forwarding (RPF) neighbor."
+    ::= { tmnxPimSnpgGrpSrcEntry 5 }
+
+tmnxPimSnpgGrpSrcRpfNbrAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcRpfNbrAddr indicates the address of the
+         RPF neighbor."
+    ::= { tmnxPimSnpgGrpSrcEntry 6 }
+
+tmnxPimSnpgGrpSrcRpfIfIndex      OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcRpfIfIndex indicates the router's
+         interface index on which the RPF neighbor exists."
+    ::= { tmnxPimSnpgGrpSrcEntry 7 }
+
+tmnxPimSnpgGrpSrcRptRpfNbrAdrTp  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcRptRpfNbrAdrTp indicates the type of
+         address of the RPF neighbor on the RPT."
+    ::= { tmnxPimSnpgGrpSrcEntry 8 }
+
+tmnxPimSnpgGrpSrcRptRpfNbrAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcRptRpfNbrAddr indicates the address of
+         the RPF neighbor on the RPT."
+    ::= { tmnxPimSnpgGrpSrcEntry 9 }
+
+tmnxPimSnpgGrpSrcUstrmJpState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no-info    (0),
+        joined     (1),
+        prune-pend (2),
+        pruned     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcUstrmJpState indicates the upstream
+         Join-Prune state."
+    ::= { tmnxPimSnpgGrpSrcEntry 10 }
+
+tmnxPimSnpgGrpSrcUstrmJpTimer    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcUstrmJpTimer indicates the time
+         remaining before the router sends another Join message to it's
+         upstream neighbor."
+    ::= { tmnxPimSnpgGrpSrcEntry 11 }
+
+tmnxPimSnpgGrpSrcUstrmRptJpSt    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notJoinedStarG (0),
+        notPruned      (1),
+        pruned         (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcUstrmRptJpSt indicates the upstream RPT
+         Join-Prune state. (S,G,rpt) Joins and Prunes are (S,G) Joins or Prunes
+         sent on the RP tree with the RPT bit set, either to modify the results
+         of (*,G) Joins, or to override the behavior of other upstream LAN
+         peers."
+    ::= { tmnxPimSnpgGrpSrcEntry 12 }
+
+tmnxPimSnpgGrpSrcUstrmRptOvdTmr  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcUstrmRptOvdTmr indicates the delay to
+         triggered Join(S,G,rpt) messages to prevent implosions of triggered
+         messages.
+
+         If tmnxPimSnpgGrpSrcUstrmRptOvdTmr has a non-zero value, it means that
+         the router was in 'notPruned' state and it saw a Prune(S,G,rpt)
+         message being sent to RPF'(S,G,rpt).
+
+         If the router sees a Join(S,G,rpt) override message being sent by some
+         other router on the LAN while the timer is still non-zero, it simply
+         cancels the override timer. If it does not see a Join(S,G,rpt)
+         message, then on expiry of the override timer, it sends it's own
+         Join(S,G,rpt) message to RPF'(S,G,rpt). A similar scenario exists when
+         RPF'(S,G,rpt) changes to become equal to RPF'(*,G)."
+    ::= { tmnxPimSnpgGrpSrcEntry 13 }
+
+tmnxPimSnpgGrpSrcNumJoinOif      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcNumJoinOif indicates the number of
+         interfaces on which the router received a Join or Prune message for
+         this source group combination."
+    ::= { tmnxPimSnpgGrpSrcEntry 14 }
+
+tmnxPimSnpgGrpSrcNumImdiateOif   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcNumImdiateOif indicates the number of
+         interfaces in the immediate outgoing interface list."
+    ::= { tmnxPimSnpgGrpSrcEntry 15 }
+
+tmnxPimSnpgGrpSrcNumInhritedOif  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcNumInhritedOif indicates the number of
+         interfaces in the inherited outgoing interface list."
+    ::= { tmnxPimSnpgGrpSrcEntry 16 }
+
+tmnxPimSnpgGrpSrcNumInherRptOif  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcNumInherRptOif indicates the number of
+         interfaces in the inherited outgoing interface list for (S,G,Rpt)."
+    ::= { tmnxPimSnpgGrpSrcEntry 17 }
+
+tmnxPimSnpgGrpSrcNumIif          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcNumIif indicates the number of
+         interfaces on which the router received messages for this source group
+         combination."
+    ::= { tmnxPimSnpgGrpSrcEntry 18 }
+
+tmnxPimSnpgGrpSrcUpTime          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcUpTime indicates the time since this
+         source group entry got created."
+    ::= { tmnxPimSnpgGrpSrcEntry 19 }
+
+tmnxPimSnpgGrpSrcIfTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists the PIM snooping enabled interfaces for an entry in
+         tmnxPimSnpgGrpSrcTable."
+    ::= { tmnxPimSnpgProtocolObjs 4 }
+
+tmnxPimSnpgGrpSrcIfEntry         OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgGrpSrcIfTable. Each entry represents the
+         state of the PIM enabled interface for every tmnxPimSnpgGrpSrcEntry."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgGrpSrcGrpAddrType,
+        tmnxPimSnpgGrpSrcGroupAddress,
+        tmnxPimSnpgGrpSrcSrcAddrType,
+        tmnxPimSnpgGrpSrcSourceAddress,
+        tmnxPimSnpgPortId,
+        tmnxPimSnpgEncapValue
+    }
+    ::= { tmnxPimSnpgGrpSrcIfTable 1 }
+
+TmnxPimSnpgGrpSrcIfEntry         ::= SEQUENCE
+{
+    tmnxPimSnpgPortId                TmnxPortID,
+    tmnxPimSnpgEncapValue            TmnxEncapVal,
+    tmnxPimSnpgGrpSrcIfFlags         BITS
+}
+
+tmnxPimSnpgPortId                OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgPortId along with value of
+         tmnxPimSnpgEncapValue indicates the sap-id or sdp-id."
+    ::= { tmnxPimSnpgGrpSrcIfEntry 1 }
+
+tmnxPimSnpgEncapValue            OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgEncapValue along with value of
+         tmnxPimSnpgPortId indicates the sap-id or sdp-id."
+    ::= { tmnxPimSnpgGrpSrcIfEntry 2 }
+
+tmnxPimSnpgGrpSrcIfFlags         OBJECT-TYPE
+    SYNTAX      BITS {
+        immediateOifList    (0),
+        inheritedOifList    (1),
+        inheritedRptOifList (2),
+        joined              (3),
+        rpfPort             (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcIfFlags indicates the different lists
+         that this interface belongs to."
+    ::= { tmnxPimSnpgGrpSrcIfEntry 3 }
+
+tmnxPimSnpgGenStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgGenStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxPimSnpgGenStatsTable lists PIM snooping statistics for a
+         particular PIM snooping instance."
+    ::= { tmnxPimSnpgProtocolObjs 5 }
+
+tmnxPimSnpgGenStatsEntry         OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgGenStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgGenStatsTable."
+    AUGMENTS    { tmnxPimSnpgGeneralEntry }
+    ::= { tmnxPimSnpgGenStatsTable 1 }
+
+TmnxPimSnpgGenStatsEntry         ::= SEQUENCE
+{
+    tmnxPimSnpgGenStatsStarGTypes    Gauge32,
+    tmnxPimSnpgGenStatsSGTypes       Gauge32
+}
+
+tmnxPimSnpgGenStatsStarGTypes    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenStatsStarGTypes indicates the number of
+         entries in tmnxPimSnpgGrpSrcTable for which the source type is
+         'starG'."
+    ::= { tmnxPimSnpgGenStatsEntry 1 }
+
+tmnxPimSnpgGenStatsSGTypes       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGenStatsSGTypes indicates the number of
+         entries in tmnxPimSnpgGrpSrcTable for which the source type is 'sg'."
+    ::= { tmnxPimSnpgGenStatsEntry 2 }
+
+tmnxPimSnpgGrpSrcStatsTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgGrpSrcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxPimSnpgGrpSrcStatsTable contains statistics for the entries in the
+         tmnxPimSnpgGrpSrcTable. These statistics are collected by the
+         forwarding engine."
+    ::= { tmnxPimSnpgProtocolObjs 6 }
+
+tmnxPimSnpgGrpSrcStatsEntry      OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgGrpSrcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgGrpSrcStatsTable."
+    AUGMENTS    { tmnxPimSnpgGrpSrcEntry }
+    ::= { tmnxPimSnpgGrpSrcStatsTable 1 }
+
+TmnxPimSnpgGrpSrcStatsEntry      ::= SEQUENCE
+{
+    tmnxPimSnpgGrpSrcStatsFwdedPkts  Counter32,
+    tmnxPimSnpgGrpSrcStatsFwdedOct   Counter32
+}
+
+tmnxPimSnpgGrpSrcStatsFwdedPkts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcStatsFwdedPkts indicates the number of
+         multicast packets that were forwarded to the interfaces in the
+         outgoing interface list. tmnxPimSnpgGrpSrcIfTable lists all the
+         interfaces in the outgoing interface list."
+    ::= { tmnxPimSnpgGrpSrcStatsEntry 1 }
+
+tmnxPimSnpgGrpSrcStatsFwdedOct   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgGrpSrcStatsFwdedOct indicates the number of
+         multicast octets that were forwarded to the interfaces in the outgoing
+         interface list. tmnxPimSnpgGrpSrcIfTable lists all the interfaces in
+         the outgoing interface list."
+    ::= { tmnxPimSnpgGrpSrcStatsEntry 2 }
+
+tmnxPimSnpgIfObjs                OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 2 }
+
+tmnxPimSnpgIfTableLastChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfTableLastChanged indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPimSnpgIfTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPimSnpgIfObjs 1 }
+
+tmnxPimSnpgIfTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the interfaces on which PIM snooping operation is
+         enabled."
+    ::= { tmnxPimSnpgIfObjs 2 }
+
+tmnxPimSnpgIfEntry               OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the tmnxPimSnpgIfTable represents an interface on
+         this router that participates in the PIM snooping operation. An entry
+         in this table will be created when the corresponding sap or sdp is
+         created."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgPortId,
+        tmnxPimSnpgEncapValue,
+        vRtrPimNgAFGenAFType
+    }
+    ::= { tmnxPimSnpgIfTable 1 }
+
+TmnxPimSnpgIfEntry               ::= SEQUENCE
+{
+    tmnxPimSnpgIfLastChangeTime      TimeStamp,
+    tmnxPimSnpgIfOperState           ServiceOperStatus,
+    tmnxPimSnpgIfUpTime              Unsigned32,
+    tmnxPimSnpgIfMaxGroups           Unsigned32,
+    tmnxPimSnpgIfCurrentGroups       Gauge32,
+    tmnxPimSnpgIfMaxGroupsTillNow    Counter32,
+    tmnxPimSnpgIfPwFwding            TruthValue,
+    tmnxPimSnpgIntfNbrCount          Unsigned32
+}
+
+tmnxPimSnpgIfLastChangeTime      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfLastChangeTime indicates the sysUpTime when
+         this row was last modified."
+    ::= { tmnxPimSnpgIfEntry 1 }
+
+tmnxPimSnpgIfOperState           OBJECT-TYPE
+    SYNTAX      ServiceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfOperState indicates the current operational
+         state of PIM snooping on this interface."
+    ::= { tmnxPimSnpgIfEntry 2 }
+
+tmnxPimSnpgIfUpTime              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfUpTime indicates the time since this
+         interface become up."
+    ::= { tmnxPimSnpgIfEntry 3 }
+
+tmnxPimSnpgIfMaxGroups           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..16000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfMaxGroups specifies the maximum number of
+         groups for which PIM snooping can have downstream state based on
+         received PIM snooping joins on this interface."
+    DEFVAL      { 0 }
+    ::= { tmnxPimSnpgIfEntry 4 }
+
+tmnxPimSnpgIfCurrentGroups       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfCurrentGroups indicates the number of groups
+         that currently have this interface as an outgoing interface."
+    ::= { tmnxPimSnpgIfEntry 5 }
+
+tmnxPimSnpgIfMaxGroupsTillNow    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfMaxGroupsTillNow indicates the highest value
+         that tmnxPimSnpgIfCurrentGroups had till now."
+    ::= { tmnxPimSnpgIfEntry 6 }
+
+tmnxPimSnpgIfPwFwding            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfPwFwding indicates if this interface is the
+         forwarding interface of a pair of redundant pseudo-wire ports."
+    DEFVAL      { true }
+    ::= { tmnxPimSnpgIfEntry 7 }
+
+tmnxPimSnpgIntfNbrCount          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIntfNbrCount indicates the number of neighbors
+         attached to the interface."
+    ::= { tmnxPimSnpgIfEntry 8 }
+
+tmnxPimSnpgIfNbrTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the router's PIM neighbors on an interface."
+    ::= { tmnxPimSnpgIfObjs 3 }
+
+tmnxPimSnpgIfNbrEntry            OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgIfNbrTable. Entries in this table cannot be
+         created or deleted using SNMP."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgPortId,
+        tmnxPimSnpgEncapValue,
+        tmnxPimSnpgIfNbrAddrType,
+        tmnxPimSnpgIfNbrAddress
+    }
+    ::= { tmnxPimSnpgIfNbrTable 1 }
+
+TmnxPimSnpgIfNbrEntry            ::= SEQUENCE
+{
+    tmnxPimSnpgIfNbrAddrType         InetAddressType,
+    tmnxPimSnpgIfNbrAddress          InetAddress,
+    tmnxPimSnpgIfNbrUpTime           Unsigned32,
+    tmnxPimSnpgIfNbrExpiryTime       Unsigned32,
+    tmnxPimSnpgIfNbrGenId            Unsigned32,
+    tmnxPimSnpgIfNbrDrPriority       Unsigned32,
+    tmnxPimSnpgIfNbrDrPriorPresent   TruthValue,
+    tmnxPimSnpgIfNbrLanDelay         Unsigned32,
+    tmnxPimSnpgIfNbrLanDlayPrsnt     TruthValue,
+    tmnxPimSnpgIfNbrTrckngSpprt      TruthValue,
+    tmnxPimSnpgIfNbrHoldTime         Unsigned32,
+    tmnxPimSnpgIfNbrOvrdeIntrvl      Unsigned32,
+    tmnxPimSnpgIfNbrCount            Unsigned32
+}
+
+tmnxPimSnpgIfNbrAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrAddrType indicates the type of IP address
+         of the PIM snooping neighbor."
+    ::= { tmnxPimSnpgIfNbrEntry 1 }
+
+tmnxPimSnpgIfNbrAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrAddress indicates the IP address of the
+         PIM snooping neighbor for which this entry contains information."
+    ::= { tmnxPimSnpgIfNbrEntry 2 }
+
+tmnxPimSnpgIfNbrUpTime           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrUpTime indicates the time since this PIM
+         snooping neighbor last became a neighbor of the local router."
+    ::= { tmnxPimSnpgIfNbrEntry 3 }
+
+tmnxPimSnpgIfNbrExpiryTime       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrExpiryTime indicates the minimum time
+         remaining before this PIM snooping neighbor will be aged out. If the
+         value of this object is zero, it means that this neighbor will never
+         be aged out. This happens when the PIM snooping neighbor sends a Hello
+         message with Holdtime set to `0xffff'."
+    ::= { tmnxPimSnpgIfNbrEntry 4 }
+
+tmnxPimSnpgIfNbrGenId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrGenId indicates a randomly generated
+         32-bit value that is regenerated each time PIM forwarding is
+         started or restarted on the interface, including when the router
+         itself restarts.  When a Hello message with a new
+         tmnxPimSnpgIfNbrGenId is received from a neighbor, any old Hello
+         information about that neighbor is discarded and superseded by the
+         information from the new Hello message."
+    ::= { tmnxPimSnpgIfNbrEntry 5 }
+
+tmnxPimSnpgIfNbrDrPriority       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrDrPriority indicates neighbor's DR
+         priority which is received in the hello message. If the Hello Message
+         did not contain the DR priority field, the value of this object will
+         be set to '1' and tmnxPimSnpgIfNbrDrPriorPresent will be set to
+         'false'."
+    ::= { tmnxPimSnpgIfNbrEntry 6 }
+
+tmnxPimSnpgIfNbrDrPriorPresent   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrDrPriorPresent indicates whether the DR
+         priority field was present in the Hello message received from the PIM
+         snooping neighbor. If present, the value is set to 'true'."
+    ::= { tmnxPimSnpgIfNbrEntry 7 }
+
+tmnxPimSnpgIfNbrLanDelay         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrLanDelay indicates the lan delay field
+         present in the Hello message received from the neighbor. If the
+         neighbor did not send this field, a default value of 500 ms is used
+         and the value of tmnxPimSnpgIfNbrLanDlayPrsnt is set to 'false'."
+    ::= { tmnxPimSnpgIfNbrEntry 8 }
+
+tmnxPimSnpgIfNbrLanDlayPrsnt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrLanDlayPrsnt indicates whether the Hello
+         message received from the neighbor contained the Lan Delay field. If
+         present, the value is set to 'true'."
+    ::= { tmnxPimSnpgIfNbrEntry 9 }
+
+tmnxPimSnpgIfNbrTrckngSpprt      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrTrckngSpprt indicates whether the T bit
+         in the LAN Prune Delay option was present in the Hello message. This
+         indicates the neighbor's capability to disable Join message
+         suppression."
+    ::= { tmnxPimSnpgIfNbrEntry 10 }
+
+tmnxPimSnpgIfNbrHoldTime         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrHoldTime indicates the value of the hold
+         time present in the Hello message."
+    ::= { tmnxPimSnpgIfNbrEntry 11 }
+
+tmnxPimSnpgIfNbrOvrdeIntrvl      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrOvrdeIntrvl indicates the value of the
+         override interval present in the Hello message."
+    ::= { tmnxPimSnpgIfNbrEntry 12 }
+
+tmnxPimSnpgIfNbrCount            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfNbrCount indicates the number of neighbors
+         attached to the VPLS interface."
+    ::= { tmnxPimSnpgIfNbrEntry 13 }
+
+tmnxPimSnpgIfGrpSrcTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the (*,*,RP), (*,G) and (S,G) and (S,G,rpt) entries
+         for which this particular interface has state."
+    ::= { tmnxPimSnpgIfObjs 4 }
+
+tmnxPimSnpgIfGrpSrcEntry         OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgIfGrpSrcTable. This is a read-only table."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgPortId,
+        tmnxPimSnpgEncapValue,
+        tmnxPimSnpgIfGrpSrcGrpAddrType,
+        tmnxPimSnpgIfGrpSrcGroupAddr,
+        tmnxPimSnpgIfGrpSrcSrcAddrType,
+        tmnxPimSnpgIfGrpSrcSourceAddr
+    }
+    ::= { tmnxPimSnpgIfGrpSrcTable 1 }
+
+TmnxPimSnpgIfGrpSrcEntry         ::= SEQUENCE
+{
+    tmnxPimSnpgIfGrpSrcGrpAddrType   InetAddressType,
+    tmnxPimSnpgIfGrpSrcGroupAddr     InetAddress,
+    tmnxPimSnpgIfGrpSrcSrcAddrType   InetAddressType,
+    tmnxPimSnpgIfGrpSrcSourceAddr    InetAddress,
+    tmnxPimSnpgIfGrpSrcJPState       INTEGER,
+    tmnxPimSnpgIfGrpSrcPrunePendTmr  Unsigned32,
+    tmnxPimSnpgIfGrpSrcJPTimer       Unsigned32,
+    tmnxPimSnpgIfGrpSrcJPRptState    INTEGER,
+    tmnxPimSnpgIfGrpSrcRptPrnPndTmr  Unsigned32,
+    tmnxPimSnpgIfGrpSrcRptJPTimer    Unsigned32,
+    tmnxPimSnpgIfGrpSrcUpTime        Unsigned32
+}
+
+tmnxPimSnpgIfGrpSrcGrpAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcGrpAddrType indicates the type of
+         address of the multicast group address."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 1 }
+
+tmnxPimSnpgIfGrpSrcGroupAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcGroupAddr indicates the multicast
+         group address of the entry."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 2 }
+
+tmnxPimSnpgIfGrpSrcSrcAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcSrcAddrType indicates the type of
+         source address of the multicast sender."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 3 }
+
+tmnxPimSnpgIfGrpSrcSourceAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcSourceAddr indicates the source
+         address of the multicast sender."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 4 }
+
+tmnxPimSnpgIfGrpSrcJPState       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcJPState indicates the Join Prune state
+         for this entry on the interface. PIM Join or Prune messages are sent
+         by the downstream routers towards the RPF' neighbor."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 5 }
+
+tmnxPimSnpgIfGrpSrcPrunePendTmr  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcPrunePendTmr indicates the time
+         remaining before the router transitions the value of
+         tmnxPimSnpgIfGrpSrcJPState to 'noInfo'. The timer is set when the PIM
+         Prune message is received."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 6 }
+
+tmnxPimSnpgIfGrpSrcJPTimer       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcJPTimer indicates the time remaining
+         before the router transitions the value of tmnxPimSnpgIfGrpSrcJPState
+         to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         tmnxPimSnpgIfGrpSrcJPState is 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         tmnxPimSnpgIfGrpSrcJPState will not transition until an appropriate
+         cancelling of Join or Prune message is received."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 7 }
+
+tmnxPimSnpgIfGrpSrcJPRptState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcJPRptState indicates the Join Prune
+         Rpt state for this entry on the interface. PIM Join or Prune messages
+         are sent by the downstream routers towards the RPF' neighbor.
+         (S,G,rpt) state is a result of receiving (S,G, rpt) JP message from
+         the downstream router on the RP tree."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 8 }
+
+tmnxPimSnpgIfGrpSrcRptPrnPndTmr  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcRptPrnPndTmr indicates the time
+         remaining before the router transitions the value of
+         tmnxPimSnpgIfGrpSrcJPRptState to 'noInfo'. The timer is set when the
+         (S,G,rpt) PIM Prune message is received."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 9 }
+
+tmnxPimSnpgIfGrpSrcRptJPTimer    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcRptJPTimer indicates the time
+         remaining before the router transitions the value of
+         tmnxPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         tmnxPimSnpgIfGrpSrcJPRptState is in 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         tmnxPimSnpgIfGrpSrcJPRptState will not transition until an appropriate
+         cancelling of Join or Prune message is received from the downstream
+         router."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 10 }
+
+tmnxPimSnpgIfGrpSrcUpTime        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfGrpSrcUpTime indicates the time since this
+         source group entry got created."
+    ::= { tmnxPimSnpgIfGrpSrcEntry 11 }
+
+tmnxPimSnpgIfStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the PIM statistics for a particular interface."
+    ::= { tmnxPimSnpgIfObjs 5 }
+
+tmnxPimSnpgIfStatsEntry          OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxPimSnpgIfStatsTable."
+    AUGMENTS    { tmnxPimSnpgIfEntry }
+    ::= { tmnxPimSnpgIfStatsTable 1 }
+
+TmnxPimSnpgIfStatsEntry          ::= SEQUENCE
+{
+    tmnxPimSnpgIfTxPkts              Counter32,
+    tmnxPimSnpgIfRxPkts              Counter32,
+    tmnxPimSnpgIfRxHellos            Counter32,
+    tmnxPimSnpgIfRxHellosDropped     Counter32,
+    tmnxPimSnpgIfRxNbrUnknown        Counter32,
+    tmnxPimSnpgIfRxBadChecksumDscrd  Counter32,
+    tmnxPimSnpgIfRxBadVersionDscrd   Counter32,
+    tmnxPimSnpgIfRxBadEncodings      Counter32,
+    tmnxPimSnpgIfStarGTypes          Gauge32,
+    tmnxPimSnpgIfSGTypes             Gauge32,
+    tmnxPimSnpgIfJoinPolicyDrops     Counter32,
+    tmnxPimSnpgIfTxJoinPrunes        Counter32,
+    tmnxPimSnpgIfRxJoinPrunes        Counter32,
+    tmnxPimSnpgIfRxJoinPruneErrs     Counter32
+}
+
+tmnxPimSnpgIfTxPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfTxPkts indicates the number of multicast
+         data packets transmitted on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 1 }
+
+tmnxPimSnpgIfRxPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxPkts indicates the number of multicast
+         data packets received on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 2 }
+
+tmnxPimSnpgIfRxHellos            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxHellos indicates the number of PIM hello
+         messages received on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 3 }
+
+tmnxPimSnpgIfRxHellosDropped     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxHellosDropped indicates the number of PIM
+         Hello messages which were received on this interface but were dropped."
+    ::= { tmnxPimSnpgIfStatsEntry 4 }
+
+tmnxPimSnpgIfRxNbrUnknown        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxNbrUnknown indicates the number of PIM
+         messages (other than Hello messages) which were received on this
+         interface and were rejected because the adjacency with the neighbor
+         router was not already established."
+    ::= { tmnxPimSnpgIfStatsEntry 5 }
+
+tmnxPimSnpgIfRxBadChecksumDscrd  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxBadChecksumDscrd indicates the number of
+         PIM messages received on this interface which were discarded because
+         of bad checksum."
+    ::= { tmnxPimSnpgIfStatsEntry 6 }
+
+tmnxPimSnpgIfRxBadVersionDscrd   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxBadVersionDscrd indicates the number of
+         PIM messages with bad versions received on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 7 }
+
+tmnxPimSnpgIfRxBadEncodings      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxBadEncodings indicates the number of PIM
+         messages with bad encodings received on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 8 }
+
+tmnxPimSnpgIfStarGTypes          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfStarGTypes indicates the number of (*,G)
+         entries in tmnxPimSnpgIfGrpSrcTable."
+    ::= { tmnxPimSnpgIfStatsEntry 9 }
+
+tmnxPimSnpgIfSGTypes             OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfSGTypes indicates the number of (S,G)
+         entries in tmnxPimSnpgIfGrpSrcTable."
+    ::= { tmnxPimSnpgIfStatsEntry 10 }
+
+tmnxPimSnpgIfJoinPolicyDrops     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfJoinPolicyDrops indicates the number of
+         times the join policy match resulted in dropping PIM Join-Prune
+         Message or one of the source group contained in the message."
+    ::= { tmnxPimSnpgIfStatsEntry 11 }
+
+tmnxPimSnpgIfTxJoinPrunes        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfTxJoinPrunes indicates the number of PIM
+         Join Prune messages transmitted on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 12 }
+
+tmnxPimSnpgIfRxJoinPrunes        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxJoinPrunes indicates the number of PIM
+         Join Prune messages received on this interface."
+    ::= { tmnxPimSnpgIfStatsEntry 13 }
+
+tmnxPimSnpgIfRxJoinPruneErrs     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfRxJoinPruneErrs indicates the number of
+         errors while processing Join-Prune messages received on this
+         interface."
+    ::= { tmnxPimSnpgIfStatsEntry 14 }
+
+tmnxPimSnpgIfSecNbrTblLstChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfSecNbrTblLstChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         tmnxPimSnpgIfSecNbrTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPimSnpgIfObjs 6 }
+
+tmnxPimSnpgIfSecNbrTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the secondary addresses advertised by PIM snooping
+         neighbor."
+    ::= { tmnxPimSnpgIfObjs 7 }
+
+tmnxPimSnpgIfSecNbrEntry         OBJECT-TYPE
+    SYNTAX      TmnxPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents each secondary address advertised by each of
+         the router's PIM snooping neighbors. The Address List Option
+         advertises all the secondary addresses associated with the source
+         interface of the router originating the HELLO message. Entries in this
+         table cannot be created or deleted using SNMP."
+    INDEX       {
+        svcId,
+        tmnxPimSnpgPortId,
+        tmnxPimSnpgEncapValue,
+        tmnxPimSnpgIfNbrAddrType,
+        tmnxPimSnpgIfNbrAddress,
+        tmnxPimSnpgIfSecNbrAddrType,
+        tmnxPimSnpgIfSecNbrAddress
+    }
+    ::= { tmnxPimSnpgIfSecNbrTable 1 }
+
+TmnxPimSnpgIfSecNbrEntry         ::= SEQUENCE
+{
+    tmnxPimSnpgIfSecNbrAddrType      InetAddressType,
+    tmnxPimSnpgIfSecNbrAddress       InetAddress
+}
+
+tmnxPimSnpgIfSecNbrAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfSecNbrAddrType indicates the type of IP
+         address of the PIM snooping secondary neighbor."
+    ::= { tmnxPimSnpgIfSecNbrEntry 1 }
+
+tmnxPimSnpgIfSecNbrAddress       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPimSnpgIfSecNbrAddress indicates the IP address of
+         the PIM snooping secondary neighbor."
+    ::= { tmnxPimSnpgIfSecNbrEntry 2 }
+
+tmnxPimSnpgNotificationObjs      OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 3 }
+
+tmnxPimSnpgVxlanIfObjs           OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 4 }
+
+vxlanPimSnpgIfTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgIfTable contains information collected by PIM snooping for
+         each VXLAN (virtual extensible LAN)."
+    ::= { tmnxPimSnpgVxlanIfObjs 1 }
+
+vxlanPimSnpgIfEntry              OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates a VXLAN that participates in PIM
+         snooping operation.
+
+         An entry in this table will be created when the corresponding VXLAN is
+         created."
+    INDEX       {
+        svcId,
+        vxlanVTEPAddr,
+        vxlanVNI,
+        vRtrPimNgAFGenAFType
+    }
+    ::= { vxlanPimSnpgIfTable 1 }
+
+VxlanPimSnpgIfEntry              ::= SEQUENCE
+{
+    vxlanPimSnpgIfLastChangeTime     TimeStamp,
+    vxlanPimSnpgIfOperState          ServiceOperStatus,
+    vxlanPimSnpgIfUpTime             Unsigned32,
+    vxlanPimSnpgIfCurrentGroups      Gauge32,
+    vxlanPimSnpgIfMaxGroupsTillNow   Counter32,
+    vxlanPimSnpgIfPwFwding           TruthValue
+}
+
+vxlanPimSnpgIfLastChangeTime     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfLastChangeTime indicates the sysUpTime when
+         this row was last modified."
+    ::= { vxlanPimSnpgIfEntry 1 }
+
+vxlanPimSnpgIfOperState          OBJECT-TYPE
+    SYNTAX      ServiceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfOperState indicates the current operational
+         state of PIM snooping on this VXLAN."
+    ::= { vxlanPimSnpgIfEntry 2 }
+
+vxlanPimSnpgIfUpTime             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfUpTime indicates the time since this VXLAN
+         became up."
+    ::= { vxlanPimSnpgIfEntry 3 }
+
+vxlanPimSnpgIfCurrentGroups      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfCurrentGroups indicates the number of
+         groups that currently have this VXLAN as an outgoing interface."
+    ::= { vxlanPimSnpgIfEntry 4 }
+
+vxlanPimSnpgIfMaxGroupsTillNow   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfMaxGroupsTillNow indicates the highest
+         value that vxlanPimSnpgIfCurrentGroups had till now."
+    ::= { vxlanPimSnpgIfEntry 5 }
+
+vxlanPimSnpgIfPwFwding           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfPwFwding indicates if this VXLAN is the
+         forwarding interface of a pair of redundant pseudo-wire ports."
+    DEFVAL      { true }
+    ::= { vxlanPimSnpgIfEntry 6 }
+
+vxlanPimSnpgIfStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgIfStatsTable contains PIM snooping statistics for each
+         VXLAN."
+    ::= { tmnxPimSnpgVxlanIfObjs 2 }
+
+vxlanPimSnpgIfStatsEntry         OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the vxlanPimSnpgIfStatsTable."
+    AUGMENTS    { vxlanPimSnpgIfEntry }
+    ::= { vxlanPimSnpgIfStatsTable 1 }
+
+VxlanPimSnpgIfStatsEntry         ::= SEQUENCE
+{
+    vxlanPimSnpgIfTxPkts             Counter32,
+    vxlanPimSnpgIfRxPkts             Counter32,
+    vxlanPimSnpgIfRxHellos           Counter32,
+    vxlanPimSnpgIfRxHellosDropped    Counter32,
+    vxlanPimSnpgIfRxNbrUnknown       Counter32,
+    vxlanPimSnpgIfRxBadChecksumDscrd Counter32,
+    vxlanPimSnpgIfRxBadVersionDscrd  Counter32,
+    vxlanPimSnpgIfRxBadEncodings     Counter32,
+    vxlanPimSnpgIfStarGTypes         Gauge32,
+    vxlanPimSnpgIfSGTypes            Gauge32,
+    vxlanPimSnpgIfJoinPolicyDrops    Counter32,
+    vxlanPimSnpgIfTxJoinPrunes       Counter32,
+    vxlanPimSnpgIfRxJoinPrunes       Counter32,
+    vxlanPimSnpgIfRxJoinPruneErrs    Counter32
+}
+
+vxlanPimSnpgIfTxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfTxPkts indicates the number of multicast
+         data packets transmitted on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 1 }
+
+vxlanPimSnpgIfRxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxPkts indicates the number of multicast
+         data packets received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 2 }
+
+vxlanPimSnpgIfRxHellos           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxHellos indicates the number of PIM hello
+         messages received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 3 }
+
+vxlanPimSnpgIfRxHellosDropped    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxHellosDropped indicates the number of PIM
+         Hello messages which were received on this VXLAN but were dropped."
+    ::= { vxlanPimSnpgIfStatsEntry 4 }
+
+vxlanPimSnpgIfRxNbrUnknown       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxNbrUnknown indicates the number of PIM
+         messages (other than Hello messages) which were received on this VXLAN
+         and were rejected because the adjacency with the neighbor router was
+         not already established."
+    ::= { vxlanPimSnpgIfStatsEntry 5 }
+
+vxlanPimSnpgIfRxBadChecksumDscrd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxBadChecksumDscrd indicates the number of
+         PIM messages received on this VXLAN which were discarded because of
+         bad checksum."
+    ::= { vxlanPimSnpgIfStatsEntry 6 }
+
+vxlanPimSnpgIfRxBadVersionDscrd  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxBadVersionDscrd indicates the number of
+         PIM messages with bad versions received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 7 }
+
+vxlanPimSnpgIfRxBadEncodings     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxBadEncodings indicates the number of PIM
+         messages with bad encodings received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 8 }
+
+vxlanPimSnpgIfStarGTypes         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfStarGTypes indicates the number of (*,G)
+         entries in vxlanPimSnpgIfGrpSrcTable."
+    ::= { vxlanPimSnpgIfStatsEntry 9 }
+
+vxlanPimSnpgIfSGTypes            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfSGTypes indicates the number of (S,G)
+         entries in vxlanPimSnpgIfGrpSrcTable."
+    ::= { vxlanPimSnpgIfStatsEntry 10 }
+
+vxlanPimSnpgIfJoinPolicyDrops    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfJoinPolicyDrops indicates the number of
+         times the join policy match resulted in dropping PIM Join-Prune
+         Message or one of the source group contained in the message."
+    ::= { vxlanPimSnpgIfStatsEntry 11 }
+
+vxlanPimSnpgIfTxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfTxJoinPrunes indicates the number of PIM
+         Join Prune messages transmitted on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 12 }
+
+vxlanPimSnpgIfRxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxJoinPrunes indicates the number of PIM
+         Join Prune messages received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 13 }
+
+vxlanPimSnpgIfRxJoinPruneErrs    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfRxJoinPruneErrs indicates the number of
+         errors while processing Join-Prune messages received on this VXLAN."
+    ::= { vxlanPimSnpgIfStatsEntry 14 }
+
+vxlanPimSnpgIfNbrTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgIfNbrTable contains the PIM neighbors for each VXLAN."
+    ::= { tmnxPimSnpgVxlanIfObjs 3 }
+
+vxlanPimSnpgIfNbrEntry           OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the vxlanPimSnpgIfNbrTable."
+    INDEX       {
+        svcId,
+        vxlanVTEPAddr,
+        vxlanVNI,
+        vxlanPimSnpgIfNbrAddrType,
+        vxlanPimSnpgIfNbrAddress
+    }
+    ::= { vxlanPimSnpgIfNbrTable 1 }
+
+VxlanPimSnpgIfNbrEntry           ::= SEQUENCE
+{
+    vxlanPimSnpgIfNbrAddrType        InetAddressType,
+    vxlanPimSnpgIfNbrAddress         InetAddress,
+    vxlanPimSnpgIfNbrUpTime          Unsigned32,
+    vxlanPimSnpgIfNbrExpiryTime      Unsigned32,
+    vxlanPimSnpgIfNbrGenId           Unsigned32,
+    vxlanPimSnpgIfNbrDrPriority      Unsigned32,
+    vxlanPimSnpgIfNbrDrPriorPresent  TruthValue,
+    vxlanPimSnpgIfNbrLanDelay        Unsigned32,
+    vxlanPimSnpgIfNbrLanDlayPrsnt    TruthValue,
+    vxlanPimSnpgIfNbrTrckngSpprt     TruthValue,
+    vxlanPimSnpgIfNbrHoldTime        Unsigned32,
+    vxlanPimSnpgIfNbrOvrdeIntrvl     Unsigned32
+}
+
+vxlanPimSnpgIfNbrAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrAddrType indicates the type of IP
+         address of the PIM snooping neighbor."
+    ::= { vxlanPimSnpgIfNbrEntry 1 }
+
+vxlanPimSnpgIfNbrAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrAddress indicates the IP address of the
+         PIM snooping neighbor for which this entry contains information."
+    ::= { vxlanPimSnpgIfNbrEntry 2 }
+
+vxlanPimSnpgIfNbrUpTime          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrUpTime indicates the time since this PIM
+         snooping neighbor last became a neighbor of the local router."
+    ::= { vxlanPimSnpgIfNbrEntry 3 }
+
+vxlanPimSnpgIfNbrExpiryTime      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrExpiryTime indicates the minimum time
+         remaining before this PIM snooping neighbor will be aged out. If the
+         value of this object is zero, it means that this neighbor will never
+         be aged out. This happens when the PIM snooping neighbor sends a Hello
+         message with Holdtime set to `0xffff'."
+    ::= { vxlanPimSnpgIfNbrEntry 4 }
+
+vxlanPimSnpgIfNbrGenId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrGenId indicates a randomly generated
+         32-bit value that is regenerated each time PIM forwarding is
+         started or restarted on the VXLAN, including when the router
+         itself restarts.  When a Hello message with a new
+         tmnxPimSnpgIfNbrGenId is received from a neighbor, any old Hello
+         information about that neighbor is discarded and superseded by the
+         information from the new Hello message."
+    ::= { vxlanPimSnpgIfNbrEntry 5 }
+
+vxlanPimSnpgIfNbrDrPriority      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrDrPriority indicates neighbor's DR
+         priority which is received in the hello message. If the Hello Message
+         did not contain the DR priority field, the value of this object will
+         be set to '1' and vxlanPimSnpgIfNbrDrPriorPresent will be set to
+         'false'."
+    ::= { vxlanPimSnpgIfNbrEntry 6 }
+
+vxlanPimSnpgIfNbrDrPriorPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrDrPriorPresent indicates whether the DR
+         priority field was present in the Hello message received from the PIM
+         snooping neighbor. If present, the value is set to 'true'."
+    ::= { vxlanPimSnpgIfNbrEntry 7 }
+
+vxlanPimSnpgIfNbrLanDelay        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrLanDelay indicates the lan delay field
+         present in the Hello message received from the neighbor. If the
+         neighbor did not send this field, a default value of 500 ms is used
+         and the value of vxlanPimSnpgIfNbrLanDlayPrsnt is set to 'false'."
+    ::= { vxlanPimSnpgIfNbrEntry 8 }
+
+vxlanPimSnpgIfNbrLanDlayPrsnt    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrLanDlayPrsnt indicates whether the Hello
+         message received from the neighbor contained the Lan Delay field. If
+         present, the value is set to 'true'."
+    ::= { vxlanPimSnpgIfNbrEntry 9 }
+
+vxlanPimSnpgIfNbrTrckngSpprt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrTrckngSpprt indicates whether the T bit
+         in the LAN Prune Delay option was present in the Hello message. This
+         indicates the neighbor's capability to disable Join message
+         suppression."
+    ::= { vxlanPimSnpgIfNbrEntry 10 }
+
+vxlanPimSnpgIfNbrHoldTime        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrHoldTime indicates the value of the hold
+         time present in the Hello message."
+    ::= { vxlanPimSnpgIfNbrEntry 11 }
+
+vxlanPimSnpgIfNbrOvrdeIntrvl     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfNbrOvrdeIntrvl indicates the value of the
+         override interval present in the Hello message."
+    ::= { vxlanPimSnpgIfNbrEntry 12 }
+
+vxlanPimSnpgIfSecNbrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgIfSecNbrTable contains the secondary addresses advertised
+         by the PIM snooping neighbor for each VXLAN."
+    ::= { tmnxPimSnpgVxlanIfObjs 4 }
+
+vxlanPimSnpgIfSecNbrEntry        OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates a secondary address advertised by
+         the PIM snooping neighbors.
+
+         The Address List Option advertises all the secondary addresses
+         associated with the source interface of the VXLAN originating the
+         HELLO message."
+    INDEX       {
+        svcId,
+        vxlanVTEPAddr,
+        vxlanVNI,
+        vxlanPimSnpgIfNbrAddrType,
+        vxlanPimSnpgIfNbrAddress,
+        vxlanPimSnpgIfSecNbrAddrType,
+        vxlanPimSnpgIfSecNbrAddress
+    }
+    ::= { vxlanPimSnpgIfSecNbrTable 1 }
+
+VxlanPimSnpgIfSecNbrEntry        ::= SEQUENCE
+{
+    vxlanPimSnpgIfSecNbrAddrType     InetAddressType,
+    vxlanPimSnpgIfSecNbrAddress      InetAddress
+}
+
+vxlanPimSnpgIfSecNbrAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfSecNbrAddrType indicates the type of IP
+         address of the PIM snooping secondary neighbor."
+    ::= { vxlanPimSnpgIfSecNbrEntry 1 }
+
+vxlanPimSnpgIfSecNbrAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfSecNbrAddress indicates the IP address of
+         the PIM snooping secondary neighbor."
+    ::= { vxlanPimSnpgIfSecNbrEntry 2 }
+
+vxlanPimSnpgIfGrpSrcTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgIfGrpSrcTable contains the (*,*,RP), (*,G) and (S,G) and
+         (S,G,rpt) entries for each VXLAN."
+    ::= { tmnxPimSnpgVxlanIfObjs 5 }
+
+vxlanPimSnpgIfGrpSrcEntry        OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the vxlanPimSnpgIfGrpSrcTable."
+    INDEX       {
+        svcId,
+        vxlanVTEPAddr,
+        vxlanVNI,
+        vxlanPimSnpgIfGrpSrcGrpAddrType,
+        vxlanPimSnpgIfGrpSrcGroupAddr,
+        vxlanPimSnpgIfGrpSrcSrcAddrType,
+        vxlanPimSnpgIfGrpSrcSourceAddr
+    }
+    ::= { vxlanPimSnpgIfGrpSrcTable 1 }
+
+VxlanPimSnpgIfGrpSrcEntry        ::= SEQUENCE
+{
+    vxlanPimSnpgIfGrpSrcGrpAddrType  InetAddressType,
+    vxlanPimSnpgIfGrpSrcGroupAddr    InetAddress,
+    vxlanPimSnpgIfGrpSrcSrcAddrType  InetAddressType,
+    vxlanPimSnpgIfGrpSrcSourceAddr   InetAddress,
+    vxlanPimSnpgIfGrpSrcJPState      INTEGER,
+    vxlanPimSnpgIfGrpSrcPrunePendTmr Unsigned32,
+    vxlanPimSnpgIfGrpSrcJPTimer      Unsigned32,
+    vxlanPimSnpgIfGrpSrcJPRptState   INTEGER,
+    vxlanPimSnpgIfGrpSrcRptPrnPndTmr Unsigned32,
+    vxlanPimSnpgIfGrpSrcRptJPTimer   Unsigned32,
+    vxlanPimSnpgIfGrpSrcUpTime       Unsigned32
+}
+
+vxlanPimSnpgIfGrpSrcGrpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcGrpAddrType indicates the type of
+         address of the multicast group address."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 1 }
+
+vxlanPimSnpgIfGrpSrcGroupAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcGroupAddr indicates the multicast
+         group address of the entry."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 2 }
+
+vxlanPimSnpgIfGrpSrcSrcAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcSrcAddrType indicates the type of
+         source address of the multicast sender."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 3 }
+
+vxlanPimSnpgIfGrpSrcSourceAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcSourceAddr indicates the source
+         address of the multicast sender."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 4 }
+
+vxlanPimSnpgIfGrpSrcJPState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcJPState indicates the Join Prune
+         state for this entry on the VXLAN. PIM Join or Prune messages are sent
+         by the downstream routers towards the RPF neighbor."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 5 }
+
+vxlanPimSnpgIfGrpSrcPrunePendTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcPrunePendTmr indicates the time
+         remaining before the VXLAN transitions the value of
+         vxlanPimSnpgIfGrpSrcJPState to 'noInfo'. The timer is set when the PIM
+         Prune message is received."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 6 }
+
+vxlanPimSnpgIfGrpSrcJPTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcJPTimer indicates the time remaining
+         before the VXLAN transitions the value of vxlanPimSnpgIfGrpSrcJPState
+         to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         vxlanPimSnpgIfGrpSrcJPState is 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         vxlanPimSnpgIfGrpSrcJPState will not transition until an appropriate
+         cancelling of Join or Prune message is received."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 7 }
+
+vxlanPimSnpgIfGrpSrcJPRptState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcJPRptState indicates the Join Prune
+         Rpt state for this entry on the VXLAN.
+
+         PIM Join or Prune messages are sent by the downstream routers towards
+         the RPF neighbor.
+
+         (S,G,rpt) state is a result of receiving (S,G, rpt) JP message from
+         the downstream router on the RP tree."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 8 }
+
+vxlanPimSnpgIfGrpSrcRptPrnPndTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcRptPrnPndTmr indicates the time
+         remaining before the VXLAN transitions the value of
+         vxlanPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is set when the (S,G,rpt) PIM Prune message is received."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 9 }
+
+vxlanPimSnpgIfGrpSrcRptJPTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcRptJPTimer indicates the time
+         remaining before the VXLAN transitions the value of
+         vxlanPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         vxlanPimSnpgIfGrpSrcJPRptState is in 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         vxlanPimSnpgIfGrpSrcJPRptState will not transition until an
+         appropriate cancelling of Join or Prune message is received from the
+         downstream router."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 10 }
+
+vxlanPimSnpgIfGrpSrcUpTime       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgIfGrpSrcUpTime indicates the time since this
+         source group entry got created."
+    ::= { vxlanPimSnpgIfGrpSrcEntry 11 }
+
+vxlanPimSnpgGrpSrcIfTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VxlanPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vxlanPimSnpgGrpSrcIfTable contains the PIM snooping enabled VXLAN's
+         for each entry in tmnxPimSnpgGrpSrcTable."
+    ::= { tmnxPimSnpgVxlanIfObjs 6 }
+
+vxlanPimSnpgGrpSrcIfEntry        OBJECT-TYPE
+    SYNTAX      VxlanPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the vxlanPimSnpgGrpSrcIfTable.
+
+         Each entry represents the state of the PIM enabled VXLAN for every
+         tmnxPimSnpgGrpSrcEntry."
+    INDEX       {
+        svcId,
+        vxlanPimSnpgGrpSrcGrpAddrType,
+        vxlanPimSnpgGrpSrcGroupAddress,
+        vxlanPimSnpgGrpSrcSrcAddrType,
+        vxlanPimSnpgGrpSrcSourceAddress,
+        vxlanVTEPAddr,
+        vxlanVNI
+    }
+    ::= { vxlanPimSnpgGrpSrcIfTable 1 }
+
+VxlanPimSnpgGrpSrcIfEntry        ::= SEQUENCE
+{
+    vxlanPimSnpgGrpSrcGrpAddrType    InetAddressType,
+    vxlanPimSnpgGrpSrcGroupAddress   InetAddress,
+    vxlanPimSnpgGrpSrcSrcAddrType    InetAddressType,
+    vxlanPimSnpgGrpSrcSourceAddress  InetAddress,
+    vxlanPimSnpgGrpSrcIfFlags        BITS
+}
+
+vxlanPimSnpgGrpSrcGrpAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgGrpSrcGrpAddrType indicates the type of IP
+         multicast group address represented by vxlanPimSnpgGrpSrcGroupAddress."
+    ::= { vxlanPimSnpgGrpSrcIfEntry 1 }
+
+vxlanPimSnpgGrpSrcGroupAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgGrpSrcGroupAddress indicates the IP multicast
+         group address for which this entry contains information."
+    ::= { vxlanPimSnpgGrpSrcIfEntry 2 }
+
+vxlanPimSnpgGrpSrcSrcAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgGrpSrcSrcAddrType indicates the type of IP
+         multicast source address represented by
+         vxlanPimSnpgGrpSrcSourceAddress."
+    ::= { vxlanPimSnpgGrpSrcIfEntry 3 }
+
+vxlanPimSnpgGrpSrcSourceAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgGrpSrcSourceAddress indicates the source
+         address for which this entry contains information."
+    ::= { vxlanPimSnpgGrpSrcIfEntry 4 }
+
+vxlanPimSnpgGrpSrcIfFlags        OBJECT-TYPE
+    SYNTAX      BITS {
+        immediateOifList    (0),
+        inheritedOifList    (1),
+        inheritedRptOifList (2),
+        joined              (3),
+        rpfPort             (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vxlanPimSnpgGrpSrcIfFlags indicates the different lists
+         that this VXLAN belongs to."
+    ::= { vxlanPimSnpgGrpSrcIfEntry 5 }
+
+tmnxPimSnpgEMplsIfObjs           OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 5 }
+
+eMplsPimSnpgIfTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgIfTable contains information collected by PIM snooping for
+         each evpn-mpls."
+    ::= { tmnxPimSnpgEMplsIfObjs 1 }
+
+eMplsPimSnpgIfEntry              OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates an evpn-mpls that participates in
+         the PIM snooping operation.
+
+         An entry in this table will be created when the corresponding
+         evpn-mpls is created."
+    INDEX       {
+        svcId,
+        vRtrPimNgAFGenAFType
+    }
+    ::= { eMplsPimSnpgIfTable 1 }
+
+EMplsPimSnpgIfEntry              ::= SEQUENCE
+{
+    eMplsPimSnpgIfLastChangeTime     TimeStamp,
+    eMplsPimSnpgIfOperState          ServiceOperStatus,
+    eMplsPimSnpgIfUpTime             Unsigned32,
+    eMplsPimSnpgIfCurrentGroups      Gauge32,
+    eMplsPimSnpgIfMaxGroupsTillNow   Counter32,
+    eMplsPimSnpgIfPwFwding           TruthValue
+}
+
+eMplsPimSnpgIfLastChangeTime     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfLastChangeTime indicates the sysUpTime when
+         this row was last modified."
+    ::= { eMplsPimSnpgIfEntry 1 }
+
+eMplsPimSnpgIfOperState          OBJECT-TYPE
+    SYNTAX      ServiceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfOperState indicates the current operational
+         state of PIM snooping on this evpn-mpls."
+    ::= { eMplsPimSnpgIfEntry 2 }
+
+eMplsPimSnpgIfUpTime             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfUpTime indicates the time since this
+         evpn-mpls became up."
+    ::= { eMplsPimSnpgIfEntry 3 }
+
+eMplsPimSnpgIfCurrentGroups      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfCurrentGroups indicates the number of
+         groups that currently have this evpn-mpls as an outgoing interface."
+    ::= { eMplsPimSnpgIfEntry 4 }
+
+eMplsPimSnpgIfMaxGroupsTillNow   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfMaxGroupsTillNow indicates the highest
+         value that eMplsPimSnpgIfCurrentGroups had till now."
+    ::= { eMplsPimSnpgIfEntry 5 }
+
+eMplsPimSnpgIfPwFwding           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfPwFwding indicates if this evpn-mpls is the
+         forwarding interface of a pair of redundant pseudo-wire ports."
+    DEFVAL      { true }
+    ::= { eMplsPimSnpgIfEntry 6 }
+
+eMplsPimSnpgIfStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgIfStatsTable contains PIM snooping statistics for each
+         evpn-mpls."
+    ::= { tmnxPimSnpgEMplsIfObjs 2 }
+
+eMplsPimSnpgIfStatsEntry         OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the eMplsPimSnpgIfStatsTable."
+    AUGMENTS    { eMplsPimSnpgIfEntry }
+    ::= { eMplsPimSnpgIfStatsTable 1 }
+
+EMplsPimSnpgIfStatsEntry         ::= SEQUENCE
+{
+    eMplsPimSnpgIfTxPkts             Counter32,
+    eMplsPimSnpgIfRxPkts             Counter32,
+    eMplsPimSnpgIfRxHellos           Counter32,
+    eMplsPimSnpgIfRxHellosDropped    Counter32,
+    eMplsPimSnpgIfRxNbrUnknown       Counter32,
+    eMplsPimSnpgIfRxBadChecksumDscrd Counter32,
+    eMplsPimSnpgIfRxBadVersionDscrd  Counter32,
+    eMplsPimSnpgIfRxBadEncodings     Counter32,
+    eMplsPimSnpgIfStarGTypes         Gauge32,
+    eMplsPimSnpgIfSGTypes            Gauge32,
+    eMplsPimSnpgIfJoinPolicyDrops    Counter32,
+    eMplsPimSnpgIfTxJoinPrunes       Counter32,
+    eMplsPimSnpgIfRxJoinPrunes       Counter32,
+    eMplsPimSnpgIfRxJoinPruneErrs    Counter32
+}
+
+eMplsPimSnpgIfTxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfTxPkts indicates the number of multicast
+         data packets transmitted on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 1 }
+
+eMplsPimSnpgIfRxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxPkts indicates the number of multicast
+         data packets received on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 2 }
+
+eMplsPimSnpgIfRxHellos           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxHellos indicates the number of PIM hello
+         messages received on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 3 }
+
+eMplsPimSnpgIfRxHellosDropped    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxHellosDropped indicates the number of PIM
+         Hello messages which were received on this evpn-mpls but were dropped."
+    ::= { eMplsPimSnpgIfStatsEntry 4 }
+
+eMplsPimSnpgIfRxNbrUnknown       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxNbrUnknown indicates the number of PIM
+         messages (other than Hello messages) which were received on this
+         evpn-mpls and were rejected because the adjacency with the neighbor
+         router was not already established."
+    ::= { eMplsPimSnpgIfStatsEntry 5 }
+
+eMplsPimSnpgIfRxBadChecksumDscrd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxBadChecksumDscrd indicates the number of
+         PIM messages received on this evpn-mpls which were discarded because
+         of bad checksum."
+    ::= { eMplsPimSnpgIfStatsEntry 6 }
+
+eMplsPimSnpgIfRxBadVersionDscrd  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxBadVersionDscrd indicates the number of
+         PIM messages with bad versions received on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 7 }
+
+eMplsPimSnpgIfRxBadEncodings     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxBadEncodings indicates the number of PIM
+         messages with bad encodings received on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 8 }
+
+eMplsPimSnpgIfStarGTypes         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfStarGTypes indicates the number of (*,G)
+         entries in eMplsPimSnpgIfGrpSrcTable."
+    ::= { eMplsPimSnpgIfStatsEntry 9 }
+
+eMplsPimSnpgIfSGTypes            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfSGTypes indicates the number of (S,G)
+         entries in eMplsPimSnpgIfGrpSrcTable."
+    ::= { eMplsPimSnpgIfStatsEntry 10 }
+
+eMplsPimSnpgIfJoinPolicyDrops    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfJoinPolicyDrops indicates the number of
+         times the join policy match resulted in dropping PIM Join-Prune
+         Message or one of the source group contained in the message."
+    ::= { eMplsPimSnpgIfStatsEntry 11 }
+
+eMplsPimSnpgIfTxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfTxJoinPrunes indicates the number of PIM
+         Join Prune messages transmitted on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 12 }
+
+eMplsPimSnpgIfRxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxJoinPrunes indicates the number of PIM
+         Join Prune messages received on this evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 13 }
+
+eMplsPimSnpgIfRxJoinPruneErrs    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfRxJoinPruneErrs indicates the number of
+         errors while processing Join-Prune messages received on this
+         evpn-mpls."
+    ::= { eMplsPimSnpgIfStatsEntry 14 }
+
+eMplsPimSnpgIfNbrTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgIfNbrTable contains the PIM neighbors for each evpn-mpls."
+    ::= { tmnxPimSnpgEMplsIfObjs 3 }
+
+eMplsPimSnpgIfNbrEntry           OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the eMplsPimSnpgIfNbrTable."
+    INDEX       {
+        svcId,
+        eMplsPimSnpgIfNbrAddrType,
+        eMplsPimSnpgIfNbrAddress
+    }
+    ::= { eMplsPimSnpgIfNbrTable 1 }
+
+EMplsPimSnpgIfNbrEntry           ::= SEQUENCE
+{
+    eMplsPimSnpgIfNbrAddrType        InetAddressType,
+    eMplsPimSnpgIfNbrAddress         InetAddress,
+    eMplsPimSnpgIfNbrUpTime          Unsigned32,
+    eMplsPimSnpgIfNbrExpiryTime      Unsigned32,
+    eMplsPimSnpgIfNbrGenId           Unsigned32,
+    eMplsPimSnpgIfNbrDrPriority      Unsigned32,
+    eMplsPimSnpgIfNbrDrPriorPresent  TruthValue,
+    eMplsPimSnpgIfNbrLanDelay        Unsigned32,
+    eMplsPimSnpgIfNbrLanDlayPrsnt    TruthValue,
+    eMplsPimSnpgIfNbrTrckngSpprt     TruthValue,
+    eMplsPimSnpgIfNbrHoldTime        Unsigned32,
+    eMplsPimSnpgIfNbrOvrdeIntrvl     Unsigned32
+}
+
+eMplsPimSnpgIfNbrAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrAddrType indicates the type of IP
+         address of the PIM snooping neighbor."
+    ::= { eMplsPimSnpgIfNbrEntry 1 }
+
+eMplsPimSnpgIfNbrAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrAddress indicates the IP address of the
+         PIM snooping neighbor for which this entry contains information."
+    ::= { eMplsPimSnpgIfNbrEntry 2 }
+
+eMplsPimSnpgIfNbrUpTime          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrUpTime indicates the time since this PIM
+         snooping neighbor last became a neighbor of the local router."
+    ::= { eMplsPimSnpgIfNbrEntry 3 }
+
+eMplsPimSnpgIfNbrExpiryTime      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrExpiryTime indicates the minimum time
+         remaining before this PIM snooping neighbor will be aged out.
+
+         If the value of this object is zero, it means that this neighbor will
+         never be aged out. This happens when the PIM snooping neighbor sends a
+         Hello message with Holdtime set to `0xffff'."
+    ::= { eMplsPimSnpgIfNbrEntry 4 }
+
+eMplsPimSnpgIfNbrGenId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrGenId indicates a randomly generated
+         32-bit value that is regenerated each time PIM forwarding is
+         started or restarted on the evpn-mpls, including when the router
+         itself restarts.  When a Hello message with a new
+         tmnxPimSnpgIfNbrGenId is received from a neighbor, any old Hello
+         information about that neighbor is discarded and superseded by the
+         information from the new Hello message."
+    ::= { eMplsPimSnpgIfNbrEntry 5 }
+
+eMplsPimSnpgIfNbrDrPriority      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrDrPriority indicates neighbor's DR
+         priority which is received in the hello message. If the Hello Message
+         did not contain the DR priority field, the value of this object will
+         be set to '1' and eMplsPimSnpgIfNbrDrPriorPresent will be set to
+         'false'."
+    ::= { eMplsPimSnpgIfNbrEntry 6 }
+
+eMplsPimSnpgIfNbrDrPriorPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrDrPriorPresent indicates whether the DR
+         priority field was present in the Hello message received from the PIM
+         snooping neighbor. If present, the value is set to 'true'."
+    ::= { eMplsPimSnpgIfNbrEntry 7 }
+
+eMplsPimSnpgIfNbrLanDelay        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrLanDelay indicates the lan delay field
+         present in the Hello message received from the neighbor. If the
+         neighbor did not send this field, a default value of 500 ms is used
+         and the value of eMplsPimSnpgIfNbrLanDlayPrsnt is set to 'false'."
+    ::= { eMplsPimSnpgIfNbrEntry 8 }
+
+eMplsPimSnpgIfNbrLanDlayPrsnt    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrLanDlayPrsnt indicates whether the Hello
+         message received from the neighbor contained the Lan Delay field. If
+         present, the value is set to 'true'."
+    ::= { eMplsPimSnpgIfNbrEntry 9 }
+
+eMplsPimSnpgIfNbrTrckngSpprt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrTrckngSpprt indicates whether the T bit
+         in the LAN Prune Delay option was present in the Hello message. This
+         indicates the neighbor's capability to disable Join message
+         suppression."
+    ::= { eMplsPimSnpgIfNbrEntry 10 }
+
+eMplsPimSnpgIfNbrHoldTime        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrHoldTime indicates the value of the hold
+         time present in the Hello message."
+    ::= { eMplsPimSnpgIfNbrEntry 11 }
+
+eMplsPimSnpgIfNbrOvrdeIntrvl     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfNbrOvrdeIntrvl indicates the value of the
+         override interval present in the Hello message."
+    ::= { eMplsPimSnpgIfNbrEntry 12 }
+
+eMplsPimSnpgIfSecNbrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgIfSecNbrTable contains the secondary addresses advertised
+         by the PIM snooping neighbor for each evpn-mpls."
+    ::= { tmnxPimSnpgEMplsIfObjs 4 }
+
+eMplsPimSnpgIfSecNbrEntry        OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates a secondary address advertised by
+         the PIM snooping neighbor.
+
+         The Address List Option advertises all the secondary addresses
+         associated with the source evpn-mpls of the router originating the
+         HELLO message.
+
+         Entries in this table cannot be created or deleted using SNMP."
+    INDEX       {
+        svcId,
+        eMplsPimSnpgIfNbrAddrType,
+        eMplsPimSnpgIfNbrAddress,
+        eMplsPimSnpgIfSecNbrAddrType,
+        eMplsPimSnpgIfSecNbrAddress
+    }
+    ::= { eMplsPimSnpgIfSecNbrTable 1 }
+
+EMplsPimSnpgIfSecNbrEntry        ::= SEQUENCE
+{
+    eMplsPimSnpgIfSecNbrAddrType     InetAddressType,
+    eMplsPimSnpgIfSecNbrAddress      InetAddress
+}
+
+eMplsPimSnpgIfSecNbrAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfSecNbrAddrType indicates the type of IP
+         address of the PIM snooping secondary neighbor."
+    ::= { eMplsPimSnpgIfSecNbrEntry 1 }
+
+eMplsPimSnpgIfSecNbrAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfSecNbrAddress indicates the IP address of
+         the PIM snooping secondary neighbor."
+    ::= { eMplsPimSnpgIfSecNbrEntry 2 }
+
+eMplsPimSnpgIfGrpSrcTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgIfGrpSrcTable contains the (*,*,RP), (*,G) and (S,G) and
+         (S,G,rpt) entries for each evpn-mpls."
+    ::= { tmnxPimSnpgEMplsIfObjs 5 }
+
+eMplsPimSnpgIfGrpSrcEntry        OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the eMplsPimSnpgIfGrpSrcTable."
+    INDEX       {
+        svcId,
+        eMplsPimSnpgIfGrpSrcGrpAddrType,
+        eMplsPimSnpgIfGrpSrcGroupAddr,
+        eMplsPimSnpgIfGrpSrcSrcAddrType,
+        eMplsPimSnpgIfGrpSrcSourceAddr
+    }
+    ::= { eMplsPimSnpgIfGrpSrcTable 1 }
+
+EMplsPimSnpgIfGrpSrcEntry        ::= SEQUENCE
+{
+    eMplsPimSnpgIfGrpSrcGrpAddrType  InetAddressType,
+    eMplsPimSnpgIfGrpSrcGroupAddr    InetAddress,
+    eMplsPimSnpgIfGrpSrcSrcAddrType  InetAddressType,
+    eMplsPimSnpgIfGrpSrcSourceAddr   InetAddress,
+    eMplsPimSnpgIfGrpSrcJPState      INTEGER,
+    eMplsPimSnpgIfGrpSrcPrunePendTmr Unsigned32,
+    eMplsPimSnpgIfGrpSrcJPTimer      Unsigned32,
+    eMplsPimSnpgIfGrpSrcJPRptState   INTEGER,
+    eMplsPimSnpgIfGrpSrcRptPrnPndTmr Unsigned32,
+    eMplsPimSnpgIfGrpSrcRptJPTimer   Unsigned32,
+    eMplsPimSnpgIfGrpSrcUpTime       Unsigned32
+}
+
+eMplsPimSnpgIfGrpSrcGrpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcGrpAddrType indicates the type of
+         address of the multicast group address."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 1 }
+
+eMplsPimSnpgIfGrpSrcGroupAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcGroupAddr indicates the multicast
+         group address of the entry."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 2 }
+
+eMplsPimSnpgIfGrpSrcSrcAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcSrcAddrType indicates the type of
+         source address of the multicast sender."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 3 }
+
+eMplsPimSnpgIfGrpSrcSourceAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcSourceAddr indicates the source
+         address of the multicast sender."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 4 }
+
+eMplsPimSnpgIfGrpSrcJPState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcJPState indicates the Join Prune
+         state for this entry on the evpn-mpls. PIM Join or Prune messages are
+         sent by the downstream routers towards the RPF neighbor."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 5 }
+
+eMplsPimSnpgIfGrpSrcPrunePendTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcPrunePendTmr indicates the time
+         remaining before the evpn-mpls transitions the value of
+         eMplsPimSnpgIfGrpSrcJPState to 'noInfo'. The timer is set when the PIM
+         Prune message is received."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 6 }
+
+eMplsPimSnpgIfGrpSrcJPTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcJPTimer indicates the time remaining
+         before the evpn-mpls transitions the value of
+         eMplsPimSnpgIfGrpSrcJPState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         eMplsPimSnpgIfGrpSrcJPState is 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         eMplsPimSnpgIfGrpSrcJPState will not transition until an appropriate
+         cancelling of Join or Prune message is received."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 7 }
+
+eMplsPimSnpgIfGrpSrcJPRptState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcJPRptState indicates the Join Prune
+         Rpt state for this entry on the evpn-mpls.
+
+         PIM Join or Prune messages are sent by the downstream routers towards
+         the RPF neighbor.
+
+         (S,G,rpt) state is a result of receiving (S,G, rpt) JP message from
+         the downstream router on the RP tree."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 8 }
+
+eMplsPimSnpgIfGrpSrcRptPrnPndTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcRptPrnPndTmr indicates the time
+         remaining before the evpn-mpls transitions the value of
+         eMplsPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is set when the (S,G,rpt) PIM Prune message is received."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 9 }
+
+eMplsPimSnpgIfGrpSrcRptJPTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcRptJPTimer indicates the time
+         remaining before the evpn-mpls transitions the value of
+         eMplsPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         eMplsPimSnpgIfGrpSrcJPRptState is in 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         eMplsPimSnpgIfGrpSrcJPRptState will not transition until an
+         appropriate cancelling of Join or Prune message is received from the
+         downstream router."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 10 }
+
+eMplsPimSnpgIfGrpSrcUpTime       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgIfGrpSrcUpTime indicates the time since this
+         source group entry got created."
+    ::= { eMplsPimSnpgIfGrpSrcEntry 11 }
+
+eMplsPimSnpgGrpSrcIfTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EMplsPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "eMplsPimSnpgGrpSrcIfTable contains the PIM snooping enabled
+         evpn-mpls's for each entry in tmnxPimSnpgGrpSrcTable."
+    ::= { tmnxPimSnpgEMplsIfObjs 6 }
+
+eMplsPimSnpgGrpSrcIfEntry        OBJECT-TYPE
+    SYNTAX      EMplsPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the eMplsPimSnpgGrpSrcIfTable.
+
+         Each entry represents the state of the PIM enabled evpn-mpls for every
+         tmnxPimSnpgGrpSrcEntry."
+    INDEX       {
+        svcId,
+        eMplsPimSnpgGrpSrcGrpAddrType,
+        eMplsPimSnpgGrpSrcGroupAddress,
+        eMplsPimSnpgGrpSrcSrcAddrType,
+        eMplsPimSnpgGrpSrcSourceAddress
+    }
+    ::= { eMplsPimSnpgGrpSrcIfTable 1 }
+
+EMplsPimSnpgGrpSrcIfEntry        ::= SEQUENCE
+{
+    eMplsPimSnpgGrpSrcGrpAddrType    InetAddressType,
+    eMplsPimSnpgGrpSrcGroupAddress   InetAddress,
+    eMplsPimSnpgGrpSrcSrcAddrType    InetAddressType,
+    eMplsPimSnpgGrpSrcSourceAddress  InetAddress,
+    eMplsPimSnpgGrpSrcIfFlags        BITS
+}
+
+eMplsPimSnpgGrpSrcGrpAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgGrpSrcGrpAddrType indicates the type of IP
+         multicast group address represented by eMplsPimSnpgGrpSrcGroupAddress."
+    ::= { eMplsPimSnpgGrpSrcIfEntry 1 }
+
+eMplsPimSnpgGrpSrcGroupAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgGrpSrcGroupAddress indicates the IP multicast
+         group address for which this entry contains information."
+    ::= { eMplsPimSnpgGrpSrcIfEntry 2 }
+
+eMplsPimSnpgGrpSrcSrcAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgGrpSrcSrcAddrType indicates the type of IP
+         multicast source address represented by
+         eMplsPimSnpgGrpSrcSourceAddress."
+    ::= { eMplsPimSnpgGrpSrcIfEntry 3 }
+
+eMplsPimSnpgGrpSrcSourceAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgGrpSrcSourceAddress indicates the source
+         address for which this entry contains information."
+    ::= { eMplsPimSnpgGrpSrcIfEntry 4 }
+
+eMplsPimSnpgGrpSrcIfFlags        OBJECT-TYPE
+    SYNTAX      BITS {
+        immediateOifList    (0),
+        inheritedOifList    (1),
+        inheritedRptOifList (2),
+        joined              (3),
+        rpfPort             (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of eMplsPimSnpgGrpSrcIfFlags indicates the different lists
+         that this evpn-mpls belongs to."
+    ::= { eMplsPimSnpgGrpSrcIfEntry 5 }
+
+tmnxPimSnpgRVplsIfObjs           OBJECT IDENTIFIER ::= { tmnxPimSnpgObjs 6 }
+
+rVplsPimSnpgIfTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgIfTable contains information collected by PIM snooping for
+         each Routed VPLS (RVPLS) interface."
+    ::= { tmnxPimSnpgRVplsIfObjs 1 }
+
+rVplsPimSnpgIfEntry              OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates an RVPLS interface that
+         participates in the PIM snooping operation.
+
+         An entry in this table will be created when the corresponding RVPLS
+         interface is created."
+    INDEX       {
+        svcId,
+        vRtrID,
+        vRtrIfIndex,
+        vRtrPimNgAFGenAFType
+    }
+    ::= { rVplsPimSnpgIfTable 1 }
+
+RVplsPimSnpgIfEntry              ::= SEQUENCE
+{
+    rVplsPimSnpgIfLastChangeTime     TimeStamp,
+    rVplsPimSnpgIfOperState          ServiceOperStatus,
+    rVplsPimSnpgIfUpTime             Unsigned32,
+    rVplsPimSnpgIfCurrentGroups      Gauge32,
+    rVplsPimSnpgIfMaxGroupsTillNow   Counter32,
+    rVplsPimSnpgIfPwFwding           TruthValue
+}
+
+rVplsPimSnpgIfLastChangeTime     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfLastChangeTime indicates the sysUpTime when
+         this row was last modified."
+    ::= { rVplsPimSnpgIfEntry 1 }
+
+rVplsPimSnpgIfOperState          OBJECT-TYPE
+    SYNTAX      ServiceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfOperState indicates the current operational
+         state of PIM snooping on this RVPLS interface."
+    ::= { rVplsPimSnpgIfEntry 2 }
+
+rVplsPimSnpgIfUpTime             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfUpTime indicates the time since this RVPLS
+         interface became up."
+    ::= { rVplsPimSnpgIfEntry 3 }
+
+rVplsPimSnpgIfCurrentGroups      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfCurrentGroups indicates the number of
+         groups that currently have this RVPLS interface as an outgoing
+         interface."
+    ::= { rVplsPimSnpgIfEntry 4 }
+
+rVplsPimSnpgIfMaxGroupsTillNow   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfMaxGroupsTillNow indicates the highest
+         value that rVplsPimSnpgIfCurrentGroups had till now."
+    ::= { rVplsPimSnpgIfEntry 5 }
+
+rVplsPimSnpgIfPwFwding           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfPwFwding indicates if this RVPLS interface
+         is the forwarding interface of a pair of redundant pseudo-wire ports."
+    DEFVAL      { true }
+    ::= { rVplsPimSnpgIfEntry 6 }
+
+rVplsPimSnpgIfStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgIfStatsTable contains PIM snooping statistics for each
+         RVPLS interface."
+    ::= { tmnxPimSnpgRVplsIfObjs 2 }
+
+rVplsPimSnpgIfStatsEntry         OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rVplsPimSnpgIfStatsTable."
+    AUGMENTS    { rVplsPimSnpgIfEntry }
+    ::= { rVplsPimSnpgIfStatsTable 1 }
+
+RVplsPimSnpgIfStatsEntry         ::= SEQUENCE
+{
+    rVplsPimSnpgIfTxPkts             Counter32,
+    rVplsPimSnpgIfRxPkts             Counter32,
+    rVplsPimSnpgIfRxHellos           Counter32,
+    rVplsPimSnpgIfRxHellosDropped    Counter32,
+    rVplsPimSnpgIfRxNbrUnknown       Counter32,
+    rVplsPimSnpgIfRxBadChecksumDscrd Counter32,
+    rVplsPimSnpgIfRxBadVersionDscrd  Counter32,
+    rVplsPimSnpgIfRxBadEncodings     Counter32,
+    rVplsPimSnpgIfStarGTypes         Gauge32,
+    rVplsPimSnpgIfSGTypes            Gauge32,
+    rVplsPimSnpgIfJoinPolicyDrops    Counter32,
+    rVplsPimSnpgIfTxJoinPrunes       Counter32,
+    rVplsPimSnpgIfRxJoinPrunes       Counter32,
+    rVplsPimSnpgIfRxJoinPruneErrs    Counter32
+}
+
+rVplsPimSnpgIfTxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfTxPkts indicates the number of multicast
+         data packets transmitted on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 1 }
+
+rVplsPimSnpgIfRxPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxPkts indicates the number of multicast
+         data packets received on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 2 }
+
+rVplsPimSnpgIfRxHellos           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxHellos indicates the number of PIM hello
+         messages received on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 3 }
+
+rVplsPimSnpgIfRxHellosDropped    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxHellosDropped indicates the number of PIM
+         Hello messages which were received on this RVPLS interface but were
+         dropped."
+    ::= { rVplsPimSnpgIfStatsEntry 4 }
+
+rVplsPimSnpgIfRxNbrUnknown       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxNbrUnknown indicates the number of PIM
+         messages (other than Hello messages) which were received on this RVPLS
+         interface and were rejected because the adjacency with the neighbor
+         router was not already established."
+    ::= { rVplsPimSnpgIfStatsEntry 5 }
+
+rVplsPimSnpgIfRxBadChecksumDscrd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxBadChecksumDscrd indicates the number of
+         PIM messages received on this RVPLS interface which were discarded
+         because of bad checksum."
+    ::= { rVplsPimSnpgIfStatsEntry 6 }
+
+rVplsPimSnpgIfRxBadVersionDscrd  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxBadVersionDscrd indicates the number of
+         PIM messages with bad versions received on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 7 }
+
+rVplsPimSnpgIfRxBadEncodings     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxBadEncodings indicates the number of PIM
+         messages with bad encodings received on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 8 }
+
+rVplsPimSnpgIfStarGTypes         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfStarGTypes indicates the number of (*,G)
+         entries in rVplsPimSnpgIfGrpSrcTable."
+    ::= { rVplsPimSnpgIfStatsEntry 9 }
+
+rVplsPimSnpgIfSGTypes            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfSGTypes indicates the number of (S,G)
+         entries in rVplsPimSnpgIfGrpSrcTable."
+    ::= { rVplsPimSnpgIfStatsEntry 10 }
+
+rVplsPimSnpgIfJoinPolicyDrops    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfJoinPolicyDrops indicates the number of
+         times the join policy match resulted in dropping PIM Join-Prune
+         Message or one of the source group contained in the message."
+    ::= { rVplsPimSnpgIfStatsEntry 11 }
+
+rVplsPimSnpgIfTxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfTxJoinPrunes indicates the number of PIM
+         Join Prune messages transmitted on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 12 }
+
+rVplsPimSnpgIfRxJoinPrunes       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxJoinPrunes indicates the number of PIM
+         Join Prune messages received on this RVPLS interface."
+    ::= { rVplsPimSnpgIfStatsEntry 13 }
+
+rVplsPimSnpgIfRxJoinPruneErrs    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfRxJoinPruneErrs indicates the number of
+         errors while processing Join-Prune messages received on this RVPLS
+         interface."
+    ::= { rVplsPimSnpgIfStatsEntry 14 }
+
+rVplsPimSnpgIfNbrTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgIfNbrTable contains the PIM neighbors for each RVPLS
+         interface."
+    ::= { tmnxPimSnpgRVplsIfObjs 3 }
+
+rVplsPimSnpgIfNbrEntry           OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgIfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rVplsPimSnpgIfNbrTable."
+    INDEX       {
+        svcId,
+        vRtrID,
+        vRtrIfIndex,
+        rVplsPimSnpgIfNbrAddrType,
+        rVplsPimSnpgIfNbrAddress
+    }
+    ::= { rVplsPimSnpgIfNbrTable 1 }
+
+RVplsPimSnpgIfNbrEntry           ::= SEQUENCE
+{
+    rVplsPimSnpgIfNbrAddrType        InetAddressType,
+    rVplsPimSnpgIfNbrAddress         InetAddress,
+    rVplsPimSnpgIfNbrUpTime          Unsigned32,
+    rVplsPimSnpgIfNbrExpiryTime      Unsigned32,
+    rVplsPimSnpgIfNbrGenId           Unsigned32,
+    rVplsPimSnpgIfNbrDrPriority      Unsigned32,
+    rVplsPimSnpgIfNbrDrPriorPresent  TruthValue,
+    rVplsPimSnpgIfNbrLanDelay        Unsigned32,
+    rVplsPimSnpgIfNbrLanDlayPrsnt    TruthValue,
+    rVplsPimSnpgIfNbrTrckngSpprt     TruthValue,
+    rVplsPimSnpgIfNbrHoldTime        Unsigned32,
+    rVplsPimSnpgIfNbrOvrdeIntrvl     Unsigned32
+}
+
+rVplsPimSnpgIfNbrAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrAddrType indicates the type of IP
+         address of the PIM snooping neighbor."
+    ::= { rVplsPimSnpgIfNbrEntry 1 }
+
+rVplsPimSnpgIfNbrAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrAddress indicates the IP address of the
+         PIM snooping neighbor for which this entry contains information."
+    ::= { rVplsPimSnpgIfNbrEntry 2 }
+
+rVplsPimSnpgIfNbrUpTime          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrUpTime indicates the time since this PIM
+         snooping neighbor last became a neighbor of the local router."
+    ::= { rVplsPimSnpgIfNbrEntry 3 }
+
+rVplsPimSnpgIfNbrExpiryTime      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrExpiryTime indicates the minimum time
+         remaining before this PIM snooping neighbor will be aged out.
+
+         If the value of this object is zero, it means that this neighbor will
+         never be aged out. This happens when the PIM snooping neighbor sends a
+         Hello message with Holdtime set to `0xffff'."
+    ::= { rVplsPimSnpgIfNbrEntry 4 }
+
+rVplsPimSnpgIfNbrGenId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrGenId indicates a randomly generated
+         32-bit value that is regenerated each time PIM forwarding is
+         started or restarted on the RVPLS interface, including when the router
+         itself restarts.  When a Hello message with a new
+         tmnxPimSnpgIfNbrGenId is received from a neighbor, any old Hello
+         information about that neighbor is discarded and superseded by the
+         information from the new Hello message."
+    ::= { rVplsPimSnpgIfNbrEntry 5 }
+
+rVplsPimSnpgIfNbrDrPriority      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrDrPriority indicates neighbor's DR
+         priority which is received in the hello message. If the Hello Message
+         did not contain the DR priority field, the value of this object will
+         be set to '1' and rVplsPimSnpgIfNbrDrPriorPresent will be set to
+         'false'."
+    ::= { rVplsPimSnpgIfNbrEntry 6 }
+
+rVplsPimSnpgIfNbrDrPriorPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrDrPriorPresent indicates whether the DR
+         priority field was present in the Hello message received from the PIM
+         snooping neighbor. If present, the value is set to 'true'."
+    ::= { rVplsPimSnpgIfNbrEntry 7 }
+
+rVplsPimSnpgIfNbrLanDelay        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrLanDelay indicates the lan delay field
+         present in the Hello message received from the neighbor. If the
+         neighbor did not send this field, a default value of 500 ms is used
+         and the value of rVplsPimSnpgIfNbrLanDlayPrsnt is set to 'false'."
+    ::= { rVplsPimSnpgIfNbrEntry 8 }
+
+rVplsPimSnpgIfNbrLanDlayPrsnt    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrLanDlayPrsnt indicates whether the Hello
+         message received from the neighbor contained the Lan Delay field. If
+         present, the value is set to 'true'."
+    ::= { rVplsPimSnpgIfNbrEntry 9 }
+
+rVplsPimSnpgIfNbrTrckngSpprt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrTrckngSpprt indicates whether the T bit
+         in the LAN Prune Delay option was present in the Hello message. This
+         indicates the neighbor's capability to disable Join message
+         suppression."
+    ::= { rVplsPimSnpgIfNbrEntry 10 }
+
+rVplsPimSnpgIfNbrHoldTime        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrHoldTime indicates the value of the hold
+         time present in the Hello message."
+    ::= { rVplsPimSnpgIfNbrEntry 11 }
+
+rVplsPimSnpgIfNbrOvrdeIntrvl     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfNbrOvrdeIntrvl indicates the value of the
+         override interval present in the Hello message."
+    ::= { rVplsPimSnpgIfNbrEntry 12 }
+
+rVplsPimSnpgIfSecNbrTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgIfSecNbrTable contains the secondary addresses advertised
+         by the PIM snooping neighbor for each RVPLS interface."
+    ::= { tmnxPimSnpgRVplsIfObjs 4 }
+
+rVplsPimSnpgIfSecNbrEntry        OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgIfSecNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates a secondary address advertised by
+         the PIM snooping neighbor.
+
+         The Address List Option advertises all the secondary addresses
+         associated with the source RVPLS interface of the router originating
+         the HELLO message.
+
+         Entries in this table cannot be created or deleted using SNMP."
+    INDEX       {
+        svcId,
+        vRtrID,
+        vRtrIfIndex,
+        rVplsPimSnpgIfNbrAddrType,
+        rVplsPimSnpgIfNbrAddress,
+        rVplsPimSnpgIfSecNbrAddrType,
+        rVplsPimSnpgIfSecNbrAddress
+    }
+    ::= { rVplsPimSnpgIfSecNbrTable 1 }
+
+RVplsPimSnpgIfSecNbrEntry        ::= SEQUENCE
+{
+    rVplsPimSnpgIfSecNbrAddrType     InetAddressType,
+    rVplsPimSnpgIfSecNbrAddress      InetAddress
+}
+
+rVplsPimSnpgIfSecNbrAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfSecNbrAddrType indicates the type of IP
+         address of the PIM snooping secondary neighbor."
+    ::= { rVplsPimSnpgIfSecNbrEntry 1 }
+
+rVplsPimSnpgIfSecNbrAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfSecNbrAddress indicates the IP address of
+         the PIM snooping secondary neighbor."
+    ::= { rVplsPimSnpgIfSecNbrEntry 2 }
+
+rVplsPimSnpgIfGrpSrcTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgIfGrpSrcTable contains the (*,*,RP), (*,G) and (S,G) and
+         (S,G,rpt) entries for each RVPLS interface."
+    ::= { tmnxPimSnpgRVplsIfObjs 5 }
+
+rVplsPimSnpgIfGrpSrcEntry        OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgIfGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rVplsPimSnpgIfGrpSrcTable."
+    INDEX       {
+        svcId,
+        vRtrID,
+        vRtrIfIndex,
+        rVplsPimSnpgIfGrpSrcGrpAddrType,
+        rVplsPimSnpgIfGrpSrcGroupAddr,
+        rVplsPimSnpgIfGrpSrcSrcAddrType,
+        rVplsPimSnpgIfGrpSrcSourceAddr
+    }
+    ::= { rVplsPimSnpgIfGrpSrcTable 1 }
+
+RVplsPimSnpgIfGrpSrcEntry        ::= SEQUENCE
+{
+    rVplsPimSnpgIfGrpSrcGrpAddrType  InetAddressType,
+    rVplsPimSnpgIfGrpSrcGroupAddr    InetAddress,
+    rVplsPimSnpgIfGrpSrcSrcAddrType  InetAddressType,
+    rVplsPimSnpgIfGrpSrcSourceAddr   InetAddress,
+    rVplsPimSnpgIfGrpSrcJPState      INTEGER,
+    rVplsPimSnpgIfGrpSrcPrunePendTmr Unsigned32,
+    rVplsPimSnpgIfGrpSrcJPTimer      Unsigned32,
+    rVplsPimSnpgIfGrpSrcJPRptState   INTEGER,
+    rVplsPimSnpgIfGrpSrcRptPrnPndTmr Unsigned32,
+    rVplsPimSnpgIfGrpSrcRptJPTimer   Unsigned32,
+    rVplsPimSnpgIfGrpSrcUpTime       Unsigned32
+}
+
+rVplsPimSnpgIfGrpSrcGrpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcGrpAddrType indicates the type of
+         address of the multicast group address."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 1 }
+
+rVplsPimSnpgIfGrpSrcGroupAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcGroupAddr indicates the multicast
+         group address of the entry."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 2 }
+
+rVplsPimSnpgIfGrpSrcSrcAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcSrcAddrType indicates the type of
+         source address of the multicast sender."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 3 }
+
+rVplsPimSnpgIfGrpSrcSourceAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcSourceAddr indicates the source
+         address of the multicast sender."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 4 }
+
+rVplsPimSnpgIfGrpSrcJPState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcJPState indicates the Join Prune
+         state for this entry on the RVPLS interface. PIM Join or Prune
+         messages are sent by the downstream routers towards the RPF neighbor."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 5 }
+
+rVplsPimSnpgIfGrpSrcPrunePendTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcPrunePendTmr indicates the time
+         remaining before the RVPLS interface transitions the value of
+         rVplsPimSnpgIfGrpSrcJPState to 'noInfo'. The timer is set when the PIM
+         Prune message is received."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 6 }
+
+rVplsPimSnpgIfGrpSrcJPTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcJPTimer indicates the time remaining
+         before the RVPLS interface transitions the value of
+         rVplsPimSnpgIfGrpSrcJPState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         rVplsPimSnpgIfGrpSrcJPState is 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         rVplsPimSnpgIfGrpSrcJPState will not transition until an appropriate
+         cancelling of Join or Prune message is received."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 7 }
+
+rVplsPimSnpgIfGrpSrcJPRptState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noInfo    (0),
+        join      (1),
+        prunePend (2),
+        pruned    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcJPRptState indicates the Join Prune
+         Rpt state for this entry on the RVPLS interface.
+
+         PIM Join or Prune messages are sent by the downstream routers towards
+         the RPF neighbor.
+
+         (S,G,rpt) state is a result of receiving (S,G, rpt) JP message from
+         the downstream router on the RP tree."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 8 }
+
+rVplsPimSnpgIfGrpSrcRptPrnPndTmr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcRptPrnPndTmr indicates the time
+         remaining before the RVPLS interface transitions the value of
+         rVplsPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is set when the (S,G,rpt) PIM Prune message is received."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 9 }
+
+rVplsPimSnpgIfGrpSrcRptJPTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcRptJPTimer indicates the time
+         remaining before the RVPLS interface transitions the value of
+         rVplsPimSnpgIfGrpSrcJPRptState to 'noInfo'.
+
+         The timer is started or restarted when a valid Join message is
+         received. If the value of this object is zero and
+         rVplsPimSnpgIfGrpSrcJPRptState is in 'join' state, it means that the
+         downstream router sent a holdtime of '0xffff'. In this case,
+         rVplsPimSnpgIfGrpSrcJPRptState will not transition until an
+         appropriate cancelling of Join or Prune message is received from the
+         downstream router."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 10 }
+
+rVplsPimSnpgIfGrpSrcUpTime       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgIfGrpSrcUpTime indicates the time since this
+         source group entry got created."
+    ::= { rVplsPimSnpgIfGrpSrcEntry 11 }
+
+rVplsPimSnpgGrpSrcIfTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RVplsPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "rVplsPimSnpgGrpSrcIfTable contains the PIM snooping enabled RVPLS
+         interfaces for each entry in tmnxPimSnpgGrpSrcTable."
+    ::= { tmnxPimSnpgRVplsIfObjs 6 }
+
+rVplsPimSnpgGrpSrcIfEntry        OBJECT-TYPE
+    SYNTAX      RVplsPimSnpgGrpSrcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rVplsPimSnpgGrpSrcIfTable.
+
+         Each entry represents the state of the PIM enabled RVPLS interface for
+         every tmnxPimSnpgGrpSrcEntry."
+    INDEX       {
+        svcId,
+        rVplsPimSnpgGrpSrcGrpAddrType,
+        rVplsPimSnpgGrpSrcGroupAddress,
+        rVplsPimSnpgGrpSrcSrcAddrType,
+        rVplsPimSnpgGrpSrcSourceAddress,
+        vRtrID,
+        vRtrIfIndex
+    }
+    ::= { rVplsPimSnpgGrpSrcIfTable 1 }
+
+RVplsPimSnpgGrpSrcIfEntry        ::= SEQUENCE
+{
+    rVplsPimSnpgGrpSrcGrpAddrType    InetAddressType,
+    rVplsPimSnpgGrpSrcGroupAddress   InetAddress,
+    rVplsPimSnpgGrpSrcSrcAddrType    InetAddressType,
+    rVplsPimSnpgGrpSrcSourceAddress  InetAddress,
+    rVplsPimSnpgGrpSrcIfFlags        BITS
+}
+
+rVplsPimSnpgGrpSrcGrpAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgGrpSrcGrpAddrType indicates the type of IP
+         multicast group address represented by rVplsPimSnpgGrpSrcGroupAddress."
+    ::= { rVplsPimSnpgGrpSrcIfEntry 1 }
+
+rVplsPimSnpgGrpSrcGroupAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgGrpSrcGroupAddress indicates the IP multicast
+         group address for which this entry contains information."
+    ::= { rVplsPimSnpgGrpSrcIfEntry 2 }
+
+rVplsPimSnpgGrpSrcSrcAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgGrpSrcSrcAddrType indicates the type of IP
+         multicast source address represented by
+         rVplsPimSnpgGrpSrcSourceAddress."
+    ::= { rVplsPimSnpgGrpSrcIfEntry 3 }
+
+rVplsPimSnpgGrpSrcSourceAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgGrpSrcSourceAddress indicates the source
+         address for which this entry contains information."
+    ::= { rVplsPimSnpgGrpSrcIfEntry 4 }
+
+rVplsPimSnpgGrpSrcIfFlags        OBJECT-TYPE
+    SYNTAX      BITS {
+        immediateOifList    (0),
+        inheritedOifList    (1),
+        inheritedRptOifList (2),
+        joined              (3),
+        rpfPort             (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of rVplsPimSnpgGrpSrcIfFlags indicates the different lists
+         that this RVPLS interface belongs to."
+    ::= { rVplsPimSnpgGrpSrcIfEntry 5 }
+
+tmnxPimSnpgConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 53 }
+
+tmnxPimSnpgCompliances           OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 1 }
+
+tmnxPimSnpgCompliance            MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended PIM protocol on
+         Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgGlobalGroup,
+            tmnxPimSnpgIfGroup,
+            tmnxPimSnpgNotificationGroup,
+            tmnxPimSnpgIfSecNbrV6v0Group
+        }
+    ::= { tmnxPimSnpgCompliances 1 }
+
+tmnxPimSnpgComplianceV14v0       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended PIM protocol on
+         Nokia 7x50 SR release 14.0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgGlobalGroup,
+            tmnxPimSnpgIfGroup,
+            tmnxPimSnpgNotificationGroup,
+            tmnxPimSnpgIfSecNbrV6v0Group,
+            tmnxPimSnpgIfV14v0Group
+        }
+    ::= { tmnxPimSnpgCompliances 2 }
+
+tmnxPimSnpgComplianceV22v0       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended PIM  protocol on
+         Nokia 7x50 SR release 22.0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgNotificationGroup
+        }
+    ::= { tmnxPimSnpgCompliances 3 }
+
+tmnxPimSnpgComplianceV23v0       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended PIM  protocol on
+         Nokia 7x50 SR release 23.0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgIfV23v0Group
+        }
+    ::= { tmnxPimSnpgCompliances 4 }
+
+tmnxPimSnpgGroups                OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 2 }
+
+tmnxPimSnpgGlobalGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgGenTableLstChanged,
+        tmnxPimSnpgGenRowStatus,
+        tmnxPimSnpgGenRowLastChanged,
+        tmnxPimSnpgGenAdminState,
+        tmnxPimSnpgGenOperState,
+        tmnxPimSnpgGenHoldTime,
+        tmnxPimSnpgGenDRType,
+        tmnxPimSnpgGenDR,
+        tmnxPimSnpgGenTrackingSupport,
+        tmnxPimSnpgGenUpTime,
+        tmnxPimSnpgGenMode,
+        tmnxPimSnpgGenGroupPolicy1,
+        tmnxPimSnpgGenGroupPolicy2,
+        tmnxPimSnpgGenGroupPolicy3,
+        tmnxPimSnpgGenGroupPolicy4,
+        tmnxPimSnpgGenGroupPolicy5,
+        tmnxPimSnpgGrpSrcRpfNbrAddrType,
+        tmnxPimSnpgGrpSrcRpfNbrAddr,
+        tmnxPimSnpgGrpSrcRpfIfIndex,
+        tmnxPimSnpgGrpSrcRptRpfNbrAdrTp,
+        tmnxPimSnpgGrpSrcRptRpfNbrAddr,
+        tmnxPimSnpgGrpSrcUstrmJpState,
+        tmnxPimSnpgGrpSrcUstrmJpTimer,
+        tmnxPimSnpgGrpSrcUstrmRptJpSt,
+        tmnxPimSnpgGrpSrcUstrmRptOvdTmr,
+        tmnxPimSnpgGrpSrcNumJoinOif,
+        tmnxPimSnpgGrpSrcNumImdiateOif,
+        tmnxPimSnpgGrpSrcNumInhritedOif,
+        tmnxPimSnpgGrpSrcNumInherRptOif,
+        tmnxPimSnpgGrpSrcNumIif,
+        tmnxPimSnpgGrpSrcUpTime,
+        tmnxPimSnpgGrpSrcIfFlags,
+        tmnxPimSnpgGenStatsStarGTypes,
+        tmnxPimSnpgGenStatsSGTypes,
+        tmnxPimSnpgGrpSrcStatsFwdedPkts,
+        tmnxPimSnpgGrpSrcStatsFwdedOct
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM general
+         capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxPimSnpgGroups 1 }
+
+tmnxPimSnpgIfGroup               OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIfTableLastChanged,
+        tmnxPimSnpgIfLastChangeTime,
+        tmnxPimSnpgIfOperState,
+        tmnxPimSnpgIfUpTime,
+        tmnxPimSnpgIfMaxGroups,
+        tmnxPimSnpgIfCurrentGroups,
+        tmnxPimSnpgIfMaxGroupsTillNow,
+        tmnxPimSnpgIfNbrUpTime,
+        tmnxPimSnpgIfNbrExpiryTime,
+        tmnxPimSnpgIfNbrGenId,
+        tmnxPimSnpgIfNbrDrPriority,
+        tmnxPimSnpgIfNbrDrPriorPresent,
+        tmnxPimSnpgIfNbrLanDelay,
+        tmnxPimSnpgIfNbrLanDlayPrsnt,
+        tmnxPimSnpgIfNbrTrckngSpprt,
+        tmnxPimSnpgIfNbrHoldTime,
+        tmnxPimSnpgIfNbrOvrdeIntrvl,
+        tmnxPimSnpgIfGrpSrcJPState,
+        tmnxPimSnpgIfGrpSrcPrunePendTmr,
+        tmnxPimSnpgIfGrpSrcJPTimer,
+        tmnxPimSnpgIfGrpSrcJPRptState,
+        tmnxPimSnpgIfGrpSrcRptPrnPndTmr,
+        tmnxPimSnpgIfGrpSrcRptJPTimer,
+        tmnxPimSnpgIfGrpSrcUpTime,
+        tmnxPimSnpgIfTxPkts,
+        tmnxPimSnpgIfRxPkts,
+        tmnxPimSnpgIfRxHellos,
+        tmnxPimSnpgIfRxHellosDropped,
+        tmnxPimSnpgIfRxNbrUnknown,
+        tmnxPimSnpgIfRxBadChecksumDscrd,
+        tmnxPimSnpgIfRxBadVersionDscrd,
+        tmnxPimSnpgIfRxBadEncodings,
+        tmnxPimSnpgIfStarGTypes,
+        tmnxPimSnpgIfSGTypes,
+        tmnxPimSnpgIfJoinPolicyDrops,
+        tmnxPimSnpgIfTxJoinPrunes,
+        tmnxPimSnpgIfRxJoinPrunes,
+        tmnxPimSnpgIfRxJoinPruneErrs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interfaces
+         on Nokia 7x50 SR series systems."
+    ::= { tmnxPimSnpgGroups 2 }
+
+tmnxPimSnpgNotificationGroup     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPimSnpgIfNeighborLoss,
+        tmnxPimSnpgIfNeighborUp,
+        tmnxPimSnpgSGLimitExceeded,
+        tmnxPimSnpgSnoopModeChanged,
+        tmnxPimSnpgIfMaxNbrReached,
+        tmnxPimSnpgMaxNbrReached
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting PIM snooping protocol on Nokia
+         7x50 SR series systems."
+    ::= { tmnxPimSnpgGroups 3 }
+
+tmnxPimSnpgIfSecNbrV6v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIfSecNbrTblLstChanged,
+        tmnxPimSnpgIfSecNbrAddrType,
+        tmnxPimSnpgIfSecNbrAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interface
+         neighbors on Nokia 7x50 6.0 series systems."
+    ::= { tmnxPimSnpgGroups 4 }
+
+tmnxPimSnpgIfV14v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIfPwFwding
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interfaces
+         on Nokia 7x50 SR release 14.0 series systems."
+    ::= { tmnxPimSnpgGroups 5 }
+
+tmnxPimSnpgIfV22v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIfNbrCount
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM snooping
+         protocols on Nokia 7x50 SR release 22.0 series systems."
+    ::= { tmnxPimSnpgGroups 6 }
+
+tmnxPimSnpgIfV23v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIntfNbrCount,
+        tmnxPimSnpgNbrCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM snooping
+         protocols on Nokia 7x50 SR release 23.0 series systems."
+    ::= { tmnxPimSnpgGroups 7 }
+
+tmnxPimsnpgIfV23v0ObsoletedGroup OBJECT-GROUP
+    OBJECTS     {
+        tmnxPimSnpgIfNbrCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects made obsolete related to extended PIM snooping
+         protocols on Nokia 7x50 SR release 23.0 series systems."
+    ::= { tmnxPimSnpgGroups 8 }
+
+tmnxPimSnpgVxlanCompliances      OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 3 }
+
+tmnxPimSnpgVxlanComplianceV15v0  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PIM Snooping on VXLAN on
+         Nokia 7x50 SR series release 15.0 systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgVxlanIfV15v0Group
+        }
+    ::= { tmnxPimSnpgVxlanCompliances 1 }
+
+tmnxPimSnpgVxlanGroups           OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 4 }
+
+tmnxPimSnpgVxlanIfV15v0Group     OBJECT-GROUP
+    OBJECTS     {
+        vxlanPimSnpgIfLastChangeTime,
+        vxlanPimSnpgIfOperState,
+        vxlanPimSnpgIfUpTime,
+        vxlanPimSnpgIfCurrentGroups,
+        vxlanPimSnpgIfMaxGroupsTillNow,
+        vxlanPimSnpgIfPwFwding,
+        vxlanPimSnpgIfTxPkts,
+        vxlanPimSnpgIfRxPkts,
+        vxlanPimSnpgIfRxHellos,
+        vxlanPimSnpgIfRxHellosDropped,
+        vxlanPimSnpgIfRxNbrUnknown,
+        vxlanPimSnpgIfRxBadChecksumDscrd,
+        vxlanPimSnpgIfRxBadVersionDscrd,
+        vxlanPimSnpgIfRxBadEncodings,
+        vxlanPimSnpgIfStarGTypes,
+        vxlanPimSnpgIfSGTypes,
+        vxlanPimSnpgIfJoinPolicyDrops,
+        vxlanPimSnpgIfTxJoinPrunes,
+        vxlanPimSnpgIfRxJoinPrunes,
+        vxlanPimSnpgIfRxJoinPruneErrs,
+        vxlanPimSnpgIfNbrUpTime,
+        vxlanPimSnpgIfNbrExpiryTime,
+        vxlanPimSnpgIfNbrGenId,
+        vxlanPimSnpgIfNbrDrPriority,
+        vxlanPimSnpgIfNbrDrPriorPresent,
+        vxlanPimSnpgIfNbrLanDelay,
+        vxlanPimSnpgIfNbrLanDlayPrsnt,
+        vxlanPimSnpgIfNbrTrckngSpprt,
+        vxlanPimSnpgIfNbrHoldTime,
+        vxlanPimSnpgIfNbrOvrdeIntrvl,
+        vxlanPimSnpgIfSecNbrAddrType,
+        vxlanPimSnpgIfSecNbrAddress,
+        vxlanPimSnpgIfGrpSrcJPState,
+        vxlanPimSnpgIfGrpSrcPrunePendTmr,
+        vxlanPimSnpgIfGrpSrcJPTimer,
+        vxlanPimSnpgIfGrpSrcJPRptState,
+        vxlanPimSnpgIfGrpSrcRptPrnPndTmr,
+        vxlanPimSnpgIfGrpSrcRptJPTimer,
+        vxlanPimSnpgIfGrpSrcUpTime,
+        vxlanPimSnpgGrpSrcIfFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interfaces
+         on Nokia 7x50 SR release 15.0 series systems."
+    ::= { tmnxPimSnpgVxlanGroups 1 }
+
+tmnxPimSnpgEMplsCompliances      OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 5 }
+
+tmnxPimSnpgEMplsComplianceV15v0  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PIM Snooping on evpn-mpls
+         on Nokia 7x50 SR series release 15.0 systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgEMplsIfV15v0Group
+        }
+    ::= { tmnxPimSnpgEMplsCompliances 1 }
+
+tmnxPimSnpgEMplsGroups           OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 6 }
+
+tmnxPimSnpgEMplsIfV15v0Group     OBJECT-GROUP
+    OBJECTS     {
+        eMplsPimSnpgIfLastChangeTime,
+        eMplsPimSnpgIfOperState,
+        eMplsPimSnpgIfUpTime,
+        eMplsPimSnpgIfCurrentGroups,
+        eMplsPimSnpgIfMaxGroupsTillNow,
+        eMplsPimSnpgIfPwFwding,
+        eMplsPimSnpgIfTxPkts,
+        eMplsPimSnpgIfRxPkts,
+        eMplsPimSnpgIfRxHellos,
+        eMplsPimSnpgIfRxHellosDropped,
+        eMplsPimSnpgIfRxNbrUnknown,
+        eMplsPimSnpgIfRxBadChecksumDscrd,
+        eMplsPimSnpgIfRxBadVersionDscrd,
+        eMplsPimSnpgIfRxBadEncodings,
+        eMplsPimSnpgIfStarGTypes,
+        eMplsPimSnpgIfSGTypes,
+        eMplsPimSnpgIfJoinPolicyDrops,
+        eMplsPimSnpgIfTxJoinPrunes,
+        eMplsPimSnpgIfRxJoinPrunes,
+        eMplsPimSnpgIfRxJoinPruneErrs,
+        eMplsPimSnpgIfNbrUpTime,
+        eMplsPimSnpgIfNbrExpiryTime,
+        eMplsPimSnpgIfNbrGenId,
+        eMplsPimSnpgIfNbrDrPriority,
+        eMplsPimSnpgIfNbrDrPriorPresent,
+        eMplsPimSnpgIfNbrLanDelay,
+        eMplsPimSnpgIfNbrLanDlayPrsnt,
+        eMplsPimSnpgIfNbrTrckngSpprt,
+        eMplsPimSnpgIfNbrHoldTime,
+        eMplsPimSnpgIfNbrOvrdeIntrvl,
+        eMplsPimSnpgIfSecNbrAddrType,
+        eMplsPimSnpgIfSecNbrAddress,
+        eMplsPimSnpgIfGrpSrcJPState,
+        eMplsPimSnpgIfGrpSrcPrunePendTmr,
+        eMplsPimSnpgIfGrpSrcJPTimer,
+        eMplsPimSnpgIfGrpSrcJPRptState,
+        eMplsPimSnpgIfGrpSrcRptPrnPndTmr,
+        eMplsPimSnpgIfGrpSrcRptJPTimer,
+        eMplsPimSnpgIfGrpSrcUpTime,
+        eMplsPimSnpgGrpSrcIfFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interfaces
+         on Nokia 7x50 SR release 15.0 series systems."
+    ::= { tmnxPimSnpgEMplsGroups 1 }
+
+tmnxPimSnpgRvplsCompliances      OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 7 }
+
+tmnxPimSnpgRvplsComplianceV16v0  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PIM Snooping on RVPLS
+         interfaces on Nokia 7x50 SR series release 16.0 systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPimSnpgRvplsIfV16v0Group
+        }
+    ::= { tmnxPimSnpgRvplsCompliances 1 }
+
+tmnxPimSnpgRvplsIfGroups         OBJECT IDENTIFIER ::= { tmnxPimSnpgConformance 8 }
+
+tmnxPimSnpgRvplsIfV16v0Group     OBJECT-GROUP
+    OBJECTS     {
+        rVplsPimSnpgIfLastChangeTime,
+        rVplsPimSnpgIfOperState,
+        rVplsPimSnpgIfUpTime,
+        rVplsPimSnpgIfCurrentGroups,
+        rVplsPimSnpgIfMaxGroupsTillNow,
+        rVplsPimSnpgIfPwFwding,
+        rVplsPimSnpgIfTxPkts,
+        rVplsPimSnpgIfRxPkts,
+        rVplsPimSnpgIfRxHellos,
+        rVplsPimSnpgIfRxHellosDropped,
+        rVplsPimSnpgIfRxNbrUnknown,
+        rVplsPimSnpgIfRxBadChecksumDscrd,
+        rVplsPimSnpgIfRxBadVersionDscrd,
+        rVplsPimSnpgIfRxBadEncodings,
+        rVplsPimSnpgIfStarGTypes,
+        rVplsPimSnpgIfSGTypes,
+        rVplsPimSnpgIfJoinPolicyDrops,
+        rVplsPimSnpgIfTxJoinPrunes,
+        rVplsPimSnpgIfRxJoinPrunes,
+        rVplsPimSnpgIfRxJoinPruneErrs,
+        rVplsPimSnpgIfNbrUpTime,
+        rVplsPimSnpgIfNbrExpiryTime,
+        rVplsPimSnpgIfNbrGenId,
+        rVplsPimSnpgIfNbrDrPriority,
+        rVplsPimSnpgIfNbrDrPriorPresent,
+        rVplsPimSnpgIfNbrLanDelay,
+        rVplsPimSnpgIfNbrLanDlayPrsnt,
+        rVplsPimSnpgIfNbrTrckngSpprt,
+        rVplsPimSnpgIfNbrHoldTime,
+        rVplsPimSnpgIfNbrOvrdeIntrvl,
+        rVplsPimSnpgIfSecNbrAddrType,
+        rVplsPimSnpgIfSecNbrAddress,
+        rVplsPimSnpgIfGrpSrcJPState,
+        rVplsPimSnpgIfGrpSrcPrunePendTmr,
+        rVplsPimSnpgIfGrpSrcJPTimer,
+        rVplsPimSnpgIfGrpSrcJPRptState,
+        rVplsPimSnpgIfGrpSrcRptPrnPndTmr,
+        rVplsPimSnpgIfGrpSrcRptJPTimer,
+        rVplsPimSnpgIfGrpSrcUpTime,
+        rVplsPimSnpgGrpSrcIfFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended PIM interfaces
+         on Nokia 7x50 SR release 16.0 series systems."
+    ::= { tmnxPimSnpgRvplsIfGroups 1 }
+
+tmnxPimSnpgNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 53 }
+
+tmnxPimSnpgNotifications         OBJECT IDENTIFIER ::= { tmnxPimSnpgNotifyPrefix 0 }
+
+tmnxPimSnpgIfNeighborLoss        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPimSnpgIfNbrUpTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A tmnxPimSnpgIfNeighborLoss notification is generated when the PIM
+         adjacency with a neighbor is lost."
+    ::= { tmnxPimSnpgNotifications 1 }
+
+tmnxPimSnpgIfNeighborUp          NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPimSnpgIfNbrUpTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "A tmnxPimSnpgIfNeighborUp notification is generated when the PIM
+         adjacency with a new neighbor is established."
+    ::= { tmnxPimSnpgNotifications 2 }
+
+tmnxPimSnpgSGLimitExceeded       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCardHwIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "A tmnxPimSnpgSGLimitExceeded notification is generated when a (S,G)
+         record is failed to be programmed to an IOM because the supported
+         (S,G) limit is exceeded. This limit is currently at 16000 (S,G)
+         entries."
+    ::= { tmnxPimSnpgNotifications 3 }
+
+tmnxPimSnpgSnoopModeChanged      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPimSnpgGenOperState,
+        tmnxPimSnpgGenMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "A tmnxPimSnpgSnoopModeChanged notification is generated when a
+         snooping mode is changed from proxy to snoop or vice versa."
+    ::= { tmnxPimSnpgNotifications 4 }
+
+tmnxPimSnpgIfMaxNbrReached       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPimSnpgIntfNbrCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPimSnpgIfMaxNbrReached is generated when PIM snooping
+         interface has received more than 10K neighbors.
+
+         [EFFECT] We restrict the number of neighbors to 10K per interface.
+
+         [RECOVERY] The operator should be informed that the limit is higher
+         than allowed."
+    ::= { tmnxPimSnpgNotifications 5 }
+
+tmnxPimSnpgMaxNbrReached         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPimSnpgNbrCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPimSnpgMaxNbrReached is generated when PIM snooping
+         instance has received more than 10K neighbors.
+
+         [EFFECT] We restrict the number of neighbors to 10K per instance.
+
+         [RECOVERY] The operator should be informed that the limit is higher
+         than allowed."
+    ::= { tmnxPimSnpgNotifications 6 }
+
+END

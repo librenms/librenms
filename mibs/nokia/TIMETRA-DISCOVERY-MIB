@@ -1,0 +1,372 @@
+TIMETRA-DISCOVERY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        InetAddress, InetAddressType
+                                                FROM INET-ADDRESS-MIB
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        NOTIFICATION-TYPE, Unsigned32,
+        IpAddress                               FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, 
+        NOTIFICATION-GROUP                      FROM SNMPv2-CONF
+
+        SnmpAdminString
+                                                FROM SNMP-FRAMEWORK-MIB
+                                                
+        TEXTUAL-CONVENTION, TimeStamp,
+        TruthValue, RowStatus, DisplayString    FROM SNMPv2-TC
+                
+        timetraSRMIBModules, tmnxSRObjs,
+        tmnxSRConfs, tmnxSRNotifyPrefix         FROM TIMETRA-GLOBAL-MIB
+        
+        tmnxChassisIndex, tmnxChassisNotifyChassisId
+                                                FROM TIMETRA-CHASSIS-MIB
+        tmnxPortNotifyPortId
+                                                FROM TIMETRA-PORT-MIB
+        
+        TmnxCellularSimCardNumber, TmnxCellularImsi
+                                                FROM TIMETRA-CELLULAR-MIB        
+        ;
+
+
+tmnxDiscoveryMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "201703090000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO    
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the 
+        configuration discovery components on the Nokia 7xxx device.
+        
+        Copyright 2017-2018 Nokia.  All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains 
+        all title and ownership in the Specification, including any 
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive 
+        license to use and distribute an unmodified copy of this 
+        Specification in connection with management of Nokia 
+        products, and without fee, provided this copyright notice and 
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia 
+        makes no warranty, either express or implied, as to the use, 
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "201703090000Z"
+        DESCRIPTION     "Rev 1.0                9 Mar 2017 00:00 
+                         1.0 release of the TIMETRA-DISCOVERY-MIB."
+                         
+        ::= { timetraSRMIBModules 112 }
+
+
+tmnxDiscoveryObjs             OBJECT IDENTIFIER ::= { tmnxSRObjs 112 }
+tmnxDiscoveryNotifyObjs       OBJECT IDENTIFIER ::= { tmnxDiscoveryObjs 1 }
+
+tmnxDiscoveryMIBConformance   OBJECT IDENTIFIER ::= { tmnxSRConfs 112 }
+tmnxDiscoveryConformance      OBJECT IDENTIFIER ::= { tmnxDiscoveryMIBConformance 1 }
+
+tmnxDiscoveryNotificationsPrefix   OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 112 }
+    tmnxDiscoveryNotifications     OBJECT IDENTIFIER ::= { tmnxDiscoveryNotificationsPrefix 0 } 
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      TIMETRA-DISCOVERY-MIB textual conventions
+--
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--     TmnxDiscoveryStatus
+--
+TmnxDiscoveryStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxDiscoveryStatus is an enumerated integer
+         that indicates the status of configuration discovery on this system.
+             noDiscovery (0)     - indicates that config-discovery was not
+                                   used during the boot process of this
+                                   system.
+             connecting (1)      - indicates that config-discovery is 
+                                   connecting to network.
+             requestingConfig (2)- indicates that config-discovery is
+                                   requesting configuration
+             terminated (3)      - indicates that config-discovery was
+                                   terminated by the operator.
+             complete  (4)       - indicates that config-discovery is
+                                   finished."
+    SYNTAX      INTEGER {
+                    noDiscovery      (0),
+                    connecting       (1),
+                    requestingConfig (2),
+                    terminated       (3),
+                    complete         (4)
+                }
+                    
+                                
+--
+-- Config-Discovery Table (System)
+--
+tmnxDiscoveryTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDiscoveryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDiscoveryTable has one entry for the system."
+    ::= { tmnxDiscoveryObjs 2 }
+tmnxDiscoveryEntry   OBJECT-TYPE
+    SYNTAX      TmnxDiscoveryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the runtime information of config-discovery
+        of this system.  The information contained in this table is since
+        last system boot."
+    INDEX       { tmnxChassisIndex }
+    ::= { tmnxDiscoveryTable 1 }
+
+TmnxDiscoveryEntry ::=
+    SEQUENCE {
+        tmnxDiscoveryStatus          TmnxDiscoveryStatus,
+        tmnxDiscoveryStartTime       TimeStamp,
+        tmnxDiscoveryEndTime         TimeStamp
+   }
+   
+tmnxDiscoveryStatus  OBJECT-TYPE
+    SYNTAX      TmnxDiscoveryStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "tmnxDiscoveryStatus specifies the current status of the Configuration-Discovery Agent.
+        
+        Only the value of complete (3) can be set."
+    ::= { tmnxDiscoveryEntry 1 }
+
+
+tmnxDiscoveryStartTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxDiscoveryStartTime specifies the last time the Config-Discovery Agent was
+        started since the last system boot."
+    ::= { tmnxDiscoveryEntry 2 }
+    
+tmnxDiscoveryEndTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxDiscoveryEndTime specifies the last time the Config-Discovery Agent finished
+        since the last system boot. "
+    ::= { tmnxDiscoveryEntry 3 }
+    
+--
+-- Config-Discovery Boot Options 
+--
+tmnxDiscoveryBofInfo    OBJECT IDENTIFIER ::= { tmnxDiscoveryObjs 3 }
+
+tmnxSbiDiscoverConfig  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSbiDiscoverConfig specifies whether or not the system
+         will use Config-Discovery during bootup to generate its configuration. When set to 'true',
+         Config-Discovery is enabled."
+    DEFVAL { false }
+    ::= { tmnxDiscoveryBofInfo 1 }
+
+tmnxSbiDiscoverReqDest1  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSbiDiscoverReqDest1 specifies the destination hostname or ip-address for
+        sending discovery requests."
+    DEFVAL { ''H }
+    ::= { tmnxDiscoveryBofInfo 2}
+
+tmnxSbiDiscoverReqDest2  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSbiDiscoverReqDest2 specifies the secondary destination hostname or
+        ip-address for sending discovery requests."
+    DEFVAL { ''H }
+    ::= { tmnxDiscoveryBofInfo 3}
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ --
+ --     Notification Definition section
+ --
+ --                     Notification Objects
+ --
+
+tmnxAdpNotifyChassisSerialNum             OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notifications for ADP to indicate chassis serial number."
+    ::= { tmnxDiscoveryNotifyObjs 1 }
+
+tmnxAdpNotifyCellSimCardId                OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notifications for ADP to indicate Cellular SIM card Id."
+    ::= { tmnxDiscoveryNotifyObjs 2 }
+
+tmnxAdpNotifyCellSimCardImsi              OBJECT-TYPE
+    SYNTAX      TmnxCellularImsi
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notifications for ADP to indicate Cellular SIM IMSI."
+    ::= { tmnxDiscoveryNotifyObjs 3 }
+
+tmnxAdpNotifyCellPdnIpAddrType             OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notifications for ADP to indicate PDN network address
+        type."
+    ::= { tmnxDiscoveryNotifyObjs 4 }
+
+tmnxAdpNotifyCellPdnIpAddr                 OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notifications for ADP to indicate PDN network address."
+    ::= { tmnxDiscoveryNotifyObjs 5 }
+
+tmnxAdpNotifyEndReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   operatorTerminated (1),
+                   complete           (2)
+                   }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by notification for ADP to indicate the reason ADP stoppped.
+                 operatorTerminated - Process terminated by operator before
+                                      it completed
+                 complete           - Process had completed successfully"
+    ::= { tmnxDiscoveryNotifyObjs 6 }
+
+tmnxAdpNotifySwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The software product release version number for the software image
+         currently running on the system."
+    ::= { tmnxDiscoveryNotifyObjs 7 }
+
+tmnxDiscoveryCellularReq  NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyChassisId,
+        tmnxPortNotifyPortId,
+        tmnxAdpNotifyChassisSerialNum,
+        tmnxAdpNotifyCellSimCardId,
+        tmnxAdpNotifyCellSimCardImsi,
+        tmnxAdpNotifyCellPdnIpAddrType,
+        tmnxAdpNotifyCellPdnIpAddr,
+        tmnxAdpNotifySwVersion
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxDiscoveryCellularReq notification request config discovery
+         over cellular network." 
+    ::= { tmnxDiscoveryNotifications 1 }
+
+tmnxDiscoveryEndNotify  NOTIFICATION-TYPE
+    OBJECTS {
+        tmnxChassisNotifyChassisId,
+        tmnxAdpNotifyChassisSerialNum,
+        tmnxAdpNotifyEndReason
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tmnxDiscoveryEndNotify notification indicates that auto-discovery
+         process has ended." 
+    ::= { tmnxDiscoveryNotifications 2 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      The compliance specifications.
+--
+
+tmnxDiscoveryCompliances     OBJECT IDENTIFIER ::= { tmnxDiscoveryConformance 1 }
+tmnxDiscoveryGroups          OBJECT IDENTIFIER ::= { tmnxDiscoveryConformance 2 }
+
+
+aluDiscoveryCompV1v0  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for revision 1.0 of TIMETRA-DISCOVERY-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 
+            tmnxDiscoveryGroup,
+            tmnxDiscoveryGrpNotifyObjs,
+            tmnxDiscoveryNotificationGroup
+        }
+    ::= { tmnxDiscoveryCompliances 1 }
+
+
+-- units of conformance
+
+tmnxDiscoveryGroup     OBJECT-GROUP
+    OBJECTS {   tmnxDiscoveryStatus,
+                tmnxDiscoveryStartTime,
+                tmnxDiscoveryEndTime,
+                tmnxSbiDiscoverConfig,
+                tmnxSbiDiscoverReqDest1,
+                tmnxSbiDiscoverReqDest2
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the config-discovery
+         on Nokia series systems."
+    ::= { tmnxDiscoveryGroups 1 }
+
+tmnxDiscoveryGrpNotifyObjs     OBJECT-GROUP
+    OBJECTS {   tmnxAdpNotifyChassisSerialNum,
+                tmnxAdpNotifyCellSimCardId,
+                tmnxAdpNotifyCellSimCardImsi,
+                tmnxAdpNotifyCellPdnIpAddrType,
+                tmnxAdpNotifyCellPdnIpAddr,
+                tmnxAdpNotifyEndReason,
+                tmnxAdpNotifySwVersion
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifies of the config-discovery
+         on Nokia series systems."
+    ::= { tmnxDiscoveryGroups 2 }
+    
+tmnxDiscoveryNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   { 
+                      tmnxDiscoveryCellularReq,
+                      tmnxDiscoveryEndNotify
+                    }
+    STATUS        current
+    DESCRIPTION
+        "The group of notifications supporting the management of config-discovery
+        on Nokia series systems."
+    ::= { tmnxDiscoveryGroups 3 }
+
+END

@@ -1,0 +1,2001 @@
+ALU-NGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter32, Counter64,
+    IpAddress
+                                                FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION, RowStatus,
+    TimeStamp
+                                                FROM SNMPv2-TC
+
+    TItemDescription, TLNamedItemOrEmpty,
+    IpAddressPrefixLength, TIpProtocol,
+    TTcpUdpPort, TOperator                      FROM TIMETRA-TC-MIB
+
+    aluSARMIBModules, aluSARObjs,
+    aluSARConfs, aluSARNotifyPrefix
+                                                FROM ALU-SAR-GLOBAL-MIB
+
+    sdpInfoEntry, sdpBindBaseStatsEntry
+                                                FROM TIMETRA-SDP-MIB
+
+    svcBaseInfoEntry
+                                                FROM TIMETRA-SERV-MIB
+
+    tmnxChassisIndex, tmnxCardSlotNum,
+    tmnxMDASlotNum
+                                                FROM TIMETRA-CHASSIS-MIB
+
+    vRtrIfStatsEntry, vRtrID
+                                                FROM TIMETRA-VRTR-MIB
+
+    InterfaceIndex                              FROM IF-MIB
+
+    TFilterID, TFilterScope, TEntryId           FROM TIMETRA-FILTER-MIB
+
+    tmnxWlanGwSoftGreIfEntry                    FROM TIMETRA-WLAN-GW-MIB
+    ;
+
+aluNgeMIBModule MODULE-IDENTITY
+    LAST-UPDATED "201407040000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB  module to manage and provision
+         the  Nokia 7705 device with Network Group Encryption
+         (NGE) and other related features.
+
+         Copyright 2008-2018 Nokia. All rights reserved.
+
+         Reproduction of  this document is authorized  on the condition 
+         that the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary  intellectual  property. Nokia retains all 
+         title and ownership in the Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive 
+         license to use and distribute an unmodified copy of this 
+         Specification in connection with management of Nokia
+         products, and without fee, provided this copyright notice and 
+         license appear on all copies.
+
+         This  Specification  is supplied `as is', and Nokia
+         makes no warranty, either express or implied, as to the use, 
+         operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "201407040000Z"
+        DESCRIPTION     "Rev 0.1                04 Jul 2014 00:00
+                         Initial version of the ALU-NGE-MIB."
+
+    ::= {aluSARMIBModules 18}
+
+-- ----------------------------------------------------------------------------
+--  MIB structure
+-- ----------------------------------------------------------------------------
+aluNgeObjs                      OBJECT IDENTIFIER ::= { aluSARObjs 20 }
+    aluNgeSystemObjs                OBJECT IDENTIFIER ::= { aluNgeObjs 1 }
+    aluNgeKeygroupObjs              OBJECT IDENTIFIER ::= { aluNgeObjs 2 }
+    aluNgeKeygroupSpiObjs           OBJECT IDENTIFIER ::= { aluNgeObjs 3 }
+    aluNgeKeygroupSdpBindingObjs    OBJECT IDENTIFIER ::= { aluNgeObjs 4 }
+    aluNgeKeygroupVrfBindingObjs    OBJECT IDENTIFIER ::= { aluNgeObjs 5 }
+    aluNgeStatsObjs                 OBJECT IDENTIFIER ::= { aluNgeObjs 6 }
+    aluNgeKeygroupNameObjs          OBJECT IDENTIFIER ::= { aluNgeObjs 7 }
+    aluNgeNotifyObjs                OBJECT IDENTIFIER ::= { aluNgeObjs 8 }
+    aluNgeKeygroupRIBindingObjs     OBJECT IDENTIFIER ::= { aluNgeObjs 9 }
+    aluNgeKeygroupEthBindingObjs    OBJECT IDENTIFIER ::= { aluNgeObjs 10 }
+    aluNgeIPExceptObjs              OBJECT IDENTIFIER ::= { aluNgeObjs 11 }
+    aluNgeKeygroupWlanGwBindingObjs OBJECT IDENTIFIER ::= { aluNgeObjs 12 }
+
+aluNgeNotificationsPrefix       OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 16 }
+    aluNgeNotifications             OBJECT IDENTIFIER ::= { aluNgeNotificationsPrefix 0 }
+
+aluNgeMIBConformance            OBJECT IDENTIFIER ::= { aluSARConfs 20 }
+    aluNgeCompliances               OBJECT IDENTIFIER ::= { aluNgeMIBConformance 1 }
+    aluNgeGroups                    OBJECT IDENTIFIER ::= { aluNgeMIBConformance 2 }
+
+-- ----------------------------------------------------------------------------
+--  Textual Conventions
+-- ----------------------------------------------------------------------------
+AluNgeKeygroupId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A number used to identify an entry in the aluNgeKeygroupTable." 
+    SYNTAX          Unsigned32 (1..127)
+
+AluNgeKeygroupIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A number used to identify an entry in the aluNgeKeygroupTable or zero." 
+    SYNTAX          Unsigned32 (0..127)
+
+AluNgeAuthAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "AluNgeAuthAlgorithm data type is an enumerated integer 
+         that describes the values used to identify the 
+         hashing algorithm.
+
+         Value Descriptions:
+   
+         sha256   - Choosing this value configures the use of 
+                    hmac-sha256 algorithm for authentication.
+
+         sha512   - Choosing this value configures the use of 
+                    hmac-sha512 algorithm for authentication."
+    SYNTAX          INTEGER {
+                        sha256 (1),
+                        sha512 (2)
+                    }
+
+AluNgeEncrAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "AluNgeEncrAlgorithm data type is an enumerated integer 
+         that describes the values used to identify the encryption 
+         algorithm.
+
+         Value Descriptions:
+
+         aes128 - Choosing this value configures the aes algorithm 
+                  with a block size of 128 bits. This is a 
+                  mandatory implementation size for aes. As of 
+                  today, this is a very strong algorithm choice.
+
+         aes256 - Choosing this value configures the aes algorithm
+                  with a block size of 256 bits. This is the 
+                  strongest available version of aes."
+    SYNTAX          INTEGER {
+                         aes128 (1),
+                         aes256 (2)
+                    }
+
+AluNgeKeygroupSpiId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A number used to identify an entry in the aluNgeKeygroupSpiTable." 
+    SYNTAX          Unsigned32 (1..1023)
+
+AluNgeKeygroupSpiIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A number used to identify an entry in the aluNgeKeygroupSpiTable or zero." 
+    SYNTAX          Unsigned32 (0..1023)
+
+-- ----------------------------------------------------------------------------
+-- NGE objects
+-- ----------------------------------------------------------------------------
+aluNgeLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 32..2047)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeLabel specifies the network-wide unique label to be used
+         by group encryption. It is used as an identifier for encrypted packets and 
+         is a mandatory configuration for group encryption to be functional. Once 
+         a label value is used, it will be reserved and will not be available for any 
+         MPLS interface label-map pop operation."
+     DEFVAL     { 0 }
+    ::= { aluNgeSystemObjs 1 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Table
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup entries."
+    ::= { aluNgeKeygroupObjs 1 }
+
+aluNgeKeygroupEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup entry."
+    INDEX { aluNgeKeygroupId }
+    ::= { aluNgeKeygroupTable 1 }
+
+AluNgeKeygroupTableEntry ::= SEQUENCE {
+    aluNgeKeygroupId                        AluNgeKeygroupId,
+    aluNgeKeygroupRowStatus                 RowStatus,
+    aluNgeKeygroupDescription               TItemDescription,
+    aluNgeKeygroupAuthAlgorithm             AluNgeAuthAlgorithm,
+    aluNgeKeygroupEncrAlgorithm             AluNgeEncrAlgorithm,
+    aluNgeKeygroupActiveOutboundSa          AluNgeKeygroupSpiIdOrZero,
+    aluNgeKeygroupOutboundSaActivateTime    TimeStamp,
+    aluNgeKeygroupName                      TLNamedItemOrEmpty
+}
+
+aluNgeKeygroupId OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupId specifies the id of a keygroup 
+         entry and is the primary index for the table 
+         aluNgeKeygroupTable."
+    ::= { aluNgeKeygroupEntry 1 }
+
+aluNgeKeygroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The aluNgeKeygroupRowStatus object is used to create and 
+         delete rows in the aluNgeKeygroupTable."
+    ::= { aluNgeKeygroupEntry 2 }
+
+aluNgeKeygroupDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupDescription specifies the 
+         user-provided description for each aluNgeKeygroupEntry in the 
+         table aluNgeKeygroupTable."
+    DEFVAL      { "" }
+    ::= { aluNgeKeygroupEntry 3 }
+
+aluNgeKeygroupAuthAlgorithm OBJECT-TYPE
+    SYNTAX      AluNgeAuthAlgorithm
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupAuthAlgorithm specifies the Hashing 
+         algorithm used for the AH (Authentication Header) protocol's 
+         authentication function."
+    DEFVAL      { sha256 }
+    ::= { aluNgeKeygroupEntry 4 }
+
+aluNgeKeygroupEncrAlgorithm OBJECT-TYPE
+    SYNTAX      AluNgeEncrAlgorithm 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupEncrAlgorithm specifies the 
+         Encryption algorithm to be used. Encryption only applies 
+         to ESP(Encapsulating Security Payload) configurations."
+    DEFVAL      { aes128 }
+    ::= { aluNgeKeygroupEntry 5 }
+
+aluNgeKeygroupActiveOutboundSa OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupSpiIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupActiveOutboundSa specifies the SPI
+         to be used when performing encryption and authentication 
+         on egressing packets using this keygroup."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupEntry 6 }
+
+aluNgeKeygroupOutboundSaActivateTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of aluNgeKeygroupOutboundSaActivateTime indicates the sysUpTime
+        at the time the outbound security association is activated."
+    ::= { aluNgeKeygroupEntry 7 }
+
+aluNgeKeygroupName OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupName specifies the name to associate
+        with this keygroup."
+    DEFVAL { ''H }
+    ::= { aluNgeKeygroupEntry 8 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Spi Table
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupSpiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupTableSpiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup SPI entries."
+    ::= { aluNgeKeygroupSpiObjs 1 }
+
+aluNgeKeygroupSpiEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupTableSpiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup SPI entry."
+    INDEX { aluNgeKeygroupId,
+            aluNgeKeygroupSpiId }
+    ::= { aluNgeKeygroupSpiTable 1 }
+
+AluNgeKeygroupTableSpiEntry ::= SEQUENCE {
+    aluNgeKeygroupSpiId                     AluNgeKeygroupSpiId,
+    aluNgeKeygroupSpiRowStatus              RowStatus,
+    aluNgeKeygroupSpiAuthKey                OCTET STRING,
+    aluNgeKeygroupSpiEncrKey                OCTET STRING,
+    aluNgeKeygroupSpiInstallTime            TimeStamp,
+    aluNgeKeygroupSpiKeyCRC                 Unsigned32
+}
+
+aluNgeKeygroupSpiId OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupSpiId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiId specifies the id of a keygroup 
+         SPI entry and is the primary index for the table 
+         aluNgeKeygroupSpiTable."
+    ::= { aluNgeKeygroupSpiEntry 1 }
+
+aluNgeKeygroupSpiRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The aluNgeKeygroupSpiRowStatus object is used to create and 
+         delete rows in the aluNgeKeygroupSpiTable."
+    ::= { aluNgeKeygroupSpiEntry 2 }
+
+aluNgeKeygroupSpiAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiAuthKey specifies the key used 
+         for the authentication algorithm defined by the 
+         aluNgeKeygroupAuthAlgorithm in the keygroup indexed
+         by aluNgeKeygroupId.
+
+         The length of the key must match the length required by the 
+         authentication algorithm. If a key of another length is set, the
+         request will fail with an 'inconsistentValue' error.
+
+         There is no default value for aluNgeKeygroupSpiAuthKey and 
+         this is a required object when creating an entry in 
+         aluNgeKeygroupSpiTable. If aluNgeKeygroupSpiAuthKey is not specified 
+         when creating an entry, the request will fail with an 
+         'inconsistentValue' error.
+
+         Any GET request on this object returns an empty string."
+    ::= { aluNgeKeygroupSpiEntry 3 }
+
+aluNgeKeygroupSpiEncrKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiEncrKey specifies the key used 
+         for the encryption algorithm defined by the 
+         aluNgeKeygroupEncrAlgorithm in the keygroup indexed
+         by aluNgeKeygroupId.
+
+         The length of the key must match the length required by the 
+         encryption algorithm. If a key of another length is set, the
+         request will fail with an 'inconsistentValue' error.
+
+         There is no default value for aluNgeKeygroupSpiEncrKey and 
+         this is a required object when creating an entry in 
+         aluNgeKeygroupSpiTable. If aluNgeKeygroupSpiEncrKey is not specified 
+         when creating an entry, the request will fail with an 
+         'inconsistentValue' error.
+
+         Any GET request on this object returns an empty string."
+    ::= { aluNgeKeygroupSpiEntry 4 }
+
+aluNgeKeygroupSpiInstallTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of aluNgeKeygroupSpiInstallTime indicates the sysUpTime
+        at the time the security association is installed."
+    ::= { aluNgeKeygroupSpiEntry 5 }
+
+aluNgeKeygroupSpiKeyCRC OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of aluNgeKeygroupSpiKeyCRC indicates the
+        result of CRC calculation base on the configured SPI keys."
+    ::= { aluNgeKeygroupSpiEntry 6 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Sdp Binding Table
+-- ALU Extensions of sdpInfoEntry
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupSdpBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupSdpBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup sdp binding entries."
+    ::= { aluNgeKeygroupSdpBindingObjs 1 }
+
+aluNgeKeygroupSdpBindingEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupSdpBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup sdp binding entry."
+    AUGMENTS {
+        sdpInfoEntry
+    }
+    ::= { aluNgeKeygroupSdpBindingTable 1 }
+
+AluNgeKeygroupSdpBindingEntry ::= SEQUENCE {
+    aluNgeKeygroupSdpBindingInbound         AluNgeKeygroupIdOrZero,
+    aluNgeKeygroupSdpBindingOutbound        AluNgeKeygroupIdOrZero
+}
+
+aluNgeKeygroupSdpBindingInbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindingInbound specifies the keygroup
+         id used for inbound traffic verification. Inbound traffic must contain
+         SPIs configured within this keygroup.
+         If the value of aluNgeKeygroupSdpBindingInbound is not defined,
+         all SPIs configured within the system will be considered when
+         verifying inbound traffic."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupSdpBindingEntry 1 }
+
+aluNgeKeygroupSdpBindingOutbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindingOutbound specifies the keygroup
+         id used for outbound traffic encryption. The value of
+         aluNgeKeygroupActiveOutboundSa within the specified keygroup must be
+         defined.
+         If the value of aluNgeKeygroupSdpBindingOutbound is not defined,
+         all outbound traffic from this SDP will be clear."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupSdpBindingEntry 2 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Vrf Binding Table
+-- ALU Extensions of svcBaseInfoEntry
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupVrfBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupVrfBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup vrf binding entries."
+    ::= { aluNgeKeygroupVrfBindingObjs 1 }
+
+aluNgeKeygroupVrfBindingEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupVrfBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup vrf binding entry."
+    AUGMENTS {
+        svcBaseInfoEntry
+    }
+    ::= { aluNgeKeygroupVrfBindingTable 1 }
+
+AluNgeKeygroupVrfBindingEntry ::= SEQUENCE {
+    aluNgeKeygroupVrfBindingInbound         AluNgeKeygroupIdOrZero,
+    aluNgeKeygroupVrfBindingOutbound        AluNgeKeygroupIdOrZero
+}
+
+aluNgeKeygroupVrfBindingInbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupVrfBindingInbound specifies the keygroup
+         id used for inbound traffic verification. Inbound traffic must contain
+         SPIs configured within this keygroup.
+         If the value of aluNgeKeygroupVrfBindingInbound is not defined,
+         all SPIs configured within the system will be considered when
+         verifying inbound traffic."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupVrfBindingEntry 1 }
+
+aluNgeKeygroupVrfBindingOutbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupVrfBindingOutbound specifies the keygroup
+         id used for outbound traffic encryption. The value of
+         aluNgeKeygroupActiveOutboundSa within the specified keygroup must be
+         defined.
+         If the value of aluNgeKeygroupVrfBindingOutbound is not defined,
+         all outbound traffic from this VRF will be clear."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupVrfBindingEntry 2 }
+aluNgeKeygroupRIBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupRIBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup router interface binding entries."
+    ::= { aluNgeKeygroupRIBindingObjs 1 }
+
+aluNgeKeygroupRIBindingEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupRIBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup router interface binding entry."
+    INDEX { vRtrID, aluNgeKeygroupRIBindingIfIndex }
+    ::= { aluNgeKeygroupRIBindingTable 1 }
+
+AluNgeKeygroupRIBindingEntry ::= SEQUENCE {
+    aluNgeKeygroupRIBindingIfIndex           InterfaceIndex,
+    aluNgeKeygroupRIBindingRowStatus         RowStatus,
+    aluNgeKeygroupRIBindingInbound           AluNgeKeygroupIdOrZero,
+    aluNgeKeygroupRIBindingOutbound          AluNgeKeygroupIdOrZero,
+    aluNgeKeygroupRIBindInExceptId           TFilterID,
+    aluNgeKeygroupRIBindOutExceptId          TFilterID
+}
+
+aluNgeKeygroupRIBindingIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The unique value which identifies this interface, as stored in the vRtrIfTable."
+    ::= { aluNgeKeygroupRIBindingEntry 1 }
+
+aluNgeKeygroupRIBindingRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status. The creation or deletion of a router interface entry
+         causes enabling or disabling of group encryption for the interface."
+    ::= { aluNgeKeygroupRIBindingEntry 2 }
+
+aluNgeKeygroupRIBindingInbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupRIBindingInbound specifies the keygroup
+         id used for inbound traffic verification. Inbound traffic must contain
+         SPIs configured within this keygroup.
+         If the value of aluNgeKeygroupRIBindingInbound is not defined,
+         all SPIs configured within the system will be considered when
+         verifying inbound traffic."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupRIBindingEntry 3 }
+
+aluNgeKeygroupRIBindingOutbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupRIBindingOutbound specifies the keygroup
+         id used for outbound traffic encryption. The value of
+         aluNgeKeygroupActiveOutboundSa within the specified keygroup must be
+         defined.
+         If the value of aluNgeKeygroupRIBindingOutbound is not defined,
+         all outbound traffic from this interface will be clear."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupRIBindingEntry 4 }
+
+aluNgeKeygroupRIBindInExceptId OBJECT-TYPE
+    SYNTAX          TFilterID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object aluNgeKeygroupRIBindInExceptId specifies the
+                     row index in the aluNgeIPExceptionTable corresponding to this
+                     ingress exception, or zero if no exception is specified."
+    DEFVAL          { 0 }
+    ::= { aluNgeKeygroupRIBindingEntry 5 }
+
+aluNgeKeygroupRIBindOutExceptId OBJECT-TYPE
+    SYNTAX          TFilterID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object aluNgeKeygroupRIBindOutExceptId specifies the
+                     row index in the aluNgeIPExceptionTable corresponding to this
+                     egress exception, or zero if no exception is specified."
+    DEFVAL          { 0 }
+    ::= { aluNgeKeygroupRIBindingEntry 6 }
+
+aluNgeIPExceptionTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AluNgeIPExceptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Contains a list of all IP exceptions configured on this system."
+    ::= { aluNgeIPExceptObjs 1 }
+
+aluNgeIPExceptionEntry OBJECT-TYPE
+    SYNTAX     AluNgeIPExceptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Information about a particular IP Exception entry. Entries are
+         create/deleted by the user. Entries have a presumed StorageType of
+         nonVolatile."
+    INDEX { aluNgeIPExceptionId }
+    ::= { aluNgeIPExceptionTable 1 }
+
+AluNgeIPExceptionEntry ::= SEQUENCE {
+    aluNgeIPExceptionId          TFilterID,
+    aluNgeIPExceptionRowStatus   RowStatus,
+    aluNgeIPExceptionScope       TFilterScope,
+    aluNgeIPExceptionDescription TItemDescription,
+    aluNgeIPExceptionName        TLNamedItemOrEmpty
+}
+
+aluNgeIPExceptionId OBJECT-TYPE
+    SYNTAX     TFilterID
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Uniquely identifies an IP exception."
+    ::= { aluNgeIPExceptionEntry 1 }
+
+aluNgeIPExceptionRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object allows entries to be created and deleted in the
+         aluNgeIPExceptionTable."
+    ::= { aluNgeIPExceptionEntry 2 }
+
+aluNgeIPExceptionScope OBJECT-TYPE
+    SYNTAX      TFilterScope
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the scope of this exception definition."
+    DEFVAL { template }
+    ::= { aluNgeIPExceptionEntry 3 }
+
+aluNgeIPExceptionDescription OBJECT-TYPE
+    SYNTAX     TItemDescription
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of aluNgeIPExceptionDescription specifies the 
+         user-provided description for each aluNgeIPExceptionEntry in the 
+         table aluNgeIPExceptionTable."
+    DEFVAL     { "" }
+    ::= { aluNgeIPExceptionEntry 4 }
+
+aluNgeIPExceptionName OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeIPExceptionName specifies the name to associate
+        with this IP exception."
+    DEFVAL { ''H }
+    ::= { aluNgeIPExceptionEntry 5 }
+
+aluNgeIPExceptNameTableLastChgd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the sysUpTime at the time of
+         the last modification of aluNgeIPExceptionNameTable.
+
+         If no changes were made to the entry since the last
+         re-initialization of the local network management subsystem,
+         then this object is zero."
+    ::= { aluNgeIPExceptObjs 2}
+
+aluNgeIPExceptionNameTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AluNgeIPExceptionNameEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table that contains IP exception name to Id mappings. Entries are
+         created automatically by the system when an aluIPExceptionName object
+         is set for an IP exception."
+    ::= { aluNgeIPExceptObjs 3 }
+
+aluNgeIPExceptionNameEntry OBJECT-TYPE
+    SYNTAX     AluNgeIPExceptionNameEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP exception name to Id mapping."
+    INDEX      { aluNgeIPExceptionName }
+    ::= { aluNgeIPExceptionNameTable 1 }
+
+AluNgeIPExceptionNameEntry ::=
+    SEQUENCE {
+        aluNgeIPExceptionNameId          TFilterID,
+        aluNgeIPExceptionNameRowStatus   RowStatus,
+        aluNgeIPExceptionNameLastChanged TimeStamp
+    }
+
+aluNgeIPExceptionNameId OBJECT-TYPE
+    SYNTAX     TFilterID
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the filter Id associated with the IP
+         exception name."
+    ::= { aluNgeIPExceptionNameEntry 1 }
+
+aluNgeIPExceptionNameRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the row status."
+    ::= { aluNgeIPExceptionNameEntry 2 }
+
+aluNgeIPExceptionNameLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the sysUpTime at the time
+         of the last modification of this entry.
+
+         If no changes were made to the entry since the last
+         re-initialization of the local network management
+         subsystem, then this object is zero."
+     ::= { aluNgeIPExceptionNameEntry 3 }
+
+aluNgeIPExceptionParamsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AluNgeIPExceptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table of all IP exception match entries for all IP exceptions."
+    ::= { aluNgeIPExceptObjs 4 }
+
+aluNgeIPExceptionParamsEntry OBJECT-TYPE
+    SYNTAX     AluNgeIPExceptionParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A match entry for a particular IP exception.
+         Each match constitutes some criteria by which an unencrypted
+         IP packet will be accepted at the router interface to which
+         the IP exception is applied."
+     INDEX { aluNgeIPExceptionId, aluNgeIPExceptionParamsId }
+     ::= { aluNgeIPExceptionParamsTable 1 }
+
+AluNgeIPExceptionParamsEntry ::= SEQUENCE {
+    aluNgeIPExceptionParamsId        TEntryId,
+    aluNgeIPExceptionParamsRowStatus RowStatus,
+    aluNgeIPExceptParamsDescription  TItemDescription,
+    aluNgeIPExceptParamsSourceIpAddr IpAddress,
+    aluNgeIPExceptParamsSourceIpMask IpAddressPrefixLength,
+    aluNgeIPExceptParamsDestIpAddr   IpAddress,
+    aluNgeIPExceptParamsDestIpMask   IpAddressPrefixLength,
+    aluNgeIPExceptParamsProtocol     TIpProtocol,
+    aluNgeIPExceptParamsSrcPortVal1  TTcpUdpPort,
+    aluNgeIPExceptParamsSrcPortVal2  TTcpUdpPort,
+    aluNgeIPExceptParamsSrcPortOpr   TOperator,
+    aluNgeIPExceptParamsDestPortVal1 TTcpUdpPort,
+    aluNgeIPExceptParamsDestPortVal2 TTcpUdpPort,
+    aluNgeIPExceptParamsDestPortOpr  TOperator,
+    aluNgeIPExceptParamsIcmpCode     INTEGER,
+    aluNgeIPExceptParamsIcmpType     INTEGER,
+    aluNgeIPExceptParmSrcIpFullMask  IpAddress,
+    aluNgeIPExceptParmDestIpFullMask IpAddress,
+    aluNgeIPExceptIngressHitCount    Counter64,
+    aluNgeIPExceptEgressHitCount     Counter64,
+    aluNgeIPExceptIngrHitByteCount   Counter64,
+    aluNgeIPExceptEgressHitByteCount Counter64
+}
+
+aluNgeIPExceptionParamsId OBJECT-TYPE
+    SYNTAX     TEntryId
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is the index for the match entry. Each IP exception can have multiple
+         entries."
+     ::= { aluNgeIPExceptionParamsEntry 1 }
+
+aluNgeIPExceptionParamsRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object allows entries to be created and deleted in the
+         aluNgeIPExceptionParamsTable."
+     ::= { aluNgeIPExceptionParamsEntry 2 }
+
+aluNgeIPExceptParamsDescription OBJECT-TYPE
+    SYNTAX     TItemDescription
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of aluNgeIPExceptParamsDescription specifies the
+         user-provided description for each aluNgeIPExceptionParamsEntry in the
+         table aluNgeIPExceptionParamsTable."
+    DEFVAL     { "" }
+    ::= { aluNgeIPExceptionParamsEntry 3 }
+
+aluNgeIPExceptParamsSourceIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "IP address to match the source-ip of the packet."
+    DEFVAL { '00000000'H }
+    ::= { aluNgeIPExceptionParamsEntry 4 }
+
+aluNgeIPExceptParamsSourceIpMask OBJECT-TYPE
+    SYNTAX      IpAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, the object aluNgeIPExceptParamsSourceIpMask
+         specifies the IP Mask value for this policy IP exception entry.
+         The mask is ANDed with the received source IP address to match
+         the aluNgeIPExceptParamsSourceIpAddr.
+
+         If this value is 0, and the
+         value of aluNgeIPExceptParmSrcIpFullMask is non zero then the
+         value of aluNgeIPExceptParmSrcIpFullMask is used as mask.
+
+         If this value is non zero,
+         it will be equal to the mask expressed in the object
+         aluNgeIPExceptParmSrcIpFullMask.
+
+         If both aluNgeIPExceptParamsSourceIpMask and
+         aluNgeIPExceptParmSrcIpFullMask are set to 0, no matching is done
+         on the source Ip address.
+
+         If a value is specified for this object, then the value of the
+         object aluNgeIPExceptParmSrcIpFullMask will be set to reflect
+         this same mask."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 5 }
+
+aluNgeIPExceptParamsDestIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "IP address to match the destination-ip of the packet."
+    DEFVAL { '00000000'H }
+    ::= { aluNgeIPExceptionParamsEntry 6 }
+
+aluNgeIPExceptParamsDestIpMask OBJECT-TYPE
+    SYNTAX      IpAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, the object aluNgeIPExceptParamsDestIpMask
+         specifies the IP Mask value for this IP exception entry.
+         The mask is ANDed with the received destination IP address to match
+         the aluNgeIPExceptParamsDestIpAddr.
+
+         If this value is 0, and the
+         value of aluNgeIPExceptParmDestIpFullMask is non zero then the
+         value of aluNgeIPExceptParmDestIpFullMask is used as mask.
+
+         If this value is non zero,
+         it will be equal to the mask expressed in the object
+         aluNgeIPExceptParmDestIpFullMask.
+
+         If both aluNgeIPExceptParamsDestIpMask and
+         aluNgeIPExceptParmDestIpFullMask are set to 0, no matching is done
+         on the Destination Ip address.
+
+         If a value is specified for this object, then the value of the
+         object aluNgeIPExceptParmDestIpFullMask will be set to reflect
+         this same mask."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 7 }
+
+aluNgeIPExceptParamsProtocol OBJECT-TYPE
+    SYNTAX      TIpProtocol
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "IP protocol to match.  set to -1 to disable matching IP protocol. If
+         the protocol is changed the protocol specific parameters are reset."
+    DEFVAL { -1 }
+    ::= { aluNgeIPExceptionParamsEntry 8 }
+
+aluNgeIPExceptParamsSrcPortVal1 OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TCP/UDP port value1. The value of this object is used as per the
+         description for aluNgeIPExceptParamsSrcPortOpr."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 9 }
+
+aluNgeIPExceptParamsSrcPortVal2 OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TCP/UDP port value2. The value of this object is used as per the
+         description for aluNgeIPExceptParamsSrcPortOpr."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 10 }
+
+aluNgeIPExceptParamsSrcPortOpr OBJECT-TYPE
+    SYNTAX      TOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operator specifies the manner in which
+         aluNgeIPExceptParamsSrcPortVal1 and aluNgeIPExceptParamsSrcPortVal2
+         are to be used. The value of these latter 2 objects and
+         aluNgeIPExceptParamsSrcPortOpr is used as described in
+         TOperator."
+    DEFVAL { none }
+    ::= { aluNgeIPExceptionParamsEntry 11 }
+
+aluNgeIPExceptParamsDestPortVal1 OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TCP/UDP port value1. The value of this object is used as per the
+         description for aluNgeIPExceptParamsDestPortOperator."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 12 }
+
+aluNgeIPExceptParamsDestPortVal2 OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "TCP/UDP port value2. The value of this object is used as per the
+         description for aluNgeIPExceptParamsDestPortOperator."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 13 }
+
+aluNgeIPExceptParamsDestPortOpr OBJECT-TYPE
+    SYNTAX      TOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operator specifies the manner in which
+         aluNgeIPExceptParamsDestPortVal1 and aluNgeIPExceptParamsDestPortVal2
+         are to be used. The value of these latter 2 objects and
+         aluNgeIPExceptParamsDestPortOpr is used as described in
+         TOperator."
+    DEFVAL { none }
+    ::= { aluNgeIPExceptionParamsEntry 14 }
+
+aluNgeIPExceptParamsIcmpCode OBJECT-TYPE
+    SYNTAX      INTEGER (-1|0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Icmp code to be matched. aluNgeIPExceptParamsIcmpCode complements the
+        object aluNgeIPExceptParamsIcmpType. Both of them need to be set to actually
+        enable ICMP matching. The value -1 means Icmp code matching is not
+        enabled."
+    DEFVAL { -1 }
+    ::= { aluNgeIPExceptionParamsEntry 15 }
+
+aluNgeIPExceptParamsIcmpType OBJECT-TYPE
+    SYNTAX      INTEGER (-1|0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Icmp type to be matched. aluNgeIPExceptParamsIcmpType complements the
+        object aluNgeIPExceptParamsIcmpCode. Both of them need to be set to actually
+        enable ICMP matching. The value -1 means Icmp type matching is not
+        enabled."
+    DEFVAL { -1 }
+    ::= { aluNgeIPExceptionParamsEntry 16 }
+
+aluNgeIPExceptParmSrcIpFullMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, the object aluNgeIPExceptParmSrcIpFullMask
+         specifies the IP Mask value for this policy IP exception entry.
+         The mask is ANDed with the received Source IP address to match
+         the aluNgeIPExceptParamsSourceIpAddr.
+
+         If the value of aluNgeIPExceptParamsSourceIpMask is non zero,
+         it will be equal to the mask expressed in this object.
+
+         If both aluNgeIPExceptParamsSourceIpMask and
+         this object are set to 0, no matching is done
+         on the Source Ip address.
+
+         This object should contain consecutive ones and zeros. Both
+         a regular and an inverse mask is allowed (i.e. the sequence of
+         consecutive ones can appear at the front or at the end of the
+         mask).
+
+         If a regular mask is specified for this object
+         then the value of aluNgeIPExceptParamsSourceIpMask will be changed
+         to reflect this value. If an inverse is specified, the value of
+         aluNgeIPExceptParamsSourceIpMask will be set to 0."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 17 }
+
+aluNgeIPExceptParmDestIpFullMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If not 0, the object aluNgeIPExceptParamsDestIpFullMask
+         specifies the IP Mask value for this policy IP exception entry.
+         The mask is ANDed with the received Destination IP address to match
+         the aluNgeIPExceptParmDestIpAddr.
+
+         If the value of aluNgeIPExceptParamsDestIpMask is non zero,
+         it will be equal to the mask expressed this object.
+
+         If both aluNgeIPExceptParamsDestIpMask and
+         this object are set to 0, no matching is done
+         on the Destination Ip address.
+
+         This object should contain consecutive ones and zeros. Both
+         a regular and an inverse mask is allowed (i.e. the sequence of
+         consecutive ones can appear at the front or at the end of the
+         mask).
+
+         If a regular mask is specified for this object
+         then the value of aluNgeIPExceptParamsDestIpMask will be changed
+         to reflect this value. If an inverse is specified, the value of
+         aluNgeIPExceptParamsDestIpMask will be set to 0."
+    DEFVAL { 0 }
+    ::= { aluNgeIPExceptionParamsEntry 18 }
+
+aluNgeIPExceptIngressHitCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of times an ingress packet
+         matched this entry."
+    ::= { aluNgeIPExceptionParamsEntry 19 }
+
+aluNgeIPExceptEgressHitCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of times an egress packet
+         matched this entry."
+    ::= { aluNgeIPExceptionParamsEntry 20 }
+
+aluNgeIPExceptIngrHitByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of bytes of all
+         ingress packets that matched this entry."
+    ::= { aluNgeIPExceptionParamsEntry 21 }
+
+aluNgeIPExceptEgressHitByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of bytes of all
+         egress packets that matched this entry."
+    ::= { aluNgeIPExceptionParamsEntry 22 }
+
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Soft GRE Interface Table
+-- ALU Extensions of tmnxWlanGwSoftGreIfEntry
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupWlanGwBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupWlanGwBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup soft GRE interface entries."
+    ::= { aluNgeKeygroupWlanGwBindingObjs 1 }
+
+aluNgeKeygroupWlanGwBindingEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupWlanGwBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup Soft GRE Interface entry."
+    AUGMENTS {
+        tmnxWlanGwSoftGreIfEntry
+    }
+    ::= { aluNgeKeygroupWlanGwBindingTable 1 }
+
+AluNgeKeygroupWlanGwBindingEntry ::= SEQUENCE {
+    aluNgeKeygroupWlanGwBindingInbound         AluNgeKeygroupIdOrZero,
+    aluNgeKeygroupWlanGwBindingOutbound        AluNgeKeygroupIdOrZero
+}
+
+aluNgeKeygroupWlanGwBindingInbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupWlanGwBindingInbound specifies the keygroup
+         id used for inbound traffic verification. Inbound traffic must contain
+         SPIs configured within this keygroup.
+         If the value of aluNgeKeygroupWlanGwBindingInbound is not defined,
+         all SPIs configured within the system will be considered when
+         verifying inbound traffic."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupWlanGwBindingEntry 1 }
+
+aluNgeKeygroupWlanGwBindingOutbound OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupWlanGwBindingOutbound specifies the keygroup
+         id used for outbound traffic encryption. The value of
+         aluNgeKeygroupActiveOutboundSa within the specified keygroup must be
+         defined.
+         If the value of aluNgeKeygroupWlanGwBindingOutbound is not defined,
+         all outbound traffic from this Soft GRE Interface will be clear."
+    DEFVAL      { 0 }
+    ::= { aluNgeKeygroupWlanGwBindingEntry 2 }
+
+
+
+-- ----------------------------------------------------------------------------
+-- NGE MDA Stats Table
+-- ----------------------------------------------------------------------------
+aluNgeMdaStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeMdaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store group encryption MDA level statistics."
+    ::= { aluNgeStatsObjs 1 }
+
+aluNgeMdaStatsEntry       OBJECT-TYPE
+    SYNTAX      AluNgeMdaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statistics for a single group encryption MDA."
+    INDEX { tmnxChassisIndex, 
+            tmnxCardSlotNum, 
+            tmnxMDASlotNum }
+    ::= { aluNgeMdaStatsTable 1 }
+
+AluNgeMdaStatsEntry ::= SEQUENCE {
+    aluNgeMdaEncryptPkts                    Counter64,
+    aluNgeMdaEncryptBytes                   Counter64,
+    aluNgeMdaDecryptPkts                    Counter64,
+    aluNgeMdaDecryptBytes                   Counter64,
+    aluNgeMdaOutDropPkts                    Counter32,
+    aluNgeMdaOutDropUnsupportedUplink       Counter32,
+    aluNgeMdaOutDropEnqueueError            Counter32,
+    aluNgeMdaInDropPkts                     Counter32,
+    aluNgeMdaInDropInvalidSpi               Counter32,
+    aluNgeMdaInDropAuthFailure              Counter32,
+    aluNgeMdaInDropPaddingFailure           Counter32,
+    aluNgeMdaInDropEnqueueError             Counter32,
+    aluNgeMdaInDropControlWordMismatch      Counter32
+}
+
+aluNgeMdaEncryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaEncryptPkts indicates the number
+         of packets successfully encrypted by the group 
+         encryption data path."
+    ::= { aluNgeMdaStatsEntry 1 }
+
+aluNgeMdaEncryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaEncryptBytes indicates the number
+         of bytes successfully encrypted by the group 
+         encryption data path."
+    ::= { aluNgeMdaStatsEntry 2 }
+
+aluNgeMdaDecryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaDecryptPkts indicates the number
+         of packets successfully decrypted by the group 
+         encryption data path."
+    ::= { aluNgeMdaStatsEntry 3 }
+
+aluNgeMdaDecryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaDecryptBytes indicates the number
+         of bytes successfully decrypted by the group 
+         encryption data path."
+    ::= { aluNgeMdaStatsEntry 4 }
+
+aluNgeMdaOutDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaOutDropPkts indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption data path."
+    ::= { aluNgeMdaStatsEntry 5 }
+
+aluNgeMdaOutDropUnsupportedUplink OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaOutDropUnsupportedUplink indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption data path. This implies that
+         the resolved uplink does not support encryption."
+    ::= { aluNgeMdaStatsEntry 6 }
+
+aluNgeMdaOutDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaOutDropEnqueueError indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption data path. This implies that 
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeMdaStatsEntry 7 }
+
+aluNgeMdaInDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropPkts indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path."
+    ::= { aluNgeMdaStatsEntry 8 }
+
+aluNgeMdaInDropInvalidSpi OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropInvalidSpi indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path. This implies that
+         1) the received SPI does not exist within the system
+         2) the received SPI is not part of the associated inbound keygroup
+         3) un-encrypted packet has been received on SDP with an associated inbound keygroup"
+    ::= { aluNgeMdaStatsEntry 9 }
+
+aluNgeMdaInDropAuthFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropAuthFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path. This implies that
+         authentication failed on the received packets."
+    ::= { aluNgeMdaStatsEntry 10 }
+
+aluNgeMdaInDropPaddingFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropPaddingFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path. This implies that
+         there are padding errors detected on the received packets."
+    ::= { aluNgeMdaStatsEntry 11 }
+
+aluNgeMdaInDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropEnqueueError indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path. This implies that 
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeMdaStatsEntry 12 }
+
+aluNgeMdaInDropControlWordMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeMdaInDropControlWordMismatch indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption data path. This implies that
+         the decrypted control word does not match the outer control word."
+    ::= { aluNgeMdaStatsEntry 13 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Stats Table
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store group encryption keygroup level statistics."
+    ::= { aluNgeStatsObjs 2 }
+
+aluNgeKeygroupStatsEntry       OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statistics for a single group encryption keygroup."
+    INDEX { aluNgeKeygroupId }
+    ::= { aluNgeKeygroupStatsTable 1 }
+
+AluNgeKeygroupStatsEntry ::= SEQUENCE {
+    aluNgeKeygroupEncryptPkts                 Counter64,
+    aluNgeKeygroupEncryptBytes                Counter64,
+    aluNgeKeygroupDecryptPkts                 Counter64,
+    aluNgeKeygroupDecryptBytes                Counter64,
+    aluNgeKeygroupOutDropPkts                 Counter32,
+    aluNgeKeygroupOutDropUnsupportedUplink    Counter32,
+    aluNgeKeygroupOutDropEnqueueError         Counter32,
+    aluNgeKeygroupOutDropOther                Counter32,
+    aluNgeKeygroupInDropPkts                  Counter32,
+    aluNgeKeygroupInDropInvalidSpi            Counter32,
+    aluNgeKeygroupInDropAuthFailure           Counter32,
+    aluNgeKeygroupInDropPaddingFailure        Counter32,
+    aluNgeKeygroupInDropEnqueueError          Counter32,
+    aluNgeKeygroupInDropControlWordMismatch   Counter32,
+    aluNgeKeygroupInDropOther                 Counter32,
+    aluNgeKeygroupInLastDropSpi               Unsigned32
+}
+
+aluNgeKeygroupEncryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupEncryptPkts indicates the number
+         of packets successfully encrypted by the group 
+         encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 1 }
+
+aluNgeKeygroupEncryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupEncryptBytes indicates the number
+         of bytes successfully encrypted by the group 
+         encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 2 }
+
+aluNgeKeygroupDecryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupDecryptPkts indicates the number
+         of packets successfully decrypted by the group 
+         encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 3 }
+
+aluNgeKeygroupDecryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupDecryptBytes indicates the number
+         of bytes successfully decrypted by the group 
+         encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 4 }
+
+aluNgeKeygroupOutDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupOutDropPkts indicates the total number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 5 }
+
+aluNgeKeygroupOutDropUnsupportedUplink OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupOutDropUnsupportedUplink indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup. This implies that
+         the resolved uplink does not support encryption."
+    ::= { aluNgeKeygroupStatsEntry 6 }
+
+aluNgeKeygroupOutDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupOutDropEnqueueError indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup. This implies that
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeKeygroupStatsEntry 7 }
+
+aluNgeKeygroupOutDropOther OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupOutDropOther indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup for unspecified
+         reasons."
+    ::= { aluNgeKeygroupStatsEntry 8 }
+
+aluNgeKeygroupInDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropPkts indicates the total number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup."
+    ::= { aluNgeKeygroupStatsEntry 9 }
+
+aluNgeKeygroupInDropInvalidSpi OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropInvalidSpi indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup. This implies that
+         1) the received SPI does not exist within the system
+         2) the received SPI is not part of the associated inbound keygroup
+         3) un-encrypted packet has been received on SDP with an associated inbound keygroup"
+    ::= { aluNgeKeygroupStatsEntry 10 }
+
+aluNgeKeygroupInDropAuthFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropAuthFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup. This implies that
+         authentication failed on the received packets."
+    ::= { aluNgeKeygroupStatsEntry 11 }
+
+aluNgeKeygroupInDropPaddingFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropPaddingFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup. This implies that
+         there are padding errors detected on the received packets."
+    ::= { aluNgeKeygroupStatsEntry 12 }
+
+aluNgeKeygroupInDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropEnqueueError indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup. This implies that
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeKeygroupStatsEntry 13 }
+
+aluNgeKeygroupInDropControlWordMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropControlWordMismatch indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup. This implies that
+         the decrypted control word does not match the outer control word."
+    ::= { aluNgeKeygroupStatsEntry 14 }
+
+aluNgeKeygroupInDropOther OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInDropOther indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup for unspecifed
+         reasons."
+    ::= { aluNgeKeygroupStatsEntry 15 }
+
+aluNgeKeygroupInLastDropSpi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupInLastDropSpi indicates the last
+         SPI value of the packet dropped before and during inbound (decryption)
+         processing by the group encryption keygroup.
+
+         If 0x00000000 is received, it implies that no discard involving SPIs
+         has occured.
+
+         If 0xFFFFFFFF is received, it implies that discards occured involving
+         unencrypted traffic without encryption label.
+
+         Any other values should be interpreted as a normal SPI ID."
+    ::= { aluNgeKeygroupStatsEntry 16 }
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup SPI Stats Table
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupSpiStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupSpiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store group encryption keygroup SPI level statistics."
+    ::= { aluNgeStatsObjs 3 }
+
+aluNgeKeygroupSpiStatsEntry       OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupSpiStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statistics for a single encryption keygroup SPI."
+    INDEX { aluNgeKeygroupId,
+            aluNgeKeygroupSpiId }
+    ::= { aluNgeKeygroupSpiStatsTable 1 }
+
+AluNgeKeygroupSpiStatsEntry ::= SEQUENCE {
+    aluNgeKeygroupSpiEncryptPkts                  Counter64,
+    aluNgeKeygroupSpiEncryptBytes                 Counter64,
+    aluNgeKeygroupSpiDecryptPkts                  Counter64,
+    aluNgeKeygroupSpiDecryptBytes                 Counter64,
+    aluNgeKeygroupSpiOutDropPkts                  Counter32,
+    aluNgeKeygroupSpiOutDropEnqueueError          Counter32,
+    aluNgeKeygroupSpiOutDropOther                 Counter32,
+    aluNgeKeygroupSpiInDropPkts                   Counter32,
+    aluNgeKeygroupSpiInDropAuthFailure            Counter32,
+    aluNgeKeygroupSpiInDropPaddingFailure         Counter32,
+    aluNgeKeygroupSpiInDropEnqueueError           Counter32,
+    aluNgeKeygroupSpiInDropControlWordMismatch    Counter32,
+    aluNgeKeygroupSpiInDropOther                  Counter32
+}
+
+aluNgeKeygroupSpiEncryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiEncryptPkts indicates the number
+         of packets successfully encrypted by the group 
+         encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 1 }
+
+aluNgeKeygroupSpiEncryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiEncryptBytes indicates the number
+         of bytes successfully encrypted by the group 
+         encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 2 }
+
+aluNgeKeygroupSpiDecryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiDecryptPkts indicates the number
+         of packets successfully decrypted by the group 
+         encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 3 }
+
+aluNgeKeygroupSpiDecryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiDecryptBytes indicates the number
+         of bytes successfully decrypted by the group 
+         encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 4 }
+
+aluNgeKeygroupSpiOutDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiOutDropPkts indicates the total number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 5 }
+
+
+aluNgeKeygroupSpiOutDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiOutDropEnqueueError indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup SPI. This implies that
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeKeygroupSpiStatsEntry 6 }
+
+aluNgeKeygroupSpiOutDropOther OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiOutDropOther indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the group encryption keygroup SPI for unspecified
+         reasons."
+    ::= { aluNgeKeygroupSpiStatsEntry 7 }
+
+aluNgeKeygroupSpiInDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropPkts indicates the total number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI."
+    ::= { aluNgeKeygroupSpiStatsEntry 8 }
+
+
+aluNgeKeygroupSpiInDropAuthFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropAuthFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI. This implies that
+         authentication failed on the received packets."
+    ::= { aluNgeKeygroupSpiStatsEntry 9 }
+
+aluNgeKeygroupSpiInDropPaddingFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropPaddingFailure indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI. This implies that
+         there are padding errors detected on the received packets."
+    ::= { aluNgeKeygroupSpiStatsEntry 10 }
+
+aluNgeKeygroupSpiInDropEnqueueError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropEnqueueError indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI. This implies that
+         there are enqueue errors in the encryption engine."
+    ::= { aluNgeKeygroupSpiStatsEntry 11 }
+
+aluNgeKeygroupSpiInDropControlWordMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropControlWordMismatch indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI. This implies that
+         the decrypted control word does not match the outer control word."
+    ::= { aluNgeKeygroupSpiStatsEntry 12 }
+
+aluNgeKeygroupSpiInDropOther OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSpiInDropOther indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the group encryption keygroup SPI for unspecifed
+         reasons."
+    ::= { aluNgeKeygroupSpiStatsEntry 13 }
+
+
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Sdp Binding Stats Table
+-- ALU Extensions of sdpBindBaseStatsEntry
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupSdpBindStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupSdpBindStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the NGE keygroup sdp binding statistics."
+    ::= { aluNgeStatsObjs 4 }
+
+aluNgeKeygroupSdpBindStatsEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupSdpBindStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single NGE keygroup sdp binding statistics."
+    AUGMENTS {
+        sdpBindBaseStatsEntry
+    }
+    ::= { aluNgeKeygroupSdpBindStatsTable 1 }
+
+AluNgeKeygroupSdpBindStatsEntry ::= SEQUENCE {
+    aluNgeKeygroupSdpBindEncryptPkts          Counter64,
+    aluNgeKeygroupSdpBindEncryptBytes         Counter64,
+    aluNgeKeygroupSdpBindDecryptPkts          Counter64,
+    aluNgeKeygroupSdpBindDecryptBytes         Counter64,
+    aluNgeKeygroupSdpBindIngDropOtherPkts     Counter32,
+    aluNgeKeygroupSdpBindEgDropPkts           Counter32,
+    aluNgeKeygroupSdpBindIngDropInvalidSpi    Counter32
+}
+
+aluNgeKeygroupSdpBindEncryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindEncryptPkts indicates the number
+         of packets successfully encrypted by the sdp binding."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 1 }
+
+aluNgeKeygroupSdpBindEncryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindEncryptBytes indicates the number
+         of bytes successfully encrypted by the sdp binding."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 2 }
+
+aluNgeKeygroupSdpBindDecryptPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindDecryptPkts indicates the number
+         of packets successfully decrypted by the sdp binding."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 3 }
+
+aluNgeKeygroupSdpBindDecryptBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindDecryptBytes indicates the number
+         of bytes successfully decrypted by the sdp binding."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 4 }
+
+aluNgeKeygroupSdpBindIngDropOtherPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindIngDropOtherPkts indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the sdp binding for unspecified reasons."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 5 }
+
+aluNgeKeygroupSdpBindEgDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindEgDropPkts indicates the number
+         of packets dropped before and during outbound (encryption)
+         processing by the sdp binding."
+    ::= { aluNgeKeygroupSdpBindStatsEntry 6 }
+
+aluNgeKeygroupSdpBindIngDropInvalidSpi OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of aluNgeKeygroupSdpBindIngDropInvalidSpi indicates the number
+         of packets dropped before and during inbound (decryption)
+         processing by the sdp binding. This implies that
+         1) the received SPI does not exist within the system
+         2) the received SPI is not part of the associated inbound keygroup
+         3) un-encrypted packet has been received on SDP with an associated inbound keygroup"
+    ::= { aluNgeKeygroupSdpBindStatsEntry 7 }
+
+
+-- ----------------------------------------------------------------------------
+-- NGE Keygroup Name Table
+-- ----------------------------------------------------------------------------
+aluNgeKeygroupNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluNgeKeygroupNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains keygroup name information. Entries
+         are created automatically by the system
+         when aluNgeKeygroupName object is set for the keygroup."
+    ::= { aluNgeKeygroupNameObjs 1 }
+
+aluNgeKeygroupNameEntry OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Basic information about a specific keygroup name."
+    INDEX           { aluNgeKeygroupName }
+    ::= { aluNgeKeygroupNameTable 1 }
+
+AluNgeKeygroupNameEntry ::=
+    SEQUENCE {
+        aluNgeKeygroupNameId                   AluNgeKeygroupId,
+        aluNgeKeygroupNameRowStatus            RowStatus
+    }
+
+aluNgeKeygroupNameId OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluNgeKeygroupNameId specifies the keygroup
+         associated with this name."
+    ::= { aluNgeKeygroupNameEntry 1 }
+
+aluNgeKeygroupNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value of the object aluNgeKeygroupNameRowStatus specifies the
+         status of this row."
+    ::= { aluNgeKeygroupNameEntry 2 }
+
+
+-- ----------------------------------------------------------------------------
+-- NGE compliance statements
+-- ----------------------------------------------------------------------------
+aluNgeCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for management of group encryption on
+         Nokia 7705 systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            aluNgeGroup,
+            aluNgeStatsGroup
+        }
+    ::= { aluNgeCompliances 1 }
+
+-- ----------------------------------------------------------------------------
+-- NGE conformance groups
+-- ----------------------------------------------------------------------------
+aluNgeGroup OBJECT-GROUP
+    OBJECTS {
+        aluNgeLabel,
+
+        aluNgeKeygroupRowStatus,
+        aluNgeKeygroupDescription,
+        aluNgeKeygroupAuthAlgorithm,
+        aluNgeKeygroupEncrAlgorithm,
+        aluNgeKeygroupActiveOutboundSa,
+        aluNgeKeygroupOutboundSaActivateTime,
+        aluNgeKeygroupName,
+
+        aluNgeKeygroupSpiRowStatus,
+        aluNgeKeygroupSpiAuthKey,
+        aluNgeKeygroupSpiEncrKey,
+        aluNgeKeygroupSpiInstallTime,
+        aluNgeKeygroupSpiKeyCRC,
+
+        aluNgeKeygroupSdpBindingInbound,
+        aluNgeKeygroupSdpBindingOutbound,
+        aluNgeKeygroupVrfBindingInbound,
+        aluNgeKeygroupVrfBindingOutbound,
+
+        aluNgeKeygroupNameId,
+        aluNgeKeygroupNameRowStatus
+    }
+    STATUS       current
+    DESCRIPTION
+        "The group of objects providing configuration of group encryption on
+         Nokia 77xx systems."
+    ::= { aluNgeGroups 1 }
+
+aluNgeStatsGroup OBJECT-GROUP
+    OBJECTS {
+        aluNgeMdaEncryptPkts,
+        aluNgeMdaEncryptBytes,
+        aluNgeMdaDecryptPkts,
+        aluNgeMdaDecryptBytes,
+        aluNgeMdaOutDropPkts,
+        aluNgeMdaOutDropUnsupportedUplink,
+        aluNgeMdaOutDropEnqueueError,
+        aluNgeMdaInDropPkts,
+        aluNgeMdaInDropInvalidSpi,
+        aluNgeMdaInDropAuthFailure,
+        aluNgeMdaInDropPaddingFailure,
+        aluNgeMdaInDropEnqueueError,
+        aluNgeMdaInDropControlWordMismatch,
+
+        aluNgeKeygroupEncryptPkts,
+        aluNgeKeygroupEncryptBytes,
+        aluNgeKeygroupDecryptPkts,
+        aluNgeKeygroupDecryptBytes,
+        aluNgeKeygroupOutDropPkts,
+        aluNgeKeygroupOutDropUnsupportedUplink,
+        aluNgeKeygroupOutDropEnqueueError,
+        aluNgeKeygroupOutDropOther,
+        aluNgeKeygroupInDropPkts,
+        aluNgeKeygroupInDropInvalidSpi,
+        aluNgeKeygroupInDropAuthFailure,
+        aluNgeKeygroupInDropPaddingFailure,
+        aluNgeKeygroupInDropEnqueueError,
+        aluNgeKeygroupInDropControlWordMismatch,
+        aluNgeKeygroupInDropOther,
+        aluNgeKeygroupInLastDropSpi,
+
+        aluNgeKeygroupSpiEncryptPkts,
+        aluNgeKeygroupSpiEncryptBytes,
+        aluNgeKeygroupSpiDecryptPkts,
+        aluNgeKeygroupSpiDecryptBytes,
+        aluNgeKeygroupSpiOutDropPkts,
+        aluNgeKeygroupSpiOutDropEnqueueError,
+        aluNgeKeygroupSpiOutDropOther,
+        aluNgeKeygroupSpiInDropPkts,
+        aluNgeKeygroupSpiInDropAuthFailure,
+        aluNgeKeygroupSpiInDropPaddingFailure,
+        aluNgeKeygroupSpiInDropEnqueueError,
+        aluNgeKeygroupSpiInDropControlWordMismatch,
+        aluNgeKeygroupSpiInDropOther,
+
+        aluNgeKeygroupSdpBindEncryptPkts,
+        aluNgeKeygroupSdpBindEncryptBytes,
+        aluNgeKeygroupSdpBindDecryptPkts,
+        aluNgeKeygroupSdpBindDecryptBytes,
+        aluNgeKeygroupSdpBindIngDropOtherPkts,
+        aluNgeKeygroupSdpBindEgDropPkts,
+        aluNgeKeygroupSdpBindIngDropInvalidSpi
+    }
+    STATUS       current
+    DESCRIPTION
+        "The group of objects providing statistics of group encryption on
+         Nokia 77xx systems."
+    ::= { aluNgeGroups 2 }
+
+-- ----------------------------------------------------------------------------
+-- NGE notification groups
+-- ----------------------------------------------------------------------------
+
+END

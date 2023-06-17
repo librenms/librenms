@@ -1152,7 +1152,7 @@ ssiConfigMaxBackupRevisions      OBJECT-TYPE
         "The value of ssiConfigMaxBackupRevisions is the maximum number of
          backup revisions maintained for a configuration file. This value also
          applies to the number of revisions maintained for the BOF file."
-    DEFVAL      { 5 }
+    DEFVAL      { 50 }
     ::= { sysSyncInfo 21 }
 
 ssiSaveConfigResult              OBJECT-TYPE
@@ -1598,6 +1598,20 @@ sbiAllowBootLicenseViolations    OBJECT-TYPE
          system will reboot after one hour if the violations are not fixed."
     DEFVAL      { true }
     ::= { sysBootInfo 14 }
+
+sbiSnmpdMaxBulkDuration          OBJECT-TYPE
+    SYNTAX      Unsigned32 (100..5000 | 4294967295)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiSnmpdMaxBulkDuration specifies the maximum duration to
+         process the SNMP BULK request before the response is returned.
+
+         The value all ones (4294967295) means that there is no maximum
+         duration."
+    DEFVAL      { 4294967295 }
+    ::= { sysBootInfo 15 }
 
 sysRadiusInfo                    OBJECT IDENTIFIER ::= { tmnxSysObjs 6 }
 
@@ -2104,6 +2118,16 @@ tmnxLiConfigFileFormatType       OBJECT-TYPE
         "The value of tmnxLiConfigFileFormatType specifies format of the li
          configuration file."
     ::= { tmnxSysNotifyObjs 40 }
+
+tmnxSysAdditionalInfo            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSubAdditionalInfo is a printable character
+         string which contains information about the reason why the
+         notification was generated."
+    ::= { tmnxSysNotifyObjs 41 }
 
 sysLoginControlInfo              OBJECT IDENTIFIER ::= { tmnxSysObjs 8 }
 
@@ -3167,6 +3191,18 @@ sbiAutoBootMode                  OBJECT-TYPE
     ::= { sysBofInfo 48 }
 
 sbiAutoBootInfo                  OBJECT IDENTIFIER ::= { sysBofInfo 49 }
+
+sbiAutoBootTimeout               OBJECT-TYPE
+    SYNTAX      Unsigned32 (30..1440)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiAutoBootTimeout specifies the timeout for auto-boot.
+         The system will reboot and re-attempt auto-boot after the timeout is
+         reached."
+    DEFVAL      { 30 }
+    ::= { sbiAutoBootInfo 1 }
 
 sbiAutoBootPortMtu               OBJECT-TYPE
     SYNTAX      Unsigned32 (0 | 512..9800)
@@ -5012,7 +5048,7 @@ tmnxSysNetconfCapCandidateCfg    OBJECT-TYPE
 tmnxSysNetconfCapRunningCfg      OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysNetconfCapRunningCfg specifies whether or not the
          writable running datastore is supported by the NETCONF server. When
@@ -5066,7 +5102,7 @@ tmnxSysNetconfAutoCfgSave        OBJECT-TYPE
         "The value of tmnxSysNetconfAutoCfgSave specifies whether the running
          configuration is saved as part of a commit operation initiated from
          Netconf."
-    DEFVAL      { false }
+    DEFVAL      { true }
     ::= { tmnxSysNetconfInfo 25 }
 
 tmnxSysNetconfPort               OBJECT-TYPE
@@ -5108,6 +5144,34 @@ tmnxSysNetconfActionRequests     OBJECT-TYPE
          of action NETCONF requests which have been accepted and processed by
          the NETCONF server."
     ::= { tmnxSysNetconfInfo 29 }
+
+tmnxSysNetconfBadHellos          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfBadHellos indicates the total number of
+         NETCONF bad hello messages which have been received by the NETCONF
+         server."
+    ::= { tmnxSysNetconfInfo 30 }
+
+tmnxSysNetconfDroppedSessions    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfDroppedSessions indicates the total number
+         of dropped NETCONF sessions."
+    ::= { tmnxSysNetconfInfo 31 }
+
+tmnxSysNetconfLastOperChange     OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfLastOperChange indicates the time of last
+         change of the operational state of NETCONF server."
+    ::= { tmnxSysNetconfInfo 32 }
 
 tmnxDCSysObjs                    OBJECT IDENTIFIER ::= { tmnxSysObjs 24 }
 
@@ -5166,7 +5230,7 @@ tmnxSysXmppInfo                  OBJECT IDENTIFIER ::= { tmnxSysObjs 26 }
 tmnxSysXmppServerTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSysXmppServerEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxSysXmppServerTable contains information pertaining to an entry
          for each server. Row entries are created and deleted by the agent."
@@ -5175,7 +5239,7 @@ tmnxSysXmppServerTable           OBJECT-TYPE
 tmnxSysXmppServerEntry           OBJECT-TYPE
     SYNTAX      TmnxSysXmppServerEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each row entry contains information about a XMPP server."
     INDEX       { tmnxSysXmppServName }
@@ -5212,15 +5276,13 @@ TmnxSysXmppServerEntry           ::= SEQUENCE
     tmnxSysXmppServAdminState        TmnxAdminState,
     tmnxSysXmppServOperUserName      TNamedItemOrEmpty,
     tmnxSysXmppServAuthType          TNamedItemOrEmpty,
-    tmnxSysXmppServConnMode          INTEGER,
-    tmnxSysXmppServServiceId         TmnxServId,
-    tmnxSysXmppServRouterId          TmnxVRtrIDOrZero
+    tmnxSysXmppServConnMode          INTEGER
 }
 
 tmnxSysXmppServName              OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..32))
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServName indicates the name associated with
          the XMPP Server."
@@ -5229,7 +5291,7 @@ tmnxSysXmppServName              OBJECT-TYPE
 tmnxSysXmppServFQDN              OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServFQDN specifies the Fully Qualified Domain
          Name (FQDN) associated with the XMPP Server."
@@ -5238,7 +5300,7 @@ tmnxSysXmppServFQDN              OBJECT-TYPE
 tmnxSysXmppServRowStatus         OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServRowStatus specifies the row status. It is
          used to create and delete row entries in this table."
@@ -5247,7 +5309,7 @@ tmnxSysXmppServRowStatus         OBJECT-TYPE
 tmnxSysXmppServUserName          OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServUserName specifies the username that
          is used in the XMPP server access requests. When no username is
@@ -5257,7 +5319,7 @@ tmnxSysXmppServUserName          OBJECT-TYPE
 tmnxSysXmppServPassword          OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..32))
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServPassword specifies the password that is
          used in the XMPP server access requests."
@@ -5267,7 +5329,7 @@ tmnxSysXmppServPassword          OBJECT-TYPE
 tmnxSysXmppServLastChanged       OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServLastChanged indicates the timestamp of
          last change to this row in tmnxSysXmppServerTable."
@@ -5276,7 +5338,7 @@ tmnxSysXmppServLastChanged       OBJECT-TYPE
 tmnxSysXmppServUptime            OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxSysXmppServUptime indicates the uptime of the XMPP server."
     ::= { tmnxSysXmppServerEntry 7 }
@@ -5284,7 +5346,7 @@ tmnxSysXmppServUptime            OBJECT-TYPE
 tmnxSysXmppServIQSent            OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQSent indicates the number of XMPP
          Info/Query message sent."
@@ -5293,7 +5355,7 @@ tmnxSysXmppServIQSent            OBJECT-TYPE
 tmnxSysXmppServIQRcvd            OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQRcvd indicates the number of XMPP
          Info/Query message received."
@@ -5302,7 +5364,7 @@ tmnxSysXmppServIQRcvd            OBJECT-TYPE
 tmnxSysXmppServIQError           OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQError indicates the number of XMPP
          Info/Query error messages received."
@@ -5311,7 +5373,7 @@ tmnxSysXmppServIQError           OBJECT-TYPE
 tmnxSysXmppServIQTimedOut        OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQTimedOut indicates the number of XMPP
          Info/Query messages timed out."
@@ -5320,7 +5382,7 @@ tmnxSysXmppServIQTimedOut        OBJECT-TYPE
 tmnxSysXmppServIQAckRcvd         OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQAckRcvd indicates the number of XMPP
          Info/Query acknowledgement messages received."
@@ -5330,7 +5392,7 @@ tmnxSysXmppServIQMinRtt          OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQMinRtt indicates the XMPP Info/Query
          minimum round trip time."
@@ -5340,7 +5402,7 @@ tmnxSysXmppServIQMaxRtt          OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServIQMaxRtt indicates the XMPP Info/Query
          maximum round trip time."
@@ -5349,7 +5411,7 @@ tmnxSysXmppServIQMaxRtt          OBJECT-TYPE
 tmnxSysXmppServVsdUpdatesRcvd    OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServVsdUpdatesRcvd indicates the number of VSD
          updates received by the XMPP server."
@@ -5358,7 +5420,7 @@ tmnxSysXmppServVsdUpdatesRcvd    OBJECT-TYPE
 tmnxSysXmppServUpdatesRcvd       OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServUpdatesRcvd indicates the number of nuage
          updates received by the XMPP server."
@@ -5367,7 +5429,7 @@ tmnxSysXmppServUpdatesRcvd       OBJECT-TYPE
 tmnxSysXmppServMsgSent           OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgSent indicates the number of messages
          sent from the XMPP server."
@@ -5376,7 +5438,7 @@ tmnxSysXmppServMsgSent           OBJECT-TYPE
 tmnxSysXmppServMsgRcvd           OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgRcvd indicates the number of messages
          received from the XMPP server."
@@ -5385,7 +5447,7 @@ tmnxSysXmppServMsgRcvd           OBJECT-TYPE
 tmnxSysXmppServMsgAckRcvd        OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgAckRcvd indicates the number of message
          acknowledgements received from the XMPP server."
@@ -5394,7 +5456,7 @@ tmnxSysXmppServMsgAckRcvd        OBJECT-TYPE
 tmnxSysXmppServMsgError          OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgError indicates the number of error
          messages received from the XMPP server."
@@ -5403,7 +5465,7 @@ tmnxSysXmppServMsgError          OBJECT-TYPE
 tmnxSysXmppServMsgTimedOut       OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgTimedOut indicates the number of
          timeout messages received from the XMPP server."
@@ -5413,7 +5475,7 @@ tmnxSysXmppServMsgMinRtt         OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgMinRtt indicates the minimum message
          round trip time from the XMPP server."
@@ -5423,7 +5485,7 @@ tmnxSysXmppServMsgMaxRtt         OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServMsgMaxRtt indicates the maximum message
          round trip time from the XMPP server."
@@ -5432,7 +5494,7 @@ tmnxSysXmppServMsgMaxRtt         OBJECT-TYPE
 tmnxSysXmppServSubSent           OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServSubSent indicates the number of
          subscriptions sent from the XMPP server."
@@ -5441,7 +5503,7 @@ tmnxSysXmppServSubSent           OBJECT-TYPE
 tmnxSysXmppServUnSubSent         OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServUnSubSent indicates the number of
          unsubscriptions sent from the XMPP server."
@@ -5450,7 +5512,7 @@ tmnxSysXmppServUnSubSent         OBJECT-TYPE
 tmnxSysXmppServState             OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..32))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServState indicates the state of the XMPP
          server."
@@ -5459,7 +5521,7 @@ tmnxSysXmppServState             OBJECT-TYPE
 tmnxSysXmppServAdminState        OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServAdminState specifies the administrative
          state of the XMPP server."
@@ -5469,7 +5531,7 @@ tmnxSysXmppServAdminState        OBJECT-TYPE
 tmnxSysXmppServOperUserName      OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServOperUserName indicates the operational user
          name that is used in the XMPP server access requests. When no user
@@ -5480,7 +5542,7 @@ tmnxSysXmppServOperUserName      OBJECT-TYPE
 tmnxSysXmppServAuthType          OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServAuthType indicates the authentication type
          that is used in the XMPP server access requests."
@@ -5492,42 +5554,16 @@ tmnxSysXmppServConnMode          OBJECT-TYPE
         outOfBand (2)
     }
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysXmppServConnMode indicates the connection type
          that is used in the XMPP server access requests."
     ::= { tmnxSysXmppServerEntry 30 }
 
-tmnxSysXmppServServiceId         OBJECT-TYPE
-    SYNTAX      TmnxServId
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The tmnxSysXmppServServiceId specifies the routing context which
-         provides reachability to the DNS and XMPP servers configured.
-
-         When tmnxSysXmppServRouterId is non-zero, tmnxSysXmppServServiceId
-         must be zero and vice versa."
-    DEFVAL      { 0 }
-    ::= { tmnxSysXmppServerEntry 31 }
-
-tmnxSysXmppServRouterId          OBJECT-TYPE
-    SYNTAX      TmnxVRtrIDOrZero
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "The tmnxSysXmppServRouterId specifies the routing context that
-         provides reachability to the DNS and XMPP servers configured.
-
-         When tmnxSysXmppServRouterId is non-zero, tmnxSysXmppServServiceId
-         must be zero and vice versa."
-    DEFVAL      { 0 }
-    ::= { tmnxSysXmppServerEntry 32 }
-
 tmnxSysVsdServerTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSysVsdServerEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxSysVsdServerTable contains information pertaining to an entry
          for each server."
@@ -5536,7 +5572,7 @@ tmnxSysVsdServerTable            OBJECT-TYPE
 tmnxSysVsdServerEntry            OBJECT-TYPE
     SYNTAX      TmnxSysVsdServerEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each row entry contains information about a VSwitch Controller VSD
          server."
@@ -5561,7 +5597,7 @@ TmnxSysVsdServerEntry            ::= SEQUENCE
 tmnxSysVsdServerInstance         OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServerInstance specifies an instance of a
          VSwitch Controller VSD server.
@@ -5572,7 +5608,7 @@ tmnxSysVsdServerInstance         OBJECT-TYPE
 tmnxSysVsdServUptime             OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServUptime indicates the timestamp of the
          uptime of each VSD server entry in tmnxSysXmppServerTable."
@@ -5581,7 +5617,7 @@ tmnxSysVsdServUptime             OBJECT-TYPE
 tmnxSysVsdServUserName           OBJECT-TYPE
     SYNTAX      TLDisplayString
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServUserName specifies the VSD username."
     ::= { tmnxSysVsdServerEntry 3 }
@@ -5589,7 +5625,7 @@ tmnxSysVsdServUserName           OBJECT-TYPE
 tmnxSysVsdServerStatus           OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..32))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServerStatus indicates the status of the VSD
          server."
@@ -5598,7 +5634,7 @@ tmnxSysVsdServerStatus           OBJECT-TYPE
 tmnxSysVsdServMsgSent            OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgSent indicates the number of messages
          sent from the VSD server."
@@ -5607,7 +5643,7 @@ tmnxSysVsdServMsgSent            OBJECT-TYPE
 tmnxSysVsdServMsgRcvd            OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgRcvd indicates the number of messages
          received from the VSD server."
@@ -5616,7 +5652,7 @@ tmnxSysVsdServMsgRcvd            OBJECT-TYPE
 tmnxSysVsdServMsgAckRcvd         OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgAckRcvd indicates the number of message
          acknowledgements received from the VSD server."
@@ -5625,7 +5661,7 @@ tmnxSysVsdServMsgAckRcvd         OBJECT-TYPE
 tmnxSysVsdServMsgError           OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgError indicates the number of error
          messages received from the VSD server."
@@ -5634,7 +5670,7 @@ tmnxSysVsdServMsgError           OBJECT-TYPE
 tmnxSysVsdServMsgTimedOut        OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgTimedOut indicates the number of timeout
          messages received from the VSD server."
@@ -5644,7 +5680,7 @@ tmnxSysVsdServMsgMinRtt          OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgMinRtt indicates the minimum message
          round trip time from the VSD server."
@@ -5654,7 +5690,7 @@ tmnxSysVsdServMsgMaxRtt          OBJECT-TYPE
     SYNTAX      Counter64
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdServMsgMaxRtt indicates the maximum message
          round trip time from the VSD server."
@@ -6066,6 +6102,73 @@ tmnxSysFpResAllocFecOprSysWdPd   OBJECT-TYPE
          number of paired FEC space."
     ::= { tmnxSysFpResAllocation 8 }
 
+tmnxSysFpResAlcEgrEncapRouted    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        entries4k  (1),
+        entries8k  (2),
+        entries12k (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpResAlcEgrEncapRouted specifies the number of
+         egress encapsulated routable entries that have been administratively
+         provisioned for the given FP.
+
+         This value only takes effect after the system has rebooted.
+
+         tmnxSysFpResAlcEgrEncapOprRouted indicates the operational value."
+    DEFVAL      { entries12k }
+    ::= { tmnxSysFpResAllocation 9 }
+
+tmnxSysFpResAlcEgrEncapOprRouted OBJECT-TYPE
+    SYNTAX      INTEGER {
+        entries4k  (1),
+        entries8k  (2),
+        entries12k (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpResAlcEgrEncapOprRouted indicates the
+         operational number of egress encapsulated routable entries that have
+         allocated for the given FP."
+    ::= { tmnxSysFpResAllocation 10 }
+
+tmnxSysFpRAEgrEncpPrtVlanTrns    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        entries2k  (1),
+        entries4k  (2),
+        entries8k  (3),
+        entries16k (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpRAEgrEncpPrtVlanTrns specifies the number of
+         egress encapsulated port VLAN translation entries that have been
+         administratively provisioned for the given FP.
+
+         This value only takes effect after the system has rebooted.
+
+         tmnxSysFpRAEgrEncpOprPrtVlanTrns indicates the operational value."
+    ::= { tmnxSysFpResAllocation 11 }
+
+tmnxSysFpRAEgrEncpOprPrtVlanTrns OBJECT-TYPE
+    SYNTAX      INTEGER {
+        entries2k  (1),
+        entries4k  (2),
+        entries8k  (3),
+        entries16k (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpRAEgrEncpOprPrtVlanTrns indicates the
+         operational number of egress encapsulated port VLAN translation
+         entries that have been allocated for the given FP."
+    ::= { tmnxSysFpResAllocation 12 }
+
 tmnxSysFpResAllocPoolTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSysFpResAllocPoolEntry
     MAX-ACCESS  not-accessible
@@ -6105,7 +6208,7 @@ tmnxSysFpRAPoolId                OBJECT-TYPE
     ::= { tmnxSysFpResAllocPoolEntry 1 }
 
 tmnxSysFpRAPoolLgBndRsvMemCnt    OBJECT-TYPE
-    SYNTAX      Unsigned32 (8 | 16 | 32 | 64)
+    SYNTAX      Unsigned32 (2 | 4 | 8 | 16 | 32 | 64)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -6127,6 +6230,578 @@ tmnxSysFpRAPoolOprLgBndRsvMemCnt OBJECT-TYPE
 
          This value takes effect after system has rebooted."
     ::= { tmnxSysFpResAllocPoolEntry 3 }
+
+tmnxSySFpRAFltrObjects           OBJECT IDENTIFIER ::= { tmnxSysFpResAlloc 3 }
+
+tmnxSySpRAFltrIngObjects         OBJECT IDENTIFIER ::= { tmnxSySFpRAFltrObjects 1 }
+
+tmnxSysFpRAFltrIngIpMatchObjs    OBJECT IDENTIFIER ::= { tmnxSySpRAFltrIngObjects 1 }
+
+tmnxSysFpRAFltrInIpMSrcIp        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMSrcIp specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         source IP address as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 1 }
+
+tmnxSysFpRAFltrInIpOpMSrcIp      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMSrcIp indicates the
+         operational of tmnxSysFpRAFltrInIpMSrcIp."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 2 }
+
+tmnxSysFpRAFltrInIpMDstIp        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMDstIp specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         destination IP address as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 3 }
+
+tmnxSysFpRAFltrInIpOpMDstIp      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMDstIp indicates the
+         operational of tmnxSysFpRAFltrInIpMDstIp."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 4 }
+
+tmnxSysFpRAFltrInIpMSrcPort      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMSrcPort specifies whether
+         filter policies referenced on ingress endpoints allow configuring L4
+         source port as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 5 }
+
+tmnxSysFpRAFltrInIpOpMSrcPort    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMSrcPort indicates the
+         operational of tmnxSysFpRAFltrInIpMSrcPort."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 6 }
+
+tmnxSysFpRAFltrInIpMDstPort      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMDstPort specifies whether
+         filter policies referenced on ingress endpoints allow configuring L4
+         destination port as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 7 }
+
+tmnxSysFpRAFltrInIpOpMDstPort    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMDstPort indicates the
+         operational of tmnxSysFpRAFltrInIpMDstPort."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 8 }
+
+tmnxSysFpRAFltrInIpMProt         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMProt specifies whether
+         filter policies referenced on ingress endpoints allow configuring IP
+         protocol as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 9 }
+
+tmnxSysFpRAFltrInIpOpMProt       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMProt indicates the
+         operational of tmnxSysFpRAFltrInIpMProt."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 10 }
+
+tmnxSysFpRAFltrInIpMTcpFlgs      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMTcpFlgs specifies whether
+         filter policies referenced on ingress endpoints allow configuring TCP
+         flags as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 11 }
+
+tmnxSysFpRAFltrInIpOpMTcpFlgs    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMTcpFlgs indicates the
+         operational of tmnxSysFpRAFltrInIpMTcpFlgs."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 12 }
+
+tmnxSysFpRAFltrInIpMDscp         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpMDscp specifies whether
+         filter policies referenced on ingress endpoints allow configuring DSCP
+         as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 13 }
+
+tmnxSysFpRAFltrInIpOpMDscp       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpMDscp indicates the
+         operational of tmnxSysFpRAFltrInIpMDscp."
+    ::= { tmnxSysFpRAFltrIngIpMatchObjs 14 }
+
+tmnxSysFpRAFltrIngIpActObjs      OBJECT IDENTIFIER ::= { tmnxSySpRAFltrIngObjects 2 }
+
+tmnxSysFpRAFltrInIpADrop         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpADrop specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         action drop."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 1 }
+
+tmnxSysFpRAFltrInIpOpADrop       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpADrop indicates the
+         operational of tmnxSysFpRAFltrInIpADrop."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 2 }
+
+tmnxSysFpRAFltrInIpARedir        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpARedir specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         actions redirecting traffic."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 3 }
+
+tmnxSysFpRAFltrInIpOpARedir      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpARedir indicates the
+         operational of tmnxSysFpRAFltrInIpARedir."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 4 }
+
+tmnxSysFpRAFltrInIpALog          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpALog specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         logging for their entries."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 5 }
+
+tmnxSysFpRAFltrInIpOpALog        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpALog indicates the
+         operational of tmnxSysFpRAFltrInIpALog."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 6 }
+
+tmnxSysFpRAFltrInIpAMirror       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpAMirror specifies whether
+         filter policies referenced on ingress endpoints allow using their
+         entries as mirror source."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 7 }
+
+tmnxSysFpRAFltrInIpOpAMirror     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpAMirror indicates the
+         operational of tmnxSysFpRAFltrInIpAMirror."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 8 }
+
+tmnxSysFpRAFltrInIpAFc           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpAFc specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         action fc."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 9 }
+
+tmnxSysFpRAFltrInIpOpAFc         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpAFc indicates the
+         operational of tmnxSysFpRAFltrInIpAFc."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 10 }
+
+tmnxSysFpRAFltrInIpAStats        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpAStats specifies whether
+         filter policies referenced on ingress endpoints allow statistics
+         collection for their entries."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpActObjs 11 }
+
+tmnxSysFpRAFltrInIpOpAStats      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpOpAStats indicates the
+         operational of tmnxSysFpRAFltrInIpAStats."
+    ::= { tmnxSysFpRAFltrIngIpActObjs 12 }
+
+tmnxSysFpRAFltrIngIpv6MatchObjs  OBJECT IDENTIFIER ::= { tmnxSySpRAFltrIngObjects 3 }
+
+tmnxSysFpRAFltrInIpv6MSrcIpMsb   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MSrcIpMsb specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring source IP address as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 1 }
+
+tmnxSysFpRAFltrInIpv6OpMSrcIpMsb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMSrcIpMsb indicates the
+         operational of tmnxSysFpRAFltrInIpv6MSrcIpMsb."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 2 }
+
+tmnxSysFpRAFltrInIpv6MSrcIpLsb   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MSrcIpLsb specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring source IP address as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 3 }
+
+tmnxSysFpRAFltrInIpv6OpMSrcIpLsb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMSrcIpLsb indicates the
+         operational of tmnxSysFpRAFltrInIpv6MSrcIpLsb."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 4 }
+
+tmnxSysFpRAFltrInIpv6MDstIpMsb   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MDstIpMsb specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring destination IP address as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 5 }
+
+tmnxSysFpRAFltrInIpv6OpMDstIpMsb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMDstIpMsb indicates the
+         operational of tmnxSysFpRAFltrInIpv6MDstIpMsb."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 6 }
+
+tmnxSysFpRAFltrInIpv6MDstIpLsb   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MDstIpLsb specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring destination IP address as their match criterion."
+    DEFVAL      { false }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 7 }
+
+tmnxSysFpRAFltrInIpv6OpMDstIpLsb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMDstIpLsb indicates the
+         operational of tmnxSysFpRAFltrInIpv6MDstIpLsb."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 8 }
+
+tmnxSysFpRAFltrInIpv6MSrcPort    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MSrcPort specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring L4 source port as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 9 }
+
+tmnxSysFpRAFltrInIpv6OpMSrcPort  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMSrcPort indicates the
+         operational of tmnxSysFpRAFltrInIpv6MSrcPort."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 10 }
+
+tmnxSysFpRAFltrInIpv6MDstPort    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MDstPort specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring L4 destination port as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 11 }
+
+tmnxSysFpRAFltrInIpv6OpMDstPort  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMDstPort indicates the
+         operational of tmnxSysFpRAFltrInIpv6MDstPort."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 12 }
+
+tmnxSysFpRAFltrInIpv6MNextHdr    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MNextHdr specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring IP protocol as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 13 }
+
+tmnxSysFpRAFltrInIpv6OpMNextHdr  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMNextHdr indicates the
+         operational of tmnxSysFpRAFltrInIpv6MNextHdr."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 14 }
+
+tmnxSysFpRAFltrInIpv6MTcpFlgs    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MTcpFlgs specifies
+         whether filter policies referenced on ingress endpoints allow
+         configuring TCP flags as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 15 }
+
+tmnxSysFpRAFltrInIpv6OpMTcpFlgs  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMTcpFlgs indicates the
+         operational of tmnxSysFpRAFltrInIpv6MTcpFlgs."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 16 }
+
+tmnxSysFpRAFltrInIpv6MDscp       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6MDscp specifies whether
+         filter policies referenced on ingress endpoints allow configuring DSCP
+         as their match criterion."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 17 }
+
+tmnxSysFpRAFltrInIpv6OpMDscp     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpMDscp indicates the
+         operational of tmnxSysFpRAFltrInIpv6MDscp."
+    ::= { tmnxSysFpRAFltrIngIpv6MatchObjs 18 }
+
+tmnxSysFpRAFltrIngIpv6ActObjs    OBJECT IDENTIFIER ::= { tmnxSySpRAFltrIngObjects 4 }
+
+tmnxSysFpRAFltrInIpv6ADrop       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6ADrop specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         action drop."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 1 }
+
+tmnxSysFpRAFltrInIpv6OpADrop     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpADrop indicates the
+         operational of tmnxSysFpRAFltrInIpv6ADrop."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 2 }
+
+tmnxSysFpRAFltrInIpv6ARedir      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6ARedir specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         actions redirecting traffic."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 3 }
+
+tmnxSysFpRAFltrInIpv6OpARedir    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpARedir indicates the
+         operational of tmnxSysFpRAFltrInIpv6ARedir."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 4 }
+
+tmnxSysFpRAFltrInIpv6ALog        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6ALog specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         logging for their entries."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 5 }
+
+tmnxSysFpRAFltrInIpv6OpALog      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpALog indicates the
+         operational of tmnxSysFpRAFltrInIpv6ALog."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 6 }
+
+tmnxSysFpRAFltrInIpv6AMirror     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6AMirror specifies whether
+         filter policies referenced on ingress endpoints allow using their
+         entries as mirror source."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 7 }
+
+tmnxSysFpRAFltrInIpv6OpAMirror   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpAMirror indicates the
+         operational of tmnxSysFpRAFltrInIpv6AMirror."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 8 }
+
+tmnxSysFpRAFltrInIpv6AFc         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6AFc specifies whether
+         filter policies referenced on ingress endpoints allow configuring
+         action fc."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 9 }
+
+tmnxSysFpRAFltrInIpv6OpAFc       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpAFc indicates the
+         operational of tmnxSysFpRAFltrInIpv6AFc."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 10 }
+
+tmnxSysFpRAFltrInIpv6AStats      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6AStats specifies whether
+         filter policies referenced on ingress endpoints allow statistics
+         collection for their entries."
+    DEFVAL      { true }
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 11 }
+
+tmnxSysFpRAFltrInIpv6OpAStats    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysFpRAFltrInIpv6OpAStats indicates the
+         operational of tmnxSysFpRAFltrInIpv6AStats."
+    ::= { tmnxSysFpRAFltrIngIpv6ActObjs 12 }
 
 tmnxSysDhcp                      OBJECT IDENTIFIER ::= { tmnxSysObjs 28 }
 
@@ -6172,7 +6847,7 @@ tmnxSysVsdInfo                   OBJECT IDENTIFIER ::= { tmnxSysObjs 29 }
 tmnxSysVsdSystemId               OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdSystemId specifies the name used by this system
          as its identity when communicating with VSD."
@@ -6182,7 +6857,7 @@ tmnxSysVsdSystemId               OBJECT-TYPE
 tmnxSysVsdGwPubSubIsSubscrd      OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdGwPubSubIsSubscrd indicates whether the system
          is subscribed to the gateway publish-subscribe node."
@@ -6191,7 +6866,7 @@ tmnxSysVsdGwPubSubIsSubscrd      OBJECT-TYPE
 tmnxSysVsdGwPubSubNodeName       OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdGwPubSubNodeName indicates the gateway
          publish-subscribe node name assigned by VSD."
@@ -6200,7 +6875,7 @@ tmnxSysVsdGwPubSubNodeName       OBJECT-TYPE
 tmnxSysVsdGwPubSubLstSubscrdTime OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdGwPubSubLstSubscrdTime indicates the last
          subscription time to the gateway publish-subscribe node."
@@ -6209,7 +6884,7 @@ tmnxSysVsdGwPubSubLstSubscrdTime OBJECT-TYPE
 tmnxSysVsdGwLastAuditTxTime      OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysVsdGwLastAuditTxTime indicates the time last
          gateway audit was sent to the VSD."
@@ -7539,7 +8214,8 @@ TmnxSysFileTransProfEntry        ::= SEQUENCE
     tmnxSysFileTransProfTimeout      Unsigned32,
     tmnxSysFileTransProfRetry        Unsigned32,
     tmnxSysFileTransProfRedirection  Unsigned32,
-    tmnxSysFileTransProfSvcName      TLNamedItemOrEmpty
+    tmnxSysFileTransProfSvcName      TLNamedItemOrEmpty,
+    tmnxSysFileTransProfHttpVersion  INTEGER
 }
 
 tmnxSysFileTransProfName         OBJECT-TYPE
@@ -7756,6 +8432,19 @@ tmnxSysFileTransProfSvcName      OBJECT-TYPE
          Only VPRN service names are allowed."
     DEFVAL      { ''H }
     ::= { tmnxSysFileTransProfEntry 13 }
+
+tmnxSysFileTransProfHttpVersion  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        v10 (1),
+        v11 (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFileTransProfHttpVersion specifies the HTTP
+         version to be used by this file transmission profile."
+    DEFVAL      { v11 }
+    ::= { tmnxSysFileTransProfEntry 14 }
 
 tmnxEhsExtObjs                   OBJECT IDENTIFIER ::= { tmnxSysObjs 35 }
 
@@ -8088,7 +8777,7 @@ tmnxSysGrpcAutoCfgSave           OBJECT-TYPE
         "The value of tmnxSysGrpcAutoCfgSave specifies whether the running
          configuration is saved as part of a commit operation initiated from
          gRPC."
-    DEFVAL      { false }
+    DEFVAL      { true }
     ::= { tmnxSysGrpcInfo 5 }
 
 tmnxSysGrpcGnmiVersion           OBJECT-TYPE
@@ -8273,6 +8962,27 @@ tmnxSysGrpcGnoiSystemVersion     OBJECT-TYPE
          'gNOI System' service provided by gRPC server."
     ::= { tmnxSysGrpcInfo 23 }
 
+tmnxSysGrpcGnmiProtoVersion      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        latest (0),
+        v070   (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysGrpcGnmiProtoVersion specifies the
+         version of gNMI service provided by gRPC server.
+
+         Values other than 'latest' are only for backward compatibility with
+         legacy collectors.
+
+         This leaf affect also Dial-out Telemetry feature.
+
+           'latest (0)' - Use latest supported version.
+           'v070 (1)'   - Use gNMI 0.7.0 version."
+    DEFVAL      { latest }
+    ::= { tmnxSysGrpcInfo 24 }
+
 tmnxSysMgmtInterfaceMDCli        OBJECT IDENTIFIER ::= { tmnxSysObjs 40 }
 
 tmnxSysMgmtIfMDCliAutoCfgSave    OBJECT-TYPE
@@ -8283,7 +8993,7 @@ tmnxSysMgmtIfMDCliAutoCfgSave    OBJECT-TYPE
         "The value of tmnxSysMgmtIfMDCliAutoCfgSave specifies whether the
          running configuration is saved as part of a commit operation initiated
          from MD CLI."
-    DEFVAL      { false }
+    DEFVAL      { true }
     ::= { tmnxSysMgmtInterfaceMDCli 1 }
 
 tmnxSysMgmtIfMDEnvComplEnter     OBJECT-TYPE
@@ -8482,7 +9192,7 @@ tmnxSysMgmtInterfaceYangModules  OBJECT IDENTIFIER ::= { tmnxSysObjs 42 }
 tmnxSysMgmtIfYangBaseR13         OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysMgmtIfYangBaseR13 specifies whether or not the
          base release 13 YANG models are supported. When set to 'true', network
@@ -8503,7 +9213,7 @@ tmnxSysMgmtIfYangNokia           OBJECT-TYPE
 
 tmnxSysMgmtIfYangOpenConfig      OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of tmnxSysMgmtIfYangOpenConfig specifies whether or not the
@@ -8562,7 +9272,6 @@ tmnxSysMgmtIfWriteMode           OBJECT-TYPE
          re-enable SNMP access an operator MUST have write-access to CLI or a
          newer interface such as Netconf or gNMI and set the mode to either
          'classic (1)' or 'mixed (3)'."
-    DEFVAL      { classic }
     ::= { tmnxSysMgmtInterfaces 1 }
 
 tmnxSysMgmtIfWriteOperMode       OBJECT-TYPE
@@ -8970,7 +9679,12 @@ TmnxSysGrpcConnEntry             ::= SEQUENCE
     tmnxSysGrpcConnTxBytes           Counter64,
     tmnxSysGrpcConnQos               TDSCPNameOrEmpty,
     tmnxSysGrpcConnSrcVRtrId         TmnxVRtrID,
-    tmnxSysGrpcConnGrpcTunnel        TNamedItemOrEmpty
+    tmnxSysGrpcConnGrpcTunnel        TNamedItemOrEmpty,
+    tmnxSysGrpcConnLFRpcName         TNamedItemOrEmpty,
+    tmnxSysGrpcConnLFRpcServiceName  TNamedItemOrEmpty,
+    tmnxSysGrpcConnLFRpcDuration     Counter64,
+    tmnxSysGrpcConnLFRpcFinishTime   DateAndTime,
+    tmnxSysGrpcConnLFRpcErrorStatus  OCTET STRING
 }
 
 tmnxSysGrpcConnSrcIpAddType      OBJECT-TYPE
@@ -9076,6 +9790,58 @@ tmnxSysGrpcConnGrpcTunnel        OBJECT-TYPE
         "The value of the object tmnxSysGrpcConnGrpcTunnel indicates the
          gRPC-Tunnel instance used as transport of a connection."
     ::= { tmnxSysGrpcConnEntry 11 }
+
+tmnxSysGrpcConnLFRpcName         OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysGrpcConnLFRpcName indicates the name of
+         a last finished RPC on this connection."
+    ::= { tmnxSysGrpcConnEntry 12 }
+
+tmnxSysGrpcConnLFRpcServiceName  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysGrpcConnLFRpcServiceName indicates the
+         name of a last finished RPC service on this connection."
+    ::= { tmnxSysGrpcConnEntry 13 }
+
+tmnxSysGrpcConnLFRpcDuration     OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysGrpcConnLFRpcDuration indicates the
+         duration of a last finished RPC on this connection."
+    ::= { tmnxSysGrpcConnEntry 14 }
+
+tmnxSysGrpcConnLFRpcFinishTime   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcConnLFRpcFinishTime indicates the finish time
+         of a last finished RPC on this connection.
+
+         DateAndTime.year = 0 is returned if no RPC have been finished on this
+         connection."
+    ::= { tmnxSysGrpcConnEntry 15 }
+
+tmnxSysGrpcConnLFRpcErrorStatus  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcConnLFRpcErrorStatus indicates the error
+         status of a last finished RPC on this connection.
+
+         Empty string is returned if no RPC have been finished on this
+         connection, or if last RPC finished with OK status."
+    ::= { tmnxSysGrpcConnEntry 16 }
 
 tmnxSysHttpRdr                   OBJECT IDENTIFIER ::= { tmnxSysObjs 45 }
 
@@ -9562,7 +10328,7 @@ tmnxSysFpoQosFc4ProfOperState    OBJECT-TYPE
 tmnxSysFpoMplsFastSwOvAdminState OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysFpoMplsFastSwOvAdminState specifies the
          administrative state of the MPLS fast switchover forwarding path
@@ -9573,7 +10339,7 @@ tmnxSysFpoMplsFastSwOvAdminState OBJECT-TYPE
 tmnxSysFpoMplsFastSwOvOperState  OBJECT-TYPE
     SYNTAX      TmnxOperState
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysFpoMplsFastSwOvOperState indicates the operational
          state of the MPLS fast switchover forwarding path option."
@@ -9582,7 +10348,7 @@ tmnxSysFpoMplsFastSwOvOperState  OBJECT-TYPE
 tmnxSysFpoRouterEcmpAdminState   OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysFpoRouterEcmpAdminState specifies the
          administrative state of the router ECMP forwarding path option."
@@ -9592,7 +10358,7 @@ tmnxSysFpoRouterEcmpAdminState   OBJECT-TYPE
 tmnxSysFpoRouterEcmpOperState    OBJECT-TYPE
     SYNTAX      TmnxOperState
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSysFpoRouterEcmpOperState indicates the operational
          state of the router ECMP forwarding path option."
@@ -9985,6 +10751,28 @@ tmnxSysFpoRingApsOperState       OBJECT-TYPE
         "The value of tmnxSysFpoRingApsOperState indicates the operational
          state of the ring aps forwarding path option."
     ::= { tmnxSysFwdPathOptsObjs 50 }
+
+tmnxSysFpoSvcCesAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoSvcCesAdminState specifies the administrative
+         state of the CES service forwarding path option.
+
+         When the value is outOfService, 4K egress encapsulation entries
+         dedicated to CES will be freed up for dynamic resource allocation."
+    DEFVAL      { inService }
+    ::= { tmnxSysFwdPathOptsObjs 51 }
+
+tmnxSysFpoSvcCesOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoSvcCesOperState indicates the operational state
+         of the CES service forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 52 }
 
 tmnxSysSwitchFabricObjs          OBJECT IDENTIFIER ::= { tmnxSysObjs 49 }
 
@@ -11775,6 +12563,20 @@ tmnxSysFanIncMinimumSpeed        OBJECT-TYPE
     DEFVAL      { false }
     ::= { tmnxSysFanControl 1 }
 
+tmnxSysFanCtrlMinimumSpeed       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        default   (-1),
+        percent65 (65),
+        percent90 (90)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFanCtrlMinimumSpeed specifies a minimum fan speed
+         which the system may reach, expressed as a percentage."
+    DEFVAL      { default }
+    ::= { tmnxSysFanControl 2 }
+
 tmnxSysFpResourceAllocationObjs  OBJECT IDENTIFIER ::= { tmnxSysObjs 59 }
 
 tmnxSysFpResAlcnLpmTblLastChg    OBJECT-TYPE
@@ -11816,7 +12618,7 @@ TmnxSysFpResAlcnLpmEntry         ::= SEQUENCE
 }
 
 tmnxSysFpResAlcnLpmScaleOption   OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..3)
+    SYNTAX      Unsigned32 (1..4)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -12179,7 +12981,7 @@ tmnxSysV13v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxSysCompliances 14 }
 
 tmnxSysV14v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of general system capabilities
          on Nokia SROS series systems in release 14.0."
@@ -12242,7 +13044,7 @@ tmnxSysV14v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxSysCompliances 15 }
 
 tmnxSysV15v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of general system capabilities
          on Nokia SROS series systems in release 15.0."
@@ -12250,7 +13052,6 @@ tmnxSysV15v0Compliance           MODULE-COMPLIANCE
         MANDATORY-GROUPS {
             tmnxSysLoginControlV15v0Group,
             tmnxSysGrpcV15v0Group,
-            tmnxSysXmppMgmtGroup,
             tmnxSysLicenseApp48HrsGroup
         }
     ::= { tmnxSysCompliances 16 }
@@ -12323,10 +13124,11 @@ tmnxSysV20v0Compliance           MODULE-COMPLIANCE
     MODULE
         MANDATORY-GROUPS {
             tmnxSysNotificationV20v0Group,
-            tmnxSysFwdPathOptsV20v0Group,
+            tmnxSysNotifyObjsV20v0Group,
             tmnxSysAutoBootV20v0Group,
             tmnxSysSwitchFabricV20v0Group,
             tmnxSysUsbV20v0Group,
+            tmnxSysAutoBootTimeoutV20v0Group,
             tmnxSysGeneralV20v0Group,
             tmnxSysMgmtInterfaceV20v0Group,
             tmnxSysAutoNEDV20v0Group,
@@ -12380,9 +13182,80 @@ tmnxSysV22v0Compliance           MODULE-COMPLIANCE
             tmnxSysNotificationV22v0Group,
             tmnxSysFpLpmResAlcnV22v0Group,
             tmnxSysFanControlV22v0Group,
-            tmnxSysRemoteMgmtV22v0Group
+            tmnxSysRemoteMgmtV22v0Group,
+            tmnxSysFpResAllocV22v0Group
         }
     ::= { tmnxSysCompliances 22 }
+
+tmnxSysV23v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of general system capabilities
+         on Nokia SROS series systems in release 23."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSysBofV6v0Group,
+            tmnxSysCandidateCfgGroup,
+            tmnxSysCardResourceGroup,
+            tmnxSysCertGroup,
+            tmnxSysConfigV8v0Group,
+            tmnxSysDNSSecNotifV12v0Group,
+            tmnxSysDNSSecV12v0Group,
+            tmnxSysEthInfoGroup,
+            tmnxSysGeneralV3v0Group,
+            tmnxSysGeneralV7v0Group,
+            tmnxSysGroupingSystemGroup,
+            tmnxSysIcmpVSV6v1Group,
+            tmnxSysIpv6MgmtItfV6v0Group,
+            tmnxSysLiFilterGroup,
+            tmnxSysLiV6v0Group,
+            tmnxSysLoginControlSecGroup,
+            tmnxSysLoginControlV8v0Group,
+            tmnxSysLoginControlV9v0Group,
+            tmnxSysNetconfV11v0Group,
+            tmnxSysNotificationRBGroup,
+            tmnxSysNotificationV10v0Group,
+            tmnxSysNotificationV6v0Group,
+            tmnxSysNotificationV9v0Group,
+            tmnxSysRadiusServerV5v0Group,
+            tmnxSysRollbackRescueGroup,
+            tmnxSysRollbackV9v0Group,
+            tmnxSysDhcpGroup,
+            tmnxSysStrmV11v0R4Group,
+            tmnxSysTacPlusServerV5v0Group,
+            tmnxSysTimeV4v0Group,
+            tmnxSystemCpuMonitorGroup,
+            tmnxSysBofV12v0Group,
+            tmnxSysLicenseV12v0Group,
+            tmnxSysFibV13v0Group,
+            tmnxSysNetconfV13v0Group,
+            tmnxSysSnmpSrcAccesLstV13v0Group,
+            tmnxSysMgmtProtocolV13v0Group,
+            tmnxSysFileTransProfV13v0Group,
+            tmnxSysEhsV13v0Group,
+            tmnxSysBofV13v0Group,
+            tmnxSysLicenseV13v0Group,
+            tmnxSysLicenseNotifV13v0Group,
+            tmnxSysSwReposV13v0Group,
+            tmnxSysBofV14v0Group,
+            tmnxSysNotificationV14v0Group,
+            tmnxPersistenceV14v0Group,
+            tmnxSysEhsParameterGroup,
+            tmnxSysLicenseApplicationGroup,
+            tmnxSysNotifyObjsV14v0Group,
+            tmnxSysTimeV14v0Group,
+            tmnxSysLoginControlV15v0Group,
+            tmnxSysGrpcV15v0Group,
+            tmnxSysLicenseApp48HrsGroup,
+            tmnxSysNotificationV23v0Group,
+            tmnxSysConfigV23v0Group,
+            tmnxSysFltrProfiles23v0Group,
+            tmnxSysFileTransProfV23v0Group,
+            tmnxPersistenceV23v0Group,
+            tmnxPythonPersistenceV23v0Grp,
+            tmnxSysFanControlV23v0Group
+        }
+    ::= { tmnxSysCompliances 23 }
 
 tmnxSysGroups                    OBJECT IDENTIFIER ::= { tmnxSysConformance 2 }
 
@@ -13309,7 +14182,7 @@ tmnxPersistenceV12v0Group        OBJECT-GROUP
         spiPythonPersistenceFileLoc,
         spiPythonPersistenceDescr
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of persistency across
          system reboot on Nokia SROS series systems release 12.0."
@@ -13346,7 +14219,7 @@ tmnxSysNotificationV12v0Group    NOTIFICATION-GROUP
         tmnxSysXmppServerFunctional,
         tmnxSysXmppServerNotFunctional
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of notifications supporting the general system capabilities
          added in release 12.0 of SROS."
@@ -13399,7 +14272,7 @@ tmnxSysXmppV12v4Group            OBJECT-GROUP
         tmnxSysXmppServAuthType,
         tmnxSysXmppServConnMode
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting XMPP server information on Nokia SROS
          series systems in release 12.0 R4."
@@ -13766,6 +14639,7 @@ tmnxSysGrpcV15v0Group            OBJECT-GROUP
         tmnxSysGrpcGnoiFileVersion,
         tmnxSysGrpcGnoiSystemAdminState,
         tmnxSysGrpcGnoiSystemVersion,
+        tmnxSysGrpcGnmiProtoVersion,
         tmnxSysGrpcConnStartTime,
         tmnxSysGrpcConnActRpcCnt,
         tmnxSysGrpcConnTotRpcCnt,
@@ -13774,6 +14648,11 @@ tmnxSysGrpcV15v0Group            OBJECT-GROUP
         tmnxSysGrpcConnQos,
         tmnxSysGrpcConnSrcVRtrId,
         tmnxSysGrpcConnGrpcTunnel,
+        tmnxSysGrpcConnLFRpcName,
+        tmnxSysGrpcConnLFRpcServiceName,
+        tmnxSysGrpcConnLFRpcDuration,
+        tmnxSysGrpcConnLFRpcFinishTime,
+        tmnxSysGrpcConnLFRpcErrorStatus,
         tmnxSysGrpcRpcName,
         tmnxSysGrpcRpcServiceName,
         tmnxSysGrpcRpcStartTime,
@@ -13793,17 +14672,6 @@ tmnxSysGrpcV15v0Group            OBJECT-GROUP
         "The group of objects supporting gRPC server on Nokia SROS series
          systems for 15.0 Release."
     ::= { tmnxSysGroups 74 }
-
-tmnxSysXmppMgmtGroup             OBJECT-GROUP
-    OBJECTS     {
-        tmnxSysXmppServServiceId,
-        tmnxSysXmppServRouterId
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting management of XMPP server on Nokia
-         SROS series systems for 15.0 Release."
-    ::= { tmnxSysGroups 75 }
 
 tmnxSysV15v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 76 }
 
@@ -14302,7 +15170,8 @@ tmnxSysV20v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 80 }
 tmnxSysNotificationV20v0Group    NOTIFICATION-GROUP
     NOTIFICATIONS {
         tmnxEqOperStateChange,
-        stiDateAndTimeChanging
+        stiDateAndTimeChanging,
+        tmnxSysHttpRdrOutOfSeqLimitExc
     }
     STATUS      current
     DESCRIPTION
@@ -14317,7 +15186,7 @@ tmnxSysFwdPathOptsV20v0Group     OBJECT-GROUP
         tmnxSysFpoRouterEcmpAdminState,
         tmnxSysFpoRouterEcmpOperState
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of system forwarding path
          options on Nokia SROS series system added in SROS release 20."
@@ -14354,6 +15223,16 @@ tmnxSysUsbV20v0Group             OBJECT-GROUP
          (USB) ports on Nokia SROS series systems added in SROS release 20."
     ::= { tmnxSysV20v0Groups 5 }
 
+tmnxSysAutoBootTimeoutV20v0Group OBJECT-GROUP
+    OBJECTS     {
+        sbiAutoBootTimeout
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of system zero touch
+         provisioning on Nokia SROS series system added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 6 }
+
 tmnxSysGeneralV20v0Group         OBJECT-GROUP
     OBJECTS     {
         sgiCryptoModVersion
@@ -14363,6 +15242,16 @@ tmnxSysGeneralV20v0Group         OBJECT-GROUP
         "The group of objects supporting management of general system
          capabilities on Nokia SROS series system added in SROS release 20."
     ::= { tmnxSysV20v0Groups 7 }
+
+tmnxSysNotifyObjsV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysAdditionalInfo
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications for general system
+         capabilities, added in Nokia SROS release 14.0."
+    ::= { tmnxSysV20v0Groups 8 }
 
 tmnxSysMgmtInterfaceV20v0Group   OBJECT-GROUP
     OBJECTS     {
@@ -14489,12 +15378,15 @@ tmnxSysNetconfCountersExtension  OBJECT-GROUP
     OBJECTS     {
         tmnxSysNetconfGetSchemaRequests,
         tmnxSysNetconfGetDataRequests,
-        tmnxSysNetconfActionRequests
+        tmnxSysNetconfActionRequests,
+        tmnxSysNetconfBadHellos,
+        tmnxSysNetconfDroppedSessions,
+        tmnxSysNetconfLastOperChange
     }
     STATUS      current
     DESCRIPTION
         "The group of objects supporting management of the NETCONF on Nokia
-         SROS series system added in SROS release 20.0."
+         SROS series system added in SROS releases 20.0 and 22.0."
     ::= { tmnxSysV20v0Groups 14 }
 
 tmnxSysFpResAllocObsoleteGroup   OBJECT-GROUP
@@ -14700,7 +15592,9 @@ tmnxSysFwdPathOptsV22v0Group     OBJECT-GROUP
         tmnxSysFpoIpv6FltPbrRdrtAdmState,
         tmnxSysFpoIpv6FltPbrRdrtOprState,
         tmnxSysFpoRingApsAdminState,
-        tmnxSysFpoRingApsOperState
+        tmnxSysFpoRingApsOperState,
+        tmnxSysFpoSvcCesAdminState,
+        tmnxSysFpoSvcCesOperState
     }
     STATUS      current
     DESCRIPTION
@@ -14789,6 +15683,183 @@ tmnxSysFpResMacFltrObsoleteGroup OBJECT-GROUP
          Nokia SROS series systems that were obsoleted in SROS release 22.2."
     ::= { tmnxSysV22v0Groups 8 }
 
+tmnxSysFpResAllocV22v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpResAlcEgrEncapRouted,
+        tmnxSysFpResAlcEgrEncapOprRouted,
+        tmnxSysFpRAEgrEncpPrtVlanTrns,
+        tmnxSysFpRAEgrEncpOprPrtVlanTrns
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting system FP resource allocation
+         capabilities on Nokia SROS release 22."
+    ::= { tmnxSysV22v0Groups 10 }
+
+tmnxSysV23v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 83 }
+
+tmnxSysConfigV23v0Group          OBJECT-GROUP
+    OBJECTS     {
+        sbiSnmpdMaxBulkDuration
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of boot-up configuration
+         and synchronization of active and standby systems on Nokia SROS series
+         systems in release 23."
+    ::= { tmnxSysV23v0Groups 1 }
+
+tmnxSysFileTransProfV23v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFileTransProfHttpVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the configuration of file transmission
+         profile on Nokia SROS series system added in SROS release 23."
+    ::= { tmnxSysV23v0Groups 2 }
+
+tmnxSysNotificationV23v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxConfigConflict,
+        tmnxSysLicenseInvalid,
+        tmnxSysLicenseExpiresSoon
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system capabilities
+         added in release 12.0 of SROS."
+    ::= { tmnxSysV23v0Groups 3 }
+
+tmnxPersistenceV23v0Group        OBJECT-GROUP
+    OBJECTS     {
+        spiSubMgmtPersistenceFileLocation,
+        spiSubMgmtPersistenceDescription,
+        spiDhcpSrvPersistenceFileLoc,
+        spiDhcpSrvPersistenceDescr,
+        spiNatFwdPersistenceFileLoc,
+        spiNatFwdPersistenceDescr,
+        spiAAPersistenceFileLoc,
+        spiAAPersistenceDescr,
+        spiAncpPersistenceFileLoc,
+        spiAncpPersistenceDescr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of persistency across
+         system reboot on Nokia SROS series systems release 12.0."
+    ::= { tmnxSysV23v0Groups 4 }
+
+tmnxPythonPersistenceV23v0Grp    OBJECT-GROUP
+    OBJECTS     {
+        spiPythonPersistenceFileLoc,
+        spiPythonPersistenceDescr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of persistency across
+         system reboot on Nokia SROS series systems release 12.0."
+    ::= { tmnxSysV23v0Groups 5 }
+
+tmnxSysFltrProfiles23v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpRAFltrInIpMSrcIp,
+        tmnxSysFpRAFltrInIpOpMSrcIp,
+        tmnxSysFpRAFltrInIpMDstIp,
+        tmnxSysFpRAFltrInIpOpMDstIp,
+        tmnxSysFpRAFltrInIpMSrcPort,
+        tmnxSysFpRAFltrInIpOpMSrcPort,
+        tmnxSysFpRAFltrInIpMDstPort,
+        tmnxSysFpRAFltrInIpOpMDstPort,
+        tmnxSysFpRAFltrInIpMProt,
+        tmnxSysFpRAFltrInIpOpMProt,
+        tmnxSysFpRAFltrInIpMTcpFlgs,
+        tmnxSysFpRAFltrInIpOpMTcpFlgs,
+        tmnxSysFpRAFltrInIpMDscp,
+        tmnxSysFpRAFltrInIpOpMDscp,
+        tmnxSysFpRAFltrInIpADrop,
+        tmnxSysFpRAFltrInIpOpADrop,
+        tmnxSysFpRAFltrInIpARedir,
+        tmnxSysFpRAFltrInIpOpARedir,
+        tmnxSysFpRAFltrInIpALog,
+        tmnxSysFpRAFltrInIpOpALog,
+        tmnxSysFpRAFltrInIpAMirror,
+        tmnxSysFpRAFltrInIpOpAMirror,
+        tmnxSysFpRAFltrInIpAFc,
+        tmnxSysFpRAFltrInIpOpAFc,
+        tmnxSysFpRAFltrInIpAStats,
+        tmnxSysFpRAFltrInIpOpAStats,
+        tmnxSysFpRAFltrInIpv6MSrcIpMsb,
+        tmnxSysFpRAFltrInIpv6OpMSrcIpMsb,
+        tmnxSysFpRAFltrInIpv6MSrcIpLsb,
+        tmnxSysFpRAFltrInIpv6OpMSrcIpLsb,
+        tmnxSysFpRAFltrInIpv6MDstIpMsb,
+        tmnxSysFpRAFltrInIpv6OpMDstIpMsb,
+        tmnxSysFpRAFltrInIpv6MDstIpLsb,
+        tmnxSysFpRAFltrInIpv6OpMDstIpLsb,
+        tmnxSysFpRAFltrInIpv6MSrcPort,
+        tmnxSysFpRAFltrInIpv6OpMSrcPort,
+        tmnxSysFpRAFltrInIpv6MDstPort,
+        tmnxSysFpRAFltrInIpv6OpMDstPort,
+        tmnxSysFpRAFltrInIpv6MNextHdr,
+        tmnxSysFpRAFltrInIpv6OpMNextHdr,
+        tmnxSysFpRAFltrInIpv6MTcpFlgs,
+        tmnxSysFpRAFltrInIpv6OpMTcpFlgs,
+        tmnxSysFpRAFltrInIpv6MDscp,
+        tmnxSysFpRAFltrInIpv6OpMDscp,
+        tmnxSysFpRAFltrInIpv6ADrop,
+        tmnxSysFpRAFltrInIpv6OpADrop,
+        tmnxSysFpRAFltrInIpv6ARedir,
+        tmnxSysFpRAFltrInIpv6OpARedir,
+        tmnxSysFpRAFltrInIpv6ALog,
+        tmnxSysFpRAFltrInIpv6OpALog,
+        tmnxSysFpRAFltrInIpv6AMirror,
+        tmnxSysFpRAFltrInIpv6OpAMirror,
+        tmnxSysFpRAFltrInIpv6AFc,
+        tmnxSysFpRAFltrInIpv6OpAFc,
+        tmnxSysFpRAFltrInIpv6AStats,
+        tmnxSysFpRAFltrInIpv6OpAStats
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting user defined filter profiles
+         capability on Nokia SROS release 23."
+    ::= { tmnxSysV23v0Groups 6 }
+
+tmnxSysFPOptsV23v0ObsoleteGrp    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpoMplsFastSwOvAdminState,
+        tmnxSysFpoMplsFastSwOvOperState,
+        tmnxSysFpoRouterEcmpAdminState,
+        tmnxSysFpoRouterEcmpOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting obsoletion of system forwarding path
+         options on Nokia SROS series system added in SROS release 23."
+    ::= { tmnxSysV23v0Groups 9 }
+
+tmnxSysNetconfV23vObsoleteGroup  OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysMgmtIfYangBaseR13,
+        tmnxSysNetconfCapRunningCfg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NETCONF on Nokia
+         SROS series system which are obsoleted"
+    ::= { tmnxSysV23v0Groups 10 }
+
+tmnxSysFanControlV23v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFanCtrlMinimumSpeed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting system fan control capability on Nokia
+         SROS release 23."
+    ::= { tmnxSysV23v0Groups 11 }
+
 tmnxSysMGGroups                  OBJECT IDENTIFIER ::= { tmnxSysConformance 3 }
 
 tmnxSysMGCompliances             OBJECT IDENTIFIER ::= { tmnxSysConformance 4 }
@@ -14800,6 +15871,59 @@ tmnxSysDCGroups                  OBJECT IDENTIFIER ::= { tmnxSysConformance 6 }
 tmnxSysNspProxyCompliances       OBJECT IDENTIFIER ::= { tmnxSysConformance 7 }
 
 tmnxSysNspProxyGroups            OBJECT IDENTIFIER ::= { tmnxSysConformance 8 }
+
+tmnxSysVsdObsoletedGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysVsdSystemId,
+        tmnxSysVsdGwPubSubIsSubscrd,
+        tmnxSysVsdGwPubSubNodeName,
+        tmnxSysVsdGwPubSubLstSubscrdTime,
+        tmnxSysVsdGwLastAuditTxTime,
+        tmnxSysXmppServFQDN,
+        tmnxSysXmppServRowStatus,
+        tmnxSysXmppServUserName,
+        tmnxSysXmppServPassword,
+        tmnxSysXmppServLastChanged,
+        tmnxSysXmppServUptime,
+        tmnxSysXmppServIQSent,
+        tmnxSysXmppServIQRcvd,
+        tmnxSysXmppServIQError,
+        tmnxSysXmppServIQTimedOut,
+        tmnxSysXmppServIQAckRcvd,
+        tmnxSysXmppServIQMinRtt,
+        tmnxSysXmppServIQMaxRtt,
+        tmnxSysXmppServVsdUpdatesRcvd,
+        tmnxSysXmppServUpdatesRcvd,
+        tmnxSysXmppServMsgSent,
+        tmnxSysXmppServMsgRcvd,
+        tmnxSysXmppServMsgAckRcvd,
+        tmnxSysXmppServMsgError,
+        tmnxSysXmppServMsgTimedOut,
+        tmnxSysXmppServMsgMinRtt,
+        tmnxSysXmppServMsgMaxRtt,
+        tmnxSysXmppServSubSent,
+        tmnxSysXmppServUnSubSent,
+        tmnxSysXmppServState,
+        tmnxSysXmppServAdminState,
+        tmnxSysVsdServUptime,
+        tmnxSysVsdServUserName,
+        tmnxSysVsdServerStatus,
+        tmnxSysVsdServMsgSent,
+        tmnxSysVsdServMsgRcvd,
+        tmnxSysVsdServMsgAckRcvd,
+        tmnxSysVsdServMsgError,
+        tmnxSysVsdServMsgTimedOut,
+        tmnxSysVsdServMsgMinRtt,
+        tmnxSysVsdServMsgMaxRtt,
+        tmnxSysXmppServOperUserName,
+        tmnxSysXmppServAuthType,
+        tmnxSysXmppServConnMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted objects in 23.3 supporting the general system
+         Vsd and xmpp tables on Nokia SROS series systems."
+    ::= { tmnxSysNspProxyGroups 3 }
 
 tmnxSysMIBNotifyPrefix           OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 1 }
 
@@ -15685,7 +16809,7 @@ tmnxSysVsdServerAvailable        NOTIFICATION-TYPE
     OBJECTS     {
         tmnxSysNotifVsdServerName
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The tmnxSysVsdServerAvailable notification is generated when
          system discover a new VSD server.
@@ -15700,7 +16824,7 @@ tmnxSysVsdServerUnavailable      NOTIFICATION-TYPE
     OBJECTS     {
         tmnxSysNotifVsdServerName
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The tmnxSysVsdServerAvailable notification is generated when
          system loses connection to VSD.
@@ -15715,7 +16839,7 @@ tmnxSysXmppServerFunctional      NOTIFICATION-TYPE
     OBJECTS     {
         tmnxSysNotifXmppServerName
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The tmnxSysXmppServerFunctional notification is generated when
          system discover a new XMPP server.
@@ -15730,7 +16854,7 @@ tmnxSysXmppServerNotFunctional   NOTIFICATION-TYPE
     OBJECTS     {
         tmnxSysNotifXmppServerName
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The tmnxSysXmppServerNotFunctional notification is generated
          when system can not communicate with XMPP server.
@@ -16185,6 +17309,26 @@ tmnxSysDyingGasp                 NOTIFICATION-TYPE
 
          [RECOVERY] Restore power at site."
     ::= { tmnxSysNotifications 93 }
+
+tmnxSysHttpRdrOutOfSeqLimitExc   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSysAdditionalInfo
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The notification tmnxSysHttpRdrOutOfSeqLimitExc is sent
+         when the value of the object tmnxSysHttpRdrCpmOptimizedMode
+         is equal to 'true' and, for any given HTTP relay TCP connection, the
+         number of
+         - TCP sync packets (receive direction) or
+         - TCP data packets (transmit direction)
+         received out-of-sequence exceeds the limit of 10.
+
+         [EFFECT] The out-of-sequence packets received for that connection are
+         dropped.
+
+         [RECOVERY] The root cause in the network must be found and fixed."
+    ::= { tmnxSysNotifications 94 }
 
 tmnxSysMGNotifications           OBJECT IDENTIFIER ::= { tmnxSysMIBNotifyPrefix 1 }
 

@@ -226,7 +226,23 @@ TmnxMplsLspFailCode              ::= TEXTUAL-CONVENTION
         mplsV6Down                 (61),
         lspAdminDown               (62),
         pathAdminDown              (63),
-        templateAdminDown          (64)
+        templateAdminDown          (64),
+        pceAssocConflict           (65),
+        pathRetried                (66),
+        clearCommand               (67),
+        nonActiveSecondary         (68),
+        autoBandwidthAdjustment    (69),
+        pathDegraded               (71),
+        lspSelfPingTimeout         (72),
+        rsvpError                  (73),
+        p2mpInstanceAdminDown      (74),
+        bfdDown                    (75),
+        rsvpNeighborDown           (76),
+        resvTimeout                (77),
+        resvTear                   (78),
+        frrPathDown                (79),
+        lspInitRetryTimeout        (80),
+        iomProgrammingFailure      (81)
     }
 
 TmnxMplsLabelOwner               ::= TEXTUAL-CONVENTION
@@ -452,7 +468,8 @@ VRtrMplsLspEntry                 ::= SEQUENCE
     vRtrMplsLspBfdEnable             TruthValue,
     vRtrMplsLspBfdPingIntvl          Unsigned32,
     vRtrMplsLspNgFromAddr            InetAddress,
-    vRtrMplsLspNgToAddr              InetAddress
+    vRtrMplsLspNgToAddr              InetAddress,
+    vRtrMplsLspIgpScSrOverSrTe       TruthValue
 }
 
 vRtrMplsLspIndex                 OBJECT-TYPE
@@ -1704,6 +1721,28 @@ vRtrMplsLspNgToAddr              OBJECT-TYPE
          this LSP."
     ::= { vRtrMplsLspEntry 78 }
 
+vRtrMplsLspIgpScSrOverSrTe       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspIgpScSrOverSrTe specifies whether the SR-TE
+         LSP can be used as an SRv4/SRv6 IGP shortcut.
+
+         The object vRtrMplsLspIgpScSrOverSrTe is applicable to SR-TE LSPs.
+
+         When vRtrMplsLspIgpScSrOverSrTe is set to  'true', the SR-TE LSP can used as
+         an SRv4/SRv6 IGP shortcut.
+
+         When vRtrMplsLspIgpScSrOverSrTe is set to 'false', the SR-TE LSP
+         cannot be used as an SRv4/SRv6 shortcut.
+
+         An 'inconsistentValue' error is returned if an attempt is made to set
+         this object to a non-default value when the value of the object
+         vRtrMplsLspIgpShortcut is not set to 'true'."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspEntry 79 }
+
 vRtrMplsLspStatTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspStatEntry
     MAX-ACCESS  not-accessible
@@ -1913,11 +1952,13 @@ vRtrMplsLspSelfPingOamNoRsc      OBJECT-TYPE
 vRtrMplsLspPathTableSpinlock     OBJECT-TYPE
     SYNTAX      TestAndIncr
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "voluntary serialization control for vRtrMplsLspPathTable. Primarily
          used by SNMP manager to coordinate changes to
-         vRtrMplsLspPathInheritance."
+         vRtrMplsLspPathInheritance.
+
+         Obsoleted in 23.3."
     DEFVAL      { 0 }
     ::= { tmnxMplsObjs 3 }
 
@@ -3433,7 +3474,12 @@ VRtrMplsGeneralEntry             ::= SEQUENCE
     vRtrMplsGenRsvpPccOperState      TmnxOperState,
     vRtrMplsGenRsvpPceOperState      TmnxOperState,
     vRtrMplsGenSrTePccOperState      TmnxOperState,
-    vRtrMplsGenSrTePceOperState      TmnxOperState
+    vRtrMplsGenSrTePceOperState      TmnxOperState,
+    vRtrMplsGenStrictEroNhopDirRes   TruthValue,
+    vRtrMplsGenSrTeResigOnIgpOvl     TruthValue,
+    vRtrMplsGenLspBsidBlkName        TLNamedItemOrEmpty,
+    vRtrMplsGenLspHistory            TruthValue,
+    vRtrMplsGenLspHistAdminState     TmnxAdminState
 }
 
 vRtrMplsGeneralLastChange        OBJECT-TYPE
@@ -4389,6 +4435,67 @@ vRtrMplsGenSrTePceOperState      OBJECT-TYPE
          A value of 'outOfService' indicates that SR-TE related PCE is
          operationally down."
     ::= { vRtrMplsGeneralEntry 66 }
+
+vRtrMplsGenStrictEroNhopDirRes   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenStrictEroNhopDirRes specifies whether the
+         route to a strict next-hop in ERO of RSVP LSPs must be resolved using
+         only direct routes."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 67 }
+
+vRtrMplsGenSrTeResigOnIgpOvl     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenSrTeResigOnIgpOvl specifies whether or not
+         SR-TE LSPs will be resignaled when IGP overload is received."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 69 }
+
+vRtrMplsGenLspBsidBlkName        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspBsidBlkName specifies the name identifying
+         the reserved label block for LSP binding SID."
+    DEFVAL      { "" }
+    ::= { vRtrMplsGeneralEntry 71 }
+
+vRtrMplsGenLspHistory            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspHistory specifies whether or not LSP
+         history is enabled."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 72 }
+
+vRtrMplsGenLspHistAdminState     OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspHistAdminState specifies whether or not LSP
+         history is being recorded.
+
+         When the value of vRtrMplsGenLspHistAdminState is set to 'inService',
+         LSP history will be recorded.
+
+         When the value of vRtrMplsGenLspHistAdminState is set to
+         'outOfService',  LSP history will stop being recorded and previously
+         recorded history  will remain intact.
+
+         This variable is not valid if LSP history is disabled i.e. when
+         vRtrMplsGenLspHistory is set to 'false'."
+    DEFVAL      { inService }
+    ::= { vRtrMplsGeneralEntry 73 }
 
 vRtrMplsGeneralStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsGeneralStatEntry
@@ -9246,7 +9353,8 @@ VRtrMplsLspTemplateEntry         ::= SEQUENCE
     vRtrMplsLspTempBfdUpWaitTimer    Unsigned32,
     vRtrMplsLspTempSelfPing          INTEGER,
     vRtrMplsLspTempAddrFamily        INTEGER,
-    vRtrMplsLspTemplateEgrStatsMode  INTEGER
+    vRtrMplsLspTemplateEgrStatsMode  INTEGER,
+    vRtrMplsLspTempIgpScSrOverSrTe   TruthValue
 }
 
 vRtrMplsLspTemplateName          OBJECT-TYPE
@@ -10304,6 +10412,28 @@ vRtrMplsLspTemplateEgrStatsMode  OBJECT-TYPE
          collected stats will be aggregated."
     DEFVAL      { per-fc }
     ::= { vRtrMplsLspTemplateEntry 68 }
+
+vRtrMplsLspTempIgpScSrOverSrTe   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempIgpScSrOverSrTe specifies whether the
+         SR-TE LSP can be used as an SRv4/SRv6 IGP shortcut.
+
+         The object vRtrMplsLspTempIgpScSrOverSrTe is applicable to SR-TE LSPs.
+
+         When vRtrMplsLspTempIgpScSrOverSrTe is set to  'true', the SR-TE LSP can used as
+         an SRv4/SRv6 IGP shortcut.
+
+         When vRtrMplsLspTempIgpScSrOverSrTe is set to 'false', the SR-TE LSP
+         cannot be used as an SRv4/SRv6 shortcut.
+
+         An 'inconsistentValue' error is returned if an attempt is made to set
+         this object to a non-default value when the value of the object
+         vRtrMplsLspTemplateIgpShortcut is not set to 'true'."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspTemplateEntry 69 }
 
 vRtrMplsLspAutoBWTableLastChg    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -12259,7 +12389,8 @@ VRtrMplsLspExtEntry              ::= SEQUENCE
     vRtrMplsLspExtOverrideTunElc     TruthValue,
     vRtrMplsLspExtPrefTransFrr       TruthValue,
     vRtrMplsLspExtBfdReturnPathLabel Unsigned32,
-    vRtrMplsLspExtSoftPreemption     TruthValue
+    vRtrMplsLspExtSoftPreemption     TruthValue,
+    vRtrMplsLspExtBsid               TmnxMplsLabelOrZero
 }
 
 vRtrMplsLspExtPceCompute         OBJECT-TYPE
@@ -12668,6 +12799,16 @@ vRtrMplsLspExtSoftPreemption     OBJECT-TYPE
          preemption is enabled or disabled for P2MP RSVP LSPs."
     DEFVAL      { false }
     ::= { vRtrMplsLspExtEntry 26 }
+
+vRtrMplsLspExtBsid               OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtBsid specifies the binding SID (segment ID)
+         value used for the SR-TE LSP."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspExtEntry 27 }
 
 vRtrMplsLspPathProfTblLstChg     OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -15344,7 +15485,8 @@ VRtrMplsLspTemplateExtEntry      ::= SEQUENCE
     vRtrMplsLspTempExtOverrideTunElc TruthValue,
     vRtrMplsLspTempExtPrefTransFrr   TruthValue,
     vRtrMplsLspTempExtReturnPathLbl  Unsigned32,
-    vRtrMplsLspTempExtSoftPreemption TruthValue
+    vRtrMplsLspTempExtSoftPreemption TruthValue,
+    vRtrMplsLspTempExtBsidEnable     TruthValue
 }
 
 vRtrMplsLspTempExtFallbkPathComp OBJECT-TYPE
@@ -15426,6 +15568,103 @@ vRtrMplsLspTempExtSoftPreemption OBJECT-TYPE
     DEFVAL      { false }
     ::= { vRtrMplsLspTemplateExtEntry 6 }
 
+vRtrMplsLspTempExtBsidEnable     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempExtBsidEnable specifies whether binding
+         SID (segment ID) is used for the SR-TE LSP Template."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspTemplateExtEntry 7 }
+
+vRtrMplsLspPceAssocTableLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocTableLastChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsLspPceAssocTable."
+    ::= { tmnxMplsObjs 93 }
+
+vRtrMplsLspPceAssocTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPceAssocTable has an entry for each Labeled Switch Path
+         (LSP) configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 94 }
+
+vRtrMplsLspPceAssocEntry         OBJECT-TYPE
+    SYNTAX      VRtrMplsLspPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Labeled Switch Path (LSP) configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspPceAssocType and  vRtrMplsLspPceAssocName to
+         have been assigned valid values."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspIndex,
+        vRtrMplsLspPceAssocType,
+        vRtrMplsLspPceAssocName
+    }
+    ::= { vRtrMplsLspPceAssocTable 1 }
+
+VRtrMplsLspPceAssocEntry         ::= SEQUENCE
+{
+    vRtrMplsLspPceAssocType          INTEGER,
+    vRtrMplsLspPceAssocName          TNamedItem,
+    vRtrMplsLspPceAssocRowStatus     RowStatus,
+    vRtrMplsLspPceAssocLastChange    TimeStamp
+}
+
+vRtrMplsLspPceAssocType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        diversity (1),
+        policy    (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocType specifies the type of association
+         used by the the specified LSP."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspPceAssocEntry 1 }
+
+vRtrMplsLspPceAssocName          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocName specifies the name of the pce
+         association name."
+    ::= { vRtrMplsLspPceAssocEntry 2 }
+
+vRtrMplsLspPceAssocRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspPceAssocTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspName must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspPceAssocEntry 3 }
+
+vRtrMplsLspPceAssocLastChange    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspPceAssocEntry 4 }
+
 vRtrMplsLspTempPathProTblLastChg OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -15506,6 +15745,93 @@ vRtrMplsLspTempPathProfGroupId   OBJECT-TYPE
          used by the path profile for the specified LSP Template."
     DEFVAL      { 0 }
     ::= { vRtrMplsLspTempPathProfEntry 4 }
+
+vRtrMplsLspTempPceAssocTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocTblLstChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsLspTempPceAssocTable."
+    ::= { tmnxMplsObjs 97 }
+
+vRtrMplsLspTempPceAssocTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspTempPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspTempPceAssocTable has an entry for each Labeled Switch
+         Path (LSP) Template configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 98 }
+
+vRtrMplsLspTempPceAssocEntry     OBJECT-TYPE
+    SYNTAX      VRtrMplsLspTempPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Labeled Switch Path (LSP) Template configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspTempPceAssocType and  vRtrMplsLspTempPceAssocName to
+         have been assigned valid values."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspTemplateName,
+        vRtrMplsLspTempPceAssocType,
+        vRtrMplsLspTempPceAssocName
+    }
+    ::= { vRtrMplsLspTempPceAssocTable 1 }
+
+VRtrMplsLspTempPceAssocEntry     ::= SEQUENCE
+{
+    vRtrMplsLspTempPceAssocType      INTEGER,
+    vRtrMplsLspTempPceAssocName      TNamedItem,
+    vRtrMplsLspTempPceAssocRowStatus RowStatus,
+    vRtrMplsLspTempPceAssocLstChg    TimeStamp
+}
+
+vRtrMplsLspTempPceAssocType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        diversity (1),
+        policy    (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocType specifies the type of
+         association used by the the specified LSP Template."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspTempPceAssocEntry 1 }
+
+vRtrMplsLspTempPceAssocName      OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocName specifies the name of the pce
+         association name."
+    ::= { vRtrMplsLspTempPceAssocEntry 2 }
+
+vRtrMplsLspTempPceAssocRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspTempPceAssocTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspTemplateName must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspTempPceAssocEntry 3 }
+
+vRtrMplsLspTempPceAssocLstChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspTempPceAssocEntry 4 }
 
 tmnxMplsConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 6 }
 
@@ -16262,6 +16588,7 @@ tmnxMplsV21v0Compliance          MODULE-COMPLIANCE
             tmnxMplsPccPceOperStateV21Group,
             tmnxMplsLspTempExtV21Group,
             tmnxMplsLspStatsModeV21Group,
+            tmnxMplsLspPceAssocGroup,
             tmnxMplsLspOvrTunnelElcGroup,
             tmnxMplsLspTransportFrrGroup,
             tmnxMplsLspTempPathProfGroup
@@ -16278,9 +16605,26 @@ tmnxMplsV22v0Compliance          MODULE-COMPLIANCE
             tmnxMplsLspExtBfdGroup,
             tmnxMplsLspRateCountersGroup,
             tmnxP2mpMplsLspSoftPreemptGroup,
-            tmnxMplsNotifyV22v0Group
+            tmnxMplsNotifyV22v0Group,
+            tmnxMplsStrictEroNextHopResGroup,
+            tmnxMplsLspTempPceAssocGroup,
+            tmnxMplsAdHocRouteOptGroup,
+            tmnxMplsBsidRsvdLblBlkGroup,
+            tmnxMplsLspHistoryGroup,
+            tmnxMplsIgpScOverSrTeGroup
         }
     ::= { tmnxMplsCompliances 20 }
+
+tmnxMplsV23v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 23.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsIgpScOverSrTeGroup
+        }
+    ::= { tmnxMplsCompliances 21 }
 
 tmnxMplsGroups                   OBJECT IDENTIFIER ::= { tmnxMplsConformance 2 }
 
@@ -19074,6 +19418,18 @@ tmnxMplsLspStatsModeV21Group     OBJECT-GROUP
          SROS series systems 21.0 Release."
     ::= { tmnxMplsGroups 131 }
 
+tmnxMplsLspPceAssocGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPceAssocTableLastChg,
+        vRtrMplsLspPceAssocRowStatus,
+        vRtrMplsLspPceAssocLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS LSP on Nokia SROS
+         series systems."
+    ::= { tmnxMplsGroups 132 }
+
 tmnxMplsLspOvrTunnelElcGroup     OBJECT-GROUP
     OBJECTS     {
         vRtrMplsLspExtOverrideTunElc,
@@ -19147,13 +19503,90 @@ tmnxP2mpMplsLspSoftPreemptGroup  OBJECT-GROUP
 
 tmnxMplsNotifyV22v0Group         NOTIFICATION-GROUP
     NOTIFICATIONS {
-        vRtrMplsS2lSubLspPreempted
+        vRtrMplsS2lSubLspPreempted,
+        vRtrMplsNodeInIgpOverloadIpv6
     }
     STATUS      current
     DESCRIPTION
         "The group of notifications supporting MPLS  on Nokia SROS series
          systems 22.0 Release."
     ::= { tmnxMplsGroups 139 }
+
+tmnxMplsStrictEroNextHopResGroup OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenStrictEroNhopDirRes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of strict ERO  next hop
+         resolution in MPLS in Nokia SROS series systems."
+    ::= { tmnxMplsGroups 140 }
+
+tmnxMplsLspTempPceAssocGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspTempPceAssocTblLstChg,
+        vRtrMplsLspTempPceAssocRowStatus,
+        vRtrMplsLspTempPceAssocLstChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS LSP templates on
+         Nokia SROS series systems."
+    ::= { tmnxMplsGroups 141 }
+
+tmnxMplsAdHocRouteOptGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenSrTeResigOnIgpOvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS Ad Hoc route
+         optimization of LSPs on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 142 }
+
+tmnxMplsBsidRsvdLblBlkGroup      OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspExtBsid,
+        vRtrMplsLspTempExtBsidEnable,
+        vRtrMplsGenLspBsidBlkName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 143 }
+
+tmnxMplsLspHistoryGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenLspHistory,
+        vRtrMplsGenLspHistAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 144 }
+
+tmnxMplsV23v0ObsoleteGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPathTableSpinlock
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects which are no longer supported in MPLS
+         23.3.R1 release onwards on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 145 }
+
+tmnxMplsIgpScOverSrTeGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspIgpScSrOverSrTe,
+        vRtrMplsLspTempIgpScSrOverSrTe
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 146 }
 
 tmnxMplsNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
 
@@ -19647,5 +20080,23 @@ vRtrMplsS2lSubLspPreempted       NOTIFICATION-TYPE
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tmnxMplsNotifications 30 }
+
+vRtrMplsNodeInIgpOverloadIpv6    NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrMplsGenRetryOnIgpOverload,
+        vRtrMplsIgpOverloadRtrAddrType,
+        vRtrMplsIgpOverloadRtrAddr,
+        vRtrMplsIgpOverloadIgpType
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsNodeInIgpOverloadIpv6 notification is generated
+         when MPLS gets a notification that a node is in IGP overload state.
+
+         [EFFECT] The LSPs with IPv6 addresses transiting through nodes  that
+         are in IGP overload state are teardown.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 31 }
 
 END

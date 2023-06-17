@@ -1,0 +1,1850 @@
+TIMETRA-BIER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TNamedItem, TmnxAdminState,
+    TmnxLongDisplayString, TmnxOperState
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID, vRtrIfIndex
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraBierMIBModule             MODULE-IDENTITY
+    LAST-UPDATED "201801010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         extensions to the BIER routing protocol for the Nokia SROS device.
+
+         Copyright 2008-2018 Nokia.  All rights reserved.  Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property.  Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201801010000Z"
+    DESCRIPTION
+        "Rev 0.1                01 Jan 2018 00:00
+         Initial version of the TIMETRA-BIER-MIB."
+
+    ::= { timetraSRMIBModules 123 }
+
+TmnxBierMultiTopology            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxBierMultiTopology is an enumerated integer that specifies the ISIS
+         Multi Topology."
+    SYNTAX      INTEGER {
+        ipv4-unicast   (0),
+        ipv6-unicast   (2),
+        ipv4-multicast (3),
+        ipv6-multicast (4)
+    }
+
+tmnxBierObjs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 123 }
+
+vRtrBierGeneralTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralTableLastChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrBierGeneralTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxBierObjs 1 }
+
+vRtrBierGeneralTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierGeneralTable contains objects for general control and
+         management of the BIER protocol instance within a virtual router."
+    ::= { tmnxBierObjs 2 }
+
+vRtrBierGeneralEntry             OBJECT-TYPE
+    SYNTAX      VRtrBierGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an instance of the BIER protocol running
+         within a virtual router.
+
+         Row entries can be created or deleted via SNMP SET
+         requests.  A row with default attribute values is created
+         by setting vRtrBierGeneralRowStatus to 'createAndGo'. A row
+         entry can be destroyed by setting vRtrBierGeneralRowStatus
+         to 'destroy'."
+    INDEX       { vRtrID }
+    ::= { vRtrBierGeneralTable 1 }
+
+VRtrBierGeneralEntry             ::= SEQUENCE
+{
+    vRtrBierGeneralRowStatus         RowStatus,
+    vRtrBierGeneralAdminState        TmnxAdminState,
+    vRtrBierGeneralRowLastChange     TimeStamp,
+    vRtrBierGeneralFrr               TruthValue,
+    vRtrBierGeneralBfdEnabled        BITS
+}
+
+vRtrBierGeneralRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrBierGeneralRowStatus is used to control the creation and deletion
+         of rows in the vRtrBierGeneralTable.
+
+         A row can be created by setting
+         vRtrBierGeneralRowStatus to 'createAndGo'.  The agent
+         should assign the default attribute values and change
+         the row status to 'active'.
+
+         A row entry can be destroyed by setting vRtrBierGeneralRowStatus to
+         'destroy'."
+    ::= { vRtrBierGeneralEntry 1 }
+
+vRtrBierGeneralAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralAdminState specifies the current
+         administrative state of this BIER instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrBierGeneralEntry 2 }
+
+vRtrBierGeneralRowLastChange     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralRowLastChange indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrBierGeneralEntry 3 }
+
+vRtrBierGeneralFrr               OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralFrr specifies whether fast reroute for
+         BIER is enabled or disabled."
+    DEFVAL      { false }
+    ::= { vRtrBierGeneralEntry 4 }
+
+vRtrBierGeneralBfdEnabled        OBJECT-TYPE
+    SYNTAX      BITS {
+        ipv4 (0)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralBfdEnabled specifies whether BFD tracking
+         is enabled for BIER next-hops. When this object has a value of 'ipv4',
+         BFD tracking is enabled for each resolved ipv4 next-hop. When this
+         object has value of 0, BFD tracking is disabled."
+    DEFVAL      { {} }
+    ::= { vRtrBierGeneralEntry 5 }
+
+vRtrBierTemplateTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTemplateTableLastChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrBierTemplateTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxBierObjs 3 }
+
+vRtrBierTemplateTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierTemplateTable lists BIER policies for a particular BIER
+         instance. BIER template depicts how BIER routing underlay should
+         advertise the BIER information throughout the network."
+    ::= { tmnxBierObjs 4 }
+
+vRtrBierTemplateEntry            OBJECT-TYPE
+    SYNTAX      VRtrBierTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to a BIER template which indicates a BIER
+         Domain. One such template entry would be associated with routing for
+         BIER routing overlay.
+
+         Row entries can be created or deleted via SNMP SET
+         requests.  A row with default attribute values is created
+         by setting vRtrBierTemplateRowStatus to 'createAndGo'. A
+         row entry can be destroyed by setting
+         vRtrBierTemplateRowStatus to 'destroy'."
+    INDEX       {
+        vRtrID,
+        vRtrBierTemplateName
+    }
+    ::= { vRtrBierTemplateTable 1 }
+
+VRtrBierTemplateEntry            ::= SEQUENCE
+{
+    vRtrBierTemplateName             TNamedItem,
+    vRtrBierTemplateRowStatus        RowStatus,
+    vRtrBierTemplateAdminState       TmnxAdminState,
+    vRtrBierTemplateRowLastChange    TimeStamp
+}
+
+vRtrBierTemplateName             OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTemplateName specifies the template name of
+         vRtrBierTemplateEntry"
+    ::= { vRtrBierTemplateEntry 1 }
+
+vRtrBierTemplateRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrBierTemplateRowStatus is used to control the creation and deletion
+         of rows in the vRtrBierTemplateTable.
+
+         A row can be created by setting
+         vRtrBierTemplateRowStatus to 'createAndGo'.  The agent
+         should assign the default attribute values and change
+         the row status to 'active'.
+
+         A row entry can be destroyed by setting vRtrBierTemplateRowStatus to
+         'destroy'."
+    ::= { vRtrBierTemplateEntry 2 }
+
+vRtrBierTemplateAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTemplateAdminState specifies the current
+         administrative state of this BIER instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrBierTemplateEntry 3 }
+
+vRtrBierTemplateRowLastChange    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTemplateRowLastChange indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrBierTemplateEntry 4 }
+
+vRtrBierSubDomainTableLstChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainTableLstChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrBierSubDomainTableLstChanged.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxBierObjs 5 }
+
+vRtrBierSubDomainTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierSubDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierSubDomainTable contains objects for general control and
+         management of the BIER sub-domains within the corresponding template
+         specified in vRtrBierTemplateTable."
+    ::= { tmnxBierObjs 6 }
+
+vRtrBierSubDomainEntry           OBJECT-TYPE
+    SYNTAX      VRtrBierSubDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an instance of the BIER sub- domain running
+         within the corresponding template specified in vRtrBierTemplateTable.
+
+         A BIER Template is a BIER domain which may contain one or more
+         sub-domain. Each BIER domain must contain at least one sub-domain in
+         order for the template to be advertised.
+
+         Row entries can be created or deleted via SNMP SET
+         requests.  A row with default attribute values is created
+         by setting vRtrBierSubDomainRowStatus to 'createAndGo'. A
+         row entry can be destroyed by setting
+         vRtrBierSubDomainRowStatus to 'destroy'."
+    INDEX       {
+        vRtrID,
+        vRtrBierTemplateName,
+        vRtrBierSubDomainStart,
+        vRtrBierSubDomainEnd
+    }
+    ::= { vRtrBierSubDomainTable 1 }
+
+VRtrBierSubDomainEntry           ::= SEQUENCE
+{
+    vRtrBierSubDomainStart           Unsigned32,
+    vRtrBierSubDomainEnd             Unsigned32,
+    vRtrBierSubDomainPrefixType      InetAddressType,
+    vRtrBierSubDomainPrefix          InetAddress,
+    vRtrBierSubDomainBfrId           Unsigned32,
+    vRtrBierSubDomainMT              TmnxBierMultiTopology,
+    vRtrBierSubDomainRowStatus       RowStatus,
+    vRtrBierSubDomainRowLastChange   TimeStamp
+}
+
+vRtrBierSubDomainStart           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainStart specifies the BIER sub-domain
+         start value."
+    ::= { vRtrBierSubDomainEntry 1 }
+
+vRtrBierSubDomainEnd             OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainEnd specifies the BIER sub-domain end
+         value. For single sub-domain range the start and end value is same. "
+    ::= { vRtrBierSubDomainEntry 2 }
+
+vRtrBierSubDomainPrefixType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainPrefixType specifies the address type of
+         vRtrBierSubDomainPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierSubDomainEntry 3 }
+
+vRtrBierSubDomainPrefix          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainPrefix specifies the address of the BFR
+         prefix to be advertised in this sub-domain or the sub Domain range."
+    ::= { vRtrBierSubDomainEntry 4 }
+
+vRtrBierSubDomainBfrId           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainBfrId specifies the BFR ID within the
+         BIER sub-domain. A BFR ID uniquely identifies a BFIR/BFER within the
+         sub-domain. A value of '0' indicates that the sub-domain range will
+         not be advertized."
+    DEFVAL      { 0 }
+    ::= { vRtrBierSubDomainEntry 5 }
+
+vRtrBierSubDomainMT              OBJECT-TYPE
+    SYNTAX      TmnxBierMultiTopology
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrBierSubDomainMT specifies the ISIS
+         multi-topology ID where the BIER template should be applied."
+    DEFVAL      { ipv4-unicast }
+    ::= { vRtrBierSubDomainEntry 6 }
+
+vRtrBierSubDomainRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrBierSubDomainRowStatus is used to control the creation and
+         deletion of rows in the vRtrBierSubDomainTable.
+
+         A row can be created by setting
+         vRtrBierSubDomainRowStatus to 'createAndGo'.  The agent
+         should assign the default attribute values and change
+         the row status to 'active'.
+
+         A row entry can be destroyed by setting vRtrBierSubDomainRowStatus to
+         'destroy'."
+    ::= { vRtrBierSubDomainEntry 7 }
+
+vRtrBierSubDomainRowLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierSubDomainRowLastChange indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrBierSubDomainEntry 8 }
+
+vRtrBierDatabaseTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierDatabaseTable contains objects for BIER database of the
+         BIER protocol instance within a virtual router."
+    ::= { tmnxBierObjs 7 }
+
+vRtrBierDatabaseEntry            OBJECT-TYPE
+    SYNTAX      VRtrBierDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierDatabaseTable."
+    INDEX       {
+        vRtrID,
+        vRtrBierTemplateName,
+        vRtrBierDatabaseSubDomainId
+    }
+    ::= { vRtrBierDatabaseTable 1 }
+
+VRtrBierDatabaseEntry            ::= SEQUENCE
+{
+    vRtrBierDatabaseSubDomainId      Unsigned32,
+    vRtrBierDatabaseBitStringLen     Unsigned32,
+    vRtrBierDatabasePrefixType       InetAddressType,
+    vRtrBierDatabasePrefix           InetAddress,
+    vRtrBierDatabaseBfrId            Unsigned32,
+    vRtrBierDatabaseMT               TmnxBierMultiTopology,
+    vRtrBierDatabaseMplsLabelStart   Unsigned32,
+    vRtrBierDatabaseMplsLabelEnd     Unsigned32,
+    vRtrBierDatabaseMplsLabelTotal   Unsigned32
+}
+
+vRtrBierDatabaseSubDomainId      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierDatabaseSubDomainId indicates the BIER sub-domain
+         start value."
+    ::= { vRtrBierDatabaseEntry 1 }
+
+vRtrBierDatabaseBitStringLen     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierDatabaseBitStringLen indicates the current
+         supported bit string length."
+    ::= { vRtrBierDatabaseEntry 2 }
+
+vRtrBierDatabasePrefixType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierDatabasePrefixType indicates the address type of
+         vRtrBierSubDomainPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierDatabaseEntry 3 }
+
+vRtrBierDatabasePrefix           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierDatabasePrefix indicates the address of the BFR
+         prefix to be advertised in this sub-domain or the sub-domain range."
+    ::= { vRtrBierDatabaseEntry 4 }
+
+vRtrBierDatabaseBfrId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierDatabaseBfrId indicates the BFR ID within the
+         BIER sub-domain. A BFR ID uniquely identifies a BFIR/BFER within the
+         sub-domain. A value of '0' indicates that the sub-domain range will
+         not be advertised."
+    ::= { vRtrBierDatabaseEntry 5 }
+
+vRtrBierDatabaseMT               OBJECT-TYPE
+    SYNTAX      TmnxBierMultiTopology
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrBierDatabaseMT indicates the ISIS
+         Multi-topolog ID where the BIER template should be applied."
+    ::= { vRtrBierDatabaseEntry 6 }
+
+vRtrBierDatabaseMplsLabelStart   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrBierDatabaseMplsLabelStart indicates the
+         mpls start label."
+    ::= { vRtrBierDatabaseEntry 7 }
+
+vRtrBierDatabaseMplsLabelEnd     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrBierDatabaseMplsLabelEnd indicates the
+         mpls end label."
+    ::= { vRtrBierDatabaseEntry 8 }
+
+vRtrBierDatabaseMplsLabelTotal   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrBierDatabaseMplsLabelTotal indicates the
+         total number of mpls labels."
+    ::= { vRtrBierDatabaseEntry 9 }
+
+vRtrBierForwardingTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierForwardingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierForwardingTable contains objects for BIER forwarding of
+         the BIER protocol instance within a virtual router."
+    ::= { tmnxBierObjs 8 }
+
+vRtrBierForwardingEntry          OBJECT-TYPE
+    SYNTAX      VRtrBierForwardingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierForwardingTable."
+    INDEX       {
+        vRtrID,
+        vRtrBierForwardingSubDomainId,
+        vRtrBierForwardingBitStringLen,
+        vRtrBierForwardingNhopPrefixType,
+        vRtrBierForwardingNhopPrefix,
+        vRtrBierForwardingNhopIfIndex,
+        vRtrBierForwardingBierSetId
+    }
+    ::= { vRtrBierForwardingTable 1 }
+
+VRtrBierForwardingEntry          ::= SEQUENCE
+{
+    vRtrBierForwardingSubDomainId    Unsigned32,
+    vRtrBierForwardingBitStringLen   Unsigned32,
+    vRtrBierForwardingNhopPrefixType InetAddressType,
+    vRtrBierForwardingNhopPrefix     InetAddress,
+    vRtrBierForwardingNhopIfIndex    Unsigned32,
+    vRtrBierForwardingBierSetId      Unsigned32,
+    vRtrBierForwardingNbrPrefixType  InetAddressType,
+    vRtrBierForwardingNbrPrefix      InetAddress,
+    vRtrBierForwardingBitMask        TmnxLongDisplayString,
+    vRtrBierForwardingMplsLabel      Unsigned32,
+    vRtrBierForwardingBkupNbrPfxType InetAddressType,
+    vRtrBierForwardingBkupNbrPrefix  InetAddress,
+    vRtrBierFwrdingBkupNhopPfxType   InetAddressType,
+    vRtrBierForwardingBkupNhopPrefix InetAddress,
+    vRtrBierForwardingBkupNhopIfIdx  Unsigned32,
+    vRtrBierForwardingBkupBitMask    TmnxLongDisplayString,
+    vRtrBierForwardingBkupMplsLabel  Unsigned32
+}
+
+vRtrBierForwardingSubDomainId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingSubDomainId indicates the BIER
+         sub-domain start value."
+    ::= { vRtrBierForwardingEntry 1 }
+
+vRtrBierForwardingBitStringLen   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBitStringLen indicates the current
+         supported bit string length."
+    ::= { vRtrBierForwardingEntry 2 }
+
+vRtrBierForwardingNhopPrefixType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingNhopPrefixType indicates the address
+         type of vRtrBierForwardingNhopPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierForwardingEntry 3 }
+
+vRtrBierForwardingNhopPrefix     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingNhopPrefix indicates the address of the
+         next hop prefix."
+    ::= { vRtrBierForwardingEntry 4 }
+
+vRtrBierForwardingNhopIfIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingNhopIfIndex indicated the next hope
+         interface index."
+    ::= { vRtrBierForwardingEntry 5 }
+
+vRtrBierForwardingBierSetId      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBierSetId indicates the set identifier."
+    ::= { vRtrBierForwardingEntry 6 }
+
+vRtrBierForwardingNbrPrefixType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingNbrPrefixType indicates the address
+         type of vRtrBierSubDomainPrefix address."
+    ::= { vRtrBierForwardingEntry 7 }
+
+vRtrBierForwardingNbrPrefix      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingNbrPrefix indicates the address of the
+         BFR prefix to be advertised in this sub-domain or the sub-domain
+         range."
+    ::= { vRtrBierForwardingEntry 8 }
+
+vRtrBierForwardingBitMask        OBJECT-TYPE
+    SYNTAX      TmnxLongDisplayString (SIZE (0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBitMask indicates the Forwarding Bit
+         Mask (F-BM) for a particular BFR neighbor and SI."
+    ::= { vRtrBierForwardingEntry 9 }
+
+vRtrBierForwardingMplsLabel      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingMplsLabel indicates the service BIER
+         label for the sender tunnel."
+    ::= { vRtrBierForwardingEntry 10 }
+
+vRtrBierForwardingBkupNbrPfxType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupNbrPfxType indicates the address
+         type of vRtrBierForwardingBkupNbrPrefix address."
+    ::= { vRtrBierForwardingEntry 11 }
+
+vRtrBierForwardingBkupNbrPrefix  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupNbrPrefix indicates the address of
+         the backup neighbor's BFR prefix."
+    ::= { vRtrBierForwardingEntry 12 }
+
+vRtrBierFwrdingBkupNhopPfxType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierFwrdingBkupNhopPfxType indicates the address type
+         of vRtrBierForwardingBkupNhopPrefix address."
+    ::= { vRtrBierForwardingEntry 13 }
+
+vRtrBierForwardingBkupNhopPrefix OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupNhopPrefix indicates the address of
+         the backup next hop prefix."
+    ::= { vRtrBierForwardingEntry 14 }
+
+vRtrBierForwardingBkupNhopIfIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupNhopIfIdx indicates the interface
+         index of the backup next-hop."
+    ::= { vRtrBierForwardingEntry 15 }
+
+vRtrBierForwardingBkupBitMask    OBJECT-TYPE
+    SYNTAX      TmnxLongDisplayString (SIZE (0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupBitMask indicates the Forwarding
+         Bit Mask (F-BM) for the backup BFR neighbor."
+    ::= { vRtrBierForwardingEntry 16 }
+
+vRtrBierForwardingBkupMplsLabel  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierForwardingBkupMplsLabel indicates the BIER label
+         for the backup next-hop."
+    ::= { vRtrBierForwardingEntry 17 }
+
+vRtrBierRoutingTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierRoutingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierRoutingTable contains objects for BIER routing of the BIER
+         protocol instance within a virtual router."
+    ::= { tmnxBierObjs 9 }
+
+vRtrBierRoutingEntry             OBJECT-TYPE
+    SYNTAX      VRtrBierRoutingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierRoutingTable."
+    INDEX       {
+        vRtrID,
+        vRtrBierRoutingSubDomainId,
+        vRtrBierRoutingBitStringLen,
+        vRtrBierRoutingNhopPrefixType,
+        vRtrBierRoutingNhopPrefix,
+        vRtrBierRoutingNhopIfIndex,
+        vRtrBierRoutingDestPrefixType,
+        vRtrBierRoutingDestPrefix
+    }
+    ::= { vRtrBierRoutingTable 1 }
+
+VRtrBierRoutingEntry             ::= SEQUENCE
+{
+    vRtrBierRoutingSubDomainId       Unsigned32,
+    vRtrBierRoutingBitStringLen      Unsigned32,
+    vRtrBierRoutingNhopPrefixType    InetAddressType,
+    vRtrBierRoutingNhopPrefix        InetAddress,
+    vRtrBierRoutingNhopIfIndex       Unsigned32,
+    vRtrBierRoutingDestPrefixType    InetAddressType,
+    vRtrBierRoutingDestPrefix        InetAddress,
+    vRtrBierRoutingNbrPrefixType     InetAddressType,
+    vRtrBierRoutingNbrPrefix         InetAddress,
+    vRtrBierRoutingBfrId             Unsigned32,
+    vRtrBierRoutingLastUpdated       TimeStamp,
+    vRtrBierRoutingBkupNbrPfxType    InetAddressType,
+    vRtrBierRoutingBkupNbrPrefix     InetAddress,
+    vRtrBierRoutingBkupNhopPfxType   InetAddressType,
+    vRtrBierRoutingBkupNhopPrefix    InetAddress,
+    vRtrBierRoutingBkupNhopIfIndex   Unsigned32
+}
+
+vRtrBierRoutingSubDomainId       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingSubDomainId indicates the BIER sub-domain
+         start value."
+    ::= { vRtrBierRoutingEntry 1 }
+
+vRtrBierRoutingBitStringLen      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBitStringLen indicates the current
+         supported bit string length."
+    ::= { vRtrBierRoutingEntry 2 }
+
+vRtrBierRoutingNhopPrefixType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingNhopPrefixType indicates the address type
+         of vRtrBierRoutingNhopPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierRoutingEntry 3 }
+
+vRtrBierRoutingNhopPrefix        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingNhopPrefix indicates the address of
+         destination prefix."
+    ::= { vRtrBierRoutingEntry 4 }
+
+vRtrBierRoutingNhopIfIndex       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingNhopIfIndex indicates the next hop
+         interface index."
+    ::= { vRtrBierRoutingEntry 5 }
+
+vRtrBierRoutingDestPrefixType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingDestPrefixType indicates the address type
+         of vRtrBierRoutingDestPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierRoutingEntry 6 }
+
+vRtrBierRoutingDestPrefix        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingDestPrefix indicates the address of
+         destination prefix."
+    ::= { vRtrBierRoutingEntry 7 }
+
+vRtrBierRoutingNbrPrefixType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingNbrPrefixType indicates the address type
+         of vRtrBierRoutingNbrPrefix address."
+    ::= { vRtrBierRoutingEntry 8 }
+
+vRtrBierRoutingNbrPrefix         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingNbrPrefix indicates the address of the BFR
+         prefix to be advertised in this sub-domain or the sub-domain range."
+    ::= { vRtrBierRoutingEntry 9 }
+
+vRtrBierRoutingBfrId             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBfrId indicates the BFR ID within the BIER
+         sub-domain. A BFR ID uniquely identifies a BFIR/BFER within the
+         sub-domain. A value of '0' indicates that the sub-domain range will
+         not be advertised."
+    ::= { vRtrBierRoutingEntry 10 }
+
+vRtrBierRoutingLastUpdated       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingLastUpdated indicates the sysUpTime when
+         this route was last updated."
+    ::= { vRtrBierRoutingEntry 11 }
+
+vRtrBierRoutingBkupNbrPfxType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBkupNbrPfxType indicates the address type
+         of vRtrBierRoutingBkupNbrPrefix address."
+    ::= { vRtrBierRoutingEntry 12 }
+
+vRtrBierRoutingBkupNbrPrefix     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBkupNbrPrefix indicates the address of the
+         backup BFR neighbor prefix."
+    ::= { vRtrBierRoutingEntry 13 }
+
+vRtrBierRoutingBkupNhopPfxType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBkupNhopPfxType indicates the address type
+         of vRtrBierRoutingBkupNhopPrefix address."
+    ::= { vRtrBierRoutingEntry 14 }
+
+vRtrBierRoutingBkupNhopPrefix    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBkupNhopPrefix indicates the address of
+         the backup next-hop."
+    ::= { vRtrBierRoutingEntry 15 }
+
+vRtrBierRoutingBkupNhopIfIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierRoutingBkupNhopIfIndex indicates the interface
+         index of the backup next-hop."
+    ::= { vRtrBierRoutingEntry 16 }
+
+vRtrBierTunnelTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierTunnelTable contains objects for BIER Tunnel of the BIER
+         protocol instance within a virtual router."
+    ::= { tmnxBierObjs 10 }
+
+vRtrBierTunnelEntry              OBJECT-TYPE
+    SYNTAX      VRtrBierTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierTunnelTable."
+    INDEX       {
+        vRtrID,
+        vRtrIfIndex
+    }
+    ::= { vRtrBierTunnelTable 1 }
+
+VRtrBierTunnelEntry              ::= SEQUENCE
+{
+    vRtrBierTunnelType               INTEGER,
+    vRtrBierTunnelPrefixType         InetAddressType,
+    vRtrBierTunnelPrefix             InetAddress,
+    vRtrBierTunnelSubDomain          Unsigned32,
+    vRtrBierTunnelMplsLabel          Unsigned32,
+    vRtrBierTunnelBfrId              Unsigned32,
+    vRtrBierTunnelOperState          TmnxAdminState,
+    vRtrBierTunnelNumLeaves          Unsigned32,
+    vRtrBierTunnelLastOperDownReason Unsigned32,
+    vRtrBierTunnelIsInBand           TruthValue
+}
+
+vRtrBierTunnelType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tx (0),
+        rx (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelType indicates whether this tunnel is of
+         type transmitter or receiver."
+    ::= { vRtrBierTunnelEntry 1 }
+
+vRtrBierTunnelPrefixType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelPrefixType indicates the address type of
+         vRtrBierSubDomainPrefix address."
+    ::= { vRtrBierTunnelEntry 2 }
+
+vRtrBierTunnelPrefix             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelPrefix indicates the address of the BFR
+         prefix to be advertised in this sub-domain or the sub Domain range."
+    ::= { vRtrBierTunnelEntry 3 }
+
+vRtrBierTunnelSubDomain          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelSubDomain indicates the sub domain
+         identifier."
+    ::= { vRtrBierTunnelEntry 4 }
+
+vRtrBierTunnelMplsLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelMplsLabel indicates the service BIER level
+         label."
+    ::= { vRtrBierTunnelEntry 5 }
+
+vRtrBierTunnelBfrId              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelBfrId indicates the BFD ID."
+    ::= { vRtrBierTunnelEntry 6 }
+
+vRtrBierTunnelOperState          OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelOperState indicates the tunnel operational
+         status."
+    ::= { vRtrBierTunnelEntry 7 }
+
+vRtrBierTunnelNumLeaves          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelNumLeaves indicates number of leaves per tx
+         tunnels."
+    ::= { vRtrBierTunnelEntry 8 }
+
+vRtrBierTunnelLastOperDownReason OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelLastOperDownReason indicates the last
+         operdown reason."
+    ::= { vRtrBierTunnelEntry 9 }
+
+vRtrBierTunnelIsInBand           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTunnelIsInBand indicates whether bier tunnel is
+         inBand or not."
+    ::= { vRtrBierTunnelEntry 10 }
+
+vRtrBierTxTunnelLeafTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierTxTunnelLeafEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierTxTunnelLeafTable contains objects for BIER Tunnel Leaf of
+         the BIER protocol instance within a virtual router."
+    ::= { tmnxBierObjs 11 }
+
+vRtrBierTxTunnelLeafEntry        OBJECT-TYPE
+    SYNTAX      VRtrBierTxTunnelLeafEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierTunnelTable."
+    INDEX       {
+        vRtrID,
+        vRtrIfIndex,
+        vRtrBierTxTunnelLeafPrefixType,
+        vRtrBierTxTunnelLeafPrefix
+    }
+    ::= { vRtrBierTxTunnelLeafTable 1 }
+
+VRtrBierTxTunnelLeafEntry        ::= SEQUENCE
+{
+    vRtrBierTxTunnelLeafPrefixType   InetAddressType,
+    vRtrBierTxTunnelLeafPrefix       InetAddress,
+    vRtrBierTxTunnelMvpnId           Unsigned32,
+    vRtrBierTxTunnelOperState        TmnxAdminState,
+    vRtrBierTxTunnelPtaPrefixType    InetAddressType,
+    vRtrBierTxTunnelPtaPrefix        InetAddress,
+    vRtrBierTxTunnelPtaBfrId         Unsigned32,
+    vRtrBierTxTunnelPtaSubDomain     Unsigned32,
+    vRtrBierTxTunnelPtaMplsLabel     Unsigned32,
+    vRtrBierTxTunnelLeafBfrID        Unsigned32
+}
+
+vRtrBierTxTunnelLeafPrefixType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelLeafPrefixType indicates the address type
+         of vRtrBierSubDomainPrefix address."
+    DEFVAL      { unknown }
+    ::= { vRtrBierTxTunnelLeafEntry 2 }
+
+vRtrBierTxTunnelLeafPrefix       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelLeafPrefix indicates the address of the
+         BFR prefix to be advertised in this sub-domain or the sub Domain
+         range."
+    ::= { vRtrBierTxTunnelLeafEntry 3 }
+
+vRtrBierTxTunnelMvpnId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelMvpnId indicates the MVPN ID."
+    ::= { vRtrBierTxTunnelLeafEntry 4 }
+
+vRtrBierTxTunnelOperState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelOperState indicates the current
+         administrative state of this tunnel."
+    ::= { vRtrBierTxTunnelLeafEntry 5 }
+
+vRtrBierTxTunnelPtaPrefixType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelPtaPrefixType indicates the address type
+         of vRtrBierTxTunnelPtaPrefix address."
+    ::= { vRtrBierTxTunnelLeafEntry 6 }
+
+vRtrBierTxTunnelPtaPrefix        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelPtaPrefix indicates the address of the
+         BFR prefix to be advertised in this sub-domain or the sub Domain
+         range."
+    ::= { vRtrBierTxTunnelLeafEntry 7 }
+
+vRtrBierTxTunnelPtaBfrId         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelPtaBfrId indicates the BFD ID."
+    ::= { vRtrBierTxTunnelLeafEntry 8 }
+
+vRtrBierTxTunnelPtaSubDomain     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelPtaSubDomain indicates the sub domain ID."
+    ::= { vRtrBierTxTunnelLeafEntry 9 }
+
+vRtrBierTxTunnelPtaMplsLabel     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelPtaMplsLabel indicates the service BIER
+         level label for this transmitter tunnel."
+    ::= { vRtrBierTxTunnelLeafEntry 10 }
+
+vRtrBierTxTunnelLeafBfrID        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTxTunnelLeafBfrID specifies the address of the
+         BFR prefix to be advertised in this sub-domain or the sub Domain
+         range."
+    ::= { vRtrBierTxTunnelLeafEntry 11 }
+
+vRtrBierStatsTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierStatsTable contains objects for BIER statistics for a
+         particular router instance."
+    ::= { tmnxBierObjs 12 }
+
+vRtrBierStatsEntry               OBJECT-TYPE
+    SYNTAX      VRtrBierStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an entry in vRtrBierStatsTable."
+    INDEX       { vRtrID }
+    ::= { vRtrBierStatsTable 1 }
+
+VRtrBierStatsEntry               ::= SEQUENCE
+{
+    vRtrBierStatsTotalLearntRoutes   Counter32,
+    vRtrBierStatsTotalValidRoutes    Counter32,
+    vRtrBierStatsValidNbrNextHops    Counter32,
+    vRtrBierStatsRxInvalidBierInfo   Counter32,
+    vRtrBierStatsRxInvalidBfrInfo    Counter32,
+    vRtrBierStatsRxInvalidEncapInfo  Counter32,
+    vRtrBierStatsRxInvalidMplsInfo   Counter32,
+    vRtrBierStatsDiscardTunnelNhop   Counter32,
+    vRtrBierStatsDiscardNonNtwIfNhop Counter32,
+    vRtrBierStatsDiscardNonFp4Nhop   Counter32,
+    vRtrBierStatsSdBslMismatch       Counter32,
+    vRtrBierStatsMultiTopoMismatch   Counter32,
+    vRtrBierStatsUnsupIpv6Routes     Counter32,
+    vRtrBierStatsBfrIdDuplicate      Counter32
+}
+
+vRtrBierStatsTotalLearntRoutes   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsTotalLearntRoutes indicates the total number
+         of learnt BFR prefixes."
+    ::= { vRtrBierStatsEntry 1 }
+
+vRtrBierStatsTotalValidRoutes    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsTotalValidRoutes indicates the total number
+         of BFR prefixes with valid BFR info."
+    ::= { vRtrBierStatsEntry 2 }
+
+vRtrBierStatsValidNbrNextHops    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsValidNbrNextHops indicates the total number
+         of neighbors or next-hops with valid BFR info."
+    ::= { vRtrBierStatsEntry 3 }
+
+vRtrBierStatsRxInvalidBierInfo   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsRxInvalidBierInfo indicates the number of
+         learnt BFR prefixes with invalid BIER info."
+    ::= { vRtrBierStatsEntry 4 }
+
+vRtrBierStatsRxInvalidBfrInfo    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsRxInvalidBfrInfo indicates the number of
+         learnt BFR prefixes with invalid BFR info."
+    ::= { vRtrBierStatsEntry 5 }
+
+vRtrBierStatsRxInvalidEncapInfo  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsRxInvalidEncapInfo indicates the number of
+         learnt BFR prefixes with invalid ENCAP info."
+    ::= { vRtrBierStatsEntry 6 }
+
+vRtrBierStatsRxInvalidMplsInfo   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsRxInvalidMplsInfo indicates the number of
+         learnt BFR prefixes with invalid MPLS info."
+    ::= { vRtrBierStatsEntry 7 }
+
+vRtrBierStatsDiscardTunnelNhop   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsDiscardTunnelNhop indicates the number of
+         tunnel next-hops discarded."
+    ::= { vRtrBierStatsEntry 8 }
+
+vRtrBierStatsDiscardNonNtwIfNhop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsDiscardNonNtwIfNhop indicates the
+          number of non network next-hops discarded."
+    ::= { vRtrBierStatsEntry 9 }
+
+vRtrBierStatsDiscardNonFp4Nhop   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsDiscardNonFp4Nhop indicates the number of
+         non FP4 next-hops discarded."
+    ::= { vRtrBierStatsEntry 10 }
+
+vRtrBierStatsSdBslMismatch       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsSdBslMismatch indicates the the number of
+         BFR prefixes received with sub-domain and BSL values different from
+         configured values."
+    ::= { vRtrBierStatsEntry 11 }
+
+vRtrBierStatsMultiTopoMismatch   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsMultiTopoMismatch indicates the the number
+         of BFR prefixes received with multi-topology value different from the
+         configured value."
+    ::= { vRtrBierStatsEntry 12 }
+
+vRtrBierStatsUnsupIpv6Routes     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsUnsupIpv6Routes indicates the the number of
+         BFR prefixes learnt with ipv6 address."
+    ::= { vRtrBierStatsEntry 13 }
+
+vRtrBierStatsBfrIdDuplicate      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierStatsBfrIdDuplicate indicates the the number of
+         duplicate BFR id received in multiple BFR prefixes."
+    ::= { vRtrBierStatsEntry 14 }
+
+vRtrBierNotificationObjs         OBJECT IDENTIFIER ::= { tmnxBierObjs 13 }
+
+vRtrBierNotifySubDomainId        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifySubDomainId indicates the configured BIER
+         sub-domain value."
+    ::= { vRtrBierNotificationObjs 1 }
+
+vRtrBierNotifyRecvSubDomainId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifyRecvSubDomainId indicates the received BIER
+         sub-domain value."
+    ::= { vRtrBierNotificationObjs 2 }
+
+vRtrBierNotifyBsl                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifyBsl indicates the BIER BSL value."
+    ::= { vRtrBierNotificationObjs 3 }
+
+vRtrBierNotifyBfrId              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifyBfrId indicates the BIER BFR Id value."
+    ::= { vRtrBierNotificationObjs 4 }
+
+vRtrBierNotifyMTId               OBJECT-TYPE
+    SYNTAX      TmnxBierMultiTopology
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifyMTId indicates the configured ISIS
+         multi-topology value."
+    ::= { vRtrBierNotificationObjs 5 }
+
+vRtrBierNotifyRecvMTId           OBJECT-TYPE
+    SYNTAX      TmnxBierMultiTopology
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNotifyRecvMTId indicates the received ISIS
+         mutli-topology value."
+    ::= { vRtrBierNotificationObjs 6 }
+
+vRtrBierPrefix1AddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierPrefix1AddrType indicates the address type of
+         vRtrBierPrefix1Address address."
+    ::= { vRtrBierNotificationObjs 7 }
+
+vRtrBierPrefix1Address           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierPrefix1Address indicates the BFR prefix."
+    ::= { vRtrBierNotificationObjs 8 }
+
+vRtrBierPrefix2AddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierPrefix2AddrType indicates the address type of
+         vRtrBierPrefix2Address address."
+    ::= { vRtrBierNotificationObjs 9 }
+
+vRtrBierPrefix2Address           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierPrefix2Address indicates the BFR prefix."
+    ::= { vRtrBierNotificationObjs 10 }
+
+vRtrBierNextHopAddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNextHopAddrType indicates the address type of
+         vRtrBierNextHopAddress address."
+    ::= { vRtrBierNotificationObjs 11 }
+
+vRtrBierNextHopAddress           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNextHopAddress indicates the next hop address."
+    ::= { vRtrBierNotificationObjs 12 }
+
+vRtrBierNextHopeType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tunnel    (0),
+        non-nw-if (1),
+        non-fp4   (2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierNextHopeType indicates the type of next hop."
+    ::= { vRtrBierNotificationObjs 13 }
+
+vRtrBierUnsupportedNhopState     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierUnsupportedNhopState indicates if an unsupported
+         next-hop was found for a given prefix.
+
+         When the value of vRtrBierUnsupportedNhopState is 'true', it indicates
+         that an unsupported next-hop was found.
+
+         When the value of vRtrBierUnsupportedNhopState is 'false', it
+         indicates that the unsupported next-hop was cleared and the correct
+         next-hop was received."
+    ::= { vRtrBierNotificationObjs 14 }
+
+vRtrBierGeneralOperTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierGeneralOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierGeneralOperTable contains the operational state objects
+         for the general control and management of the BIER protocol instance
+         within a virtual router."
+    ::= { tmnxBierObjs 14 }
+
+vRtrBierGeneralOperEntry         OBJECT-TYPE
+    SYNTAX      VRtrBierGeneralOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the operational values of the BIER protocol
+         instance running within a virtual router."
+    INDEX       { vRtrID }
+    ::= { vRtrBierGeneralOperTable 1 }
+
+VRtrBierGeneralOperEntry         ::= SEQUENCE
+{
+    vRtrBierGeneralOperState         TmnxOperState,
+    vRtrBierGeneralOperDownReason    INTEGER
+}
+
+vRtrBierGeneralOperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralOperState indicates the current
+         operational state of this BIER instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrBierGeneralOperEntry 1 }
+
+vRtrBierGeneralOperDownReason    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none       (0),
+        admin-down (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierGeneralOperDownReason indicates the reason due to
+         which BIER instance is operationally down."
+    ::= { vRtrBierGeneralOperEntry 2 }
+
+vRtrBierTemplateOperTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrBierTemplateOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBierTemplateOperTable lists the opreational state objects
+         within the BIER policies for a particular BIER instance."
+    ::= { tmnxBierObjs 15 }
+
+vRtrBierTemplateOperEntry        OBJECT-TYPE
+    SYNTAX      VRtrBierTemplateOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to the operational values of the BIER template
+         which indicates a BIER Domain."
+    INDEX       {
+        vRtrID,
+        vRtrBierTemplateName
+    }
+    ::= { vRtrBierTemplateOperTable 1 }
+
+VRtrBierTemplateOperEntry        ::= SEQUENCE
+{ vRtrBierTemplateOperState        TmnxOperState }
+
+vRtrBierTemplateOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBierTemplateOperState indicates the current
+         operational state of this BIER instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrBierTemplateOperEntry 1 }
+
+tmnxBierConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 123 }
+
+tmnxBierCompliances              OBJECT IDENTIFIER ::= { tmnxBierConformance 1 }
+
+tmnxBierV16v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of BIER on Nokia SROS series
+         systems 16.0 release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBierV16v0Group,
+            tmnxBierNotificationV16v0Group,
+            tmnxBierOperStateGroup
+        }
+    ::= { tmnxBierCompliances 1 }
+
+tmnxBierV19v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of BIER on Nokia SROS series
+         systems 19.0 release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBierV19v0Group
+        }
+    ::= { tmnxBierCompliances 2 }
+
+tmnxBierV21v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of BIER on Nokia SROS series
+         systems 21.0 release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBierV21v0Group
+        }
+    ::= { tmnxBierCompliances 3 }
+
+tmnxBierGroups                   OBJECT IDENTIFIER ::= { tmnxBierConformance 2 }
+
+tmnxBierV16v0Group               OBJECT-GROUP
+    OBJECTS     {
+        vRtrBierGeneralTableLastChanged,
+        vRtrBierGeneralRowStatus,
+        vRtrBierGeneralAdminState,
+        vRtrBierGeneralRowLastChange,
+        vRtrBierTemplateTableLastChanged,
+        vRtrBierTemplateRowStatus,
+        vRtrBierTemplateAdminState,
+        vRtrBierTemplateRowLastChange,
+        vRtrBierSubDomainTableLstChanged,
+        vRtrBierSubDomainPrefixType,
+        vRtrBierSubDomainPrefix,
+        vRtrBierSubDomainBfrId,
+        vRtrBierSubDomainMT,
+        vRtrBierSubDomainRowStatus,
+        vRtrBierSubDomainRowLastChange,
+        vRtrBierDatabaseBitStringLen,
+        vRtrBierDatabasePrefixType,
+        vRtrBierDatabasePrefix,
+        vRtrBierDatabaseBfrId,
+        vRtrBierDatabaseMT,
+        vRtrBierDatabaseMplsLabelStart,
+        vRtrBierDatabaseMplsLabelEnd,
+        vRtrBierDatabaseMplsLabelTotal,
+        vRtrBierForwardingNbrPrefixType,
+        vRtrBierForwardingNbrPrefix,
+        vRtrBierForwardingBitMask,
+        vRtrBierForwardingMplsLabel,
+        vRtrBierRoutingNbrPrefixType,
+        vRtrBierRoutingNbrPrefix,
+        vRtrBierRoutingBfrId,
+        vRtrBierRoutingLastUpdated,
+        vRtrBierTunnelType,
+        vRtrBierTunnelPrefixType,
+        vRtrBierTunnelPrefix,
+        vRtrBierTunnelSubDomain,
+        vRtrBierTunnelMplsLabel,
+        vRtrBierTunnelBfrId,
+        vRtrBierTunnelOperState,
+        vRtrBierTunnelNumLeaves,
+        vRtrBierTunnelLastOperDownReason,
+        vRtrBierTxTunnelMvpnId,
+        vRtrBierTxTunnelOperState,
+        vRtrBierTxTunnelPtaPrefixType,
+        vRtrBierTxTunnelPtaPrefix,
+        vRtrBierTxTunnelPtaBfrId,
+        vRtrBierTxTunnelPtaSubDomain,
+        vRtrBierTxTunnelPtaMplsLabel,
+        vRtrBierTxTunnelLeafBfrID,
+        vRtrBierStatsTotalLearntRoutes,
+        vRtrBierStatsTotalValidRoutes,
+        vRtrBierStatsValidNbrNextHops,
+        vRtrBierStatsRxInvalidBierInfo,
+        vRtrBierStatsRxInvalidBfrInfo,
+        vRtrBierStatsRxInvalidEncapInfo,
+        vRtrBierStatsRxInvalidMplsInfo,
+        vRtrBierStatsDiscardTunnelNhop,
+        vRtrBierStatsDiscardNonNtwIfNhop,
+        vRtrBierStatsDiscardNonFp4Nhop,
+        vRtrBierStatsSdBslMismatch,
+        vRtrBierStatsMultiTopoMismatch,
+        vRtrBierStatsUnsupIpv6Routes,
+        vRtrBierStatsBfrIdDuplicate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting general management of BIER on Nokia
+         SROS series systems 16.0 release."
+    ::= { tmnxBierGroups 1 }
+
+tmnxBierNotifyObjsGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrBierNotifySubDomainId,
+        vRtrBierNotifyRecvSubDomainId,
+        vRtrBierNotifyBsl,
+        vRtrBierNotifyBfrId,
+        vRtrBierNotifyMTId,
+        vRtrBierNotifyRecvMTId,
+        vRtrBierPrefix1AddrType,
+        vRtrBierPrefix1Address,
+        vRtrBierPrefix2AddrType,
+        vRtrBierPrefix2Address,
+        vRtrBierNextHopAddrType,
+        vRtrBierNextHopAddress,
+        vRtrBierNextHopeType,
+        vRtrBierUnsupportedNhopState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting BIER notifications on Nokia SROS
+         series systems."
+    ::= { tmnxBierGroups 2 }
+
+tmnxBierNotificationV16v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrBierBfrIdCollision,
+        vRtrBierMtMismatch,
+        vRtrBierSubDomainMismatch,
+        vRtrBierUnsupportedNhop
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting BIER protocol on Nokia SROS
+         series systems."
+    ::= { tmnxBierGroups 3 }
+
+tmnxBierOperStateGroup           OBJECT-GROUP
+    OBJECTS     {
+        vRtrBierGeneralOperState,
+        vRtrBierTemplateOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of operational objects supporting general management of BIER
+         on Nokia SROS series systems 16.0 release."
+    ::= { tmnxBierGroups 4 }
+
+tmnxBierV19v0Group               OBJECT-GROUP
+    OBJECTS     {
+        vRtrBierTunnelIsInBand
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting general management of BIER on Nokia
+         SROS series systems 19.0 release."
+    ::= { tmnxBierGroups 5 }
+
+tmnxBierV21v0Group               OBJECT-GROUP
+    OBJECTS     {
+        vRtrBierGeneralFrr,
+        vRtrBierGeneralBfdEnabled,
+        vRtrBierRoutingBkupNbrPfxType,
+        vRtrBierRoutingBkupNbrPrefix,
+        vRtrBierRoutingBkupNhopPfxType,
+        vRtrBierRoutingBkupNhopPrefix,
+        vRtrBierRoutingBkupNhopIfIndex,
+        vRtrBierForwardingBkupNbrPfxType,
+        vRtrBierForwardingBkupNbrPrefix,
+        vRtrBierFwrdingBkupNhopPfxType,
+        vRtrBierForwardingBkupNhopPrefix,
+        vRtrBierForwardingBkupNhopIfIdx,
+        vRtrBierForwardingBkupBitMask,
+        vRtrBierForwardingBkupMplsLabel,
+        vRtrBierGeneralOperDownReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting general management of BIER on Nokia
+         SROS series systems 21.0 release."
+    ::= { tmnxBierGroups 7 }
+
+vRtrBierNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 123 }
+
+vRtrBierNotifications            OBJECT IDENTIFIER ::= { vRtrBierNotifyPrefix 0 }
+
+vRtrBierBfrIdCollision           NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrBierNotifySubDomainId,
+        vRtrBierNotifyBsl,
+        vRtrBierPrefix1AddrType,
+        vRtrBierPrefix1Address,
+        vRtrBierPrefix2AddrType,
+        vRtrBierPrefix2Address,
+        vRtrBierNotifyBfrId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrBierBfrIdCollision is generated when BFR ID received
+         from two different routes is the same.
+
+         [EFFECT] We will remove the duplicate BFR Id from neighbors
+          f-BM (forwarding Bit Mask).
+
+         [RECOVERY] An operator intervention is needed to remove the
+          duplicate BFR ID from the configuration."
+    ::= { vRtrBierNotifications 1 }
+
+vRtrBierMtMismatch               NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrBierNotifySubDomainId,
+        vRtrBierNotifyBsl,
+        vRtrBierNotifyMTId,
+        vRtrBierNotifyRecvMTId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrBierMtMismatch is generated when the multi- topology
+         sent by the peer is different from what is configured locally.
+
+         [EFFECT] We will ignore the advertisement.
+
+         [RECOVERY] N/A"
+    ::= { vRtrBierNotifications 2 }
+
+vRtrBierSubDomainMismatch        NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrBierNotifySubDomainId,
+        vRtrBierNotifyBsl,
+        vRtrBierNotifyRecvSubDomainId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrBierSubDomainMismatch is generated when the sub-domain
+         in the received route is not configured locally.
+
+         [EFFECT] We will ignore the sub TLV.
+
+         [RECOVERY] Operator may need to configure the mismatched sub-domains."
+    ::= { vRtrBierNotifications 3 }
+
+vRtrBierUnsupportedNhop          NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrBierNextHopeType,
+        vRtrBierUnsupportedNhopState,
+        vRtrBierPrefix1AddrType,
+        vRtrBierPrefix1Address,
+        vRtrBierNextHopAddrType,
+        vRtrBierNextHopAddress,
+        vRtrIfIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrBierUnsupportedNhop is generated when the
+          next hop indicated by vRtrBierNextHopAddress is
+          unsupported by the system.
+
+         [EFFECT] We will ignore it while calculating the next hop.
+
+         [RECOVERY] The recovery is caused on receiving the subsequent
+          correct next hop and clearing this trap by setting
+          vRtrBierUnsupportedNhopState to 'false'."
+    ::= { vRtrBierNotifications 4 }
+
+END

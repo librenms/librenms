@@ -1,0 +1,1267 @@
+ALCATEL-IEEE8021-PAE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    dot1xAuthConfigEntry, dot1xPaePortNumber
+                                                         FROM IEEE8021-PAE-MIB
+    SnmpAdminString
+                                                         FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Counter64, Gauge32,
+    IpAddress, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    TimeTicks, Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, MacAddress, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    alcatelCommonMIBModules,
+    alcatelConformance, alcatelNotifyPrefix,
+    alcatelObjects
+                                                         FROM TIMETRA-GLOBAL-MIB
+    ServiceAdminStatus, TNamedItem,
+    TNamedItemOrEmpty,
+    TPolicyStatementNameOrEmpty,
+    TmnxAdminState,
+    TmnxEnabledDisabledAdminState,
+    TmnxPortID
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+alcatelIEEE8021PaeMIBModule      MODULE-IDENTITY
+    LAST-UPDATED "202101150000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This  document  is  the  SNMP MIB module to manage and
+         provision  the 7x50 extensions to the IEEE8021-PAE-MIB
+         (Port Access Entity nodule for managing IEEE 802.X) feature for
+         the Nokia 7x50 device.
+
+         Copyright 2004-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "202101150000Z"
+    DESCRIPTION
+        "Rev 21               15 January 2021 00:00
+         release 21 of the ALCATEL-IEEE8021-PAE-MIB."
+
+    REVISION    "202009010000Z"
+    DESCRIPTION
+        "Rev 20             1 September 2020 00:00
+         release 20 of the ALCATEL-IEEE8021-PAE-MIB."
+
+    REVISION    "200701010000Z"
+    DESCRIPTION
+        "Rev 5.0                01 Jan 2007 00:00
+         5.0 release of the ALCATEL-IEEE8021-PAE-MIB."
+
+    REVISION    "200508310000Z"
+    DESCRIPTION
+        "Rev 3.0                31 Aug 2005 00:00
+         3.0 release of the ALCATEL-IEEE8021-PAE-MIB."
+
+    REVISION    "200503290000Z"
+    DESCRIPTION
+        "Rev 2.0                29 Mar 2005 00:00
+         2.0 release of the ALCATEL-IEEE8021-PAE-MIB."
+
+    REVISION    "200408030000Z"
+    DESCRIPTION
+        "Rev 1.0                03 Aug 2004 00:00
+         1.0 release of the ALCATEL-IEEE8021-PAE-MIB."
+
+    ::= { alcatelCommonMIBModules 3 }
+
+AlxDot1xRadiusServerType         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The AlxDot1xRadiusServerType data type is used to denote the type of
+         the RADIUS server."
+    SYNTAX      INTEGER {
+        authorization (0),
+        accounting    (1),
+        combined      (2)
+    }
+
+alxDot1xObjs                     OBJECT IDENTIFIER ::= { alcatelObjects 3 }
+
+alxDot1xAuthenticatorObjs        OBJECT IDENTIFIER ::= { alxDot1xObjs 1 }
+
+alxdot1xAuthConfigTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  table alxdot1xAuthConfigTable allows configuration of
+         RADIUS authentication parameters for the 802.1X PAE
+         feature on port level."
+    ::= { alxDot1xAuthenticatorObjs 1 }
+
+alxDot1xAuthConfigEntry          OBJECT-TYPE
+    SYNTAX      AlxDot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xAuthConfigEntry is an entry (conceptual row) in the
+         alxdot1xAuthConfigTable. Each entry represents the configuration for
+         Radius Authentication on a port. Entries have a presumed StorageType
+         of nonVolatile."
+    AUGMENTS    { dot1xAuthConfigEntry }
+    ::= { alxdot1xAuthConfigTable 1 }
+
+AlxDot1xAuthConfigEntry          ::= SEQUENCE
+{
+    alxDot1xAuthRadiusPlcy           TPolicyStatementNameOrEmpty,
+    alxDot1xAuthRadiusServerPlcyAuth TNamedItemOrEmpty,
+    alxDot1xAuthPerHost              TmnxEnabledDisabledAdminState,
+    alxDot1xAuthRadiusServerPlcyAcct TNamedItemOrEmpty,
+    alxDot1xAuthenticatorInit        TruthValue,
+    alxDot1xAuthAdminState           TmnxAdminState
+}
+
+alxDot1xAuthRadiusPlcy           OBJECT-TYPE
+    SYNTAX      TPolicyStatementNameOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xAuthRadiusPlcy   specifies  the  name  of  the
+         Radius   Policy.   The   Radius  Policy  specifies  the
+         parameters that control the Radius Protocol. If no Policy is
+         specified (empty string) no Radius authentication will be
+         possible. This object can only be set to a policy that is defined
+         in the alxdot1xRadiusServerPlcyTable."
+    DEFVAL      { "" }
+    ::= { alxDot1xAuthConfigEntry 50 }
+
+alxDot1xAuthRadiusServerPlcyAuth OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthRadiusServerPlcyAuth specifies the RADIUS
+         server policy for authentication as defined in
+         TIMETRA-RADIUS-MIB::tmnxRadSrvPlcyTable to be applied in this port."
+    DEFVAL      { "" }
+    ::= { alxDot1xAuthConfigEntry 51 }
+
+alxDot1xAuthPerHost              OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthPerHost specifies if per-host dot1x
+         authentication is enabled.
+
+         If the value is equal to 'disabled', dot1x authentication is per port.
+
+         If the value is equal to 'enabled', dot1x authentication is per host."
+    DEFVAL      { disabled }
+    ::= { alxDot1xAuthConfigEntry 52 }
+
+alxDot1xAuthRadiusServerPlcyAcct OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthRadiusServerPlcyAcct specifies the RADIUS
+         server policy for accounting as defined in
+         TIMETRA-RADIUS-MIB::tmnxRadSrvPlcyTable to be applied in this port."
+    DEFVAL      { "" }
+    ::= { alxDot1xAuthConfigEntry 53 }
+
+alxDot1xAuthenticatorInit        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthenticatorInit specifies if the dot1x
+         authentication is initiated by the Authenticator (this system).
+
+         The value of this object is only relevant when the value of
+         alxDot1xAuthPerHost is equal to 'enabled' and is ignored when that
+         value is 'disabled'."
+    DEFVAL      { true }
+    ::= { alxDot1xAuthConfigEntry 54 }
+
+alxDot1xAuthAdminState           OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthAdminState specifies the administrative state
+         of the Dot1x functionality for this port."
+    DEFVAL      { inService }
+    ::= { alxDot1xAuthConfigEntry 55 }
+
+alxDot1xAuthMacTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAuthMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alxDot1xAuthMacTable contains the MAC addresses of the hosts that
+         are allowed access."
+    ::= { alxDot1xAuthenticatorObjs 2 }
+
+alxDot1xAuthMacEntry             OBJECT-TYPE
+    SYNTAX      AlxDot1xAuthMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents a particular host that is allowed
+         access.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       {
+        dot1xPaePortNumber,
+        alxDot1xAuthMacAddress
+    }
+    ::= { alxDot1xAuthMacTable 1 }
+
+AlxDot1xAuthMacEntry             ::= SEQUENCE
+{
+    alxDot1xAuthMacAddress           MacAddress,
+    alxDot1xAuthMacRowStatus         RowStatus,
+    alxDot1xAuthMacLastCh            TimeStamp
+}
+
+alxDot1xAuthMacAddress           OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthMacAddress specifies the MAC address of the
+         host."
+    ::= { alxDot1xAuthMacEntry 1 }
+
+alxDot1xAuthMacRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthMacRowStatus specifies the row status of this
+         row."
+    ::= { alxDot1xAuthMacEntry 2 }
+
+alxDot1xAuthMacLastCh            OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthMacLastCh indicates the sysUpTime at the time
+         of the most recent management-initiated change to this table row."
+    ::= { alxDot1xAuthMacEntry 3 }
+
+alxDot1xAuthHostTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAuthHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alxDot1xAuthHostTable contains the hosts involved in
+         authentication.
+
+         Entries in this table are created automatically by the system."
+    ::= { alxDot1xAuthenticatorObjs 3 }
+
+alxDot1xAuthHostEntry            OBJECT-TYPE
+    SYNTAX      AlxDot1xAuthHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents a particular host involved in
+         authentication."
+    INDEX       {
+        dot1xPaePortNumber,
+        alxDot1xAuthHostMac
+    }
+    ::= { alxDot1xAuthHostTable 1 }
+
+AlxDot1xAuthHostEntry            ::= SEQUENCE
+{
+    alxDot1xAuthHostMac              MacAddress,
+    alxDot1xAuthHostAllowed          TruthValue,
+    alxDot1xAuthHostPaeState         INTEGER,
+    alxDot1xAuthHostBackendAuthState INTEGER
+}
+
+alxDot1xAuthHostMac              OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthHostMac indicates the MAC address of the
+         host."
+    ::= { alxDot1xAuthHostEntry 1 }
+
+alxDot1xAuthHostAllowed          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthHostAllowed indicates if the host is allowed
+         access by its presence in the alxDot1xAuthMacTable."
+    ::= { alxDot1xAuthHostEntry 2 }
+
+alxDot1xAuthHostPaeState         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        initialize     (1),
+        disconnected   (2),
+        connecting     (3),
+        authenticating (4),
+        authenticated  (5),
+        aborting       (6),
+        held           (7),
+        forceAuth      (8),
+        forceUnauth    (9)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthHostPaeState indicates the current value of
+         the Authenticator PAE state machine."
+    ::= { alxDot1xAuthHostEntry 3 }
+
+alxDot1xAuthHostBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        request    (1),
+        response   (2),
+        success    (3),
+        fail       (4),
+        timeout    (5),
+        idle       (6),
+        initialize (7)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthHostBackendAuthState indicates the current
+         state of the Backend Authentication state machine."
+    ::= { alxDot1xAuthHostEntry 4 }
+
+alxDot1xAhStatsTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAhStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the session statistics objects for the
+         Authenticator PAE associated with each host. The system automatically
+         creates an entry in this table for each host that may authenticate
+         access to itself."
+    ::= { alxDot1xAuthenticatorObjs 4 }
+
+alxDot1xAhStatsEntry             OBJECT-TYPE
+    SYNTAX      AlxDot1xAhStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The session statistics information for an Authenticator
+         PAE.  This shows the current values being collected for
+         each session that is still in progress, or the final
+         values for the last valid session on each host where
+         there is no session currently active."
+    INDEX       {
+        dot1xPaePortNumber,
+        alxDot1xAuthHostMac
+    }
+    ::= { alxDot1xAhStatsTable 1 }
+
+AlxDot1xAhStatsEntry             ::= SEQUENCE
+{
+    alxDot1xAhSessionOctetsRx        Counter64,
+    alxDot1xAhSessionOctetsTx        Counter64,
+    alxDot1xAhSessionFramesRx        Counter32,
+    alxDot1xAhSessionFramesTx        Counter32,
+    alxDot1xAhSessionId              SnmpAdminString,
+    alxDot1xAhSessionAuthenticMethod INTEGER,
+    alxDot1xAhSessionTime            TimeTicks,
+    alxDot1xAhSessionTerminateCause  INTEGER,
+    alxDot1xAhSessionUserName        SnmpAdminString
+}
+
+alxDot1xAhSessionOctetsRx        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received in user data frames on this Port during
+         the session."
+    ::= { alxDot1xAhStatsEntry 1 }
+
+alxDot1xAhSessionOctetsTx        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets transmitted in user data frames on this Port
+         during the session."
+    ::= { alxDot1xAhStatsEntry 2 }
+
+alxDot1xAhSessionFramesRx        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames received on this Port during the
+         session."
+    ::= { alxDot1xAhStatsEntry 3 }
+
+alxDot1xAhSessionFramesTx        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames transmitted on this Port during the
+         session."
+    ::= { alxDot1xAhStatsEntry 4 }
+
+alxDot1xAhSessionId              OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for the session, in the form of a printable ASCII
+         string of at least three characters."
+    ::= { alxDot1xAhStatsEntry 5 }
+
+alxDot1xAhSessionAuthenticMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+        remoteAuthServer (1),
+        localAuthServer  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication method used to establish the session."
+    ::= { alxDot1xAhStatsEntry 6 }
+
+alxDot1xAhSessionTime            OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The duration of the session in seconds."
+    ::= { alxDot1xAhStatsEntry 7 }
+
+alxDot1xAhSessionTerminateCause  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        supplicantLogoff       (1),
+        portFailure            (2),
+        supplicantRestart      (3),
+        reauthFailed           (4),
+        authControlForceUnauth (5),
+        portReInit             (6),
+        portAdminDisabled      (7),
+        notTerminatedYet       (999)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason for the session termination."
+    ::= { alxDot1xAhStatsEntry 8 }
+
+alxDot1xAhSessionUserName        OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    ::= { alxDot1xAhStatsEntry 9 }
+
+alxDot1xAhDiagTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAhDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the diagnostics objects for the Authenticator
+         PAE associated with each host. The system automatically creates an
+         entry in this table for each host that may authenticate access to
+         itself."
+    ::= { alxDot1xAuthenticatorObjs 5 }
+
+alxDot1xAhDiagEntry              OBJECT-TYPE
+    SYNTAX      AlxDot1xAhDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The diagnostics information for an Authenticator PAE host."
+    INDEX       {
+        dot1xPaePortNumber,
+        alxDot1xAuthHostMac
+    }
+    ::= { alxDot1xAhDiagTable 1 }
+
+AlxDot1xAhDiagEntry              ::= SEQUENCE
+{
+    alxDot1xAhEntersConnIng          Counter32,
+    alxDot1xAhEapLogoffsWhileConnIng Counter32,
+    alxDot1xAhEntersAuthIng          Counter32,
+    alxDot1xAhSuccessWhileAuthIng    Counter32,
+    alxDot1xAhTimeoutsWhileAuthIng   Counter32,
+    alxDot1xAhFailWhileAuthIng       Counter32,
+    alxDot1xAhReauthsWhileAuthIng    Counter32,
+    alxDot1xAhEapStartsWhileAuthIng  Counter32,
+    alxDot1xAhEapLogoffWhileAuthIng  Counter32,
+    alxDot1xAhReauthsWhileAuthEd     Counter32,
+    alxDot1xAhEapStartsWhileAuthEd   Counter32,
+    alxDot1xAhEapLogoffWhileAuthEd   Counter32,
+    alxDot1xAhResponses              Counter32,
+    alxDot1xAhAccessChallenges       Counter32,
+    alxDot1xAhOtherRequestsToSup     Counter32,
+    alxDot1xAhNonNakResponsesFromSup Counter32,
+    alxDot1xAhAuthSuccesses          Counter32,
+    alxDot1xAhAuthFails              Counter32
+}
+
+alxDot1xAhEntersConnIng          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions to the
+         CONNECTING state from any other state."
+    ::= { alxDot1xAhDiagEntry 1 }
+
+alxDot1xAhEapLogoffsWhileConnIng OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         CONNECTING to DISCONNECTED as a result of receiving an EAPOL-Logoff
+         message."
+    ::= { alxDot1xAhDiagEntry 2 }
+
+alxDot1xAhEntersAuthIng          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         CONNECTING to AUTHENTICATING, as a result of an EAP-Response/Identity
+         message being received from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.3"
+    ::= { alxDot1xAhDiagEntry 3 }
+
+alxDot1xAhSuccessWhileAuthIng    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to AUTHENTICATED, as a result of the Backend
+         Authentication state machine indicating successful authentication of
+         the Supplicant ('authSuccess' = TRUE)."
+    ::= { alxDot1xAhDiagEntry 4 }
+
+alxDot1xAhTimeoutsWhileAuthIng   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to ABORTING, as a result of the Backend Authentication
+         state machine indicating authentication timeout ('authTimeout' =
+         TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.5"
+    ::= { alxDot1xAhDiagEntry 5 }
+
+alxDot1xAhFailWhileAuthIng       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to HELD, as a result of the Backend Authentication
+         state machine indicating authentication failure ('authFail' = TRUE)."
+    ::= { alxDot1xAhDiagEntry 6 }
+
+alxDot1xAhReauthsWhileAuthIng    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to ABORTING, as a result of a reauthentication request
+         ('reAuthenticate' = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.7"
+    ::= { alxDot1xAhDiagEntry 7 }
+
+alxDot1xAhEapStartsWhileAuthIng  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to ABORTING, as a result of an EAPOL-Start message
+         being received from the Supplicant."
+    ::= { alxDot1xAhDiagEntry 8 }
+
+alxDot1xAhEapLogoffWhileAuthIng  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATING to ABORTING, as a result of an EAPOL-Logoff message
+         being received from the Supplicant."
+    ::= { alxDot1xAhDiagEntry 9 }
+
+alxDot1xAhReauthsWhileAuthEd     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATED to CONNECTING, as a result of a reauthentication request
+         ('reAuthenticate' = TRUE)."
+    ::= { alxDot1xAhDiagEntry 10 }
+
+alxDot1xAhEapStartsWhileAuthEd   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATED to CONNECTING, as a result of an EAPOL-Start message
+         being received from the Supplicant."
+    ::= { alxDot1xAhDiagEntry 11 }
+
+alxDot1xAhEapLogoffWhileAuthEd   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions from
+         AUTHENTICATED to DISCONNECTED, as a result of an EAPOL-Logoff message
+         being received from the Supplicant."
+    ::= { alxDot1xAhDiagEntry 12 }
+
+alxDot1xAhResponses              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine sends an initial
+         Access-Request packet to the Authentication server (i.e., executes
+         'sendRespToServer' on entry to the RESPONSE state). Indicates that the
+         Authenticator attempted communication with the Authentication Server."
+    ::= { alxDot1xAhDiagEntry 13 }
+
+alxDot1xAhAccessChallenges       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives an initial
+         Access-Challenge packet from the Authentication server (i.e., 'aReq'
+         becomes TRUE, causing exit from the RESPONSE state). Indicates that
+         the Authentication Server has communication with the Authenticator."
+    ::= { alxDot1xAhDiagEntry 14 }
+
+alxDot1xAhOtherRequestsToSup     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine sends an EAP-Request
+         packet (other than an Identity, Notification, Failure or Success
+         message) to the Supplicant (i.e., executes 'txReq' on entry to the
+         REQUEST state). Indicates that the Authenticator chose an EAP-method."
+    ::= { alxDot1xAhDiagEntry 15 }
+
+alxDot1xAhNonNakResponsesFromSup OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives a response
+         from the Supplicant to an initial EAP-Request, and the response is
+         something other than EAP-NAK (i.e., 'rxResp' becomes TRUE, causing the
+         state machine to transition from REQUEST to RESPONSE, and the response
+         is not an EAP-NAK). Indicates that the Supplicant can respond to the
+         Authenticator's chosen EAP-method."
+    ::= { alxDot1xAhDiagEntry 16 }
+
+alxDot1xAhAuthSuccesses          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives an
+         EAP-Success message from the Authentication Server (i.e., 'aSuccess'
+         becomes TRUE, causing a transition from RESPONSE to SUCCESS).
+         Indicates that the Supplicant has successfully authenticated to the
+         Authentication Server."
+    ::= { alxDot1xAhDiagEntry 17 }
+
+alxDot1xAhAuthFails              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives an
+         EAP-Failure message from the Authentication Server (i.e., 'aFail'
+         becomes TRUE, causing a transition from RESPONSE to FAIL). Indicates
+         that the Supplicant has not authenticated to the Authentication
+         Server."
+    ::= { alxDot1xAhDiagEntry 18 }
+
+alxDot1xAuthStateTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xAuthStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the state information  about host authentication
+         organized per port. The system automatically creates an entry in this
+         table for each entry in the IEEE8021-PAE-MIB::dot1xAuthConfigTable."
+    ::= { alxDot1xAuthenticatorObjs 6 }
+
+alxDot1xAuthStateEntry           OBJECT-TYPE
+    SYNTAX      AlxDot1xAuthStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The diagnostics information for an Authenticator PAE host."
+    AUGMENTS    { dot1xAuthConfigEntry }
+    ::= { alxDot1xAuthStateTable 1 }
+
+AlxDot1xAuthStateEntry           ::= SEQUENCE
+{
+    alxDot1xAuthAllowedHosts         Gauge32,
+    alxDot1xAuthDisallowedHosts      Gauge32
+}
+
+alxDot1xAuthAllowedHosts         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthAllowedHosts indicates the current number of
+         hosts that are allowed access."
+    ::= { alxDot1xAuthStateEntry 1 }
+
+alxDot1xAuthDisallowedHosts      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xAuthDisallowedHosts indicates the current number
+         of hosts that are not allowed access."
+    ::= { alxDot1xAuthStateEntry 2 }
+
+alxDot1xSysAuthAllowedHosts      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xSysAuthAllowedHosts indicates the current number
+         of hosts that are allowed access."
+    ::= { alxDot1xAuthenticatorObjs 101 }
+
+alxDot1xSysAuthDisallowedHosts   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xSysAuthDisallowedHosts indicates the current
+         number of hosts that are not allowed access."
+    ::= { alxDot1xAuthenticatorObjs 102 }
+
+alxDot1xRadiusObjs               OBJECT IDENTIFIER ::= { alxDot1xObjs 2 }
+
+alxDot1xRadiusServerPlcyTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xRadiusServerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  alxDot1xRadiusServerPlcyTable allows configuration of
+         RADIUS  authentication  parameters  for  the 802.1X PAE
+         feature."
+    ::= { alxDot1xRadiusObjs 1 }
+
+alxDot1xRadiusServerPlcyEntry    OBJECT-TYPE
+    SYNTAX      AlxDot1xRadiusServerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xRadiusServerPlcyEntry is an entry (conceptual row) in the
+         alxDot1xRadiusServerPlcyTable. Each entry represents the configuration
+         for a 802.1X Radius Policy. Entries in this table can be created and
+         deleted via SNMP SET operations to alxDot1xRadiusPlcyRowStatus.
+         Entries have a presumed StorageType of nonVolatile."
+    INDEX       { alxDot1xRadiusPlcyName }
+    ::= { alxDot1xRadiusServerPlcyTable 1 }
+
+AlxDot1xRadiusServerPlcyEntry    ::= SEQUENCE
+{
+    alxDot1xRadiusPlcyName           TNamedItem,
+    alxDot1xRadiusPlcySrceAddr       IpAddress,
+    alxDot1xRadiusPlcyAdminState     ServiceAdminStatus,
+    alxDot1xRadiusPlcyRowStatus      RowStatus,
+    alxDot1xRadiusPlcyRetryAttempts  Unsigned32,
+    alxDot1xRadiusPlcyTimeout        Unsigned32
+}
+
+alxDot1xRadiusPlcyName           OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusPlcyName specifies a specific
+         radius server Policy to be used for 802.1X authentication."
+    ::= { alxDot1xRadiusServerPlcyEntry 1 }
+
+alxDot1xRadiusPlcySrceAddr       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusPlcySrceAddr  specifies the
+         source  address  of  the  Radius packet. It must be a
+         valid unicast address. (otherwise a wrongValue error is returned.)
+
+         If  this  object is configured with the address of the
+         router interface, the Radius client uses it while making a request
+         to the server.
+
+         If the address is not configured or is not the address of the one of
+         interfaces, the source address is based on the address of the Radius
+         server. If the server address is in-band, the client uses the system
+         ip address. If it is out-of-band, the source address is the address of
+         the management interface."
+    DEFVAL      { '00000000'H }
+    ::= { alxDot1xRadiusServerPlcyEntry 2 }
+
+alxDot1xRadiusPlcyAdminState     OBJECT-TYPE
+    SYNTAX      ServiceAdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The  value of the object alxDot1xRadiusPlcyAdminState specifies a
+         specific radius server Policy to be used for 802.1x
+         authentication."
+    DEFVAL      { down }
+    ::= { alxDot1xRadiusServerPlcyEntry 3 }
+
+alxDot1xRadiusPlcyRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xRadiusPlcyRowStatus controls the creation and deletion of rows
+         in the table."
+    ::= { alxDot1xRadiusServerPlcyEntry 4 }
+
+alxDot1xRadiusPlcyRetryAttempts  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusPlcyRetryAttempts specifies the
+         number  of  RADIUS  requests  towards  the  same RADIUS server."
+    DEFVAL      { 3 }
+    ::= { alxDot1xRadiusServerPlcyEntry 5 }
+
+alxDot1xRadiusPlcyTimeout        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..90)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xRadiusPlcyTimeout specifies the time, in seconds,
+         between request retries towards the same RADIUS server."
+    DEFVAL      { 5 }
+    ::= { alxDot1xRadiusServerPlcyEntry 6 }
+
+alxDot1xRadiusServerTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlxDot1xRadiusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alxDot1xRadiusServerTable has an entry for each RADIUS server used
+         for 802.1x authentication."
+    ::= { alxDot1xRadiusObjs 2 }
+
+alxDot1xRadiusServerEntry        OBJECT-TYPE
+    SYNTAX      AlxDot1xRadiusServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xRadiusServerEntry is an entry (conceptual row) in the
+         alxDot1xRadiusServerTable. Each entry represents the configuration for
+         a RADIUS server. Entries in this table can be created and deleted via
+         SNMP SET operations on alxDot1xRadiusServerRowStatus."
+    INDEX       {
+        alxDot1xRadiusServerPlcyName,
+        alxDot1xRadiusServerIndex
+    }
+    ::= { alxDot1xRadiusServerTable 1 }
+
+AlxDot1xRadiusServerEntry        ::= SEQUENCE
+{
+    alxDot1xRadiusServerPlcyName     TNamedItem,
+    alxDot1xRadiusServerIndex        Unsigned32,
+    alxDot1xRadiusServerAddress      IpAddress,
+    alxDot1xRadiusServerSecret       OCTET STRING,
+    alxDot1xRadiusServerAuthPort     Unsigned32,
+    alxDot1xRadiusServerOperStatus   INTEGER,
+    alxDot1xRadiusServerRowStatus    RowStatus,
+    alxDot1xRadiusServerType         AlxDot1xRadiusServerType,
+    alxDot1xRadiusServerAcctPort     Unsigned32
+}
+
+alxDot1xRadiusServerPlcyName     OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  value of the object alxDot1xRadiusServerPlcyName specifies
+         the radius server  Policy  to be used for 802.1x
+         authentication as defined in the alxDot1xRadiusServerPlcyTable.
+         Row creation will be denied if no policy with the same name does
+         not occur in the alxDot1xRadiusServerPlcyTable."
+    ::= { alxDot1xRadiusServerEntry 1 }
+
+alxDot1xRadiusServerIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerIndex specifies a specific
+         radius server in the policy."
+    ::= { alxDot1xRadiusServerEntry 2 }
+
+alxDot1xRadiusServerAddress      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerAddress specifies the IP
+         address of the RADIUS server. A valid unicast IP address must be
+         specified for row creation to succeed."
+    ::= { alxDot1xRadiusServerEntry 3 }
+
+alxDot1xRadiusServerSecret       OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..20))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerSecret specifies
+         the secret  key associated with the RADIUS server. An
+         Empty key is not accepted."
+    ::= { alxDot1xRadiusServerEntry 4 }
+
+alxDot1xRadiusServerAuthPort     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerAuthPort specifies
+         the  UDP  port  number on which to contact the RADIUS
+         server for authentication."
+    DEFVAL      { 1812 }
+    ::= { alxDot1xRadiusServerEntry 5 }
+
+alxDot1xRadiusServerOperStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerOperStatus indicates the
+         current status of the RADIUS server."
+    ::= { alxDot1xRadiusServerEntry 6 }
+
+alxDot1xRadiusServerRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "alxDot1xRadiusServerRowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { alxDot1xRadiusServerEntry 7 }
+
+alxDot1xRadiusServerType         OBJECT-TYPE
+    SYNTAX      AlxDot1xRadiusServerType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerType  indicates
+         the  type  of the RADIUS server."
+    ::= { alxDot1xRadiusServerEntry 8 }
+
+alxDot1xRadiusServerAcctPort     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xRadiusServerAcctPort  specifies
+         the  UDP port number  on  which  to  contact  the  RADIUS  server for
+         accounting."
+    DEFVAL      { 1813 }
+    ::= { alxDot1xRadiusServerEntry 9 }
+
+alxDot1xNotificationObjs         OBJECT IDENTIFIER ::= { alxDot1xObjs 10 }
+
+alxDot1xNotifyDescription        OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object alxDot1xNotifyDescription is a printable character string."
+    ::= { alxDot1xNotificationObjs 1 }
+
+alxDot1xNotifyPort               OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object alxDot1xNotifyPort identifies a port."
+    ::= { alxDot1xNotificationObjs 2 }
+
+alxDot1xNotifyMacAddress         OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alxDot1xNotifyMacAddress indicates a MAC
+         address."
+    ::= { alxDot1xNotificationObjs 3 }
+
+alxDot1xNotifyAuthHostEvent      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        start   (0),
+        success (1),
+        failure (2),
+        timeout (3),
+        logoff  (4)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of alxDot1xNotifyAuthHostEvent indicates
+         the type of event that occurred in the authentication sequence
+         of  a host."
+    ::= { alxDot1xNotificationObjs 4 }
+
+alxDot1xConformance              OBJECT IDENTIFIER ::= { alcatelConformance 3 }
+
+alxDot1xAuthenticatorConformance OBJECT IDENTIFIER ::= { alxDot1xConformance 1 }
+
+alxDot1xAuthenticatorCompliancs  OBJECT IDENTIFIER ::= { alxDot1xAuthenticatorConformance 1 }
+
+alxDot1xAuthenticatorCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The  compliance statement for management of Radius
+         authentication  for  the  IEEE802.1X PAE feature on
+         Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            alxDot1xAuthConfigGroup,
+            alxDot1xRadiusPlcyGroup
+        }
+    ::= { alxDot1xAuthenticatorCompliancs 1 }
+
+alxDot1xAuthV20v0Compliance      MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The  compliance statement for management of Radius
+         authentication  for  the  IEEE802.1X PAE feature on
+         Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            alxDot1xAuthConfigGroup,
+            alxDot1xAuthConfigV20v0Group,
+            alxDot1xRadiusPlcyGroup
+        }
+    ::= { alxDot1xAuthenticatorCompliancs 2 }
+
+alxDot1xAuthV21v0Compliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The  compliance statement for management of Radius
+         authentication  for  the  IEEE802.1X PAE feature on
+         Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            alxDot1xAuthConfigGroup,
+            alxDot1xAuthConfigV20v0Group,
+            alxDot1xRadiusPlcyGroup,
+            alxDot1xAuthNotifyGroup,
+            alxDot1xAuthConfigV21v0Group
+        }
+    ::= { alxDot1xAuthenticatorCompliancs 3 }
+
+alxDot1xAuthenticatorGroups      OBJECT IDENTIFIER ::= { alxDot1xAuthenticatorConformance 2 }
+
+alxDot1xAuthConfigGroup          OBJECT-GROUP
+    OBJECTS     {
+        alxDot1xAuthRadiusPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of  objects supporting management of Radius
+         authentication   for  the  IEEE802.1X  PAE  feature  on
+         Nokia 7x50 SR series systems."
+    ::= { alxDot1xAuthenticatorGroups 1 }
+
+alxDot1xAuthConfigV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        alxDot1xAuthRadiusServerPlcyAuth,
+        alxDot1xAuthRadiusServerPlcyAcct,
+        alxDot1xAuthPerHost,
+        alxDot1xAuthenticatorInit,
+        alxDot1xAuthMacRowStatus,
+        alxDot1xAuthMacLastCh,
+        alxDot1xAuthHostAllowed,
+        alxDot1xAuthHostPaeState,
+        alxDot1xAuthHostBackendAuthState,
+        alxDot1xAhSessionOctetsRx,
+        alxDot1xAhSessionOctetsTx,
+        alxDot1xAhSessionFramesRx,
+        alxDot1xAhSessionFramesTx,
+        alxDot1xAhSessionId,
+        alxDot1xAhSessionAuthenticMethod,
+        alxDot1xAhSessionTime,
+        alxDot1xAhSessionTerminateCause,
+        alxDot1xAhSessionUserName,
+        alxDot1xAhEntersConnIng,
+        alxDot1xAhEapLogoffsWhileConnIng,
+        alxDot1xAhEntersAuthIng,
+        alxDot1xAhSuccessWhileAuthIng,
+        alxDot1xAhTimeoutsWhileAuthIng,
+        alxDot1xAhFailWhileAuthIng,
+        alxDot1xAhReauthsWhileAuthIng,
+        alxDot1xAhEapStartsWhileAuthIng,
+        alxDot1xAhEapLogoffWhileAuthIng,
+        alxDot1xAhReauthsWhileAuthEd,
+        alxDot1xAhEapStartsWhileAuthEd,
+        alxDot1xAhEapLogoffWhileAuthEd,
+        alxDot1xAhResponses,
+        alxDot1xAhAccessChallenges,
+        alxDot1xAhOtherRequestsToSup,
+        alxDot1xAhNonNakResponsesFromSup,
+        alxDot1xAhAuthSuccesses,
+        alxDot1xAhAuthFails
+    }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of  objects supporting management of Radius
+         authentication   for  the  IEEE802.1X  PAE  feature  added for
+         release 20 of the Nokia 7xxx series systems."
+    ::= { alxDot1xAuthenticatorGroups 2 }
+
+alxDot1xAuthNotifyGroup          NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alxDot1xHostAuthEvent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting IEEE802.1X PAE in Nokia SROS
+         series systems."
+    ::= { alxDot1xAuthenticatorGroups 3 }
+
+alxDot1xAuthConfigV21v0Group     OBJECT-GROUP
+    OBJECTS     {
+        alxDot1xAuthAllowedHosts,
+        alxDot1xAuthDisallowedHosts,
+        alxDot1xSysAuthAllowedHosts,
+        alxDot1xSysAuthDisallowedHosts,
+        alxDot1xAuthAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of  objects supporting management of Radius
+         authentication   for  the  IEEE802.1X  PAE  feature  added for
+         release 21 of the Nokia 7xxx series systems."
+    ::= { alxDot1xAuthenticatorGroups 4 }
+
+alxDot1xAuthNotifyObjsGroup      OBJECT-GROUP
+    OBJECTS     {
+        alxDot1xNotifyDescription,
+        alxDot1xNotifyPort,
+        alxDot1xNotifyMacAddress,
+        alxDot1xNotifyAuthHostEvent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting notifications about
+         Radius authentication for the IEEE802.1X PAE feature on Nokia SROS
+         series systems."
+    ::= { alxDot1xAuthenticatorGroups 99 }
+
+alxDot1xRadiusConformance        OBJECT IDENTIFIER ::= { alxDot1xConformance 2 }
+
+alxDot1xRadiusCompliancs         OBJECT IDENTIFIER ::= { alxDot1xRadiusConformance 1 }
+
+alxDot1xRadiusGroups             OBJECT IDENTIFIER ::= { alxDot1xRadiusConformance 2 }
+
+alxDot1xRadiusPlcyGroup          OBJECT-GROUP
+    OBJECTS     {
+        alxDot1xRadiusPlcySrceAddr,
+        alxDot1xRadiusPlcyAdminState,
+        alxDot1xRadiusPlcyRowStatus,
+        alxDot1xRadiusPlcyRetryAttempts,
+        alxDot1xRadiusPlcyTimeout,
+        alxDot1xRadiusServerAddress,
+        alxDot1xRadiusServerSecret,
+        alxDot1xRadiusServerAuthPort,
+        alxDot1xRadiusServerAcctPort,
+        alxDot1xRadiusServerOperStatus,
+        alxDot1xRadiusServerRowStatus,
+        alxDot1xRadiusServerType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of  objects supporting management of Radius
+         authentication   for  the  IEEE802.1X  PAE  feature  on
+         Nokia 7x50 SR series systems."
+    ::= { alxDot1xRadiusGroups 1 }
+
+alxDot1xNotificationsPrefix      OBJECT IDENTIFIER ::= { alcatelNotifyPrefix 3 }
+
+alxDot1xNotifications            OBJECT IDENTIFIER ::= { alxDot1xNotificationsPrefix 0 }
+
+alxDot1xHostAuthEvent            NOTIFICATION-TYPE
+    OBJECTS     {
+        alxDot1xNotifyPort,
+        alxDot1xNotifyMacAddress,
+        alxDot1xNotifyAuthHostEvent,
+        alxDot1xNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The alxDot1xHostAuthEvent notification is sent when there is a 802.1X
+         PAE authentication event for a host. [CAUSE] An event occurred while
+         authenticating a host. [EFFECT] The effect depends on the particular
+         event. If the event is a failure, the value of the object
+         alxDot1xNotifyDescription may contain additional information.
+         [RECOVERY] Recovery, if any, depends on the particular event."
+    ::= { alxDot1xNotifications 1 }
+
+END

@@ -1,0 +1,2180 @@
+TIMETRA-DYNAMIC-SERVICES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DateAndTime, DisplayString, MacAddress,
+    RowPointer, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    sapEncapValue, sapPortId
+                                                         FROM TIMETRA-SAP-MIB
+    svcId
+                                                         FROM TIMETRA-SERV-MIB
+    TItemDescription, TNamedItem,
+    TNamedItemOrEmpty, TmnxAdminState,
+    TmnxAuthPassword, TmnxEnabledDisabled,
+    TmnxEncapVal, TmnxPortID, TmnxServId,
+    TmnxSubAcctSessionId
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraDynSrvMIBModule           MODULE-IDENTITY
+    LAST-UPDATED "201601010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision Dynamic
+         Services for the Nokia 7xxx device.
+
+         Copyright 2012-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0                01 Jan 2016 00:00
+         14.0 release of the TIMETRA-DYNAMIC-SERVICES-PROTOCOL-MIB.mib."
+
+    REVISION    "201305310000Z"
+    DESCRIPTION
+        "Rev 11.0                31 May 2013 12:00
+         11.0 release of the TIMETRA-DYNAMIC-SERVICES-PROTOCOL-MIB.mib."
+
+    ::= { timetraSRMIBModules 84 }
+
+TmnxDynSrvAcctStatsType          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxDynSrvAcctStatsType data type is an enumerated integer that
+         describes the values used to identify the type of accounting
+         statistics gathered."
+    SYNTAX      INTEGER {
+        volumeTime (1),
+        time       (2)
+    }
+
+tmnxDynSvc                       OBJECT IDENTIFIER ::= { tmnxSRObjs 84 }
+
+tmnxDynSvcObjs                   OBJECT IDENTIFIER ::= { tmnxDynSvc 1 }
+
+tmnxDynSvcPlcyTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcPlcyTable allows configuration of policies for Dynamic
+         Services."
+    ::= { tmnxDynSvcObjs 1 }
+
+tmnxDynSvcPlcyEntry              OBJECT-TYPE
+    SYNTAX      TmnxDynSvcPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular Dynamic
+         Services profile.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxDynSvcPlcyRowStatus."
+    INDEX       { IMPLIED tmnxDynSvcPlcyName }
+    ::= { tmnxDynSvcPlcyTable 1 }
+
+TmnxDynSvcPlcyEntry              ::= SEQUENCE
+{
+    tmnxDynSvcPlcyName               TNamedItem,
+    tmnxDynSvcPlcyRowStatus          RowStatus,
+    tmnxDynSvcPlcyLastCh             TimeStamp,
+    tmnxDynSvcPlcyDescription        TItemDescription,
+    tmnxDynSvcPlcyScriptPlcy         TNamedItemOrEmpty,
+    tmnxDynSvcPlcyCliUser            TNamedItemOrEmpty,
+    tmnxDynSvcPlcySapLimit           Unsigned32
+}
+
+tmnxDynSvcPlcyName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyName specifies the identifier name of this
+         Dynamic Services policy."
+    ::= { tmnxDynSvcPlcyEntry 1 }
+
+tmnxDynSvcPlcyRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxDynSvcPlcyEntry 2 }
+
+tmnxDynSvcPlcyLastCh             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyLastCh indicates the sysUpTime at the time
+         of the most recent management-initiated change to this conceptual row."
+    ::= { tmnxDynSvcPlcyEntry 3 }
+
+tmnxDynSvcPlcyDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyDescription specifies the description of
+         this Dynamic Services policy."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyEntry 4 }
+
+tmnxDynSvcPlcyScriptPlcy         OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyScriptPlcy specifies the identifier name of
+         the script policy associated with this Dynamic Services policy.
+
+         For a non-empty value, a row with the same value for the object
+         tmnxRadScriptPlcyName must exist in the
+         TIMETRA-RADIUS-MIB::tmnxRadScriptPlcyTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyEntry 5 }
+
+tmnxDynSvcPlcyCliUser            OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyCliUser specifies the identifier name of
+         the CLI user associated with this Dynamic Services policy.
+
+         For a non-empty value, a row with the same value for the object
+         tmnxUserName must exist in the TIMETRA-SECURITY-MIB::tmnxUserTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyEntry 6 }
+
+tmnxDynSvcPlcySapLimit           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..131072)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcySapLimit specifies the limit of the number
+         of SAPs (Service Access Point) that can be created using this Dynamic
+         Services policy.
+
+         Each SAP counts for a dynamic service instance.
+
+         Changing the value from any nonzero value to zero specifies that no
+         new SAPs can be created."
+    DEFVAL      { 1 }
+    ::= { tmnxDynSvcPlcyEntry 7 }
+
+tmnxDynSvcPlcyApTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcPlcyApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcPlcyApTable allows configuration of accounting policies
+         associated with Dynamic Services policies."
+    ::= { tmnxDynSvcObjs 2 }
+
+tmnxDynSvcPlcyApEntry            OBJECT-TYPE
+    SYNTAX      TmnxDynSvcPlcyApEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular Dynamic
+         Services profile.
+
+         Two rows in this table are created automatically by the system for
+         each row in the tmnxDynSvcPlcyTable."
+    INDEX       {
+        tmnxDynSvcPlcyName,
+        tmnxDynSvcPlcyApIndex
+    }
+    ::= { tmnxDynSvcPlcyApTable 1 }
+
+TmnxDynSvcPlcyApEntry            ::= SEQUENCE
+{
+    tmnxDynSvcPlcyApIndex            Unsigned32,
+    tmnxDynSvcPlcyApLastCh           TimeStamp,
+    tmnxDynSvcPlcyApName             TNamedItemOrEmpty,
+    tmnxDynSvcPlcyApStatsType        TmnxDynSrvAcctStatsType,
+    tmnxDynSvcPlcyApUpdateInterval   Unsigned32,
+    tmnxDynSvcPlcyApUpdateIvlJitter  Integer32
+}
+
+tmnxDynSvcPlcyApIndex            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApIndex specifies the identifier number of
+         this row within the scope of a Dynamic Services policy."
+    ::= { tmnxDynSvcPlcyApEntry 1 }
+
+tmnxDynSvcPlcyApLastCh           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcPlcyApEntry 2 }
+
+tmnxDynSvcPlcyApName             OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApName specifies the identifier name of a
+         RADIUS server policy to be used for accounting.
+
+         For a non-empty value, a row with the same value for the object
+         tmnxRadSrvPlcyName must exist in the
+         TIMETRA-RADIUS-MIB::tmnxRadSrvPlcyTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyApEntry 3 }
+
+tmnxDynSvcPlcyApStatsType        OBJECT-TYPE
+    SYNTAX      TmnxDynSrvAcctStatsType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApStatsType specifies what type of
+         statistics are sent to the accounting server."
+    DEFVAL      { volumeTime }
+    ::= { tmnxDynSvcPlcyApEntry 4 }
+
+tmnxDynSvcPlcyApUpdateInterval   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 5..259200)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApUpdateInterval specifies the time
+         interval between consecutive accounting updates when using this
+         Dynamic Services policy.
+
+         The value zero specifies that no intermediate updates be sent."
+    DEFVAL      { 0 }
+    ::= { tmnxDynSvcPlcyApEntry 5 }
+
+tmnxDynSvcPlcyApUpdateIvlJitter  OBJECT-TYPE
+    SYNTAX      Integer32 (-10 | 0..3600)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyApUpdateIvlJitter specifies the amount of
+         jitter to be applied on the update interval which is configured in
+         tmnxDynSvcPlcyApUpdateInterval and can be overruled by RADIUS.
+
+         A value between 0..3600 specifies the amount of jitter in seconds.
+
+         The (default) value -10 corresponds to a jitter value of 10% of the
+         update interval.
+
+         The operational value used by the system will never be bigger then 10%
+         of the update interval."
+    DEFVAL      { -10 }
+    ::= { tmnxDynSvcPlcyApEntry 6 }
+
+tmnxDynSvcRange                  OBJECT IDENTIFIER ::= { tmnxDynSvcObjs 3 }
+
+tmnxDynSvcRangeStart             OBJECT-TYPE
+    SYNTAX      TmnxServId (0 | 1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRangeStart specifies the start of the range of
+         service identifiers used as dynamic services."
+    DEFVAL      { 0 }
+    ::= { tmnxDynSvcRange 1 }
+
+tmnxDynSvcRangeEnd               OBJECT-TYPE
+    SYNTAX      TmnxServId (0 | 1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRangeEnd specifies the end of the range of
+         service identifiers used as dynamic services.
+
+         The value of tmnxDynSvcRangeEnd must be greater than or equal to the
+         value of tmnxDynSvcRangeStart."
+    DEFVAL      { 0 }
+    ::= { tmnxDynSvcRange 2 }
+
+tmnxDynSvcSapTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSapTable contains the Service Access Points (SAPs)
+         created for Dynamic Services.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 4 }
+
+tmnxDynSvcSapEntry               OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a particular Dynamic
+         Services SAP."
+    INDEX       {
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { tmnxDynSvcSapTable 1 }
+
+TmnxDynSvcSapEntry               ::= SEQUENCE
+{
+    tmnxDynSvcSapAcctSessionId       TmnxSubAcctSessionId,
+    tmnxDynSvcSapAcctSessionIdCtrl   TmnxSubAcctSessionId,
+    tmnxDynSvcSapPolicy              TNamedItemOrEmpty,
+    tmnxDynSvcSapScriptsExecuted     Counter32,
+    tmnxDynSvcSapScriptsSuccess      Counter32,
+    tmnxDynSvcSapLastScriptAction    INTEGER,
+    tmnxDynSvcSapLastScriptTime      DateAndTime,
+    tmnxDynSvcSapOrphaned            TruthValue,
+    tmnxDynSvcSapService             TmnxServId,
+    tmnxDynSvcSapLastScriptParams    OCTET STRING
+}
+
+tmnxDynSvcSapAcctSessionId       OBJECT-TYPE
+    SYNTAX      TmnxSubAcctSessionId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctSessionId indicates the identifier used
+         for accounting."
+    ::= { tmnxDynSvcSapEntry 1 }
+
+tmnxDynSvcSapAcctSessionIdCtrl   OBJECT-TYPE
+    SYNTAX      TmnxSubAcctSessionId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctSessionIdCtrl indicates the identifier
+         used for accounting of the Customer Premises Equipment's (CPE) control
+         channel that is associated with this SAP."
+    ::= { tmnxDynSvcSapEntry 2 }
+
+tmnxDynSvcSapPolicy              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapPolicy indicates the Dynamic Services policy
+         associated with this SAP.
+
+         It refers to a conceptual row in the tmnxDynSvcPlcyTable."
+    ::= { tmnxDynSvcSapEntry 3 }
+
+tmnxDynSvcSapScriptsExecuted     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapScriptsExecuted indicates the number of
+         times a script was executed for this SAP."
+    ::= { tmnxDynSvcSapEntry 4 }
+
+tmnxDynSvcSapScriptsSuccess      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapScriptsSuccess indicates the number of times
+         a script was successfully executed for this SAP."
+    ::= { tmnxDynSvcSapEntry 5 }
+
+tmnxDynSvcSapLastScriptAction    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        setup    (1),
+        modify   (2),
+        teardown (3),
+        commit   (4),
+        revert   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapLastScriptAction indicates the action of the
+         last script executed for this SAP."
+    ::= { tmnxDynSvcSapEntry 6 }
+
+tmnxDynSvcSapLastScriptTime      OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (11))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapLastScriptTime indicates the time when the
+         last script executed for this SAP."
+    ::= { tmnxDynSvcSapEntry 7 }
+
+tmnxDynSvcSapOrphaned            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxDynSvcSapOrphaned indicates whether the corresponding
+         SAP was not deleted after running the teardown portion of the script.
+
+         If set to 'true', the SAP was not deleted, and manual action is needed
+         to get rid of the SAP."
+    ::= { tmnxDynSvcSapEntry 8 }
+
+tmnxDynSvcSapService             OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapService indicates the parent service of this
+         SAP.
+
+         The value zero indicates that the parent service is currently unknown."
+    ::= { tmnxDynSvcSapEntry 9 }
+
+tmnxDynSvcSapLastScriptParams    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..1000))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapLastScriptParams indicates the parameter
+         string of the script instance that was last executed on this SAP.
+
+         The value of this object corresponds with the content of the RADIUS
+         vendor-specific Alc-Dyn-Serv-Script-Params option.
+
+         The value of this object is subjected to the same constraints as for
+         the DisplayString syntax."
+    ::= { tmnxDynSvcSapEntry 10 }
+
+tmnxDynSvcSapAcctTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSapAcctEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSapAcctTable contains the Dynamic Services SAP's
+         accounting information.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 5 }
+
+tmnxDynSvcSapAcctEntry           OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSapAcctEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about an accounting instance
+         of a particular Dynamic Services SAP."
+    INDEX       {
+        sapPortId,
+        sapEncapValue,
+        tmnxDynSvcSapAcctIndex
+    }
+    ::= { tmnxDynSvcSapAcctTable 1 }
+
+TmnxDynSvcSapAcctEntry           ::= SEQUENCE
+{
+    tmnxDynSvcSapAcctIndex           Unsigned32,
+    tmnxDynSvcSapAcctAcctStatus      TmnxEnabledDisabled,
+    tmnxDynSvcSapAcctStatsType       TmnxDynSrvAcctStatsType,
+    tmnxDynSvcSapAcctAcctInterval    Unsigned32
+}
+
+tmnxDynSvcSapAcctIndex           OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctIndex specifies the identifier number of
+         this conceptual row within the scope of a Dynamic Services SAP."
+    ::= { tmnxDynSvcSapAcctEntry 1 }
+
+tmnxDynSvcSapAcctAcctStatus      OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctAcctStatus indicates the operational
+         status of this accounting instance."
+    ::= { tmnxDynSvcSapAcctEntry 2 }
+
+tmnxDynSvcSapAcctStatsType       OBJECT-TYPE
+    SYNTAX      TmnxDynSrvAcctStatsType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctStatsType indicates the actual type of
+         accounting statistics gathered by this accounting instance.
+
+         It can be specified by the associated Dynamic Services policy (the
+         object tmnxDynSvcPlcyApStatsType), or by the AAA server."
+    ::= { tmnxDynSvcSapAcctEntry 3 }
+
+tmnxDynSvcSapAcctAcctInterval    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapAcctAcctInterval indicates the actual
+         accounting update interval for this accounting instance.
+
+         It can be specified by the associated Dynamic Services policy (the
+         object tmnxDynSvcPlcyApUpdateInterval), or by the AAA server."
+    ::= { tmnxDynSvcSapAcctEntry 4 }
+
+tmnxDynSvcRootObjTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcRootObjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcRootObjTable contains information of the Root objects
+         created by Dynamic Services.
+
+         A root object is an object created by a Dynamic Service of which the
+         parent is not created by a Dynamic Service.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 6 }
+
+tmnxDynSvcRootObjEntry           OBJECT-TYPE
+    SYNTAX      TmnxDynSvcRootObjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a Dynamic Services root
+         object."
+    INDEX       { tmnxDynSvcRootObjIndex }
+    ::= { tmnxDynSvcRootObjTable 1 }
+
+TmnxDynSvcRootObjEntry           ::= SEQUENCE
+{
+    tmnxDynSvcRootObjIndex           Unsigned32,
+    tmnxDynSvcRootObjInstance        RowPointer,
+    tmnxDynSvcRootObjOrphanTime      TimeStamp,
+    tmnxDynSvcRootObjSnippetName     DisplayString,
+    tmnxDynSvcRootObjSnippetInstance DisplayString
+}
+
+tmnxDynSvcRootObjIndex           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRootObjIndex specifies the index that
+         identifies this conceptual row within the scope of a Dynamic Services
+         Root object."
+    ::= { tmnxDynSvcRootObjEntry 1 }
+
+tmnxDynSvcRootObjInstance        OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRootObjInstance indicates the concerned root
+         object."
+    ::= { tmnxDynSvcRootObjEntry 2 }
+
+tmnxDynSvcRootObjOrphanTime      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRootObjOrphanTime indicates the sysUpTime when
+         the object was orphaned.
+
+         When the object is not orphaned or when the time is unknown, the
+         tmnxDynSvcRootObjOrphanTime is set to 0."
+    ::= { tmnxDynSvcRootObjEntry 3 }
+
+tmnxDynSvcRootObjSnippetName     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRootObjSnippetName indicates the type-name from
+         the snippet to which the root object belongs.
+
+         A 'snippet' is the name of a set of python functions to create, modify
+         or destroy configuration; for example: a snippet called 'vprn' in
+         order to create/modify/destroy VPRN services.
+
+         When the tmnxDynSvcRootObjSnippetName is an empty string it implies
+         that there is no snippet."
+    ::= { tmnxDynSvcRootObjEntry 4 }
+
+tmnxDynSvcRootObjSnippetInstance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcRootObjSnippetInstance indicates the identifier
+         from the snippet to which the object belongs and is unique within the
+         snippet scope.
+
+         A 'snippet instance' is an instance of the configuration created by a
+         snippet; for example: a particular VPRN service.
+
+         When the tmnxDynSvcRootObjSnippetInstance is an empty string it
+         implies that there is no snippet."
+    ::= { tmnxDynSvcRootObjEntry 5 }
+
+tmnxDynSvcStatsTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcStatsTable shows statistics information of the Dynamic
+         Services."
+    ::= { tmnxDynSvcObjs 7 }
+
+tmnxDynSvcStatsEntry             OBJECT-TYPE
+    SYNTAX      TmnxDynSvcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents a statistic counter.
+
+         Entries in this table are created and destroyed by the system.
+
+         Rows are only created where the statistics value is nonzero; this
+         allows faster walking through this table; hence, it is recommended to
+         perform only get-next-request operations to retrieve information from
+         this table."
+    INDEX       { tmnxDynSvcStatsId }
+    ::= { tmnxDynSvcStatsTable 1 }
+
+TmnxDynSvcStatsEntry             ::= SEQUENCE
+{
+    tmnxDynSvcStatsId                Unsigned32,
+    tmnxDynSvcStatsDescr             TItemDescription,
+    tmnxDynSvcStatsVal               Counter32
+}
+
+tmnxDynSvcStatsId                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcStatsId specifies the number that identifies
+         this conceptual row within the scope of a Dynamic Services."
+    ::= { tmnxDynSvcStatsEntry 1 }
+
+tmnxDynSvcStatsDescr             OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcStatsDescr indicates the description
+         of the statistic counter contained in this conceptual row."
+    ::= { tmnxDynSvcStatsEntry 2 }
+
+tmnxDynSvcStatsVal               OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcStatsVal indicates the value of the
+         statistics contained in this conceptual row."
+    ::= { tmnxDynSvcStatsEntry 3 }
+
+tmnxDynSvcSnippetTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSnippetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSnippetTable contains information of the snippets
+         created by Dynamic Services.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 8 }
+
+tmnxDynSvcSnippetEntry           OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSnippetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a snippet within the
+         scope of Dynamic Services."
+    INDEX       {
+        tmnxDynSvcSnippetName,
+        tmnxDynSvcSnippetInstance
+    }
+    ::= { tmnxDynSvcSnippetTable 1 }
+
+TmnxDynSvcSnippetEntry           ::= SEQUENCE
+{
+    tmnxDynSvcSnippetName            DisplayString,
+    tmnxDynSvcSnippetInstance        DisplayString,
+    tmnxDynSvcSnippetRefCount        Counter32,
+    tmnxDynSvcSnippetDictLength      Unsigned32
+}
+
+tmnxDynSvcSnippetName            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSnippetName specifies the type-name from the
+         snippet that identifies this conceptual row within the scope of a
+         Dynamic Services.
+
+         The type-name is used to lookup the set of python functions to create,
+         modify or destroy configuration; for example: a snippet with type-name
+         'vprn' could be used to create/modify/destroy VPRN services."
+    ::= { tmnxDynSvcSnippetEntry 1 }
+
+tmnxDynSvcSnippetInstance        OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..48))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetInstance specifies the
+         identifier from the snippet that in combination with the type-name
+         uniquely identifies a snippet.
+
+         A 'snippet instance' is an instance of the configuration created by a
+         snippet; for example: a particular VPRN service."
+    ::= { tmnxDynSvcSnippetEntry 2 }
+
+tmnxDynSvcSnippetRefCount        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRefCount indicates the number
+         of times this snippet is referenced by other snippets."
+    ::= { tmnxDynSvcSnippetEntry 3 }
+
+tmnxDynSvcSnippetDictLength      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetDictLength indicates the
+         length of the python dictionary stored for this snippet."
+    ::= { tmnxDynSvcSnippetEntry 4 }
+
+tmnxDynSvcSnippetRootObjTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSnippetRootObjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSnippetRootObjTable contains information of the root
+         objects created by a snippet within the scope of a Dynamic Service.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 9 }
+
+tmnxDynSvcSnippetRootObjEntry    OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSnippetRootObjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a root object created
+         by a snippet within the scope of a Dynamic Service."
+    INDEX       {
+        tmnxDynSvcSnippetName,
+        tmnxDynSvcSnippetInstance,
+        tmnxDynSvcSnippetRootObjIdx
+    }
+    ::= { tmnxDynSvcSnippetRootObjTable 1 }
+
+TmnxDynSvcSnippetRootObjEntry    ::= SEQUENCE
+{
+    tmnxDynSvcSnippetRootObjIdx      Unsigned32,
+    tmnxDynSvcSnippetRootObjOid      RowPointer
+}
+
+tmnxDynSvcSnippetRootObjIdx      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRootObjIdx specifies the
+         index that identifies this conceptual row within the scope of the
+         snippet."
+    ::= { tmnxDynSvcSnippetRootObjEntry 1 }
+
+tmnxDynSvcSnippetRootObjOid      OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRootObjOid indicates the
+         concerned root object that was created by the snippet."
+    ::= { tmnxDynSvcSnippetRootObjEntry 2 }
+
+tmnxDynSvcSnippetRefTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSnippetRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSnippetRefTable contains information of the referenced
+         snippets created by a python script within the scope of a Dynamic
+         Service.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 10 }
+
+tmnxDynSvcSnippetRefEntry        OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSnippetRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a referenced snippet
+         created by a python script within the scope of a Dynamic Service."
+    INDEX       {
+        tmnxDynSvcSnippetName,
+        tmnxDynSvcSnippetInstance,
+        tmnxDynSvcSnippetRefIdx
+    }
+    ::= { tmnxDynSvcSnippetRefTable 1 }
+
+TmnxDynSvcSnippetRefEntry        ::= SEQUENCE
+{
+    tmnxDynSvcSnippetRefIdx          Unsigned32,
+    tmnxDynSvcSnippetRefSnipName     DisplayString,
+    tmnxDynSvcSnippetRefSnipInst     DisplayString
+}
+
+tmnxDynSvcSnippetRefIdx          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRefIdx specifies the index
+         that identifies this conceptual row within the scope of the snippet."
+    ::= { tmnxDynSvcSnippetRefEntry 1 }
+
+tmnxDynSvcSnippetRefSnipName     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRefSnipName indicates the
+         type-name from the snippet created or referenced by a python script."
+    ::= { tmnxDynSvcSnippetRefEntry 2 }
+
+tmnxDynSvcSnippetRefSnipInst     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRefSnipInst indicates the
+         identifier from the snippet created or referenced by a python script."
+    ::= { tmnxDynSvcSnippetRefEntry 3 }
+
+tmnxDynSvcSnippetResIdTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcSnippetResIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcSnippetResIdTable contains information of the
+         identifiers reserved by a python script within the scope of a Dynamic
+         Service.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 11 }
+
+tmnxDynSvcSnippetResIdEntry      OBJECT-TYPE
+    SYNTAX      TmnxDynSvcSnippetResIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about an identifier reserved
+         by a python script within the scope of a Dynamic Service."
+    INDEX       {
+        tmnxDynSvcSnippetName,
+        tmnxDynSvcSnippetInstance,
+        tmnxDynSvcSnippetResIdIdx
+    }
+    ::= { tmnxDynSvcSnippetResIdTable 1 }
+
+TmnxDynSvcSnippetResIdEntry      ::= SEQUENCE
+{
+    tmnxDynSvcSnippetResIdIdx        Unsigned32,
+    tmnxDynSvcSnippetResIdType       DisplayString,
+    tmnxDynSvcSnippetResIdValue      DisplayString
+}
+
+tmnxDynSvcSnippetResIdIdx        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetResIdIdx specifies the index
+         that identifies this conceptual row within the scope of the snippet."
+    ::= { tmnxDynSvcSnippetResIdEntry 1 }
+
+tmnxDynSvcSnippetResIdType       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetResIdType indicates the
+         type-name from the identifier reserved by a python script."
+    ::= { tmnxDynSvcSnippetResIdEntry 2 }
+
+tmnxDynSvcSnippetResIdValue      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetResIdValue indicates the
+         value from the identifier reserved by a python script."
+    ::= { tmnxDynSvcSnippetResIdEntry 3 }
+
+tmnxDynSvcTimer                  OBJECT IDENTIFIER ::= { tmnxDynSvcObjs 12 }
+
+tmnxDynSvcTimerAccSetupTimeout   OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcTimerAccSetupTimeout specifies the timeout in
+         seconds after which a script is cancelled for setup actions received
+         via RADIUS Access-Accept messages."
+    DEFVAL      { 30 }
+    ::= { tmnxDynSvcTimer 1 }
+
+tmnxDynSvcPlcyAuthTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcPlcyAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcPlcyAuthTable allows configuration of authentication
+         parameters associated with Dynamic Services policies."
+    ::= { tmnxDynSvcObjs 13 }
+
+tmnxDynSvcPlcyAuthEntry          OBJECT-TYPE
+    SYNTAX      TmnxDynSvcPlcyAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular Dynamic
+         Services profile.
+
+         An entry in this table is automatically created by the system for each
+         row in the tmnxDynSvcPlcyTable."
+    AUGMENTS    { tmnxDynSvcPlcyEntry }
+    ::= { tmnxDynSvcPlcyAuthTable 1 }
+
+TmnxDynSvcPlcyAuthEntry          ::= SEQUENCE
+{
+    tmnxDynSvcPlcyAuthLastCh         TimeStamp,
+    tmnxDynSvcPlcyAuthRadiusSrvPlcy  TNamedItemOrEmpty,
+    tmnxDynSvcPlcyAuthPassword       TmnxAuthPassword,
+    tmnxDynSvcPlcyAuthLocalDb        TNamedItemOrEmpty
+}
+
+tmnxDynSvcPlcyAuthLastCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyAuthLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcPlcyAuthEntry 1 }
+
+tmnxDynSvcPlcyAuthRadiusSrvPlcy  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyAuthRadiusSrvPlcy specifies the RADIUS
+         server policy to be used for authentication.
+
+         For a non-empty value, a row with the same value for the object
+         tmnxRadSrvPlcyName must exist in the
+         TIMETRA-RADIUS-MIB::tmnxRadSrvPlcyTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyAuthEntry 2 }
+
+tmnxDynSvcPlcyAuthPassword       OBJECT-TYPE
+    SYNTAX      TmnxAuthPassword
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyAuthPassword specifies the password for
+         going to the RADIUS server. An empty string is returned on SNMP GET
+         requests."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyAuthEntry 3 }
+
+tmnxDynSvcPlcyAuthLocalDb        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcPlcyAuthLocalDb specifies the local database to
+         be used for authentication.
+
+         For a non-empty value, a row with the same value for the object
+         tmnxDynSvcLocAuthDbName must exist in the tmnxDynSvcLocalAuthDbTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcPlcyAuthEntry 4 }
+
+tmnxDynSvcCaptureSapTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcCaptureSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Dynamic Services configuration for capture SAPs.
+         It allows to dynamically create dynamic SAPs based on incoming data
+         packets.
+
+         A row is automatically created in the tmnxDynSvcCaptureSapTable for an
+         entry in the sapBaseInfoTable where the value of the object sapSubType
+         is equal to 'capture' and the SAP's encapsulation allows creation of
+         dynamic SAPs."
+    ::= { tmnxDynSvcObjs 14 }
+
+tmnxDynSvcCaptureSapEntry        OBJECT-TYPE
+    SYNTAX      TmnxDynSvcCaptureSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Dynamic Services specific configuration for a capture SAP."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { tmnxDynSvcCaptureSapTable 1 }
+
+TmnxDynSvcCaptureSapEntry        ::= SEQUENCE
+{
+    tmnxDynSvcCaptureSapLastCh       TimeStamp,
+    tmnxDynSvcCaptureSapAdminState   TmnxAdminState,
+    tmnxDynSvcCaptureSapPolicy       TNamedItemOrEmpty
+}
+
+tmnxDynSvcCaptureSapLastCh       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCaptureSapLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcCaptureSapEntry 1 }
+
+tmnxDynSvcCaptureSapAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCaptureSapAdminState specifies the
+         administrative state of this capture SAP.
+
+         If the value of this field is set 'inService', data packets coming in
+         on this capture SAP will get authenticated and, if successful, result
+         in the creation of Dynamic Services SAPs."
+    DEFVAL      { outOfService }
+    ::= { tmnxDynSvcCaptureSapEntry 2 }
+
+tmnxDynSvcCaptureSapPolicy       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCaptureSapPolicy specifies
+         the Dynamic Services policy associated with this capture SAP.
+         Its use is twofold:
+         - define the parameters to authenticate the incoming data packet
+         - used as default Dynamic Services Policy when authentication does
+           not return one.
+
+         It refers to a conceptual row in the tmnxDynSvcPlcyTable."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcCaptureSapEntry 3 }
+
+tmnxDynSvcCaptureSapStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcCaptureSapStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcCaptureSapStatsTable contains statistics about the
+         capture SAPs of this system."
+    ::= { tmnxDynSvcObjs 15 }
+
+tmnxDynSvcCaptureSapStatsEntry   OBJECT-TYPE
+    SYNTAX      TmnxDynSvcCaptureSapStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents statistics about a particular capture
+         SAP.
+
+         Rows are created and destroyed automatically by the system."
+    AUGMENTS    { tmnxDynSvcCaptureSapEntry }
+    ::= { tmnxDynSvcCaptureSapStatsTable 1 }
+
+TmnxDynSvcCaptureSapStatsEntry   ::= SEQUENCE
+{ tmnxDynSvcCSapStatsRxPackets     Counter32 }
+
+tmnxDynSvcCSapStatsRxPackets     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCSapStatsRxPackets indicates the total number
+         of data packets received by this capture SAP."
+    ::= { tmnxDynSvcCaptureSapStatsEntry 1 }
+
+tmnxDynSvcCaptureSapDropTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcCaptureSapDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcCaptureSapDropTable contains data-trigger related drop
+         statistics about the capture SAPs of this system."
+    ::= { tmnxDynSvcObjs 16 }
+
+tmnxDynSvcCaptureSapDropEntry    OBJECT-TYPE
+    SYNTAX      TmnxDynSvcCaptureSapDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents information about a specific drop
+         reason.
+
+         Rows are created and destroyed automatically by the system."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue,
+        tmnxDynSvcCSapDropIndex
+    }
+    ::= { tmnxDynSvcCaptureSapDropTable 1 }
+
+TmnxDynSvcCaptureSapDropEntry    ::= SEQUENCE
+{
+    tmnxDynSvcCSapDropIndex          Unsigned32,
+    tmnxDynSvcCSapDropReason         DisplayString,
+    tmnxDynSvcCSapDropCounter        Counter32
+}
+
+tmnxDynSvcCSapDropIndex          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..9)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCSapDropIndex specifies the index of this row."
+    ::= { tmnxDynSvcCaptureSapDropEntry 1 }
+
+tmnxDynSvcCSapDropReason         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCSapDropReason indicates a descriptive reason
+         explaining the cause of drop."
+    ::= { tmnxDynSvcCaptureSapDropEntry 2 }
+
+tmnxDynSvcCSapDropCounter        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcCSapDropCounter indicates the amount of
+         data-triggers dropped corresponding to this row."
+    ::= { tmnxDynSvcCaptureSapDropEntry 3 }
+
+tmnxDynSvcDataTriggerTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcDataTriggerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcDataTriggerTable contains the Data Triggers created for
+         Dynamic Services.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxDynSvcObjs 17 }
+
+tmnxDynSvcDataTriggerEntry       OBJECT-TYPE
+    SYNTAX      TmnxDynSvcDataTriggerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row presents information about a particular Data
+         Trigger."
+    INDEX       {
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { tmnxDynSvcDataTriggerTable 1 }
+
+TmnxDynSvcDataTriggerEntry       ::= SEQUENCE
+{
+    tmnxDynSvcDTriggerAcctSessionId  TmnxSubAcctSessionId,
+    tmnxDynSvcDTriggerMacAddress     MacAddress,
+    tmnxDynSvcDTriggerIpAddressType  InetAddressType,
+    tmnxDynSvcDTriggerIpAddress      InetAddress,
+    tmnxDynSvcDTriggerState          INTEGER
+}
+
+tmnxDynSvcDTriggerAcctSessionId  OBJECT-TYPE
+    SYNTAX      TmnxSubAcctSessionId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcDTriggerAcctSessionId indicates the identifier
+         used for accounting."
+    ::= { tmnxDynSvcDataTriggerEntry 1 }
+
+tmnxDynSvcDTriggerMacAddress     OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcDTriggerMacAddress indicates the MAC address of
+         the incoming data packet triggering the creation of this row."
+    ::= { tmnxDynSvcDataTriggerEntry 2 }
+
+tmnxDynSvcDTriggerIpAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcDTriggerIpAddressType indicates the type of
+         address stored in tmnxDynSvcDTriggerIpAddress."
+    ::= { tmnxDynSvcDataTriggerEntry 3 }
+
+tmnxDynSvcDTriggerIpAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcDTriggerIpAddress indicates the IP address of
+         the incoming data packet triggering the creation of this row. If this
+         row was created by a non-IP packet, the value of
+         tmnxDynSvcDTriggerIpAddressType returns 'unknown'."
+    ::= { tmnxDynSvcDataTriggerEntry 4 }
+
+tmnxDynSvcDTriggerState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pending    (1),
+        accepted   (2),
+        sapCreated (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcDTriggerState indicates the current state of
+         the Data Trigger corresponding to this row:
+         - 'pending'   : authentication is going on
+         - 'accepted'  : authentication has been finished and was successful
+         - 'sapCreated': the dynamic SAP has been created"
+    ::= { tmnxDynSvcDataTriggerEntry 5 }
+
+tmnxDynSvcLocalAuthDbTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcLocalAuthDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcLocalAuthDbTable allows configuration of local
+         authentication databases for data-triggered Dynamic Services."
+    ::= { tmnxDynSvcObjs 18 }
+
+tmnxDynSvcLocalAuthDbEntry       OBJECT-TYPE
+    SYNTAX      TmnxDynSvcLocalAuthDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular database.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxDynSvcLocAuthDbRowStatus."
+    INDEX       { IMPLIED tmnxDynSvcLocAuthDbName }
+    ::= { tmnxDynSvcLocalAuthDbTable 1 }
+
+TmnxDynSvcLocalAuthDbEntry       ::= SEQUENCE
+{
+    tmnxDynSvcLocAuthDbName          TNamedItem,
+    tmnxDynSvcLocAuthDbRowStatus     RowStatus,
+    tmnxDynSvcLocAuthDbLastCh        TimeStamp,
+    tmnxDynSvcLocAuthDbAdminState    TmnxAdminState,
+    tmnxDynSvcLocAuthDbDescription   TItemDescription
+}
+
+tmnxDynSvcLocAuthDbName          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocAuthDbName specifies the identifier name of
+         this database."
+    ::= { tmnxDynSvcLocalAuthDbEntry 1 }
+
+tmnxDynSvcLocAuthDbRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocAuthDbRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxDynSvcLocalAuthDbEntry 2 }
+
+tmnxDynSvcLocAuthDbLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocAuthDbLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcLocalAuthDbEntry 3 }
+
+tmnxDynSvcLocAuthDbAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocAuthDbAdminState specifies the
+         administrative state of this database."
+    DEFVAL      { outOfService }
+    ::= { tmnxDynSvcLocalAuthDbEntry 4 }
+
+tmnxDynSvcLocAuthDbDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocAuthDbDescription specifies the description
+         of this database."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbEntry 5 }
+
+tmnxDynSvcLocalAuthDbUserTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcLocalAuthDbUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcLocalAuthDbUserTable allows configuration of user
+         entries in the local authentication databases defined in the
+         tmnxDynSvcLocalAuthDbTable."
+    ::= { tmnxDynSvcObjs 19 }
+
+tmnxDynSvcLocalAuthDbUserEntry   OBJECT-TYPE
+    SYNTAX      TmnxDynSvcLocalAuthDbUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular user entry.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxDynSvcLocADbUsrRowStatus."
+    INDEX       {
+        tmnxDynSvcLocAuthDbName,
+        tmnxDynSvcLocADbUsrName
+    }
+    ::= { tmnxDynSvcLocalAuthDbUserTable 1 }
+
+TmnxDynSvcLocalAuthDbUserEntry   ::= SEQUENCE
+{
+    tmnxDynSvcLocADbUsrName          DisplayString,
+    tmnxDynSvcLocADbUsrRowStatus     RowStatus,
+    tmnxDynSvcLocADbUsrLastCh        TimeStamp,
+    tmnxDynSvcLocADbUsrAdminState    TmnxAdminState,
+    tmnxDynSvcLocADbUsrDescription   TItemDescription
+}
+
+tmnxDynSvcLocADbUsrName          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbUsrName specifies the user-name of this
+         entry."
+    ::= { tmnxDynSvcLocalAuthDbUserEntry 1 }
+
+tmnxDynSvcLocADbUsrRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbUsrRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxDynSvcLocalAuthDbUserEntry 2 }
+
+tmnxDynSvcLocADbUsrLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbUsrLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcLocalAuthDbUserEntry 3 }
+
+tmnxDynSvcLocADbUsrAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbUsrAdminState specifies the
+         administrative state of this user entry."
+    DEFVAL      { outOfService }
+    ::= { tmnxDynSvcLocalAuthDbUserEntry 4 }
+
+tmnxDynSvcLocADbUsrDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbUsrDescription specifies the description
+         of this user entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbUserEntry 5 }
+
+tmnxDynSvcLocalAuthDbSapTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcLocalAuthDbSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcLocalAuthDbSapTable allows configuration of per-user SAP
+         entries in the local authentication databases defined in the
+         tmnxDynSvcLocalAuthDbUserTable."
+    ::= { tmnxDynSvcObjs 20 }
+
+tmnxDynSvcLocalAuthDbSapEntry    OBJECT-TYPE
+    SYNTAX      TmnxDynSvcLocalAuthDbSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular per-user SAP
+         entry.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxDynSvcLocADbSapRowStatus."
+    INDEX       {
+        tmnxDynSvcLocAuthDbName,
+        tmnxDynSvcLocADbUsrName,
+        tmnxDynSvcLocADbSapIndex
+    }
+    ::= { tmnxDynSvcLocalAuthDbSapTable 1 }
+
+TmnxDynSvcLocalAuthDbSapEntry    ::= SEQUENCE
+{
+    tmnxDynSvcLocADbSapIndex         Unsigned32,
+    tmnxDynSvcLocADbSapRowStatus     RowStatus,
+    tmnxDynSvcLocADbSapLastCh        TimeStamp,
+    tmnxDynSvcLocADbSapSapId         DisplayString,
+    tmnxDynSvcLocADbSapPolicy        TNamedItemOrEmpty,
+    tmnxDynSvcLocADbSapScriptParams1 DisplayString,
+    tmnxDynSvcLocADbSapScriptParams2 DisplayString,
+    tmnxDynSvcLocADbSapScriptParams3 DisplayString,
+    tmnxDynSvcLocADbSapScriptParams4 DisplayString
+}
+
+tmnxDynSvcLocADbSapIndex         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapIndex specifies the index of this
+         entry."
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 1 }
+
+tmnxDynSvcLocADbSapRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 2 }
+
+tmnxDynSvcLocADbSapLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 3 }
+
+tmnxDynSvcLocADbSapSapId         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapSapId specifies the SAP identifier of
+         this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 4 }
+
+tmnxDynSvcLocADbSapPolicy        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapPolicy specifies the Dynamic Services
+         policy of this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 5 }
+
+tmnxDynSvcLocADbSapScriptParams1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..250))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapScriptParams1 specifies the Python
+         script parameters of this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 6 }
+
+tmnxDynSvcLocADbSapScriptParams2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..250))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapScriptParams2 specifies the Python
+         script parameters of this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 7 }
+
+tmnxDynSvcLocADbSapScriptParams3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..250))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapScriptParams3 specifies the Python
+         script parameters of this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 8 }
+
+tmnxDynSvcLocADbSapScriptParams4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..250))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbSapScriptParams4 specifies the Python
+         script parameters of this SAP entry."
+    DEFVAL      { "" }
+    ::= { tmnxDynSvcLocalAuthDbSapEntry 9 }
+
+tmnxDynSvcLocalAuthDbAcctTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxDynSvcLocalAuthDbAcctEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxDynSvcLocalAuthDbAcctTable allows accounting configuration of
+         per-user SAP entries in the local authentication databases defined in
+         the tmnxDynSvcLocalAuthDbSapTable."
+    ::= { tmnxDynSvcObjs 21 }
+
+tmnxDynSvcLocalAuthDbAcctEntry   OBJECT-TYPE
+    SYNTAX      TmnxDynSvcLocalAuthDbAcctEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the configuration for a particular accounting
+         instance.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to tmnxDynSvcLocADbAcctRowStatus."
+    INDEX       {
+        tmnxDynSvcLocAuthDbName,
+        tmnxDynSvcLocADbUsrName,
+        tmnxDynSvcLocADbSapIndex,
+        tmnxDynSvcLocADbAcctIndex
+    }
+    ::= { tmnxDynSvcLocalAuthDbAcctTable 1 }
+
+TmnxDynSvcLocalAuthDbAcctEntry   ::= SEQUENCE
+{
+    tmnxDynSvcLocADbAcctIndex        Unsigned32,
+    tmnxDynSvcLocADbAcctRowStatus    RowStatus,
+    tmnxDynSvcLocADbAcctLastCh       TimeStamp,
+    tmnxDynSvcLocADbAcctStatsType    INTEGER,
+    tmnxDynSvcLocADbAcctUpdateIvl    Unsigned32
+}
+
+tmnxDynSvcLocADbAcctIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbAcctIndex specifies the accounting
+         instance."
+    ::= { tmnxDynSvcLocalAuthDbAcctEntry 1 }
+
+tmnxDynSvcLocADbAcctRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbAcctRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxDynSvcLocalAuthDbAcctEntry 2 }
+
+tmnxDynSvcLocADbAcctLastCh       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbAcctLastCh indicates the sysUpTime at the
+         time of the most recent management-initiated change to this conceptual
+         row."
+    ::= { tmnxDynSvcLocalAuthDbAcctEntry 3 }
+
+tmnxDynSvcLocADbAcctStatsType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off        (1),
+        volumeTime (2),
+        time       (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbAcctStatsType specifies the type of
+         statistics."
+    DEFVAL      { off }
+    ::= { tmnxDynSvcLocalAuthDbAcctEntry 4 }
+
+tmnxDynSvcLocADbAcctUpdateIvl    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 5..259200)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcLocADbAcctUpdateIvl specifies the time interval
+         between consecutive accounting updates.
+
+         The value zero specifies that no intermediate updates be sent."
+    DEFVAL      { 0 }
+    ::= { tmnxDynSvcLocalAuthDbAcctEntry 5 }
+
+tmnxDynSvcPlcyTableLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcPlcyTableLastCh indicates the value
+         of sysUpTime at the time of the last modification of an entry in the
+         tmnxDynSvcPlcyTable."
+    ::= { tmnxDynSvcObjs 100 }
+
+tmnxDynSvcPlcyApTableLastCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcPlcyApTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcPlcyApTable."
+    ::= { tmnxDynSvcObjs 101 }
+
+tmnxDynSvcSapTableLastCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDynSvcSapTableLastCh indicates the sysUpTime at the
+         time of the last change of a row in the tmnxDynSvcSapTable or an
+         associated row in the tmnxDynSvcSapAcctTable.
+
+         If no changes occurred since the last re-initialization of the local
+         network management subsystem, then this object contains a zero value."
+    ::= { tmnxDynSvcObjs 102 }
+
+tmnxDynSvcRootObjTableLastCh     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcRootObjTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcRootObjTable."
+    ::= { tmnxDynSvcObjs 103 }
+
+tmnxDynSvcNonStoredRootObjCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcNonStoredRootObjCount indicates the
+         number of root objects that are currently not stored in the
+         tmnxDynSvcRootObjTable.
+
+         The value of tmnxDynSvcNonStoredRootObjCount can go back to 0 when the
+         objects that could not be stored in the tmnxDynSvcRootObjTable are
+         deleted again."
+    ::= { tmnxDynSvcObjs 104 }
+
+tmnxDynSvcSnippetTableLastCh     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcSnippetTable."
+    ::= { tmnxDynSvcObjs 105 }
+
+tmnxDynSvcSnipRootObjTblLastCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnipRootObjTblLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcSnippetRootObjTable."
+    ::= { tmnxDynSvcObjs 106 }
+
+tmnxDynSvcSnippetRefTableLastCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetRefTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcSnippetRefTable."
+    ::= { tmnxDynSvcObjs 107 }
+
+tmnxDynSvcSnippetResIdTblLastCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcSnippetResIdTblLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcSnippetResIdTable."
+    ::= { tmnxDynSvcObjs 108 }
+
+tmnxDynSvcStatsLastClearedTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcStatsLastClearedTime indicates the
+         value of sysUpTime at the time when the counters in
+         tmnxDynSvcStatsTable were last cleared."
+    ::= { tmnxDynSvcObjs 109 }
+
+tmnxDynSvcPlcyAuthTableLastCh    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcPlcyAuthTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcPlcyAuthTable."
+    ::= { tmnxDynSvcObjs 110 }
+
+tmnxDynSvcCaptureSapTableLastCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcCaptureSapTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcCaptureSapTable."
+    ::= { tmnxDynSvcObjs 111 }
+
+tmnxDynSvcCSapStatsLastClearTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcCSapStatsLastClearTime indicates the
+         value of sysUpTime at the time when the counters in
+         tmnxDynSvcCaptureSapStatsTable were last cleared."
+    ::= { tmnxDynSvcObjs 112 }
+
+tmnxDynSvcDataTriggerTableLastCh OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcDataTriggerTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcDataTriggerTable."
+    ::= { tmnxDynSvcObjs 113 }
+
+tmnxDynSvcLocADbTableLastCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcLocADbTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcLocalAuthDbTable."
+    ::= { tmnxDynSvcObjs 114 }
+
+tmnxDynSvcLocADbUsrTableLastCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcLocADbUsrTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcLocalAuthDbUserTable."
+    ::= { tmnxDynSvcObjs 115 }
+
+tmnxDynSvcLocADbSapTableLastCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcLocADbSapTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcLocalAuthDbSapTable."
+    ::= { tmnxDynSvcObjs 116 }
+
+tmnxDynSvcLocADbAcctTableLastCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDynSvcLocADbAcctTableLastCh indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the tmnxDynSvcLocalAuthDbAcctTable."
+    ::= { tmnxDynSvcObjs 117 }
+
+tmnxDynSvcNotificationObjs       OBJECT IDENTIFIER ::= { tmnxDynSvc 2 }
+
+tmnxDynSvcNotifDescription       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxDynSvcNotifDescription is a printable character string."
+    ::= { tmnxDynSvcNotificationObjs 1 }
+
+tmnxDynSvcNotifSapPortId         OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxDynSvcNotifSapPortId is the ID number of the access
+         port where a SAP is defined."
+    ::= { tmnxDynSvcNotificationObjs 2 }
+
+tmnxDynSvcNotifSapEncapValue     OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxDynSvcNotifSapEncapValue is the value of the label used
+         to identify a SAP on the access port specified by
+         tmnxDynSvcNotifSapPortId."
+    ::= { tmnxDynSvcNotificationObjs 3 }
+
+tmnxDynSvcNotifSapAcctSessionId  OBJECT-TYPE
+    SYNTAX      TmnxSubAcctSessionId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxDynSvcNotifSapAcctSessionId is the value of the
+         identifier used for accounting."
+    ::= { tmnxDynSvcNotificationObjs 4 }
+
+tmnxDynSvcConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 84 }
+
+tmnxDynSvcCompliances            OBJECT IDENTIFIER ::= { tmnxDynSvcConformance 1 }
+
+tmnxDynSvcCompliance             MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Dynamic Services on Nokia
+         7xxx series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDynSvcGroup
+        }
+    ::= { tmnxDynSvcCompliances 1 }
+
+tmnxDynSvcNotifyCompliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for Dynamic Services notifications on Nokia
+         SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDynSvcNotifyGroup
+        }
+    ::= { tmnxDynSvcCompliances 2 }
+
+tmnxDynSvcV14v0Compliance        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Dynamic Services on Nokia
+         7xxx series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDynSvcV14v0Group,
+            tmnxDynSvcObsoletedGroup
+        }
+    ::= { tmnxDynSvcCompliances 3 }
+
+tmnxDynSvcGroups                 OBJECT IDENTIFIER ::= { tmnxDynSvcConformance 2 }
+
+tmnxDynSvcGroup                  OBJECT-GROUP
+    OBJECTS     {
+        tmnxDynSvcPlcyRowStatus,
+        tmnxDynSvcPlcyLastCh,
+        tmnxDynSvcPlcyDescription,
+        tmnxDynSvcPlcyScriptPlcy,
+        tmnxDynSvcPlcyCliUser,
+        tmnxDynSvcPlcySapLimit,
+        tmnxDynSvcPlcyTableLastCh,
+        tmnxDynSvcPlcyApLastCh,
+        tmnxDynSvcPlcyApName,
+        tmnxDynSvcPlcyApStatsType,
+        tmnxDynSvcPlcyApUpdateInterval,
+        tmnxDynSvcPlcyApTableLastCh,
+        tmnxDynSvcRangeStart,
+        tmnxDynSvcRangeEnd,
+        tmnxDynSvcSapAcctSessionId,
+        tmnxDynSvcSapAcctSessionIdCtrl,
+        tmnxDynSvcSapPolicy,
+        tmnxDynSvcSapScriptsExecuted,
+        tmnxDynSvcSapScriptsSuccess,
+        tmnxDynSvcSapLastScriptAction,
+        tmnxDynSvcSapLastScriptTime,
+        tmnxDynSvcSapOrphaned,
+        tmnxDynSvcSapService,
+        tmnxDynSvcSapLastScriptParams,
+        tmnxDynSvcSapTableLastCh,
+        tmnxDynSvcSapAcctAcctStatus,
+        tmnxDynSvcSapAcctStatsType,
+        tmnxDynSvcSapAcctAcctInterval,
+        tmnxDynSvcPlcyApUpdateIvlJitter,
+        tmnxDynSvcRootObjInstance,
+        tmnxDynSvcRootObjOrphanTime,
+        tmnxDynSvcRootObjSnippetName,
+        tmnxDynSvcRootObjSnippetInstance,
+        tmnxDynSvcRootObjTableLastCh,
+        tmnxDynSvcNonStoredRootObjCount,
+        tmnxDynSvcStatsDescr,
+        tmnxDynSvcStatsVal,
+        tmnxDynSvcSnippetRefCount,
+        tmnxDynSvcSnippetDictLength,
+        tmnxDynSvcSnippetRootObjOid,
+        tmnxDynSvcSnippetRefSnipName,
+        tmnxDynSvcSnippetRefSnipInst,
+        tmnxDynSvcSnippetResIdType,
+        tmnxDynSvcSnippetResIdValue,
+        tmnxDynSvcSnippetTableLastCh,
+        tmnxDynSvcSnipRootObjTblLastCh,
+        tmnxDynSvcSnippetRefTableLastCh,
+        tmnxDynSvcSnippetResIdTblLastCh,
+        tmnxDynSvcTimerAccSetupTimeout,
+        tmnxDynSvcStatsLastClearedTime
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects for the management of Dynamic Services on Nokia
+         SROS series systems."
+    ::= { tmnxDynSvcGroups 1 }
+
+tmnxDynSvcV14v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxDynSvcPlcyRowStatus,
+        tmnxDynSvcPlcyLastCh,
+        tmnxDynSvcPlcyDescription,
+        tmnxDynSvcPlcyScriptPlcy,
+        tmnxDynSvcPlcyCliUser,
+        tmnxDynSvcPlcySapLimit,
+        tmnxDynSvcPlcyTableLastCh,
+        tmnxDynSvcPlcyApLastCh,
+        tmnxDynSvcPlcyApName,
+        tmnxDynSvcPlcyApStatsType,
+        tmnxDynSvcPlcyApUpdateInterval,
+        tmnxDynSvcPlcyApTableLastCh,
+        tmnxDynSvcRangeStart,
+        tmnxDynSvcRangeEnd,
+        tmnxDynSvcSapAcctSessionId,
+        tmnxDynSvcSapAcctSessionIdCtrl,
+        tmnxDynSvcSapPolicy,
+        tmnxDynSvcSapScriptsExecuted,
+        tmnxDynSvcSapScriptsSuccess,
+        tmnxDynSvcSapLastScriptAction,
+        tmnxDynSvcSapLastScriptTime,
+        tmnxDynSvcSapService,
+        tmnxDynSvcSapLastScriptParams,
+        tmnxDynSvcSapTableLastCh,
+        tmnxDynSvcSapAcctAcctStatus,
+        tmnxDynSvcSapAcctStatsType,
+        tmnxDynSvcSapAcctAcctInterval,
+        tmnxDynSvcPlcyApUpdateIvlJitter,
+        tmnxDynSvcRootObjInstance,
+        tmnxDynSvcRootObjOrphanTime,
+        tmnxDynSvcRootObjSnippetName,
+        tmnxDynSvcRootObjSnippetInstance,
+        tmnxDynSvcRootObjTableLastCh,
+        tmnxDynSvcNonStoredRootObjCount,
+        tmnxDynSvcStatsDescr,
+        tmnxDynSvcStatsVal,
+        tmnxDynSvcSnippetRefCount,
+        tmnxDynSvcSnippetDictLength,
+        tmnxDynSvcSnippetRootObjOid,
+        tmnxDynSvcSnippetRefSnipName,
+        tmnxDynSvcSnippetRefSnipInst,
+        tmnxDynSvcSnippetResIdType,
+        tmnxDynSvcSnippetResIdValue,
+        tmnxDynSvcSnippetTableLastCh,
+        tmnxDynSvcSnipRootObjTblLastCh,
+        tmnxDynSvcSnippetRefTableLastCh,
+        tmnxDynSvcSnippetResIdTblLastCh,
+        tmnxDynSvcTimerAccSetupTimeout,
+        tmnxDynSvcStatsLastClearedTime,
+        tmnxDynSvcPlcyAuthLastCh,
+        tmnxDynSvcPlcyAuthRadiusSrvPlcy,
+        tmnxDynSvcPlcyAuthPassword,
+        tmnxDynSvcPlcyAuthLocalDb,
+        tmnxDynSvcPlcyAuthTableLastCh,
+        tmnxDynSvcCaptureSapLastCh,
+        tmnxDynSvcCaptureSapAdminState,
+        tmnxDynSvcCaptureSapPolicy,
+        tmnxDynSvcCaptureSapTableLastCh,
+        tmnxDynSvcCSapStatsRxPackets,
+        tmnxDynSvcCSapDropReason,
+        tmnxDynSvcCSapDropCounter,
+        tmnxDynSvcCSapStatsLastClearTime,
+        tmnxDynSvcDataTriggerTableLastCh,
+        tmnxDynSvcDTriggerAcctSessionId,
+        tmnxDynSvcDTriggerMacAddress,
+        tmnxDynSvcDTriggerIpAddressType,
+        tmnxDynSvcDTriggerIpAddress,
+        tmnxDynSvcDTriggerState,
+        tmnxDynSvcLocADbTableLastCh,
+        tmnxDynSvcLocADbUsrTableLastCh,
+        tmnxDynSvcLocADbSapTableLastCh,
+        tmnxDynSvcLocADbAcctTableLastCh,
+        tmnxDynSvcLocAuthDbRowStatus,
+        tmnxDynSvcLocAuthDbLastCh,
+        tmnxDynSvcLocAuthDbAdminState,
+        tmnxDynSvcLocAuthDbDescription,
+        tmnxDynSvcLocADbUsrRowStatus,
+        tmnxDynSvcLocADbUsrLastCh,
+        tmnxDynSvcLocADbUsrAdminState,
+        tmnxDynSvcLocADbUsrDescription,
+        tmnxDynSvcLocADbSapRowStatus,
+        tmnxDynSvcLocADbSapLastCh,
+        tmnxDynSvcLocADbSapSapId,
+        tmnxDynSvcLocADbSapPolicy,
+        tmnxDynSvcLocADbSapScriptParams1,
+        tmnxDynSvcLocADbSapScriptParams2,
+        tmnxDynSvcLocADbSapScriptParams3,
+        tmnxDynSvcLocADbSapScriptParams4,
+        tmnxDynSvcLocADbAcctRowStatus,
+        tmnxDynSvcLocADbAcctLastCh,
+        tmnxDynSvcLocADbAcctStatsType,
+        tmnxDynSvcLocADbAcctUpdateIvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the management of Dynamic Services on Nokia
+         SROS series systems in release 14.0."
+    ::= { tmnxDynSvcGroups 2 }
+
+tmnxDynSvcObsoletedGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxDynSvcSapOrphaned
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted objects for the management of Dynamic Services
+         on Nokia SROS series systems."
+    ::= { tmnxDynSvcGroups 98 }
+
+tmnxDynSvcNotifyObjsGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxDynSvcNotifSapAcctSessionId,
+        tmnxDynSvcNotifSapPortId,
+        tmnxDynSvcNotifSapEncapValue,
+        tmnxDynSvcNotifDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting Dynamic Services
+         notifications on Nokia SROS series systems."
+    ::= { tmnxDynSvcGroups 99 }
+
+tmnxDynSvcNotifyGroup            NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxDynSvcSapFailed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting Dynamic Services on Nokia SROS
+         series systems."
+    ::= { tmnxDynSvcGroups 100 }
+
+tmnxDynSvcNotifyPrefix           OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 84 }
+
+tmnxDynSvcNotifications          OBJECT IDENTIFIER ::= { tmnxDynSvcNotifyPrefix 0 }
+
+tmnxDynSvcSapFailed              NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxDynSvcNotifSapAcctSessionId,
+        tmnxDynSvcNotifSapPortId,
+        tmnxDynSvcNotifSapEncapValue,
+        tmnxDynSvcNotifDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxDynSvcSapFailed notification is sent when a Dynamic
+         Services service SAP creation, modification or removal failed.
+
+         [EFFECT] The desired new configuration is not in effect; the system
+         has returned to the original configuration if possible.
+
+         [RECOVERY] No recovery is necessary when the original configuration
+         could be restored.
+
+         If the SAP does not exist in the tmnxDynSvcSapTable at the time of
+         this notification, the value 'invalid portid' is put in the object
+         tmnxDynSvcNotifSapPortId."
+    ::= { tmnxDynSvcNotifications 1 }
+
+END

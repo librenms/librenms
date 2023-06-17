@@ -1,0 +1,313 @@
+TIMETRA-IPSEC-STATIC-SA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeStamp
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TNamedItem, TNamedItemOrEmpty
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraIPsecStaticSAMIBModule    MODULE-IDENTITY
+    LAST-UPDATED "200912140000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB  module to manage and provision
+         the  Nokia SROS device with IPsec Static SA tunneling,
+         encryption and other related features.
+
+         Copyright 2008-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "200912140000Z"
+    DESCRIPTION
+        "Rev 8.0                14 Dec 2009 00:00
+         8.0 release of the TIMETRA-IPSEC-STATIC-SA-MIB."
+
+    ::= { timetraSRMIBModules 73 }
+
+TmnxAuthAlgorithm                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxAuthAlgorithm data type is an enumerated integer that describes
+         the values used to identify the hashing algorithm.
+
+         Value Descriptions:
+
+         null   - Choosing this value configures the high-speed
+                  null algorithm, which does nothing. This is same
+                  as not having authentication turned on, same as
+                  turning the protocol off.
+
+         md5    - Choosing this value configures the use of
+                  hmac-md5 algorithm for authentication.
+
+         sha1   - Choosing this value configures the use of
+                  hmac-sha1 algorithm for authentication."
+    SYNTAX      INTEGER {
+        null (1),
+        md5  (2),
+        sha1 (3)
+    }
+
+TmnxIPsecDirection2              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIPsecDirection data type is an enumerated integer that describes
+         the values used to identify the direction of an IPsec tunnel."
+    SYNTAX      INTEGER {
+        inbound       (1),
+        outbound      (2),
+        bidirectional (3)
+    }
+
+TmnxIPsecProtocol                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIPsecProtocol data type is an enumerated integer that describes
+         the values used to identify the used IPsec protocol."
+    SYNTAX      INTEGER {
+        ah  (1),
+        esp (2)
+    }
+
+tmnxIPsecStaticSAObjects         OBJECT IDENTIFIER ::= { tmnxSRObjs 73 }
+
+tmnxIPsecStaticSATableLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSATableLastChange indicates the sysUpTime
+         at the time of the last modification to tmnxIPsecStaticSATable by
+         adding, deleting an entry or change to a writable object in the table.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxIPsecStaticSAObjects 1 }
+
+tmnxIPsecStaticSATable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxIPsecStaticSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to store the IPsec static SA entries."
+    ::= { tmnxIPsecStaticSAObjects 2 }
+
+tmnxIPsecStaticSAEntry           OBJECT-TYPE
+    SYNTAX      TmnxIPsecStaticSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single IPsec static SA entry."
+    INDEX       { IMPLIED tmnxIPsecStaticSAName }
+    ::= { tmnxIPsecStaticSATable 1 }
+
+TmnxIPsecStaticSAEntry           ::= SEQUENCE
+{
+    tmnxIPsecStaticSAName            TNamedItem,
+    tmnxIPsecStaticSARowStatus       RowStatus,
+    tmnxIPsecStaticSALastChanged     TimeStamp,
+    tmnxIPsecStaticSADirection       TmnxIPsecDirection2,
+    tmnxIPsecStaticSAProtocol        TmnxIPsecProtocol,
+    tmnxIPsecStaticSAAuthAlgorithm   TmnxAuthAlgorithm,
+    tmnxIPsecStaticSAAuthKey         OCTET STRING,
+    tmnxIPsecStaticSASpi             Unsigned32,
+    tmnxIPsecStaticSADescription     TNamedItemOrEmpty
+}
+
+tmnxIPsecStaticSAName            OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSAName specifies the name of this static
+         SA and is part of the index for the table tmnxIPsecStaticSATable, and
+         thus a required object."
+    ::= { tmnxIPsecStaticSAEntry 1 }
+
+tmnxIPsecStaticSARowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxIPsecStaticSARowStatus object is used to create and delete
+         rows in the tmnxIPsecStaticSATable.
+
+         When creating an entry in tmnxIPsecStaticSATable, the value of
+         tmnxIPsecStaticSARowStatus must be 'createAndGo'."
+    ::= { tmnxIPsecStaticSAEntry 2 }
+
+tmnxIPsecStaticSALastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSALastChanged indicates the sysUpTime at
+         the time of the last modification of this entry.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxIPsecStaticSAEntry 3 }
+
+tmnxIPsecStaticSADirection       OBJECT-TYPE
+    SYNTAX      TmnxIPsecDirection2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSADirection specifies the direction to
+         which this static SA entry can be applied.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { bidirectional }
+    ::= { tmnxIPsecStaticSAEntry 4 }
+
+tmnxIPsecStaticSAProtocol        OBJECT-TYPE
+    SYNTAX      TmnxIPsecProtocol
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSAProtocol specifies the protocol used by
+         this static SA.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { esp }
+    ::= { tmnxIPsecStaticSAEntry 5 }
+
+tmnxIPsecStaticSAAuthAlgorithm   OBJECT-TYPE
+    SYNTAX      TmnxAuthAlgorithm
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSAAuthAlgorithm specifies the
+         authentication algorithm used with this static SA.
+
+         The 'md5' algorithm requires a 16 byte key, and the 'sha1' algorithm
+         requires a 20 byte key.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { sha1 }
+    ::= { tmnxIPsecStaticSAEntry 6 }
+
+tmnxIPsecStaticSAAuthKey         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..20))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSAAuthKey specifies the key used for the
+         authentication algorithm defined by tmnxIPsecStaticSAAuthAlgorithm.
+
+         The length of the key must match the length required by the
+         authentication algorithm. If a key of another length is set, the
+         request will fail with an 'inconsistentValue' error.
+
+         The default value for tmnxIPsecStaticSAAuthKey is an empty string, in
+         this case the static SA cannot be used.
+
+         When read, tmnxIPsecStaticSAAuthKey always returns an octet string of
+         length zero.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { "" }
+    ::= { tmnxIPsecStaticSAEntry 7 }
+
+tmnxIPsecStaticSASpi             OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 256..16383)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSASpi specifies the SPI (Security
+         Parameter Index) used to lookup the instruction to verify and decrypt
+         the incoming IPsec packets when the value of
+         tmnxIPsecStaticSADirection is 'inbound'.
+
+         The value of tmnxIPsecStaticSASpi specifies the SPI that will be used
+         in the encoding of the outgoing packets when the value of
+         tmnxIPsecStaticSADirection is 'outbound'.  The remote node can use this
+         SPI to lookup the instruction to verify and decrypt the packet.
+
+         If 'no' SPI is selected, then this static SA cannot be used.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { 0 }
+    ::= { tmnxIPsecStaticSAEntry 8 }
+
+tmnxIPsecStaticSADescription     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIPsecStaticSADescription describes this static SA.
+
+         This is an optional object when creating an entry in
+         tmnxIPsecStaticSATable."
+    DEFVAL      { "" }
+    ::= { tmnxIPsecStaticSAEntry 9 }
+
+tmnxIPsecStaticSAConformance     OBJECT IDENTIFIER ::= { tmnxSRConfs 73 }
+
+tmnxIPsecStaticSACompliances     OBJECT IDENTIFIER ::= { tmnxIPsecStaticSAConformance 1 }
+
+tmnxIPsecStaticSAV8v0Compliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of IPsec static SA features on
+         Nokia 7x50 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxIPsecStaticSAGroup
+        }
+    ::= { tmnxIPsecStaticSACompliances 1 }
+
+tmnxIPsecStaticSAGroups          OBJECT IDENTIFIER ::= { tmnxIPsecStaticSAConformance 2 }
+
+tmnxIPsecStaticSAGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxIPsecStaticSATableLastChange,
+        tmnxIPsecStaticSARowStatus,
+        tmnxIPsecStaticSALastChanged,
+        tmnxIPsecStaticSADirection,
+        tmnxIPsecStaticSAProtocol,
+        tmnxIPsecStaticSAAuthAlgorithm,
+        tmnxIPsecStaticSAAuthKey,
+        tmnxIPsecStaticSASpi,
+        tmnxIPsecStaticSADescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for IPsec static SA on Nokia 7xx0 SR series
+         systems."
+    ::= { tmnxIPsecStaticSAGroups 1 }
+
+END

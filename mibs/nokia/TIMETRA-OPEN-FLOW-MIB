@@ -1,0 +1,2079 @@
+TIMETRA-OPEN-FLOW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressIPv6,
+    InetAddressType, InetPortNumber
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TLNamedItemOrEmpty, TNamedItem,
+    TNamedItemOrEmpty, TmnxAdminState,
+    TmnxEnabledDisabled, TmnxOperState,
+    TmnxPortID, TmnxServId
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraOpenFlowMIBModule         MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of open-flow.
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0               1 Jan 2017 00:00
+         15.0 release of the TIMETRA-OPEN-FLOW-MIB."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               1 Jan 2016 00:00
+         14.0 release of the TIMETRA-OPEN-FLOW-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               1 Jan 2015 00:00
+         13.0 release of the TIMETRA-OPEN-FLOW-MIB."
+
+    REVISION    "201401010000Z"
+    DESCRIPTION
+        "Rev 0.1                1 Jan 2014 00:00
+         Initial version of the TIMETRA-OPEN-FLOW-MIB."
+
+    ::= { timetraSRMIBModules 93 }
+
+TmnxOFDatapathIdentifier         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "64-bit Organizationally Unique Identifier. The lower 48-bits are
+         open-flow switch MAC address and the upper 16-bits are implementation
+         dependent."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TmnxOFPktType                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxOFPktType specifies the type of packet exchanged
+         between an open-flow switch and the controller."
+    SYNTAX      INTEGER {
+        hello                 (1),
+        error                 (2),
+        echoRequest           (3),
+        echoReply             (4),
+        experimenter          (5),
+        featureRequest        (6),
+        featureReply          (7),
+        getConfigRequest      (8),
+        getConfigReply        (9),
+        setConfig             (10),
+        packetIn              (11),
+        flowRemoved           (12),
+        portStatus            (13),
+        packetOut             (14),
+        flowMod               (15),
+        groupMod              (16),
+        portMod               (17),
+        tableMod              (18),
+        multipartRequest      (19),
+        multipartReply        (20),
+        barrierRequest        (21),
+        barrierReply          (22),
+        getQueueConfigRequest (23),
+        getQueueConfigReply   (24),
+        roleRequest           (25),
+        roleReply             (26),
+        getAsyncRequest       (27),
+        getAsyncReply         (28),
+        setAsync              (29),
+        meterMod              (30)
+    }
+
+TmnxOFAsyncFltrPacketIn          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxOFAsyncFltrPacketIn specifies the asynchronous filter
+         bitmap for message type 'packet-in'."
+    SYNTAX      BITS {
+        tableMiss   (0),
+        applyAction (1),
+        invalidTTL  (2)
+    }
+
+TmnxOFAsyncFltrPortStatus        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxOFAsyncFltrPortStatus specifies the asynchronous
+         filter bitmap for message type 'port-status'."
+    SYNTAX      BITS {
+        portAdd    (0),
+        portDelete (1),
+        portModify (2)
+    }
+
+TmnxOFAsyncFltrFlowRemoved       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxOFAsyncFltrFlowRemoved specifies the asynchronous
+         filter bitmap for message type 'flow-removed'."
+    SYNTAX      BITS {
+        idleTimeOut   (0),
+        hardTimeOut   (1),
+        flowModDelete (2),
+        groupDelete   (3)
+    }
+
+tmnxOpenFlow                     OBJECT IDENTIFIER ::= { tmnxSRObjs 93 }
+
+tmnxOpenFlowObjs                 OBJECT IDENTIFIER ::= { tmnxOpenFlow 1 }
+
+tmnxOFSwitchTableLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchTableLastChanged indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxOFSwitchTable."
+    ::= { tmnxOpenFlowObjs 1 }
+
+tmnxOFSwitchTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFSwitchTable contains objects to configure an open-flow
+         switch."
+    ::= { tmnxOpenFlowObjs 2 }
+
+tmnxOFSwitchEntry                OBJECT-TYPE
+    SYNTAX      TmnxOFSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchEntry represents an open-flow switch
+         configuration information.
+
+         Entries are created and deleted by the user."
+    INDEX       { tmnxOFSwitchName }
+    ::= { tmnxOFSwitchTable 1 }
+
+TmnxOFSwitchEntry                ::= SEQUENCE
+{
+    tmnxOFSwitchName                 TNamedItem,
+    tmnxOFSwitchRowStatus            RowStatus,
+    tmnxOFSwitchLastChanged          TimeStamp,
+    tmnxOFSwitchEchoInterval         Unsigned32,
+    tmnxOFSwitchEchoMultiple         Unsigned32,
+    tmnxOFSwitchLogicalPortStatus    BITS,
+    tmnxOFSwitchAdminState           TmnxAdminState,
+    tmnxOFSwitchDescription          DisplayString,
+    tmnxOFSwitchDataPathID           TmnxOFDatapathIdentifier,
+    tmnxOFSwitchFeaturesBufferSize   Unsigned32,
+    tmnxOFSwitchFeaturesNumTables    Unsigned32,
+    tmnxOFSwitchFeaturesCapability   BITS,
+    tmnxOFSwitchAuxChannelEnabled    TruthValue,
+    tmnxOFSwitchID                   Unsigned32
+}
+
+tmnxOFSwitchName                 OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchName specifies the name of this open-flow
+         switch."
+    ::= { tmnxOFSwitchEntry 1 }
+
+tmnxOFSwitchRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchRowStatus controls the creation and deletion
+         of rows in the table."
+    ::= { tmnxOFSwitchEntry 2 }
+
+tmnxOFSwitchLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchLastChanged indicates the sysUpTime at the
+         time of the most recent change to this open-flow switch."
+    ::= { tmnxOFSwitchEntry 3 }
+
+tmnxOFSwitchEchoInterval         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchEchoInterval specifies the time interval
+         between two consecutive open-flow echo request transmissions for a
+         given open-flow session."
+    DEFVAL      { 10 }
+    ::= { tmnxOFSwitchEntry 4 }
+
+tmnxOFSwitchEchoMultiple         OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchEchoMultiple specifies the number of
+         consecutive open-flow echo reply message lost to terminate the
+         open-flow session. Once the open-flow channel is terminated, retry to
+         open the session is initiated using non-configurable retry timer
+         sequence."
+    DEFVAL      { 3 }
+    ::= { tmnxOFSwitchEntry 5 }
+
+tmnxOFSwitchLogicalPortStatus    OBJECT-TYPE
+    SYNTAX      BITS {
+        rsvpTe (0),
+        mplsTp (1),
+        srTe   (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchLogicalPortStatus specifies a bit mask for
+         the type of reporting for logical open-flow ports (interfaces with
+         open-flow enabled) to the controller.
+
+         Setting the 'rsvpTe(0)' bit reports status/statistics for all RSVP-TE
+         LSPs present in the system that are used as output port in flow-table
+         to redirect all RSVP LSPs.
+
+         Setting the 'mplsTp(1)' bit reports status/statistics for all MPLS-TP
+         LSPs present in the system that are used as output port in flow-table
+         to redirect MPLS-TP LSPs.
+
+         Setting the 'srTe(2)' bit reports status/statistics for all SR-TE LSPs
+         present in the system that are used as output port in flow-table to
+         redirect SR-TE LSPs.
+
+         By default, all bits are cleared."
+    DEFVAL      { {} }
+    ::= { tmnxOFSwitchEntry 6 }
+
+tmnxOFSwitchAdminState           OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchAdminState specifies the desired
+         administrative state of an open-flow switch instance."
+    DEFVAL      { outOfService }
+    ::= { tmnxOFSwitchEntry 7 }
+
+tmnxOFSwitchDescription          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchDescription specifies the user provided
+         description for this open-flow switch instance."
+    DEFVAL      { ''H }
+    ::= { tmnxOFSwitchEntry 8 }
+
+tmnxOFSwitchDataPathID           OBJECT-TYPE
+    SYNTAX      TmnxOFDatapathIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchDataPathID indicates a 64-bit identifier for
+         this open-flow switch instance. The lower 48-bits are its MAC address
+         and the upper 16-bits are implementation dependent."
+    ::= { tmnxOFSwitchEntry 9 }
+
+tmnxOFSwitchFeaturesBufferSize   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchFeaturesBufferSize indicates the maximum
+         number of packets this open-flow switch instance can buffer while
+         sending the packets to the controller when the message type is
+         'packet-in'."
+    ::= { tmnxOFSwitchEntry 10 }
+
+tmnxOFSwitchFeaturesNumTables    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchFeaturesNumTables indicates the number of
+         open-flow tables associated with this switch instance."
+    ::= { tmnxOFSwitchEntry 11 }
+
+tmnxOFSwitchFeaturesCapability   OBJECT-TYPE
+    SYNTAX      BITS {
+        flowStats  (0),
+        tableStats (1),
+        portStats  (2),
+        groupStats (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchFeaturesCapability indicates the bitmap of
+         capabilities supported by the datapath associated with this open-flow
+         switch instance."
+    ::= { tmnxOFSwitchEntry 12 }
+
+tmnxOFSwitchAuxChannelEnabled    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchAuxChannelEnabled specifies whether the
+         auxiliary connection (channel) exits between the controller and the
+         open-flow switch.
+
+         When the value of tmnxOFSwitchAuxChannelEnabled is set to 'true (1)',
+         the auxiliary statistics channel is established for sending statistics
+         information. Additionally, the auxiliary packet-in channel is
+         established for sending packet-in information, if the value of
+         tmnxOFFlowTableNoMatchAction is set to 'packetIn (3). If the packet-in
+         auxiliary channel could not be established, the auxiliary statistics
+         channel will be used is present. If the auxiliary channel could not be
+         established, main channel will be used.
+
+         When the value of tmnxOFSwitchAuxChannelEnabled is set to 'false (2)',
+         the auxiliary channel won't established and main channel will be used."
+    DEFVAL      { false }
+    ::= { tmnxOFSwitchEntry 13 }
+
+tmnxOFSwitchID                   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFSwitchID specifies a 16-bit unique identifier for
+         this open-flow switch instance."
+    DEFVAL      { 0 }
+    ::= { tmnxOFSwitchEntry 14 }
+
+tmnxOFControllerTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerTableLastChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         tmnxOFControllerTable."
+    ::= { tmnxOpenFlowObjs 3 }
+
+tmnxOFControllerTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFControllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFControllerTable contains objects to configure an open-flow
+         controller."
+    ::= { tmnxOpenFlowObjs 4 }
+
+tmnxOFControllerEntry            OBJECT-TYPE
+    SYNTAX      TmnxOFControllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerEntry represents an open-flow controller
+         configuration information that is connected to open-flow switch
+         specified by tmnxOFSwitchName.
+
+         Entries are created and deleted by the user."
+    INDEX       {
+        tmnxOFSwitchName,
+        tmnxOFControllerAddressType,
+        tmnxOFControllerAddress,
+        tmnxOFControllerTCPPort
+    }
+    ::= { tmnxOFControllerTable 1 }
+
+TmnxOFControllerEntry            ::= SEQUENCE
+{
+    tmnxOFControllerAddressType      InetAddressType,
+    tmnxOFControllerAddress          InetAddress,
+    tmnxOFControllerTCPPort          InetPortNumber,
+    tmnxOFControllerRowStatus        RowStatus,
+    tmnxOFControllerLastChanged      TimeStamp,
+    tmnxOFControllerRole             INTEGER,
+    tmnxOFControllerGenID            Counter64,
+    tmnxOFControllerTLSProfileName   TNamedItemOrEmpty,
+    tmnxOFControllerServiceID        TmnxServId,
+    tmnxOFControllerLoopbckAddrType  InetAddressType,
+    tmnxOFControllerLoopbackAddr     InetAddress,
+    tmnxOFControllerSvcName          TLNamedItemOrEmpty
+}
+
+tmnxOFControllerAddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerAddressType specifies the address type of
+         the controller IP address specified by tmnxOFControllerAddress."
+    ::= { tmnxOFControllerEntry 1 }
+
+tmnxOFControllerAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerAddress specifies IP address of the
+         controller connected to open-flow switch specified by
+         tmnxOFSwitchName."
+    ::= { tmnxOFControllerEntry 2 }
+
+tmnxOFControllerTCPPort          OBJECT-TYPE
+    SYNTAX      InetPortNumber (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerTCPPort specifies the TCP port number of
+         the controller connected to open-flow switch specified by
+         tmnxOFSwitchName."
+    ::= { tmnxOFControllerEntry 3 }
+
+tmnxOFControllerRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxOFControllerEntry 4 }
+
+tmnxOFControllerLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerLastChanged indicates the sysUpTime at
+         the time of the most recent change to this controller."
+    ::= { tmnxOFControllerEntry 5 }
+
+tmnxOFControllerRole             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noChange (0),
+        equal    (1),
+        master   (2),
+        slave    (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerRole indicates the role of the controller
+         connected to an open-flow switch specified by tmnxOFSwitchName."
+    ::= { tmnxOFControllerEntry 6 }
+
+tmnxOFControllerGenID            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerGenID indicates 64-bit generation
+         identifier used for checking of stale messages when the value of
+         tmnxOFControllerRole is 'master (2)' or 'slave (3)'."
+    ::= { tmnxOFControllerEntry 7 }
+
+tmnxOFControllerTLSProfileName   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerTLSProfileName specifies the
+         TIMETRA-TLS-MIB::tTlsClntProfileName used by the controller specified
+         by tmnxOFControllerAddress and tmnxOFControllerTCPPort."
+    DEFVAL      { ''H }
+    ::= { tmnxOFControllerEntry 8 }
+
+tmnxOFControllerServiceID        OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The  unique value which identifies the Service identifier."
+    DEFVAL      { 0 }
+    ::= { tmnxOFControllerEntry 9 }
+
+tmnxOFControllerLoopbckAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerLoopbckAddrType specifies the address
+         type of the controller IP address specified by
+         tmnxOFControllerAddress."
+    DEFVAL      { unknown }
+    ::= { tmnxOFControllerEntry 10 }
+
+tmnxOFControllerLoopbackAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerLoopbackAddr specifies the  controller
+         loop back IP address."
+    DEFVAL      { ''H }
+    ::= { tmnxOFControllerEntry 11 }
+
+tmnxOFControllerSvcName          OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFControllerSvcName specifies the service name
+         associated with this entry."
+    DEFVAL      { ''H }
+    ::= { tmnxOFControllerEntry 12 }
+
+tmnxOFFlowTableTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableTableLastChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         tmnxOFFlowTableTable."
+    ::= { tmnxOpenFlowObjs 5 }
+
+tmnxOFFlowTableTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFFlowTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFFlowTableTable contains objects to configure a flow-table
+         per open-flow switch instance."
+    ::= { tmnxOpenFlowObjs 6 }
+
+tmnxOFFlowTableEntry             OBJECT-TYPE
+    SYNTAX      TmnxOFFlowTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableEntry represents a flow-table specific to
+         to an open-flow switch instance.
+
+         The current release does not support multiple multiple flow-table,
+         therefore there will not be more than one row entry in this table;
+         attempts to create additional rows in this table will be denied."
+    INDEX       {
+        tmnxOFSwitchName,
+        tmnxOFFlowTableId
+    }
+    ::= { tmnxOFFlowTableTable 1 }
+
+TmnxOFFlowTableEntry             ::= SEQUENCE
+{
+    tmnxOFFlowTableId                Unsigned32,
+    tmnxOFFlowTableRowStatus         RowStatus,
+    tmnxOFFlowTableLastChanged       TimeStamp,
+    tmnxOFFlowTableMaxSize           Unsigned32,
+    tmnxOFFlowTableNoMatchAction     INTEGER,
+    tmnxOFFlowTableNumEntries        Unsigned32,
+    tmnxOFFlowTableOperStatus        TmnxOperState,
+    tmnxOFFlowTableSwitchDefCookie   TmnxEnabledDisabled
+}
+
+tmnxOFFlowTableId                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableId specifies the unique identifier for the
+         flow table per open-flow switch instance.
+
+         Current release supports one flow-table per open-flow switch instance
+         with the value of tmnxOFFlowTableId equal to 0."
+    ::= { tmnxOFFlowTableEntry 1 }
+
+tmnxOFFlowTableRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableRowStatus controls the creation and
+         deletion of rows in the table. The row entry for tmnxOFFlowTableId
+         equal 0 cannot be deleted."
+    ::= { tmnxOFFlowTableEntry 2 }
+
+tmnxOFFlowTableLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableLastChanged indicates the sysUpTime at the
+         time of the most recent change to this flow-table."
+    ::= { tmnxOFFlowTableEntry 3 }
+
+tmnxOFFlowTableMaxSize           OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..524288)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableMaxSize specifies the maximum number of
+         entries that the flow table can have. The maximum size cannot be
+         changed if any entries are present in the flow-table."
+    DEFVAL      { 1000 }
+    ::= { tmnxOFFlowTableEntry 4 }
+
+tmnxOFFlowTableNoMatchAction     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        drop        (1),
+        fallThrough (2),
+        packetIn    (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableNoMatchAction specifies the action to be
+         performed when no match is found in the flow table.
+
+         When the value of tmnxOFFlowTableNoMatchAction is set to 'drop (1)',
+         packets are dropped if no match is found in flow table.
+
+         When the value of tmnxOFFlowTableNoMatchAction is set to 'fall-through
+         (2), evaluating is continued based on filter policy.
+
+         When the value of tmnxOFFlowTableNoMatchAction is set to 'packetIn
+         (3)', packets are forwarded to the controller if no match is found in
+         flow table."
+    DEFVAL      { fallThrough }
+    ::= { tmnxOFFlowTableEntry 5 }
+
+tmnxOFFlowTableNumEntries        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableNumEntries indicates the total number of
+         open-flow entries currently present in the flow-table."
+    ::= { tmnxOFFlowTableEntry 6 }
+
+tmnxOFFlowTableOperStatus        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableOperStatus indicates the operational
+         status of the flow table for a given open-flow switch instance."
+    ::= { tmnxOFFlowTableEntry 7 }
+
+tmnxOFFlowTableSwitchDefCookie   OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFFlowTableSwitchDefCookie specifies whether to
+         enable switch-defined cookie encoding or use standard cookie encoding
+         for this flow-table.
+
+         When the value of tmnxOFFlowTableSwitchDefCookie is set to 'disabled
+         (2)', open-flow controller uses standard cookie encoding.
+
+         When the value of tmnxOFFlowTableSwitchDefCookie is set to 'enabled
+         (1)', open-flow controller encodes cookie with special information
+         detailed below:
+
+         64          60 59                     32 31                     0
+         +-------------+-------------------------+-----------------------+
+         | cookie-type |  switch-defined-cookie  |  standard-flow-cookie |
+         +-------------+-------------------------+-----------------------+
+
+          Cookie Name  Cookie Type    Cookie Value    Cookie Usage
+                       (Bits 63..60)  (Bits 59..32)
+          -----------  -------------  ------------    -------------------------
+          grt          0 0 0 0        0               use this cookie value to
+                                                      program flowtable rules
+                                                      to be used in GRT instance
+
+          system       1 0 0 0        0               use this cookie value to
+                                                      program flowtable rules
+                                                      to be used in system
+                                                      filters
+
+          service      1 1 0 0        service-id for  use this cookie value to
+                                      'vpls' or       program flowtable rules
+                                      'vprn'          to be used in 'vpls' or
+                                      services        'vprn' service-types
+
+
+          All other values for the cookie are reserved."
+    DEFVAL      { disabled }
+    ::= { tmnxOFFlowTableEntry 8 }
+
+tmnxOFChannelInfoTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFChannelInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFChannelInfoTable contains channel information used for
+         exchanging messages between open-flow switch and controller."
+    ::= { tmnxOpenFlowObjs 7 }
+
+tmnxOFChannelInfoEntry           OBJECT-TYPE
+    SYNTAX      TmnxOFChannelInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelInfoEntry specifies channel information
+         associated an open-flow switch and the controller used for exchanging
+         of messages."
+    INDEX       {
+        tmnxOFSwitchName,
+        tmnxOFControllerAddressType,
+        tmnxOFControllerAddress,
+        tmnxOFControllerTCPPort,
+        tmnxOFChannelID
+    }
+    ::= { tmnxOFChannelInfoTable 1 }
+
+TmnxOFChannelInfoEntry           ::= SEQUENCE
+{
+    tmnxOFChannelID                  Unsigned32,
+    tmnxOFChannelVersion             Unsigned32,
+    tmnxOFChannelType                INTEGER,
+    tmnxOFChannelOperStatus          TmnxOperState,
+    tmnxOFChannelOperFlags           BITS,
+    tmnxOFChannelEchoTimeExpiry      Unsigned32,
+    tmnxOFChannelHoldTimeExpiry      Unsigned32,
+    tmnxOFChannelConnRetryExpiry     Unsigned32,
+    tmnxOFChannelConnUpTime          Unsigned32,
+    tmnxOFChannelMEAsyncFltrPacketIn TmnxOFAsyncFltrPacketIn,
+    tmnxOFChannelSlAsyncFltrPacketIn TmnxOFAsyncFltrPacketIn,
+    tmnxOFChannelMEAsyncFltrPortSts  TmnxOFAsyncFltrPortStatus,
+    tmnxOFChannelSlAsyncFltrPortSts  TmnxOFAsyncFltrPortStatus,
+    tmnxOFChannelMEAsyncFltrFlowRem  TmnxOFAsyncFltrFlowRemoved,
+    tmnxOFChannelSlAsyncFltrFlowRem  TmnxOFAsyncFltrFlowRemoved,
+    tmnxOFChannelAuxiliaryID         Unsigned32,
+    tmnxOFChannelSrcAddressType      InetAddressType,
+    tmnxOFChannelSrcAddress          InetAddress,
+    tmnxOFChannelSrcPort             InetPortNumber,
+    tmnxOFChannelInfoServiceID       TmnxServId,
+    tmnxOFChannelInfoLoopbckAddrType InetAddressType,
+    tmnxOFChannelInfoLoopbackAddr    InetAddress
+}
+
+tmnxOFChannelID                  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelID specifies the unique channel identifier
+         between an open-flow switch and the controller."
+    ::= { tmnxOFChannelInfoEntry 1 }
+
+tmnxOFChannelVersion             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelVersion indicates the open-flow version
+         negotiated between an open-flow switch and the controller."
+    ::= { tmnxOFChannelInfoEntry 2 }
+
+tmnxOFChannelType                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary   (1),
+        auxiliary (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelType indicates the type of connection
+         established between an open-flow switch and the controller."
+    ::= { tmnxOFChannelInfoEntry 3 }
+
+tmnxOFChannelOperStatus          OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelOperStatus indicates the operational status
+         of the channel established between an open-flow switch and the
+         controller."
+    ::= { tmnxOFChannelInfoEntry 4 }
+
+tmnxOFChannelOperFlags           OBJECT-TYPE
+    SYNTAX      BITS {
+        socketStateDisable     (0),
+        socketStateListen      (1),
+        socketStateConnecting  (2),
+        socketStateEstablished (3),
+        helloReceived          (4),
+        helloTransmitted       (5),
+        handshake              (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelOperFlags indicates various conditions that
+         affects the operational status of the channel established between an
+         open-flow switch and the controller."
+    ::= { tmnxOFChannelInfoEntry 5 }
+
+tmnxOFChannelEchoTimeExpiry      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelEchoTimeExpiry indicates the time remaining
+         before an open-flow switch sends another echo-request message to the
+         controller for an established open-flow channel."
+    ::= { tmnxOFChannelInfoEntry 6 }
+
+tmnxOFChannelHoldTimeExpiry      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelHoldTimeExpiry indicates the time remaining
+         for keeping an open-flow session alive since receiving an
+         echo-response message. When the timer expires, the open-flow session
+         is terminated."
+    ::= { tmnxOFChannelInfoEntry 7 }
+
+tmnxOFChannelConnRetryExpiry     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelConnRetryExpiry indicates the time remaining
+         after which an open-flow switch will retry to establish an open-flow
+         session with the controller if not successful initially."
+    ::= { tmnxOFChannelInfoEntry 8 }
+
+tmnxOFChannelConnUpTime          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelConnUpTime indicates how long an open-flow
+         session has been up. If the session is down, zero value is returned."
+    ::= { tmnxOFChannelInfoEntry 9 }
+
+tmnxOFChannelMEAsyncFltrPacketIn OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrPacketIn
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelMEAsyncFltrPacketIn indicates whether the
+         controller when in 'master' or 'equal' role will receive asynchronous
+         messages for message type 'packet-in'."
+    ::= { tmnxOFChannelInfoEntry 10 }
+
+tmnxOFChannelSlAsyncFltrPacketIn OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrPacketIn
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSlAsyncFltrPacketIn indicates whether the
+         controller when in 'slave' role will receive asynchronous messages for
+         message type 'packet-in'."
+    ::= { tmnxOFChannelInfoEntry 11 }
+
+tmnxOFChannelMEAsyncFltrPortSts  OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelMEAsyncFltrPortSts indicates whether the
+         controller when in 'master' or 'equal' role will receive asynchronous
+         messages for message type 'port-status'."
+    ::= { tmnxOFChannelInfoEntry 12 }
+
+tmnxOFChannelSlAsyncFltrPortSts  OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSlAsyncFltrPortSts indicates whether the
+         controller when in 'slave' role will receive asynchronous messages for
+         message type 'port-status'."
+    ::= { tmnxOFChannelInfoEntry 13 }
+
+tmnxOFChannelMEAsyncFltrFlowRem  OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrFlowRemoved
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelMEAsyncFltrFlowRem indicates whether the
+         controller when in 'master' or 'equal' role will receive asynchronous
+         messages for message type 'flow-removed'."
+    ::= { tmnxOFChannelInfoEntry 14 }
+
+tmnxOFChannelSlAsyncFltrFlowRem  OBJECT-TYPE
+    SYNTAX      TmnxOFAsyncFltrFlowRemoved
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSlAsyncFltrFlowRem indicates whether the
+         controller when in 'slave' role will receive asynchronous messages for
+         message type 'flow-removed'."
+    ::= { tmnxOFChannelInfoEntry 15 }
+
+tmnxOFChannelAuxiliaryID         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelAuxiliaryID indicates the auxiliary channel
+         identifier."
+    ::= { tmnxOFChannelInfoEntry 16 }
+
+tmnxOFChannelSrcAddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSrcAddressType indicates the address type
+         for the source IP address specified by tmnxOFChannelSrcAddress."
+    ::= { tmnxOFChannelInfoEntry 17 }
+
+tmnxOFChannelSrcAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSrcAddress indicates the source IP address
+         used for connecting to the controller."
+    ::= { tmnxOFChannelInfoEntry 18 }
+
+tmnxOFChannelSrcPort             OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelSrcPort indicates the source port number
+         used for connecting to the controller."
+    ::= { tmnxOFChannelInfoEntry 19 }
+
+tmnxOFChannelInfoServiceID       OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The  unique value which indicates the Service identifier."
+    ::= { tmnxOFChannelInfoEntry 20 }
+
+tmnxOFChannelInfoLoopbckAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelInfoLoopbckAddrType indicates the address
+         type of the channel IP address specified by
+         tmnxOFChannelInfoLoopbackAddr."
+    ::= { tmnxOFChannelInfoEntry 21 }
+
+tmnxOFChannelInfoLoopbackAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelInfoLoopbackAddr indicates the channel loop
+         back IP address."
+    ::= { tmnxOFChannelInfoEntry 22 }
+
+tmnxOFChannelStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFChannelStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFChannelStatsTable contains channel statistics information."
+    ::= { tmnxOpenFlowObjs 8 }
+
+tmnxOFChannelStatsEntry          OBJECT-TYPE
+    SYNTAX      TmnxOFChannelStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelStatsEntry specifies statistics information
+         for the various packets exchanged between an open-flow switch and the
+         controller."
+    INDEX       {
+        tmnxOFSwitchName,
+        tmnxOFControllerAddressType,
+        tmnxOFControllerAddress,
+        tmnxOFControllerTCPPort,
+        tmnxOFChannelID,
+        tmnxOFChannelPacketType
+    }
+    ::= { tmnxOFChannelStatsTable 1 }
+
+TmnxOFChannelStatsEntry          ::= SEQUENCE
+{
+    tmnxOFChannelPacketType          TmnxOFPktType,
+    tmnxOFChannelPacketTx            Counter64,
+    tmnxOFChannelPacketRx            Counter64,
+    tmnxOFChannelPacketErr           Counter64,
+    tmnxOFChannelServiceID           TmnxServId,
+    tmnxOFChannelLoopbckAddrType     InetAddressType,
+    tmnxOFChannelLoopbackAddr        InetAddress
+}
+
+tmnxOFChannelPacketType          OBJECT-TYPE
+    SYNTAX      TmnxOFPktType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelPacketType specifies the packet type
+         exchanged between an open-flow switch and the controller."
+    ::= { tmnxOFChannelStatsEntry 1 }
+
+tmnxOFChannelPacketTx            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelPacketTx indicates the total number of
+         packets transmitted by an open-flow switch specified by
+         tmnxOFSwitchName."
+    ::= { tmnxOFChannelStatsEntry 2 }
+
+tmnxOFChannelPacketRx            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelPacketRx indicates the total number of
+         packets received by an open-flow switch specified by tmnxOFSwitchName."
+    ::= { tmnxOFChannelStatsEntry 3 }
+
+tmnxOFChannelPacketErr           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelPacketErr indicates the total number of
+         error packets exchanged by open-flow switch specified by
+         tmnxOFSwitchName with the controller."
+    ::= { tmnxOFChannelStatsEntry 4 }
+
+tmnxOFChannelServiceID           OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The  unique value which indicates the Service identifier."
+    ::= { tmnxOFChannelStatsEntry 5 }
+
+tmnxOFChannelLoopbckAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelLoopbckAddrType indicates the address type
+         of the channel IP address specified by tmnxOFChannelLoopbackAddr."
+    ::= { tmnxOFChannelStatsEntry 6 }
+
+tmnxOFChannelLoopbackAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFChannelLoopbackAddr indicates the channel loop
+         back IP address."
+    ::= { tmnxOFChannelStatsEntry 7 }
+
+tmnxOFPortStatsTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFPortStatsTable contains port statistics information."
+    ::= { tmnxOpenFlowObjs 9 }
+
+tmnxOFPortStatsEntry             OBJECT-TYPE
+    SYNTAX      TmnxOFPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortStatsEntry specifies statistics information
+         related to port associated with an open-flow switch."
+    INDEX       {
+        tmnxOFSwitchName,
+        tmnxOFPortID
+    }
+    ::= { tmnxOFPortStatsTable 1 }
+
+TmnxOFPortStatsEntry             ::= SEQUENCE
+{
+    tmnxOFPortID                     TmnxPortID,
+    tmnxOFPortName                   TLNamedItemOrEmpty,
+    tmnxOFPortType                   INTEGER,
+    tmnxOFPortTxPackets              Counter64,
+    tmnxOFPortTxBytes                Counter64
+}
+
+tmnxOFPortID                     OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortID specifies the port identifier for uniquely
+         identifying a port within an open-flow switch instance specified by
+         tmnxOFSwitchName."
+    ::= { tmnxOFPortStatsEntry 1 }
+
+tmnxOFPortName                   OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortName indicates the textual name of the
+         interface. The value of this object should be the name of the
+         interface as assigned by the open-flow switch."
+    ::= { tmnxOFPortStatsEntry 2 }
+
+tmnxOFPortType                   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        openFlowPhysicalPort (0),
+        openFlowLogicalPort  (1),
+        openFlowReservedPort (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortType indicates the port-type for port identifier
+         specified by tmnxOFPortID.
+             openFlowPhysicalPort (1) - corresponds to hardware interface of an
+                                        open-flow switch.
+             openFlowLogicalPort (2)  - corresponds to higher level abstractions
+                                        defined by an open-flow switch (e.g.
+                                        link aggregation groups, tunnels,
+                                        loopback interfaces).
+             openFlowReservedPort (3) - specifies generic forwarding actions
+                                        such as sending to the controller,
+                                        flooding, or forwarding using non
+                                        open-flow methods, such as 'normal'
+                                        switch processing."
+    ::= { tmnxOFPortStatsEntry 3 }
+
+tmnxOFPortTxPackets              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortTxPackets indicates the total number of packets
+         transmitted by this open-flow port."
+    ::= { tmnxOFPortStatsEntry 4 }
+
+tmnxOFPortTxBytes                OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFPortTxBytes indicates the total number of bytes
+         transmitted by this open-flow port."
+    ::= { tmnxOFPortStatsEntry 5 }
+
+tmnxOpenFlowNotificationObjs     OBJECT IDENTIFIER ::= { tmnxOpenFlow 2 }
+
+tmnxOFNotifyDescription          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxOFNotifyDescription is a printable character string."
+    ::= { tmnxOpenFlowNotificationObjs 1 }
+
+tmnxOpenFlowControllerObjs       OBJECT IDENTIFIER ::= { tmnxOpenFlow 3 }
+
+tmnxOFCntrllerTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerTableLastChanged indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxOFCntrllerTable."
+    ::= { tmnxOpenFlowControllerObjs 1 }
+
+tmnxOFCntrllerTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFCntrllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFCntrllerTable contains objects to configure an open-flow
+         controller."
+    ::= { tmnxOpenFlowControllerObjs 2 }
+
+tmnxOFCntrllerEntry              OBJECT-TYPE
+    SYNTAX      TmnxOFCntrllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerEntry represents an open-flow controller
+         configuration information.
+
+         Entries are created and deleted by the user."
+    INDEX       { tmnxOFCntrllerID }
+    ::= { tmnxOFCntrllerTable 1 }
+
+TmnxOFCntrllerEntry              ::= SEQUENCE
+{
+    tmnxOFCntrllerID                 Integer32,
+    tmnxOFCntrllerRowStatus          RowStatus,
+    tmnxOFCntrllerLastChanged        TimeStamp,
+    tmnxOFCntrllerDescription        DisplayString,
+    tmnxOFCntrllerVersion            Unsigned32,
+    tmnxOFCntrllerRole               INTEGER,
+    tmnxOFCntrllerAddressType        InetAddressType,
+    tmnxOFCntrllerAddress            InetAddress,
+    tmnxOFCntrllerEchoInterval       Unsigned32,
+    tmnxOFCntrllerEchoMultiple       Unsigned32,
+    tmnxOFCntrllerTCPPort            InetPortNumber,
+    tmnxOFCntrllerAdminState         TmnxAdminState,
+    tmnxOFCntrllerTLSServProfName    TNamedItemOrEmpty,
+    tmnxOFCntrllerIpv6Address        InetAddressIPv6
+}
+
+tmnxOFCntrllerID                 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerID specifies the number of open-flow
+         controller instances. There will always be atleast one open-flow
+         controller entry defined with tmnxOFCntrllerID = 1."
+    ::= { tmnxOFCntrllerEntry 1 }
+
+tmnxOFCntrllerRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxOFCntrllerEntry 2 }
+
+tmnxOFCntrllerLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerLastChanged indicates the sysUpTime at the
+         time of the most recent change to this open-flow controller."
+    ::= { tmnxOFCntrllerEntry 3 }
+
+tmnxOFCntrllerDescription        OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerDescription specifies the user provided
+         description for this open-flow controller configuration."
+    DEFVAL      { ''H }
+    ::= { tmnxOFCntrllerEntry 4 }
+
+tmnxOFCntrllerVersion            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerVersion indicates the open-flow version
+         negotiated between an open-flow controller and the switch. The default
+         value of 4 corresponds to Open Flow Version 1.3.1, the only version
+         supported in SR release 15.0."
+    DEFVAL      { 4 }
+    ::= { tmnxOFCntrllerEntry 5 }
+
+tmnxOFCntrllerRole               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        equal  (0),
+        master (1),
+        slave  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerRole indicates the role that the controller
+         will request to Open Flow switches when multiple controllers are
+         connected to a switch.
+
+         equal sets the role to equal master sets the requested role to master
+         slave sets the requested role to slave. The default role is equal."
+    DEFVAL      { equal }
+    ::= { tmnxOFCntrllerEntry 6 }
+
+tmnxOFCntrllerAddressType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerAddressType specifies the address type of
+         the controller IP address specified by tmnxOFCntrllerAddress."
+    ::= { tmnxOFCntrllerEntry 7 }
+
+tmnxOFCntrllerAddress            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerAddress specifies the local IPv4 address
+         for Open Flow controller to be used for packets on both main and aux
+         channels. By default, this is the management IP address of the system.
+         It may also correspond to the system IP address or another loopback
+         address configured on the system. The Open Flow controller must be
+         shutdown to change its address."
+    DEFVAL      { ''H }
+    ::= { tmnxOFCntrllerEntry 8 }
+
+tmnxOFCntrllerEchoInterval       OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerEchoInterval specifies the time interval
+         between two consecutive open flow echo request transmissions for a
+         given open flow session."
+    DEFVAL      { 10 }
+    ::= { tmnxOFCntrllerEntry 9 }
+
+tmnxOFCntrllerEchoMultiple       OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerEchoMultiple specifies the multiplier for
+         Open Flow control channel echo packets. The Open Flow control channel
+         is considered operationally down if no reply is heard from the switch
+         after the specified multiplier"
+    DEFVAL      { 3 }
+    ::= { tmnxOFCntrllerEntry 10 }
+
+tmnxOFCntrllerTCPPort            OBJECT-TYPE
+    SYNTAX      InetPortNumber (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerTCPPort specifies the TCP port number of
+         the controller."
+    DEFVAL      { 6653 }
+    ::= { tmnxOFCntrllerEntry 11 }
+
+tmnxOFCntrllerAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerAdminState specifies the desired
+         administrative state of an open-flow controller instance."
+    DEFVAL      { outOfService }
+    ::= { tmnxOFCntrllerEntry 12 }
+
+tmnxOFCntrllerTLSServProfName    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerTLSServProfName specifies the
+         TIMETRA-TLS-MIB::tTlsSrvProfileName used by the controller."
+    DEFVAL      { ''H }
+    ::= { tmnxOFCntrllerEntry 13 }
+
+tmnxOFCntrllerIpv6Address        OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCntrllerIpv6Address specifies the local IPv6
+         address for Open Flow controller to be used for packets on both main
+         and aux channels. By default, this is the management IP address of the
+         system. It may also correspond to the system IP address or another
+         loopback address configured on the system. The Open Flow controller
+         must be shutdown to change its address."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tmnxOFCntrllerEntry 14 }
+
+tmnxOFCSwitchTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFCSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFCSwitchTable contains statistics for an open-flow switch
+         connected to an open-flow controller."
+    ::= { tmnxOpenFlowControllerObjs 3 }
+
+tmnxOFCSwitchEntry               OBJECT-TYPE
+    SYNTAX      TmnxOFCSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row of tmnxOFCSwitchEntry represents a collection of statistics
+         for an open-flow switch configuration connected to the  open-flow
+         controller instance specified by tmnxOFCntrllerID.
+
+         Entries cannot be created and deleted via SNMP SET operations"
+    INDEX       {
+        tmnxOFCntrllerID,
+        tmnxOFCSwitchDataPathID
+    }
+    ::= { tmnxOFCSwitchTable 1 }
+
+TmnxOFCSwitchEntry               ::= SEQUENCE
+{
+    tmnxOFCSwitchDataPathID          TmnxOFDatapathIdentifier,
+    tmnxOFCSwitchName                TNamedItemOrEmpty,
+    tmnxOFCSwitchVersion             Unsigned32,
+    tmnxOFCSwitchVendorName          TLNamedItemOrEmpty,
+    tmnxOFCSwitchAddressType         InetAddressType,
+    tmnxOFCSwitchAddress             InetAddress,
+    tmnxOFCSwitchFeaturesCapability  BITS,
+    tmnxOFCSwitchFlowTableMaxSize    Unsigned32,
+    tmnxOFCSwitchMeterTableMaxSize   Unsigned32,
+    tmnxOFCSwitchPortNumEntries      Unsigned32,
+    tmnxOFCSwitchFlowNumEntries      Unsigned32,
+    tmnxOFCSwitchMeterNumEntries     Unsigned32,
+    tmnxOFCSwitchMaxFlowTables       Unsigned32,
+    tmnxOFCSwitchGroupNumEntries     Unsigned32,
+    tmnxOFCSwitchGrpAllMaxEntry      Unsigned32,
+    tmnxOFCSwitchGrpSelectMaxEntry   Unsigned32,
+    tmnxOFCSwitchGrpIndirectMaxEntry Unsigned32,
+    tmnxOFCSwitchGrpFastFailMaxEntry Unsigned32
+}
+
+tmnxOFCSwitchDataPathID          OBJECT-TYPE
+    SYNTAX      TmnxOFDatapathIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchDataPathID indicates a 64-bit identifier for
+         this open-flow switch instance. The lower 48-bits are its MAC address
+         and the upper 16-bits are implementation dependent."
+    ::= { tmnxOFCSwitchEntry 1 }
+
+tmnxOFCSwitchName                OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchName indicates the name of this open-flow
+         switch."
+    ::= { tmnxOFCSwitchEntry 2 }
+
+tmnxOFCSwitchVersion             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchVersion indicates the open-flow version
+         negotiated between an open-flow controller and the switch. The
+         default value of 4 corresponds to Open Flow Version 1.3.1."
+    ::= { tmnxOFCSwitchEntry 3 }
+
+tmnxOFCSwitchVendorName          OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchVendorName indicates the name of the vendor
+         for this  open flow switch instance."
+    ::= { tmnxOFCSwitchEntry 4 }
+
+tmnxOFCSwitchAddressType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchAddressType indicates the address type of
+         the open flow switch IP address specified by tmnxOFCSwitchAddress."
+    ::= { tmnxOFCSwitchEntry 5 }
+
+tmnxOFCSwitchAddress             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchAddress indicates IP address of the
+         open-flow switch connected to the open-flow controller specified by
+         tmnxOFCntrllerID."
+    ::= { tmnxOFCSwitchEntry 6 }
+
+tmnxOFCSwitchFeaturesCapability  OBJECT-TYPE
+    SYNTAX      BITS {
+        flowStats   (0),
+        tableStats  (1),
+        portStats   (2),
+        groupStats  (3),
+        future1     (4),
+        ipReasm     (5),
+        queueStats  (6),
+        future2     (7),
+        portBlocked (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchFeaturesCapability indicates the bitmap of
+         capabilities supported by the datapath associated with this open-flow
+         switch instance.  The unused bit positions are reserved for future use
+         as specified in  Open Flow Switch Specification version 1.3.1"
+    ::= { tmnxOFCSwitchEntry 7 }
+
+tmnxOFCSwitchFlowTableMaxSize    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchFlowTableMaxSize indicates the maximum
+         number of flow entries that the flow table can have."
+    ::= { tmnxOFCSwitchEntry 8 }
+
+tmnxOFCSwitchMeterTableMaxSize   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchMeterTableMaxSize indicates the maximum
+         number of meter entries defining per flow meters the meter table can
+         have."
+    ::= { tmnxOFCSwitchEntry 9 }
+
+tmnxOFCSwitchPortNumEntries      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchPortNumEntries indicates the total number of
+         ports associated with an open-flow switch."
+    ::= { tmnxOFCSwitchEntry 10 }
+
+tmnxOFCSwitchFlowNumEntries      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchFlowNumEntries indicates the total number of
+         open-flow entries currently present in the flow-table."
+    ::= { tmnxOFCSwitchEntry 11 }
+
+tmnxOFCSwitchMeterNumEntries     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchMeterNumEntries indicates the total number
+         of open-flow entries currently present in the meter-table."
+    ::= { tmnxOFCSwitchEntry 12 }
+
+tmnxOFCSwitchMaxFlowTables       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchMaxFlowTables indicates the maximum number
+         of flow tables that the of-controller switch can have."
+    ::= { tmnxOFCSwitchEntry 13 }
+
+tmnxOFCSwitchGroupNumEntries     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchGroupNumEntries indicates the total number
+         of group entries currently present in the group-table."
+    ::= { tmnxOFCSwitchEntry 14 }
+
+tmnxOFCSwitchGrpAllMaxEntry      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchGrpAllMaxEntry indicates the maximum number
+         of groups of type ALL supported."
+    ::= { tmnxOFCSwitchEntry 15 }
+
+tmnxOFCSwitchGrpSelectMaxEntry   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchGrpSelectMaxEntry indicates the maximum
+         number of groups of type SELECT supported."
+    ::= { tmnxOFCSwitchEntry 16 }
+
+tmnxOFCSwitchGrpIndirectMaxEntry OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchGrpIndirectMaxEntry indicates the maximum
+         number of groups of type INDIRECT supported."
+    ::= { tmnxOFCSwitchEntry 17 }
+
+tmnxOFCSwitchGrpFastFailMaxEntry OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchGrpFastFailMaxEntry indicates the maximum
+         number of groups of type FAST-FAILOVER supported."
+    ::= { tmnxOFCSwitchEntry 18 }
+
+tmnxOFCSwitchChannelInfoTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOFCSwitchChannelInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxOFCSwitchChannelInfoTable contains information about the
+         channel used for exchanging messages between open-flow switch and
+         controller."
+    ::= { tmnxOpenFlowControllerObjs 4 }
+
+tmnxOFCSwitchChannelInfoEntry    OBJECT-TYPE
+    SYNTAX      TmnxOFCSwitchChannelInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row of tmnxOFCSwitchChannelInfoEntry specifies information about
+         the channel used for exchanging messages between an open-flow switch
+         specified by tmnxOFCSwitchDataPathID and the controller instance
+         specified by tmnxOFCntrllerID."
+    INDEX       {
+        tmnxOFCntrllerID,
+        tmnxOFCSwitchDataPathID,
+        tmnxOFCSwitchChannelID
+    }
+    ::= { tmnxOFCSwitchChannelInfoTable 1 }
+
+TmnxOFCSwitchChannelInfoEntry    ::= SEQUENCE
+{
+    tmnxOFCSwitchChannelID           Unsigned32,
+    tmnxOFCSwitchChannelConnUpTime   Unsigned32,
+    tmnxOFCSwitchChannelType         INTEGER,
+    tmnxOFCSwitchChannelOperState    INTEGER,
+    tmnxOFCSwitchChannelTlsEnabled   TmnxEnabledDisabled
+}
+
+tmnxOFCSwitchChannelID           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchChannelID specifies the unique channel
+         identifier between an open-flow switch and the controller."
+    ::= { tmnxOFCSwitchChannelInfoEntry 1 }
+
+tmnxOFCSwitchChannelConnUpTime   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchChannelConnUpTime indicates how long an
+         open-flow session has been up. If the session is down,  zero value is
+         returned."
+    ::= { tmnxOFCSwitchChannelInfoEntry 2 }
+
+tmnxOFCSwitchChannelType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary   (1),
+        auxiliary (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchChannelType indicates the type of channel
+         established between an open-flow controller and switch."
+    ::= { tmnxOFCSwitchChannelInfoEntry 3 }
+
+tmnxOFCSwitchChannelOperState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        down (0),
+        up   (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchChannelOperState indicates the operational
+         status of the channel established between an open-flow controller and
+         switch."
+    ::= { tmnxOFCSwitchChannelInfoEntry 4 }
+
+tmnxOFCSwitchChannelTlsEnabled   OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOFCSwitchChannelTlsEnabled indicates whether
+         Transport Layer Security(TLS) is enabled or not in the channel
+         established between an open-flow controller and switch."
+    ::= { tmnxOFCSwitchChannelInfoEntry 5 }
+
+tmnxOpenFlowConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 93 }
+
+tmnxOpenFlowCompliances          OBJECT IDENTIFIER ::= { tmnxOpenFlowConformance 1 }
+
+tmnxOpenFlowComplianceV12v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 12.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOpenFlowConfigGroup,
+            tmnxOpenFlowNotifyObjsGroup,
+            tmnxOpenFlowNotificationGroup
+        }
+    ::= { tmnxOpenFlowCompliances 1 }
+
+tmnxOpenFlowComplianceV13v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 13.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOpenFlowV13v0Group
+        }
+    ::= { tmnxOpenFlowCompliances 2 }
+
+tmnxOpenFlowComplianceV14v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 14.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOpenFlowAuxChannelGroup
+        }
+    ::= { tmnxOpenFlowCompliances 3 }
+
+tmnxOpenFlowComplianceV15v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 15.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOFControllerGroup,
+            tmnxOFControllerSwitchGroup,
+            tmnxOpenFlowConfigV15v0Group,
+            tmnxOpenFlowSwitchV15v0Group
+        }
+    ::= { tmnxOpenFlowCompliances 4 }
+
+tmnxOpenFlowComplianceV16v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 16.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOpenFlowSwitchV16v0Group,
+            tmnxOFSwitchSvcV16v0Group
+        }
+    ::= { tmnxOpenFlowCompliances 5 }
+
+tmnxOpenFlowComplianceV19v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Open Flow features on Nokia
+         SROS series systems release 19.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOFControllerV19v0Group,
+            tmnxOFCSwitchGroupV19v0Group
+        }
+    ::= { tmnxOpenFlowCompliances 6 }
+
+tmnxOpenFlowGroups               OBJECT IDENTIFIER ::= { tmnxOpenFlowConformance 2 }
+
+tmnxOpenFlowV12v0Groups          OBJECT IDENTIFIER ::= { tmnxOpenFlowGroups 1 }
+
+tmnxOpenFlowConfigGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFSwitchTableLastChanged,
+        tmnxOFSwitchRowStatus,
+        tmnxOFSwitchLastChanged,
+        tmnxOFSwitchEchoInterval,
+        tmnxOFSwitchEchoMultiple,
+        tmnxOFSwitchLogicalPortStatus,
+        tmnxOFSwitchAdminState,
+        tmnxOFSwitchDescription,
+        tmnxOFSwitchDataPathID,
+        tmnxOFSwitchFeaturesBufferSize,
+        tmnxOFSwitchFeaturesNumTables,
+        tmnxOFSwitchFeaturesCapability,
+        tmnxOFControllerTableLastChanged,
+        tmnxOFControllerRowStatus,
+        tmnxOFControllerLastChanged,
+        tmnxOFControllerRole,
+        tmnxOFControllerGenID,
+        tmnxOFFlowTableTableLastChanged,
+        tmnxOFFlowTableRowStatus,
+        tmnxOFFlowTableLastChanged,
+        tmnxOFFlowTableMaxSize,
+        tmnxOFFlowTableNoMatchAction,
+        tmnxOFFlowTableNumEntries,
+        tmnxOFFlowTableOperStatus,
+        tmnxOFChannelVersion,
+        tmnxOFChannelType,
+        tmnxOFChannelOperStatus,
+        tmnxOFChannelOperFlags,
+        tmnxOFChannelEchoTimeExpiry,
+        tmnxOFChannelHoldTimeExpiry,
+        tmnxOFChannelConnRetryExpiry,
+        tmnxOFChannelConnUpTime,
+        tmnxOFChannelMEAsyncFltrPacketIn,
+        tmnxOFChannelSlAsyncFltrPacketIn,
+        tmnxOFChannelMEAsyncFltrPortSts,
+        tmnxOFChannelSlAsyncFltrPortSts,
+        tmnxOFChannelMEAsyncFltrFlowRem,
+        tmnxOFChannelSlAsyncFltrFlowRem,
+        tmnxOFChannelPacketTx,
+        tmnxOFChannelPacketRx,
+        tmnxOFChannelPacketErr,
+        tmnxOFPortName,
+        tmnxOFPortType,
+        tmnxOFPortTxPackets,
+        tmnxOFPortTxBytes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow configuration on Nokia SROS
+         series systems release 12.0."
+    ::= { tmnxOpenFlowV12v0Groups 1 }
+
+tmnxOpenFlowNotifyObjsGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting open-flow notifications
+         on Nokia SROS series systems 12.0 release."
+    ::= { tmnxOpenFlowV12v0Groups 2 }
+
+tmnxOpenFlowNotificationGroup    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxOFFlowEntryInsertFailed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications reporting open-flow state changes on on
+         Nokia SROS series systems 12.0 release."
+    ::= { tmnxOpenFlowV12v0Groups 3 }
+
+tmnxOpenFlowV13v0Groups          OBJECT IDENTIFIER ::= { tmnxOpenFlowGroups 2 }
+
+tmnxOpenFlowV13v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFFlowTableSwitchDefCookie
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow configuration on Nokia SROS
+         series systems release 13.0."
+    ::= { tmnxOpenFlowV13v0Groups 1 }
+
+tmnxOpenFlowV14v0Groups          OBJECT IDENTIFIER ::= { tmnxOpenFlowGroups 3 }
+
+tmnxOpenFlowAuxChannelGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFSwitchAuxChannelEnabled,
+        tmnxOFChannelAuxiliaryID,
+        tmnxOFChannelSrcAddressType,
+        tmnxOFChannelSrcAddress,
+        tmnxOFChannelSrcPort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow configuration on Nokia SROS
+         series systems release 14.0."
+    ::= { tmnxOpenFlowV14v0Groups 1 }
+
+tmnxOpenFlowV15v0Groups          OBJECT IDENTIFIER ::= { tmnxOpenFlowGroups 4 }
+
+tmnxOpenFlowConfigV15v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFControllerTLSProfileName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow switch configuration on
+         Nokia SROS series systems release 15.0."
+    ::= { tmnxOpenFlowV15v0Groups 1 }
+
+tmnxOpenFlowSwitchV15v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFSwitchID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow switch configuration on
+         Nokia SROS series systems release 15.0."
+    ::= { tmnxOpenFlowV15v0Groups 2 }
+
+tmnxOpenFlowV16v0Groups          OBJECT IDENTIFIER ::= { tmnxOpenFlowGroups 5 }
+
+tmnxOpenFlowSwitchV16v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFControllerServiceID,
+        tmnxOFControllerLoopbckAddrType,
+        tmnxOFControllerLoopbackAddr,
+        tmnxOFChannelInfoServiceID,
+        tmnxOFChannelInfoLoopbckAddrType,
+        tmnxOFChannelInfoLoopbackAddr,
+        tmnxOFChannelServiceID,
+        tmnxOFChannelLoopbckAddrType,
+        tmnxOFChannelLoopbackAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow switch configuration on
+         Nokia SROS series systems release 16.0."
+    ::= { tmnxOpenFlowV16v0Groups 1 }
+
+tmnxOFSwitchSvcV16v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFControllerSvcName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow switch configuration on
+         Nokia SROS series systems release 16.0."
+    ::= { tmnxOpenFlowV16v0Groups 2 }
+
+tmnxOpenFlowNotifGroups          OBJECT IDENTIFIER ::= { tmnxOpenFlowConformance 3 }
+
+tmnxOpenFlowControllerGroups     OBJECT IDENTIFIER ::= { tmnxOpenFlowConformance 4 }
+
+tmnxOFControllerGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFCntrllerTableLastChanged,
+        tmnxOFCntrllerRowStatus,
+        tmnxOFCntrllerLastChanged,
+        tmnxOFCntrllerDescription,
+        tmnxOFCntrllerVersion,
+        tmnxOFCntrllerRole,
+        tmnxOFCntrllerAddressType,
+        tmnxOFCntrllerAddress,
+        tmnxOFCntrllerEchoInterval,
+        tmnxOFCntrllerEchoMultiple,
+        tmnxOFCntrllerTCPPort,
+        tmnxOFCntrllerAdminState,
+        tmnxOFCntrllerTLSServProfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting open-flow controller configuration on
+         Nokia SROS series systems."
+    ::= { tmnxOpenFlowControllerGroups 1 }
+
+tmnxOFControllerSwitchGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFCSwitchName,
+        tmnxOFCSwitchVersion,
+        tmnxOFCSwitchVendorName,
+        tmnxOFCSwitchAddressType,
+        tmnxOFCSwitchAddress,
+        tmnxOFCSwitchFeaturesCapability,
+        tmnxOFCSwitchFlowTableMaxSize,
+        tmnxOFCSwitchMeterTableMaxSize,
+        tmnxOFCSwitchPortNumEntries,
+        tmnxOFCSwitchFlowNumEntries,
+        tmnxOFCSwitchMeterNumEntries,
+        tmnxOFCSwitchChannelConnUpTime,
+        tmnxOFCSwitchChannelType,
+        tmnxOFCSwitchChannelOperState,
+        tmnxOFCSwitchChannelTlsEnabled,
+        tmnxOFCSwitchMaxFlowTables
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting configuration of an open-flow switch
+         connected to an open-flow controller."
+    ::= { tmnxOpenFlowControllerGroups 2 }
+
+tmnxOFControllerV19v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFCntrllerIpv6Address
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting configuration of open-flow controller
+         in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxOpenFlowControllerGroups 3 }
+
+tmnxOFCSwitchGroupV19v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxOFCSwitchGroupNumEntries,
+        tmnxOFCSwitchGrpAllMaxEntry,
+        tmnxOFCSwitchGrpSelectMaxEntry,
+        tmnxOFCSwitchGrpIndirectMaxEntry,
+        tmnxOFCSwitchGrpFastFailMaxEntry
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting configuration of open-flow controller
+         group entries in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxOpenFlowControllerGroups 4 }
+
+tmnxOpenFlowNotifyPrefix         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 93 }
+
+tmnxOpenFlowNotification         OBJECT IDENTIFIER ::= { tmnxOpenFlowNotifyPrefix 0 }
+
+tmnxOFFlowEntryInsertFailed      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxOFFlowTableNoMatchAction,
+        tmnxOFFlowTableOperStatus,
+        tmnxOFNotifyDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxOFFlowEntryInsertFailed notification is generated when
+         a flow-entry could not be inserted into an open-flow table.
+
+         [EFFECT] The flow-entry won't be available in the flow-table. If
+         inserting of a default flow-entry failed, then the value of
+         tmnxOFFlowTableOperStatus is set to 'outOfService (3)'.
+
+         [RECOVERY] In order to insert the failed flow-entry into flow-table is
+         to change the admin state of an open-flow switch instance to
+         'outOfService (3)' and then back to 'inService (1)' and try inserting
+         the flow-entry again."
+    ::= { tmnxOpenFlowNotification 1 }
+
+END

@@ -1,0 +1,944 @@
+TIMETRA-PPP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Gauge32, IpAddress,
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    MacAddress, TimeInterval, TimeStamp
+                                                         FROM SNMPv2-TC
+    tmnxChassisIndex, tmnxHwConformance,
+    tmnxHwNotification, tmnxHwObjs
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules
+                                                         FROM TIMETRA-GLOBAL-MIB
+    tmnxPortPortID
+                                                         FROM TIMETRA-PORT-MIB
+    TmnxPppCpState
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+tmnxPppMIBModule                 MODULE-IDENTITY
+    LAST-UPDATED "200801010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         hardware components of the Nokia SROS device.
+
+         Copyright 2003-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "200801010000Z"
+    DESCRIPTION
+        "Rev 6.0                01 Jan 2008 00:00
+         6.0 release of the TIMETRA-PPP-MIB."
+
+    REVISION    "200701010000Z"
+    DESCRIPTION
+        "Rev 5.0                01 Jan 2007 00:00
+         5.0 release of the TIMETRA-PPP-MIB."
+
+    REVISION    "200603150000Z"
+    DESCRIPTION
+        "Rev 4.0                15 Mar 2006 00:00
+         4.0 release of the TIMETRA-PPP-MIB."
+
+    REVISION    "200501240000Z"
+    DESCRIPTION
+        "Rev 2.1                24 Jan 2005 00:00
+         2.1 release of the TIMETRA-PPP-MIB."
+
+    REVISION    "200403010000Z"
+    DESCRIPTION
+        "Rev 2.0                01 Mar 2004 00:00
+         2.0 release of the TIMETRA-PPP-MIB."
+
+    ::= { timetraSRMIBModules 26 }
+
+tmnxPppConformance               OBJECT IDENTIFIER ::= { tmnxHwConformance 3 }
+
+tmnxPppCompliances               OBJECT IDENTIFIER ::= { tmnxPppConformance 1 }
+
+tmnxPppCompliance                MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of PPP protocol features using
+         the TIMETRA-PPP-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPppGroup,
+            tmnxPppNotificationGroup
+        }
+    ::= { tmnxPppCompliances 1 }
+
+tmnxPpp7450V4v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of PPP protocol features for
+         revision 4.0 on the Nokia 7450 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPpp7450V4v0Group,
+            tmnxPppNotificationGroup
+        }
+    ::= { tmnxPppCompliances 2 }
+
+tmnxPpp7750V4v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of PPP protocol features for
+         revision 4.0 on the Nokia 7750 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPpp7750V4v0Group,
+            tmnxPppNotificationGroup
+        }
+    ::= { tmnxPppCompliances 3 }
+
+tmnxPpp7450V6v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of PPP protocol features for
+         revision 6.0 on the Nokia 7450 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPpp7450V4v0Group,
+            tmnxPppNotificationGroup
+        }
+    ::= { tmnxPppCompliances 4 }
+
+tmnxPpp77x0V6v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of PPP protocol features for
+         revision 6.0 on the Nokia 77x0 SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPpp7750V4v0Group,
+            tmnxPppNotificationGroup,
+            tmnxPppCompressionGroup
+        }
+    ::= { tmnxPppCompliances 5 }
+
+tmnxPppGroups                    OBJECT IDENTIFIER ::= { tmnxPppConformance 2 }
+
+tmnxPppGroup                     OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppLinkPhase,
+        tmnxPppLocalAddress,
+        tmnxPppRemoteAddress,
+        tmnxPppRemoteMacAddress,
+        tmnxPppLineMonitorMethod,
+        tmnxPppKaPeriod,
+        tmnxPppKaDropCount,
+        tmnxPppKaLastClearedTime,
+        tmnxPppKaThresholdExceedsCount,
+        tmnxPppKaInPktCount,
+        tmnxPppKaOutPktCount,
+        tmnxPppKaTimeDropLink,
+        tmnxPppQuality,
+        tmnxPppLqmOperPeriod,
+        tmnxPppLqmInRate,
+        tmnxPppLqmOutRate,
+        tmnxPppLqmLastClearedTime,
+        tmnxPppLqmThresholdExceedsCount,
+        tmnxPppLqmInPktCount,
+        tmnxPppLqmOutPktCount,
+        tmnxPppLqmTimeDropLink,
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber,
+        tmnxPppCpState,
+        tmnxPppCpLastChange,
+        tmnxPppCpRestartCount,
+        tmnxPppCpLastClearedTime
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Point-to-Point Protocol
+         (PPP) capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxPppGroups 1 }
+
+tmnxPppNotificationGroup         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPppCpUp,
+        tmnxPppCpDown,
+        tmnxPppCpDown,
+        tmnxPppNcpUp,
+        tmnxPppNcpDown,
+        tmnxPppKeepaliveFailure,
+        tmnxPppLqmFailure,
+        tmnxPppLoopback,
+        tmnxPppLoopbackClear
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting the management of Point-to-Point
+         Protocol (PPP) on Nokia 7x50 SR series systems."
+    ::= { tmnxPppGroups 3 }
+
+tmnxPPPObsoleteV4v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppLocalAddress,
+        tmnxPppRemoteAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in TIMETRA-PPP-MIB which are obsoleted."
+    ::= { tmnxPppGroups 4 }
+
+tmnxPpp7450V4v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppLinkPhase,
+        tmnxPppRemoteMacAddress,
+        tmnxPppLineMonitorMethod,
+        tmnxPppKaPeriod,
+        tmnxPppKaDropCount,
+        tmnxPppKaLastClearedTime,
+        tmnxPppKaThresholdExceedsCount,
+        tmnxPppKaInPktCount,
+        tmnxPppKaOutPktCount,
+        tmnxPppKaTimeDropLink,
+        tmnxPppQuality,
+        tmnxPppLqmOperPeriod,
+        tmnxPppLqmInRate,
+        tmnxPppLqmOutRate,
+        tmnxPppLqmLastClearedTime,
+        tmnxPppLqmThresholdExceedsCount,
+        tmnxPppLqmInPktCount,
+        tmnxPppLqmOutPktCount,
+        tmnxPppLqmTimeDropLink,
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber,
+        tmnxPppCpState,
+        tmnxPppCpLastChange,
+        tmnxPppCpRestartCount,
+        tmnxPppCpLastClearedTime,
+        tmnxPppLocalIPv4AddressType,
+        tmnxPppLocalIPv4Address,
+        tmnxPppRemoteIPv4AddressType,
+        tmnxPppRemoteIPv4Address
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Point-to-Point Protocol
+         (PPP) capabilities on the 4.0 version of Nokia 7450 SR systems."
+    ::= { tmnxPppGroups 5 }
+
+tmnxPpp7750V4v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppLinkPhase,
+        tmnxPppRemoteMacAddress,
+        tmnxPppLineMonitorMethod,
+        tmnxPppKaPeriod,
+        tmnxPppKaDropCount,
+        tmnxPppKaLastClearedTime,
+        tmnxPppKaThresholdExceedsCount,
+        tmnxPppKaInPktCount,
+        tmnxPppKaOutPktCount,
+        tmnxPppKaTimeDropLink,
+        tmnxPppQuality,
+        tmnxPppLqmOperPeriod,
+        tmnxPppLqmInRate,
+        tmnxPppLqmOutRate,
+        tmnxPppLqmLastClearedTime,
+        tmnxPppLqmThresholdExceedsCount,
+        tmnxPppLqmInPktCount,
+        tmnxPppLqmOutPktCount,
+        tmnxPppLqmTimeDropLink,
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber,
+        tmnxPppCpState,
+        tmnxPppCpLastChange,
+        tmnxPppCpRestartCount,
+        tmnxPppCpLastClearedTime,
+        tmnxPppLocalIPv4AddressType,
+        tmnxPppLocalIPv4Address,
+        tmnxPppLocalIPv6AddressType,
+        tmnxPppLocalIPv6Address,
+        tmnxPppRemoteIPv4AddressType,
+        tmnxPppRemoteIPv4Address,
+        tmnxPppRemoteIPv6AddressType,
+        tmnxPppRemoteIPv6Address
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Point-to-Point Protocol
+         (PPP) capabilities on the 4.0 version of Nokia 7750 SR systems."
+    ::= { tmnxPppGroups 6 }
+
+tmnxPppCompressionGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppHdrCompression
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of compression capabilities
+         over Point-to-Point Protocol (PPP) interfaces on the Nokia 7750 SR
+         systems."
+    ::= { tmnxPppGroups 7 }
+
+tmnxPppObsoleteGroup             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPppLinkPhase,
+        tmnxPppRemoteMacAddress,
+        tmnxPppLineMonitorMethod,
+        tmnxPppKaPeriod,
+        tmnxPppKaDropCount,
+        tmnxPppKaLastClearedTime,
+        tmnxPppKaThresholdExceedsCount,
+        tmnxPppKaInPktCount,
+        tmnxPppKaOutPktCount,
+        tmnxPppKaTimeDropLink,
+        tmnxPppQuality,
+        tmnxPppLqmOperPeriod,
+        tmnxPppLqmInRate,
+        tmnxPppLqmOutRate,
+        tmnxPppLqmLastClearedTime,
+        tmnxPppLqmThresholdExceedsCount,
+        tmnxPppLqmInPktCount,
+        tmnxPppLqmOutPktCount,
+        tmnxPppLqmTimeDropLink,
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber,
+        tmnxPppCpState,
+        tmnxPppCpLastChange,
+        tmnxPppCpRestartCount,
+        tmnxPppCpLastClearedTime,
+        tmnxPppLocalIPv4AddressType,
+        tmnxPppLocalIPv4Address,
+        tmnxPppLocalIPv6AddressType,
+        tmnxPppLocalIPv6Address,
+        tmnxPppRemoteIPv4AddressType,
+        tmnxPppRemoteIPv4Address,
+        tmnxPppRemoteIPv6AddressType,
+        tmnxPppRemoteIPv6Address,
+        tmnxPppHdrCompression
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects supporting management of Point-to-Point
+         Protocol (PPP) capabilities for 23.0 version of Nokia 7750 SR systems."
+    ::= { tmnxPppGroups 8 }
+
+tmnxPppObsoleteNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPppCpUp,
+        tmnxPppCpDown,
+        tmnxPppCpDown,
+        tmnxPppNcpUp,
+        tmnxPppNcpDown,
+        tmnxPppKeepaliveFailure,
+        tmnxPppLqmFailure,
+        tmnxPppLoopback,
+        tmnxPppLoopbackClear
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete notifications supporting the management of
+         Point-to-Point Protocol (PPP) for 23.0 on Nokia 7x50 SR series
+         systems."
+    ::= { tmnxPppGroups 9 }
+
+tmnxPppNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxHwNotification 3 }
+
+tmnxPppNotification              OBJECT IDENTIFIER ::= { tmnxPppNotifyPrefix 0 }
+
+tmnxPppCpUp                      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppCpState
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the finite state machine of a control protocol (LCP,
+         LQR, etc.) reaches the OPENED state."
+    ::= { tmnxPppNotification 1 }
+
+tmnxPppCpDown                    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppCpState
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the finite state machine of a control protocol (LCP,
+         LQR, etc.) leaves the OPENED state."
+    ::= { tmnxPppNotification 2 }
+
+tmnxPppNcpUp                     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppCpState
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the finite state machine of a network control protocol
+         (IPCP, MPLSCP, BCP, OSICP, etc.) reaches the OPENED state."
+    ::= { tmnxPppNotification 3 }
+
+tmnxPppNcpDown                   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppCpState
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the finite state machine of a network control protocol
+         (IPCP, MPLSCP, BCP, OSICP, etc.) leaves the OPENED state."
+    ::= { tmnxPppNotification 4 }
+
+tmnxPppKeepaliveFailure          NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppKaPeriod
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the keepalive based on echo packets failed."
+    ::= { tmnxPppNotification 5 }
+
+tmnxPppLqmFailure                NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppLqmInRate,
+        tmnxPppLqmOutRate,
+        tmnxPppQuality
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the link has failed in meeting the specified quality
+         percentage."
+    ::= { tmnxPppNotification 6 }
+
+tmnxPppLoopback                  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the value of tmnxPppLocalMagicNumber is the same as the
+         value of tmnxPppRemoteMagicNumber sent by the peer."
+    ::= { tmnxPppNotification 7 }
+
+tmnxPppLoopbackClear             NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPppLocalMagicNumber,
+        tmnxPppRemoteMagicNumber
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "Generated when the loopback condition is cleared. It means that the
+         value of tmnxPppLocalMagicNumber is different than the value of
+         tmnxPppRemoteMagicNumber sent by the peer."
+    ::= { tmnxPppNotification 8 }
+
+tmnxPppObjs                      OBJECT IDENTIFIER ::= { tmnxHwObjs 5 }
+
+tmnxPppTable                     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxPppTable has an entry for each port in the system that is
+         configured for PPP."
+    ::= { tmnxPppObjs 1 }
+
+tmnxPppEntry                     OBJECT-TYPE
+    SYNTAX      TmnxPppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each row entry represents a port from the tmnxPortTable
+         that is configured for PPP.  Entries cannot be created and
+         deleted via SNMP SET operations."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID
+    }
+    ::= { tmnxPppTable 1 }
+
+TmnxPppEntry                     ::= SEQUENCE
+{
+    tmnxPppLinkPhase                 INTEGER,
+    tmnxPppLocalAddress              IpAddress,
+    tmnxPppRemoteAddress             IpAddress,
+    tmnxPppRemoteMacAddress          MacAddress,
+    tmnxPppLineMonitorMethod         INTEGER,
+    tmnxPppKaPeriod                  Unsigned32,
+    tmnxPppKaDropCount               Unsigned32,
+    tmnxPppKaLastClearedTime         TimeStamp,
+    tmnxPppKaThresholdExceedsCount   Counter32,
+    tmnxPppKaInPktCount              Counter32,
+    tmnxPppKaOutPktCount             Counter32,
+    tmnxPppKaTimeDropLink            TimeInterval,
+    tmnxPppQuality                   Unsigned32,
+    tmnxPppLqmOperPeriod             Unsigned32,
+    tmnxPppLqmInRate                 Gauge32,
+    tmnxPppLqmOutRate                Gauge32,
+    tmnxPppLqmLastClearedTime        TimeStamp,
+    tmnxPppLqmThresholdExceedsCount  Counter32,
+    tmnxPppLqmInPktCount             Counter32,
+    tmnxPppLqmOutPktCount            Counter32,
+    tmnxPppLqmTimeDropLink           TimeInterval,
+    tmnxPppLocalMagicNumber          Unsigned32,
+    tmnxPppRemoteMagicNumber         Unsigned32,
+    tmnxPppLocalIPv4AddressType      InetAddressType,
+    tmnxPppLocalIPv4Address          InetAddress,
+    tmnxPppLocalIPv6AddressType      InetAddressType,
+    tmnxPppLocalIPv6Address          InetAddress,
+    tmnxPppRemoteIPv4AddressType     InetAddressType,
+    tmnxPppRemoteIPv4Address         InetAddress,
+    tmnxPppRemoteIPv6AddressType     InetAddressType,
+    tmnxPppRemoteIPv6Address         InetAddress,
+    tmnxPppHdrCompression            BITS
+}
+
+tmnxPppLinkPhase                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        dead         (1),
+        establish    (2),
+        authenticate (3),
+        network      (4),
+        terminate    (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The current link phase for this PPP connection."
+    ::= { tmnxPppEntry 1 }
+
+tmnxPppLocalAddress              OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Ip address assigned the local end of the PPP link.
+
+         This object was made obsolete in the 4.0 release."
+    ::= { tmnxPppEntry 2 }
+
+tmnxPppRemoteAddress             OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Ip address of the remote end of the PPP link.
+
+         This object was made obsolete in the 4.0 release."
+    ::= { tmnxPppEntry 3 }
+
+tmnxPppRemoteMacAddress          OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The Ethernet MacAddress sent by the remote end of the PPP link."
+    ::= { tmnxPppEntry 4 }
+
+tmnxPppLineMonitorMethod         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        keepalive (2),
+        lqm       (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The type of line monitoring packets being sent and received on
+         this PPP link.  Note that this can be deduced from the values of
+         tmnxPppKaPeriod and tmnxPppQuality.  One can find out whether
+         lqm or keepalive is enabled or not. That is, lqm is enabled
+         (keepalive is disabled) if tmnxPppQuality is not zero; and
+         keepalive is enabled if tmnxPppKaPeriod is not zero and
+         tmnxPppQuality is zero.  If tmnxPppQuality and tmnxPppKaPeriod
+         are both set to zero, no line monitoring is used."
+    ::= { tmnxPppEntry 5 }
+
+tmnxPppKaPeriod                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value tmnxPppKaPeriod is used to configure the time
+         interval in seconds at which keepalive requests are issued.  When
+         LQM is enabled by setting tmnxPppQuality equal to some
+         value other than zero (0), keepalives are replaced with LQR
+         messages."
+    DEFVAL      { 10 }
+    ::= { tmnxPppEntry 6 }
+
+tmnxPppKaDropCount               OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxPppKaDropCount determines how many keepalive or LQR
+         messages can be missed before the line is brought down."
+    DEFVAL      { 3 }
+    ::= { tmnxPppEntry 7 }
+
+tmnxPppKaLastClearedTime         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The last time that keepalive stats were cleared.  Note that the
+         keepalive stats are cleared when changing from LQM to keepalives
+         or vice versa."
+    ::= { tmnxPppEntry 8 }
+
+tmnxPppKaThresholdExceedsCount   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of times that tmnxPppKaDropCount was reached."
+    ::= { tmnxPppEntry 9 }
+
+tmnxPppKaInPktCount              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of echo reply packets received."
+    ::= { tmnxPppEntry 10 }
+
+tmnxPppKaOutPktCount             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of echo request packets sent."
+    ::= { tmnxPppEntry 11 }
+
+tmnxPppKaTimeDropLink            OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time remaining before the link will be declared dropped if a
+         keepalive echo reply packet is not received."
+    ::= { tmnxPppEntry 12 }
+
+tmnxPppQuality                   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxPppQuality is a percentage used by LQM to
+         monitor the link quality.  If the quality drops below this
+         percentage, the router shuts down the link.  The percentages
+         are calculated for both the incoming and outgoing directions.
+         When LQM is enabled by setting tmnxPppQuality to a non-zero
+         value, Link Quality Reports (LQRs) are sent, in place of
+         keepalives, every keepalive period.  All incoming keepalives
+         and/or LQRs are always responded to regardless of the setting
+         of tmnxPppQuality.  A value of zero (0) implies no LQM quality
+         monitoring and is the only value supported."
+    DEFVAL      { 0 }
+    ::= { tmnxPppEntry 13 }
+
+tmnxPppLqmOperPeriod             OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value tmnxPppLqmOperPeriod is the negotiated time interval in
+         seconds at which LQM LQR requests are issued."
+    ::= { tmnxPppEntry 14 }
+
+tmnxPppLqmInRate                 OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The average of 'SaveInPackets'/'PeerOutPackets' in the last five
+         consecutive LQRs received."
+    ::= { tmnxPppEntry 15 }
+
+tmnxPppLqmOutRate                OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The average of 'PeerInPackets'/'LastOutPackets' in the last five
+         consecutive LQRs received."
+    ::= { tmnxPppEntry 16 }
+
+tmnxPppLqmLastClearedTime        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The last time that LQM stats were cleared."
+    ::= { tmnxPppEntry 17 }
+
+tmnxPppLqmThresholdExceedsCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of times that either tmnxPppLqmInRate or tmnxPppLqmOutRate
+         falls below the specified quality percentage when PPP quality or LQM
+         is enforced."
+    ::= { tmnxPppEntry 18 }
+
+tmnxPppLqmInPktCount             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of LQR packets received."
+    ::= { tmnxPppEntry 19 }
+
+tmnxPppLqmOutPktCount            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of LQR packets sent."
+    ::= { tmnxPppEntry 20 }
+
+tmnxPppLqmTimeDropLink           OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The time remaining before the link will be declared dropped if a LQM
+         LQR message packet is not received."
+    ::= { tmnxPppEntry 21 }
+
+tmnxPppLocalMagicNumber          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppLocalMagicNumber is the local magic number to be sent to the
+         peer. The magic number provides a method to detect loopbacks. If the
+         value of tmnxPppLocalMagicNumber is the same as the value of
+         tmnxPppRemoteMagicNumber, then it is possible that the link might be
+         looped back. If the two magic numbers do not match, then the link is
+         not looped back."
+    ::= { tmnxPppEntry 22 }
+
+tmnxPppRemoteMagicNumber         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppRemoteMagicNumber is the magic number sent by the peer. If the
+         value of tmnxPppRemoteMagicNumber is the same as the value of
+         tmnxPppLocalMagicNumber, then it is possible that the link might be
+         looped back. If the two magic numbers do not match, then the link is
+         not looped back."
+    ::= { tmnxPppEntry 23 }
+
+tmnxPppLocalIPv4AddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppLocalIPv4AddressType indicates the address type of the address
+         at the local end of the PPP link."
+    ::= { tmnxPppEntry 24 }
+
+tmnxPppLocalIPv4Address          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppLocalIPv4Address indicates the IPv4 address of the local end of
+         the PPP link."
+    ::= { tmnxPppEntry 25 }
+
+tmnxPppLocalIPv6AddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppLocalIPv6AddressType indicates the address type of the address
+         at the local end of the PPP link."
+    ::= { tmnxPppEntry 26 }
+
+tmnxPppLocalIPv6Address          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppLocalIPv6Address indicates the IPv6 address of the local end of
+         the PPP link."
+    ::= { tmnxPppEntry 27 }
+
+tmnxPppRemoteIPv4AddressType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppRemoteIPv4AddressType indicates the address type of the address
+         at the remote end of the PPP link."
+    ::= { tmnxPppEntry 28 }
+
+tmnxPppRemoteIPv4Address         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppRemoteIPv4Address indicates the IPv4 address of the remote end
+         of the PPP link."
+    ::= { tmnxPppEntry 29 }
+
+tmnxPppRemoteIPv6AddressType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppRemoteIPv6AddressType indicates the address type of the address
+         at the remote end of the PPP link."
+    ::= { tmnxPppEntry 30 }
+
+tmnxPppRemoteIPv6Address         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxPppRemoteIPv6Address indicates the IPv6 address of the remote end
+         of the PPP link."
+    ::= { tmnxPppEntry 31 }
+
+tmnxPppHdrCompression            OBJECT-TYPE
+    SYNTAX      BITS {
+        acfc (0),
+        pfc  (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxPppHdrCompression specifies Address Control Field
+         Compression (ACFC) and Protocol Field Compression (PFC) behaviour over
+         this PPP link as detailed below.
+
+         tmnxPppHdrCompression|            Protocol action
+         ---------------------|-----------------------------------------------
+          acfc                | ACFC is requested in config requests sent and
+                              | accepted in config request received
+          pfc                 | PFC is requested in config requests sent and
+                              | accepted in config request received"
+    DEFVAL      { {} }
+    ::= { tmnxPppEntry 32 }
+
+tmnxPppCpTable                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPppCpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxPppCpTable has an entry for each PPP Control Protocol run on
+         each port in the system that is configured for PPP."
+    ::= { tmnxPppObjs 2 }
+
+tmnxPppCpEntry                   OBJECT-TYPE
+    SYNTAX      TmnxPppCpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a specific Ppp Control Protocol
+         being run on a specific port from the tmnxPortTable
+         that is configured for PPP.  Entries cannot be created and
+         deleted via SNMP SET operations; rows are created and
+         deleted by the agent as the tmnxPortClass and tmnxPortEncapType
+         values are modified.  For any specific link, there is one Link
+         Control Protocol (LCP) plus one or more Network Control Protocols
+         (NCP) depending on the type of protocols supported on the link:
+         ipcp, mplscp, bcp or osicp."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID,
+        tmnxPppCpProtocol
+    }
+    ::= { tmnxPppCpTable 1 }
+
+TmnxPppCpEntry                   ::= SEQUENCE
+{
+    tmnxPppCpProtocol                INTEGER,
+    tmnxPppCpState                   TmnxPppCpState,
+    tmnxPppCpLastChange              TimeStamp,
+    tmnxPppCpRestartCount            Counter32,
+    tmnxPppCpLastClearedTime         TimeStamp
+}
+
+tmnxPppCpProtocol                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        lcp    (1),
+        ipcp   (2),
+        mplscp (3),
+        bcp    (4),
+        osicp  (5),
+        lqr    (6),
+        ipv6cp (7)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The enumerated value of tmnxPppCpProtocol indicates the type
+         of Control Protocol represented by this row entry.  For any
+         specific link, there is one Link Control Protocol (LCP) plus one
+         or more Network Control Protocols (NCP) depending on the type of
+         protocols supported on the link: ipcp, mplscp, bcp or osicp."
+    ::= { tmnxPppCpEntry 1 }
+
+tmnxPppCpState                   OBJECT-TYPE
+    SYNTAX      TmnxPppCpState
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxPppCpState variable indicates the current state of the PPP
+         Control Protocol on this interface."
+    ::= { tmnxPppCpEntry 2 }
+
+tmnxPppCpLastChange              OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The last time the value of tmnxPppCpState changed."
+    ::= { tmnxPppCpEntry 3 }
+
+tmnxPppCpRestartCount            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of times that this Control Protocol has reached the 'open'
+         state."
+    ::= { tmnxPppCpEntry 4 }
+
+tmnxPppCpLastClearedTime         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The last time tmnxPppCpRestartCount has been reset to zero."
+    ::= { tmnxPppCpEntry 5 }
+
+END

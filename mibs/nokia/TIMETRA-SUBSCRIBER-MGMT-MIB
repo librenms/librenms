@@ -74,8 +74,6 @@ IMPORTS
     THSMDABurstSizeBytesOverride,
     THsClassWeightOverride, THsWrrWeightOvr,
     THsmdaCIRKRateOverride,
-    THsmdaCounterIdOrZero,
-    THsmdaCounterIdOrZeroOrAll,
     THsmdaPIRKRateOverride,
     THsmdaWrrWeightOverride,
     TIcmpCodeOrNone, TIcmpTypeOrNone,
@@ -99,9 +97,7 @@ IMPORTS
     TQueueIdOrAll, TQueueStatModeFormat,
     TSapEgressPolicyID, TSapIngressPolicyID,
     TTcpUdpPort, TTcpUdpPortOperator,
-    TXLNamedItem, TmnxAccPlcyOECounters,
-    TmnxAccPlcyOICounters,
-    TmnxAccPlcyQECounters,
+    TXLNamedItem, TmnxAccPlcyQECounters,
     TmnxAccPlcyQICounters, TmnxActionType,
     TmnxAdminState, TmnxAncpStringOrZero,
     TmnxAppProfileStringOrEmpty,
@@ -1236,6 +1232,26 @@ TmnxSubAuthOrigin                ::= TEXTUAL-CONVENTION
         config                 (10)
     }
 
+TmnxSubPccRuleLevel2Id           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxSubPccRuleLevel2Id identifies the level-2 QOS object
+         for a service data flow."
+    SYNTAX      Unsigned32
+
+TmnxSubPccRuleLvl2MapFromProfile ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxSubPccRuleLvl2MapFromProfile specifies if the
+         level-2 QOS object for a service data flow is taken from the
+         corresponding sla-profile pfcp-mappings session-qer config: either
+         downlink-mbr-gbr queue or uplink-mbr-gbr arbiter."
+    SYNTAX      INTEGER {
+        none    (0),
+        queue   (1),
+        arbiter (2)
+    }
+
 tmnxSubMgmt                      OBJECT IDENTIFIER ::= { tmnxSRObjs 33 }
 
 tmnxSubMgmtObjects               OBJECT IDENTIFIER ::= { tmnxSubMgmt 1 }
@@ -2355,7 +2371,6 @@ TmnxSubProfileEntry              ::= SEQUENCE
     tmnxSubProfHsmdaIngAggRateLimit  TPortSchedulerPIR,
     tmnxSubProfHsmdaEgrAggRateLimit  TPortSchedulerPIR,
     tmnxSubProfHsmdaIngPackByteOff   TIngHsmdaPerPacketOffsetOvr,
-    tmnxSubProfHsmdaEgrPackByteOff   TEgrHsmdaPerPacketOffsetOvr,
     tmnxSubProfHostTrackingPolicy    TNamedItemOrEmpty,
     tmnxSubProfUseSubscriberMss      TruthValue,
     tmnxSubProfIngPolicerPolicy      TNamedItemOrEmpty,
@@ -2618,24 +2633,6 @@ tmnxSubProfHsmdaIngPackByteOff   OBJECT-TYPE
          This object is obsoleted in 10.0 Release."
     DEFVAL      { -128 }
     ::= { tmnxSubProfileEntry 18 }
-
-tmnxSubProfHsmdaEgrPackByteOff   OBJECT-TYPE
-    SYNTAX      TEgrHsmdaPerPacketOffsetOvr
-    UNITS       "bytes"
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubProfHsmdaEgrPackByteOff specifies the value, in
-         bytes, of the adjustment for accounting to make to the size of each
-         HSMDA packet on egress. The specified value overrides the the value of
-         tSapEgressHsmdaPacketOffset specified in the tSapEgressEntry indexed
-         by tmnxSubProfEgrQosPolId.
-
-         A value of -128 indicates no override.
-
-         This object is obsoleted in 10.0 Release."
-    DEFVAL      { -128 }
-    ::= { tmnxSubProfileEntry 19 }
 
 tmnxSubProfHostTrackingPolicy    OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
@@ -4952,7 +4949,6 @@ TmnxSubscriberInfoEntry          ::= SEQUENCE
     tmnxSubInfoRadEgrAggRateLimit    TPIRRateOverride,
     tmnxSubInfoEgrAggRateLimit       TPIRRateOverride,
     tmnxSubInfoQos                   TmnxMdaQos,
-    tmnxSubInfoIngQosPolIdOvr        TAnyQosPolicyIDorZero,
     tmnxSubInfoShortId               TmnxSubIdentShortString,
     tmnxSubInfoEgrAggRateLimitLow    TruthValue
 }
@@ -5082,18 +5078,6 @@ tmnxSubInfoQos                   OBJECT-TYPE
          associated with this subscriber. It is determined by the MDA (Media
          Dependent Adapter) and/or IOM (I/O Module of the subscriber hosts."
     ::= { tmnxSubscriberInfoEntry 12 }
-
-tmnxSubInfoIngQosPolIdOvr        OBJECT-TYPE
-    SYNTAX      TAnyQosPolicyIDorZero
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "If different from 0, the value of tmnxSubInfoIngQosPolIdOvr indicates
-         the ID of the overriding ingress Qos policy.
-
-         The value of tmnxSubInfoIngQosPolIdOvr is only used for HSMDA-2
-         subscribers."
-    ::= { tmnxSubscriberInfoEntry 13 }
 
 tmnxSubInfoShortId               OBJECT-TYPE
     SYNTAX      TmnxSubIdentShortString
@@ -6811,12 +6795,12 @@ tmnxSubAcctPlcyDelayStartTime    OBJECT-TYPE
 
 tmnxSubAcctPlcyTriggeredUpdates  OBJECT-TYPE
     SYNTAX      BITS {
-        gtpMobility (0),
-        reserved1   (1),
-        reserved2   (2),
-        reserved3   (3),
-        reserved4   (4),
-        reserved5   (5)
+        gtpMobility          (0),
+        gtpChangeS1Release   (1),
+        gtpChangeSvcReq      (2),
+        gtpChangeUliChange   (3),
+        gtpChangeTeiduChange (4),
+        gtpChangeTeidcChange (5)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -8837,7 +8821,9 @@ TmnxSubHostInfoV2Entry           ::= SEQUENCE
     tmnxSubHostInfoV2SpiGroupType    TmnxSubHostGrouping,
     tmnxSubHostInfoV2SpiGroupId      Unsigned32,
     tmnxSubHostInfoV2HwAggShapQSet   TruthValue,
-    tmnxSubHostInfoV2HwAggShapInUse  TruthValue
+    tmnxSubHostInfoV2HwAggShapInUse  TruthValue,
+    tmnxSubHostInfoV2LagActivePort   TmnxPortID,
+    tmnxSubHostInfoV2HwAggShapQSetSz Unsigned32
 }
 
 tmnxSubHostInfoV2IpAddressType   OBJECT-TYPE
@@ -9228,6 +9214,27 @@ tmnxSubHostInfoV2HwAggShapInUse  OBJECT-TYPE
          forwarding plane (FP), or if it is used for this subscriber host on at
          least one of its FPs if sapPortId is a multi-member port such as a LAG"
     ::= { tmnxSubHostInfoV2Entry 36 }
+
+tmnxSubHostInfoV2LagActivePort   OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this subscriber host uses a port access egress virtual port (see
+         tmnxSubHostInfoV2EgrVPortName) and is on a LAG for which the value of
+         the object TIMETRA-LAG-MIB::tLagPerLinkHashSubscriberHash is 'vport',
+         then the value of tmnxSubHostInfoV2LagActivePort indicates the member
+         port that is used for this host. Else it is 0"
+    ::= { tmnxSubHostInfoV2Entry 37 }
+
+tmnxSubHostInfoV2HwAggShapQSetSz OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 2..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubHostInfoV2HwAggShapQSetSz indicates the queue set
+         size used by this host. The value 0 means non-shaper queues."
+    ::= { tmnxSubHostInfoV2Entry 38 }
 
 tmnxSLAProfInstSubHostV2Table    OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSLAProfInstSubHostV2Entry
@@ -10092,11 +10099,8 @@ TmnxSubApCustRecordEntry         ::= SEQUENCE
     tmnxSubApCrLastChanged           TimeStamp,
     tmnxSubApCrSignChangeDelta       Unsigned32,
     tmnxSubApCrSignChangeQueue       TQueueIdOrAll,
-    tmnxSubApCrSignChangeOCntr       THsmdaCounterIdOrZeroOrAll,
     tmnxSubApCrSignChangeQICounters  TmnxAccPlcyQICounters,
-    tmnxSubApCrSignChangeQECounters  TmnxAccPlcyQECounters,
-    tmnxSubApCrSignChangeOICounters  TmnxAccPlcyOICounters,
-    tmnxSubApCrSignChangeOECounters  TmnxAccPlcyOECounters
+    tmnxSubApCrSignChangeQECounters  TmnxAccPlcyQECounters
 }
 
 tmnxSubApCrLastChanged           OBJECT-TYPE
@@ -10131,17 +10135,6 @@ tmnxSubApCrSignChangeQueue       OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { tmnxSubApCustRecordEntry 3 }
 
-tmnxSubApCrSignChangeOCntr       OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZeroOrAll
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrSignChangeOCntr specifies the counter-id that
-         will be taken as reference to which the significant change defined in
-         tmnxSubApCrSignChangeDelta applies."
-    DEFVAL      { 0 }
-    ::= { tmnxSubApCustRecordEntry 4 }
-
 tmnxSubApCrSignChangeQICounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyQICounters
     MAX-ACCESS  read-write
@@ -10171,36 +10164,6 @@ tmnxSubApCrSignChangeQECounters  OBJECT-TYPE
          tmnxSubApCrSignChangeQueue has a non-zero value."
     DEFVAL      { {} }
     ::= { tmnxSubApCustRecordEntry 6 }
-
-tmnxSubApCrSignChangeOICounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrSignChangeOICounters specifies the ingress
-         counter Ids in the counter-group defined by tmnxSubApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxSubApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxSubApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxSubApCustRecordEntry 7 }
-
-tmnxSubApCrSignChangeOECounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrSignChangeOECounters specifies the egress
-         counter Ids in the counter-group defined by tmnxSubApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxSubApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxSubApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxSubApCustRecordEntry 8 }
 
 tmnxSubApCustRecQueueLastChnge   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -10303,108 +10266,6 @@ tmnxSubApCrQueueECounters        OBJECT-TYPE
          tmnxSubApCrQueueECounters must have a non-zero value."
     DEFVAL      { {} }
     ::= { tmnxSubApCustRecordQueueEntry 5 }
-
-tmnxSubApCustRecOvrCtrLastChnge  OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCustRecOvrCtrLastChnge indicates the sysUpTime
-         at the time of the last modification of tmnxSubApCrOverrideCntrTable.
-
-         If no changes were made to the entry since the last re-initialization
-         of the local network management subsystem, then this object contains a
-         zero value."
-    ::= { tmnxSubMgmtObjects 53 }
-
-tmnxSubApCrOverrideCntrTable     OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxSubApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The Nokia SROS series tmnxSubApCrOverrideCntrTable allows to create
-         custom record counter override information for a given accounting
-         policy. Rows can only be created for existing accounting policies (as
-         defined in tmnxSubApTable)."
-    ::= { tmnxSubMgmtObjects 54 }
-
-tmnxSubApCrOverrideCntrEntry     OBJECT-TYPE
-    SYNTAX      TmnxSubApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "Defines an entry in the tmnxSubApCrOverrideCntrTable. Entries in this
-         table are created and destroyed via SNMP Set requests."
-    INDEX       {
-        tmnxSubAcctPlcyName,
-        tmnxSubApCrOverrideCntrId
-    }
-    ::= { tmnxSubApCrOverrideCntrTable 1 }
-
-TmnxSubApCrOverrideCntrEntry     ::= SEQUENCE
-{
-    tmnxSubApCrOverrideCntrId        THsmdaCounterIdOrZero,
-    tmnxSubApCrOverrideCntrRowStatus RowStatus,
-    tmnxSubApCrOverrideCntrLastChngd TimeStamp,
-    tmnxSubApCrOverrideCntrICounters TmnxAccPlcyOICounters,
-    tmnxSubApCrOverrideCntrECounters TmnxAccPlcyOECounters
-}
-
-tmnxSubApCrOverrideCntrId        OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZero (1..8)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxSubApCrOverrideCntrId specifies the counter group for
-         which counters will be collected in this custom record. The counters
-         that will be collected are defined in tmnxSubApCrOverrideCntrICounters
-         and tmnxSubApCrOverrideCntrECounters."
-    ::= { tmnxSubApCrOverrideCntrEntry 1 }
-
-tmnxSubApCrOverrideCntrRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "Row Status of the entry. This allows creation/deletion of rows in this
-         table."
-    ::= { tmnxSubApCrOverrideCntrEntry 2 }
-
-tmnxSubApCrOverrideCntrLastChngd OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrOverrideCntrLastChngd indicates the sysUpTime
-         when an object in this table was last modified. A Value 0 means that
-         no change was made to this row since it was created."
-    ::= { tmnxSubApCrOverrideCntrEntry 3 }
-
-tmnxSubApCrOverrideCntrICounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrOverrideCntrICounters specifies the list of
-         ingress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxSubApCrOverrideCntrICounters or
-         tmnxSubApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxSubApCrOverrideCntrEntry 4 }
-
-tmnxSubApCrOverrideCntrECounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubApCrOverrideCntrECounters specifies the list of
-         egress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxSubApCrOverrideCntrICounters or
-         tmnxSubApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxSubApCrOverrideCntrEntry 5 }
 
 tmnxSubApCCPlcyTableLastChnge    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -14655,10 +14516,7 @@ tmnxSLAProfInstOvrWrrWeight      OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSLAProfInstOvrWrrWeight is only relevant if the value
-         of tmnxSLAProfInstOvrType is equal to 'queue', and if the queue
-         specified in tmnxSLAProfInstOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this PPP session."
+         of tmnxSLAProfInstOvrType is equal to 'queue' ."
     ::= { tmnxSLAProfInstOverridesEntry 9 }
 
 tmnxSLAProfInstOvrPIRHi          OBJECT-TYPE
@@ -15022,10 +14880,7 @@ tmnxSubOvrWrrWeight              OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubOvrWrrWeight is only relevant if the value of
-         tmnxSubOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this PPP session."
+         tmnxSubOvrType is equal to 'queue' ."
     ::= { tmnxSubOverridesEntry 9 }
 
 tmnxSubOvrPIRHi                  OBJECT-TYPE
@@ -24442,10 +24297,7 @@ tmnxSubSlaacOvrWrrWeight         OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubSlaacOvrWrrWeight is only relevant if the value of
-         tmnxSubSlaacOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubSlaacOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated with this PPP session."
+         tmnxSubSlaacOvrType is equal to 'queue' ."
     ::= { tmnxSubSlaacOvrEntry 9 }
 
 tmnxSubSlaacOvrSummedCIR         OBJECT-TYPE
@@ -29324,6 +29176,10 @@ tmnxSubHttpRdrPlcyUrl            OBJECT-TYPE
          - $NASIP:   specifies that '$NASIP' must be replaced with a string that
                      represents the RADIUS IP address of the ISA/ESA-VM;
                      this IP address can be used as the destination IP address
+                     of a CoA message to move from portal to ESM or DSM state.
+         - $NASIPV6: specifies that '$NASIPV6' must be replaced with a string that
+                     represents the RADIUS IPv6 address of the ISA/ESA-VM;
+                     this IPv6 address can be used as the destination IPv6 address
                      of a CoA message to move from portal to ESM or DSM state."
     DEFVAL      { "" }
     ::= { tmnxSubHttpRdrPlcyEntry 5 }
@@ -32457,10 +32313,7 @@ tmnxSubSpiOvrWrrWeight           OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubSpiOvrWrrWeight is only relevant if the value of
-         tmnxSubSpiOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubSpiOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this PPP session."
+         tmnxSubSpiOvrType is equal to 'queue' ."
     ::= { tmnxSubSpiOvrEntry 9 }
 
 tmnxSubSpiOvrPIRHi               OBJECT-TYPE
@@ -37200,7 +37053,8 @@ TmnxSubEgrQosAggShaperEntry      ::= SEQUENCE
     tmnxSubEgrQosAggShapBurstLimit   Integer32,
     tmnxSubEgrQosAggShapDepth        Unsigned32,
     tmnxSubEgrQosAggShapPacketMode   TmnxPacketMode,
-    tmnxSubEgrQosAggShapOutOfDate    TruthValue
+    tmnxSubEgrQosAggShapOutOfDate    TruthValue,
+    tmnxSubEgrQosAggShapQSetSize     Unsigned32
 }
 
 tmnxSubEgrQosAggShapPort         OBJECT-TYPE
@@ -37336,6 +37190,15 @@ tmnxSubEgrQosAggShapOutOfDate    OBJECT-TYPE
          aggregate shaper algorithm has not yet re-run, and therefore
          tmnxSubEgrQosAggShapOperRate has not yet been recalculated."
     ::= { tmnxSubEgrQosAggShaperEntry 14 }
+
+tmnxSubEgrQosAggShapQSetSize     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubEgrQosAggShapQSetSize indicates the queue set size
+         of the aggregate shaper."
+    ::= { tmnxSubEgrQosAggShaperEntry 15 }
 
 tmnxSubscriberNotifyObjects      OBJECT IDENTIFIER ::= { tmnxSubMgmt 2 }
 
@@ -39181,7 +39044,10 @@ TmnxSubPppEntry                  ::= SEQUENCE
     tmnxSubPppRadSubIfPfxLen         InetAddressPrefixLength,
     tmnxSubPppSteeringProfile        TNamedItemOrEmpty,
     tmnxSubPppSteeringOperState      TmnxLacSteeringOperState,
-    tmnxSubPppRtrAdvPlcy             TNamedItemOrEmpty
+    tmnxSubPppRtrAdvPlcy             TNamedItemOrEmpty,
+    tmnxSubPppLcpKaOrigin            Unsigned32,
+    tmnxSubPppLcpKaInterval          Unsigned32,
+    tmnxSubPppLcpKaHoldUpMplier      Unsigned32
 }
 
 tmnxSubPppIndex                  OBJECT-TYPE
@@ -40028,6 +39894,36 @@ tmnxSubPppRtrAdvPlcy             OBJECT-TYPE
          advertisement policy associated with this session during
          authentication."
     ::= { tmnxSubPppEntry 112 }
+
+tmnxSubPppLcpKaOrigin            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubPppLcpKaOrigin specifies the origin of the values for
+         tmnxSubPppLcpKaInterval and tmnxSubPppLcpKaHoldUpMplier."
+    ::= { tmnxSubPppEntry 113 }
+
+tmnxSubPppLcpKaInterval          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubPppLcpKaInterval specifies the time interval in
+         seconds at which LCP echo requests are transmitted. This number will
+         override the value defined within the PPPoE policy."
+    ::= { tmnxSubPppEntry 114 }
+
+tmnxSubPppLcpKaHoldUpMplier      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubPppLcpKaHoldUpMplier specifies how many  LCP
+         keepalive messages can be missed before the related PPP session is
+         brought down. This number will override the value defined within the
+         PPPoE policy."
+    ::= { tmnxSubPppEntry 115 }
 
 tmnxSubPppStatTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSubPppStatEntry
@@ -40886,10 +40782,7 @@ tmnxSubPppOvrWrrWeight           OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubPppOvrWrrWeight is only relevant if the value of
-         tmnxSubPppOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubPppOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this PPP session."
+         tmnxSubPppOvrType is equal to 'queue' ."
     ::= { tmnxSubPppOvrEntry 9 }
 
 tmnxSubPppOvrPIRHi               OBJECT-TYPE
@@ -42399,186 +42292,6 @@ tmnxSubHsmdaIngQosPolStatMode    OBJECT-TYPE
     DEFVAL      { noOverride }
     ::= { tmnxSubHsmdaIngQosPolEntry 3 }
 
-tmnxSubEgrPStatsTable            OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxSubEgrPStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The tmnxSubEgrPStatsTable contains egress QoS policer statistics about
-         HSMDA-2 subscribers."
-    ::= { tmnxSubHsmda2Objs 8 }
-
-tmnxSubEgrPStatsEntry            OBJECT-TYPE
-    SYNTAX      TmnxSubEgrPStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each row entry contains egress QoS policer statistics about a
-         particular HSMDA-2 subscriber and policer.
-
-         In the descriptions below 'Pchip' refers to the Nokia SROS series
-         Packet Processing chip, while 'Qchip' refers to the Nokia SROS series
-         QoS Queueing Engine chip."
-    INDEX       {
-        tmnxSubInfoSubIdent,
-        tSapEgrPolicerId
-    }
-    ::= { tmnxSubEgrPStatsTable 1 }
-
-TmnxSubEgrPStatsEntry            ::= SEQUENCE
-{
-    tmnxSubEgrPStatsMode             TmnxSubEgrPolicerStatMode,
-    tmnxSubEgrPStatsOffInProfPkts    Counter64,
-    tmnxSubEgrPStatsOffInProfOcts    Counter64,
-    tmnxSubEgrPStatsOffOutProfPkts   Counter64,
-    tmnxSubEgrPStatsOffOutProfOcts   Counter64,
-    tmnxSubEgrPStatsOffUncolPkts     Counter64,
-    tmnxSubEgrPStatsOffUncolOcts     Counter64,
-    tmnxSubEgrPStatsDrpInProfPkts    Counter64,
-    tmnxSubEgrPStatsDrpInProfOcts    Counter64,
-    tmnxSubEgrPStatsDrpOutProfPkts   Counter64,
-    tmnxSubEgrPStatsDrpOutProfOcts   Counter64,
-    tmnxSubEgrPStatsFwdInProfPkts    Counter64,
-    tmnxSubEgrPStatsFwdInProfOcts    Counter64,
-    tmnxSubEgrPStatsFwdOutProfPkts   Counter64,
-    tmnxSubEgrPStatsFwdOutProfOcts   Counter64
-}
-
-tmnxSubEgrPStatsMode             OBJECT-TYPE
-    SYNTAX      TmnxSubEgrPolicerStatMode
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsMode indicates the stat mode used by the
-         policer."
-    ::= { tmnxSubEgrPStatsEntry 2 }
-
-tmnxSubEgrPStatsOffInProfPkts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffInProfPkts indicates the number of
-         in-profile packets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 3 }
-
-tmnxSubEgrPStatsOffInProfOcts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffInProfOcts indicates the number of
-         in-profile octets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 4 }
-
-tmnxSubEgrPStatsOffOutProfPkts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffOutProfPkts indicates the number of
-         out-of-profile packets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 5 }
-
-tmnxSubEgrPStatsOffOutProfOcts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffOutProfOcts indicates the number of
-         out-of-profile octets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 6 }
-
-tmnxSubEgrPStatsOffUncolPkts     OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffUncolPkts indicates the number of
-         uncolored packets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 7 }
-
-tmnxSubEgrPStatsOffUncolOcts     OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsOffUncolOcts indicates the number of
-         uncolored octets offered by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 8 }
-
-tmnxSubEgrPStatsDrpInProfPkts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsDrpInProfPkts indicates the number of
-         in-profile packets dropped by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 9 }
-
-tmnxSubEgrPStatsDrpInProfOcts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsDrpInProfOcts indicates the number of
-         in-profile octets dropped by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 10 }
-
-tmnxSubEgrPStatsDrpOutProfPkts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsDrpOutProfPkts indicates the number of
-         out-of-profile packets dropped by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 11 }
-
-tmnxSubEgrPStatsDrpOutProfOcts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsDrpOutProfOcts indicates the number of
-         out-of-profile octets dropped by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 12 }
-
-tmnxSubEgrPStatsFwdInProfPkts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsFwdInProfPkts indicates the number of
-         in-profile packets forwarded by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 13 }
-
-tmnxSubEgrPStatsFwdInProfOcts    OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsFwdInProfOcts indicates the number of
-         in-profile octets forwarded by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 14 }
-
-tmnxSubEgrPStatsFwdOutProfPkts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsFwdOutProfPkts indicates the number of
-         out-of-profile packets forwarded by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 15 }
-
-tmnxSubEgrPStatsFwdOutProfOcts   OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxSubEgrPStatsFwdOutProfOcts indicates the number of
-         out-of-profile octets forwarded by the egress Pchip."
-    ::= { tmnxSubEgrPStatsEntry 16 }
-
 tmnxSubIpoeObjs                  OBJECT IDENTIFIER ::= { tmnxSubMgmt 7 }
 
 tmnxSubIpoePlcyTableLastChanged  OBJECT-TYPE
@@ -43864,10 +43577,7 @@ tmnxSubIpoeOvrWrrWeight          OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubIpoeOvrWrrWeight is only relevant if the value of
-         tmnxSubIpoeOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubIpoeOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this IPoE session."
+         tmnxSubIpoeOvrType is equal to 'queue'"
     ::= { tmnxSubIpoeOvrEntry 7 }
 
 tmnxSubIpoeOvrPIRHi              OBJECT-TYPE
@@ -46974,10 +46684,7 @@ tmnxSubBrgOvrWrrWeight           OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of tmnxSubBrgOvrWrrWeight is only relevant if the value of
-         tmnxSubBrgOvrType is equal to 'queue', and if the queue specified in
-         tmnxSubBrgOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated with this PPP session."
+         tmnxSubBrgOvrType is equal to 'queue' ."
     ::= { tmnxSubBrgOvrEntry 9 }
 
 tmnxSubBrgOvrSummedCir           OBJECT-TYPE
@@ -50086,8 +49793,10 @@ TmnxPfcpAssocEntry               ::= SEQUENCE
     tmnxPfcpAssocTimerRunning        TimeStamp,
     tmnxPfcpAssocL2AwNatGroup        TmnxNatIsaGrpIdOrZero,
     tmnxPfcpAssocCurrReleaseTimeout  Unsigned32,
+    tmnxPfcpAssocPythonPolicy        TNamedItemOrEmpty,
     tmnxPfcpAssocCurrPeerNodeIdType  TmnxSubPfcpCurrPeerNodeIdType,
-    tmnxPfcpAssocCurrPeerFqdn        TmnxSubPfcpNodeIdDomainName
+    tmnxPfcpAssocCurrPeerFqdn        TmnxSubPfcpNodeIdDomainName,
+    tmnxPfcpAssocPathDownDetect      TruthValue
 }
 
 tmnxPfcpAssocName                OBJECT-TYPE
@@ -50225,8 +49934,8 @@ tmnxPfcpAssocSetupRetryT         OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxPfcpAssocSetupRetryT specifies the time to wait
-         before attempting a retry after an Sx association setup failed."
+        "The value of tmnxPfcpAssocSetupRetryT is ignored. This object will be
+         obsoleted in a future release."
     DEFVAL      { 10 }
     ::= { tmnxPfcpAssocEntry 14 }
 
@@ -50253,7 +49962,7 @@ tmnxPfcpAssocHbTimeout           OBJECT-TYPE
     ::= { tmnxPfcpAssocEntry 16 }
 
 tmnxPfcpAssocHbRetries           OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..15)
+    SYNTAX      Unsigned32 (0..30)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -50270,7 +49979,7 @@ tmnxPfcpAssocTxTimeout           OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxPfcpAssocTxTimeout specifies the retransmission timer
          T1."
-    DEFVAL      { 5 }
+    DEFVAL      { 1 }
     ::= { tmnxPfcpAssocEntry 19 }
 
 tmnxPfcpAssocTxRetries           OBJECT-TYPE
@@ -50446,7 +50155,8 @@ tmnxPfcpAssocUpNokiaFeatures     OBJECT-TYPE
         bulkAudit (0),
         natAm     (1),
         lac       (2),
-        sssg      (3)
+        sssg      (3),
+        fsg       (4)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -50473,7 +50183,7 @@ tmnxPfcpAssocCpFeatures          OBJECT-TYPE
     ::= { tmnxPfcpAssocEntry 39 }
 
 tmnxPfcpAssocPathRestorationTime OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 5..1440)
+    SYNTAX      Unsigned32 (0 | 1..1440)
     UNITS       "minutes"
     MAX-ACCESS  read-create
     STATUS      current
@@ -50549,6 +50259,19 @@ tmnxPfcpAssocCurrReleaseTimeout  OBJECT-TYPE
          tmnxPfcpAssocReleaseTimeout."
     ::= { tmnxPfcpAssocEntry 46 }
 
+tmnxPfcpAssocPythonPolicy        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpAssocPythonPolicy specifies the Python policy
+         used for modifying PFCP messages.
+
+         A non-empty value for tmnxRadIsaPlcyPythonPolicy must correspond to a
+         row in the TIMETRA-PYTHON-MIB::tmnxPythonPolicyTable."
+    DEFVAL      { "" }
+    ::= { tmnxPfcpAssocEntry 48 }
+
 tmnxPfcpAssocCurrPeerNodeIdType  OBJECT-TYPE
     SYNTAX      TmnxSubPfcpCurrPeerNodeIdType
     MAX-ACCESS  read-only
@@ -50570,6 +50293,16 @@ tmnxPfcpAssocCurrPeerFqdn        OBJECT-TYPE
          The tmnxPfcpAssocCurrPeerFqdn has only a non-empty value if the value
          of tmnxPfcpAssocCurrPeerNodeIdType is equal to 'fqdn'."
     ::= { tmnxPfcpAssocEntry 50 }
+
+tmnxPfcpAssocPathDownDetect      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpAssocPathDownDetect specifies whether the PFCP
+         path state will be put in restoration upon detecting a BFD down event"
+    DEFVAL      { false }
+    ::= { tmnxPfcpAssocEntry 51 }
 
 tmnxSubGitTableLastChanged       OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -51222,6 +50955,9 @@ TmnxPfcpStatsEntry               ::= SEQUENCE
     tmnxPfcpStatsIbcpPktDefTnlNoTrig Counter32,
     tmnxPfcpStatsIbcpPktNoDefTnl     Counter32,
     tmnxPfcpStatsIbcpDefTnlOverwrite Counter32,
+    tmnxPfcpStatsDdrReq              Counter32,
+    tmnxPfcpStatsDdrRsp              Counter32,
+    tmnxPfcpStatsDdrRspFail          Counter32,
     tmnxPfcpStatsLastCleared         TimeStamp
 }
 
@@ -51844,6 +51580,33 @@ tmnxPfcpStatsIbcpDefTnlOverwrite OBJECT-TYPE
         "The value of tmnxPfcpStatsIbcpDefTnlOverwrite indicates that the
          existing ibcp default tunnel is overwritten  with another sessionId"
     ::= { tmnxPfcpStatsEntry 68 }
+
+tmnxPfcpStatsDdrReq              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpStatsDdrReq indicates the number of Downlink Data
+         Report Request messages transmitted."
+    ::= { tmnxPfcpStatsEntry 70 }
+
+tmnxPfcpStatsDdrRsp              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpStatsDdrRsp indicates the number of Downlink Data
+         Report Response messages received without failure."
+    ::= { tmnxPfcpStatsEntry 71 }
+
+tmnxPfcpStatsDdrRspFail          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpStatsDdrRspFail indicates the number of Downlink
+         Data Report Response messages received with a failure cause."
+    ::= { tmnxPfcpStatsEntry 72 }
 
 tmnxPfcpStatsLastCleared         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -52600,6 +52363,33 @@ tmnxPfcpTotalIbcpDefTnlOverwrite OBJECT-TYPE
          number of times the default tunnel is overwritten."
     ::= { tmnxPfcpStatsTotalObjects 68 }
 
+tmnxPfcpTotalDdrReq              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpTotalDdrReq indicates the total number of
+         Downlink Data Report Request messages transmitted."
+    ::= { tmnxPfcpStatsTotalObjects 70 }
+
+tmnxPfcpTotalDdrRsp              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpTotalDdrRsp indicates the total number of
+         Downlink Data Report Response messages received without failure."
+    ::= { tmnxPfcpStatsTotalObjects 71 }
+
+tmnxPfcpTotalDdrRspFail          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpTotalDdrRspFail indicates the total number of
+         Downlink Data Report Response messages received with a failure cause."
+    ::= { tmnxPfcpStatsTotalObjects 72 }
+
 tmnxPfcpSessionTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxPfcpSessionEntry
     MAX-ACCESS  not-accessible
@@ -52661,7 +52451,15 @@ TmnxPfcpSessionEntry             ::= SEQUENCE
     tmnxPfcpSeProtocols              BITS,
     tmnxPfcpSeL2tpRouter             TmnxVRtrIDOrZero,
     tmnxPfcpSeL2tpSeId               Unsigned32,
-    tmnxPfcpSeFsgId                  Unsigned32
+    tmnxPfcpSeFsgId                  Unsigned32,
+    tmnxPfcpSeFsgOperState           INTEGER,
+    tmnxPfcpSeRemGtpuAddrType        InetAddressType,
+    tmnxPfcpSeRemGtpuAddr            InetAddress,
+    tmnxPfcpSeRemGtpuTeId            Unsigned32,
+    tmnxPfcpSeLocGtpuAddrType        InetAddressType,
+    tmnxPfcpSeLocGtpuAddr            InetAddress,
+    tmnxPfcpSeLocGtpuTeId            Unsigned32,
+    tmnxPfcpSeLocGtpuRouter          TmnxVRtrIDOrZero
 }
 
 tmnxPfcpSeIdHi                   OBJECT-TYPE
@@ -52986,7 +52784,8 @@ tmnxPfcpSeProtocols              OBJECT-TYPE
         ipoedhcp4 (0),
         ipoedhcp6 (1),
         ipoers    (2),
-        pppoedisc (3)
+        pppoedisc (3),
+        reserved4 (4)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -53034,6 +52833,83 @@ tmnxPfcpSeFsgId                  OBJECT-TYPE
          the Fate Sharing Group (tmnxSubUpResFsgTable) associated with this
          PFCP session."
     ::= { tmnxPfcpSessionEntry 39 }
+
+tmnxPfcpSeFsgOperState           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown (0),
+        standby (1),
+        active  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPfcpSeFsgOperState indicates the oper
+         state of the Fate Sharing Group (tmnxSubUpResFsgTable) associated with
+         this PFCP session."
+    ::= { tmnxPfcpSessionEntry 42 }
+
+tmnxPfcpSeRemGtpuAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpSeRemGtpuAddrType indicates the type of address
+         stored in tmnxPfcpSeRemGtpuAddr."
+    ::= { tmnxPfcpSessionEntry 43 }
+
+tmnxPfcpSeRemGtpuAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpSeRemGtpuAddr indicates the remote IP address of
+         the GTPU tunnel."
+    ::= { tmnxPfcpSessionEntry 44 }
+
+tmnxPfcpSeRemGtpuTeId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPfcpSeRemGtpuTeId indicates the remote
+         Traffic Endpoint ID (TE-ID) of the GTPU tunnel."
+    ::= { tmnxPfcpSessionEntry 45 }
+
+tmnxPfcpSeLocGtpuAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpSeLocGtpuAddrType indicates the type of address
+         stored in tmnxPfcpSeLocGtpuAddr."
+    ::= { tmnxPfcpSessionEntry 46 }
+
+tmnxPfcpSeLocGtpuAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpSeLocGtpuAddr indicates the local IP address of
+         the GTPU tunnel."
+    ::= { tmnxPfcpSessionEntry 47 }
+
+tmnxPfcpSeLocGtpuTeId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPfcpSeLocGtpuTeId indicates the local
+         Traffic Endpoint ID (TE-ID) of the GTPU tunnel."
+    ::= { tmnxPfcpSessionEntry 48 }
+
+tmnxPfcpSeLocGtpuRouter          OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPfcpSeLocGtpuRouter indicates the virtual router
+         instance used for the GTPU tunnel."
+    ::= { tmnxPfcpSessionEntry 49 }
 
 tmnxPfcpPeerTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxPfcpPeerEntry
@@ -53742,6 +53618,96 @@ tmnxSubUpFsgStatsNrEntries       OBJECT-TYPE
         "The value of tmnxSubUpFsgStatsNrEntries specifies the number of FSG
          entries."
     ::= { tmnxSubUpResFsgStatsObjs 2 }
+
+tmnxSubUpFsgStatsOpInvalid       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpInvalid specifies the number of
+         invalid operations on FSG entries."
+    ::= { tmnxSubUpResFsgStatsObjs 3 }
+
+tmnxSubUpFsgStatsOpCreate        OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpCreate specifies the number of FSG
+         entries that were created sucessfully."
+    ::= { tmnxSubUpResFsgStatsObjs 4 }
+
+tmnxSubUpFsgStatsOpCreateFail    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpCreateFail specifies the number of FSG
+         entries that were created but failed."
+    ::= { tmnxSubUpResFsgStatsObjs 5 }
+
+tmnxSubUpFsgStatsOpCreateTotal   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpCreateTotal specifies the total number
+         of FSG entries that were created"
+    ::= { tmnxSubUpResFsgStatsObjs 6 }
+
+tmnxSubUpFsgStatsOpMod           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpMod specifies the number of FSG
+         entries that were modified sucessfully."
+    ::= { tmnxSubUpResFsgStatsObjs 7 }
+
+tmnxSubUpFsgStatsOpModFail       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpModFail specifies the number of FSG
+         entries that were modified but failed."
+    ::= { tmnxSubUpResFsgStatsObjs 8 }
+
+tmnxSubUpFsgStatsOpModTotal      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpModTotal specifies the total number of
+         FSG entries that were modified."
+    ::= { tmnxSubUpResFsgStatsObjs 9 }
+
+tmnxSubUpFsgStatsOpDel           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpDel specifies the number of FSG
+         entries that were deleted sucessfully."
+    ::= { tmnxSubUpResFsgStatsObjs 10 }
+
+tmnxSubUpFsgStatsOpDelFail       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpDelFail specifies the number of FSG
+         entries that were deleted but failed."
+    ::= { tmnxSubUpResFsgStatsObjs 11 }
+
+tmnxSubUpFsgStatsOpDelTotal      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubUpFsgStatsOpDelTotal specifies the total number of
+         FSG entries that were deleted."
+    ::= { tmnxSubUpResFsgStatsObjs 12 }
 
 tmnxSubMgmtConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 33 }
 
@@ -54490,7 +54456,6 @@ tmnxSubMgmtSROSV14v0Compliance   MODULE-COMPLIANCE
             tmnxSubRadClassGroup,
             tmnxSubIpoeV14v0Group,
             tmnxSubMgmtV14v0NotifGroup,
-            tmnxSubHsmdaV14v0Group,
             tmnxSubErrorsGroup,
             tmnxSubCreditControlV14v0Group
         }
@@ -54574,7 +54539,6 @@ tmnxSubMgmtSROSV15v0Compliance   MODULE-COMPLIANCE
             tmnxSubRadClassGroup,
             tmnxSubIpoeV14v0Group,
             tmnxSubMgmtV14v0NotifGroup,
-            tmnxSubHsmdaV14v0Group,
             tmnxSubErrorsGroup,
             tmnxSubCreditControlV14v0Group,
             tmnxSubHsqV15v0Group,
@@ -54670,7 +54634,6 @@ tmnxSubMgmtSROSV16v0Compliance   MODULE-COMPLIANCE
             tmnxSubRadClassGroup,
             tmnxSubIpoeV14v0Group,
             tmnxSubMgmtV14v0NotifGroup,
-            tmnxSubHsmdaV14v0Group,
             tmnxSubErrorsGroup,
             tmnxSubCreditControlV14v0Group,
             tmnxSubHsqV15v0Group,
@@ -54782,7 +54745,6 @@ tmnxSubMgmtSROSV19v0Compliance   MODULE-COMPLIANCE
             tmnxSubRadClassGroup,
             tmnxSubIpoeV14v0Group,
             tmnxSubMgmtV14v0NotifGroup,
-            tmnxSubHsmdaV14v0Group,
             tmnxSubErrorsGroup,
             tmnxSubCreditControlV14v0Group,
             tmnxSubHsqV15v0Group,
@@ -55034,7 +54996,7 @@ tmnxSubMgmtSROSV21v0Compliance   MODULE-COMPLIANCE
     ::= { tmnxSubMgmtCompliances 33 }
 
 tmnxSubMgmtSROSV22v0Compliance   MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for TIMETRA-SUBSCRIBER-MGMT-MIB on Nokia SROS
          systems release 22.0."
@@ -55148,9 +55110,138 @@ tmnxSubMgmtSROSV22v0Compliance   MODULE-COMPLIANCE
             tmnxSubShcvV21v0Group,
             tmnxSubHttpRdrPlcyV22v0Group,
             tmnxSubMgmtV21v0NotifGroup,
-            tmnxSubHqosV22v0Group
+            tmnxSubHqosV22v0Group,
+            tmnxSubCupsPfcpBfdV22v0Group,
+            tmnxSubCupsStatsDDRV22v0Group,
+            tmnxSubVportLagPLHWV22v0Group,
+            tmnxSubHostInfoHWASV22v0Group
         }
     ::= { tmnxSubMgmtCompliances 34 }
+
+tmnxSubMgmtSROSV23v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for TIMETRA-SUBSCRIBER-MGMT-MIB on Nokia SROS
+         systems release 23.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSubAleGroup,
+            tmnxSubAuthenticationV10v0Group,
+            tmnxSubAuthenticationV11v0Group,
+            tmnxSubAuthenticationV12v0Group,
+            tmnxSubAuthenticationV14v0Group,
+            tmnxSubAccountingV10v0Group,
+            tmnxSubAccountingV11v0Group,
+            tmnxSubAccountingV12v0Group,
+            tmnxSubAccountingV13v0Group,
+            tmnxSubAccountingV14v0Group,
+            tmnxSubAccountingV15v0Group,
+            tmnxSubAccountingV16v0Group,
+            tmnxSubAccountingV19v0Group,
+            tmnxSubMgmtV7v0NotifGroup,
+            tmnxSubMgmtV9v0NotifGroup,
+            tmnxSubMgmtV10v0NotifGroup,
+            tmnxSubMgmtV12v0NotifGroup,
+            tmnxSubMgmtV13v0NotifGroup,
+            tmnxSubMgmtObsoletedNotifGroup,
+            tmnxSubMgmtIpoeNotifGroup,
+            tmnxSubRadNotifStatsV6v0Group,
+            tmnxSubFrameBasedAccntV6v0Group,
+            tmnxSubBsxObjV16v0Group,
+            tmnxSubHostTrackingV9v0Group,
+            tmnxSubRadusPlcyCustomRecordV7v0Group,
+            tmnxSubCreditControlV8v0Group,
+            tmnxCcIpFltrV8v0Group,
+            tmnxCcIpv6FltrV8v0Group,
+            tmnxSubV6GrpIfRAV11v0Group,
+            tmnxSubMgmtIPv6V8v0Group,
+            tmnxSubProfileMssExtensionsGroup,
+            tmnxSubCreditControlV9v0Group,
+            tmnxSubCreditControlV10v0Group,
+            tmnxSubCreditControlV13v0Group,
+            tmnxSubAutoSubIdV10v0Group,
+            tmnxSubAutoSubIdV13v0Group,
+            tmnxSubIpoeLinkV10v0Group,
+            tmnxSubPppV11v0Group,
+            tmnxSubPppV13v0Group,
+            tmnxSubSlaacV11v0Group,
+            tmnxSubSlaacV12v0Group,
+            tmnxSubSlaacV13v0Group,
+            tmnxSubNatV14v0Group,
+            tmnxSubL2tpGroup,
+            tmnxSubMgmtV11v0Group,
+            tmnxSubMgmtV12v0Group,
+            tmnxSubMgmtV13v0Group,
+            tmnxSubMgmtV14v0Group,
+            tmnxSubMgmtV15v0Group,
+            tmnxSubMgmtV16v0Group,
+            tmnxSubHttpRedirectGroup,
+            tmnxSubHttpRedirectV12v0Group,
+            tmnxSubVSubnetV12v0Group,
+            tmnxSubSysGroup,
+            tmnxSubServiceGroup,
+            tmnxSubSchedulerRateV11v0Group,
+            tmnxSubSchedulerRateV12v0Group,
+            tmnxSubSchedulerRateV13v0Group,
+            tmnxSubQosParentLocV12v0Group,
+            tmnxSubIpoeV13v0Group,
+            tmnxSubRipV13v0Group,
+            tmnxSubCcLongCatMapNameGroup,
+            tmnxSubPimGroup,
+            tmnxSubShcvGroup,
+            tmnxSubPppDfGroup,
+            tmnxSubPccRuleEntryV13v0Group,
+            tmnxSubPccRuleEntryV14v0Group,
+            tmnxSubDataTriggerGroup,
+            tmnxSubRadClassGroup,
+            tmnxSubIpoeV14v0Group,
+            tmnxSubMgmtV14v0NotifGroup,
+            tmnxSubErrorsGroup,
+            tmnxSubCreditControlV14v0Group,
+            tmnxSubHsqV15v0Group,
+            tmnxSubAccuStatsV15v0Group,
+            tmnxSteeringProfV15v0Group,
+            tmnxSubVcpeV15v0Group,
+            tmnxSubRtrAdvPlcyV15v0Group,
+            tmnxSubMgmtV15v0NotifGroup,
+            tmnxSubMgmtSvcChainV15v0Group,
+            tmnxSubDhcpOverloadGroup,
+            tmnxSubSpiSharingV16v0Group,
+            tmnxSubGtpObjV15v0Group,
+            tmnxSubGtpObjV16v0Group,
+            tmnxSubMgmtV16v0NotifGroup,
+            tmnxSubCupsV20v0Group,
+            tmnxSubCupsUpNotifGroup,
+            tmnxSubMgmtV19v0NotifGroup,
+            tmnxSubPccRuleEntryV19v0Group,
+            tmnxSubStringLenLongV20v0Group,
+            tmnxSubVcpeV20v0Group,
+            tmnxSubIpoeV20v0Group,
+            tmnxSubMgmtV20v0Group,
+            tmnxSubMgmtSvcStatsV20v0Group,
+            tmnxSubMgmtSubItfStatsV20v0Group,
+            tmnxSubMgmtGrpItfStatsV20v0Group,
+            tmnxSubMgmtV20v0NotifGroup,
+            tmnxSubMgmtSVlanStatsV21v0Group,
+            tmnxSubMgmtProfV21v0Group,
+            tmnxSubProfileV21v0Group,
+            tmnxSubMgmtV21v0Group,
+            tmnxSubIpoeV21v0Group,
+            tmnxSubHostInfoV21v0Group,
+            tmnxSubCupsV22v0Group,
+            tmnxSubMgmtV22v0Group,
+            tmnxSubShcvV21v0Group,
+            tmnxSubHttpRdrPlcyV22v0Group,
+            tmnxSubMgmtV21v0NotifGroup,
+            tmnxSubHqosV22v0Group,
+            tmnxSubCupsPfcpBfdV22v0Group,
+            tmnxSubCupsStatsDDRV22v0Group,
+            tmnxSubVportLagPLHWV22v0Group,
+            tmnxSubHostInfoHWASV22v0Group,
+            tmnxSubPppV23v0Group,
+            tmnxSubFwaV23v0Group
+        }
+    ::= { tmnxSubMgmtCompliances 35 }
 
 tmnxSubMgmtGroups                OBJECT IDENTIFIER ::= { tmnxSubMgmtConformance 2 }
 
@@ -55885,7 +55976,6 @@ tmnxHsmdaSubscriberV6v0Group     OBJECT-GROUP
         tmnxSubProfHsmdaIngAggRateLimit,
         tmnxSubProfHsmdaEgrAggRateLimit,
         tmnxSubProfHsmdaIngPackByteOff,
-        tmnxSubProfHsmdaEgrPackByteOff,
         tmnxSubHsmdaIngQueueOvrTableLC,
         tmnxSubHsmdaIngQueueOvrRowStat,
         tmnxSubHsmdaIngQueueOvrLastChgd,
@@ -58687,7 +58777,6 @@ tmnxSubObsoletedV10v0Group       OBJECT-GROUP
         tmnxSubProfHsmdaIngAggRateLimit,
         tmnxSubProfHsmdaEgrAggRateLimit,
         tmnxSubProfHsmdaIngPackByteOff,
-        tmnxSubProfHsmdaEgrPackByteOff,
         tmnxSubHsmdaIngQueueOvrTableLC,
         tmnxSubHsmdaEgrQueueOvrTblLC,
         tmnxSubHsmdaIngQueueOvrRowStat,
@@ -60607,31 +60696,6 @@ tmnxSubCreditControlV13v0Group   OBJECT-GROUP
          the credit control feature on Nokia SROS series systems added in
          release 13.0."
     ::= { tmnxSubMgmtGroups 120 }
-
-tmnxSubHsmdaV14v0Group           OBJECT-GROUP
-    OBJECTS     {
-        tmnxSubEgrPStatsMode,
-        tmnxSubEgrPStatsOffInProfPkts,
-        tmnxSubEgrPStatsOffInProfOcts,
-        tmnxSubEgrPStatsOffOutProfPkts,
-        tmnxSubEgrPStatsOffOutProfOcts,
-        tmnxSubEgrPStatsOffUncolPkts,
-        tmnxSubEgrPStatsOffUncolOcts,
-        tmnxSubEgrPStatsDrpInProfPkts,
-        tmnxSubEgrPStatsDrpInProfOcts,
-        tmnxSubEgrPStatsDrpOutProfPkts,
-        tmnxSubEgrPStatsDrpOutProfOcts,
-        tmnxSubEgrPStatsFwdInProfPkts,
-        tmnxSubEgrPStatsFwdInProfOcts,
-        tmnxSubEgrPStatsFwdOutProfPkts,
-        tmnxSubEgrPStatsFwdOutProfOcts,
-        tmnxSubInfoIngQosPolIdOvr
-    }
-    STATUS      obsolete
-    DESCRIPTION
-        "The group of subscriber management objects supporting management of
-         HSMDA-2 on Nokia SROS series systems added in release 14.0."
-    ::= { tmnxSubMgmtGroups 121 }
 
 tmnxSubErrorsGroup               OBJECT-GROUP
     OBJECTS     {
@@ -63493,7 +63557,6 @@ tmnxSubMgmtProfV21v0Group        OBJECT-GROUP
         tmnxSPIEgrPStatsOffInPProfOcts,
         tmnxSPIEgrPStatsFwdInPProfOcts,
         tmnxSPIEgrPStatsDrpInPProfOcts,
-        tmnxSubInfoIngQosPolIdOvr,
         tmnxSubInfoEgrSecShaper,
         tmnxSubIngQStatsOffTotalOcts,
         tmnxSubIngQStatsFwdInProfPkts,
@@ -63672,21 +63735,6 @@ tmnxSubProfObsoleteV21v0Group    OBJECT-GROUP
         tmnxSubHsmdaStEgrDropOutProfPkt,
         tmnxSubHsmdaStEgrDropInProfOct,
         tmnxSubHsmdaStEgrDropOutProfOct,
-        tmnxSubEgrPStatsMode,
-        tmnxSubEgrPStatsOffInProfPkts,
-        tmnxSubEgrPStatsOffInProfOcts,
-        tmnxSubEgrPStatsOffOutProfPkts,
-        tmnxSubEgrPStatsOffOutProfOcts,
-        tmnxSubEgrPStatsOffUncolPkts,
-        tmnxSubEgrPStatsOffUncolOcts,
-        tmnxSubEgrPStatsDrpInProfPkts,
-        tmnxSubEgrPStatsDrpInProfOcts,
-        tmnxSubEgrPStatsDrpOutProfPkts,
-        tmnxSubEgrPStatsDrpOutProfOcts,
-        tmnxSubEgrPStatsFwdInProfPkts,
-        tmnxSubEgrPStatsFwdInProfOcts,
-        tmnxSubEgrPStatsFwdOutProfPkts,
-        tmnxSubEgrPStatsFwdOutProfOcts,
         tmnxSubIngQStatsFwdInProfPkts,
         tmnxSubIngQStatsFwdOutProfPkts,
         tmnxSubIngQStatsFwdInProfOcts,
@@ -63719,15 +63767,7 @@ tmnxSubProfObsoleteV21v0Group    OBJECT-GROUP
         tmnxSubEgrOvrCntrDropInProfOcts,
         tmnxSubEgrOvrCntrDropOutProfOcts,
         tmnxSubEgrOvrCntrStatModeFormat,
-        tmnxSubSapTmplDelPfxLenMode,
-        tmnxSubApCrSignChangeOCntr,
-        tmnxSubApCrSignChangeOICounters,
-        tmnxSubApCrSignChangeOECounters,
-        tmnxSubApCustRecOvrCtrLastChnge,
-        tmnxSubApCrOverrideCntrRowStatus,
-        tmnxSubApCrOverrideCntrLastChngd,
-        tmnxSubApCrOverrideCntrICounters,
-        tmnxSubApCrOverrideCntrECounters
+        tmnxSubSapTmplDelPfxLenMode
     }
     STATUS      current
     DESCRIPTION
@@ -64125,6 +64165,7 @@ tmnxSubCupsV21v0Group            OBJECT-GROUP
         tmnxSubFsgTmplGarpGranularity,
         tmnxSubFsgTmplRedInterface,
         tmnxSubFsgTmplRedInterfaceSvc,
+        tmnxPfcpAssocPythonPolicy,
         tmnxPfcpAssocCurrPeerNodeIdType,
         tmnxPfcpAssocCurrPeerFqdn,
         tmnxSubFsgTmplStandbyFwding
@@ -64511,6 +64552,7 @@ tmnxSubCupsV22v0Group            OBJECT-GROUP
         tmnxSubFsgTmplGarpGranularity,
         tmnxSubFsgTmplRedInterface,
         tmnxSubFsgTmplRedInterfaceSvc,
+        tmnxPfcpAssocPythonPolicy,
         tmnxPfcpAssocCurrPeerNodeIdType,
         tmnxPfcpAssocCurrPeerFqdn,
         tmnxSubFsgTmplStandbyFwding,
@@ -64552,7 +64594,18 @@ tmnxSubCupsV22v0Group            OBJECT-GROUP
         tmnxSubUpResFsgIfIndex,
         tmnxSubUpFsgStatsRxMsgs,
         tmnxSubUpFsgStatsNrEntries,
-        tmnxSubUpFsgPfcpSessions
+        tmnxSubUpFsgPfcpSessions,
+        tmnxPfcpSeFsgOperState,
+        tmnxSubUpFsgStatsOpInvalid,
+        tmnxSubUpFsgStatsOpCreate,
+        tmnxSubUpFsgStatsOpCreateFail,
+        tmnxSubUpFsgStatsOpCreateTotal,
+        tmnxSubUpFsgStatsOpMod,
+        tmnxSubUpFsgStatsOpModFail,
+        tmnxSubUpFsgStatsOpModTotal,
+        tmnxSubUpFsgStatsOpDel,
+        tmnxSubUpFsgStatsOpDelFail,
+        tmnxSubUpFsgStatsOpDelTotal
     }
     STATUS      current
     DESCRIPTION
@@ -64616,6 +64669,80 @@ tmnxSubObsoletedV22v0Group       OBJECT-GROUP
         "The group of subscriber management objects obsoleted in release 22 of
          the Nokia SROS series systems."
     ::= { tmnxSubMgmtGroups 182 }
+
+tmnxSubCupsPfcpBfdV22v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxPfcpAssocPathDownDetect
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting bfd expedited headless on the Nokia
+         SROS series added in release 22.0."
+    ::= { tmnxSubMgmtGroups 185 }
+
+tmnxSubCupsStatsDDRV22v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxPfcpStatsDdrReq,
+        tmnxPfcpStatsDdrRsp,
+        tmnxPfcpStatsDdrRspFail,
+        tmnxPfcpTotalDdrReq,
+        tmnxPfcpTotalDdrRsp,
+        tmnxPfcpTotalDdrRspFail
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting downlink data reports in pfcp
+         association statistics in release 22.0."
+    ::= { tmnxSubMgmtGroups 186 }
+
+tmnxSubVportLagPLHWV22v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubHostInfoV2LagActivePort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of virtual port
+         weighted lag-per-link-hashing in release 22.0 on Nokia SROS series
+         systems."
+    ::= { tmnxSubMgmtGroups 187 }
+
+tmnxSubHostInfoHWASV22v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubHostInfoV2HwAggShapQSetSz,
+        tmnxSubEgrQosAggShapQSetSize
+    }
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { tmnxSubMgmtGroups 188 }
+
+tmnxSubPppV23v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubPppLcpKaOrigin,
+        tmnxSubPppLcpKaInterval,
+        tmnxSubPppLcpKaHoldUpMplier
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of subscriber PPPoE
+         sessions in release 23.0 on Nokia SROS series systems."
+    ::= { tmnxSubMgmtGroups 189 }
+
+tmnxSubFwaV23v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPfcpSeRemGtpuAddrType,
+        tmnxPfcpSeRemGtpuAddr,
+        tmnxPfcpSeRemGtpuTeId,
+        tmnxPfcpSeLocGtpuAddrType,
+        tmnxPfcpSeLocGtpuAddr,
+        tmnxPfcpSeLocGtpuTeId,
+        tmnxPfcpSeLocGtpuRouter
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting CUPS FWA on the Nokia SROS series
+         systems added in release 23.0."
+    ::= { tmnxSubMgmtGroups 192 }
 
 tmnxSubMgmtNotifGroup            OBJECT IDENTIFIER ::= { tmnxSubMgmtConformance 3 }
 

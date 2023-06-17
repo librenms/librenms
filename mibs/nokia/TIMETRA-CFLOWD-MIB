@@ -1,0 +1,2593 @@
+TIMETRA-CFLOWD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Counter64, Gauge32,
+    Integer32, IpAddress, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemDescription, TmnxActionType,
+    TmnxAdminState, TmnxEnabledDisabled,
+    TmnxOperState, TmnxStatus, TmnxVRtrID
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID, vRtrIfIndex
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraCflowdMIBModule           MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the Nokia
+         Cflowd traffic flow analysis utility.
+
+         Copyright 2003-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0                1 Jan 2017 00:00
+         15.0 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0                1 Jan 2015 00:00
+         13.0 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "201402010000Z"
+    DESCRIPTION
+        "Rev 12.0                1 Feb 2014 00:00
+         12.0 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "200501240000Z"
+    DESCRIPTION
+        "Rev 2.1                24 Jan 2005 00:00
+         2.1 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "200401150000Z"
+    DESCRIPTION
+        "Rev 2.0                15 Jan 2004 00:00
+         2.0 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "200308150000Z"
+    DESCRIPTION
+        "Rev 1.2                15 Aug 2003 00:00
+         1.2 release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "200301200000Z"
+    DESCRIPTION
+        "Rev 1.0                20 Jan 2003 00:00
+         1.0 Release of the TIMETRA-CFLOWD-MIB."
+
+    REVISION    "200111100000Z"
+    DESCRIPTION
+        "Rev 0.1                15 Jan 2003 00:00
+         Initial version of the TIMETRA-CFLOWD-MIB."
+
+    ::= { timetraSRMIBModules 19 }
+
+TmnxCflowdAggScheme              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCflowdAggScheme is a bit mask which specifies the
+         aggregation scheme(s) used to aggregate multiple individual flows into
+         an aggregated flow for export to a remote host collector.
+
+         If no aggregation scheme is specified, {}, no data will be exported
+         to a remote collector host.  If the 'raw (5)' scheme is specified,
+         flow data is exported without aggregation in version 5 format.
+         All other aggregation types use version 8 format to export the flow
+         data to this remote host collector."
+    SYNTAX      BITS {
+        asMatrix                (0),
+        protocolPort            (1),
+        sourcePrefix            (2),
+        destinationPrefix       (3),
+        sourceDestinationPrefix (4),
+        raw                     (5)
+    }
+
+TmnxCflowdTemplateSet            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCflowdTemplateSet specifies the set of templates sent
+         to the collector when using cflowd version 9 or 10.
+         The recognized template-sets are:
+            notApplicable (0) -- No cflowd packets will be sent to the collector.
+            basic         (1) -- Basic flow data is sent.
+            mplsIp        (2) -- Extended flow data is sent that includes IP and
+                                 MPLS information.
+            l2Ip          (3) -- L2 flow data is sent.
+            mplsTransport (4) -- MPLS flow data is sent that is identified by
+                                 outer transport label and Experimental Use (EXP)
+                                 bits.
+            compact       (5) -- Reduced number of fields are sent.
+            fastpath      (6) -- FP acceleration is used."
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        basic         (1),
+        mplsIp        (2),
+        l2Ip          (3),
+        mplsTransport (4),
+        compact       (5),
+        fastpath      (6)
+    }
+
+TmnxCflowdSampleProfileID        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCflowdSampleProfileID specifies a unique number that
+         identifies a row in the tmnxCflowdSampleProfileEntry."
+    SYNTAX      Unsigned32 (1..5)
+
+TmnxCflowdMeteringProcess        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCflowdMeteringProcess specifies the method used to
+         process the samples.
+
+         If 'standard (1)' is specified, the samples are extracted at the CPM
+         and are processed there.
+
+         If 'fpAccelerated (2)' is specified, the samples are processed in the
+         datapath by an FP assist."
+    SYNTAX      INTEGER {
+        standard      (1),
+        fpAccelerated (2)
+    }
+
+TmnxCflowdSliceSel               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCflowdSliceSel specifies the method the datapath uses
+         to generate the sample from the original packet.
+
+         If 'standard (1)' is specified, the sample is generated from the
+         original packet in an efficient manner that preserves most of the
+         packet's header but truncates after a platform determined length.
+
+         If 'full (2)' is specified, the sample is generated using the entire
+         original packet but comes at expense of performance."
+    SYNTAX      INTEGER {
+        standard (1),
+        full     (2)
+    }
+
+tmnxCflowdObjs                   OBJECT IDENTIFIER ::= { tmnxSRObjs 19 }
+
+tmnxCflowdGeneralObjs            OBJECT IDENTIFIER ::= { tmnxCflowdObjs 1 }
+
+tmnxCflowdStatus                 OBJECT-TYPE
+    SYNTAX      TmnxStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The desired state for Cflowd on this virtual router.  An attempt
+         to set tmnxCflowdStatus to 'delete' will fail if the Cflowd
+         protocol is not in the administrative outOfService state,
+         i.e. tmnxCflowdAdminStatus must first be set to 'outOfService'."
+    DEFVAL      { delete }
+    ::= { tmnxCflowdGeneralObjs 1 }
+
+tmnxCflowdActiveTimeout          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..600)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxCflowdActiveTimeout specifies the maximum amount
+         of time, in minutes, before an active flow will be exported.  If an
+         individual flow is active for this amount of time, the flow is
+         exported and a new flow is created."
+    DEFVAL      { 30 }
+    ::= { tmnxCflowdGeneralObjs 2 }
+
+tmnxCflowdInactiveTimeout        OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdInactiveTimeout specifies the amount of time,
+         in seconds, that must elapse without a packet matching a flow before
+         the flow is considered inactive."
+    DEFVAL      { 15 }
+    ::= { tmnxCflowdGeneralObjs 3 }
+
+tmnxCflowdCacheSize              OBJECT-TYPE
+    SYNTAX      Unsigned32 (1000..2000000)
+    UNITS       "flows"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdCacheSize specifies the maximum number of
+         active flows to be maintained in the flow cache table."
+    ::= { tmnxCflowdGeneralObjs 4 }
+
+tmnxCflowdSampleRate             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "packets"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxCflowdSampleRate specifies the rate at which traffic
+         is sampled and forwarded for Cflowd analysis.  A value of one (1)
+         causes all packets to be analyzed.  The default value '1000' causes
+         every 1000th packet to be analyzed."
+    DEFVAL      { 1000 }
+    ::= { tmnxCflowdGeneralObjs 5 }
+
+tmnxCflowdOverflow               OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..50)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdOverflow specifies the percentage number of
+         flows to be flushed when the flow cache size has been exceeded."
+    DEFVAL      { 1 }
+    ::= { tmnxCflowdGeneralObjs 6 }
+
+tmnxCflowdAdminStatus            OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAdminStatus specifies the desired
+         administrative state for the Cflowd data analysis."
+    DEFVAL      { inService }
+    ::= { tmnxCflowdGeneralObjs 7 }
+
+tmnxCflowdOperStatus             OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdOperStatus indicates the current operational
+         status of the Cflowd data analysis."
+    ::= { tmnxCflowdGeneralObjs 8 }
+
+tmnxCflowdActiveFlows            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdActiveFlows is a gauge that indicates the
+         current number of active flows being collected."
+    ::= { tmnxCflowdGeneralObjs 9 }
+
+tmnxCflowdAggregation            OBJECT-TYPE
+    SYNTAX      TmnxCflowdAggScheme
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregation is a bit mask which indicates the
+         aggregation scheme(s) currently used to aggregate multiple individual
+         flows into an aggregated flow for export to one or more remote host
+         collectors configured in the tmnxCFHostCollectorTable.
+
+         If no aggregation scheme is specified, {}, no data will be exported.
+         If the 'raw (5)' scheme is specified, flow data is exported without
+         aggregation in version 5 format.  All other aggregation types use
+         version 8 format to export the flow data to the remote host
+         collector."
+    ::= { tmnxCflowdGeneralObjs 10 }
+
+tmnxCFHostTableLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "timestamp of last change to tmnxCFHostTable."
+    ::= { tmnxCflowdGeneralObjs 11 }
+
+tmnxCflowdMaxCollectors          OBJECT-TYPE
+    SYNTAX      Integer32 (0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdMaxCollectors specifies the maximum number of
+         row entries that can be created in the tmnxCFHostCollectorTable."
+    DEFVAL      { 8 }
+    ::= { tmnxCflowdGeneralObjs 12 }
+
+tmnxCflowdTotalPktsRcvd          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTotalPktsRcvd indicates the total number of
+         packets received for Cflowd."
+    ::= { tmnxCflowdGeneralObjs 13 }
+
+tmnxCflowdTotalPktsDropped       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTotalPktsDropped indicates the total number of
+         packets dropped for Cflowd."
+    ::= { tmnxCflowdGeneralObjs 14 }
+
+tmnxCflowdTemplateRetransmit     OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateRetransmit specifies the period of
+         time, in seconds, for a template to be retransmitted."
+    DEFVAL      { 600 }
+    ::= { tmnxCflowdGeneralObjs 15 }
+
+tmnxCflowdGeneralStatisticsObjs  OBJECT IDENTIFIER ::= { tmnxCflowdGeneralObjs 16 }
+
+tmnxCflowdGenRawFlowsCreated     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenRawFlowsCreated indicates the number of raw
+         flows created by system."
+    ::= { tmnxCflowdGeneralStatisticsObjs 1 }
+
+tmnxCflowdGenAggrFlowsCreated    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenAggrFlowsCreated indicates the number of
+         aggregate flows created by system."
+    ::= { tmnxCflowdGeneralStatisticsObjs 2 }
+
+tmnxCflowdGenRawFlowsMatched     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenRawFlowsMatched indicates the number of raw
+         packets matched to an existing raw flow."
+    ::= { tmnxCflowdGeneralStatisticsObjs 3 }
+
+tmnxCflowdGenAggrFlowsMatched    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenAggrFlowsMatched indicates the number of
+         packets matched to an existing aggregate flow."
+    ::= { tmnxCflowdGeneralStatisticsObjs 4 }
+
+tmnxCflowdGenRawFlowsFlushed     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenRawFlowsFlushed indicates the number of raw
+         flows flushed."
+    ::= { tmnxCflowdGeneralStatisticsObjs 5 }
+
+tmnxCflowdGenAggrFlowsFlushed    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenAggrFlowsFlushed indicates the number of
+         aggregate flows flushed."
+    ::= { tmnxCflowdGeneralStatisticsObjs 6 }
+
+tmnxCflowdGenOverflowEvents      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenOverflowEvents indicates the number of times
+         the flow cache has entered the overflow state."
+    ::= { tmnxCflowdGeneralStatisticsObjs 7 }
+
+tmnxCflowdGenDroppedFlows        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdGenDroppedFlows indicates the number of times a
+         flow was dropped. Data from dropped flows are not reported to any
+         collector."
+    ::= { tmnxCflowdGeneralStatisticsObjs 8 }
+
+tmnxCflowdExportMode             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        automatic (1),
+        manual    (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdExportMode specifies which mode is used to
+         export flow data. An export mode of 'automatic (1)' causes flow export
+         messages to be generated based on inactivity or age thresholds. An
+         export mode of 'manual (2)' causes flow export messages to be
+         generated via a CLI or SNMP request."
+    DEFVAL      { automatic }
+    ::= { tmnxCflowdGeneralObjs 17 }
+
+tmnxCflowdExportManual           OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdExportManual specifies, when set to 'doAction
+         (1)', that a manual export will be performed. GETs and GETNEXTs on
+         this variable return 'not-applicable'."
+    DEFVAL      { notApplicable }
+    ::= { tmnxCflowdGeneralObjs 18 }
+
+tmnxCflowdVRtrIfIndexContext     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        global (1),
+        vrtr   (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfIndexContext specifies which virtual
+         router interface index context is used to identify both the ingress
+         and egress interfaces in v9 and v10 cflowd flow records.
+
+         If the value is 'global (1)', vRtrIfGlobalIndex is used to identify
+         the interface.
+
+         If the value is 'vrtr (2)', vRtrID and vRtrIfIndex are used to
+         identify the interface. V9 cflowd flow records are only available on
+         the base virtual router (vRtrID = 1)."
+    DEFVAL      { global }
+    ::= { tmnxCflowdGeneralObjs 19 }
+
+tmnxCflowdEnhancedDistribution   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdEnhancedDistribution specifies whether the
+         ingress port ID is included in the hashing of cflowd sampled packets.
+         The value 'true (1)' specifies that the ingress port ID is included."
+    DEFVAL      { false }
+    ::= { tmnxCflowdGeneralObjs 20 }
+
+tmnxCflowdInbandCollExportOnly   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdInbandCollExportOnly specifies whether the
+         traffic to all collectors will only be exported via in-band
+         interfaces. The value 'true (1)' specifies that the traffic will be
+         exported via in-band."
+    DEFVAL      { false }
+    ::= { tmnxCflowdGeneralObjs 21 }
+
+tmnxCflowdAnalyzeGrePayload      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAnalyzeGrePayload specifies whether Cflowd will
+         analyze the inner IP packet within a GRE (Generic Routing
+         Encapsulation) encapsulated packet, instead of analyzing the GRE
+         header. The value 'true (1)' specifies that the inner IP packet will
+         be analyzed."
+    DEFVAL      { false }
+    ::= { tmnxCflowdGeneralObjs 22 }
+
+tmnxCflowdAnalyzeL2TP            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAnalyzeL2TP specifies whether Cflowd will
+         analyze the inner header within an L2TP (Layer 2 Tunneling Protocol)
+         encapsulated packet. The value 'true (1)' specifies that the inner
+         header will be analyzed."
+    DEFVAL      { false }
+    ::= { tmnxCflowdGeneralObjs 23 }
+
+tmnxCflowdAnalyzeV4OverV6        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAnalyzeV4OverV6 specifies whether Cflowd will
+         analyze the inner IPv4 packet within an IPv6 encapsulated packet. The
+         value 'true (1)' specifies that the inner IPv4 header will be
+         analyzed."
+    DEFVAL      { false }
+    ::= { tmnxCflowdGeneralObjs 24 }
+
+tmnxCflowdActiveFlowTimeout      OBJECT-TYPE
+    SYNTAX      Unsigned32 (30..36000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdActiveFlowTimeout specifies the maximum amount
+         of time, in seconds, before an active flow will be exported.  If an
+         individual flow is active for this amount of time, the flow is
+         exported and a new flow is created."
+    DEFVAL      { 1800 }
+    ::= { tmnxCflowdGeneralObjs 25 }
+
+tmnxCflowdNotificationObjects    OBJECT IDENTIFIER ::= { tmnxCflowdObjs 2 }
+
+tmnxCflowdFlowFailureReasonCode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        tmnxCflowdMemAllocFailure    (0),
+        tmnxCflowdRTLookupFailure    (1),
+        tmnxCflowdTimerCreateFailure (2),
+        tmnxCflowdUDPSendFailure     (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by tmnxCflowdFlowCreateFailure and tmnxCflowdFlowFlushFailure to
+         report the failure reason code."
+    ::= { tmnxCflowdNotificationObjects 1 }
+
+tmnxCflowdFlowUnsuppIPProtoNum   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "tmnxCflowdFlowUnsuppIPProtoNum is used to specify the unsupported IP
+         protocol for the tmnxCflowdFlowUnsuppProto event. This object was made
+         obsolete in 7x50 SR Release 8.0."
+    ::= { tmnxCflowdNotificationObjects 2 }
+
+tmnxCFHostTable                  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of all Cflowd remote collector host definitions. This table is
+         deprecated in favor of tmnxCFHostCollectorTable which supports IPv6
+         addresses. Further use of this table should be discouraged."
+    ::= { tmnxCflowdObjs 3 }
+
+tmnxCFHostEntry                  OBJECT-TYPE
+    SYNTAX      TmnxCFHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular Cflowd remote collector host entry.
+
+         Entries in the tmnxCFHostTable are created and destroyed via SNMP Set
+         requests to tmnxCFHostRowStatus. Entries created in
+         tmnxCFHostCollectorTable assigned to an IPv4 address will appear in
+         this table for backwards compatibility.
+
+         There is no StorageType object, entries have a presumed StorageType of
+         'nonVolatile'. "
+    INDEX       {
+        tmnxCFHostAddress,
+        tmnxCFHostUdpPort
+    }
+    ::= { tmnxCFHostTable 1 }
+
+TmnxCFHostEntry                  ::= SEQUENCE
+{
+    tmnxCFHostAddress                IpAddress,
+    tmnxCFHostUdpPort                Integer32,
+    tmnxCFHostRowStatus              RowStatus,
+    tmnxCFHostEntryLastChanged       TimeStamp,
+    tmnxCFHostDescription            TItemDescription,
+    tmnxCFHostAdminStatus            TmnxAdminState,
+    tmnxCFHostOperStatus             TmnxOperState,
+    tmnxCFHostASType                 INTEGER,
+    tmnxCFHostAggregation            TmnxCflowdAggScheme,
+    tmnxCFHostRecordsSent            Counter32,
+    tmnxCFHostLastPktSent            TimeStamp,
+    tmnxCFHostVersion                Unsigned32,
+    tmnxCFHostTemplateSet            TmnxCflowdTemplateSet,
+    tmnxCFHostPacketsSent            Counter32
+}
+
+tmnxCFHostAddress                OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostAddress specifies the IPv4 address of a remote
+         Cflowd collector host to receive the exported Cflowd data."
+    ::= { tmnxCFHostEntry 1 }
+
+tmnxCFHostUdpPort                OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostUdpPort specifies the UDP port number on the
+         remote Cflowd collector host to receive the exported Cflowd data."
+    DEFVAL      { 2055 }
+    ::= { tmnxCFHostEntry 2 }
+
+tmnxCFHostRowStatus              OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row entries in this table are created and destroyed via SNMP set
+         requests. A row cannot be destroyed if the value of
+         tmnxCFHostAdminStatus is not 'outOfService'."
+    ::= { tmnxCFHostEntry 3 }
+
+tmnxCFHostEntryLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostEntryLastChanged is the sysUpTime when this row
+         entry was last changed."
+    ::= { tmnxCFHostEntry 4 }
+
+tmnxCFHostDescription            OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostDescription is a user provided description
+         string for this Cflowd remote collector host.  It can consist of
+         any printable, seven-bit ASCII characters up to 80 characters in
+         length."
+    DEFVAL      { ''H }
+    ::= { tmnxCFHostEntry 5 }
+
+tmnxCFHostAdminStatus            OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostAdminStatus specifies the desired
+         administrative state for this Cflowd remote collector host."
+    DEFVAL      { inService }
+    ::= { tmnxCFHostEntry 6 }
+
+tmnxCFHostOperStatus             OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostOperStatus indicates the current operational
+         status of this Cflowd remote collector host."
+    ::= { tmnxCFHostEntry 7 }
+
+tmnxCFHostASType                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        origin (1),
+        peer   (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostASType specifies which style of AS reporting
+         is used in the exported flow data.  An AS type of 'origin' reflects
+         the endpoints of the AS path which the flow is following.  An AS type
+         of 'peer' reflects the AS of the previous and next hops for the flow."
+    DEFVAL      { origin }
+    ::= { tmnxCFHostEntry 8 }
+
+tmnxCFHostAggregation            OBJECT-TYPE
+    SYNTAX      TmnxCflowdAggScheme
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostAggregation is a bit mask which specifies the
+         aggregation scheme(s) used to aggregate multiple individual flows
+         into an aggregated flow for export to this remote host collector.
+         If no aggregation scheme is specified, {}, no data will be exported
+         for this remote collector host.  If the 'raw (5)' scheme is specified,
+         flow data is exported without aggregation in version 5 format.
+         All other aggregation types use version 8 format to export the flow
+         data to this remote host collector."
+    DEFVAL      { {} }
+    ::= { tmnxCFHostEntry 9 }
+
+tmnxCFHostRecordsSent            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostRecordsSent is the number of Cflowd records
+         that have been transmitted to this remote collector host. This object
+         is only applicable for a remote collector host with tmnxCFHostVersion
+         set to either 5, 8 or 10."
+    ::= { tmnxCFHostEntry 10 }
+
+tmnxCFHostLastPktSent            OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostLastPktSent is the sysUpTime when the last
+         Cflowd packet was sent to this remote collector host."
+    ::= { tmnxCFHostEntry 11 }
+
+tmnxCFHostVersion                OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 5 | 8..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostVersion specifies the version of this remote
+         collector host. The following table indicates which objects are either
+         limited, or not supported for a particular version:
+
+            Version     Object                     Restrictions
+            --------    -----------------------    ---------------
+              5         tmnxCFHostAggregation      not supported
+                        tmnxCFHostTemplateSet      not supported
+                        tmnxCFHostPacketsSent      use tmnxCFHostRecordsSent
+
+              8         tmnxCFHostTemplateSet      not supported
+                        tmnxCFHostPacketsSent      use tmnxCFHostRecordsSent
+
+              9         tmnxCFHostASType           not supported
+                        tmnxCFHostAggregation      not supported
+                        tmnxCFHostRecordsSent      use tmnxCFHostPacketsSent
+
+              10        tmnxCFHostASType           not supported
+                        tmnxCFHostAggregation      not supported
+                        tmnxCFHostPacketsSent      use tmnxCFHostRecordsSent"
+    DEFVAL      { 0 }
+    ::= { tmnxCFHostEntry 12 }
+
+tmnxCFHostTemplateSet            OBJECT-TYPE
+    SYNTAX      TmnxCflowdTemplateSet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostTemplateSet specifies the template-set used by
+         this remote collector host. If the tmnxCFHostVersion is not set to the
+         version 9 or 10, the tmnxCFHostTemplateSet is limited to
+         'notApplicable(0)'. When the tmnxCFHostVersion is set to version 9 or
+         10 the tmnxCFHostTemplateSet is defaulted to 'basic (1)'."
+    DEFVAL      { notApplicable }
+    ::= { tmnxCFHostEntry 13 }
+
+tmnxCFHostPacketsSent            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostPacketsSent is the number of Cflowd packets
+         that have been transmitted to this remote collector host. This object
+         is only applicable for a remote collector host with tmnxCFHostVersion
+         set to 9."
+    ::= { tmnxCFHostEntry 14 }
+
+tmnxCflowdVersionStatsTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdVersionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdVersionStatsTable consists of the overall statistics
+         based on collector version."
+    ::= { tmnxCflowdObjs 4 }
+
+tmnxCflowdVersionStatsEntry      OBJECT-TYPE
+    SYNTAX      TmnxCflowdVersionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdVersionStatsEntry contains the information pertaining to
+         the system wide statistics for the specified version index."
+    INDEX       { tmnxCflowdVersionIndex }
+    ::= { tmnxCflowdVersionStatsTable 1 }
+
+TmnxCflowdVersionStatsEntry      ::= SEQUENCE
+{
+    tmnxCflowdVersionIndex           Unsigned32,
+    tmnxCflowdVersionStatus          TmnxEnabledDisabled,
+    tmnxCflowdVersionSent            Counter64,
+    tmnxCflowdVersionOpen            Counter64,
+    tmnxCflowdVersionErrors          Counter64
+}
+
+tmnxCflowdVersionIndex           OBJECT-TYPE
+    SYNTAX      Unsigned32 (5 | 8..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVersionIndex specifies the row in the
+         tmnxCflowdVersionStatsTable that pertains to the cflowd collector
+         version."
+    ::= { tmnxCflowdVersionStatsEntry 1 }
+
+tmnxCflowdVersionStatus          OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVersionStatus indicates whether or not the
+         version is in use in the system."
+    ::= { tmnxCflowdVersionStatsEntry 2 }
+
+tmnxCflowdVersionSent            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVersionSent indicates the number of packets
+         transmitted for the specified version."
+    ::= { tmnxCflowdVersionStatsEntry 3 }
+
+tmnxCflowdVersionOpen            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVersionOpen indicates the number of open
+         packets pending for the specified version."
+    ::= { tmnxCflowdVersionStatsEntry 4 }
+
+tmnxCflowdVersionErrors          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVersionErrors indicates the number of errored
+         packets for the specified version."
+    ::= { tmnxCflowdVersionStatsEntry 5 }
+
+tmnxCflowdV5StatsTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdV5StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdV5StatsTable consists of the version 5 statistics for a
+         particular remote collector host. The use of this table should be
+         restricted in favor of tmnxCFHostCollV5StatsTable."
+    ::= { tmnxCflowdObjs 5 }
+
+tmnxCflowdV5StatsEntry           OBJECT-TYPE
+    SYNTAX      TmnxCflowdV5StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdV5StatsEntry contains the statistics information
+         pertaining to the specified remote collector host."
+    INDEX       {
+        tmnxCFHostAddress,
+        tmnxCFHostUdpPort
+    }
+    ::= { tmnxCflowdV5StatsTable 1 }
+
+TmnxCflowdV5StatsEntry           ::= SEQUENCE
+{
+    tmnxCflowdV5Sent                 Counter32,
+    tmnxCflowdV5Open                 Counter32,
+    tmnxCflowdV5Errors               Counter32
+}
+
+tmnxCflowdV5Sent                 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdV5Sent indicates the number of packets
+         transmitted for the specified remote collector host."
+    ::= { tmnxCflowdV5StatsEntry 1 }
+
+tmnxCflowdV5Open                 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdV5Open indicates the number of open packets
+         pending for the specified remote collector host."
+    ::= { tmnxCflowdV5StatsEntry 2 }
+
+tmnxCflowdV5Errors               OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdV5Errors indicates the number of errored
+         packets for the specified remote collector host."
+    ::= { tmnxCflowdV5StatsEntry 3 }
+
+tmnxCflowdAggregationStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdAggregationStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdAggregationStatsTable consists of the overall statistics
+         based on aggregation type. The use of this table should be restricted
+         in favor of tmnxCFHostCollAggrStatsTable."
+    ::= { tmnxCflowdObjs 6 }
+
+tmnxCflowdAggregationStatsEntry  OBJECT-TYPE
+    SYNTAX      TmnxCflowdAggregationStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdAggregationStatsEntry contains the information
+         pertaining to the remote collector host statistics for the specified
+         aggregation index."
+    INDEX       {
+        tmnxCFHostAddress,
+        tmnxCFHostUdpPort,
+        tmnxCflowdAggregationIndex
+    }
+    ::= { tmnxCflowdAggregationStatsTable 1 }
+
+TmnxCflowdAggregationStatsEntry  ::= SEQUENCE
+{
+    tmnxCflowdAggregationIndex       INTEGER,
+    tmnxCflowdAggregationStatus      TmnxEnabledDisabled,
+    tmnxCflowdAggregationSent        Counter32,
+    tmnxCflowdAggregationOpen        Counter32,
+    tmnxCflowdAggregationErrors      Counter32
+}
+
+tmnxCflowdAggregationIndex       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        nonAggregate            (0),
+        asMatrix                (1),
+        protocolPort            (2),
+        sourcePrefix            (3),
+        destinationPrefix       (4),
+        sourceDestinationPrefix (5),
+        raw                     (6)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregationIndex specifies the row in the
+         tmnxCflowdAggregationStatsTable that pertains to the cflowd collector
+         aggregation type."
+    ::= { tmnxCflowdAggregationStatsEntry 1 }
+
+tmnxCflowdAggregationStatus      OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregationStatus indicates whether or not the
+         aggregation is in use in the remote collector host entry."
+    ::= { tmnxCflowdAggregationStatsEntry 2 }
+
+tmnxCflowdAggregationSent        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregationSent indicates the number of packets
+         transmitted for the specified aggregation type."
+    ::= { tmnxCflowdAggregationStatsEntry 3 }
+
+tmnxCflowdAggregationOpen        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregationOpen indicates the number of open
+         packets pending for the specified aggregation type."
+    ::= { tmnxCflowdAggregationStatsEntry 4 }
+
+tmnxCflowdAggregationErrors      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdAggregationErrors indicates the number of
+         errored packets for the specified aggregation type."
+    ::= { tmnxCflowdAggregationStatsEntry 5 }
+
+tmnxCflowdTemplateStatsTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdTemplateStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdTemplateStatsTable consists of the overall statistics
+         based on template flows for a specified remote collector host entry.
+         The use of this table should be restricted in favor of
+         tmnxCFHostCollTemplStatsTable."
+    ::= { tmnxCflowdObjs 7 }
+
+tmnxCflowdTemplateStatsEntry     OBJECT-TYPE
+    SYNTAX      TmnxCflowdTemplateStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdTemplateStatsEntry contains the information pertaining
+         to the remote collector host statistics for the specified template
+         index."
+    INDEX       {
+        tmnxCFHostAddress,
+        tmnxCFHostUdpPort,
+        tmnxCflowdTemplateFlowIndex
+    }
+    ::= { tmnxCflowdTemplateStatsTable 1 }
+
+TmnxCflowdTemplateStatsEntry     ::= SEQUENCE
+{
+    tmnxCflowdTemplateFlowIndex      INTEGER,
+    tmnxCflowdTemplateLastTxTime     TimeStamp,
+    tmnxCflowdTemplateSent           Counter32,
+    tmnxCflowdTemplateOpen           Counter32,
+    tmnxCflowdTemplateErrors         Counter32
+}
+
+tmnxCflowdTemplateFlowIndex      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ipv4 (1),
+        mpls (2),
+        ipv6 (3),
+        l2   (4)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateFlowIndex specifies the row in the
+         tmnxCflowdTemplateStatsTable that pertains to the cflowd collector
+         Template type.
+
+         Values:
+             ipv4          (1) - IPv4 unicast/multicast sampling
+             mpls          (2) - MPLS
+             ipv6          (3) - IPv6 unicast/multicast sampling
+             l2            (4) - Layer 2"
+    ::= { tmnxCflowdTemplateStatsEntry 1 }
+
+tmnxCflowdTemplateLastTxTime     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateLastTxTime indicates the time, since
+         system startup, when the specified template was last transmitted."
+    ::= { tmnxCflowdTemplateStatsEntry 2 }
+
+tmnxCflowdTemplateSent           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateSent indicates the number of packets
+         transmitted for the specified Template type."
+    ::= { tmnxCflowdTemplateStatsEntry 3 }
+
+tmnxCflowdTemplateOpen           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateOpen indicates the number of open
+         packets pending for the specified Template type."
+    ::= { tmnxCflowdTemplateStatsEntry 4 }
+
+tmnxCflowdTemplateErrors         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdTemplateErrors indicates the number of errored
+         packets for the specified Template type."
+    ::= { tmnxCflowdTemplateStatsEntry 5 }
+
+tmnxCflowdV2Objs                 OBJECT IDENTIFIER ::= { tmnxCflowdObjs 8 }
+
+tmnxCflowdGeneralV2Objs          OBJECT IDENTIFIER ::= { tmnxCflowdV2Objs 1 }
+
+tmnxCFHostCollectorTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of all Cflowd remote collector host definitions. This table
+         replaces the tmnxCFHostTable as it includes support for IPv6
+         addresses."
+    ::= { tmnxCflowdV2Objs 2 }
+
+tmnxCFHostCollectorEntry         OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular Cflowd remote collector host entry.
+
+         Entries in the tmnxCFHostTable are created and destroyed via SNMP Set
+         requests to tmnxCFHostRowStatus."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort
+    }
+    ::= { tmnxCFHostCollectorTable 1 }
+
+TmnxCFHostCollectorEntry         ::= SEQUENCE
+{
+    tmnxCFHostCollAddressType        InetAddressType,
+    tmnxCFHostCollAddress            InetAddress,
+    tmnxCFHostCollUdpPort            Integer32,
+    tmnxCFHostCollRowStatus          RowStatus,
+    tmnxCFHostCollEntryLastChanged   TimeStamp,
+    tmnxCFHostCollDescription        TItemDescription,
+    tmnxCFHostCollAdminStatus        TmnxAdminState,
+    tmnxCFHostCollOperStatus         TmnxOperState,
+    tmnxCFHostCollASType             INTEGER,
+    tmnxCFHostCollAggregation        TmnxCflowdAggScheme,
+    tmnxCFHostCollRecordsSent        Counter64,
+    tmnxCFHostCollLastPktSent        TimeStamp,
+    tmnxCFHostCollVersion            Unsigned32,
+    tmnxCFHostCollTemplateSet        TmnxCflowdTemplateSet,
+    tmnxCFHostCollPacketsSent        Counter64,
+    tmnxCFHostCollExpFilterAdrFamily BITS,
+    tmnxCFHostCollVRtrID             TmnxVRtrID
+}
+
+tmnxCFHostCollAddressType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAddressType specifies the type of the
+         Internet address tmnxCFHostCollAddress."
+    ::= { tmnxCFHostCollectorEntry 1 }
+
+tmnxCFHostCollAddress            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAddress specifies the IP address of a
+         remote Cflowd collector host to receive the exported Cflowd data."
+    ::= { tmnxCFHostCollectorEntry 2 }
+
+tmnxCFHostCollUdpPort            OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollUdpPort specifies the UDP port number on
+         the remote Cflowd collector host to receive the exported Cflowd data."
+    DEFVAL      { 2055 }
+    ::= { tmnxCFHostCollectorEntry 3 }
+
+tmnxCFHostCollRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Row entries in this table are created and destroyed via SNMP set
+         requests. A row cannot be destroyed if the value of
+         tmnxCFHostCollAdminStatus is not 'outOfService'."
+    ::= { tmnxCFHostCollectorEntry 4 }
+
+tmnxCFHostCollEntryLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollEntryLastChanged indicates the sysUpTime
+         when this row entry was last changed."
+    ::= { tmnxCFHostCollectorEntry 5 }
+
+tmnxCFHostCollDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollDescription specifies a user provided
+         description string for this Cflowd remote collector host."
+    DEFVAL      { ''H }
+    ::= { tmnxCFHostCollectorEntry 6 }
+
+tmnxCFHostCollAdminStatus        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAdminStatus specifies the desired
+         administrative state for this Cflowd remote collector host."
+    DEFVAL      { inService }
+    ::= { tmnxCFHostCollectorEntry 7 }
+
+tmnxCFHostCollOperStatus         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollOperStatus indicates the current
+         operational status of this Cflowd remote collector host."
+    ::= { tmnxCFHostCollectorEntry 8 }
+
+tmnxCFHostCollASType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        origin (1),
+        peer   (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollASType specifies which style of Autonomous
+         System (AS) reporting is used in the exported flow data.  An AS type of
+         'origin' reflects the endpoints of the AS path which the flow is
+         following.  An AS type of 'peer' reflects the AS of the previous and
+         next hops for the flow."
+    DEFVAL      { origin }
+    ::= { tmnxCFHostCollectorEntry 9 }
+
+tmnxCFHostCollAggregation        OBJECT-TYPE
+    SYNTAX      TmnxCflowdAggScheme
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggregation specifies the aggregation
+         scheme(s) used to aggregate multiple individual flows into an
+         aggregated flow for export to this remote host collector."
+    DEFVAL      { {} }
+    ::= { tmnxCFHostCollectorEntry 10 }
+
+tmnxCFHostCollRecordsSent        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollRecordsSent indicates the number of Cflowd
+         records that have been transmitted to this remote collector host. This
+         object is only applicable for a remote collector host with
+         tmnxCFHostCollVersion set to either 5, 8 or 10."
+    ::= { tmnxCFHostCollectorEntry 11 }
+
+tmnxCFHostCollLastPktSent        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollLastPktSent indicates the sysUpTime when
+         the last Cflowd packet was sent to this remote collector host."
+    ::= { tmnxCFHostCollectorEntry 12 }
+
+tmnxCFHostCollVersion            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 5 | 8..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollVersion specifies the version of this
+         remote collector host. The following table indicates which objects are
+         either limited, or not supported for a particular version:
+
+            Version   Object                              Restrictions
+            --------  --------------------------          -----------------------------
+              5       tmnxCFHostCollAggregation           not supported
+                      tmnxCFHostCollTemplateSet           not supported
+                      tmnxCFHostCollPacketsSent           use tmnxCFHostCollRecordsSent
+                      tmnxCFHostCollExpFilterAdrFamily    not supported
+
+              8       tmnxCFHostCollTemplateSet           not supported
+                      tmnxCFHostCollPacketsSent           use tmnxCFHostCollRecordsSent
+                      tmnxCFHostCollExpFilterAdrFamily    not supported
+
+              9       tmnxCFHostCollASType                not supported
+                      tmnxCFHostCollAggregation           not supported
+                      tmnxCFHostCollRecordsSent           use tmnxCFHostCollPacketsSent
+
+              10      tmnxCFHostCollASType                not supported
+                      tmnxCFHostCollAggregation           not supported
+                      tmnxCFHostCollPacketsSent           use tmnxCFHostCollRecordsSent
+                      "
+    DEFVAL      { 0 }
+    ::= { tmnxCFHostCollectorEntry 13 }
+
+tmnxCFHostCollTemplateSet        OBJECT-TYPE
+    SYNTAX      TmnxCflowdTemplateSet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplateSet specifies the template-set used
+         by this remote collector host. If the tmnxCFHostCollVersion is not set
+         to the version 9 or 10, the tmnxCFHostTemplateSet is limited to
+         'notApplicable(0)'. When the tmnxCFHostCollVersion is set to version 9
+         or 10 the tmnxCFHostTemplateSet is defaulted to 'basic (1)'."
+    DEFVAL      { notApplicable }
+    ::= { tmnxCFHostCollectorEntry 14 }
+
+tmnxCFHostCollPacketsSent        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollPacketsSent is the number of Cflowd packets
+         that have been transmitted to this remote collector host. This object
+         is only applicable for a remote collector host with
+         tmnxCFHostCollVersion set to 9."
+    ::= { tmnxCFHostCollectorEntry 15 }
+
+tmnxCFHostCollExpFilterAdrFamily OBJECT-TYPE
+    SYNTAX      BITS {
+        ipv4      (0),
+        ipv6      (1),
+        mcastIPv4 (2),
+        mcastIPv6 (3),
+        l2IP      (4),
+        mpls      (5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExpFilterAdrFamily specifies the address
+         family for the flow types that should not be sent to the associated
+         Cflowd collector. Multiple address family types can be included to
+         restrict multiple address families' traffic from being sent to a given
+         collector.
+
+         tmnxCFHostCollExpFilterAdrFamily can only be configured if the value
+         of tmnxCFHostCollVersion is 9 or 10. l2IP can only be configured if
+         the value of tmnxCFHostCollVersion is 10"
+    DEFVAL      { {} }
+    ::= { tmnxCFHostCollectorEntry 16 }
+
+tmnxCFHostCollVRtrID             OBJECT-TYPE
+    SYNTAX      TmnxVRtrID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollVRtrID specifies the router context for the
+         flow data sent to the associated collector to be sent within"
+    DEFVAL      { 4095 }
+    ::= { tmnxCFHostCollectorEntry 17 }
+
+tmnxCFHostCollV5StatsTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollV5StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollV5StatsTable consists of the version 5 statistics
+         for a particular remote collector host. This table replaces
+         tmnxCflowdV5StatsTable as it includes support for IPv6 addresses."
+    ::= { tmnxCflowdV2Objs 3 }
+
+tmnxCFHostCollV5StatsEntry       OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollV5StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollV5StatsEntry contains the statistics information
+         pertaining to the specified remote collector host."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort
+    }
+    ::= { tmnxCFHostCollV5StatsTable 1 }
+
+TmnxCFHostCollV5StatsEntry       ::= SEQUENCE
+{
+    tmnxCFHostCollV5SentPackets      Counter64,
+    tmnxCFHostCollV5OpenPackets      Counter64,
+    tmnxCFHostCollV5ErrorPackets     Counter64
+}
+
+tmnxCFHostCollV5SentPackets      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollV5SentPackets indicates the number of
+         packets transmitted for the specified remote collector host."
+    ::= { tmnxCFHostCollV5StatsEntry 1 }
+
+tmnxCFHostCollV5OpenPackets      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollV5OpenPackets indicates the number of open
+         packets pending for the specified remote collector host."
+    ::= { tmnxCFHostCollV5StatsEntry 2 }
+
+tmnxCFHostCollV5ErrorPackets     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollV5ErrorPackets indicates the number of
+         errored packets for the specified remote collector host."
+    ::= { tmnxCFHostCollV5StatsEntry 3 }
+
+tmnxCFHostCollAggrStatsTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollAggrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollAggrStatsTable consists of the overall statistics
+         for a remote collector host based on aggregation type. This table
+         replaces tmnxCflowdAggregationStatsTable as it includes support for
+         IPv6 addresses."
+    ::= { tmnxCflowdV2Objs 4 }
+
+tmnxCFHostCollAggrStatsEntry     OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollAggrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollAggrStatsEntry contains the information pertaining
+         to the remote collector host statistics for the specified aggregation
+         index."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort,
+        tmnxCFHostCollAggrIndex
+    }
+    ::= { tmnxCFHostCollAggrStatsTable 1 }
+
+TmnxCFHostCollAggrStatsEntry     ::= SEQUENCE
+{
+    tmnxCFHostCollAggrIndex          INTEGER,
+    tmnxCFHostCollAggrStatus         TmnxEnabledDisabled,
+    tmnxCFHostCollAggrSentPackets    Counter64,
+    tmnxCFHostCollAggrOpenPackets    Counter64,
+    tmnxCFHostCollAggrErrorPackets   Counter64
+}
+
+tmnxCFHostCollAggrIndex          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        nonAggregate            (0),
+        asMatrix                (1),
+        protocolPort            (2),
+        sourcePrefix            (3),
+        destinationPrefix       (4),
+        sourceDestinationPrefix (5),
+        raw                     (6)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggrIndex specifies the row in the
+         tmnxCFHostCollAggrStatsTable that pertains to the cflowd collector
+         aggregation type."
+    ::= { tmnxCFHostCollAggrStatsEntry 1 }
+
+tmnxCFHostCollAggrStatus         OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggrStatus indicates whether or not the
+         aggregation is in use in the remote collector host entry."
+    ::= { tmnxCFHostCollAggrStatsEntry 2 }
+
+tmnxCFHostCollAggrSentPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggrSentPackets indicates the number of
+         packets transmitted for the specified aggregation type."
+    ::= { tmnxCFHostCollAggrStatsEntry 3 }
+
+tmnxCFHostCollAggrOpenPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggrOpenPackets indicates the number of
+         open packets pending for the specified aggregation type."
+    ::= { tmnxCFHostCollAggrStatsEntry 4 }
+
+tmnxCFHostCollAggrErrorPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollAggrErrorPackets indicates the number of
+         errored packets for the specified aggregation type."
+    ::= { tmnxCFHostCollAggrStatsEntry 5 }
+
+tmnxCFHostCollTemplStatsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollTemplStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollTemplStatsTable consists of the overall statistics
+         based on template flows for a specified remote collector host entry.
+         This table replaces the tmnxCflowdTemplateStatsTable as it includes
+         support for IPv6 addresses."
+    ::= { tmnxCflowdV2Objs 5 }
+
+tmnxCFHostCollTemplStatsEntry    OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollTemplStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollTemplStatsEntry contains the information pertaining
+         to the remote collector host statistics for the specified template
+         index."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort,
+        tmnxCFHostCollTemplFlowIndex
+    }
+    ::= { tmnxCFHostCollTemplStatsTable 1 }
+
+TmnxCFHostCollTemplStatsEntry    ::= SEQUENCE
+{
+    tmnxCFHostCollTemplFlowIndex     INTEGER,
+    tmnxCFHostCollTemplLastTxTime    TimeStamp,
+    tmnxCFHostCollTemplSentPackets   Counter64,
+    tmnxCFHostCollTemplOpenPackets   Counter64,
+    tmnxCFHostCollTemplErrorPackets  Counter64
+}
+
+tmnxCFHostCollTemplFlowIndex     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ipv4 (1),
+        mpls (2),
+        ipv6 (3),
+        l2   (4)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplFlowIndex specifies the row in the
+         tmnxCflowdTemplateStatsTable that pertains to the cflowd collector
+         Template type.
+
+         Values:
+             ipv4          (1) - IPv4 unicast/multicast sampling
+             mpls          (2) - MPLS
+             ipv6          (3) - IPv6 unicast/multicast sampling
+             l2            (4) - Layer 2
+             "
+    ::= { tmnxCFHostCollTemplStatsEntry 1 }
+
+tmnxCFHostCollTemplLastTxTime    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplLastTxTime indicates the time, since
+         system startup, when the specified template was last transmitted."
+    ::= { tmnxCFHostCollTemplStatsEntry 2 }
+
+tmnxCFHostCollTemplSentPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplSentPackets indicates the number of
+         packets transmitted for the specified Template type."
+    ::= { tmnxCFHostCollTemplStatsEntry 3 }
+
+tmnxCFHostCollTemplOpenPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplOpenPackets indicates the number of
+         open packets pending for the specified Template type."
+    ::= { tmnxCFHostCollTemplStatsEntry 4 }
+
+tmnxCFHostCollTemplErrorPackets  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollTemplErrorPackets indicates the number of
+         errored packets for the specified Template type."
+    ::= { tmnxCFHostCollTemplStatsEntry 5 }
+
+tmnxCFHostCollExpFilVrtrObjects  OBJECT IDENTIFIER ::= { tmnxCflowdV2Objs 6 }
+
+tmnxCFHostCollExFlVrtrTblLastChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExFlVrtrTblLastChg indicates the time,
+         since system startup, when tmnxCFHostCollExpFilterVrtrTable last
+         changed configuration."
+    ::= { tmnxCFHostCollExpFilVrtrObjects 1 }
+
+tmnxCFHostCollExpFilterVrtrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollExpFilterVrtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollExpFilterVrtrTable has an entry for each virtual
+         router that will have its flow data exported to the associated
+         collector. If there are no entries in the table, all virtual routers
+         are exported. There can be a maximum of 100 virtual router filters
+         configured accross all collectors.
+
+         Entries can only be created if the value of tmnxCFHostCollVersion for
+         the associated collector is 9 or 10"
+    ::= { tmnxCFHostCollExpFilVrtrObjects 2 }
+
+tmnxCFHostCollExpFilterVrtrEntry OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollExpFilterVrtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entries in the tmnxCFHostCollExpFilterVrtrTable are created and
+         destroyed via SNMP Set requests to tmnxCFHostCollExpFlVrtrRowStatus."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort,
+        vRtrID
+    }
+    ::= { tmnxCFHostCollExpFilterVrtrTable 1 }
+
+TmnxCFHostCollExpFilterVrtrEntry ::= SEQUENCE
+{
+    tmnxCFHostCollExpFlVrtrRowStatus RowStatus,
+    tmnxCFHostCollExpFltVrtrLastChg  TimeStamp
+}
+
+tmnxCFHostCollExpFlVrtrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExpFlVrtrRowStatus specifies the status of
+         this row. Rows in this table are created and destroyed via SNMP set
+         requests."
+    ::= { tmnxCFHostCollExpFilterVrtrEntry 1 }
+
+tmnxCFHostCollExpFltVrtrLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExpFltVrtrLastChg indicates the sysUpTime
+         when this row was last changed."
+    ::= { tmnxCFHostCollExpFilterVrtrEntry 2 }
+
+tmnxCFHostCollExFlVrIfTblLastChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExFlVrIfTblLastChg indicates the time,
+         since system startup, when tmnxCFHostCollExpFiltVrtrIfEntry last
+         changed configuration."
+    ::= { tmnxCFHostCollExpFilVrtrObjects 3 }
+
+tmnxCFHostCollExpFiltVrtrIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCFHostCollExpFiltVrtrIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCFHostCollExpFiltVrtrIfTable has an entry for each sampling
+         interface that will have its flow data exported to the associated
+         collector. If there are no entries in the table, all sampling
+         interfaces are exported. There can be a maximum of 100 sampling
+         interface filters configured accross all collectors.
+
+         Entries can only be created if the value of tmnxCFHostCollVersion for
+         the associated collector is 9 or 10"
+    ::= { tmnxCFHostCollExpFilVrtrObjects 4 }
+
+tmnxCFHostCollExpFiltVrtrIfEntry OBJECT-TYPE
+    SYNTAX      TmnxCFHostCollExpFiltVrtrIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entries in the tmnxCFHostCollExpFiltVrtrIfTable are created and
+         destroyed via SNMP Set requests to tmnxCFHostCollExpFlVrIfRowStatus."
+    INDEX       {
+        tmnxCFHostCollAddressType,
+        tmnxCFHostCollAddress,
+        tmnxCFHostCollUdpPort,
+        vRtrID,
+        vRtrIfIndex
+    }
+    ::= { tmnxCFHostCollExpFiltVrtrIfTable 1 }
+
+TmnxCFHostCollExpFiltVrtrIfEntry ::= SEQUENCE
+{
+    tmnxCFHostCollExpFlVrIfRowStatus RowStatus,
+    tmnxCFHostCollExpFltVrIfLastChg  TimeStamp
+}
+
+tmnxCFHostCollExpFlVrIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExpFlVrIfRowStatus specifies the status of
+         this row. Rows in this table are created and destroyed via SNMP set
+         requests."
+    ::= { tmnxCFHostCollExpFiltVrtrIfEntry 1 }
+
+tmnxCFHostCollExpFltVrIfLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCFHostCollExpFltVrIfLastChg indicates the sysUpTime
+         when this row was last changed."
+    ::= { tmnxCFHostCollExpFiltVrtrIfEntry 2 }
+
+tmnxCflowdVRtrObjs               OBJECT IDENTIFIER ::= { tmnxCflowdObjs 9 }
+
+tmnxCflowdVRtrIfTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfTableLastChanged indicates the time,
+         since system startup, when tmnxCflowdVRtrIfTable last changed
+         configuration."
+    ::= { tmnxCflowdVRtrObjs 1 }
+
+tmnxCflowdVRtrIfTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdVRtrIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdVRtrIfTable contains Cflowd information for router
+         interfaces configured in the system. This table is replacing object
+         TIMETRA-VRTR-MIB::vRtrIfCflowd."
+    ::= { tmnxCflowdVRtrObjs 2 }
+
+tmnxCflowdVRtrIfEntry            OBJECT-TYPE
+    SYNTAX      TmnxCflowdVRtrIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdVRtrIfEntry consists of the configurable objects for
+         Cflowd on a given virtual router interface in the system. A Cflowd
+         profile controls the sampling and analysis of data flow through the
+         router.
+
+         Entries are created and deleted via SNMP SET operations using
+         tmnxCflowdVRtrIfRowStatus."
+    INDEX       {
+        vRtrID,
+        vRtrIfIndex,
+        tmnxCflowdVRtrIfSamplingType
+    }
+    ::= { tmnxCflowdVRtrIfTable 1 }
+
+TmnxCflowdVRtrIfEntry            ::= SEQUENCE
+{
+    tmnxCflowdVRtrIfSamplingType     INTEGER,
+    tmnxCflowdVRtrIfRowStatus        RowStatus,
+    tmnxCflowdVRtrIfLastChanged      TimeStamp,
+    tmnxCflowdVRtrIfType             INTEGER,
+    tmnxCflowdVRtrIfDirection        INTEGER,
+    tmnxCflowdVRtrIfSampleProfileID  TmnxCflowdSampleProfileID
+}
+
+tmnxCflowdVRtrIfSamplingType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unicast   (1),
+        multicast (2),
+        both      (3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfSamplingType specifies the Cflowd
+         sampling type on the given virtual router interface."
+    ::= { tmnxCflowdVRtrIfEntry 1 }
+
+tmnxCflowdVRtrIfRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfRowStatus specifies the row status. It
+         allows the creation and deletion of Cflowd on the given virtual router
+         interface.
+
+         tmnxCflowdVRtrIfType must be specified during row creation."
+    ::= { tmnxCflowdVRtrIfEntry 2 }
+
+tmnxCflowdVRtrIfLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfLastChanged indicates the time, since
+         system startup, that the configuration of this Cflowd entry was
+         created or modified."
+    ::= { tmnxCflowdVRtrIfEntry 3 }
+
+tmnxCflowdVRtrIfType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        acl       (1),
+        interface (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfType specifies the type of Cflowd
+         analysis that is applied to the given virtual router interface.
+
+         This object must be set during row creation."
+    ::= { tmnxCflowdVRtrIfEntry 4 }
+
+tmnxCflowdVRtrIfDirection        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ingressOnly (1),
+        egressOnly  (2),
+        both        (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfDirection specifies the direction of the
+         Cflowd analysis that is applied to the given virtual router interface."
+    DEFVAL      { ingressOnly }
+    ::= { tmnxCflowdVRtrIfEntry 5 }
+
+tmnxCflowdVRtrIfSampleProfileID  OBJECT-TYPE
+    SYNTAX      TmnxCflowdSampleProfileID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdVRtrIfSampleProfileID specifies the sample
+         profile to be applied to the given virtual router interface."
+    DEFVAL      { 1 }
+    ::= { tmnxCflowdVRtrIfEntry 6 }
+
+tmnxCflowdSampleProfileObjs      OBJECT IDENTIFIER ::= { tmnxCflowdObjs 10 }
+
+tmnxCflowdSampProfTblLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampProfTblLastChanged indicates the time,
+         since system startup, when tmnxCflowdSampleProfileTable last changed
+         configuration."
+    ::= { tmnxCflowdSampleProfileObjs 1 }
+
+tmnxCflowdSampleProfileTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCflowdSampleProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdSampleProfileTable contains Cflowd information for
+         sample profiles configured in the system."
+    ::= { tmnxCflowdSampleProfileObjs 2 }
+
+tmnxCflowdSampleProfileEntry     OBJECT-TYPE
+    SYNTAX      TmnxCflowdSampleProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdSampleProfileEntry consists of the configurable objects
+         for a sample profile.
+
+         A row with the tmnxCflowdSampleProfileProfileID of '1' is created by
+         the agent at initialiation and cannot be created or destroyed."
+    INDEX       { tmnxCflowdSampleProfileProfileID }
+    ::= { tmnxCflowdSampleProfileTable 1 }
+
+TmnxCflowdSampleProfileEntry     ::= SEQUENCE
+{
+    tmnxCflowdSampleProfileProfileID TmnxCflowdSampleProfileID,
+    tmnxCflowdSampleProfileRowStatus RowStatus,
+    tmnxCflowdSampleProfLastChanged  TimeStamp,
+    tmnxCflowdSampleProfileRate      Unsigned32,
+    tmnxCflowdSampleProfileMeterProc TmnxCflowdMeteringProcess,
+    tmnxCflowdSampleProfileSliceSel  TmnxCflowdSliceSel
+}
+
+tmnxCflowdSampleProfileProfileID OBJECT-TYPE
+    SYNTAX      TmnxCflowdSampleProfileID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxCflowdSampleProfileProfileID is an index into this table. It is a
+         value that uniquely identifies the sample profile."
+    ::= { tmnxCflowdSampleProfileEntry 1 }
+
+tmnxCflowdSampleProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampleProfileRowStatus specifies the row
+         status. It allows the creation and deletion of Cflowd sample profiles."
+    ::= { tmnxCflowdSampleProfileEntry 2 }
+
+tmnxCflowdSampleProfLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampleProfLastChanged indicates the time, since
+         system startup, that the configuration of this sample profile was
+         created or modified."
+    ::= { tmnxCflowdSampleProfileEntry 3 }
+
+tmnxCflowdSampleProfileRate      OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampleProfileRate specifies the sampling rate
+         associated with this sample profile. The value specifies the rate at
+         which traffic is sampled and forwarded for Cflowd analysis on this
+         interface. A value of one (1) causes all packets to be analyzed. The
+         default value '1000' causes every 1000th packet to be analyzed."
+    DEFVAL      { 1000 }
+    ::= { tmnxCflowdSampleProfileEntry 4 }
+
+tmnxCflowdSampleProfileMeterProc OBJECT-TYPE
+    SYNTAX      TmnxCflowdMeteringProcess
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampleProfileMeterProc specifies the metering
+         process used to process the samples associated with this sample
+         profile."
+    DEFVAL      { standard }
+    ::= { tmnxCflowdSampleProfileEntry 5 }
+
+tmnxCflowdSampleProfileSliceSel  OBJECT-TYPE
+    SYNTAX      TmnxCflowdSliceSel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCflowdSampleProfileSliceSel specifies the  sample
+         slice selection method used to generate a cflowd sample from the
+         original packet with this sample profile."
+    DEFVAL      { standard }
+    ::= { tmnxCflowdSampleProfileEntry 6 }
+
+tmnxCflowdConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 19 }
+
+tmnxCflowdCompliances            OBJECT IDENTIFIER ::= { tmnxCflowdConformance 1 }
+
+tmnxCflowdCompliance             MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 2.0 of TIMETRA-CFLOWD-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdGlobalGroup,
+            tmnxCflowdHostGroup,
+            tmnxCflowdNotificationGroup
+        }
+    ::= { tmnxCflowdCompliances 1 }
+
+tmnxCflowdComplianceV6v0         MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 6.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdGlobalGroup,
+            tmnxCflowdHostGroup,
+            tmnxCflowdNotificationGroup,
+            tmnxCflowdGlobalGroupV6v0
+        }
+    ::= { tmnxCflowdCompliances 2 }
+
+tmnxCflowdComplianceV8v0         MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 8.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdGlobalGroup,
+            tmnxCflowdGlobalGroupV6v0,
+            tmnxCflowdHostGroup,
+            tmnxCflowdNotificationV8v0Group,
+            tmnxCflowdGroupV8v0
+        }
+    ::= { tmnxCflowdCompliances 3 }
+
+tmnxCflowdComplianceV10v0        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 10.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdGlobalGroup,
+            tmnxCflowdGlobalGroupV6v0,
+            tmnxCflowdHostGroup,
+            tmnxCflowdNotificationV8v0Group,
+            tmnxCflowdGroupV8v0,
+            tmnxCflowdStatisticsV10v0Group,
+            tmnxCflowdV2HostCfgGroup,
+            tmnxCflowdV2HostStatisticsGroup
+        }
+    ::= { tmnxCflowdCompliances 4 }
+
+tmnxCflowdComplianceV12v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 12.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdGlobalGroup,
+            tmnxCflowdGlobalGroupV6v0,
+            tmnxCflowdHostGroup,
+            tmnxCflowdNotificationV8v0Group,
+            tmnxCflowdGroupV8v0,
+            tmnxCflowdGroupV12v0,
+            tmnxCflowdStatisticsV10v0Group,
+            tmnxCflowdV2HostCfgGroup,
+            tmnxCflowdV2HostStatisticsGroup,
+            tmnxCflowdExportGroup
+        }
+    ::= { tmnxCflowdCompliances 5 }
+
+tmnxCflowdComplianceV13v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 13.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdVRtrGroupV13v0,
+            tmnxCflowdEnhancedDistGrpV13v0
+        }
+    ::= { tmnxCflowdCompliances 6 }
+
+tmnxCflowdComplianceV15v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 15.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdV2HostCfgGroupv15v0,
+            tmnxCflowdExportFilterGroup
+        }
+    ::= { tmnxCflowdCompliances 7 }
+
+tmnxCflowdComplianceV14v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 14.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdInbandCollExportV14v0
+        }
+    ::= { tmnxCflowdCompliances 8 }
+
+tmnxCflowdComplianceV16v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 16.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdAnalyzeGrePayloadV16v0
+        }
+    ::= { tmnxCflowdCompliances 9 }
+
+tmnxCflowdComplianceV19v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 19"
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdSampleProfGroupV19v0,
+            tmnxCflowdAnalyzeTunneledV19v0
+        }
+    ::= { tmnxCflowdCompliances 10 }
+
+tmnxCflowdComplianceV20v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 20"
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdActiveTimeoutGrpV20v0
+        }
+    ::= { tmnxCflowdCompliances 11 }
+
+tmnxCflowdComplianceV21v0        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement of TIMETRA-CFLOWD-MIB for release 21"
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCflowdSampleProfileGrpV21v0
+        }
+    ::= { tmnxCflowdCompliances 12 }
+
+tmnxCflowdGroups                 OBJECT IDENTIFIER ::= { tmnxCflowdConformance 2 }
+
+tmnxCflowdGlobalGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdStatus,
+        tmnxCflowdActiveTimeout,
+        tmnxCflowdInactiveTimeout,
+        tmnxCflowdCacheSize,
+        tmnxCflowdSampleRate,
+        tmnxCflowdOverflow,
+        tmnxCflowdAdminStatus,
+        tmnxCflowdOperStatus,
+        tmnxCflowdActiveFlows,
+        tmnxCflowdAggregation,
+        tmnxCflowdMaxCollectors
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Cflowd general
+         capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxCflowdGroups 1 }
+
+tmnxCflowdHostGroup              OBJECT-GROUP
+    OBJECTS     {
+        tmnxCFHostTableLastChanged,
+        tmnxCFHostRowStatus,
+        tmnxCFHostEntryLastChanged,
+        tmnxCFHostDescription,
+        tmnxCFHostAdminStatus,
+        tmnxCFHostOperStatus,
+        tmnxCFHostASType,
+        tmnxCFHostAggregation,
+        tmnxCFHostRecordsSent,
+        tmnxCFHostLastPktSent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Cflowd hosts on Nokia
+         7x50 SR series systems."
+    ::= { tmnxCflowdGroups 2 }
+
+tmnxCflowdNotifyObjsGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdFlowUnsuppIPProtoNum,
+        tmnxCflowdFlowFailureReasonCode
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting Cflowd notifications on Nokia 7x50 SR
+         series systems."
+    ::= { tmnxCflowdGroups 3 }
+
+tmnxCflowdNotificationGroup      NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCflowdCreated,
+        tmnxCflowdCreateFailure,
+        tmnxCflowdDeleted,
+        tmnxCflowdStateChange,
+        tmnxCflowdCleared,
+        tmnxCflowdFlowCreateFailure,
+        tmnxCflowdFlowFlushFailure,
+        tmnxCflowdFlowUnsuppProto
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting the Cflowd feature on Nokia 7x50
+         SR series systems."
+    ::= { tmnxCflowdGroups 4 }
+
+tmnxCflowdGlobalGroupV6v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdTotalPktsRcvd,
+        tmnxCflowdTotalPktsDropped
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Cflowd general
+         capabilities on Nokia 7xx0 SR series systems for release 6.0."
+    ::= { tmnxCflowdGroups 5 }
+
+tmnxCflowdObsoleteV8v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdFlowUnsuppIPProtoNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that were made obsolete On Nokia 7xx0 SR series
+         systems for release 8.0."
+    ::= { tmnxCflowdGroups 6 }
+
+tmnxCflowdGroupV8v0              OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdTemplateRetransmit,
+        tmnxCflowdTemplateLastTxTime,
+        tmnxCFHostVersion,
+        tmnxCFHostTemplateSet,
+        tmnxCFHostPacketsSent,
+        tmnxCflowdVersionStatus,
+        tmnxCflowdVersionSent,
+        tmnxCflowdVersionOpen,
+        tmnxCflowdVersionErrors,
+        tmnxCflowdV5Sent,
+        tmnxCflowdV5Open,
+        tmnxCflowdV5Errors,
+        tmnxCflowdAggregationStatus,
+        tmnxCflowdAggregationSent,
+        tmnxCflowdAggregationOpen,
+        tmnxCflowdAggregationErrors,
+        tmnxCflowdTemplateSent,
+        tmnxCflowdTemplateOpen,
+        tmnxCflowdTemplateErrors
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in release 8.0 to support management of
+         Cflowd capabilities on Nokia 7xx0 SR series systems."
+    ::= { tmnxCflowdGroups 7 }
+
+tmnxCflowdNotifyObjsV8v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdFlowFailureReasonCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Cflowd notifications on Nokia 7x50 SR
+         series systems."
+    ::= { tmnxCflowdGroups 8 }
+
+tmnxCflowdNotificationV8v0Group  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCflowdCreateFailure,
+        tmnxCflowdStateChange,
+        tmnxCflowdFlowCreateFailure,
+        tmnxCflowdPacketTxFailure
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the Cflowd feature on Nokia 7x50
+         SR series systems."
+    ::= { tmnxCflowdGroups 9 }
+
+tmnxCflowdStatisticsV10v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdGenRawFlowsCreated,
+        tmnxCflowdGenAggrFlowsCreated,
+        tmnxCflowdGenRawFlowsMatched,
+        tmnxCflowdGenAggrFlowsMatched,
+        tmnxCflowdGenRawFlowsFlushed,
+        tmnxCflowdGenAggrFlowsFlushed,
+        tmnxCflowdGenOverflowEvents,
+        tmnxCflowdGenDroppedFlows
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects enhancing Cflowd statistics on Nokia 7x50 SR
+         series systems in release 10.0."
+    ::= { tmnxCflowdGroups 10 }
+
+tmnxCflowdV10v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 11 }
+
+tmnxCflowdV2HostCfgGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxCFHostCollRowStatus,
+        tmnxCFHostCollEntryLastChanged,
+        tmnxCFHostCollDescription,
+        tmnxCFHostCollAdminStatus,
+        tmnxCFHostCollOperStatus,
+        tmnxCFHostCollASType,
+        tmnxCFHostCollAggregation,
+        tmnxCFHostCollRecordsSent,
+        tmnxCFHostCollLastPktSent,
+        tmnxCFHostCollVersion,
+        tmnxCFHostCollTemplateSet,
+        tmnxCFHostCollPacketsSent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects enhancing Cflowd remote collector hosts by adding
+         the support for IPv6 addresses on Nokia SROS series systems in release
+         11.0."
+    ::= { tmnxCflowdV10v0Groups 1 }
+
+tmnxCflowdV2HostStatisticsGroup  OBJECT-GROUP
+    OBJECTS     {
+        tmnxCFHostCollV5SentPackets,
+        tmnxCFHostCollV5OpenPackets,
+        tmnxCFHostCollV5ErrorPackets,
+        tmnxCFHostCollAggrStatus,
+        tmnxCFHostCollAggrSentPackets,
+        tmnxCFHostCollAggrOpenPackets,
+        tmnxCFHostCollAggrErrorPackets,
+        tmnxCFHostCollTemplLastTxTime,
+        tmnxCFHostCollTemplSentPackets,
+        tmnxCFHostCollTemplOpenPackets,
+        tmnxCFHostCollTemplErrorPackets
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects enhancing Cflowd remote collector host statistics
+         by adding the support for IPv6 addresses on Nokia SROS series systems
+         in release 11.0."
+    ::= { tmnxCflowdV10v0Groups 2 }
+
+tmnxCflowdV2HostCfgGroupv15v0    OBJECT-GROUP
+    OBJECTS     {
+        tmnxCFHostCollVRtrID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects enhancing Cflowd remote collector hosts on Nokia
+         SROS series systems in release 15.0."
+    ::= { tmnxCflowdV10v0Groups 3 }
+
+tmnxCflowdExportFilterGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxCFHostCollExpFilterAdrFamily,
+        tmnxCFHostCollExpFltVrtrLastChg,
+        tmnxCFHostCollExpFlVrtrRowStatus,
+        tmnxCFHostCollExFlVrtrTblLastChg,
+        tmnxCFHostCollExFlVrIfTblLastChg,
+        tmnxCFHostCollExpFlVrIfRowStatus,
+        tmnxCFHostCollExpFltVrIfLastChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects enhancing export flow filtering for Cflowd remote
+         collector hosts on Nokia SROS series systems."
+    ::= { tmnxCflowdV10v0Groups 4 }
+
+tmnxCflowdExportGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdExportMode,
+        tmnxCflowdExportManual
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Cflowd export
+         capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxCflowdGroups 12 }
+
+tmnxCflowdV11v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 13 }
+
+tmnxCflowdV12v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 14 }
+
+tmnxCflowdGroupV12v0             OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdVRtrIfIndexContext
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the management of Cflowd
+         capabilities for release 12.0 in Nokia SROS series systems."
+    ::= { tmnxCflowdV12v0Groups 1 }
+
+tmnxCflowdV13v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 15 }
+
+tmnxCflowdVRtrGroupV13v0         OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdVRtrIfTableLastChanged,
+        tmnxCflowdVRtrIfRowStatus,
+        tmnxCflowdVRtrIfLastChanged,
+        tmnxCflowdVRtrIfType,
+        tmnxCflowdVRtrIfDirection
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Cflowd on virtual
+         routers for release 13.0 in Nokia SROS series systems."
+    ::= { tmnxCflowdV13v0Groups 1 }
+
+tmnxCflowdEnhancedDistGrpV13v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdEnhancedDistribution
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the inclusion of the ingress port ID
+         in the hashing of sampled packets to cflowd processing tasks for
+         release 13.0 in Nokia SROS series systems."
+    ::= { tmnxCflowdV13v0Groups 2 }
+
+tmnxCflowdV14v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 16 }
+
+tmnxCflowdInbandCollExportV14v0  OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdInbandCollExportOnly
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of collector export via
+         in-band interfaces for release 14.0 in Nokia SROS series systems."
+    ::= { tmnxCflowdV14v0Groups 1 }
+
+tmnxCflowdV16v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 17 }
+
+tmnxCflowdAnalyzeGrePayloadV16v0 OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdAnalyzeGrePayload
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of analyzing GRE inner
+         IP packets for release 16.0 in NOKIA SROS series systems."
+    ::= { tmnxCflowdV16v0Groups 1 }
+
+tmnxCflowdV19v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 18 }
+
+tmnxCflowdSampleProfGroupV19v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdVRtrIfSampleProfileID,
+        tmnxCflowdSampProfTblLastChanged,
+        tmnxCflowdSampleProfileRowStatus,
+        tmnxCflowdSampleProfLastChanged,
+        tmnxCflowdSampleProfileRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Cflowd sample
+         profiles for release 19.5 in Nokia SROS series systems."
+    ::= { tmnxCflowdV19v0Groups 1 }
+
+tmnxCflowdObsoleteV19v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdSampleRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that were made obsolete for release 19.5 in Nokia
+         SROS series systems."
+    ::= { tmnxCflowdV19v0Groups 2 }
+
+tmnxCflowdAnalyzeTunneledV19v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdAnalyzeL2TP,
+        tmnxCflowdAnalyzeV4OverV6
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Cflowd sampling of
+         the inner header inside tunneled packets for release 19.10 in NOKIA
+         SROS series systems."
+    ::= { tmnxCflowdV19v0Groups 3 }
+
+tmnxCflowdV20v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 19 }
+
+tmnxCflowdObsoleteV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdActiveTimeout
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that were made obsolete for release 20.2 in Nokia
+         SROS series systems."
+    ::= { tmnxCflowdV20v0Groups 1 }
+
+tmnxCflowdActiveTimeoutGrpV20v0  OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdActiveFlowTimeout
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Cflowd active
+         timeout in 20.2 in NOKIA SROS series systems."
+    ::= { tmnxCflowdV20v0Groups 2 }
+
+tmnxCflowdV21v0Groups            OBJECT IDENTIFIER ::= { tmnxCflowdGroups 20 }
+
+tmnxCflowdSampleProfileGrpV21v0  OBJECT-GROUP
+    OBJECTS     {
+        tmnxCflowdSampleProfileMeterProc,
+        tmnxCflowdSampleProfileSliceSel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Cflowd sample
+         profile in 21.0 in NOKIA SROS series systems."
+    ::= { tmnxCflowdV21v0Groups 1 }
+
+tmnxCflowdNotificationsPrefix    OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 19 }
+
+tmnxCflowdNotifications          OBJECT IDENTIFIER ::= { tmnxCflowdNotificationsPrefix 0 }
+
+tmnxCflowdCreated                NOTIFICATION-TYPE
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxCflowdCreated event is generated when Cflowd instance is
+         created on the system. This notification was made obsolete in 7x50 SR
+         Release 8.0."
+    ::= { tmnxCflowdNotifications 1 }
+
+tmnxCflowdCreateFailure          NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdCreateFailure event is generated when Cflowd instance
+         creation fails on the system."
+    ::= { tmnxCflowdNotifications 2 }
+
+tmnxCflowdDeleted                NOTIFICATION-TYPE
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxCflowdDeleted event is generated when Cflowd instance is
+         removed from the system. This notification was made obsolete in 7x50
+         SR Release 8.0."
+    ::= { tmnxCflowdNotifications 3 }
+
+tmnxCflowdStateChange            NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCflowdAdminStatus,
+        tmnxCflowdOperStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdStateChange event is triggered when
+         tmnxCflowdAdminStatus or tmnxCflowdOperStatus reports a change."
+    ::= { tmnxCflowdNotifications 4 }
+
+tmnxCflowdCleared                NOTIFICATION-TYPE
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxCflowdCleared event is triggered when the Cflowd statistics
+         are cleared. This notification was made obsolete in 7x50 SR Release
+         8.0."
+    ::= { tmnxCflowdNotifications 5 }
+
+tmnxCflowdFlowCreateFailure      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCflowdFlowFailureReasonCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdFlowCreateFailure event is generated when the creation
+         of a Cflowd flow fails."
+    ::= { tmnxCflowdNotifications 6 }
+
+tmnxCflowdFlowFlushFailure       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCflowdFlowFailureReasonCode
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxCflowdFlowFlushFailure event is generated when the flushing of
+         a Cflowd flow fails. This notification was made obsolete in 7x50 SR
+         Release 8.0. It was replaced by tmnxCflowdPacketTxFailure."
+    ::= { tmnxCflowdNotifications 7 }
+
+tmnxCflowdFlowUnsuppProto        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCflowdFlowUnsuppIPProtoNum
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxCflowdFlowUnsuppProto event is generated in case of an
+         unsupported IP protocol. This notification was made obsolete in 7x50
+         SR Release 8.0."
+    ::= { tmnxCflowdNotifications 8 }
+
+tmnxCflowdPacketTxFailure        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCFHostCollVersion,
+        tmnxCflowdFlowFailureReasonCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCflowdPacketTxFailure event is generated when a cflowd packet
+         fails to transmit from an active collector host."
+    ::= { tmnxCflowdNotifications 9 }
+
+END

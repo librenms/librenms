@@ -1,0 +1,1662 @@
+TIMETRA-SCHEDULER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    schedEntry
+                                                         FROM DISMAN-SCHEDULE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    sapBaseInfoEntry
+                                                         FROM TIMETRA-SAP-MIB
+    ServObjName, custMultiServiceSiteEntry
+                                                         FROM TIMETRA-SERV-MIB
+    TItemDescription, TNamedItem
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+tmnxSchedulerMIBModule           MODULE-IDENTITY
+    LAST-UPDATED "201601010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document contains the SNMP MIB module for handling time-based
+         scheduling for the Nokia SROS systems.
+
+         Copyright 2005-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               01 Jan 2016 00:00
+         14.0 release of the TIMETRA-SCHEDULER-MIB."
+
+    REVISION    "200701010000Z"
+    DESCRIPTION
+        "Rev 5.0                01 Jan 2007 00:00
+         5.0 release of the TIMETRA-SCHEDULER-MIB."
+
+    REVISION    "200603270000Z"
+    DESCRIPTION
+        "Rev 1.0                27 Mar 2006 00:00
+         1.0 release of the TIMETRA-SCHEDULER-MIB."
+
+    ::= { timetraSRMIBModules 37 }
+
+TmnxPolicyOrFilterId             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxPolicyOrFilterId represents the identification number of a filter
+         or a scheduler Policy. The value '0' indicates an invalid number. It
+         may be used to indicate that no policy or filter is assigned."
+    SYNTAX      Unsigned32 (0..65535)
+
+TmnxTimeRangeDay                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeDay is used to represent a day in the month."
+    SYNTAX      Integer32 (1..31)
+
+TmnxTimeRangeHour                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeHour is used to represent an hour in the day."
+    SYNTAX      Integer32 (0..23)
+
+TmnxTimeRangePeriodicEndHour     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangePeriodicEndHour is used to represent an hour in the day."
+    SYNTAX      Integer32 (0..24)
+
+TmnxTimeRangeMinute              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeMinute is used to represent the minute in the hour."
+    SYNTAX      Integer32 (0..59)
+
+TmnxTimeRangeMonth               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeMonth is used to represent a month in the year."
+    SYNTAX      INTEGER {
+        january   (0),
+        february  (1),
+        march     (2),
+        april     (3),
+        may       (4),
+        june      (5),
+        july      (6),
+        august    (7),
+        september (8),
+        october   (9),
+        november  (10),
+        december  (11)
+    }
+
+TmnxTimeRangeWeekday             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeWeekday is used to represent a day in the week, or a
+         range of days."
+    SYNTAX      INTEGER {
+        sunday    (0),
+        monday    (1),
+        tuesday   (2),
+        wednesday (3),
+        thursday  (4),
+        friday    (5),
+        saturday  (6),
+        daily     (7),
+        weekDay   (8),
+        weekend   (9)
+    }
+
+TmnxTimeWeekdayOrDaily           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeWeekdayOrDaily is used to represent a day in the week or
+         daily."
+    SYNTAX      INTEGER {
+        sunday    (0),
+        monday    (1),
+        tuesday   (2),
+        wednesday (3),
+        thursday  (4),
+        friday    (5),
+        saturday  (6),
+        daily     (7)
+    }
+
+TmnxTimeRangeYear                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTimeRangeYear is used to represent a year in the range 2005 -
+         2099."
+    SYNTAX      Integer32 (2005..2099)
+
+TmnxTodSuiteControlledObj        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTodSuiteControlledObj represents an object to which a time-range
+         can be assigned using a time-of-day policy."
+    SYNTAX      INTEGER {
+        ingressIpFilter     (0),
+        ingressIPv6Filter   (1),
+        ingressMacFilter    (2),
+        ingressQosPlcy      (3),
+        ingressQosSchedPlcy (4),
+        egressIpFilter      (5),
+        egressIPv6Filter    (6),
+        egressMacFilter     (7),
+        egressQosPlcy       (8),
+        egressQosSchedPlcy  (9)
+    }
+
+tmnxScheduler                    OBJECT IDENTIFIER ::= { tmnxSRObjs 37 }
+
+tmnxTimeOfDayPlcyObjects         OBJECT IDENTIFIER ::= { tmnxScheduler 1 }
+
+tmnxTimeRangeObjects             OBJECT IDENTIFIER ::= { tmnxTimeOfDayPlcyObjects 1 }
+
+tmnxTimeRangeTableLastChange     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxTimeRangeTableLastChange indicates the sysUpTime
+         at the time of the last creation or deletion of an entry in the
+         tmnxTimeRangeTable.  If the number of entries has been unchanged
+         since the last re-initialization of the local network management
+         subsystem, then this object contains a zero value."
+    ::= { tmnxTimeRangeObjects 1 }
+
+tmnxTimeRangeTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTimeRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The table tmnxTimeRangeTable contains time-range definitions. Each row
+         corresponds to a time-range. Additional information for the time range
+         can be found in tmnxAbsoluteTimeRangeParmsTable and
+         tmnxPeriodicTimeRangeParmsTable."
+    ::= { tmnxTimeRangeObjects 2 }
+
+tmnxTimeRangeEntry               OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes a time-range. Additional information for the time
+         range can be found in tmnxAbsoluteTimeRangeParmsTable and
+         tmnxPeriodicTimeRangeParmsTable."
+    INDEX       { tTimeRangeName }
+    ::= { tmnxTimeRangeTable 1 }
+
+TmnxTimeRangeEntry               ::= SEQUENCE
+{
+    tTimeRangeName                   TNamedItem,
+    tTimeRangeRowStatus              RowStatus,
+    tTimeRangeLastMgmtChange         TimeStamp,
+    tTimeRangeDescription            TItemDescription,
+    tTimeRangeTriggers               Counter32,
+    tTimeRangeActive                 TruthValue
+}
+
+tTimeRangeName                   OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeName specifies the unique name of
+         the time-range. The keyword 'NO-TIME-RANGE' is reserved and cannot be
+         assigned to a time-range."
+    ::= { tmnxTimeRangeEntry 1 }
+
+tTimeRangeRowStatus              OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeRowStatus specifies the SNMP status
+         of this row.
+
+         The value of tTimeRangeRowStatus controls the creation and deletion of
+         rows in the table. An attempt to delete a time-range that is being
+         referred to, will be rejected."
+    ::= { tmnxTimeRangeEntry 2 }
+
+tTimeRangeLastMgmtChange         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeLastMgmtChange indicates the
+         sysUpTime at the time of the most recent management-initiated change
+         to this row of the table."
+    ::= { tmnxTimeRangeEntry 3 }
+
+tTimeRangeDescription            OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeDescription specifies an optional
+         user provided description for this time-range in displayable format."
+    DEFVAL      { "" }
+    ::= { tmnxTimeRangeEntry 4 }
+
+tTimeRangeTriggers               OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeTriggers indicates the number of
+         times that the time-range has been active. A time-range is considered
+         to be active each time the current date and time maintained in this
+         managed system (TIMETRA-SYSTEM-MIB::stiDateAndTime) falls within one
+         of the range-entries defined for this time-range."
+    ::= { tmnxTimeRangeEntry 5 }
+
+tTimeRangeActive                 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTimeRangeActive indicates whether or not the
+         current time is in the time-range specification, and hence the
+         time-range can be considered as being 'active'. A time-range is
+         considered to be active each time the current date and time maintained
+         in this managed system (TIMETRA-SYSTEM-MIB::stiDateAndTime) falls
+         within one of the range-entries defined for this time-range."
+    ::= { tmnxTimeRangeEntry 6 }
+
+tmnxPeriodTRngeParmsTblLstChnge  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxPeriodTRngeParmsTblLstChnge indicates the sysUpTime
+         at the time of the last creation or deletion of an entry in the
+         tmnxPeriodicTimeRangeParmsTable. If the number of entries has been
+         unchanged since the last re-initialization of the local network
+         management subsystem, then this object contains a zero value."
+    ::= { tmnxTimeRangeObjects 3 }
+
+tmnxPeriodicTimeRangeParmsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPeriodicTimeRangeParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The table tmnxPeriodicTimeRangeParmsTable contains entries defining a
+         periodic time-range defined in the scope of a time-range."
+    ::= { tmnxTimeRangeObjects 4 }
+
+tmnxPeriodicTimeRangeParmsEntry  OBJECT-TYPE
+    SYNTAX      TmnxPeriodicTimeRangeParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes an time-range for a specific periodic time-range.
+         Multiple ranges can be defined per time-range."
+    INDEX       {
+        tTimeRangeName,
+        tPeriodicTimeRangeStartWeekDay,
+        tPeriodicTimeRangeStartHour,
+        tPeriodicTimeRangeStartMinute
+    }
+    ::= { tmnxPeriodicTimeRangeParmsTable 1 }
+
+TmnxPeriodicTimeRangeParmsEntry  ::= SEQUENCE
+{
+    tPeriodicTimeRangeStartWeekDay   TmnxTimeRangeWeekday,
+    tPeriodicTimeRangeStartHour      TmnxTimeRangeHour,
+    tPeriodicTimeRangeStartMinute    TmnxTimeRangeMinute,
+    tPeriodicTimeRangeRowStatus      RowStatus,
+    tPeriodicTimeRangeLastMgmtChg    TimeStamp,
+    tPeriodicTimeRangeEndWeekDay     TmnxTimeRangeWeekday,
+    tPeriodicTimeRangeEndHour        TmnxTimeRangePeriodicEndHour,
+    tPeriodicTimeRangeEndMinute      TmnxTimeRangeMinute,
+    tPeriodicTimeRangeActive         TruthValue
+}
+
+tPeriodicTimeRangeStartWeekDay   OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeWeekday
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeStartWeekDay specifies the
+         start day-of-the-week of this periodic time-range entry."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 1 }
+
+tPeriodicTimeRangeStartHour      OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeHour
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeStartHour specifies the
+         start hour of this periodic time-range entry."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 2 }
+
+tPeriodicTimeRangeStartMinute    OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMinute
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeStartMinute specifies the
+         start minute of this periodic time-range entry."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 3 }
+
+tPeriodicTimeRangeRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeRowStatus specifies the SNMP
+         status of this row.
+
+         The value of tPeriodicTimeRangeRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 4 }
+
+tPeriodicTimeRangeLastMgmtChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeLastMgmtChg indicates the
+         sysUpTime at the time of the most recent management-initiated change
+         to this row of the table."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 5 }
+
+tPeriodicTimeRangeEndWeekDay     OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeWeekday
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeEndWeekDay specifies the end
+         day-of-the-week of this periodic time-range entry. In case the
+         startday (tPeriodicTimeRangeStartWeekDay)contains a wildcard (i.e
+         daily(7), weekday(8), or weekend(9)), the value of the object
+         tPeriodicTimeRangeEndWeekDay must be equal to
+         tPeriodicTimeRangeStartWeekDay. If no value is specified at row
+         creation, this object defaults to the same value as
+         tPeriodicTimeRangeStartWeekDay."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 6 }
+
+tPeriodicTimeRangeEndHour        OBJECT-TYPE
+    SYNTAX      TmnxTimeRangePeriodicEndHour
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeEndHour specifies the end
+         hour of this periodic time-range entry."
+    DEFVAL      { 24 }
+    ::= { tmnxPeriodicTimeRangeParmsEntry 7 }
+
+tPeriodicTimeRangeEndMinute      OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMinute
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeEndMinute specifies the end
+         minute of this periodic time-range entry. If the value of
+         tPeriodicTimeRangeEndHour is 24, the object
+         tPeriodicTimeRangeEndMinute can only take the value 0."
+    DEFVAL      { 0 }
+    ::= { tmnxPeriodicTimeRangeParmsEntry 8 }
+
+tPeriodicTimeRangeActive         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tPeriodicTimeRangeActive indicates whether or
+         not the current time is in the time-range entry  specification, and
+         hence the time-range can be considered as being 'active'.
+         A time-range is considered to be active each time the current date and
+         time maintained in this managed system
+         (TIMETRA-SYSTEM-MIB::stiDateAndTime) falls within one of the
+         range-entries defined for this time-range."
+    ::= { tmnxPeriodicTimeRangeParmsEntry 9 }
+
+tmnxAbsTRngeParmsTblLstChnge     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxAbsTRngeParmsTblLstChnge indicates the sysUpTime at
+         the time of the last creation or deletion of an entry in the
+         tmnxAbsoluteTimeRangeParmsTable. If the number of entries has been
+         unchanged since the last re-initialization of the local network
+         management subsystem, then this object contains a zero value."
+    ::= { tmnxTimeRangeObjects 5 }
+
+tmnxAbsoluteTimeRangeParmsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxAbsoluteTimeRangeParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The table tmnxAbsoluteTimeRangeParmsTable contains entries defining an
+         absolute time-range defined in the scope of a time-range."
+    ::= { tmnxTimeRangeObjects 6 }
+
+tmnxAbsoluteTimeRangeParmsEntry  OBJECT-TYPE
+    SYNTAX      TmnxAbsoluteTimeRangeParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes an time-range for a specific absolute time-range."
+    INDEX       {
+        tTimeRangeName,
+        tAbsoluteTimeRangeStartYear,
+        tAbsoluteTimeRangeStartMonth,
+        tAbsoluteTimeRangeStartDay,
+        tAbsoluteTimeRangeStartHour,
+        tAbsoluteTimeRangeStartMinute
+    }
+    ::= { tmnxAbsoluteTimeRangeParmsTable 1 }
+
+TmnxAbsoluteTimeRangeParmsEntry  ::= SEQUENCE
+{
+    tAbsoluteTimeRangeStartYear      TmnxTimeRangeYear,
+    tAbsoluteTimeRangeStartMonth     TmnxTimeRangeMonth,
+    tAbsoluteTimeRangeStartDay       TmnxTimeRangeDay,
+    tAbsoluteTimeRangeStartHour      TmnxTimeRangeHour,
+    tAbsoluteTimeRangeStartMinute    TmnxTimeRangeMinute,
+    tAbsoluteTimeRangeRowStatus      RowStatus,
+    tAbsoluteTimeRangeLastMgmtChg    TimeStamp,
+    tAbsoluteTimeRangeEndYear        TmnxTimeRangeYear,
+    tAbsoluteTimeRangeEndMonth       TmnxTimeRangeMonth,
+    tAbsoluteTimeRangeEndDay         TmnxTimeRangeDay,
+    tAbsoluteTimeRangeEndHour        TmnxTimeRangeHour,
+    tAbsoluteTimeRangeEndMinute      TmnxTimeRangeMinute,
+    tAbsoluteTimeRangeActive         TruthValue
+}
+
+tAbsoluteTimeRangeStartYear      OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeYear
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeStartYear specifies the
+         starting year of the absolute time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 1 }
+
+tAbsoluteTimeRangeStartMonth     OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMonth
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeStartMonth specifies the
+         starting month of the absolute time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 2 }
+
+tAbsoluteTimeRangeStartDay       OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeDay
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeStartDay specifies the
+         starting day of the absolute time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 3 }
+
+tAbsoluteTimeRangeStartHour      OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeHour
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeStartHour specifies the
+         starting hour of the absolute time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 4 }
+
+tAbsoluteTimeRangeStartMinute    OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMinute
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeStartMinute specifies the
+         starting minute of the absolute time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 5 }
+
+tAbsoluteTimeRangeRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeRowStatus specifies the SNMP
+         status of this row.
+
+         The value of tAbsoluteTimeRangeRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 6 }
+
+tAbsoluteTimeRangeLastMgmtChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeLastMgmtChg indicates the
+         sysUpTime at the time of the most recent management-initiated change
+         to this row of the table."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 7 }
+
+tAbsoluteTimeRangeEndYear        OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeYear
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeEndYear specifies the end
+         year of the absolute time-range."
+    DEFVAL      { 2099 }
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 8 }
+
+tAbsoluteTimeRangeEndMonth       OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMonth
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeEndMonth specifies the end
+         month of the absolute time-range."
+    DEFVAL      { december }
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 9 }
+
+tAbsoluteTimeRangeEndDay         OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeDay
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeEndDay specifies the end day
+         of the absolute time-range."
+    DEFVAL      { 31 }
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 10 }
+
+tAbsoluteTimeRangeEndHour        OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeHour
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeEndHour specifies the end
+         hour of the absolute time-range."
+    DEFVAL      { 23 }
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 11 }
+
+tAbsoluteTimeRangeEndMinute      OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMinute
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeEndMinute specifies the end
+         minute of the absolute time-range."
+    DEFVAL      { 59 }
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 12 }
+
+tAbsoluteTimeRangeActive         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tAbsoluteTimeRangeActive indicates whether or
+         not the current time is in the time-range entry  specification, and
+         hence the time-range can be considered as being 'active'.
+         A time-range is considered to be active each time the current date and
+         time maintained in this managed system
+         (TIMETRA-SYSTEM-MIB::stiDateAndTime) falls within one of the
+         range-entries defined for this time-range."
+    ::= { tmnxAbsoluteTimeRangeParmsEntry 13 }
+
+tmnxToDSuiteObjects              OBJECT IDENTIFIER ::= { tmnxTimeOfDayPlcyObjects 3 }
+
+tmnxTodSuiteTableLastChange      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxTodSuiteTableLastChange indicates the sysUpTime
+         at the time of the last creation or deletion of an entry in the
+         tmnxTodSuiteTable.  If the number of entries has been unchanged
+         since the last re-initialization of the local network management
+         subsystem, then this object contains a zero value."
+    ::= { tmnxToDSuiteObjects 1 }
+
+tmnxTodSuiteTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTodSuiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The table tmnxTodSuiteTable contains Time Of Day (ToD) Suites"
+    ::= { tmnxToDSuiteObjects 2 }
+
+tmnxTodSuiteEntry                OBJECT-TYPE
+    SYNTAX      TmnxTodSuiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes a ToD suite. Additional information is kept in
+         the tmnxTodSuiteParmsTable."
+    INDEX       { tTodSuiteName }
+    ::= { tmnxTodSuiteTable 1 }
+
+TmnxTodSuiteEntry                ::= SEQUENCE
+{
+    tTodSuiteName                    TNamedItem,
+    tTodSuiteRowStatus               RowStatus,
+    tTodSuiteLastChanged             TimeStamp,
+    tTodSuiteDescription             TItemDescription,
+    tTodSuiteOprIngrIpFilterIndex    TmnxPolicyOrFilterId,
+    tTodSuiteOprIngrIpv6FilterIndex  TmnxPolicyOrFilterId,
+    tTodSuiteOprIngrMacFilterIndex   TmnxPolicyOrFilterId,
+    tTodSuiteOprIngrQosPolicyId      TmnxPolicyOrFilterId,
+    tTodSuiteOprIngrQosSchedulerPlcy ServObjName,
+    tTodSuiteOprEgrIpFilterIndex     TmnxPolicyOrFilterId,
+    tTodSuiteOprEgrIpv6FilterIndex   TmnxPolicyOrFilterId,
+    tTodSuiteOprEgrMacFilterIndex    TmnxPolicyOrFilterId,
+    tTodSuiteOprEgrQosPolicyId       TmnxPolicyOrFilterId,
+    tTodSuiteOprEgrQosSchedulerPlcy  ServObjName
+}
+
+tTodSuiteName                    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteName specifies the unique name of a
+         Tod Suite."
+    ::= { tmnxTodSuiteEntry 1 }
+
+tTodSuiteRowStatus               OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteRowStatus specifies the SNMP status
+         of this row.
+
+         The value of tTodSuiteRowStatus controls the creation and deletion of
+         rows in the table.  An attempt to delete a time-of-day suite that is
+         being referred to, will be rejected."
+    ::= { tmnxTodSuiteEntry 2 }
+
+tTodSuiteLastChanged             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteLastChanged indicates the sysUpTime
+         at the time of the most recent management-initiated change to this row
+         of the table."
+    ::= { tmnxTodSuiteEntry 3 }
+
+tTodSuiteDescription             OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteDescription specifies an optional
+         user provided description for this time-of-day suite in displayable
+         format."
+    DEFVAL      { "" }
+    ::= { tmnxTodSuiteEntry 4 }
+
+tTodSuiteOprIngrIpFilterIndex    OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprIngrIpFilterIndex indicates the ID
+         of the currently applied Ip filter in the scope of this time-of-day
+         suite. A value 0 indicates that no filter is currently imposed by the
+         suite."
+    ::= { tmnxTodSuiteEntry 5 }
+
+tTodSuiteOprIngrIpv6FilterIndex  OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprIngrIpv6FilterIndex indicates the
+         ID of the currently applied ingress IPv6 filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 6 }
+
+tTodSuiteOprIngrMacFilterIndex   OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprIngrMacFilterIndex indicates the
+         ID of the currently applied Ingress Mac filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 7 }
+
+tTodSuiteOprIngrQosPolicyId      OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprIngrQosPolicyId indicates the ID
+         of the currently applied Ingress Qos filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 8 }
+
+tTodSuiteOprIngrQosSchedulerPlcy OBJECT-TYPE
+    SYNTAX      ServObjName
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprIngrQosSchedulerPlcy indicates the
+         ID of the currently applied Ingress Qos scheduler in the scope of this
+         time-of-day suite. An empty string indicates that no policy is
+         currently imposed by the suite."
+    ::= { tmnxTodSuiteEntry 9 }
+
+tTodSuiteOprEgrIpFilterIndex     OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprEgrIpFilterIndex indicates the ID
+         of the currently applied Egress Ip filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 10 }
+
+tTodSuiteOprEgrIpv6FilterIndex   OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprEgrIpv6FilterIndex indicates the
+         ID of the currently applied Egress IPv6 filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 11 }
+
+tTodSuiteOprEgrMacFilterIndex    OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprEgrMacFilterIndex indicates the ID
+         of the currently applied Egress Mac filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 12 }
+
+tTodSuiteOprEgrQosPolicyId       OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprEgrQosPolicyId indicates the ID of
+         the currently applied Egress Qos filter in the scope of this
+         time-of-day suite. A value 0 indicates that no filter is currently
+         imposed by the suite."
+    ::= { tmnxTodSuiteEntry 13 }
+
+tTodSuiteOprEgrQosSchedulerPlcy  OBJECT-TYPE
+    SYNTAX      ServObjName
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteOprEgrQosSchedulerPlcy indicates
+         the ID of the currently applied Egress scheduler policy in the
+         scope  of this time-of-day suite. An empty string  indicates that
+         no filter is currently imposed by the suite."
+    ::= { tmnxTodSuiteEntry 14 }
+
+tmnxTodSuiteParmsLastChange      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxTodSuiteParmsLastChange indicates the sysUpTime
+         at the time of the last creation or deletion of an entry in the
+         tmnxTodSuiteParmsTable.  If the number of entries has been
+         unchanged since the last re-initialization of the local network
+         management subsystem, then this object contains a zero value."
+    ::= { tmnxToDSuiteObjects 3 }
+
+tmnxTodSuiteParmsTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTodSuiteParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The table tmnxTodSuiteParmsTable contains time-of-day Suite entries.
+         Each entry assigns a time-range to a policy or filter."
+    ::= { tmnxToDSuiteObjects 4 }
+
+tmnxTodSuiteParmsEntry           OBJECT-TYPE
+    SYNTAX      TmnxTodSuiteParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Each entry describes ToD suite entry. Each entry assigns a time-range
+         to a policy or filter."
+    INDEX       {
+        tTodSuiteName,
+        tTodSuiteParmsApplicObj,
+        tTodSuiteParmsTimeRange
+    }
+    ::= { tmnxTodSuiteParmsTable 1 }
+
+TmnxTodSuiteParmsEntry           ::= SEQUENCE
+{
+    tTodSuiteParmsApplicObj          TmnxTodSuiteControlledObj,
+    tTodSuiteParmsTimeRange          TNamedItem,
+    tTodSuiteParmsRowStatus          RowStatus,
+    tTodSuiteParmsPriority           Integer32,
+    tTodSuiteParmsLastMgmtChg        TimeStamp,
+    tTodSuiteParmsFltrOrPlcyId       TmnxPolicyOrFilterId,
+    tTodSuiteParmsPlcyName           ServObjName
+}
+
+tTodSuiteParmsApplicObj          OBJECT-TYPE
+    SYNTAX      TmnxTodSuiteControlledObj
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsApplicObj specifies the object
+         which this entry is controlling"
+    ::= { tmnxTodSuiteParmsEntry 1 }
+
+tTodSuiteParmsTimeRange          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsTimeRange specifies the
+         time-range to be applied. If no time-range is to be applied the
+         reserved keyword NO-TIME-RANGE must be used."
+    ::= { tmnxTodSuiteParmsEntry 2 }
+
+tTodSuiteParmsRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsRowStatus specifies the SNMP
+         status of this row.
+
+         The value of tTodSuiteParmsRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxTodSuiteParmsEntry 3 }
+
+tTodSuiteParmsPriority           OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsPriority specifies the priority
+         (with '1' being the highest priority and '10' the lowest priority)
+         assigned to this entry. No 2 rows are allowed, that have the same
+         tTodSuiteParmsApplicObj, and the same priority. Also, the value cannot
+         be modified after row creation."
+    DEFVAL      { 5 }
+    ::= { tmnxTodSuiteParmsEntry 4 }
+
+tTodSuiteParmsLastMgmtChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsLastMgmtChg indicates the
+         sysUpTime at the time of the most recent management-initiated change
+         to this row of the table."
+    ::= { tmnxTodSuiteParmsEntry 5 }
+
+tTodSuiteParmsFltrOrPlcyId       OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsFltrOrPlcyId specifies the
+         filter-id involved in the time-based control.
+
+         This object is meaningful only, and hence is required, if
+         tTodSuiteParmsApplicObj is set to one of the following values.
+                ingressIpFilter    (0)
+                ingressIPv6Filter  (1)
+                ingressMacFilter   (2)
+                ingressQosPlcy     (3)
+                egressIpFilter     (5)
+                egressIPv6Filter   (6)
+                egressMacFilter    (7)
+                egressQosPlcy      (8)
+         In all other cases the value of this object will be ignored by the
+         system. The value cannot be changed after creation."
+    DEFVAL      { 0 }
+    ::= { tmnxTodSuiteParmsEntry 6 }
+
+tTodSuiteParmsPlcyName           OBJECT-TYPE
+    SYNTAX      ServObjName
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteParmsPlcyName specifies the policy
+         name involved in the time-based control.
+
+         This object is meaningful only, and hence is required, if
+         tTodSuiteParmsApplicObj is set  to one of the following values:
+                ingressQosSchedPlcy (4)
+                egressQosSchedPlcy  (9)
+         In all other cases the value of this object will be ignored by the
+         system. The value cannot be changed after creation."
+    DEFVAL      { "" }
+    ::= { tmnxTodSuiteParmsEntry 7 }
+
+tmnxTimeRangeNotifyObjects       OBJECT IDENTIFIER ::= { tmnxTimeOfDayPlcyObjects 5 }
+
+tmnxToDSuiteNotifyObjects        OBJECT IDENTIFIER ::= { tmnxTimeOfDayPlcyObjects 6 }
+
+tTodNotifSuiteName               OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodNotifSuiteName indicates the name of the
+         involved ToD Suite."
+    ::= { tmnxToDSuiteNotifyObjects 1 }
+
+tTodNotifSuiteParmsApplicObj     OBJECT-TYPE
+    SYNTAX      TmnxTodSuiteControlledObj
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodNotifSuiteParmsApplicObj indicates the
+         involved applicable object in the ToD Suite."
+    ::= { tmnxToDSuiteNotifyObjects 2 }
+
+tTodNotifSuiteParmsFltrOrPlcyId  OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodNotifSuiteParmsFltrOrPlcyId indicates the
+         filter-id involved in the time-based control.
+
+         This object is meaningful only if tTodNotifSuiteParmsApplicObj
+         is set to one of the following values.
+                ingressIpFilter    (0)
+                ingressIPv6Filter  (1)
+                ingressMacFilter   (2)
+                ingressQosPlcy     (3)
+                egressIpFilter     (5)
+                egressIPv6Filter   (6)
+                egressMacFilter    (7)
+                egressQosPlcy      (8)
+         In all other cases the value of this object is meaningless."
+    ::= { tmnxToDSuiteNotifyObjects 3 }
+
+tTodNotifSuiteParmsPlcyName      OBJECT-TYPE
+    SYNTAX      ServObjName
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodNotifSuiteParmsPlcyName indicates the
+         policy name involved in the time-based control.
+
+         This object is meaningful only if  tTodNotifSuiteParmsApplicObj
+         is set  to one of the following values:
+                ingressQosSchedPlcy (4)
+                egressQosSchedPlcy  (9)
+         In all other cases the value of this object is meaningless."
+    ::= { tmnxToDSuiteNotifyObjects 4 }
+
+tTodSuiteProblemDescription      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of the object tTodSuiteProblemDescription is a printable
+         character string which contains additional information about the
+         reported operational problem that occurred when applying the ToD
+         Suite."
+    ::= { tmnxToDSuiteNotifyObjects 5 }
+
+tmnxTodToolsGroup                OBJECT IDENTIFIER ::= { tmnxTimeOfDayPlcyObjects 7 }
+
+tmnxTodToolRetryIpFltrDownload   OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The object tmnxTodToolRetryIpFltrDownload can be used to request the
+         system to retry to download the indicated IP filter. This command will
+         retry to download the filter entries that have
+         TIMETRA-FILTER-MIB::tIPFilterParamsTimeRangeState =
+         timeRangeActiveDownloadFailed. If the filter entry is not in this
+         state, no action is taken.
+
+         Setting the value to 0, will cause a retry on all IP filters.
+
+         Reading this object will always return 0."
+    ::= { tmnxTodToolsGroup 1 }
+
+tmnxTodToolRetryMacFltrDownload  OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The object tmnxTodToolRetryMacFltrDownload can be used to request the
+         system to retry to download the indicated Mac filter. This command
+         will retry to download the filter entries that have
+         TIMETRA-FILTER-MIB::tMacFilterParamsTimeRangeState =
+         timeRangeActiveDownloadFailed. If the filter entry is not in this
+         state, no action is taken.
+
+         Setting the value to 0, will cause a retry on all MAC filters.
+
+         Reading this object will always return 0."
+    ::= { tmnxTodToolsGroup 2 }
+
+tmnxTodToolRetryIPv6FltrDownload OBJECT-TYPE
+    SYNTAX      TmnxPolicyOrFilterId
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The object tmnxTodToolRetryIPv6FltrDownload can be used to request the
+         system to retry to download the indicated IPv6 filter. This command
+         will retry to download the filter entries that have
+         TIMETRA-FILTER-MIB::tIPv6FilterParamsTimeRangeState =
+         timeRangeActiveDownloadFailed. If the filter entry is not in this
+         state, no action is taken.
+
+         Setting the value to 0, will cause a retry on all IPv6 filters.
+
+         Reading this object will always return 0."
+    ::= { tmnxTodToolsGroup 3 }
+
+tmnxTodToolReEvaluateSapTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTodToolReEvaluateSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxTodToolReEvaluateSapTable augments the sapBaseInfoTable. It
+         allows to request a re-evaluation of the corresponding SAP with
+         respect to its Time-Of-Day Suite."
+    ::= { tmnxTodToolsGroup 4 }
+
+tmnxTodToolReEvaluateSapEntry    OBJECT-TYPE
+    SYNTAX      TmnxTodToolReEvaluateSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        ""
+    AUGMENTS    { sapBaseInfoEntry }
+    ::= { tmnxTodToolReEvaluateSapTable 1 }
+
+TmnxTodToolReEvaluateSapEntry    ::= SEQUENCE
+{ tmnxTodToolReEvaluateSap         Integer32 }
+
+tmnxTodToolReEvaluateSap         OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Setting this object to one triggers a re-evaluation of the SAP
+         referred to by this row, with respect to its Time-Of-Day Suite. If its
+         state is different from the state specified by the TOD Suite, a new
+         attempt will be made to apply that suite. Reading this object returns
+         the value zero."
+    DEFVAL      { 0 }
+    ::= { tmnxTodToolReEvaluateSapEntry 1 }
+
+tmnxTodToolReEvaluateMssTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTodToolReEvaluateMssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxTodToolReEvaluateMssTable augments the
+         custMultiServiceSiteTable. It allows to request a re-evaluation of the
+         corresponding Multi-Service-Site with respect to its Time-Of-Day
+         Suite."
+    ::= { tmnxTodToolsGroup 5 }
+
+tmnxTodToolReEvaluateMssEntry    OBJECT-TYPE
+    SYNTAX      TmnxTodToolReEvaluateMssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        ""
+    AUGMENTS    { custMultiServiceSiteEntry }
+    ::= { tmnxTodToolReEvaluateMssTable 1 }
+
+TmnxTodToolReEvaluateMssEntry    ::= SEQUENCE
+{ tmnxTodToolReEvaluateMss         Integer32 }
+
+tmnxTodToolReEvaluateMss         OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Setting this object to one triggers a re-evaluation of the
+         Multi-Service-Site referred to by this row, with respect to its
+         Time-Of-Day Suite. If its state is different from the state specified
+         by the TOD Suite, a new attempt will be made to apply that suite.
+         Reading this object returns the value zero."
+    DEFVAL      { 0 }
+    ::= { tmnxTodToolReEvaluateMssEntry 1 }
+
+tmnxTodToolReEvaluateSuiteTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTodToolReEvaluateSuiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxTodToolReEvaluateSuiteTable augments the tmnxTodSuiteTable. It
+         allows to request the system to re-evaluate the state of all SAPs and
+         MSSs related to the corresponding Time-Of-Day Suite"
+    ::= { tmnxTodToolsGroup 6 }
+
+tmnxTodToolReEvaluateSuiteEntry  OBJECT-TYPE
+    SYNTAX      TmnxTodToolReEvaluateSuiteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        ""
+    AUGMENTS    { tmnxTodSuiteEntry }
+    ::= { tmnxTodToolReEvaluateSuiteTable 1 }
+
+TmnxTodToolReEvaluateSuiteEntry  ::= SEQUENCE
+{ tmnxTodToolReEvaluateSuite       Integer32 }
+
+tmnxTodToolReEvaluateSuite       OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Setting this object to one triggers a re-evaluation of the state of
+         all SAPs and MSSs related to the corresponding Time-Of-Day Suite. If
+         their state is different from the state specified by this TOD Suite, a
+         new attempt will be made to apply this suite. Reading this object
+         returns the value zero."
+    DEFVAL      { 0 }
+    ::= { tmnxTodToolReEvaluateSuiteEntry 1 }
+
+tmnxCronObjects                  OBJECT IDENTIFIER ::= { tmnxScheduler 2 }
+
+tmnxCronSchedTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCronSchedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxCronSchedTable contains CRON schedule entries that
+         augment the DISMAN-SCHEDULE-MIB::schedTable."
+    ::= { tmnxCronObjects 1 }
+
+tmnxCronSchedEntry               OBJECT-TYPE
+    SYNTAX      TmnxCronSchedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes an augmented schedTable entry. This row exists
+         only if the associated schedEntry is active."
+    AUGMENTS    { schedEntry }
+    ::= { tmnxCronSchedTable 1 }
+
+TmnxCronSchedEntry               ::= SEQUENCE
+{
+    tmnxCronSchedCount               Unsigned32,
+    tmnxCronSchedLastMgmtChg         TimeStamp,
+    tmnxCronSchedEndTime             TruthValue,
+    tmnxCronSchedEndWeekday          TmnxTimeWeekdayOrDaily,
+    tmnxCronSchedEndYear             TmnxTimeRangeYear,
+    tmnxCronSchedEndMonth            TmnxTimeRangeMonth,
+    tmnxCronSchedEndDay              TmnxTimeRangeDay,
+    tmnxCronSchedEndHour             TmnxTimeRangeHour,
+    tmnxCronSchedEndMinute           TmnxTimeRangeMinute
+}
+
+tmnxCronSchedCount               OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedCount specifies
+         the number of times to trigger a schedule with schedType
+         equal to 'periodic'.  The schedule disables itself by changing
+         into the `finished' schedOperStatus once the schedule has
+         triggered tmnxCronSchedCount number of times.
+
+         When tmnxCronSchedCount has the value zero (0), there is no limit to
+         the number of times the schedule will trigger.
+
+         Note that implementations which maintain a list of pending activations
+         must recalculate them when this object is changed."
+    DEFVAL      { 0 }
+    ::= { tmnxCronSchedEntry 1 }
+
+tmnxCronSchedLastMgmtChg         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedLastMgmtChg indicates the
+         sysUpTime at the time of the most recent management-initiated change
+         to this row of the table."
+    ::= { tmnxCronSchedEntry 2 }
+
+tmnxCronSchedEndTime             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndTime is 'true', the values of
+         tmnxCronSchedEndWeekday, tmnxCronSchedEndMonth, tmnxCronSchedEndDay,
+         tmnxCronSchedEndHour and tmnxCronSchedEndMinute specify a time to stop
+         triggering this schedule."
+    DEFVAL      { false }
+    ::= { tmnxCronSchedEntry 3 }
+
+tmnxCronSchedEndWeekday          OBJECT-TYPE
+    SYNTAX      TmnxTimeWeekdayOrDaily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndWeekday specifies the end
+         weekday of the CRON schedule.
+
+         When this object has a value other than 'daily (7)', the values
+         specified by tmnxCronSchedEndYear, tmnxCronSchedEndMonth, and
+         tmnxCronSchedEndDay are ignored and the scheduled end time is
+         calculated to be the next specified weekday after the current date."
+    DEFVAL      { daily }
+    ::= { tmnxCronSchedEntry 4 }
+
+tmnxCronSchedEndYear             OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeYear
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndYear specifies the
+         end year of the CRON schedule.  An attempt to set
+         tmnxCronSchedEndYear to a value that is not the current
+         year or the next year will fail with an inconsistentValue
+         error.
+
+         When tmnxCronSchedEndWeekday has a value other than 'daily', this
+         object is ignored."
+    DEFVAL      { 2099 }
+    ::= { tmnxCronSchedEntry 5 }
+
+tmnxCronSchedEndMonth            OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMonth
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndMonth specifies the end month
+         of the CRON schedule.
+
+         When tmnxCronSchedEndWeekday has a value other than 'daily', this
+         object is ignored."
+    DEFVAL      { december }
+    ::= { tmnxCronSchedEntry 6 }
+
+tmnxCronSchedEndDay              OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeDay
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndDay specifies the end day of
+         the CRON schedule.
+
+         When tmnxCronSchedEndWeekday has a value other than 'daily', this
+         object is ignored."
+    DEFVAL      { 31 }
+    ::= { tmnxCronSchedEntry 7 }
+
+tmnxCronSchedEndHour             OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeHour
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndHour specifies the end hour of
+         the CRON schedule."
+    DEFVAL      { 23 }
+    ::= { tmnxCronSchedEntry 8 }
+
+tmnxCronSchedEndMinute           OBJECT-TYPE
+    SYNTAX      TmnxTimeRangeMinute
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxCronSchedEndMinute specifies the end
+         minute of the CRON schedule."
+    DEFVAL      { 59 }
+    ::= { tmnxCronSchedEntry 9 }
+
+tmnxCronSchedTblLastChange       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCronSchedTblLastChange indicates the sysUpTime at the
+         time of the last creation or deletion of an entry in the
+         DISMAN-SCHEDULE-MIB::schedTable or its augment tmnxCronSchedTable. If
+         the number of entries has been unchanged since the last
+         re-initialization of the local network management subsystem, then this
+         object contains a zero value."
+    ::= { tmnxCronObjects 2 }
+
+tmnxSchedulerCompliance          OBJECT IDENTIFIER ::= { tmnxSRConfs 37 }
+
+tmnxSchedulerCompliances         OBJECT IDENTIFIER ::= { tmnxSchedulerCompliance 1 }
+
+tmnxToDSchedV4v0MIBCompliance    MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for TIMETRA-SCHEDULER-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxTodPolicyV4v0Group,
+            tmnxTodPolicyNotificationsV4v0Group
+        }
+    ::= { tmnxSchedulerCompliances 1 }
+
+tmnxToDSchedV5v0MIBCompliance    MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for TIMETRA-SCHEDULER-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxTodPolicyV5v0Group
+        }
+    ::= { tmnxSchedulerCompliances 2 }
+
+tmnxCronSchedV5v0MIBCompliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for CRON objects in TIMETRA-SCHEDULER-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCronSchedV5v0Group
+        }
+    ::= { tmnxSchedulerCompliances 3 }
+
+tmnxTimeOfDayPlcyGroups          OBJECT IDENTIFIER ::= { tmnxSchedulerCompliance 2 }
+
+tmnxTodPolicyV4v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxTimeRangeTableLastChange,
+        tmnxPeriodTRngeParmsTblLstChnge,
+        tmnxAbsTRngeParmsTblLstChnge,
+        tmnxTodSuiteTableLastChange,
+        tmnxTodSuiteParmsLastChange,
+        tTimeRangeRowStatus,
+        tTimeRangeLastMgmtChange,
+        tTimeRangeDescription,
+        tTimeRangeTriggers,
+        tTimeRangeActive,
+        tPeriodicTimeRangeRowStatus,
+        tPeriodicTimeRangeLastMgmtChg,
+        tPeriodicTimeRangeEndWeekDay,
+        tPeriodicTimeRangeEndHour,
+        tPeriodicTimeRangeEndMinute,
+        tAbsoluteTimeRangeRowStatus,
+        tAbsoluteTimeRangeLastMgmtChg,
+        tAbsoluteTimeRangeEndYear,
+        tAbsoluteTimeRangeEndMonth,
+        tAbsoluteTimeRangeEndDay,
+        tAbsoluteTimeRangeEndHour,
+        tAbsoluteTimeRangeEndMinute,
+        tTodSuiteRowStatus,
+        tTodSuiteLastChanged,
+        tTodSuiteDescription,
+        tTodSuiteOprIngrIpFilterIndex,
+        tTodSuiteOprIngrIpv6FilterIndex,
+        tTodSuiteOprIngrMacFilterIndex,
+        tTodSuiteOprIngrQosPolicyId,
+        tTodSuiteOprIngrQosSchedulerPlcy,
+        tTodSuiteOprEgrIpFilterIndex,
+        tTodSuiteOprEgrIpv6FilterIndex,
+        tTodSuiteOprEgrMacFilterIndex,
+        tTodSuiteOprEgrQosPolicyId,
+        tTodSuiteOprEgrQosSchedulerPlcy,
+        tTodSuiteParmsRowStatus,
+        tTodSuiteParmsPriority,
+        tTodSuiteParmsLastMgmtChg,
+        tTodSuiteParmsFltrOrPlcyId,
+        tTodSuiteParmsPlcyName,
+        tPeriodicTimeRangeActive,
+        tAbsoluteTimeRangeActive,
+        tTodNotifSuiteName,
+        tTodNotifSuiteParmsApplicObj,
+        tTodNotifSuiteParmsFltrOrPlcyId,
+        tTodNotifSuiteParmsPlcyName,
+        tTodSuiteProblemDescription
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting time-of-day policies on Nokia 7x50 SR
+         series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 1 }
+
+tmnxTodPolicyNotificationsV4v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tTodSuiteProblem
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications for supporting time-of-day policies on
+         Nokia 7x50 SR series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 2 }
+
+tmnxTodPolicyV5v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxTimeRangeTableLastChange,
+        tmnxPeriodTRngeParmsTblLstChnge,
+        tmnxAbsTRngeParmsTblLstChnge,
+        tmnxTodSuiteTableLastChange,
+        tmnxTodSuiteParmsLastChange,
+        tTimeRangeRowStatus,
+        tTimeRangeLastMgmtChange,
+        tTimeRangeDescription,
+        tTimeRangeTriggers,
+        tTimeRangeActive,
+        tPeriodicTimeRangeRowStatus,
+        tPeriodicTimeRangeLastMgmtChg,
+        tPeriodicTimeRangeEndWeekDay,
+        tPeriodicTimeRangeEndHour,
+        tPeriodicTimeRangeEndMinute,
+        tAbsoluteTimeRangeRowStatus,
+        tAbsoluteTimeRangeLastMgmtChg,
+        tAbsoluteTimeRangeEndYear,
+        tAbsoluteTimeRangeEndMonth,
+        tAbsoluteTimeRangeEndDay,
+        tAbsoluteTimeRangeEndHour,
+        tAbsoluteTimeRangeEndMinute,
+        tTodSuiteRowStatus,
+        tTodSuiteLastChanged,
+        tTodSuiteDescription,
+        tTodSuiteOprIngrIpFilterIndex,
+        tTodSuiteOprIngrIpv6FilterIndex,
+        tTodSuiteOprIngrMacFilterIndex,
+        tTodSuiteOprIngrQosPolicyId,
+        tTodSuiteOprIngrQosSchedulerPlcy,
+        tTodSuiteOprEgrIpFilterIndex,
+        tTodSuiteOprEgrIpv6FilterIndex,
+        tTodSuiteOprEgrMacFilterIndex,
+        tTodSuiteOprEgrQosPolicyId,
+        tTodSuiteOprEgrQosSchedulerPlcy,
+        tTodSuiteParmsRowStatus,
+        tTodSuiteParmsPriority,
+        tTodSuiteParmsLastMgmtChg,
+        tTodSuiteParmsFltrOrPlcyId,
+        tTodSuiteParmsPlcyName,
+        tPeriodicTimeRangeActive,
+        tAbsoluteTimeRangeActive,
+        tmnxTodToolRetryIpFltrDownload,
+        tmnxTodToolRetryMacFltrDownload,
+        tmnxTodToolRetryIPv6FltrDownload,
+        tmnxTodToolReEvaluateSap,
+        tmnxTodToolReEvaluateMss,
+        tmnxTodToolReEvaluateSuite
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting time-of-day policies on Nokia 7x50 SR
+         series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 3 }
+
+tmnxTodPolicyObsoletedNotificationsV5v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tTodSuiteProblem
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications obsoleted in V5v0 for supporting
+         time-of-day policies on Nokia 7x50 SR series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 4 }
+
+tmnxTodPolicyObsoletedV5v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tTodNotifSuiteName,
+        tTodNotifSuiteParmsApplicObj,
+        tTodNotifSuiteParmsFltrOrPlcyId,
+        tTodNotifSuiteParmsPlcyName,
+        tTodSuiteProblemDescription
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting time-of-day policies which are
+         obsoleted in V5v0 on Nokia 7x50 SR series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 5 }
+
+tmnxTodPolicyObsoletedGroup      OBJECT-GROUP
+    OBJECTS     {
+        tTodNotifSuiteName,
+        tTodNotifSuiteParmsApplicObj,
+        tTodNotifSuiteParmsFltrOrPlcyId,
+        tTodNotifSuiteParmsPlcyName,
+        tTodSuiteProblemDescription,
+        tmnxTimeRangeTableLastChange,
+        tmnxPeriodTRngeParmsTblLstChnge,
+        tmnxAbsTRngeParmsTblLstChnge,
+        tmnxTodSuiteTableLastChange,
+        tmnxTodSuiteParmsLastChange,
+        tTimeRangeRowStatus,
+        tTimeRangeLastMgmtChange,
+        tTimeRangeDescription,
+        tTimeRangeTriggers,
+        tTimeRangeActive,
+        tPeriodicTimeRangeRowStatus,
+        tPeriodicTimeRangeLastMgmtChg,
+        tPeriodicTimeRangeEndWeekDay,
+        tPeriodicTimeRangeEndHour,
+        tPeriodicTimeRangeEndMinute,
+        tAbsoluteTimeRangeRowStatus,
+        tAbsoluteTimeRangeLastMgmtChg,
+        tAbsoluteTimeRangeEndYear,
+        tAbsoluteTimeRangeEndMonth,
+        tAbsoluteTimeRangeEndDay,
+        tAbsoluteTimeRangeEndHour,
+        tAbsoluteTimeRangeEndMinute,
+        tTodSuiteRowStatus,
+        tTodSuiteLastChanged,
+        tTodSuiteDescription,
+        tTodSuiteOprIngrIpFilterIndex,
+        tTodSuiteOprIngrIpv6FilterIndex,
+        tTodSuiteOprIngrMacFilterIndex,
+        tTodSuiteOprIngrQosPolicyId,
+        tTodSuiteOprIngrQosSchedulerPlcy,
+        tTodSuiteOprEgrIpFilterIndex,
+        tTodSuiteOprEgrIpv6FilterIndex,
+        tTodSuiteOprEgrMacFilterIndex,
+        tTodSuiteOprEgrQosPolicyId,
+        tTodSuiteOprEgrQosSchedulerPlcy,
+        tTodSuiteParmsRowStatus,
+        tTodSuiteParmsPriority,
+        tTodSuiteParmsLastMgmtChg,
+        tTodSuiteParmsFltrOrPlcyId,
+        tTodSuiteParmsPlcyName,
+        tPeriodicTimeRangeActive,
+        tAbsoluteTimeRangeActive,
+        tmnxTodToolRetryIpFltrDownload,
+        tmnxTodToolRetryMacFltrDownload,
+        tmnxTodToolRetryIPv6FltrDownload,
+        tmnxTodToolReEvaluateSap,
+        tmnxTodToolReEvaluateMss,
+        tmnxTodToolReEvaluateSuite
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting time-of-day policies which are
+         obsoleted in V5v0 on Nokia 7x50 SR series systems."
+    ::= { tmnxTimeOfDayPlcyGroups 6 }
+
+tmnxCronSchedGroups              OBJECT IDENTIFIER ::= { tmnxSchedulerCompliance 3 }
+
+tmnxCronSchedV5v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxCronSchedCount,
+        tmnxCronSchedLastMgmtChg,
+        tmnxCronSchedEndTime,
+        tmnxCronSchedEndWeekday,
+        tmnxCronSchedEndYear,
+        tmnxCronSchedEndMonth,
+        tmnxCronSchedEndDay,
+        tmnxCronSchedEndHour,
+        tmnxCronSchedEndMinute,
+        tmnxCronSchedTblLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting CRON schedule augmentations on Nokia
+         7xxx series systems."
+    ::= { tmnxCronSchedGroups 1 }
+
+tmnxSchedulerNotifications       OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 37 }
+
+tmnxSchedTimeRangeNotifications  OBJECT IDENTIFIER ::= { tmnxSchedulerNotifications 1 }
+
+tmnxTimeRangeNotifications       OBJECT IDENTIFIER ::= { tmnxSchedTimeRangeNotifications 0 }
+
+tmnxSchedToDSuiteNotifications   OBJECT IDENTIFIER ::= { tmnxSchedulerNotifications 2 }
+
+tmnxToDSuiteNotifications        OBJECT IDENTIFIER ::= { tmnxSchedToDSuiteNotifications 0 }
+
+tTodSuiteProblem                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tTodNotifSuiteName,
+        tTodNotifSuiteParmsApplicObj,
+        tTodNotifSuiteParmsFltrOrPlcyId,
+        tTodNotifSuiteParmsPlcyName,
+        tTodSuiteProblemDescription
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The tTodSuiteProblem notification is sent to report a problem that
+         occurred in the system while activating a ToD Suite entry."
+    ::= { tmnxToDSuiteNotifications 1 }
+
+END

@@ -1,0 +1,1519 @@
+TIMETRA-PYTHON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Gauge32, Integer32,
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    DateAndTime, DisplayString, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    tmnxCardSlotNum, tmnxChassisIndex,
+    tmnxMDASlotNum
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TDirectionIngEgr, TItemDescription,
+    TNamedItem, TNamedItemOrEmpty,
+    TmnxActionType, TmnxAdminState,
+    TmnxDisplayStringURL, TmnxEsaNum,
+    TmnxEsaVappNum, TmnxLongDisplayString,
+    TmnxNatIsaGrpIdOrZero, TmnxOperState,
+    TmnxWlanGwIsaGrpIdOrZero
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraPythonMIBModule           MODULE-IDENTITY
+    LAST-UPDATED "202202010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision Python
+         for the Nokia 7xxx device.
+
+         Copyright 2013-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "202202010000Z"
+    DESCRIPTION
+        "Rev 22                 1 Feb 2022 00:00
+         Release 22 version of the TIMETRA-PYTHON-MIB."
+
+    REVISION    "202001310000Z"
+    DESCRIPTION
+        "Rev 20                31 Jan 2020 00:00
+         Release 20 version of the TIMETRA-PYTHON-MIB."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               1 Jan 2016 00:00
+         Release 14.0 version of the TIMETRA-PYTHON-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               1 Jan 2015 00:00
+         Release 13.0 version of the TIMETRA-PYTHON-MIB."
+
+    REVISION    "201401010000Z"
+    DESCRIPTION
+        "Rev 0.1                1 Jan 2014 00:00
+         Initial version of the TIMETRA-PYTHON-MIB."
+
+    ::= { timetraSRMIBModules 87 }
+
+TmnxProtection                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxProtection specifies the method used to ensure the
+         integrity and/or the confidentiality of the affected file.
+
+         A value of 'none (1)' indicates the file is stored in plain text,
+         without any mechanism in place to ensure the integrity nor the
+         confidentiality of the content of the file.
+
+         A value of 'hmacSha256' indicates the first line of the file must
+         include the hash value obtained by hashing the rest of the file using
+         the hmac-sha256 hashing algorithm given a specified key."
+    SYNTAX      INTEGER {
+        none       (1),
+        hmacSha256 (2)
+    }
+
+tmnxPython                       OBJECT IDENTIFIER ::= { tmnxSRObjs 87 }
+
+tmnxPythonObjs                   OBJECT IDENTIFIER ::= { tmnxPython 1 }
+
+tmnxPythonScriptTableLastCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPythonScriptTableLastCh indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         tmnxPythonScriptTable."
+    ::= { tmnxPythonObjs 1 }
+
+tmnxPythonScriptTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonScriptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonScriptTable contains objects to configure Python
+         scripts.
+
+         These scripts are grouped in a script policy in the
+         tmnxPythonPolicyMessageTable."
+    ::= { tmnxPythonObjs 2 }
+
+tmnxPythonScriptEntry            OBJECT-TYPE
+    SYNTAX      TmnxPythonScriptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a Python script.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       { tmnxPythonScriptName }
+    ::= { tmnxPythonScriptTable 1 }
+
+TmnxPythonScriptEntry            ::= SEQUENCE
+{
+    tmnxPythonScriptName             TNamedItem,
+    tmnxPythonScriptRowStatus        RowStatus,
+    tmnxPythonScriptLastChanged      TimeStamp,
+    tmnxPythonScriptAdminState       TmnxAdminState,
+    tmnxPythonScriptOperState        TmnxOperState,
+    tmnxPythonScriptDescription      TItemDescription,
+    tmnxPythonScriptOnFail           INTEGER,
+    tmnxPythonScriptProtection       TmnxProtection,
+    tmnxPythonScriptProtectionKey    DisplayString,
+    tmnxPythonScriptPrimaryUrl       TmnxDisplayStringURL,
+    tmnxPythonScriptSecondaryUrl     TmnxDisplayStringURL,
+    tmnxPythonScriptTertiaryUrl      TmnxDisplayStringURL,
+    tmnxPythonScriptActiveUrl        INTEGER,
+    tmnxPythonScriptOperStateDistrib TmnxOperState,
+    tmnxPythonScriptCodeSize         Unsigned32,
+    tmnxPythonScriptVersion          INTEGER,
+    tmnxPythonScriptRunAsUser        TNamedItemOrEmpty,
+    tmnxPythonScriptReloadAction     TmnxActionType
+}
+
+tmnxPythonScriptName             OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptName specifies the name of this Python
+         script policy."
+    ::= { tmnxPythonScriptEntry 1 }
+
+tmnxPythonScriptRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxPythonScriptEntry 2 }
+
+tmnxPythonScriptLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPythonScriptLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this Python
+         script policy."
+    ::= { tmnxPythonScriptEntry 3 }
+
+tmnxPythonScriptAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptAdminState specifies the administrative
+         state of the Python script."
+    DEFVAL      { outOfService }
+    ::= { tmnxPythonScriptEntry 4 }
+
+tmnxPythonScriptOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptOperState indicates the operational state
+         of the Python script."
+    ::= { tmnxPythonScriptEntry 5 }
+
+tmnxPythonScriptDescription      OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptDescription specifies the description of
+         this Python script policy."
+    DEFVAL      { "" }
+    ::= { tmnxPythonScriptEntry 6 }
+
+tmnxPythonScriptOnFail           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        passthrough (1),
+        drop        (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptOnFail specifies the action taken when
+         Python fails to modify the given message.
+
+         When the value is 'passthrough' the packet will be sent out without
+         any modifications.
+
+         When the value is 'drop' the packet will be dropped."
+    DEFVAL      { drop }
+    ::= { tmnxPythonScriptEntry 7 }
+
+tmnxPythonScriptProtection       OBJECT-TYPE
+    SYNTAX      TmnxProtection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptProtection specifies the method used to
+         ensure the integrity and/or the confidentiality of the content of the
+         Python script.
+
+         A value of 'none (1)' indicates the Python script is stored in plain
+         text, without any mechanism in place to ensure the integrity nor the
+         confidentiality of the content of the Python script.
+
+         A value of 'hmacSha256' indicates the first line of the Python script
+         must consist of the hash value obtained by hashing the rest of the
+         Python script using the hmac-sha256 hashing algorithm given the key
+         specified in tmnxPythonScriptProtectionKey.
+
+         To set this field you must also set tmnxPythonScriptProtectionKey."
+    DEFVAL      { none }
+    ::= { tmnxPythonScriptEntry 8 }
+
+tmnxPythonScriptProtectionKey    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptProtectionKey specifies the secret key
+         used for the protection mechanism specified in
+         tmnxPythonScriptProtection.
+
+         If tmnxPythonScriptProtection is set to 'none (1)' this key must be
+         set to the empty string.
+
+         Performing an SNMP GET on this field will always return an empty
+         string."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonScriptEntry 9 }
+
+tmnxPythonScriptPrimaryUrl       OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptPrimaryUrl specifies the URL of the
+         primary script to change the Python message."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonScriptEntry 10 }
+
+tmnxPythonScriptSecondaryUrl     OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptSecondaryUrl specifies the URL of the
+         secondary script to change the Python message."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonScriptEntry 11 }
+
+tmnxPythonScriptTertiaryUrl      OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptTertiaryUrl specifies the URL of the
+         tertiary script to change the Python message."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonScriptEntry 12 }
+
+tmnxPythonScriptActiveUrl        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        primary   (1),
+        secondary (2),
+        tertiary  (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptActiveUrl indicates from which URL the
+         script has been loaded.
+
+         A value of 'primary(1)' indicates the URL in
+         tmnxPythonScriptPrimaryUrl has been used. A value of 'secondary(2)'
+         indicates the URL in tmnxPythonScriptSecondaryUrl has been used. A
+         value of 'tertiary(3)' indicates the URL in
+         tmnxPythonScriptTertiaryUrl has been used.
+
+         A value of 'none(0)' indicates no script has been loaded."
+    ::= { tmnxPythonScriptEntry 13 }
+
+tmnxPythonScriptOperStateDistrib OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptOperStateDistrib indicates the
+         operational state of the distributed deployment of the Python script."
+    ::= { tmnxPythonScriptEntry 14 }
+
+tmnxPythonScriptCodeSize         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptCodeSize indicates the bytecode size of
+         the Python script."
+    ::= { tmnxPythonScriptEntry 15 }
+
+tmnxPythonScriptVersion          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        python2 (2),
+        python3 (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptVersion indicates the version of Python
+         this script is written for."
+    DEFVAL      { python2 }
+    ::= { tmnxPythonScriptEntry 16 }
+
+tmnxPythonScriptRunAsUser        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The user which is used to authenticate with in pysros scripts."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonScriptEntry 17 }
+
+tmnxPythonScriptReloadAction     OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScriptReloadAction specifies whether to reload
+         the Python script file specified by this Python script.
+
+         When SET to the value of 'doAction' the system will load and parse the
+         file specified in the primary, secondary or tertiary url.
+
+         An SNMP GET request on this object should return 'notApplicable'."
+    DEFVAL      { notApplicable }
+    ::= { tmnxPythonScriptEntry 50 }
+
+tmnxPythonPolicyTableLastCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPythonPolicyTableLastCh indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         tmnxPythonPolicyTable."
+    ::= { tmnxPythonObjs 3 }
+
+tmnxPythonPolicyTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonPolicyTable contains objects to configure Python
+         policies."
+    ::= { tmnxPythonObjs 4 }
+
+tmnxPythonPolicyEntry            OBJECT-TYPE
+    SYNTAX      TmnxPythonPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a Python policy.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       { tmnxPyPlcyName }
+    ::= { tmnxPythonPolicyTable 1 }
+
+TmnxPythonPolicyEntry            ::= SEQUENCE
+{
+    tmnxPyPlcyName                   TNamedItem,
+    tmnxPyPlcyRowStatus              RowStatus,
+    tmnxPyPlcyLastChanged            TimeStamp,
+    tmnxPyPlcyDescription            TItemDescription,
+    tmnxPyPlcyWlanGwGroup            TmnxWlanGwIsaGrpIdOrZero,
+    tmnxPyPlcyNatGroup               TmnxNatIsaGrpIdOrZero
+}
+
+tmnxPyPlcyName                   OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyName specifies the name of this Python policy."
+    ::= { tmnxPythonPolicyEntry 1 }
+
+tmnxPyPlcyRowStatus              OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyRowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { tmnxPythonPolicyEntry 2 }
+
+tmnxPyPlcyLastChanged            OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPyPlcyLastChanged indicates the sysUpTime at the time of
+         the most recent management-initiated change to this Python policy."
+    ::= { tmnxPythonPolicyEntry 3 }
+
+tmnxPyPlcyDescription            OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyDescription specifies the description of this
+         Python policy."
+    DEFVAL      { "" }
+    ::= { tmnxPythonPolicyEntry 4 }
+
+tmnxPyPlcyWlanGwGroup            OBJECT-TYPE
+    SYNTAX      TmnxWlanGwIsaGrpIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyWlanGwGroup specifies the Wireless Local Access
+         Network Gateway (WLAN Gateway) ISA group of this Python policy.
+
+         While a nonzero value for this object is specified, the scripts
+         associated with this Python policy run on the ISA cards associated
+         with the WLAN Gateway group.
+
+         The value zero means that no WLAN Gateway group is specified.
+
+         A nonzero value for this object can only be set while this row is
+         created; a nonzero value must correspond to a row in the
+         TIMETRA-WLAN-GW-MIB::tmnxWlanGwGrpTable.
+
+         The value of this object cannot be modified while this row is active."
+    DEFVAL      { 0 }
+    ::= { tmnxPythonPolicyEntry 6 }
+
+tmnxPyPlcyNatGroup               OBJECT-TYPE
+    SYNTAX      TmnxNatIsaGrpIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyNatGroup specifies the identifier of the
+         Network Address Translation (NAT) ISA group of this Python policy.
+
+         While a nonzero value for this object is specified, the scripts
+         associated with this Python policy run on the ISA cards associated
+         with the NAT group.
+
+         The value zero means that no NAT group is specified.
+
+         A nonzero value for this object can only be set while this row is
+         created; a nonzero value must correspond to a row in the
+         TIMETRA-NAT-MIB::tmnxNatIsaGrpTable.
+
+         The value of this object cannot be modified while this row is active."
+    DEFVAL      { 0 }
+    ::= { tmnxPythonPolicyEntry 7 }
+
+tmnxPythonPolicyCacheTableLastCh OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPythonPolicyCacheTableLastCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPythonPolicyCacheTable."
+    ::= { tmnxPythonObjs 5 }
+
+tmnxPythonPolicyCacheTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonPolicyCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonPolicyCacheTable contains objects to configure
+         Python policy caches."
+    ::= { tmnxPythonObjs 6 }
+
+tmnxPythonPolicyCacheEntry       OBJECT-TYPE
+    SYNTAX      TmnxPythonPolicyCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents the cache of a Python policy.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       { tmnxPyPlcyName }
+    ::= { tmnxPythonPolicyCacheTable 1 }
+
+TmnxPythonPolicyCacheEntry       ::= SEQUENCE
+{
+    tmnxPyPlcyCacheRowStatus         RowStatus,
+    tmnxPyPlcyCacheEntrySize         Integer32,
+    tmnxPyPlcyCacheMaxEntries        Integer32,
+    tmnxPyPlcyCacheMaxLifetime       Integer32,
+    tmnxPyPlcyCacheAdminState        TmnxAdminState,
+    tmnxPyPlcyCacheLastChanged       TimeStamp,
+    tmnxPyPlcyCachePersistent        TruthValue,
+    tmnxPyPlcyCacheMinLifetimeMcs    Unsigned32,
+    tmnxPyPlcyCacheMinLifetimeHa     Unsigned32,
+    tmnxPyPlcyCacheMinLifetimePers   Unsigned32,
+    tmnxPyPlcyCacheNumberOfEntries   Gauge32
+}
+
+tmnxPyPlcyCacheRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxPythonPolicyCacheEntry 1 }
+
+tmnxPyPlcyCacheEntrySize         OBJECT-TYPE
+    SYNTAX      Integer32 (32..2048)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheEntrySize specifies the maximum size of
+         the data structure that can be stored in a single Python cache entry.
+
+         When requesting to store a data structure the size of the serialized
+         object is compared with the value specified in this MIB field. If it's
+         larger, the object will not be stored and Python will throw an
+         exception."
+    DEFVAL      { 256 }
+    ::= { tmnxPythonPolicyCacheEntry 2 }
+
+tmnxPyPlcyCacheMaxEntries        OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheMaxEntries specifies the maximum number of
+         Python cache entries that can be stored in the cache of this Python
+         policy.
+
+         If the limit has been reached, a Python exception will be thrown when
+         requested to store another data structure."
+    DEFVAL      { 128000 }
+    ::= { tmnxPythonPolicyCacheEntry 3 }
+
+tmnxPyPlcyCacheMaxLifetime       OBJECT-TYPE
+    SYNTAX      Integer32 (1..604800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheMaxLifetime specifies the maximum allowed
+         lifetime for each entry of the Python cache of this Python policy.
+
+         When adding data to the Python cache the lifetime of the given object
+         must always be specified. If the specified lifetime is bigger than the
+         value of tmnxPyPlcyCacheMaxLifetime, the value of
+         tmnxPyPlcyCacheMaxLifetime will be used instead of the lifetime that
+         was specified."
+    DEFVAL      { 86400 }
+    ::= { tmnxPythonPolicyCacheEntry 4 }
+
+tmnxPyPlcyCacheAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheAdminState specifies the administrative
+         state of the cache of this Python policy."
+    DEFVAL      { outOfService }
+    ::= { tmnxPythonPolicyCacheEntry 5 }
+
+tmnxPyPlcyCacheLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPyPlcyCacheLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to the cache of
+         this Python policy."
+    ::= { tmnxPythonPolicyCacheEntry 6 }
+
+tmnxPyPlcyCachePersistent        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCachePersistent specifies if the cache of this
+         Python policy is persistent."
+    DEFVAL      { false }
+    ::= { tmnxPythonPolicyCacheEntry 10 }
+
+tmnxPyPlcyCacheMinLifetimeMcs    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheMinLifetimeMcs specifies the minimum value
+         for the remaining lifetime of any cache entry to be be synchronized
+         with the peer system using Multi-Chassis Redundancy Synchronization."
+    DEFVAL      { 0 }
+    ::= { tmnxPythonPolicyCacheEntry 11 }
+
+tmnxPyPlcyCacheMinLifetimeHa     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheMinLifetimeHa specifies the minimum value
+         for the remaining lifetime of any cache entry to be be synchronized
+         with the standby CPM using High Availability."
+    DEFVAL      { 0 }
+    ::= { tmnxPythonPolicyCacheEntry 12 }
+
+tmnxPyPlcyCacheMinLifetimePers   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheMinLifetimePers specifies the minimum
+         value for the remaining lifetime of any cache entry to be be written
+         to the system persistence file."
+    DEFVAL      { 0 }
+    ::= { tmnxPythonPolicyCacheEntry 13 }
+
+tmnxPyPlcyCacheNumberOfEntries   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyCacheNumberOfEntries indicates the current
+         number of Python cache entries that are stored in the cache of this
+         Python policy."
+    ::= { tmnxPythonPolicyCacheEntry 14 }
+
+tmnxPythonPolicyMessageTblLstCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPythonPolicyMessageTblLstCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPythonPolicyMessageTable."
+    ::= { tmnxPythonObjs 7 }
+
+tmnxPythonPolicyMessageTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonPolicyMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonPolicyMessageTable specifies when a Python script
+         must be invoked."
+    ::= { tmnxPythonObjs 8 }
+
+tmnxPythonPolicyMessageEntry     OBJECT-TYPE
+    SYNTAX      TmnxPythonPolicyMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an event that triggers the execution of the
+         specified Python script.
+
+         Entries in this table can be created or deleted via SNMP operations."
+    INDEX       {
+        tmnxPyPlcyName,
+        tmnxPyPlcyMessageType,
+        tmnxPyPlcyMessageDirection
+    }
+    ::= { tmnxPythonPolicyMessageTable 1 }
+
+TmnxPythonPolicyMessageEntry     ::= SEQUENCE
+{
+    tmnxPyPlcyMessageType            INTEGER,
+    tmnxPyPlcyMessageDirection       TDirectionIngEgr,
+    tmnxPyPlcyMessageRowStatus       RowStatus,
+    tmnxPyPlcyMessageLastChanged     TimeStamp,
+    tmnxPyPlcyMessagePyScript        TNamedItem
+}
+
+tmnxPyPlcyMessageType            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        radiusAccessRequest                (1),
+        radiusAccessAccept                 (2),
+        radiusAccessReject                 (3),
+        radiusAccountingRequest            (4),
+        radiusAccountingResponse           (5),
+        radiusAccessChallenge              (6),
+        radiusDisconnectRequest            (7),
+        radiusChangeOfAuthorizationRequest (8),
+        dhcpDiscover                       (1001),
+        dhcpOffer                          (1002),
+        dhcpRequest                        (1003),
+        dhcpDecline                        (1004),
+        dhcpAck                            (1005),
+        dhcpNak                            (1006),
+        dhcpRelease                        (1007),
+        dhcpInform                         (1008),
+        dhcpForceRenew                     (1009),
+        dhcpLeaseQuery                     (1010),
+        dhcpLeaseUnassigned                (1011),
+        dhcpLeaseUnknown                   (1012),
+        dhcpLeaseActive                    (1013),
+        dhcp6Solicit                       (2001),
+        dhcp6Advertise                     (2002),
+        dhcp6Request                       (2003),
+        dhcp6Confirm                       (2004),
+        dhcp6Renew                         (2005),
+        dhcp6Rebind                        (2006),
+        dhcp6Reply                         (2007),
+        dhcp6Release                       (2008),
+        dhcp6Decline                       (2009),
+        dhcp6Reconfigure                   (2010),
+        dhcp6InfoRequest                   (2011),
+        dhcp6RelayForward                  (2012),
+        dhcp6RelayReply                    (2013),
+        diameterCCR                        (3001),
+        diameterCCA                        (3002),
+        diameterRAR                        (3003),
+        diameterRAA                        (3004),
+        diameterCER                        (3005),
+        diameterCEA                        (3006),
+        diameterDWR                        (3007),
+        diameterDWA                        (3008),
+        diameterDPR                        (3009),
+        diameterDPA                        (3010),
+        diameterASR                        (3011),
+        diameterASA                        (3012),
+        diameterAAR                        (3013),
+        diameterAAA                        (3014),
+        vsdAccessRequest                   (4001),
+        gtpv1CEchoRequest                  (5001),
+        gtpv1CEchoResponse                 (5002),
+        gtpv1CVersionNotSupported          (5003),
+        gtpv1CCreatePdpContextRequest      (5004),
+        gtpv1CCreatePdpContextResponse     (5005),
+        gtpv1CDeletePdpContextRequest      (5008),
+        gtpv1CDeletePdpContextResponse     (5009),
+        gtpv1CErrorIndication              (5010),
+        gtpv1CEndMarker                    (5011),
+        gtpv2CEchoRequest                  (6001),
+        gtpv2CEchoResponse                 (6002),
+        gtpv2CVersionNotSupported          (6003),
+        gtpv2CCreateSessionRequest         (6004),
+        gtpv2CCreateSessionResponse        (6005),
+        gtpv2CModifyBearerRequest          (6006),
+        gtpv2CModifyBearerResponse         (6007),
+        gtpv2CDeleteSessionRequest         (6008),
+        gtpv2CDeleteSessionResponse        (6009),
+        gtpv2CDeleteBearerRequest          (6010),
+        gtpv2CDeleteBearerResponse         (6011),
+        gtpv2CReleaseAccessBearersRequest  (6012),
+        gtpv2CReleaseAccessBearersResponse (6013),
+        gtpv2CDownLinkDataNotification     (6014),
+        gtpv2CDownLinkDataNotificationAck  (6015),
+        gtpv2CChangeNotificationRequest    (6016),
+        gtpv2CChangeNotificationResponse   (6017),
+        gtpv2CStopPagingIndication         (6018),
+        pppoeSessionLcp                    (7001),
+        pppoeSessionPap                    (7002),
+        pppoeSessionChap                   (7003),
+        pppoeSessionIpcp                   (7004),
+        pppoeSessionIp6cp                  (7005),
+        pppoePado                          (7006),
+        pppoePadi                          (7007),
+        pppoePadr                          (7008),
+        pppoePads                          (7009),
+        pppoePadt                          (7010),
+        syslog                             (8001),
+        pfcpHeartbeatRequest               (9001),
+        pfcpHeartbeatResponse              (9002),
+        pfcpAssociationSetupRequest        (9005),
+        pfcpAssociationSetupResponse       (9006),
+        pfcpAssociationUpdateRequest       (9007),
+        pfcpAssociationUpdateResponse      (9008),
+        pfcpAssociationReleaseRequest      (9009),
+        pfcpAssociationReleaseResponse     (9010),
+        pfcpNodeReportRequest              (9012),
+        pfcpNodeReportResponse             (9013),
+        pfcpSessionEstabRequest            (9050),
+        pfcpSessionEstabResponse           (9051),
+        pfcpSessionModRequest              (9052),
+        pfcpSessionModResponse             (9053),
+        pfcpSessionDelRequest              (9054),
+        pfcpSessionDelResponse             (9055),
+        pfcpSessionReportRequest           (9056),
+        pfcpSessionReportResponse          (9057)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyMessageType specifies the message type of the
+         event."
+    ::= { tmnxPythonPolicyMessageEntry 2 }
+
+tmnxPyPlcyMessageDirection       OBJECT-TYPE
+    SYNTAX      TDirectionIngEgr
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyMessageDirection specifies whether the event is
+         incoming or outgoing."
+    ::= { tmnxPythonPolicyMessageEntry 3 }
+
+tmnxPyPlcyMessageRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyMessageRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxPythonPolicyMessageEntry 4 }
+
+tmnxPyPlcyMessageLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPyPlcyMessageLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this Python
+         policy protocol."
+    ::= { tmnxPythonPolicyMessageEntry 5 }
+
+tmnxPyPlcyMessagePyScript        OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPyPlcyMessagePyScript specifies the name of the
+         Python script that will be used to handle the message specified by
+         this row."
+    ::= { tmnxPythonPolicyMessageEntry 6 }
+
+tmnxPythonProtectAction          OBJECT IDENTIFIER ::= { tmnxPythonObjs 9 }
+
+tmnxPythonProtectFileUrl         OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonProtectFileUrl specifies the URL of the Python
+         script to protect."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonProtectAction 1 }
+
+tmnxPythonProtectDestFileUrl     OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonProtectDestFileUrl specifies the URL where the
+         protected Python script must be stored."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonProtectAction 2 }
+
+tmnxPythonProtectType            OBJECT-TYPE
+    SYNTAX      TmnxProtection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonProtectType specifies the method used to ensure
+         the integrity and/or the confidentiality of the content of the Python
+         script."
+    DEFVAL      { none }
+    ::= { tmnxPythonProtectAction 3 }
+
+tmnxPythonProtectKey             OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonProtectKey specifies the secret key used for
+         the protection mechanism specified in tmnxPythonProtectType."
+    DEFVAL      { ''H }
+    ::= { tmnxPythonProtectAction 4 }
+
+tmnxPythonProtectActionGo        OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to 'doAction' triggers an attempt to protect the
+         Python script file specified in tmnxPythonProtectFileUrl.
+
+         Reading this object returns the value 'notApplicable'."
+    ::= { tmnxPythonProtectAction 5 }
+
+tmnxPythonProtectActionSuccess   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonProtectActionSuccess indicates if
+         the last action request was successful.
+
+         If the value of the object equals 'false', a row in the
+         TIMETRA-LOG-MIB::tmnxSnmpSetErrsTable is created."
+    ::= { tmnxPythonProtectAction 6 }
+
+tmnxPythonProtectActionTime      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonProtectActionTime indicates the
+         value of sysUpTime at the last time that the object
+         tmnxPythonProtectActionSuccess was written by the system."
+    ::= { tmnxPythonProtectAction 7 }
+
+tmnxPythonScrStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonScrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonScrStatsTable contains statistics about Python
+         scripts.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxPythonObjs 10 }
+
+tmnxPythonScrStatsEntry          OBJECT-TYPE
+    SYNTAX      TmnxPythonScrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents statistics about a particular Python script
+         executed on a particular ISA MDA that is part of a NAT group or
+         WLAN-GW group."
+    INDEX       {
+        tmnxPythonScriptName,
+        tmnxPythonScrStatsIsaGrpId,
+        tmnxChassisIndex,
+        tmnxCardSlotNum,
+        tmnxMDASlotNum
+    }
+    ::= { tmnxPythonScrStatsTable 1 }
+
+TmnxPythonScrStatsEntry          ::= SEQUENCE
+{
+    tmnxPythonScrStatsIsaGrpId       Unsigned32,
+    tmnxPythonScrStatsRunsSuccess    Counter32,
+    tmnxPythonScrStatsRunsFailed     Counter32,
+    tmnxPythonScrStatsRunsTimeout    Counter32,
+    tmnxPythonScrStatsRunsRateLimit  Counter32
+}
+
+tmnxPythonScrStatsIsaGrpId       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrStatsIsaGrpId indicates the
+         identifier of a NAT Integrated Service Adaptor group or WLAN Gateway
+         Integrated Service Adaptor group."
+    ::= { tmnxPythonScrStatsEntry 1 }
+
+tmnxPythonScrStatsRunsSuccess    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrStatsRunsSuccess indicates the
+         number of times the Python script has run successfully on the ISA MDA."
+    ::= { tmnxPythonScrStatsEntry 2 }
+
+tmnxPythonScrStatsRunsFailed     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrStatsRunsFailed indicates the
+         number of times the Python script has run unsuccessfully on the ISA
+         MDA."
+    ::= { tmnxPythonScrStatsEntry 3 }
+
+tmnxPythonScrStatsRunsTimeout    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrStatsRunsTimeout indicates the
+         number of times the Python script timed out while running on the ISA
+         MDA."
+    ::= { tmnxPythonScrStatsEntry 4 }
+
+tmnxPythonScrStatsRunsRateLimit  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrStatsRunsRateLimit indicates the
+         number of times the Python script was aborted due to rate limitation
+         while running on the ISA MDA."
+    ::= { tmnxPythonScrStatsEntry 5 }
+
+tmnxPythonScrVappStatsTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonScrVappStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonScrVappStatsTable contains statistics about Python
+         scripts for a Virtual Machine within an Extended Service Appliance.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxPythonObjs 11 }
+
+tmnxPythonScrVappStatsEntry      OBJECT-TYPE
+    SYNTAX      TmnxPythonScrVappStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents statistics about a particular Python script
+         executed on a particular Virtual Machine within an Extended Service
+         Appliance that is part of a NAT group or WLAN-GW group."
+    INDEX       {
+        tmnxPythonScriptName,
+        tmnxPythonScrVappStatsIsaGrpId,
+        tmnxPythonScrVappStatsEsaNum,
+        tmnxPythonScrVappStatsEsaVappNum
+    }
+    ::= { tmnxPythonScrVappStatsTable 1 }
+
+TmnxPythonScrVappStatsEntry      ::= SEQUENCE
+{
+    tmnxPythonScrVappStatsIsaGrpId   Unsigned32,
+    tmnxPythonScrVappStatsEsaNum     TmnxEsaNum,
+    tmnxPythonScrVappStatsEsaVappNum TmnxEsaVappNum,
+    tmnxPythonScrVappStatsRunSuccess Counter32,
+    tmnxPythonScrVappStatsRunFailed  Counter32,
+    tmnxPythonScrVappStatsRunTimeout Counter32,
+    tmnxPythonScrVappStatsRunRateLmt Counter32
+}
+
+tmnxPythonScrVappStatsIsaGrpId   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrVappStatsIsaGrpId indicates the
+         identifier of a NAT Integrated Service Adaptor group or WLAN Gateway
+         Integrated Service Adaptor group."
+    ::= { tmnxPythonScrVappStatsEntry 1 }
+
+tmnxPythonScrVappStatsEsaNum     OBJECT-TYPE
+    SYNTAX      TmnxEsaNum (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScrVappStatsEsaNum indicates the number of the
+         Extended  Service Appliance where the member is located."
+    ::= { tmnxPythonScrVappStatsEntry 2 }
+
+tmnxPythonScrVappStatsEsaVappNum OBJECT-TYPE
+    SYNTAX      TmnxEsaVappNum (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPythonScrVappStatsEsaVappNum indicates the number of
+         the Virtual Machine within an Extended Service Appliance where the
+         member is located."
+    ::= { tmnxPythonScrVappStatsEntry 3 }
+
+tmnxPythonScrVappStatsRunSuccess OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrVappStatsRunSuccess indicates the
+         number of times the Python script has run successfully on the Virtual
+         Machine within an Extended Service Appliance."
+    ::= { tmnxPythonScrVappStatsEntry 4 }
+
+tmnxPythonScrVappStatsRunFailed  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrVappStatsRunFailed indicates the
+         number of times the Python script has run unsuccessfully on the
+         Virtual Machine within an Extended Service Appliance."
+    ::= { tmnxPythonScrVappStatsEntry 5 }
+
+tmnxPythonScrVappStatsRunTimeout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrVappStatsRunTimeout indicates the
+         number of times the Python script timed out while running on the
+         Virtual Machine within an Extended Service Appliance."
+    ::= { tmnxPythonScrVappStatsEntry 6 }
+
+tmnxPythonScrVappStatsRunRateLmt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPythonScrVappStatsRunRateLmt indicates the
+         number of times the Python script was aborted due to rate limitation
+         while running on the Virtual Machine within an Extended Service
+         Appliance."
+    ::= { tmnxPythonScrVappStatsEntry 7 }
+
+tmnxPythonInterpreterTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPythonInterpreterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxPythonInterpreterTable contains runtime information
+         about all python-interpreters currently running.
+
+         Conceptual rows in this table are created and destroyed automatically
+         by the system."
+    ::= { tmnxPythonObjs 12 }
+
+tmnxPythonInterpreterEntry       OBJECT-TYPE
+    SYNTAX      TmnxPythonInterpreterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A python-interpreter currently executing some code"
+    INDEX       { tmnxPythonInterpreterName }
+    ::= { tmnxPythonInterpreterTable 1 }
+
+TmnxPythonInterpreterEntry       ::= SEQUENCE
+{
+    tmnxPythonInterpreterName        TNamedItem,
+    tmnxPythonInterpreterVersion     INTEGER,
+    tmnxPythonInterpreterSource      TmnxLongDisplayString,
+    tmnxPythonInterpreterSourceType  INTEGER,
+    tmnxPythonInterpreterMemMax      Unsigned32,
+    tmnxPythonInterpreterMemInUse    Unsigned32,
+    tmnxPythonInterpreterStartTime   DateAndTime,
+    tmnxPythonInterpreterRunTime     Unsigned32
+}
+
+tmnxPythonInterpreterName        OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of this python-interpreter"
+    ::= { tmnxPythonInterpreterEntry 1 }
+
+tmnxPythonInterpreterVersion     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        python2 (2),
+        python3 (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The python version of this python-interpreter"
+    ::= { tmnxPythonInterpreterEntry 2 }
+
+tmnxPythonInterpreterSource      OBJECT-TYPE
+    SYNTAX      TmnxLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The origin of the code that is currently running in this
+         python-interpreter"
+    ::= { tmnxPythonInterpreterEntry 3 }
+
+tmnxPythonInterpreterSourceType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        script (1),
+        url    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of code that is currently running in this python-interpreter"
+    ::= { tmnxPythonInterpreterEntry 4 }
+
+tmnxPythonInterpreterMemMax      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "megabytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum amount of memory this python-interpreter is allowed to
+         allocate"
+    ::= { tmnxPythonInterpreterEntry 5 }
+
+tmnxPythonInterpreterMemInUse    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "megabytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of memory currently allocated by this python-interpreter"
+    ::= { tmnxPythonInterpreterEntry 6 }
+
+tmnxPythonInterpreterStartTime   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which this python-interpreter was started"
+    ::= { tmnxPythonInterpreterEntry 7 }
+
+tmnxPythonInterpreterRunTime     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time this python-interpreter has been running for"
+    ::= { tmnxPythonInterpreterEntry 8 }
+
+tmnxPythonNotificationObjs       OBJECT IDENTIFIER ::= { tmnxPython 2 }
+
+tmnxPythonNotifyString           OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxPythonNotifyString is a printable character string."
+    ::= { tmnxPythonNotificationObjs 1 }
+
+tmnxPythonNotifyInterpreter      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object tmnxPythonNotifyInterpreter is the name of a Python
+         interpreter instance."
+    ::= { tmnxPythonNotificationObjs 2 }
+
+tmnxPythonConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 87 }
+
+tmnxPythonCompliances            OBJECT IDENTIFIER ::= { tmnxPythonConformance 1 }
+
+tmnxPythonCompliance             MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Python on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonGroup
+        }
+    ::= { tmnxPythonCompliances 1 }
+
+tmnxPythonV13v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Python on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonGroup
+        }
+    ::= { tmnxPythonCompliances 2 }
+
+tmnxPythonV14v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Python on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonGroup,
+            tmnxPythonIsaGroup
+        }
+    ::= { tmnxPythonCompliances 3 }
+
+tmnxPythonV20v0Compliance        MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of Python on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonGroup,
+            tmnxPythonIsaGroup,
+            tmnxPythonV20v0Group,
+            tmnxPythonEsaV20v0Group
+        }
+    ::= { tmnxPythonCompliances 4 }
+
+tmnxPythonV22v0Compliance        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Python on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonGroup,
+            tmnxPythonIsaGroup,
+            tmnxPythonV20v0Group,
+            tmnxPythonEsaV20v0Group,
+            tmnxPythonV22v0Group
+        }
+    ::= { tmnxPythonCompliances 5 }
+
+tmnxPythonNotifyCompliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for Python notifications on Nokia SROS series
+         systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPythonNotifyV20v0Group
+        }
+    ::= { tmnxPythonCompliances 100 }
+
+tmnxPythonGroups                 OBJECT IDENTIFIER ::= { tmnxPythonConformance 2 }
+
+tmnxPythonGroup                  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPythonScriptTableLastCh,
+        tmnxPythonScriptRowStatus,
+        tmnxPythonScriptLastChanged,
+        tmnxPythonScriptDescription,
+        tmnxPythonScriptOnFail,
+        tmnxPythonScriptProtection,
+        tmnxPythonScriptProtectionKey,
+        tmnxPythonScriptAdminState,
+        tmnxPythonScriptOperState,
+        tmnxPythonScriptPrimaryUrl,
+        tmnxPythonScriptSecondaryUrl,
+        tmnxPythonScriptTertiaryUrl,
+        tmnxPythonScriptActiveUrl,
+        tmnxPythonScriptVersion,
+        tmnxPythonScriptReloadAction,
+        tmnxPythonPolicyTableLastCh,
+        tmnxPyPlcyRowStatus,
+        tmnxPyPlcyLastChanged,
+        tmnxPyPlcyDescription,
+        tmnxPythonPolicyCacheTableLastCh,
+        tmnxPyPlcyCacheRowStatus,
+        tmnxPyPlcyCacheEntrySize,
+        tmnxPyPlcyCacheMaxEntries,
+        tmnxPyPlcyCacheMaxLifetime,
+        tmnxPyPlcyCacheAdminState,
+        tmnxPyPlcyCacheLastChanged,
+        tmnxPyPlcyCachePersistent,
+        tmnxPyPlcyCacheMinLifetimeMcs,
+        tmnxPyPlcyCacheMinLifetimeHa,
+        tmnxPyPlcyCacheMinLifetimePers,
+        tmnxPyPlcyCacheNumberOfEntries,
+        tmnxPythonProtectFileUrl,
+        tmnxPythonProtectDestFileUrl,
+        tmnxPythonProtectType,
+        tmnxPythonProtectKey,
+        tmnxPythonProtectActionGo,
+        tmnxPythonProtectActionSuccess,
+        tmnxPythonProtectActionTime,
+        tmnxPythonPolicyMessageTblLstCh,
+        tmnxPyPlcyMessageRowStatus,
+        tmnxPyPlcyMessageLastChanged,
+        tmnxPyPlcyMessagePyScript
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python on Nokia SROS
+         series systems."
+    ::= { tmnxPythonGroups 1 }
+
+tmnxPythonIsaGroup               OBJECT-GROUP
+    OBJECTS     {
+        tmnxPyPlcyWlanGwGroup,
+        tmnxPyPlcyNatGroup,
+        tmnxPythonScriptOperStateDistrib,
+        tmnxPythonScriptCodeSize,
+        tmnxPythonScrStatsRunsSuccess,
+        tmnxPythonScrStatsRunsFailed,
+        tmnxPythonScrStatsRunsTimeout,
+        tmnxPythonScrStatsRunsRateLimit
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python distributed on
+         ISA cards on Nokia SROS series systems."
+    ::= { tmnxPythonGroups 2 }
+
+tmnxPythonV20v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPythonScriptVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python on the Nokia
+         SROS series systems that were added in release 20."
+    ::= { tmnxPythonGroups 3 }
+
+tmnxPythonEsaV20v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPythonScrVappStatsRunSuccess,
+        tmnxPythonScrVappStatsRunFailed,
+        tmnxPythonScrVappStatsRunTimeout,
+        tmnxPythonScrVappStatsRunRateLmt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python distributed on
+         Virtual Machines within Extended Service Appliances on the Nokia SROS
+         series systems that were added in release 20."
+    ::= { tmnxPythonGroups 4 }
+
+tmnxPythonV22v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPythonScriptRunAsUser,
+        tmnxPythonInterpreterVersion,
+        tmnxPythonInterpreterSource,
+        tmnxPythonInterpreterSourceType,
+        tmnxPythonInterpreterMemMax,
+        tmnxPythonInterpreterMemInUse,
+        tmnxPythonInterpreterStartTime,
+        tmnxPythonInterpreterRunTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python on the Nokia
+         SROS series systems that were added in release 22."
+    ::= { tmnxPythonGroups 5 }
+
+tmnxPythonNotifyObjsGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxPythonNotifyString,
+        tmnxPythonNotifyInterpreter
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of Python distributed on
+         Virtual Machines within Extended Service Appliances on the Nokia SROS
+         series systems that were added in release 20."
+    ::= { tmnxPythonGroups 99 }
+
+tmnxPythonNotifGroups            OBJECT IDENTIFIER ::= { tmnxPythonConformance 3 }
+
+tmnxPythonNotifyV20v0Group       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPythonInterpreterRestarted
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting Python in release 20 of Nokia
+         SROS series systems."
+    ::= { tmnxPythonNotifGroups 1 }
+
+tmnxPythonNotifyPrefix           OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 87 }
+
+tmnxPythonNotifications          OBJECT IDENTIFIER ::= { tmnxPythonNotifyPrefix 0 }
+
+tmnxPythonInterpreterRestarted   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPythonNotifyInterpreter,
+        tmnxPythonNotifyString
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPythonInterpreterRestarted notification is sent when a
+         Python interpreter instance restarted.
+
+         The reason is typically a lack of memory.
+
+         The object tmnxPythonNotifyInterpreter indicates the name of the
+         interpreter, and the object tmnxPythonNotifyString indicates the
+         reason of the restart.
+
+         [EFFECT] The effect depends on the application that was executing the
+         Python script.
+
+         [RECOVERY] If this event occurs repeatedly, the exact cause should be
+         determined. The exact cause will reveal what recovery actions are
+         appropriate."
+    ::= { tmnxPythonNotifications 1 }
+
+END

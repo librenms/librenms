@@ -1,0 +1,1048 @@
+TIMETRA-ETH-RING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndexOrZero
+                                                         FROM IF-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    MacAddress, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    sapEncapValue, sapPortId
+                                                         FROM TIMETRA-SAP-MIB
+    svcId
+                                                         FROM TIMETRA-SERV-MIB
+    TItemDescription, TmnxAdminState,
+    TmnxEncapVal, TmnxOperState
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraEthRingMIBModule          MODULE-IDENTITY
+    LAST-UPDATED "201102010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         Ethernet Ring components of the Nokia SROS device.
+
+         Copyright (c) 2009-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201102010000Z"
+    DESCRIPTION
+        "Rev 9.0                01 Feb 2011 00:00
+         9.0 release of the TIMETRA-ETH-TUNNEL-MIB."
+
+    REVISION    "201001010000Z"
+    DESCRIPTION
+        "Rev 1.0                01 Jan 2010 00:00
+         1.0 release of the TIMETRA-ETH-TUNNEL-MIB."
+
+    ::= { timetraSRMIBModules 72 }
+
+TmnxEthRingIndex                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthRingIndex specifies the unique Ethernet Ring Identifier for
+         an Ethernet Ring Node.
+
+         The value of zero (0) is only used by objects which may reference a
+         tmnxEthRingConfigEntry. The value zero (0) is an invalid index that
+         specifies that the object is not associated with any Ethernet Ring
+         Node."
+    SYNTAX      Unsigned32
+
+TmnxEthRingPathIndex             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthRingPathIndex specifies the unique Ethernet Ring Path
+         Identifier.
+
+         Along with an Object of type TmnxEthRingIndex, an Object of this type
+         references a specific path on a specific Ethernet Ring Node."
+    SYNTAX      INTEGER {
+        pathA (0),
+        pathB (1)
+    }
+
+TmnxEthRingRplNodeType           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthRingRplNodeType specifies the Ring Protection Link (RPL)
+         Node type. An object of this type may be assigned to a value of:
+                - rplNone (0)       -- The Ethernet Ring Node is not designated
+                                       as either an Owner or Neighbor Node.
+                - rplOwner(1)       -- The Ethernet Ring Node is adjacent to
+                                       the RPL that is responsible for blocking
+                                       its end of the RPL under normal
+                                       conditions. It is the responsibility of
+                                       the rplOwner for activating reversion
+                                       behaviour from protected or MS/FS
+                                       conditions.
+                - rplNeighbor(2)    -- The Ethernet Ring Node is adjacent to
+                                       the RPL that is responsible for blocking
+                                       its end of the RPL under normal
+                                       conditions in addition to the block by
+                                       the RPL Owner Node. The node is, however,
+                                       not responsible for activating the
+                                       reversion behavior."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 3.14, 3.15"
+    SYNTAX      INTEGER {
+        rplNone     (0),
+        rplOwner    (1),
+        rplNeighbor (2)
+    }
+
+TmnxEthRingApsInfoType           ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x-1x [1x:1x:1x:1x:1x:1x] 24x-"
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEthRingApsInfoType specifies the Ring APS specific PDU message
+         information. If the value of an object of this type is the empty
+         string, then no Ring APS specific PDU message is available. The APS
+         pdu uses the following format:
+
+           +-------+-------+---------------+---------------+---------------+
+           |8 7 6 5|4 3 2 1|8 7 6 5 4 3 2 1|8 7 6 ... 3 2 1|8 7 6 ... 3 2 1|
+           |-------+-------+---------------+---------------+---------------+
+           | Rqst/ | sub-  |    Status     | Node ID       | Reserved      |
+           | State | code  +-+-+-+---------+  (6 octets)   |  (24 octets)  |
+           |       |       |R|D|B| status  |               |               |
+           |       |       |B|N|P|   Rsvd  |               |               |
+           |       |       | |F|R|         |               |               |
+           +-------+-------+-+-+-+---------+---------------+---------------+"
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 10.26"
+    SYNTAX      OCTET STRING (SIZE (0|8..32))
+
+tmnxEthRingObjs                  OBJECT IDENTIFIER ::= { tmnxSRObjs 72 }
+
+tmnxEthRingConfigTimeStamps      OBJECT IDENTIFIER ::= { tmnxEthRingObjs 0 }
+
+tmnxEthRingCfgTblLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingCfgTblLastChanged indicates the time, since system
+         startup, when a row in the tmnxEthRingConfigTable last changed."
+    ::= { tmnxEthRingConfigTimeStamps 1 }
+
+tmnxEthRingPathTblLastChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathTblLastChanged indicates the time, since system
+         startup, when a row in the tmnxEthRingPathTable last changed."
+    ::= { tmnxEthRingConfigTimeStamps 2 }
+
+tmnxEthRingSAPPathTblChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingSAPPathTblChanged indicates the time, since system
+         startup, when a row in the tmnxEthRingSAPPathTable last changed."
+    ::= { tmnxEthRingConfigTimeStamps 4 }
+
+tmnxEthRingConfigurations        OBJECT IDENTIFIER ::= { tmnxEthRingObjs 1 }
+
+tmnxEthRingConfigTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthRingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingConfigTable consists of the Ethernet Ring configuration
+         information."
+    ::= { tmnxEthRingConfigurations 1 }
+
+tmnxEthRingConfigEntry           OBJECT-TYPE
+    SYNTAX      TmnxEthRingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingConfigEntry contains information pertaining to an
+         individual Ethernet Ring.
+
+         Rows in this table are created and destroyed using the
+         tmnxEthRingRowStatus object."
+    INDEX       { tmnxEthRingIndex }
+    ::= { tmnxEthRingConfigTable 1 }
+
+TmnxEthRingConfigEntry           ::= SEQUENCE
+{
+    tmnxEthRingIndex                 TmnxEthRingIndex,
+    tmnxEthRingRowStatus             RowStatus,
+    tmnxEthRingTimeStamp             TimeStamp,
+    tmnxEthRingDescription           TItemDescription,
+    tmnxEthRingAdminState            TmnxAdminState,
+    tmnxEthRingOperState             TmnxOperState,
+    tmnxEthRingGuardTime             Unsigned32,
+    tmnxEthRingRevertTime            Unsigned32,
+    tmnxEthRingRevertTimeCountDn     Unsigned32,
+    tmnxEthRingCcmHoldDownTime       Unsigned32,
+    tmnxEthRingCcmHoldUpTime         Unsigned32,
+    tmnxEthRingRplNode               TmnxEthRingRplNodeType,
+    tmnxEthRingNodeId                MacAddress,
+    tmnxEthRingTxApsPdu              TmnxEthRingApsInfoType,
+    tmnxEthRingDefectStatus          BITS,
+    tmnxEthRingSubRingType           INTEGER,
+    tmnxEthRingSubRingInterconnectId Unsigned32,
+    tmnxEthRingSubRingPropTopChange  TruthValue,
+    tmnxEthRingCompatibleVersion     INTEGER
+}
+
+tmnxEthRingIndex                 OBJECT-TYPE
+    SYNTAX      TmnxEthRingIndex (1..4294967294)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingIndex specifies the row index of the Ethernet
+         Ring Group."
+    ::= { tmnxEthRingConfigEntry 1 }
+
+tmnxEthRingRowStatus             OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingRowStatus controls the creation and deletion
+         of row entries in the tmnxEthRingConfigTable."
+    ::= { tmnxEthRingConfigEntry 2 }
+
+tmnxEthRingTimeStamp             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingTimeStamp indicates the time, since system
+         startup, of the last change to this row."
+    ::= { tmnxEthRingConfigEntry 3 }
+
+tmnxEthRingDescription           OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingDescription specifies the user supplied
+         description of the Ethernet Ring."
+    DEFVAL      { "" }
+    ::= { tmnxEthRingConfigEntry 4 }
+
+tmnxEthRingAdminState            OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingAdminState specifies the administrative state
+         of the Ethernet Ring."
+    DEFVAL      { outOfService }
+    ::= { tmnxEthRingConfigEntry 5 }
+
+tmnxEthRingOperState             OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingOperState indicates the operational state of
+         the Ethernet Ring."
+    ::= { tmnxEthRingConfigEntry 6 }
+
+tmnxEthRingGuardTime             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..20)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingGuardTime specifies the guard timer, in
+         deciseconds, of a Ring-APS (R-APS) node.
+
+         The guard timer is used to prevent the Ethernet Ring node from acting
+         upon outdated R-APS messages and prevent the possibility of forming a
+         closed loop.
+
+         While the guard timer is running, any received R-APS Request/State and
+         Status information is blocked and not forwarded to the Priority Logic.
+         When the guard timer is not running, the R-APS Request/State and
+         Status information is forwarded unchanged."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 10.1.5"
+    DEFVAL      { 5 }
+    ::= { tmnxEthRingConfigEntry 7 }
+
+tmnxEthRingRevertTime            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 60..720)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingRevertTime specifies the Wait-To-Restore (WTR)
+         timer, in seconds, of a Ring-APS (R-APS) node.
+
+         The WTR timer is used to prevent frequent operation of the protection
+         switching due to intermittent signal failure defects.
+
+         Setting tmnxEthRingRevertTime to the value zero (0) puts the Ethernet
+         Ring into a non-revertive mode."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 10.1.4"
+    DEFVAL      { 300 }
+    ::= { tmnxEthRingConfigEntry 8 }
+
+tmnxEthRingRevertTimeCountDn     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingRevertTimeCountDn indicates the remaining
+         time, in seconds, before the Ethernet Ring can revert to its original
+         state."
+    DEFVAL      { 0 }
+    ::= { tmnxEthRingConfigEntry 9 }
+
+tmnxEthRingCcmHoldDownTime       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5000)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingCcmHoldDownTime specifies the time, in
+         centiseconds, used for the hold-timer for associated Continuity Check
+         (CC) Session down event dampening. This guards against reporting
+         excessive path operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         CC state to the Ethernet Ring Node until the configured timer has
+         expired.
+
+         A value of zero (0) specifies that a down transition is reported
+         immediately."
+    DEFVAL      { 0 }
+    ::= { tmnxEthRingConfigEntry 10 }
+
+tmnxEthRingCcmHoldUpTime         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5000)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingCcmHoldUpTime specifies the time, in
+         deciseconds, used for the hold-timer for associated Continuity Check
+         (CC) Session up event dampening. This guards against reporting
+         excessive path operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         CC state to the Ethernet Ring Node until the configured timer has
+         expired.
+
+         A value of zero (0) specifies that an up transition is reported
+         immediately."
+    DEFVAL      { 20 }
+    ::= { tmnxEthRingConfigEntry 11 }
+
+tmnxEthRingRplNode               OBJECT-TYPE
+    SYNTAX      TmnxEthRingRplNodeType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingRplNode specifies the Ring Protection Link
+         (RPL) type of the Ethernet Ring Node."
+    DEFVAL      { rplNone }
+    ::= { tmnxEthRingConfigEntry 12 }
+
+tmnxEthRingNodeId                OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingNodeId specifies the Ethernet Ring Node ID.
+
+         The default value is the system's MAC address.
+
+         Writing the MAC address value 00:00:00:00:00:00 to tmnxEthRingNodeId
+         will reset its value to the system's MAC address."
+    ::= { tmnxEthRingConfigEntry 13 }
+
+tmnxEthRingTxApsPdu              OBJECT-TYPE
+    SYNTAX      TmnxEthRingApsInfoType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingTxApsPdu indicates the contents of the R-APS
+         PDU transmitted on the Ethernet Ring."
+    ::= { tmnxEthRingConfigEntry 14 }
+
+tmnxEthRingDefectStatus          OBJECT-TYPE
+    SYNTAX      BITS {
+        dFopPM (0)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingDefectStatus indicates what defects are active
+         on the Ethernet Ring.
+
+         The defects are defined as:
+                dFopPM  -- Provisioning Mismatch"
+    ::= { tmnxEthRingConfigEntry 15 }
+
+tmnxEthRingSubRingType           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none           (0),
+        virtualLink    (1),
+        nonVirtualLink (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingSubRingType specifies whether this Ethernet
+         Ring is a sub-ring or not. A value of 'none (0)' specifies that the
+         Ethernet Ring is not a sub-ring. A value 'virtualLink (1)' specifies
+         that the Ethernet Ring is a sub-ring with R-APS virtual channel, while
+         the value 'nonVirtualLink (2)' specifies that the Ethernet Ring is a
+         sub-ring without R-APS virtual channel.
+
+         This object MUST be set to a value other than 'none (0)' for
+         tmnxEthRingSubRingInterconnectId and tmnxEthRingSubRingPropTopChange
+         to be modified away from their default values."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 version 3
+         Ethernet Ring Protection Switching"
+    DEFVAL      { none }
+    ::= { tmnxEthRingConfigEntry 16 }
+
+tmnxEthRingSubRingInterconnectId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..4294967294 | 4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingSubRingInterconnectId specifies whether the
+         Ethernet sub-ring is interconnected to an Ethernet Ring, as identified
+         by the Ethernet Ring ID, a VPLS service (4294967295), or is not
+         interconnected (0).
+
+         A sub-ring can only be interconnected to a VPLS service (i.e.
+         tmnxEthRingSubRingInterconnectId assigned the value 4294967295), if
+         tmnxEthRingSubRingType is assigned the value 'nonVirtualLink (2)'.
+
+         This object MUST be set to a value other than zero (0) for
+         tmnxEthRingSubRingPropTopChange to be modified away from its default
+         value.
+
+         Attempts to modify this object away from its default value when
+         tmnxEthRingSubRingType is set to 'none (0)' will result in an SNMP
+         inconsistentValue error."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 version 3
+         Ethernet Ring Protection Switching"
+    DEFVAL      { 0 }
+    ::= { tmnxEthRingConfigEntry 17 }
+
+tmnxEthRingSubRingPropTopChange  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingSubRingPropTopChange specifies whether or not
+         the Ethernet sub-ring propagates topology changes to the
+         interconnected ring as specified by the value of
+         tmnxEthRingSubRingInterconnectId.
+
+         Attempts to modify this object away from its default value when
+         tmnxEthRingSubRingInterconnectId is set to zero (0) will result in an
+         SNMP inconsistentValue error."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 version 3
+         Ethernet Ring Protection Switching"
+    DEFVAL      { false }
+    ::= { tmnxEthRingConfigEntry 18 }
+
+tmnxEthRingCompatibleVersion     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        version1 (1),
+        version2 (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingCompatibleVersion specifies the backward
+         compatibility logic for the Ethernet Ring.
+
+         If this object is set to 'version1 (1)' then:
+             1. Attempts at setting tmnxEthRingCommandSwitch to the value
+                'forceSwitch (2)' or 'manualSwitch (3)' will result in an
+                inconsistentValue error, and
+
+             2. Attempts at setting tmnxEthRingRevertTime to the value zero (0)
+                will result in an inconsistentValue error.
+
+         If this object is set to 'version2 (2)' then the above restrictions
+         will not apply."
+    DEFVAL      { version2 }
+    ::= { tmnxEthRingConfigEntry 19 }
+
+tmnxEthRingPathTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthRingPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathTable consists of the paths associated with the
+         corresponding tmnxEthRingConfigEntry."
+    ::= { tmnxEthRingConfigurations 3 }
+
+tmnxEthRingPathEntry             OBJECT-TYPE
+    SYNTAX      TmnxEthRingPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathEntry contains information pertaining to an
+         individual path associated with a tmnxEthRingConfigEntry.
+
+         Rows in this table are created and destroyed using the
+         tmnxEthRingPathRowStatus object."
+    INDEX       {
+        tmnxEthRingIndex,
+        tmnxEthRingPathIndex
+    }
+    ::= { tmnxEthRingPathTable 1 }
+
+TmnxEthRingPathEntry             ::= SEQUENCE
+{
+    tmnxEthRingPathIndex             TmnxEthRingPathIndex,
+    tmnxEthRingPathRowStatus         RowStatus,
+    tmnxEthRingPathTimeStamp         TimeStamp,
+    tmnxEthRingPathIfIndex           InterfaceIndexOrZero,
+    tmnxEthRingPathIfRapsCcTag       TmnxEncapVal,
+    tmnxEthRingPathDescription       TItemDescription,
+    tmnxEthRingPathAdminStatus       TmnxAdminState,
+    tmnxEthRingPathOperStatus        TmnxOperState,
+    tmnxEthRingPathType              INTEGER,
+    tmnxEthRingPathFwdState          INTEGER,
+    tmnxEthRingPathFwdStateChgTime   TimeStamp,
+    tmnxEthRingPathRxApsPdu          TmnxEthRingApsInfoType
+}
+
+tmnxEthRingPathIndex             OBJECT-TYPE
+    SYNTAX      TmnxEthRingPathIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathIndex specifies the row index of the member."
+    ::= { tmnxEthRingPathEntry 1 }
+
+tmnxEthRingPathRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathRowStatus, along with tmnxEthRingPathIfIndex and
+         tmnxEthRingPathIfRapsCcTag, control the creation and deletion of row
+         entries in the tmnxEthRingPathTable."
+    ::= { tmnxEthRingPathEntry 2 }
+
+tmnxEthRingPathTimeStamp         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathTimeStamp indicates the time, since system
+         startup, of the last change to this row."
+    ::= { tmnxEthRingPathEntry 3 }
+
+tmnxEthRingPathIfIndex           OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathIfIndex specifies the member's port
+         tmnxPortPortID associated with the tmnxEthRingConfigEntry.
+
+         This object must be included in the same SNMP PDU as that of the
+         tmnxEthRingPathRowStatus object for creation of the path. The absence
+         of this object will result in a NO CREATION error.
+
+         The tmnxEthRingPathIfIndex can not be changed; the row must be
+         destroyed and recreated."
+    ::= { tmnxEthRingPathEntry 4 }
+
+tmnxEthRingPathIfRapsCcTag       OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathIfRapsCcTag specifies the member's
+         encapsulation.
+
+         This object must be included in the same SNMP PDU as that of the
+         tmnxEthRingPathRowStatus object for creation of the path. The absence
+         of this object will result in a NO CREATION ERROR
+
+         Once specified, the tmnxEthRingPathIfRapsCcTag can not be changed; the
+         row must be destroyed and recreated."
+    ::= { tmnxEthRingPathEntry 5 }
+
+tmnxEthRingPathDescription       OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathDescription specifies a detailed
+         description of the Ethernet Ring path."
+    ::= { tmnxEthRingPathEntry 6 }
+
+tmnxEthRingPathAdminStatus       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathAdminStatus specifies the administrative
+         state of the path. 'outOfService (3)' specifies that the member will
+         not partake in Ring Redundancy."
+    DEFVAL      { outOfService }
+    ::= { tmnxEthRingPathEntry 7 }
+
+tmnxEthRingPathOperStatus        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathOperStatus indicates the operational state of
+         of the path. The tmnxEthRingPathOperStatus supports the
+         following two TmnxOperState values:
+               inService    (2)
+               outOfService (3)"
+    ::= { tmnxEthRingPathEntry 8 }
+
+tmnxEthRingPathType              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        normal (0),
+        rplEnd (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathType specifies the Ethernet Ring Node Path
+         acts as an rplEnd or in a normal state. This is only configurable if
+         tmnxEthRingRplNode is set to 'rplOwner (1)' or 'rplNeighbor (2)'."
+    DEFVAL      { normal }
+    ::= { tmnxEthRingPathEntry 9 }
+
+tmnxEthRingPathFwdState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unblocked (0),
+        blocked   (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathFwdState indicates whether the Ethernet
+         Ring Node Path blocks the transmission and reception of traffic on the
+         ring port."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 9.4 and 9.5"
+    ::= { tmnxEthRingPathEntry 10 }
+
+tmnxEthRingPathFwdStateChgTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathFwdStateChgTime indicates the time, since
+         system startup, that the Ethernet Ring Path last experienced a change
+         in the forwarding state."
+    ::= { tmnxEthRingPathEntry 11 }
+
+tmnxEthRingPathRxApsPdu          OBJECT-TYPE
+    SYNTAX      TmnxEthRingApsInfoType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingPathRxApsPdu indicates the contents of the
+         R-APS PDU received on the Ethernet Ring path."
+    ::= { tmnxEthRingPathEntry 12 }
+
+tmnxEthRingSAPConfigs            OBJECT IDENTIFIER ::= { tmnxEthRingConfigurations 4 }
+
+tmnxEthRingSAPPathTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthRingSAPPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingSAPPathTable consists of the configuration for Ethernet
+         Ring Group members associated to SAPs."
+    ::= { tmnxEthRingSAPConfigs 1 }
+
+tmnxEthRingSAPPathEntry          OBJECT-TYPE
+    SYNTAX      TmnxEthRingSAPPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingSAPPathEntry contains the SAP information pertaining to
+         an Ethernet Ring Group member.
+
+         Entries in the tmnxEthRingSAPPathTable are created and destroyed by
+         the system when the TIMETRA-SAP-MIB::sapEthRingIndex is set to a
+         non-zero value during the creation of a row in the
+         TIMETRA-SAP-MIB::sapBaseInfoTable."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { tmnxEthRingSAPPathTable 1 }
+
+TmnxEthRingSAPPathEntry          ::= SEQUENCE
+{
+    tmnxEthRingSAPPathIndex          Unsigned32,
+    tmnxEthRingSAPPathControlFlag    TruthValue
+}
+
+tmnxEthRingSAPPathIndex          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingSAPPathIndex indicates the corresponding path
+         index of the tmnxEthRingPathEntry for this row."
+    ::= { tmnxEthRingSAPPathEntry 1 }
+
+tmnxEthRingSAPPathControlFlag    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingSAPPathControlFlag indicates whether or not
+         this row corresponds to the control SAP of the tmnxEthRingConfigEntry."
+    ::= { tmnxEthRingSAPPathEntry 2 }
+
+tmnxEthRingCommandTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthRingCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingCommandTable consists of the one-shot action commands
+         that effect the state of the Ethernet Ring operation."
+    ::= { tmnxEthRingConfigurations 5 }
+
+tmnxEthRingCommandEntry          OBJECT-TYPE
+    SYNTAX      TmnxEthRingCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingCommandEntry contains the commands available to execute
+         on an existing Ethernet Ring Group Path.
+
+         Rows in this table are created and destroyed by the system."
+    AUGMENTS    { tmnxEthRingPathEntry }
+    ::= { tmnxEthRingCommandTable 1 }
+
+TmnxEthRingCommandEntry          ::= SEQUENCE
+{ tmnxEthRingCommandSwitch         INTEGER }
+
+tmnxEthRingCommandSwitch         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noCmd        (0),
+        clear        (1),
+        forceSwitch  (2),
+        manualSwitch (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthRingCommandSwitch specifies the switch command to
+         initiate on a path of an Ethernet Ring Group.
+
+         When read, this object returns the last command written or 'noCmd (0)'
+         if no command has been written to this Ethernet Ring Group path since
+         initialization. The return of the last command written does not imply
+         that this command is currently in effect. The request may be preempted
+         by a higher priority local or remote request. In order to determine
+         the current state of the group it is necessary to read the objects
+         tmnxEthRingPathRxApsPdu and tmnxEthRingTxApsPdu.
+
+         The value 'noCmd (0)' may not be used in a write command.
+
+         The value 'clear (1)' clears all the switch commands listed below for
+         the specified ring, regardless of the specified path. In addition, if
+         tmnxEthRingRevertTime is a non-zero value (revertive mode) the active
+         WTR (Wait To Restore) state is also cleared, or in the case of
+         non-revertive mode, the command will trigger a reversion.
+
+         The 'clear (1)' command is only valid if at least one path is
+         configured and either:
+             1. a local Forced Switch or Manual Switch command is in effect, or
+             2. a local Ethernet Ring Node is an RPL Owner Node and top priority
+                request is neither R-APS (FS) nor R-APS (MS).
+
+         The value 'forceSwitch (2)' forces the specified path's
+         tmnxEthRingPathFwdState to the 'blocked (1)' state.
+
+         The value 'manualSwitch (3)' sets the specified path's
+         tmnxEthRingPathFwdState to the 'blocked (1)' state in the absence of a
+         failure or forceSwitch. An inconsistentValue error is returned,
+         otherwise."
+    DEFVAL      { noCmd }
+    ::= { tmnxEthRingCommandEntry 1 }
+
+tmnxEthRingStatistics            OBJECT IDENTIFIER ::= { tmnxEthRingObjs 2 }
+
+tmnxEthRingConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 72 }
+
+tmnxEthRingCompliances           OBJECT IDENTIFIER ::= { tmnxEthRingConformance 1 }
+
+tmnxEthRingCompliance            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for revision 1.0 of TIMETRA-ETH-RING-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxEthRingTimeStampGroup,
+            tmnxEthRingBaseConfigGroup,
+            tmnxEthRingBasePathGroup,
+            tmnxEthRingSAPPathGroup,
+            tmnxEthRingOperNotifyGroup,
+            tmnxEthRingApsNotifyGroup
+        }
+    ::= { tmnxEthRingCompliances 1 }
+
+tmnxEthRingV9v0Compliance        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 9.0 of TIMETRA-ETH-RING-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxEthRingTimeStampGroup,
+            tmnxEthRingBaseConfigGroup,
+            tmnxEthRingBasePathGroup,
+            tmnxEthRingSAPPathGroup,
+            tmnxEthRingOperNotifyGroup,
+            tmnxEthRingApsNotifyGroup,
+            tmnxEthRingBaseConfigV9v0Group,
+            tmnxEthRingSubRingV9v0Group,
+            tmnxEthRingCommandV9v0Group
+        }
+    ::= { tmnxEthRingCompliances 2 }
+
+tmnxEthRingGroups                OBJECT IDENTIFIER ::= { tmnxEthRingConformance 2 }
+
+tmnxEthRingTSGroups              OBJECT IDENTIFIER ::= { tmnxEthRingGroups 0 }
+
+tmnxEthRingTimeStampGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingCfgTblLastChanged,
+        tmnxEthRingTimeStamp,
+        tmnxEthRingPathTblLastChanged,
+        tmnxEthRingPathTimeStamp,
+        tmnxEthRingSAPPathTblChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects that track configuration changes for the
+         maintenance of Ethernet Rings for the 7x50."
+    ::= { tmnxEthRingTSGroups 1 }
+
+tmnxEthRingConfigGroups          OBJECT IDENTIFIER ::= { tmnxEthRingGroups 1 }
+
+tmnxEthRingBaseConfigGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingRowStatus,
+        tmnxEthRingDescription,
+        tmnxEthRingAdminState,
+        tmnxEthRingOperState,
+        tmnxEthRingGuardTime,
+        tmnxEthRingCcmHoldDownTime,
+        tmnxEthRingCcmHoldUpTime,
+        tmnxEthRingRevertTime,
+        tmnxEthRingRevertTimeCountDn,
+        tmnxEthRingRplNode,
+        tmnxEthRingNodeId,
+        tmnxEthRingTxApsPdu,
+        tmnxEthRingDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Ring Group
+         configurations for the 7x50."
+    ::= { tmnxEthRingConfigGroups 1 }
+
+tmnxEthRingOperGroups            OBJECT IDENTIFIER ::= { tmnxEthRingGroups 2 }
+
+tmnxEthRingMemberGroups          OBJECT IDENTIFIER ::= { tmnxEthRingGroups 3 }
+
+tmnxEthRingBasePathGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingPathRowStatus,
+        tmnxEthRingPathIfIndex,
+        tmnxEthRingPathIfRapsCcTag,
+        tmnxEthRingPathDescription,
+        tmnxEthRingPathAdminStatus,
+        tmnxEthRingPathOperStatus,
+        tmnxEthRingPathType,
+        tmnxEthRingPathFwdState,
+        tmnxEthRingPathFwdStateChgTime,
+        tmnxEthRingPathRxApsPdu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of Ethernet Ring Group Member
+         configurations for the 7x50."
+    ::= { tmnxEthRingMemberGroups 1 }
+
+tmnxEthRingAPSGroups             OBJECT IDENTIFIER ::= { tmnxEthRingGroups 4 }
+
+tmnxEthRingNotifyGroups          OBJECT IDENTIFIER ::= { tmnxEthRingGroups 5 }
+
+tmnxEthRingOperNotifyGroup       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEthRingPathFwdStateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for management of Ethernet Ring Group
+         configurations for the SR series systems."
+    ::= { tmnxEthRingNotifyGroups 1 }
+
+tmnxEthRingApsNotifyGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEthRingApsPrvsnRaiseAlarm,
+        tmnxEthRingApsPrvsnClearAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for management of Ethernet Ring Group APS
+         configurations for the SR series systems."
+    ::= { tmnxEthRingNotifyGroups 2 }
+
+tmnxEthRingSAPGroups             OBJECT IDENTIFIER ::= { tmnxEthRingGroups 6 }
+
+tmnxEthRingSAPPathGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingSAPPathIndex,
+        tmnxEthRingSAPPathControlFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 8.0 to support configuration and
+         maintenance of Ethernet Ring Groups on SAPs for the 7x50."
+    ::= { tmnxEthRingSAPGroups 1 }
+
+tmnxEthRingV9v0Groups            OBJECT IDENTIFIER ::= { tmnxEthRingGroups 7 }
+
+tmnxEthRingBaseConfigV9v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingCompatibleVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 9.0 to support configuration and
+         maintenance of Ethernet Rings for the SROS series systems."
+    ::= { tmnxEthRingV9v0Groups 1 }
+
+tmnxEthRingSubRingV9v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingSubRingType,
+        tmnxEthRingSubRingInterconnectId,
+        tmnxEthRingSubRingPropTopChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 9.0 to support configuration and
+         maintenance of Ethernet sub-rings for the SROS series systems."
+    ::= { tmnxEthRingV9v0Groups 2 }
+
+tmnxEthRingCommandV9v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxEthRingCommandSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added in Release 9.0 to support maintenance of
+         Ethernet Rings for the SROS series systems."
+    ::= { tmnxEthRingV9v0Groups 3 }
+
+tmnxEthRingNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 72 }
+
+tmnxEthRingNotifications         OBJECT IDENTIFIER ::= { tmnxEthRingNotifyPrefix 0 }
+
+tmnxEthRingOprNotifications      OBJECT IDENTIFIER ::= { tmnxEthRingNotifications 1 }
+
+tmnxEthRingPathFwdStateChange    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthRingPathFwdState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingPathFwdStateChange is generated when an Ethernet Ring
+         Path changes its forwarding state (tmnxEthRingPathFwdState) from
+         blocked to unblocked or from unblocked to blocked."
+    ::= { tmnxEthRingOprNotifications 1 }
+
+tmnxEthRingApsNotifications      OBJECT IDENTIFIER ::= { tmnxEthRingNotifications 2 }
+
+tmnxEthRingApsPrvsnRaiseAlarm    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthRingTxApsPdu,
+        tmnxEthRingPathRxApsPdu,
+        tmnxEthRingDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingApsPrvsnRaiseAlarm is generated when an Ethernet Ring
+         provisioning mismatch is detected. A mismatch occurs when the RPL
+         Owner Node receives one or more No Request R-APS message(s) with RPL
+         Blocked status flag set (NR,RB) and a Node ID that differs from its
+         own."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 10.27"
+    ::= { tmnxEthRingApsNotifications 1 }
+
+tmnxEthRingApsPrvsnClearAlarm    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEthRingTxApsPdu,
+        tmnxEthRingPathRxApsPdu,
+        tmnxEthRingDefectStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEthRingApsPrvsnClearAlarm is generated when an Ethernet Ring
+         provisioning mismatch is cleared."
+    REFERENCE
+        "Draft ITU-T Recommendation G.8032/Y.1344 Version 2
+         Section 10.27"
+    ::= { tmnxEthRingApsNotifications 2 }
+
+END

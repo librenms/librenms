@@ -28,14 +28,10 @@ IMPORTS
     timetraSRMIBModules, tmnxSRConfs,
     tmnxSRNotifyPrefix, tmnxSRObjs
                                                          FROM TIMETRA-GLOBAL-MIB
-    THsmdaCounterIdOrZero,
-    THsmdaCounterIdOrZeroOrAll,
     TItemDescription, TLNamedItemOrEmpty,
     TNamedItem, TNamedItemOrEmpty, TQueueId,
     TQueueIdOrAll, TmnxAccPlcyAACounters,
     TmnxAccPlcyAASubAttributes,
-    TmnxAccPlcyOECounters,
-    TmnxAccPlcyOICounters,
     TmnxAccPlcyPolicerECounters,
     TmnxAccPlcyPolicerICounters,
     TmnxAccPlcyQECounters,
@@ -293,7 +289,6 @@ TmnxLogExRbkOperationType        ::= TEXTUAL-CONVENTION
         unknown  (0),
         exec     (1),
         rollback (2),
-        vsd      (3),
         load     (4)
     }
 
@@ -938,7 +933,8 @@ tmnxLogApRecord                  OBJECT-TYPE
         combinedAccessEgress        (74),
         combinedNetworkEgress       (75),
         completeSvcActivTestHead    (76),
-        combinedMplsSrteEgress      (77)
+        combinedMplsSrteEgress      (77),
+        reserved78                  (78)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -995,7 +991,8 @@ tmnxLogApPortType                OBJECT-TYPE
         networkIntf   (16),
         accessPort    (17),
         svcActvTest   (18),
-        mplsSrteEgr   (19)
+        mplsSrteEgr   (19),
+        reserved20    (20)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -3141,11 +3138,8 @@ TmnxLogApCustRecordEntry         ::= SEQUENCE
     tmnxLogApCrLastChanged           TimeStamp,
     tmnxLogApCrSignChangeDelta       Unsigned32,
     tmnxLogApCrSignChangeQueue       TQueueIdOrAll,
-    tmnxLogApCrSignChangeOCntr       THsmdaCounterIdOrZeroOrAll,
     tmnxLogApCrSignChangeQICounters  TmnxAccPlcyQICounters,
     tmnxLogApCrSignChangeQECounters  TmnxAccPlcyQECounters,
-    tmnxLogApCrSignChangeOICounters  TmnxAccPlcyOICounters,
-    tmnxLogApCrSignChangeOECounters  TmnxAccPlcyOECounters,
     tmnxLogApCrSignChangeAACounters  TmnxAccPlcyAACounters,
     tmnxLogApCrAACounters            TmnxAccPlcyAACounters,
     tmnxLogApCrAASubAttributes       TmnxAccPlcyAASubAttributes,
@@ -3186,17 +3180,6 @@ tmnxLogApCrSignChangeQueue       OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { tmnxLogApCustRecordEntry 3 }
 
-tmnxLogApCrSignChangeOCntr       OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZeroOrAll
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOCntr specifies the counter-id that
-         will be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies."
-    DEFVAL      { 0 }
-    ::= { tmnxLogApCustRecordEntry 4 }
-
 tmnxLogApCrSignChangeQICounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyQICounters
     MAX-ACCESS  read-write
@@ -3227,36 +3210,6 @@ tmnxLogApCrSignChangeQECounters  OBJECT-TYPE
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordEntry 6 }
 
-tmnxLogApCrSignChangeOICounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOICounters specifies the ingress
-         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxLogApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCustRecordEntry 7 }
-
-tmnxLogApCrSignChangeOECounters  OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-write
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrSignChangeOECounters specifies the egress
-         counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
-         to be taken as reference to which the significant change defined in
-         tmnxLogApCrSignChangeDelta applies.
-
-         A non-zero value of this object is only allowed if the object
-         tmnxLogApCrSignChangeOCntr has a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCustRecordEntry 8 }
-
 tmnxLogApCrSignChangeAACounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyAACounters
     MAX-ACCESS  read-write
@@ -3267,8 +3220,6 @@ tmnxLogApCrSignChangeAACounters  OBJECT-TYPE
          which the significant change defined in tmnxLogApCrSignChangeDelta
          applies.
 
-         A non-zero value of this object is only allowed if both the objects
-         tmnxLogApCrSignChangeOCntr and tmnxLogApCrSignChangeQueue are zero.
 
          Also, a non-zero value for this object is only allowed if the object
          tmnxLogApCrSignChangeDelta is either 0 or 1."
@@ -3432,97 +3383,6 @@ tmnxLogApCrQueueECounters        OBJECT-TYPE
          tmnxLogApCrQueueECounters must have a non-zero value."
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordQueueEntry 5 }
-
-tmnxLogApCrOverrideCntrTable     OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxLogApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "The Nokia SROS series tmnxLogApCrOverrideCntrTable allows to create
-         custom record counter override information for a given accounting
-         policy.
-
-         Rows can only be created for existing accounting policies (as defined
-         in tmnxLogApTable)."
-    ::= { tmnxLogObjs 22 }
-
-tmnxLogApCrOverrideCntrEntry     OBJECT-TYPE
-    SYNTAX      TmnxLogApCrOverrideCntrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      obsolete
-    DESCRIPTION
-        "Defines an entry in the tmnxLogApCrOverrideCntrTable. Entries in this
-         table are created and destroyed via SNMP Set requests."
-    INDEX       {
-        tmnxLogApPolicyId,
-        tmnxLogApCrOverrideCntrId
-    }
-    ::= { tmnxLogApCrOverrideCntrTable 1 }
-
-TmnxLogApCrOverrideCntrEntry     ::= SEQUENCE
-{
-    tmnxLogApCrOverrideCntrId        THsmdaCounterIdOrZero,
-    tmnxLogApCrOverrideCntrRowStatus RowStatus,
-    tmnxLogApCrOverrideCntrLastChngd TimeStamp,
-    tmnxLogApCrOverrideCntrICounters TmnxAccPlcyOICounters,
-    tmnxLogApCrOverrideCntrECounters TmnxAccPlcyOECounters
-}
-
-tmnxLogApCrOverrideCntrId        OBJECT-TYPE
-    SYNTAX      THsmdaCounterIdOrZero (1..8)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrId specifies the counter group for
-         which counters will be collected in this custom record. The counters
-         that will be collected are defined in tmnxLogApCrOverrideCntrICounters
-         and tmnxLogApCrOverrideCntrECounters."
-    ::= { tmnxLogApCrOverrideCntrEntry 1 }
-
-tmnxLogApCrOverrideCntrRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "Row Status of the entry. This allows creation/deletion of rows in this
-         table."
-    ::= { tmnxLogApCrOverrideCntrEntry 2 }
-
-tmnxLogApCrOverrideCntrLastChngd OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrLastChngd indicates the sysUpTime
-         when an object in this table was last modified. A Value 0 means that
-         no change was made to this row since it was created."
-    ::= { tmnxLogApCrOverrideCntrEntry 3 }
-
-tmnxLogApCrOverrideCntrICounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOICounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrICounters specifies the list of
-         ingress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxLogApCrOverrideCntrICounters or
-         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCrOverrideCntrEntry 4 }
-
-tmnxLogApCrOverrideCntrECounters OBJECT-TYPE
-    SYNTAX      TmnxAccPlcyOECounters
-    MAX-ACCESS  read-create
-    STATUS      obsolete
-    DESCRIPTION
-        "The value of tmnxLogApCrOverrideCntrECounters specifies the list of
-         egress counters that need to be collected in this custom record.
-
-         At least one of the objects tmnxLogApCrOverrideCntrICounters or
-         tmnxLogApCrOverrideCntrECounters must have a non-zero value."
-    DEFVAL      { {} }
-    ::= { tmnxLogApCrOverrideCntrEntry 5 }
 
 tmnxEventPrimaryRoutePref        OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -4951,6 +4811,40 @@ tmnxLogApCrPolicerECounters      OBJECT-TYPE
     DEFVAL      { {} }
     ::= { tmnxLogApCustRecordPolicerEntry 5 }
 
+tmnxLogFileEncryptKey            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileEncryptKey specifies the key used when
+         decrypting log files. A get request to this object will always return
+         an empty string. By default, tmnxLogFileEncryptKey will be an empty
+         string."
+    DEFVAL      { "" }
+    ::= { tmnxLogObjs 32 }
+
+tmnxLogFilesTotalSize            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4194304)
+    UNITS       "megabytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilesTotalSize specifies the maximum log files
+         size. The value zero specifies that no limit is specified."
+    DEFVAL      { 0 }
+    ::= { tmnxLogObjs 33 }
+
+tmnxLogApFilesTotalSize          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4194304)
+    UNITS       "megabytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogApFilesTotalSize specifies the maximum accounting
+         log files size. The value zero specifies that no limit is specified."
+    DEFVAL      { 0 }
+    ::= { tmnxLogObjs 34 }
+
 tmnxLogConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 12 }
 
 tmnxLogCompliances               OBJECT IDENTIFIER ::= { tmnxLogConformance 1 }
@@ -5344,7 +5238,9 @@ tmnxLogV22v0Compliance           MODULE-COMPLIANCE
         "The compliance statement for revision 22 of TIMETRA-LOG-MIB."
     MODULE
         MANDATORY-GROUPS {
-            tmnxSnmpTrapDestV22v0Group
+            tmnxSnmpTrapDestV22v0Group,
+            tmnxLogFileEncryptionGroup,
+            tmnxLogFilesTotalSizeGroup
         }
     ::= { tmnxLogCompliances 20 }
 
@@ -6189,22 +6085,6 @@ tmnxSyslogTlsClntProfilNameGroup OBJECT-GROUP
          feature on Nokia SROS series systems in release 20."
     ::= { tmnxLogGroups 64 }
 
-tmnxLogApObsoleteObjsV21v0Group  OBJECT-GROUP
-    OBJECTS     {
-        tmnxLogApCrSignChangeOCntr,
-        tmnxLogApCrSignChangeOECounters,
-        tmnxLogApCrSignChangeOICounters,
-        tmnxLogApCrOverrideCntrRowStatus,
-        tmnxLogApCrOverrideCntrLastChngd,
-        tmnxLogApCrOverrideCntrICounters,
-        tmnxLogApCrOverrideCntrECounters
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting custom record counter override
-         information obsoleted on Nokia SROS series systems in release 21.0."
-    ::= { tmnxLogGroups 65 }
-
 tmnxLogFileNameGroup             OBJECT-GROUP
     OBJECTS     {
         tmnxLogFileIdName
@@ -6224,6 +6104,27 @@ tmnxSnmpTrapDestV22v0Group       OBJECT-GROUP
         "The group of objects added to support SNMP trap destinations in the
          Nokia SROS series systems release 22.0."
     ::= { tmnxLogGroups 67 }
+
+tmnxLogFileEncryptionGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFileEncryptKey
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the log on Nokia SROS
+         series system added in SROS release 22."
+    ::= { tmnxLogGroups 68 }
+
+tmnxLogFilesTotalSizeGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFilesTotalSize,
+        tmnxLogApFilesTotalSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the log on Nokia SROS
+         series system added in SROS release 22.10"
+    ::= { tmnxLogGroups 69 }
 
 tmnxLogNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 12 }
 

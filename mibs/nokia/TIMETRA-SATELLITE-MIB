@@ -1,0 +1,1979 @@
+TIMETRA-SATELLITE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, MacAddress, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    TmnxPhysChassisClass,
+    TmnxPhysChassisIndex,
+    TmnxPortAdminStatus, TmnxRefInState,
+    TmnxSETSRefAlarm, TmnxSETSRefQualified,
+    TmnxSETSStatus, TmnxSSMQualityLevel,
+    tmnxHwClass, tmnxHwOperState
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    ServiceOperStatus, TItemDescription,
+    TNamedItem, TNamedItemOrEmpty,
+    TmnxActionType, TmnxAdminState,
+    TmnxEnabledDisabled, TmnxPortID
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraSatelliteMIBModule        MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of Satellites.
+
+         Copyright (c) 2014-2018 Nokia. All rights reserved. Reproduction of
+         this document is authorized on the condition that the foregoing
+         copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains all
+         title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied `as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0                1 Jan 2017 00:00
+         15.0 release of the TIMETRA-SATELLITE-MIB."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0                1 Jan 2016 00:00
+         14.0 release of the TIMETRA-SATELLITE-MIB."
+
+    REVISION    "201411110000Z"
+    DESCRIPTION
+        "Rev 0.1               11 Nov 2014 00:00
+         Initial version of the TIMETRA-SATELLITE-MIB."
+
+    ::= { timetraSRMIBModules 103 }
+
+TmnxSatelliteType                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxSatelliteType is an index into the tmnxSatelliteTypeTable used to
+         identify a specific type of satellite."
+    SYNTAX      Unsigned32
+
+TmnxSatelliteConsoleAccessStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The current operational status of client access to the satellite."
+    SYNTAX      INTEGER {
+        disabled       (1),
+        requested      (2),
+        enabled        (3),
+        not-applicable (4)
+    }
+
+tmnxSatelliteObjs                OBJECT IDENTIFIER ::= { tmnxSRObjs 103 }
+
+tmnxSatelliteConfigTimestamps    OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 1 }
+
+tmnxSatelliteTableLastChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatelliteTableLastChanged indicates the time, since
+         system startup, when tmnxSatelliteTable last changed configuration."
+    ::= { tmnxSatelliteConfigTimestamps 2 }
+
+tmnxSatPortMapConfigTableLastChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortMapConfigTableLastChg indicates the time,
+         since system startup, when tmnxSatellitePortMapConfigTable last
+         changed configuration."
+    ::= { tmnxSatelliteConfigTimestamps 3 }
+
+tmnxSatPortTemplateTableLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateTableLastChg indicates the time, since
+         system startup, when tmnxSatellitePortTemplateTable last changed
+         configuration."
+    ::= { tmnxSatelliteConfigTimestamps 4 }
+
+tmnxSatPortTmplPortTableLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTmplPortTableLastChg indicates the time, since
+         system startup, when tmnxSatPortTemplatePortTable last changed
+         configuration."
+    ::= { tmnxSatelliteConfigTimestamps 5 }
+
+tmnxSatLocalForwardTableLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardTableLastChg indicates the time, since
+         system startup, when tmnxSatelliteLocalForwardTable last changed
+         configuration."
+    ::= { tmnxSatelliteConfigTimestamps 6 }
+
+tmnxSatLocalFwdSapTableLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalFwdSapTableLastChg indicates the time, since
+         system startup, when tmnxSatLocalForwardSapTable last changed
+         configuration."
+    ::= { tmnxSatelliteConfigTimestamps 7 }
+
+tmnxSatFeaturesTableLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFeaturesTableLastChange indicates the time, since
+         system startup, when tmnxSatelliteFeaturesTable last changed
+         configuration."
+    ::= { tmnxSatelliteConfigTimestamps 8 }
+
+tmnxSatelliteConfigurations      OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 2 }
+
+tmnxSatelliteTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatelliteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatelliteTable contains configuration information for
+         satellites."
+    ::= { tmnxSatelliteConfigurations 2 }
+
+tmnxSatelliteEntry               OBJECT-TYPE
+    SYNTAX      TmnxSatelliteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatelliteEntry consists of the configurable objects for a
+         given satellite."
+    INDEX       {
+        tmnxSatClass,
+        tmnxSatId
+    }
+    ::= { tmnxSatelliteTable 1 }
+
+TmnxSatelliteEntry               ::= SEQUENCE
+{
+    tmnxSatClass                     TmnxPhysChassisClass,
+    tmnxSatId                        TmnxPhysChassisIndex,
+    tmnxSatRowStatus                 RowStatus,
+    tmnxSatLastChanged               TimeStamp,
+    tmnxSatAssignedType              TmnxSatelliteType,
+    tmnxSatEquippedType              TmnxSatelliteType,
+    tmnxSatMacAddress                MacAddress,
+    tmnxSatSoftwareRepository        TNamedItemOrEmpty,
+    tmnxSatDescription               TItemDescription,
+    tmnxSatReboot                    TmnxActionType,
+    tmnxSatUpgrade                   TmnxActionType,
+    tmnxSatSyncBootEnv               TmnxActionType,
+    tmnxSatSyncEEnabled              TruthValue,
+    tmnxSatPortTemplate              TNamedItemOrEmpty,
+    tmnxSatPtpTc                     TruthValue,
+    tmnxSatClientDownDelay           Integer32,
+    tmnxSatConsoleAccess             TruthValue,
+    tmnxSatConsoleAccessStatus       TmnxSatelliteConsoleAccessStatus,
+    tmnxSatDynamicUplink             TruthValue,
+    tmnxSatUplinkDistribution        INTEGER
+}
+
+tmnxSatClass                     OBJECT-TYPE
+    SYNTAX      TmnxPhysChassisClass
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatClass specifies the class of the satellite.
+
+         Supported values:
+             ethSatChassis (5) - Ethernet Satellite class
+             tdmSatChassis (6) - Time Division Multiplexing Satellite class"
+    ::= { tmnxSatelliteEntry 1 }
+
+tmnxSatId                        OBJECT-TYPE
+    SYNTAX      TmnxPhysChassisIndex (1..20)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatId specifies a unique value which identifies the
+         satellite."
+    ::= { tmnxSatelliteEntry 2 }
+
+tmnxSatRowStatus                 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatRowStatus specifies the row status. It allows the
+         creation and deletion of rows in tmnxSatelliteTable."
+    ::= { tmnxSatelliteEntry 3 }
+
+tmnxSatLastChanged               OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLastChanged indicates the time, since system
+         startup, that the configuration of the row was created or modified."
+    ::= { tmnxSatelliteEntry 4 }
+
+tmnxSatAssignedType              OBJECT-TYPE
+    SYNTAX      TmnxSatelliteType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatAssignedType specifies the administratively
+         assigned type of the satellite."
+    DEFVAL      { 1 }
+    ::= { tmnxSatelliteEntry 5 }
+
+tmnxSatEquippedType              OBJECT-TYPE
+    SYNTAX      TmnxSatelliteType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatEquippedType indicates the satellite type that is
+         equipped."
+    ::= { tmnxSatelliteEntry 6 }
+
+tmnxSatMacAddress                OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatMacAddress specifies the MAC address of the
+         satellite.
+
+         A value of all-zeroes indicates this object has not been configured."
+    DEFVAL      { '000000000000'H }
+    ::= { tmnxSatelliteEntry 7 }
+
+tmnxSatSoftwareRepository        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSoftwareRepository specifies the software
+         repository to be used by the satellite.
+
+         An empty string indicates this object has not been configured."
+    DEFVAL      { ''H }
+    ::= { tmnxSatelliteEntry 8 }
+
+tmnxSatDescription               OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatDescription specifies the description of the
+         satellite.
+
+         An empty string indicates this object has not been configured."
+    DEFVAL      { ''H }
+    ::= { tmnxSatelliteEntry 9 }
+
+tmnxSatReboot                    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatReboot specifies if the satellite will perform a
+         reboot.
+
+         Setting the value to 'doAction (1)' causes a soft-reboot of the entire
+         satellite including all of its CPM and IOM cards."
+    DEFVAL      { notApplicable }
+    ::= { tmnxSatelliteEntry 10 }
+
+tmnxSatUpgrade                   OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatUpgrade specifies if the satellite will perform an
+         upgrade of all firmware, as well as a reboot of the entire satellite
+         including all its CPM and IOM cards.
+
+         CAUTION: This upgrade and reboot may take several minutes to complete.
+         The satellite must not be reset or powered down, nor cards inserted or
+         removed, during this process. Any of these prohibited actions may
+         cause the cards to be rendered inoperable.
+
+         If tmnxSatUpgrade is set to 'doAction (1)', tmnxSatReboot must also be
+         set to 'doAction (1)' in the same SNMP SET request PDU."
+    DEFVAL      { notApplicable }
+    ::= { tmnxSatelliteEntry 11 }
+
+tmnxSatSyncBootEnv               OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncBootEnv specifies if the satellite will
+         synchronize the boot environment with its software repository.
+
+         Setting the value to 'doAction (1)' will synchronize the satellite
+         with all of the files required to boot the satellite in the software
+         repository (tmnxSatSoftwareRepository)."
+    DEFVAL      { notApplicable }
+    ::= { tmnxSatelliteEntry 12 }
+
+tmnxSatSyncEEnabled              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncEEnabled specifies whether or not synchronous
+         Ethernet is enabled on the satellite."
+    DEFVAL      { false }
+    ::= { tmnxSatelliteEntry 13 }
+
+tmnxSatPortTemplate              OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplate specifies the satellite port template
+         which the satellite is using for its physical port scheme. The value
+         must be specified along with tmnxSatAssignedType.
+
+         If tmnxSatAssignedType is set without providing a value for
+         tmnxSatPortTemplate, the satellite will use its factory defined
+         physical port scheme."
+    DEFVAL      { ''H }
+    ::= { tmnxSatelliteEntry 14 }
+
+tmnxSatPtpTc                     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPtpTc specifies whether or not PTP transparent
+         clock functionality is enabled on the satellite."
+    DEFVAL      { false }
+    ::= { tmnxSatelliteEntry 15 }
+
+tmnxSatClientDownDelay           OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1800)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatClientDownDelay sets the delay between the last
+         available uplink becoming unavailable and the disabling of  the
+         associated ethernet satellite client ports."
+    DEFVAL      { -1 }
+    ::= { tmnxSatelliteEntry 16 }
+
+tmnxSatConsoleAccess             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatConsoleAccess specifies whether or not  debug
+         console access functionality is enabled on the satellite."
+    DEFVAL      { false }
+    ::= { tmnxSatelliteEntry 17 }
+
+tmnxSatConsoleAccessStatus       OBJECT-TYPE
+    SYNTAX      TmnxSatelliteConsoleAccessStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatConsoleAccessStatus specifies whether or not
+         debug console access is enabled and available on the satellite."
+    DEFVAL      { disabled }
+    ::= { tmnxSatelliteEntry 18 }
+
+tmnxSatDynamicUplink             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatDynamicUplink specifies whether the satellite will
+         be permitted to dynamically re-configure uplink ports in the event of
+         a failure."
+    DEFVAL      { false }
+    ::= { tmnxSatelliteEntry 19 }
+
+tmnxSatUplinkDistribution        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none          (0),
+        singleComplex (1),
+        dualComplex   (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatUplinkDistribution specifies the maximum resources
+         the system may allocate for uplink port resiliency. In the
+         single-complex case, up to two host ports per client port may be
+         automatically allocated for resiliency. In the dual-complex case, the
+         system may allocate at-most one host port per client port."
+    DEFVAL      { none }
+    ::= { tmnxSatelliteEntry 20 }
+
+tmnxSatelliteStatus              OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 3 }
+
+tmnxSatelliteTypeTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatelliteTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The satellite type table has an entry for each satellite type
+         supported by the system. Some example types are: 'es48-1gb-sfp',
+         'es24-1gb-sfp'."
+    ::= { tmnxSatelliteStatus 1 }
+
+tmnxSatelliteTypeEntry           OBJECT-TYPE
+    SYNTAX      TmnxSatelliteTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an Nokia SROS series satellite
+         type.  Rows in this table are created by the agent at initialization
+         and cannot be created or destroyed by SNMP Set requests."
+    INDEX       { tmnxSatTypeIndex }
+    ::= { tmnxSatelliteTypeTable 1 }
+
+TmnxSatelliteTypeEntry           ::= SEQUENCE
+{
+    tmnxSatTypeIndex                 TmnxSatelliteType,
+    tmnxSatTypeClass                 TmnxPhysChassisClass,
+    tmnxSatTypeName                  TNamedItem,
+    tmnxSatTypeDescription           TItemDescription
+}
+
+tmnxSatTypeIndex                 OBJECT-TYPE
+    SYNTAX      TmnxSatelliteType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatTypeIndex specifies the unique index which
+         identifies the type of Nokia SROS series satellite."
+    ::= { tmnxSatelliteTypeEntry 1 }
+
+tmnxSatTypeClass                 OBJECT-TYPE
+    SYNTAX      TmnxPhysChassisClass
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatTypeClass indicates the class that the type of
+         Nokia SROS series satellite pertains to."
+    ::= { tmnxSatelliteTypeEntry 2 }
+
+tmnxSatTypeName                  OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatTypeName indicates the administrative name that
+         identifies the type of Nokia SROS series satellite. This name string
+         is used in CLI commands to specify a particular satellite type."
+    ::= { tmnxSatelliteTypeEntry 3 }
+
+tmnxSatTypeDescription           OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatTypeDescription indicates the detailed description
+         of this Nokia SROS series satellite type."
+    ::= { tmnxSatelliteTypeEntry 4 }
+
+tmnxSatellitePortMapTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatellitePortMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatellitePortMapTable consists of port mapping information for
+         all satellite ports.
+
+         Rows are created automatically by the system."
+    ::= { tmnxSatelliteStatus 2 }
+
+tmnxSatellitePortMapEntry        OBJECT-TYPE
+    SYNTAX      TmnxSatellitePortMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatellitePortMapEntry represents port mapping information for
+         a given satellite port."
+    INDEX       {
+        tmnxSatClass,
+        tmnxSatId,
+        tmnxSatClientPortId,
+        tmnxSatUplinkId
+    }
+    ::= { tmnxSatellitePortMapTable 1 }
+
+TmnxSatellitePortMapEntry        ::= SEQUENCE
+{
+    tmnxSatClientPortId              TmnxPortID,
+    tmnxSatUplinkId                  Unsigned32,
+    tmnxSatUplinkPortId              TmnxPortID,
+    tmnxSatUplinkActive              TruthValue,
+    tmnxSatHostPortId                TmnxPortID
+}
+
+tmnxSatClientPortId              OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatClientPortId specifies the port identifier of the
+         satellite client port."
+    ::= { tmnxSatellitePortMapEntry 1 }
+
+tmnxSatUplinkId                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatUplinkId specifies the satellite uplink
+         identifier."
+    ::= { tmnxSatellitePortMapEntry 2 }
+
+tmnxSatUplinkPortId              OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatUplinkPortId indicates the port identifier of the
+         satellite uplink port associated with the satellite client port."
+    ::= { tmnxSatellitePortMapEntry 3 }
+
+tmnxSatUplinkActive              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatUplinkActive indicates whether or not the
+         satellite uplink port is active for the satellite client port."
+    ::= { tmnxSatellitePortMapEntry 4 }
+
+tmnxSatHostPortId                OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatHostPortId indicates the port identifier of the
+         host port which is connected to the satellite uplink port.
+
+         A value of '1e000000'H indicates that the satellite uplink port is not
+         connected to a host port."
+    ::= { tmnxSatellitePortMapEntry 5 }
+
+tmnxSatelliteSyncIfTimingTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatelliteSyncIfTimingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatelliteSyncIfTimingTable consists of synchronous interface
+         timing information for every satellite in the system."
+    ::= { tmnxSatelliteStatus 3 }
+
+tmnxSatelliteSyncIfTimingEntry   OBJECT-TYPE
+    SYNTAX      TmnxSatelliteSyncIfTimingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatelliteSyncIfTimingEntry represents the configuration of
+         Synchronous Equipment Timing Source (SETS) of the satellite.
+
+         Entries are created/destroyed automatically by the system.
+
+         If the value of the reference source port is a valid Port ID then the
+         reference is a port.  If the value of the source hardware is a valid
+         non-zero HWIndex then the source is the hardware specified by the
+         HWIndex."
+    INDEX       {
+        tmnxSatClass,
+        tmnxSatId
+    }
+    ::= { tmnxSatelliteSyncIfTimingTable 1 }
+
+TmnxSatelliteSyncIfTimingEntry   ::= SEQUENCE
+{
+    tmnxSatSyncIfTimingRef1SrcPort   TmnxPortID,
+    tmnxSatSyncIfTimingRef1AdmStatus TmnxPortAdminStatus,
+    tmnxSatSyncIfTimingRef1InUse     TruthValue,
+    tmnxSatSyncIfTimingRef1Qualified TmnxSETSRefQualified,
+    tmnxSatSyncIfTimingRef1Alarm     TmnxSETSRefAlarm,
+    tmnxSatSyncIfTimingRef1RxQltyLvl TmnxSSMQualityLevel,
+    tmnxSatSyncIfTimingRef1State     TmnxRefInState,
+    tmnxSatSyncIfTimingRef2SrcPort   TmnxPortID,
+    tmnxSatSyncIfTimingRef2AdmStatus TmnxPortAdminStatus,
+    tmnxSatSyncIfTimingRef2InUse     TruthValue,
+    tmnxSatSyncIfTimingRef2Qualified TmnxSETSRefQualified,
+    tmnxSatSyncIfTimingRef2Alarm     TmnxSETSRefAlarm,
+    tmnxSatSyncIfTimingRef2RxQltyLvl TmnxSSMQualityLevel,
+    tmnxSatSyncIfTimingRef2State     TmnxRefInState,
+    tmnxSatSyncIfTimingFreqOffset    Integer32,
+    tmnxSatSyncIfTimingStatus        TmnxSETSStatus,
+    tmnxSatSyncIfTimingSystemQltyLvl TmnxSSMQualityLevel
+}
+
+tmnxSatSyncIfTimingRef1SrcPort   OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1SrcPort indicates the source port
+         of the first timing reference for the satellite.
+
+         A value of '1e000000'H indicates that there is no source port for this
+         reference."
+    ::= { tmnxSatelliteSyncIfTimingEntry 1 }
+
+tmnxSatSyncIfTimingRef1AdmStatus OBJECT-TYPE
+    SYNTAX      TmnxPortAdminStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1AdmStatus indicates the
+         administrative status of the first timing reference for the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 2 }
+
+tmnxSatSyncIfTimingRef1InUse     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1InUse indicates whether the first
+         timing reference for the satellite is presently being used by the
+         synchronous timing subsystem.  If it is in use,
+         tmnxSatSyncIfTimingFreqOffset indicates the frequency offset for this
+         reference."
+    ::= { tmnxSatelliteSyncIfTimingEntry 3 }
+
+tmnxSatSyncIfTimingRef1Qualified OBJECT-TYPE
+    SYNTAX      TmnxSETSRefQualified
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1Qualified indicates whether the
+         first timing reference for the satellite is qualified for use by the
+         synchronous timing subsystem.  If the value of
+         tmnxSatSyncIfTimingRef1Qualified is set to 'not-qualified (2)', then
+         the object tmnxSatSyncIfTimingRef1Alarm gives the reason for
+         disqualification."
+    ::= { tmnxSatelliteSyncIfTimingEntry 4 }
+
+tmnxSatSyncIfTimingRef1Alarm     OBJECT-TYPE
+    SYNTAX      TmnxSETSRefAlarm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1Alarm indicates the alarms on the
+         first reference for the satellite. If any of the bits are set, then
+         the first reference is disqualified by the timing subsystem and the
+         value of tmnxSatSyncIfTimingRef1Qualified is set to 'not-qualified
+         (2)'."
+    ::= { tmnxSatelliteSyncIfTimingEntry 5 }
+
+tmnxSatSyncIfTimingRef1RxQltyLvl OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1RxQltyLvl indicates the received
+         SSM Quality Level of the first reference for the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 6 }
+
+tmnxSatSyncIfTimingRef1State     OBJECT-TYPE
+    SYNTAX      TmnxRefInState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef1State indicates the operational
+         state of the timing for the first reference on the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 7 }
+
+tmnxSatSyncIfTimingRef2SrcPort   OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2SrcPort indicates the source port
+         of the second timing reference for the satellite.
+
+         A value of '1e000000'H indicates that there is no source port for this
+         reference."
+    ::= { tmnxSatelliteSyncIfTimingEntry 8 }
+
+tmnxSatSyncIfTimingRef2AdmStatus OBJECT-TYPE
+    SYNTAX      TmnxPortAdminStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2AdmStatus indicates the
+         administrative status of the second timing reference for the
+         satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 9 }
+
+tmnxSatSyncIfTimingRef2InUse     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2InUse indicates whether the second
+         timing reference for the satellite is presently being used by the
+         synchronous timing subsystem."
+    ::= { tmnxSatelliteSyncIfTimingEntry 10 }
+
+tmnxSatSyncIfTimingRef2Qualified OBJECT-TYPE
+    SYNTAX      TmnxSETSRefQualified
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2Qualified indicates whether the
+         second timing reference for the satellite is qualified for use by the
+         synchronous timing subsystem.  If the value of
+         tmnxSatSyncIfTimingRef2Qualified is 'not-qualified (2)' then the object
+         tmnxSatSyncIfTimingRef2Alarm gives the reason for disqualification."
+    ::= { tmnxSatelliteSyncIfTimingEntry 11 }
+
+tmnxSatSyncIfTimingRef2Alarm     OBJECT-TYPE
+    SYNTAX      TmnxSETSRefAlarm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2Alarm indicates the alarms on the
+         second reference for the satellite.  If any of the bits are set, then
+         the second reference is disqualified by the timing subsystem and the
+         value of tmnxSatSyncIfTimingRef2Qualified is set to
+         'not-qualified (2)'."
+    ::= { tmnxSatelliteSyncIfTimingEntry 12 }
+
+tmnxSatSyncIfTimingRef2RxQltyLvl OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2RxQltyLvl indicates the received
+         SSM Quality Level of the second reference for the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 13 }
+
+tmnxSatSyncIfTimingRef2State     OBJECT-TYPE
+    SYNTAX      TmnxRefInState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingRef2State indicates the operational
+         state of the timing for the second reference on the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 14 }
+
+tmnxSatSyncIfTimingFreqOffset    OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "parts-per-million"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingFreqOffset indicates the frequency
+         offset of the current selected timing reference for the satellite, in
+         parts per million (ppm)."
+    ::= { tmnxSatelliteSyncIfTimingEntry 15 }
+
+tmnxSatSyncIfTimingStatus        OBJECT-TYPE
+    SYNTAX      TmnxSETSStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingStatus indicates the present status of
+         the Synchronous Timing Equipment Source (SETS) for the satellite."
+    ::= { tmnxSatelliteSyncIfTimingEntry 16 }
+
+tmnxSatSyncIfTimingSystemQltyLvl OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSyncIfTimingSystemQltyLvl indicates the quality
+         level of the system timing reference for the satellite.  This is
+         normally the quality level of the selected timing reference.  If no
+         timing reference has been selected, it indicates the freerun/holdover
+         quality of the system."
+    ::= { tmnxSatelliteSyncIfTimingEntry 17 }
+
+tmnxSatelliteStatistics          OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 4 }
+
+tmnxSatelliteNotifyObjects       OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 5 }
+
+tmnxSatNotifyFailureReason       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatNotifyFailureReason indicates the reason why a
+         satellite is in a failed state."
+    ::= { tmnxSatelliteNotifyObjects 1 }
+
+tmnxSatNotifySyncIfTimRefAlarm   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notUsed (0),
+        los     (1),
+        oof     (2),
+        oopir   (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatNotifySyncIfTimRefAlarm indicates the reason a
+         timing reference alarm has been raised."
+    ::= { tmnxSatelliteNotifyObjects 2 }
+
+tmnxSatellitePortMapConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatellitePortMapConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatellitePortMapConfigTable consists of port mapping
+         configuration information for all satellite client ports.
+
+         Rows are created automatically by the system."
+    ::= { tmnxSatelliteObjs 6 }
+
+tmnxSatellitePortMapConfigEntry  OBJECT-TYPE
+    SYNTAX      TmnxSatellitePortMapConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatellitePortMapConfigEntry represents port mapping
+         information for a given satellite client port."
+    INDEX       {
+        tmnxSatClass,
+        tmnxSatId,
+        tmnxSatClientPortId
+    }
+    ::= { tmnxSatellitePortMapConfigTable 1 }
+
+TmnxSatellitePortMapConfigEntry  ::= SEQUENCE
+{
+    tmnxSatPortMapConfigEntryLastChg TimeStamp,
+    tmnxSatPrimaryUplinkPortId       TmnxPortID,
+    tmnxSatSecondaryUplinkPortId     TmnxPortID
+}
+
+tmnxSatPortMapConfigEntryLastChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortMapConfigEntryLastChg indicates the time,
+         since system startup, that the configuration of the row was modified."
+    ::= { tmnxSatellitePortMapConfigEntry 1 }
+
+tmnxSatPrimaryUplinkPortId       OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPrimaryUplinkPortId specifies the primary
+         satellite uplink port for the satellite client port."
+    ::= { tmnxSatellitePortMapConfigEntry 2 }
+
+tmnxSatSecondaryUplinkPortId     OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatSecondaryUplinkPortId specifies the secondary
+         satellite uplink port for the satellite client port."
+    ::= { tmnxSatellitePortMapConfigEntry 3 }
+
+tmnxSatellitePortTemplateTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatellitePortTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatellitePortTemplateTable consists of all the satellite port
+         templates defined in the system.
+
+         Rows are created and destroyed using tmnxSatPortTemplateRowStatus."
+    ::= { tmnxSatelliteObjs 7 }
+
+tmnxSatellitePortTemplateEntry   OBJECT-TYPE
+    SYNTAX      TmnxSatellitePortTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatellitePortTemplateEntry represents a satellite port
+         template defined in the system."
+    INDEX       { tmnxSatellitePortTemplateName }
+    ::= { tmnxSatellitePortTemplateTable 1 }
+
+TmnxSatellitePortTemplateEntry   ::= SEQUENCE
+{
+    tmnxSatellitePortTemplateName    TNamedItem,
+    tmnxSatPortTemplateRowStatus     RowStatus,
+    tmnxSatPortTemplateEntryLastChg  TimeStamp,
+    tmnxSatPortTemplateSatType       TmnxSatelliteType,
+    tmnxSatPortTemplateAdminState    TmnxAdminState,
+    tmnxSatPortTemplateDescription   TItemDescription
+}
+
+tmnxSatellitePortTemplateName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatellitePortTemplateName specifies the name of the
+         satellite port template."
+    ::= { tmnxSatellitePortTemplateEntry 1 }
+
+tmnxSatPortTemplateRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateRowStatus specifies the status of this
+         row.
+
+         It allows entries to be created and deleted in the
+         tmnxSatellitePortTemplateTable."
+    ::= { tmnxSatellitePortTemplateEntry 2 }
+
+tmnxSatPortTemplateEntryLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateEntryLastChg indicates the time, since
+         system startup, that the configuration of the row was modified."
+    ::= { tmnxSatellitePortTemplateEntry 3 }
+
+tmnxSatPortTemplateSatType       OBJECT-TYPE
+    SYNTAX      TmnxSatelliteType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateSatType specifies the type of
+         satellite the port template is for. The value must be specified along
+         with tmnxSatPortTemplateRowStatus during a create."
+    ::= { tmnxSatellitePortTemplateEntry 4 }
+
+tmnxSatPortTemplateAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateAdminState specifies the
+         administrative state of this satellite port template."
+    DEFVAL      { outOfService }
+    ::= { tmnxSatellitePortTemplateEntry 5 }
+
+tmnxSatPortTemplateDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplateDescription specifies the description
+         of the satellite port template."
+    DEFVAL      { ''H }
+    ::= { tmnxSatellitePortTemplateEntry 6 }
+
+tmnxSatPortTemplatePortTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatPortTemplatePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatPortTemplatePortTable consists of all the satellite port
+         properties associated with satellite port templates defined in the
+         system.
+
+         Rows are created and destroyed automatically by the system when an
+         entry in tmnxSatellitePortTemplateTable is created and destroyed
+         respectively. The number of rows created depends on the number of
+         physical ports available on the satellite of type
+         tmnxSatPortTemplateSatType."
+    ::= { tmnxSatelliteObjs 8 }
+
+tmnxSatPortTemplatePortEntry     OBJECT-TYPE
+    SYNTAX      TmnxSatPortTemplatePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatPortTemplatePortEntry contains properties for each
+         satellite port associated with satellite port templates defined in the
+         system."
+    INDEX       {
+        tmnxSatellitePortTemplateName,
+        tmnxSatPhysPortId
+    }
+    ::= { tmnxSatPortTemplatePortTable 1 }
+
+TmnxSatPortTemplatePortEntry     ::= SEQUENCE
+{
+    tmnxSatPhysPortId                TmnxPortID,
+    tmnxSatPortTmplPortEntryLastChg  TimeStamp,
+    tmnxSatPortTemplatePortRole      INTEGER,
+    tmnxSatPortTemplatePortUplink    TmnxPortID
+}
+
+tmnxSatPhysPortId                OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPhysPortId specifies the port identifier of the
+         physical satellite port which the configuration is this row pertains
+         to."
+    ::= { tmnxSatPortTemplatePortEntry 1 }
+
+tmnxSatPortTmplPortEntryLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTmplPortEntryLastChg indicates the time, since
+         system startup, that the configuration of the row was modified."
+    ::= { tmnxSatPortTemplatePortEntry 2 }
+
+tmnxSatPortTemplatePortRole      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        uplink (1),
+        client (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplatePortRole specifies the role assigned
+         in the port template to the physical satellite port.
+
+            none (0)   - Once the port template is assigned to a satellite, the port is not
+                         instantiated on the host.
+
+            uplink (1) - Once the port template is assigned to a satellite, the port is
+                         instantiated on the host as a satellite uplink port.
+
+            client (2) - Once the port template is assigned to a satellite, the port is
+                         instantiated on the host as a satellite client port."
+    ::= { tmnxSatPortTemplatePortEntry 3 }
+
+tmnxSatPortTemplatePortUplink    OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortTemplatePortUplink specifies the port
+         identifier of the physical satellite port, which the physical
+         satellite port specified by tmnxSatPhysPortId, will use as its uplink
+         port."
+    ::= { tmnxSatPortTemplatePortEntry 4 }
+
+tmnxSatelliteLocalForwardTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatelliteLocalForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatelliteLocalForwardTable consists of all the satellite local
+         forward instances defined in the system.
+
+         A local forward is used to redirect certain client traffic away from
+         the host router.
+
+         Rows are created and destroyed using tmnxSatLocalForwardRowStatus."
+    ::= { tmnxSatelliteObjs 9 }
+
+tmnxSatelliteLocalForwardEntry   OBJECT-TYPE
+    SYNTAX      TmnxSatelliteLocalForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatelliteLocalForwardEntry represents a satellite local
+         forward defined in the system."
+    INDEX       { tmnxSatLocalForwardId }
+    ::= { tmnxSatelliteLocalForwardTable 1 }
+
+TmnxSatelliteLocalForwardEntry   ::= SEQUENCE
+{
+    tmnxSatLocalForwardId            Unsigned32,
+    tmnxSatLocalForwardRowStatus     RowStatus,
+    tmnxSatLocalForwardEntryLastChg  TimeStamp,
+    tmnxSatLocalForwardAdminState    TmnxAdminState,
+    tmnxSatLocalForwardDescription   TItemDescription,
+    tmnxSatLocalForwardOperState     ServiceOperStatus
+}
+
+tmnxSatLocalForwardId            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10240)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardId specifies the identifier for the
+         local forward."
+    ::= { tmnxSatelliteLocalForwardEntry 1 }
+
+tmnxSatLocalForwardRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardRowStatus specifies the status of this
+         row.
+
+         It allows entries to be created and deleted in the
+         tmnxSatelliteLocalForwardTable."
+    ::= { tmnxSatelliteLocalForwardEntry 2 }
+
+tmnxSatLocalForwardEntryLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardEntryLastChg indicates the time, since
+         system startup, that the configuration of the row was last modified."
+    ::= { tmnxSatelliteLocalForwardEntry 3 }
+
+tmnxSatLocalForwardAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardAdminState specifies the
+         administrative state of the satellite local forward."
+    DEFVAL      { outOfService }
+    ::= { tmnxSatelliteLocalForwardEntry 4 }
+
+tmnxSatLocalForwardDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardDescription specifies the description
+         of the satellite local forward."
+    DEFVAL      { ''H }
+    ::= { tmnxSatelliteLocalForwardEntry 5 }
+
+tmnxSatLocalForwardOperState     OBJECT-TYPE
+    SYNTAX      ServiceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardOperState indicates the operational
+         state of the satellite local forward."
+    ::= { tmnxSatelliteLocalForwardEntry 6 }
+
+tmnxSatLocalForwardSapTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatLocalForwardSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatLocalForwardSapTable consists of all the Service Access
+         Points (SAPs) used in satellite local forward instances defined in the
+         system.
+
+         Rows are created and destroyed using tmnxSatLocalForwardSapRowStatus."
+    ::= { tmnxSatelliteObjs 10 }
+
+tmnxSatLocalForwardSapEntry      OBJECT-TYPE
+    SYNTAX      TmnxSatLocalForwardSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatLocalForwardSapEntry represents a SAP used in a satellite
+         local forward instance defined in the system."
+    INDEX       {
+        tmnxSatLocalForwardId,
+        tmnxSatPortId,
+        tmnxSatEncapValue
+    }
+    ::= { tmnxSatLocalForwardSapTable 1 }
+
+TmnxSatLocalForwardSapEntry      ::= SEQUENCE
+{
+    tmnxSatPortId                    TmnxPortID,
+    tmnxSatEncapValue                Unsigned32,
+    tmnxSatLocalForwardSapRowStatus  RowStatus,
+    tmnxSatLocalFwdSapEntryLastChg   TimeStamp,
+    tmnxSatLocalForwardSapAdminState TmnxAdminState,
+    tmnxSatLocalFwdSapDescription    TItemDescription,
+    tmnxSatLocalForwardSapOperState  INTEGER
+}
+
+tmnxSatPortId                    OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatPortId specifies the port ID the SAP is running
+         on."
+    ::= { tmnxSatLocalForwardSapEntry 1 }
+
+tmnxSatEncapValue                OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatEncapValue specifies the label used to identify
+         the SAP running on the port ID specified by tmnxSatPortId."
+    ::= { tmnxSatLocalForwardSapEntry 2 }
+
+tmnxSatLocalForwardSapRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardSapRowStatus specifies the status of
+         this row.
+
+         It allows entries to be created and deleted in the
+         tmnxSatLocalForwardSapTable."
+    ::= { tmnxSatLocalForwardSapEntry 3 }
+
+tmnxSatLocalFwdSapEntryLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalFwdSapEntryLastChg indicates the time, since
+         system startup, that the configuration of the row was last modified."
+    ::= { tmnxSatLocalForwardSapEntry 4 }
+
+tmnxSatLocalForwardSapAdminState OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardSapAdminState specifies the
+         administrative state of the satellite local forward SAP."
+    DEFVAL      { outOfService }
+    ::= { tmnxSatLocalForwardSapEntry 5 }
+
+tmnxSatLocalFwdSapDescription    OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalFwdSapDescription specifies the description
+         of the satellite local forward SAP."
+    DEFVAL      { ''H }
+    ::= { tmnxSatLocalForwardSapEntry 6 }
+
+tmnxSatLocalForwardSapOperState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatLocalForwardSapOperState indicates the operational
+         state of the satellite local forward SAP."
+    ::= { tmnxSatLocalForwardSapEntry 7 }
+
+tmnxSatelliteFeaturesTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSatelliteFeaturesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSatelliteFeaturesTable consists of the enabled/disabled state,
+         for all satellites, of all features which require a minimum satellite
+         software image revision to operate on a satellite. Enabling a feature
+         on a satellite which is not running the minimum satellite software
+         image revision needed to support that feature will cause the satellite
+         to fail.
+
+         Rows are created and destroyed when a row is created or destroyed in
+         the tmnxSatelliteTable."
+    ::= { tmnxSatelliteObjs 11 }
+
+tmnxSatelliteFeaturesEntry       OBJECT-TYPE
+    SYNTAX      TmnxSatelliteFeaturesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSatelliteFeaturesEntry contains the enabled/disabled state,
+         for a particular satellite, of all the features which require a
+         minimum satellite software image revision to operate on a satellite."
+    AUGMENTS    { tmnxSatelliteEntry }
+    ::= { tmnxSatelliteFeaturesTable 1 }
+
+TmnxSatelliteFeaturesEntry       ::= SEQUENCE
+{
+    tmnxSatFeaturesEntryLastChange   TimeStamp,
+    tmnxSatFeatureLocalForward       TmnxEnabledDisabled,
+    tmnxSatFeaturePtpTc              TmnxEnabledDisabled
+}
+
+tmnxSatFeaturesEntryLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFeaturesEntryLastChange indicates the time, since
+         system startup, that the configuration of the row was last modified."
+    ::= { tmnxSatelliteFeaturesEntry 1 }
+
+tmnxSatFeatureLocalForward       OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFeatureLocalForward specifies whether the local
+         forward feature is enabled or disabled on the satellite. The following
+         are important things to note about enabling/disabling local forward on
+         a satellite:
+
+            a) Rows in tmnxSatLocalForwardSapTable cannot be created referring to a
+               satellite unless tmnxSatFeatureLocalForward is set to enabled under the
+               satellite.
+
+            b) If tmnxSatFeatureLocalForward is set to enabled under a satellite, setting
+               tmnxSatFeatureLocalForward to disabled is not permitted if any rows in
+               tmnxSatLocalForwardSapTable exist that refer to the satellite."
+    DEFVAL      { disabled }
+    ::= { tmnxSatelliteFeaturesEntry 2 }
+
+tmnxSatFeaturePtpTc              OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFeaturePtpTc specifies whether the host should
+         enforce that the equipped satellite (hardware and software) supports
+         PTP transparent  clock functionality before allowing it to become
+         operational.
+
+         Setting tmnxSatFeaturePtpTc to 'enabled' is a pre-requisite to
+         enabling PTP transparent clock via tmnxSatPtpTc."
+    DEFVAL      { disabled }
+    ::= { tmnxSatelliteFeaturesEntry 3 }
+
+tmnxSatelliteSecurityObjs        OBJECT IDENTIFIER ::= { tmnxSatelliteObjs 12 }
+
+tmnxSatFileTransferFtp           OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFileTransferFtp specifies whether FTP will be
+         supported for the transfer of files to satellites for the purposes of
+         management."
+    DEFVAL      { enabled }
+    ::= { tmnxSatelliteSecurityObjs 1 }
+
+tmnxSatFileTransferScp           OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSatFileTransferScp specifies whether SCP will be
+         supported for the transfer of files to satellites for the purposes of
+         management."
+    DEFVAL      { disabled }
+    ::= { tmnxSatelliteSecurityObjs 2 }
+
+tmnxSatelliteConformance         OBJECT IDENTIFIER ::= { tmnxSRConfs 103 }
+
+tmnxSatelliteCompliances         OBJECT IDENTIFIER ::= { tmnxSatelliteConformance 1 }
+
+tmnxSatelliteComplianceV14v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         14.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatelliteGroupV14v0,
+            tmnxSatelliteTypeGroupV14v0,
+            tmnxSatellitePortMapGroupV14v0,
+            tmnxSatelliteSyncIfTimGroupV14v0,
+            tmnxSatelliteNotifGroupV14v0,
+            tmnxSatelliteNotifyObjsGrpV14v0
+        }
+    ::= { tmnxSatelliteCompliances 1 }
+
+tmnxSatelliteComplianceV15v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         15.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatPortMapGroupV15v0,
+            tmnxSatResiliencyGroupV15v0,
+            tmnxSatPortTemplateGroupV15v0,
+            tmnxSatLocalForwardGroupV15v0,
+            tmnxSatFeaturesGroupV15v0,
+            tmnxSatelliteNotifGroupV15v0
+        }
+    ::= { tmnxSatelliteCompliances 2 }
+
+tmnxSatelliteComplianceV16v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         16.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatPtpTcGroupV16v0
+        }
+    ::= { tmnxSatelliteCompliances 3 }
+
+tmnxSatelliteComplianceV19v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         19.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatClientDownDelayGroupV19v0
+        }
+    ::= { tmnxSatelliteCompliances 4 }
+
+tmnxSatelliteComplianceV20v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         20.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatConsoleAccessGroupV20v0
+        }
+    ::= { tmnxSatelliteCompliances 5 }
+
+tmnxSatelliteComplianceV21v0     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of satellites for release
+         21.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSatDynamicUplinkGroupV21v0
+        }
+    ::= { tmnxSatelliteCompliances 6 }
+
+tmnxSatelliteGroups              OBJECT IDENTIFIER ::= { tmnxSatelliteConformance 2 }
+
+tmnxSatelliteV14v0Groups         OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 1 }
+
+tmnxSatelliteGroupV14v0          OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatelliteTableLastChanged,
+        tmnxSatRowStatus,
+        tmnxSatLastChanged,
+        tmnxSatAssignedType,
+        tmnxSatEquippedType,
+        tmnxSatMacAddress,
+        tmnxSatSoftwareRepository,
+        tmnxSatDescription,
+        tmnxSatReboot,
+        tmnxSatUpgrade,
+        tmnxSatSyncBootEnv,
+        tmnxSatSyncEEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellites on Nokia
+         SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 1 }
+
+tmnxSatelliteTypeGroupV14v0      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatTypeClass,
+        tmnxSatTypeName,
+        tmnxSatTypeDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining information for satellite types on
+         Nokia SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 2 }
+
+tmnxSatellitePortMapGroupV14v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatUplinkPortId,
+        tmnxSatUplinkActive,
+        tmnxSatHostPortId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining information for satellite port
+         mapping on Nokia SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 3 }
+
+tmnxSatelliteSyncIfTimGroupV14v0 OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatSyncIfTimingRef1SrcPort,
+        tmnxSatSyncIfTimingRef1AdmStatus,
+        tmnxSatSyncIfTimingRef1InUse,
+        tmnxSatSyncIfTimingRef1Qualified,
+        tmnxSatSyncIfTimingRef1Alarm,
+        tmnxSatSyncIfTimingRef2SrcPort,
+        tmnxSatSyncIfTimingRef2AdmStatus,
+        tmnxSatSyncIfTimingRef2InUse,
+        tmnxSatSyncIfTimingRef2Qualified,
+        tmnxSatSyncIfTimingRef2Alarm,
+        tmnxSatSyncIfTimingFreqOffset,
+        tmnxSatSyncIfTimingStatus,
+        tmnxSatSyncIfTimingRef1RxQltyLvl,
+        tmnxSatSyncIfTimingRef2RxQltyLvl,
+        tmnxSatSyncIfTimingRef1State,
+        tmnxSatSyncIfTimingRef2State,
+        tmnxSatSyncIfTimingSystemQltyLvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining satellite synchronous interface
+         timing capabilities on Nokia SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 4 }
+
+tmnxSatelliteNotifGroupV14v0     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSatelliteOperStateChange,
+        tmnxSatSyncIfTimRefSwitch,
+        tmnxSatSyncIfTimSystemQuality,
+        tmnxSatSyncIfTimRef1Quality,
+        tmnxSatSyncIfTimRef2Quality,
+        tmnxSatSyncIfTimHoldover,
+        tmnxSatSyncIfTimHoldoverClear,
+        tmnxSatSyncIfTimRef1Alarm,
+        tmnxSatSyncIfTimRef1AlarmClear,
+        tmnxSatSyncIfTimRef2Alarm,
+        tmnxSatSyncIfTimRef2AlarmClear
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting satellite management on Nokia
+         SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 5 }
+
+tmnxSatelliteNotifyObjsGrpV14v0  OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatNotifyFailureReason,
+        tmnxSatNotifySyncIfTimRefAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of accessible-for-notify objects supporting satellite
+         management on Nokia SROS series systems for release 14.0."
+    ::= { tmnxSatelliteV14v0Groups 6 }
+
+tmnxSatelliteV15v0Groups         OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 2 }
+
+tmnxSatPortMapGroupV15v0         OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatPortMapConfigTableLastChg,
+        tmnxSatPortMapConfigEntryLastChg,
+        tmnxSatPrimaryUplinkPortId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite port
+         mapping on Nokia SROS series systems for release 15.0."
+    ::= { tmnxSatelliteV15v0Groups 1 }
+
+tmnxSatResiliencyGroupV15v0      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatSecondaryUplinkPortId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite
+         resiliency on Nokia SROS series systems for release 15.0."
+    ::= { tmnxSatelliteV15v0Groups 2 }
+
+tmnxSatPortTemplateGroupV15v0    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatPortTemplate,
+        tmnxSatPortTemplateTableLastChg,
+        tmnxSatPortTemplateRowStatus,
+        tmnxSatPortTemplateEntryLastChg,
+        tmnxSatPortTemplateSatType,
+        tmnxSatPortTemplateAdminState,
+        tmnxSatPortTemplateDescription,
+        tmnxSatPortTmplPortTableLastChg,
+        tmnxSatPortTmplPortEntryLastChg,
+        tmnxSatPortTemplatePortRole,
+        tmnxSatPortTemplatePortUplink
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite port
+         templates on Nokia SROS series systems for release 15.0"
+    ::= { tmnxSatelliteV15v0Groups 3 }
+
+tmnxSatLocalForwardGroupV15v0    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatLocalForwardTableLastChg,
+        tmnxSatLocalForwardRowStatus,
+        tmnxSatLocalForwardEntryLastChg,
+        tmnxSatLocalForwardAdminState,
+        tmnxSatLocalForwardDescription,
+        tmnxSatLocalForwardOperState,
+        tmnxSatLocalFwdSapTableLastChg,
+        tmnxSatLocalForwardSapRowStatus,
+        tmnxSatLocalFwdSapEntryLastChg,
+        tmnxSatLocalForwardSapAdminState,
+        tmnxSatLocalFwdSapDescription,
+        tmnxSatLocalForwardSapOperState,
+        tmnxSatFeatureLocalForward
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite local
+         forwards on Nokia SROS series systems for release 15.0"
+    ::= { tmnxSatelliteV15v0Groups 4 }
+
+tmnxSatFeaturesGroupV15v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatFeaturesTableLastChange,
+        tmnxSatFeaturesEntryLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite feature
+         enabling on Nokia SROS series systems for release 15.0"
+    ::= { tmnxSatelliteV15v0Groups 5 }
+
+tmnxSatelliteNotifGroupV15v0     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSatLocalForwardStateChg,
+        tmnxSatLocalForwardSapStateChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting satellite management on Nokia
+         SROS series systems for release 15.0."
+    ::= { tmnxSatelliteV15v0Groups 6 }
+
+tmnxSatelliteV16v0Groups         OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 3 }
+
+tmnxSatPtpTcGroupV16v0           OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatPtpTc,
+        tmnxSatFeaturePtpTc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite PTP
+         transparent clock on Nokia SROS series systems for release 16.0."
+    ::= { tmnxSatelliteV16v0Groups 1 }
+
+tmnxSatelliteV19v0Groups         OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 4 }
+
+tmnxSatClientDownDelayGroupV19v0 OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatClientDownDelay
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite client
+         delay port shutdown settings on Nokia SROS series systems for release
+         19.0."
+    ::= { tmnxSatelliteV19v0Groups 1 }
+
+tmnxSatellite20v0Groups          OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 5 }
+
+tmnxSatConsoleAccessGroupV20v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatConsoleAccess,
+        tmnxSatConsoleAccessStatus,
+        tmnxSatFileTransferFtp,
+        tmnxSatFileTransferScp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite debug
+         console access settings on Nokia SROS series systems for release 20.0."
+    ::= { tmnxSatellite20v0Groups 1 }
+
+tmnxSatellite21v0Groups          OBJECT IDENTIFIER ::= { tmnxSatelliteGroups 6 }
+
+tmnxSatDynamicUplinkGroupV21v0   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSatDynamicUplink,
+        tmnxSatUplinkDistribution
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining configuration for satellite dynamic
+         uplink settings on Nokia SROS series systems for release 21.0."
+    ::= { tmnxSatellite21v0Groups 1 }
+
+tmnxSatelliteNotifyPrefix        OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 103 }
+
+tmnxSatelliteNotifications       OBJECT IDENTIFIER ::= { tmnxSatelliteNotifyPrefix 0 }
+
+tmnxSatelliteOperStateChange     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwOperState,
+        tmnxSatNotifyFailureReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatelliteOperStateChange notification is generated
+         when there is a change in tmnxHwOperState for the satellite.
+
+         [EFFECT] The satellite has changed states. The
+          tmnxSatNotifyFailureReason is only valid when tmnxHwOperState is
+         'failed (5)', and should otherwise be blank.
+
+         [RECOVERY] Contact Nokia customer support if
+         tmnxSatNotifyFailureReason does not provide enough information to
+         rectify the situation."
+    ::= { tmnxSatelliteNotifications 1 }
+
+tmnxSatSyncIfTimRefSwitch        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatSyncIfTimingRef1InUse,
+        tmnxSatSyncIfTimingRef2InUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRefSwitch notification is generated when
+         there is a change of which timing reference is providing timing for
+         the satellite.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 2 }
+
+tmnxSatSyncIfTimSystemQuality    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatSyncIfTimingSystemQltyLvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEqSyncIfTimingSystemQuality notification is generated when
+         there is a change in the system timing quality level for the
+         satellite. This notification is a point-in-time state change event.
+
+         [CAUSE] This notification may be triggered for the following reasons:
+
+         1) There has been a switch in the timing reference in use by the
+            network element, either because the previously active timing
+            reference was disqualified, or to ensure that the network element
+            is using the timing reference with the best timing quality.
+         2) There has been a change in the active timing reference's quality
+            and the change does not result in a timing reference switch.
+         3) The network element has transitioned into or out of the holdover
+            state.
+
+         [EFFECT] The system quality level is used to determine the SSM code
+         transmitted on synchronous interfaces. This may affect the SSM code
+         transmitted on some or all interfaces, which may affect the
+         distribution of timing throughout the network.
+
+         [RECOVERY] If the customer is expecting the system to be locked to a
+         reference of a particular quality and the system quality has
+         decreased, the customer will need to determine the root cause (for
+         example, loss of communication with a satellite) and resolve the
+         issue."
+    ::= { tmnxSatelliteNotifications 3 }
+
+tmnxSatSyncIfTimRef1Quality      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatSyncIfTimingRef1RxQltyLvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef1Quality notification is generated when
+         the received quality level changes on the first timing reference of
+         the satellite.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 4 }
+
+tmnxSatSyncIfTimRef2Quality      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatSyncIfTimingRef2RxQltyLvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef2Quality notification is generated when
+         the received quality level changes on the second timing reference of
+         the satellite.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 5 }
+
+tmnxSatSyncIfTimHoldover         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimHoldover notification is generated when
+         the synchronous equipment timing subsystem of the satellite
+         transitions into a holdover state.
+
+         [EFFECT] The transmit timing of all synchronous interfaces on the
+         satellite are no longer synchronous with the host. This could result
+         in traffic loss.
+
+         [RECOVERY] Investigate the state of the two input timing references on
+         the satellite and the links between the host and the satellite (i.e.
+         the uplinks) that drive them for failures."
+    ::= { tmnxSatelliteNotifications 6 }
+
+tmnxSatSyncIfTimHoldoverClear    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimHoldoverClear notification is generated
+         when the synchronous equipment timing subsystem of the satellite
+         transitions out of the holdover state.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 7 }
+
+tmnxSatSyncIfTimRef1Alarm        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxSatNotifySyncIfTimRefAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef1Alarm notification is generated when
+         an alarm condition on the first timing reference is detected.
+
+         [EFFECT] If the other timing reference is free of faults, the
+         satellite no longer has a backup timing reference. If the other timing
+         reference also has a fault, the satellite will likely no longer be
+         synchronous with the host.
+
+         [RECOVERY] Investigate the state of the link between the host and the
+         satellite (i.e. the uplink) that drives the first timing reference on
+         the satellite for faults."
+    ::= { tmnxSatelliteNotifications 8 }
+
+tmnxSatSyncIfTimRef1AlarmClear   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxSatNotifySyncIfTimRefAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef1AlarmClear notification is generated
+         when the alarm condition on the first timing reference is cleared.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 9 }
+
+tmnxSatSyncIfTimRef2Alarm        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxSatNotifySyncIfTimRefAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef2Alarm notification is generated when
+         an alarm condition on the second timing reference is detected.
+
+         [EFFECT] If the other timing reference is free of faults, the
+         satellite no longer has a backup timing reference. If the other timing
+         reference also has a fault, the satellite will likely no longer be
+         synchronous with the host.
+
+         [RECOVERY] Investigate the state of the link between the host and the
+         satellite (i.e. the uplink) that drives the second timing reference on
+         the satellite for faults."
+    ::= { tmnxSatelliteNotifications 10 }
+
+tmnxSatSyncIfTimRef2AlarmClear   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxSatNotifySyncIfTimRefAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatSyncIfTimRef1AlarmClear notification is generated
+         when the alarm condition on the second timing reference is cleared.
+
+         [EFFECT] This notification is for informational purposes only.
+
+         [RECOVERY] No recovery required."
+    ::= { tmnxSatelliteNotifications 11 }
+
+tmnxSatLocalForwardStateChg      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatLocalForwardAdminState,
+        tmnxSatLocalForwardOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatLocalForwardStateChg notification is generated when
+         the system detects a change in the administrative state, or
+         operational state of the satellite local forward.
+
+         [EFFECT] The administrative state or operational state of the
+         satellite local forward has changed.
+
+         [RECOVERY] If the administrative state is 'inService (2)', and the
+         operational state is 'down (2)', check to ensure valid configuration
+         of the satellite local forward, and verify the connection of the
+         satellite to the host. Contact Nokia customer support if the issue
+         cannot be resolved."
+    ::= { tmnxSatelliteNotifications 16 }
+
+tmnxSatLocalForwardSapStateChg   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSatLocalForwardSapAdminState,
+        tmnxSatLocalForwardSapOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSatLocalForwardSapStateChg notification is generated
+         when the system detects a change in the administrative state, or
+         operational state of the satellite local forward SAP.
+
+         [EFFECT] The administrative state or operational state of the
+         satellite local forward SAP has changed.
+
+         [RECOVERY] If the administrative state is 'inService (2)', and the
+         operational state is 'down (2)', check to ensure valid configuration
+         of the satellite local forward SAP, and verify the connection of the
+         satellite to the host. Contact Nokia customer support if the issue
+         cannot be resolved."
+    ::= { tmnxSatelliteNotifications 17 }
+
+END

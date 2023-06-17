@@ -1,0 +1,2802 @@
+TIMETRA-SRV6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressPrefixLength,
+    InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TLNamedItem, TLNamedItemOrEmpty,
+    TNamedItemOrEmpty, TSrv6Function,
+    TSrv6FunctionErrorCode,
+    TSrv6FunctionType, TSrv6FunctionValue,
+    TmnxAdminState, TmnxAlgorithmId,
+    TmnxOperState
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraSrv6MIBModule             MODULE-IDENTITY
+    LAST-UPDATED "202012010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the MPLS
+         extensions for the Nokia SROS device.
+
+         Copyright 2003-2020 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "202012010000Z"
+    DESCRIPTION
+        "Rev 21.5               1 Dec 2020 00:00
+         21.5 release of the TIMETRA-SRV6-MIB."
+
+    ::= { timetraSRMIBModules 129 }
+
+Srv6SrhMode                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value specifies the  Segment Routing Header (SRH) mode for the
+         SID.
+
+         psp (1)    - Penultimate Segment Pop of the SRH.
+         usp (2)    - Ultimate Segment Pop of the SRH."
+    SYNTAX      INTEGER {
+        psp       (1),
+        usp       (2),
+        reserved3 (3),
+        reserved4 (4),
+        reserved5 (5)
+    }
+
+Srv6Protection                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value specifies whether the adjacency SID is protected or not."
+    SYNTAX      INTEGER {
+        unprotected (0),
+        protected   (1)
+    }
+
+vRtrSrv6Objs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 129 }
+
+vRtrSrv6ConfigTimeStamps         OBJECT IDENTIFIER ::= { vRtrSrv6Objs 1 }
+
+vRtrSrv6TblLstChg                OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6TblLstChg indicates the sysUpTime at the time of
+         the last modification of an entry in the vRtrSrv6Table."
+    ::= { vRtrSrv6ConfigTimeStamps 7 }
+
+vRtrSrv6LocatorTblLstChg         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrv6LocatorTable."
+    ::= { vRtrSrv6ConfigTimeStamps 8 }
+
+vRtrSrv6FunctionTblLstChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FunctionTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         vRtrSrv6FunctionTable."
+    ::= { vRtrSrv6ConfigTimeStamps 9 }
+
+vRtrSrv6LocatorEndTblLstChg      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorEndTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrSrv6LocatorEndTable."
+    ::= { vRtrSrv6ConfigTimeStamps 10 }
+
+vRtrSrv6LocEndAutoAllocTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndAutoAllocTblLstChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrSrv6LocEndAutoAllocTable."
+    ::= { vRtrSrv6ConfigTimeStamps 11 }
+
+vRtrSrv6LocatorEndXTblLstChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorEndXTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrSrv6LocatorEndXTable."
+    ::= { vRtrSrv6ConfigTimeStamps 12 }
+
+vRtrSrv6MicroSegmentTblLstChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MicroSegmentTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrSrv6MicroSegmentTable."
+    ::= { vRtrSrv6ConfigTimeStamps 13 }
+
+vRtrSrv6MSLocatorTblLstChg       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         vRtrSrv6MSLocatorTable."
+    ::= { vRtrSrv6ConfigTimeStamps 14 }
+
+vRtrSrv6MSFunctionTblLstChg      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFunctionTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrSrv6MSFunctionTable."
+    ::= { vRtrSrv6ConfigTimeStamps 15 }
+
+vRtrSrv6MSFuncUaAutoAllocTblLCh  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaAutoAllocTblLCh indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrSrv6MSFuncUaAutoAllocTable."
+    ::= { vRtrSrv6ConfigTimeStamps 16 }
+
+vRtrSrv6MSFuncUaTblLstChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         vRtrSrv6MSFuncUaTable."
+    ::= { vRtrSrv6ConfigTimeStamps 17 }
+
+vRtrSrv6MSBlockTblLstChg         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrv6MSBlockTable."
+    ::= { vRtrSrv6ConfigTimeStamps 18 }
+
+vRtrSrv6Configurations           OBJECT IDENTIFIER ::= { vRtrSrv6Objs 2 }
+
+vRtrSrv6Table                    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6Table has an entry for segment routing v6 configured for a
+         virtual router in the system."
+    ::= { vRtrSrv6Configurations 1 }
+
+vRtrSrv6Entry                    OBJECT-TYPE
+    SYNTAX      VRtrSrv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration for  segment routing v6 for
+         a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       { vRtrID }
+    ::= { vRtrSrv6Table 1 }
+
+VRtrSrv6Entry                    ::= SEQUENCE
+{
+    vRtrSrv6RowStatus                RowStatus,
+    vRtrSrv6LastChanged              TimeStamp,
+    vRtrSrv6SourceAddrType           InetAddressType,
+    vRtrSrv6SourceAddr               InetAddress,
+    vRtrSrv6OriginationFpe           Unsigned32
+}
+
+vRtrSrv6RowStatus                OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6RowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { vRtrSrv6Entry 1 }
+
+vRtrSrv6LastChanged              OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LastChanged indicates the sysUpTime when this row
+         was last modified."
+    ::= { vRtrSrv6Entry 2 }
+
+vRtrSrv6SourceAddrType           OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6SourceAddrType specifies the type of
+         vRtrSrv6SourceAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrv6Entry 3 }
+
+vRtrSrv6SourceAddr               OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6SourceAddr specifies the source address."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6Entry 4 }
+
+vRtrSrv6OriginationFpe           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6OriginationFpe configures the fpe for srv6
+         locator."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6Entry 5 }
+
+vRtrSrv6LocatorTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocatorTable has an entry for each segment routing locator
+         configured for a virtual router in the system."
+    ::= { vRtrSrv6Configurations 2 }
+
+vRtrSrv6LocatorEntry             OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a ipv6 locator  in the
+         segment routing for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName
+    }
+    ::= { vRtrSrv6LocatorTable 1 }
+
+VRtrSrv6LocatorEntry             ::= SEQUENCE
+{
+    vRtrSrv6LocatorName              TLNamedItem,
+    vRtrSrv6LocatorRowStatus         RowStatus,
+    vRtrSrv6LocatorLastChanged       TimeStamp,
+    vRtrSrv6LocatorAdminState        TmnxAdminState,
+    vRtrSrv6LocatorBlockLength       InetAddressPrefixLength,
+    vRtrSrv6LocatorFuncLength        InetAddressPrefixLength,
+    vRtrSrv6LocatorTermFpe           Unsigned32,
+    vRtrSrv6LocatorPrefixAddrType    InetAddressType,
+    vRtrSrv6LocatorPrefixAddr        InetAddress,
+    vRtrSrv6LocatorPrefixLength      InetAddressPrefixLength,
+    vRtrSrv6LocatorMaxEntries        Unsigned32,
+    vRtrSrv6LocatorLabelBlock        TLNamedItemOrEmpty,
+    vRtrSrv6LocatorAlgorithm         TmnxAlgorithmId,
+    vRtrSrv6LocatorUnifiedLabelBlock TLNamedItemOrEmpty,
+    vRtrSrv6LocatorOperState         TmnxOperState,
+    vRtrSrv6LocatorOperErrorCode     TSrv6FunctionErrorCode
+}
+
+vRtrSrv6LocatorName              OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorName specifies the name for the segment
+         routing locator."
+    ::= { vRtrSrv6LocatorEntry 1 }
+
+vRtrSrv6LocatorRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6LocatorEntry 2 }
+
+vRtrSrv6LocatorLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrv6LocatorEntry 3 }
+
+vRtrSrv6LocatorAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorAdminState specifies the administrative
+         state of the srv6 locator instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrv6LocatorEntry 4 }
+
+vRtrSrv6LocatorBlockLength       OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorBlockLength specifies the value of the
+         block prefix length."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6LocatorEntry 5 }
+
+vRtrSrv6LocatorFuncLength        OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (16 | 20..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorFuncLength specifies the value of the
+         function prefix length."
+    DEFVAL      { 20 }
+    ::= { vRtrSrv6LocatorEntry 6 }
+
+vRtrSrv6LocatorTermFpe           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorTermFpe configures the termination fpe for
+         srv6 locator."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6LocatorEntry 7 }
+
+vRtrSrv6LocatorPrefixAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorPrefixAddrType specifies the type of
+         vRtrSrv6LocatorPrefixAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrv6LocatorEntry 10 }
+
+vRtrSrv6LocatorPrefixAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorPrefixAddr specifies the prefix address."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6LocatorEntry 11 }
+
+vRtrSrv6LocatorPrefixLength      OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorPrefixLength specifies the value of the
+         locator prefix length."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6LocatorEntry 12 }
+
+vRtrSrv6LocatorMaxEntries        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorMaxEntries specifies the total static
+         label entries."
+    DEFVAL      { 1 }
+    ::= { vRtrSrv6LocatorEntry 13 }
+
+vRtrSrv6LocatorLabelBlock        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorLabelBlock specifies the reserved static
+         label block for this locator. The reserved label block name is defined
+         by vRtrMplsReservedLblBlkName and is the index for
+         TIMETRA-MPLS-MIB::vRtrMplsReservedLblBlkTable."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6LocatorEntry 14 }
+
+vRtrSrv6LocatorAlgorithm         OBJECT-TYPE
+    SYNTAX      TmnxAlgorithmId (0 | 128..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocatorAlgorithm specifies the
+         algorithm related to the SPF statistics.
+
+         The value can specify a defined IGP Algorithm (value 0 is SPF) or a
+         Flexible Algorithm (range 128..255)."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6LocatorEntry 15 }
+
+vRtrSrv6LocatorUnifiedLabelBlock OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorUnifiedLabelBlock specifies the reserved
+         label block for this locator. It allows to allocate static and dynamic
+         label from configured reserved label block. The reserved label block
+         name is defined by vRtrMplsReservedLblBlkName and is the index for
+         TIMETRA-MPLS-MIB::vRtrMplsReservedLblBlkTable."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6LocatorEntry 16 }
+
+vRtrSrv6LocatorOperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocatorOperState indicates the locator
+         operational state."
+    ::= { vRtrSrv6LocatorEntry 17 }
+
+vRtrSrv6LocatorOperErrorCode     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6LocatorOperErrorCode specifies the  error code
+         (reason) why the locator is operationally down."
+    ::= { vRtrSrv6LocatorEntry 18 }
+
+vRtrSrv6FunctionTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6FunctionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6FunctionTable has an entry for each segment routing dt
+         function configured for a virtual router in the system."
+    ::= { vRtrSrv6Configurations 3 }
+
+vRtrSrv6FunctionEntry            OBJECT-TYPE
+    SYNTAX      VRtrSrv6FunctionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a srv6 function  in the
+         segment routing for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName
+    }
+    ::= { vRtrSrv6FunctionTable 1 }
+
+VRtrSrv6FunctionEntry            ::= SEQUENCE
+{
+    vRtrSrv6FuncRowStatus            RowStatus,
+    vRtrSrv6FuncLastChanged          TimeStamp,
+    vRtrSrv6FuncDt4                  TSrv6FunctionType,
+    vRtrSrv6FuncDt4Value             TSrv6FunctionValue,
+    vRtrSrv6FuncDt4OperValue         TSrv6FunctionValue,
+    vRtrSrv6FuncDt4OperState         TmnxOperState,
+    vRtrSrv6FuncDt4OperErrorCode     TSrv6FunctionErrorCode,
+    vRtrSrv6FuncDt4OperSidAddrType   InetAddressType,
+    vRtrSrv6FuncDt4OperSidAddr       InetAddress,
+    vRtrSrv6FuncDt6                  TSrv6FunctionType,
+    vRtrSrv6FuncDt6Value             TSrv6FunctionValue,
+    vRtrSrv6FuncDt6OperValue         TSrv6FunctionValue,
+    vRtrSrv6FuncDt6OperState         TmnxOperState,
+    vRtrSrv6FuncDt6OperErrorCode     TSrv6FunctionErrorCode,
+    vRtrSrv6FuncDt6OperSidAddrType   InetAddressType,
+    vRtrSrv6FuncDt6OperSidAddr       InetAddress,
+    vRtrSrv6FuncDt46                 TSrv6FunctionType,
+    vRtrSrv6FuncDt46Value            TSrv6FunctionValue,
+    vRtrSrv6FuncDt46OperValue        TSrv6FunctionValue,
+    vRtrSrv6FuncDt46OperState        TmnxOperState,
+    vRtrSrv6FuncDt46OpErrorCode      TSrv6FunctionErrorCode,
+    vRtrSrv6FuncDt46OpSidAddrType    InetAddressType,
+    vRtrSrv6FuncDt46OpSidAddr        InetAddress
+}
+
+vRtrSrv6FuncRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncRowStatus specifies the row status used for
+         creation, deletion, or control of rows in the table."
+    ::= { vRtrSrv6FunctionEntry 1 }
+
+vRtrSrv6FuncLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncLastChanged indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6FunctionEntry 2 }
+
+vRtrSrv6FuncDt4                  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt4 specifies whether dt4 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6FunctionEntry 3 }
+
+vRtrSrv6FuncDt4Value             OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt4Value specifies the dt4 function value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6FunctionEntry 4 }
+
+vRtrSrv6FuncDt4OperValue         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt4OperValue specifies the operational dt4
+         function value."
+    ::= { vRtrSrv6FunctionEntry 5 }
+
+vRtrSrv6FuncDt4OperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt4OperState indicates the operational state."
+    ::= { vRtrSrv6FunctionEntry 6 }
+
+vRtrSrv6FuncDt4OperErrorCode     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt4OperErrorCode specifies the  error code for
+         dt4 function."
+    ::= { vRtrSrv6FunctionEntry 7 }
+
+vRtrSrv6FuncDt4OperSidAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt4OperSidAddrType specifies the type of
+         vRtrSrv6FuncDt4OperSidAddr."
+    ::= { vRtrSrv6FunctionEntry 8 }
+
+vRtrSrv6FuncDt4OperSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt4OperSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6FunctionEntry 9 }
+
+vRtrSrv6FuncDt6                  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt6 specifies whether dt6 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6FunctionEntry 10 }
+
+vRtrSrv6FuncDt6Value             OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt6Value specifies the dt6 function value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6FunctionEntry 11 }
+
+vRtrSrv6FuncDt6OperValue         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt6OperValue specifies the operational dt6
+         function value."
+    ::= { vRtrSrv6FunctionEntry 12 }
+
+vRtrSrv6FuncDt6OperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt6OperState indicates the operational state."
+    ::= { vRtrSrv6FunctionEntry 13 }
+
+vRtrSrv6FuncDt6OperErrorCode     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt6OperErrorCode specifies the  error code for
+         dt6 function."
+    ::= { vRtrSrv6FunctionEntry 14 }
+
+vRtrSrv6FuncDt6OperSidAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt6OperSidAddrType specifies the type of
+         vRtrSrv6FuncDt6OperSidAddr."
+    ::= { vRtrSrv6FunctionEntry 15 }
+
+vRtrSrv6FuncDt6OperSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt6OperSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6FunctionEntry 16 }
+
+vRtrSrv6FuncDt46                 OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt46 specifies whether dt46 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6FunctionEntry 17 }
+
+vRtrSrv6FuncDt46Value            OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt46Value specifies the dt46 function value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6FunctionEntry 18 }
+
+vRtrSrv6FuncDt46OperValue        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt46OperValue specifies the operational dt46
+         function value."
+    ::= { vRtrSrv6FunctionEntry 19 }
+
+vRtrSrv6FuncDt46OperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt46OperState indicates the operational
+         state."
+    ::= { vRtrSrv6FunctionEntry 20 }
+
+vRtrSrv6FuncDt46OpErrorCode      OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FuncDt46OpErrorCode specifies the  error code for
+         dt46 function."
+    ::= { vRtrSrv6FunctionEntry 21 }
+
+vRtrSrv6FuncDt46OpSidAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt46OpSidAddrType specifies the type of
+         vRtrSrv6FuncDt46OpSidAddr."
+    ::= { vRtrSrv6FunctionEntry 22 }
+
+vRtrSrv6FuncDt46OpSidAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6FuncDt46OpSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6FunctionEntry 23 }
+
+vRtrSrv6LocatorEndTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocatorEndEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocatorEndTable has an entry for a srv6 locator Endpoint
+         (END) function."
+    ::= { vRtrSrv6Configurations 4 }
+
+vRtrSrv6LocatorEndEntry          OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocatorEndEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a SRv6 END SID function
+         used by a locator in the segment routing  for a virtual router in the
+         system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName,
+        vRtrSrv6LocEndFunction
+    }
+    ::= { vRtrSrv6LocatorEndTable 1 }
+
+VRtrSrv6LocatorEndEntry          ::= SEQUENCE
+{
+    vRtrSrv6LocEndFunction           TSrv6FunctionValue,
+    vRtrSrv6LocEndRowStatus          RowStatus,
+    vRtrSrv6LocEndLastChanged        TimeStamp,
+    vRtrSrv6LocEndSrhMode            Srv6SrhMode,
+    vRtrSrv6LocEndOperValue          TSrv6FunctionValue,
+    vRtrSrv6LocEndOperState          TmnxOperState,
+    vRtrSrv6LocEndOperErrorCode      TSrv6FunctionErrorCode,
+    vRtrSrv6LocEndOperSidAddrType    InetAddressType,
+    vRtrSrv6LocEndOperSidAddr        InetAddress
+}
+
+vRtrSrv6LocEndFunction           OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocEndFunction specifies the END SID
+         function."
+    ::= { vRtrSrv6LocatorEndEntry 1 }
+
+vRtrSrv6LocEndRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndRowStatus specifies the row status used for
+         creation, deletion, or control of rows in the table."
+    ::= { vRtrSrv6LocatorEndEntry 2 }
+
+vRtrSrv6LocEndLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndLastChanged indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6LocatorEndEntry 3 }
+
+vRtrSrv6LocEndSrhMode            OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndSrhMode specifies the  Segment Routing
+         Header (SRH) mode for the SID."
+    DEFVAL      { psp }
+    ::= { vRtrSrv6LocatorEndEntry 4 }
+
+vRtrSrv6LocEndOperValue          OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6LocEndOperValue specifies the operational end
+         value."
+    ::= { vRtrSrv6LocatorEndEntry 5 }
+
+vRtrSrv6LocEndOperState          OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndOperState indicates the operational state."
+    ::= { vRtrSrv6LocatorEndEntry 6 }
+
+vRtrSrv6LocEndOperErrorCode      OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6LocEndOperErrorCode specifies the  error code for
+         end function."
+    ::= { vRtrSrv6LocatorEndEntry 7 }
+
+vRtrSrv6LocEndOperSidAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndOperSidAddrType specifies the type of
+         vRtrSrv6LocEndOperSidAddr."
+    ::= { vRtrSrv6LocatorEndEntry 8 }
+
+vRtrSrv6LocEndOperSidAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndOperSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6LocatorEndEntry 9 }
+
+vRtrSrv6LocEndAutoAllocTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocEndAutoAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocEndAutoAllocTable has an entry for a srv6 locator
+         Endpoint function for each combination of SRH mode  and protection
+         type."
+    ::= { vRtrSrv6Configurations 5 }
+
+vRtrSrv6LocEndAutoAllocEntry     OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocEndAutoAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a SRv6 END SID function
+         used by a locator in the segment routing  for a virtual router in the
+         system associated with an adjacency.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName,
+        vRtrSrv6LocEndAASrhMode,
+        vRtrSrv6LocEndAAProtected
+    }
+    ::= { vRtrSrv6LocEndAutoAllocTable 1 }
+
+VRtrSrv6LocEndAutoAllocEntry     ::= SEQUENCE
+{
+    vRtrSrv6LocEndAASrhMode          Srv6SrhMode,
+    vRtrSrv6LocEndAAProtected        Srv6Protection,
+    vRtrSrv6LocEndAALastCh           TimeStamp,
+    vRtrSrv6LocEndAARowStatus        RowStatus
+}
+
+vRtrSrv6LocEndAASrhMode          OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndAASrhMode specifies the  Segment Routing
+         Header (SRH) mode for the SID."
+    ::= { vRtrSrv6LocEndAutoAllocEntry 1 }
+
+vRtrSrv6LocEndAAProtected        OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndAAProtected specifies whether the adjacency
+         SID is protected or not."
+    ::= { vRtrSrv6LocEndAutoAllocEntry 2 }
+
+vRtrSrv6LocEndAALastCh           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndAALastCh indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6LocEndAutoAllocEntry 3 }
+
+vRtrSrv6LocEndAARowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndAARowStatus specifies the row status used
+         for creation, deletion, or control of entries."
+    ::= { vRtrSrv6LocEndAutoAllocEntry 4 }
+
+vRtrSrv6LocatorEndXTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocatorEndXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocatorEndXTable has an entry for a srv6 locator Endpoint
+         (END.X) function."
+    ::= { vRtrSrv6Configurations 6 }
+
+vRtrSrv6LocatorEndXEntry         OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocatorEndXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a SRv6 END.X SID function
+         used by a locator in the segment routing  for a virtual router in the
+         system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName,
+        vRtrSrv6LocEndXFunction
+    }
+    ::= { vRtrSrv6LocatorEndXTable 1 }
+
+VRtrSrv6LocatorEndXEntry         ::= SEQUENCE
+{
+    vRtrSrv6LocEndXFunction          TSrv6FunctionValue,
+    vRtrSrv6LocEndXRowStatus         RowStatus,
+    vRtrSrv6LocEndXLastChanged       TimeStamp,
+    vRtrSrv6LocEndXSrhMode           Srv6SrhMode,
+    vRtrSrv6LocEndXProtected         Srv6Protection,
+    vRtrSrv6LocEndXIfName            TNamedItemOrEmpty,
+    vRtrSrv6LocEndXOperValue         TSrv6FunctionValue,
+    vRtrSrv6LocEndXOperState         TmnxOperState,
+    vRtrSrv6LocEndXOperErrorCode     TSrv6FunctionErrorCode,
+    vRtrSrv6LocEndXOperSidAddrType   InetAddressType,
+    vRtrSrv6LocEndXOperSidAddr       InetAddress
+}
+
+vRtrSrv6LocEndXFunction          OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocEndXFunction specifies the END.X
+         SID function."
+    ::= { vRtrSrv6LocatorEndXEntry 1 }
+
+vRtrSrv6LocEndXRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXRowStatus specifies the row status used
+         for creation, deletion, or control of rows in the table."
+    ::= { vRtrSrv6LocatorEndXEntry 2 }
+
+vRtrSrv6LocEndXLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXLastChanged indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6LocatorEndXEntry 3 }
+
+vRtrSrv6LocEndXSrhMode           OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXSrhMode specifies the  Segment Routing
+         Header (SRH) mode for the SID."
+    DEFVAL      { psp }
+    ::= { vRtrSrv6LocatorEndXEntry 4 }
+
+vRtrSrv6LocEndXProtected         OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXProtected specifies whether the adjacency
+         SID is protected or not."
+    DEFVAL      { protected }
+    ::= { vRtrSrv6LocatorEndXEntry 5 }
+
+vRtrSrv6LocEndXIfName            OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXIfName specifies the local interface name
+         used by the END.X function."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6LocatorEndXEntry 6 }
+
+vRtrSrv6LocEndXOperValue         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6LocEndXOperValue specifies the operational end-x
+         value."
+    ::= { vRtrSrv6LocatorEndXEntry 7 }
+
+vRtrSrv6LocEndXOperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXOperState indicates the operational state."
+    ::= { vRtrSrv6LocatorEndXEntry 8 }
+
+vRtrSrv6LocEndXOperErrorCode     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6LocEndXOperErrorCode specifies the  error code for
+         end-x function."
+    ::= { vRtrSrv6LocatorEndXEntry 9 }
+
+vRtrSrv6LocEndXOperSidAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXOperSidAddrType specifies the type of
+         vRtrSrv6LocEndXOperSidAddr."
+    ::= { vRtrSrv6LocatorEndXEntry 10 }
+
+vRtrSrv6LocEndXOperSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocEndXOperSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6LocatorEndXEntry 11 }
+
+vRtrSrv6LocatorAAEndXTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocatorAAEndXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocatorAAEndXTable has an entry for a srv6 locator
+         Endpoint (END.X) auto allocated SIDs."
+    ::= { vRtrSrv6Configurations 7 }
+
+vRtrSrv6LocatorAAEndXEntry       OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocatorAAEndXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a auto-allocated SRv6 END.X SID.
+
+         Entries can be retrieved by SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocatorName,
+        vRtrSrv6LocAAEndXFunction
+    }
+    ::= { vRtrSrv6LocatorAAEndXTable 1 }
+
+VRtrSrv6LocatorAAEndXEntry       ::= SEQUENCE
+{
+    vRtrSrv6LocAAEndXFunction        Unsigned32,
+    vRtrSrv6LocAAEndXSidAddrType     InetAddressType,
+    vRtrSrv6LocAAEndXSidAddr         InetAddress,
+    vRtrSrv6LocAAEndXSrhMode         Srv6SrhMode,
+    vRtrSrv6LocAAEndXProtected       Srv6Protection,
+    vRtrSrv6LocAAEndXIfName          TNamedItemOrEmpty,
+    vRtrSrv6LocAAEndXSidLevel        INTEGER,
+    vRtrSrv6LocAAEndXMacAddr         OCTET STRING,
+    vRtrSrv6LocAAEndXNbrSysID        OCTET STRING,
+    vRtrSrv6LocAAEndXInstId          Unsigned32
+}
+
+vRtrSrv6LocAAEndXFunction        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocAAEndXFunction specifies the auto
+         allocated END.X SID function."
+    ::= { vRtrSrv6LocatorAAEndXEntry 1 }
+
+vRtrSrv6LocAAEndXSidAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXSidAddrType specifies the type of
+         vRtrSrv6LocAAEndXSidAddr."
+    ::= { vRtrSrv6LocatorAAEndXEntry 2 }
+
+vRtrSrv6LocAAEndXSidAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXSidAddr specifies the segment-identifier"
+    ::= { vRtrSrv6LocatorAAEndXEntry 3 }
+
+vRtrSrv6LocAAEndXSrhMode         OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXSrhMode specifies the  Segment Routing
+         Header (SRH) mode for the SID."
+    ::= { vRtrSrv6LocatorAAEndXEntry 4 }
+
+vRtrSrv6LocAAEndXProtected       OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXProtected specifies whether the
+         adjacency SID is protected or not."
+    ::= { vRtrSrv6LocatorAAEndXEntry 5 }
+
+vRtrSrv6LocAAEndXIfName          OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXIfName specifies the local interface
+         name used by the END.X function."
+    ::= { vRtrSrv6LocatorAAEndXEntry 6 }
+
+vRtrSrv6LocAAEndXSidLevel        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        isisl1   (1),
+        isisl2   (2),
+        isisl1l2 (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXSidLevel specifies the sidlevel for the
+         END.X function. This value is only applicable to ISIS user and for
+         other users the value will be set to 'none'."
+    ::= { vRtrSrv6LocatorAAEndXEntry 7 }
+
+vRtrSrv6LocAAEndXMacAddr         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXMacAddr specifies the mac address used
+         by the END.X function. This value is only applicable to ISIS user and
+         for other users this value will be 0."
+    ::= { vRtrSrv6LocatorAAEndXEntry 8 }
+
+vRtrSrv6LocAAEndXNbrSysID        OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXNbrSysID specifies the neighbor sys Id
+         used by the END.X function. This value is only applicable to ISIS user
+         and for other users this value will be 0."
+    ::= { vRtrSrv6LocatorAAEndXEntry 9 }
+
+vRtrSrv6LocAAEndXInstId          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocAAEndXInstId specifies the instance Id used by
+         the END.X function."
+    ::= { vRtrSrv6LocatorAAEndXEntry 10 }
+
+vRtrSrv6LocalSidTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6LocalSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6LocalSidTable has an entry for a srv6 local SIDs."
+    ::= { vRtrSrv6Configurations 8 }
+
+vRtrSrv6LocalSidEntry            OBJECT-TYPE
+    SYNTAX      VRtrSrv6LocalSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a local SRv6 SID. Entries can be retrieved
+         by SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6LocalSidAddrType,
+        vRtrSrv6LocalSidAddr
+    }
+    ::= { vRtrSrv6LocalSidTable 1 }
+
+VRtrSrv6LocalSidEntry            ::= SEQUENCE
+{
+    vRtrSrv6LocalSidAddrType         InetAddressType,
+    vRtrSrv6LocalSidAddr             InetAddress,
+    vRtrSrv6LocalSidFunctionType     TSrv6Function,
+    vRtrSrv6LocalSidFunctionValue    TSrv6FunctionValue,
+    vRtrSrv6LocalSidLocatorName      TLNamedItem,
+    vRtrSrv6LocalSidContextType      INTEGER,
+    vRtrSrv6LocalSidSvcId            Unsigned32
+}
+
+vRtrSrv6LocalSidAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocalSidAddrType specifies the type of
+         vRtrSrv6LocalSidAddr."
+    ::= { vRtrSrv6LocalSidEntry 1 }
+
+vRtrSrv6LocalSidAddr             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocalSidAddr specifies the segment-identifier"
+    ::= { vRtrSrv6LocalSidEntry 2 }
+
+vRtrSrv6LocalSidFunctionType     OBJECT-TYPE
+    SYNTAX      TSrv6Function
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocalSidFunctionType specifies the
+         SRv6 SID function type."
+    ::= { vRtrSrv6LocalSidEntry 3 }
+
+vRtrSrv6LocalSidFunctionValue    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocalSidFunctionValue specifies the
+         SRv6 SID function."
+    ::= { vRtrSrv6LocalSidEntry 4 }
+
+vRtrSrv6LocalSidLocatorName      OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocalSidLocatorName specifies the SRv6
+         SID locator."
+    ::= { vRtrSrv6LocalSidEntry 5 }
+
+vRtrSrv6LocalSidContextType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        base (1),
+        svc  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value specifies the SRv6 SID context.
+
+         none (0) - function is not locally configured.
+         base (1) - function is configured under base-routing context.
+         svc  (2) - function is configured under service segment-routing context"
+    ::= { vRtrSrv6LocalSidEntry 6 }
+
+vRtrSrv6LocalSidSvcId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6LocalSidSvcId specifies the SRv6
+         service id if vRtrSrv6LocalSidContextType has value 'svc'."
+    ::= { vRtrSrv6LocalSidEntry 7 }
+
+vRtrSrv6MicroSegmentTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MicroSegmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MicroSegmentTable has an entry for configuration
+         pertaining to segment routing v6 micro segments."
+    ::= { vRtrSrv6Configurations 9 }
+
+vRtrSrv6MicroSegmentEntry        OBJECT-TYPE
+    SYNTAX      VRtrSrv6MicroSegmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration for segment routing v6 micro
+         segments for a virtual router in the system."
+    INDEX       { vRtrID }
+    ::= { vRtrSrv6MicroSegmentTable 1 }
+
+VRtrSrv6MicroSegmentEntry        ::= SEQUENCE
+{
+    vRtrSrv6MSRowStatus              RowStatus,
+    vRtrSrv6MSLastChanged            TimeStamp,
+    vRtrSrv6MSBlockLength            Unsigned32,
+    vRtrSrv6MSSidLength              Unsigned32,
+    vRtrSrv6MSGlobalSidEntries       Unsigned32
+}
+
+vRtrSrv6MSRowStatus              OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSRowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { vRtrSrv6MicroSegmentEntry 1 }
+
+vRtrSrv6MSLastChanged            OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLastChanged indicates the sysUpTime when this
+         row was last modified."
+    ::= { vRtrSrv6MicroSegmentEntry 2 }
+
+vRtrSrv6MSBlockLength            OBJECT-TYPE
+    SYNTAX      Unsigned32 (8 | 16 | 24 | 32 | 40 | 48 | 56 | 64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockLength specifies the micro segment block
+         length."
+    DEFVAL      { 32 }
+    ::= { vRtrSrv6MicroSegmentEntry 3 }
+
+vRtrSrv6MSSidLength              OBJECT-TYPE
+    SYNTAX      Unsigned32 (16)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSSidLength specifies the micro segment SID
+         length."
+    DEFVAL      { 16 }
+    ::= { vRtrSrv6MicroSegmentEntry 4 }
+
+vRtrSrv6MSGlobalSidEntries       OBJECT-TYPE
+    SYNTAX      Unsigned32 (4..60)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSGlobalSidEntries configures the number of micro
+         segment global SID entries. Number of global SID entries is the
+         configured value multiplied by 1024. The configured value must be
+         multiples of 4."
+    DEFVAL      { 16 }
+    ::= { vRtrSrv6MicroSegmentEntry 5 }
+
+vRtrSrv6MSLocatorTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSLocatorTable has an entry for each segment routing micro
+         segment locator configured for a virtual router in the system."
+    ::= { vRtrSrv6Configurations 10 }
+
+vRtrSrv6MSLocatorEntry           OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a segment routing v6
+         micro segment locator for a virtual router in the system."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocatorName
+    }
+    ::= { vRtrSrv6MSLocatorTable 1 }
+
+VRtrSrv6MSLocatorEntry           ::= SEQUENCE
+{
+    vRtrSrv6MSLocatorName            TLNamedItem,
+    vRtrSrv6MSLocatorRowStatus       RowStatus,
+    vRtrSrv6MSLocatorLastChanged     TimeStamp,
+    vRtrSrv6MSLocatorAdminState      TmnxAdminState,
+    vRtrSrv6MSLocatorAlgorithm       TmnxAlgorithmId,
+    vRtrSrv6MSLocatorUnSrhMode       Srv6SrhMode,
+    vRtrSrv6MSLocatorBlock           TLNamedItemOrEmpty,
+    vRtrSrv6MSLocatorUnValue         TSrv6FunctionValue,
+    vRtrSrv6MSLocatorUnOperValue     TSrv6FunctionValue,
+    vRtrSrv6MSLocatorUnSidAddrT      InetAddressType,
+    vRtrSrv6MSLocatorUnSidAddr       InetAddress,
+    vRtrSrv6MSLocatorOperState       TmnxOperState,
+    vRtrSrv6MSLocatorOperErrorCode   TSrv6FunctionErrorCode
+}
+
+vRtrSrv6MSLocatorName            OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorName specifies the micro segment locator
+         name."
+    ::= { vRtrSrv6MSLocatorEntry 1 }
+
+vRtrSrv6MSLocatorRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6MSLocatorEntry 2 }
+
+vRtrSrv6MSLocatorLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrv6MSLocatorEntry 3 }
+
+vRtrSrv6MSLocatorAdminState      OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorAdminState specifies the administrative
+         state of the srv6 micro segment locator."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrv6MSLocatorEntry 4 }
+
+vRtrSrv6MSLocatorAlgorithm       OBJECT-TYPE
+    SYNTAX      TmnxAlgorithmId (0 | 128..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSLocatorAlgorithm specifies the
+         algorithm related to the SPF statistics.
+
+         The value can specify a defined IGP Algorithm (value 0 is SPF) or a
+         Flexible Algorithm (range 128..255)."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSLocatorEntry 5 }
+
+vRtrSrv6MSLocatorUnSrhMode       OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorUnSrhMode specifies the Segment Routing
+         Header (SRH) mode for the SID."
+    DEFVAL      { psp }
+    ::= { vRtrSrv6MSLocatorEntry 6 }
+
+vRtrSrv6MSLocatorBlock           OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorBlock specifies the block
+         (vRtrSrv6MSBlockName from vRtrSrv6MSBlockTable) for this locator."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6MSLocatorEntry 7 }
+
+vRtrSrv6MSLocatorUnValue         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorUnValue specifies the uN function value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSLocatorEntry 8 }
+
+vRtrSrv6MSLocatorUnOperValue     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6MSLocatorUnOperValue specifies the operational uN
+         function value."
+    ::= { vRtrSrv6MSLocatorEntry 15 }
+
+vRtrSrv6MSLocatorUnSidAddrT      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorUnSidAddrT specifies the type of
+         vRtrSrv6MSLocatorUnSidAddr."
+    ::= { vRtrSrv6MSLocatorEntry 16 }
+
+vRtrSrv6MSLocatorUnSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorUnSidAddr specifies the
+         segment-identifier"
+    ::= { vRtrSrv6MSLocatorEntry 17 }
+
+vRtrSrv6MSLocatorOperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocatorOperState indicates the locator
+         operational state."
+    ::= { vRtrSrv6MSLocatorEntry 18 }
+
+vRtrSrv6MSLocatorOperErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6MSLocatorOperErrorCode specifies the  error code
+         for the locator."
+    ::= { vRtrSrv6MSLocatorEntry 19 }
+
+vRtrSrv6MSFunctionTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSFunctionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSFunctionTable has an entry for each segment routing uDT
+         function configured for a virtual router in the system."
+    ::= { vRtrSrv6Configurations 11 }
+
+vRtrSrv6MSFunctionEntry          OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSFunctionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a srv6 micro segment
+         function in the segment routing for a virtual router in the system."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocatorName
+    }
+    ::= { vRtrSrv6MSFunctionTable 1 }
+
+VRtrSrv6MSFunctionEntry          ::= SEQUENCE
+{
+    vRtrSrv6MSFuncRowStatus          RowStatus,
+    vRtrSrv6MSFuncLastChanged        TimeStamp,
+    vRtrSrv6MSFuncUdt4               TSrv6FunctionType,
+    vRtrSrv6MSFuncUdt4Value          TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt4OperValue      TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt4OperState      TmnxOperState,
+    vRtrSrv6MSFuncUdt4OperErrCode    TSrv6FunctionErrorCode,
+    vRtrSrv6MSFuncUdt4OperSidAddrT   InetAddressType,
+    vRtrSrv6MSFuncUdt4OperSidAddr    InetAddress,
+    vRtrSrv6MSFuncUdt6               TSrv6FunctionType,
+    vRtrSrv6MSFuncUdt6Value          TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt6OperValue      TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt6OperState      TmnxOperState,
+    vRtrSrv6MSFuncUdt6OperErrCode    TSrv6FunctionErrorCode,
+    vRtrSrv6MSFuncUdt6OperSidAddrT   InetAddressType,
+    vRtrSrv6MSFuncUdt6OperSidAddr    InetAddress,
+    vRtrSrv6MSFuncUdt46              TSrv6FunctionType,
+    vRtrSrv6MSFuncUdt46Value         TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt46OperValue     TSrv6FunctionValue,
+    vRtrSrv6MSFuncUdt46OperState     TmnxOperState,
+    vRtrSrv6MSFuncUdt46OpErrCode     TSrv6FunctionErrorCode,
+    vRtrSrv6MSFuncUdt46OpSidAddrT    InetAddressType,
+    vRtrSrv6MSFuncUdt46OpSidAddr     InetAddress
+}
+
+vRtrSrv6MSFuncRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6MSFunctionEntry 1 }
+
+vRtrSrv6MSFuncLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncLastChanged indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6MSFunctionEntry 2 }
+
+vRtrSrv6MSFuncUdt4               OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4 specifies whether uDT4 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6MSFunctionEntry 3 }
+
+vRtrSrv6MSFuncUdt4Value          OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4Value specifies the uDT4 function
+         value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSFunctionEntry 4 }
+
+vRtrSrv6MSFuncUdt4OperValue      OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4OperValue specifies the operational
+         uDT4 function value."
+    ::= { vRtrSrv6MSFunctionEntry 5 }
+
+vRtrSrv6MSFuncUdt4OperState      OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4OperState indicates the operational
+         state."
+    ::= { vRtrSrv6MSFunctionEntry 6 }
+
+vRtrSrv6MSFuncUdt4OperErrCode    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4OperErrCode indicates the error code
+         for uDT4 function."
+    ::= { vRtrSrv6MSFunctionEntry 7 }
+
+vRtrSrv6MSFuncUdt4OperSidAddrT   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4OperSidAddrT indicates the type of
+         vRtrSrv6MSFuncUdt4OperSidAddr."
+    ::= { vRtrSrv6MSFunctionEntry 8 }
+
+vRtrSrv6MSFuncUdt4OperSidAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt4OperSidAddr indicates the micro
+         segment-identifier"
+    ::= { vRtrSrv6MSFunctionEntry 9 }
+
+vRtrSrv6MSFuncUdt6               OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6 specifies whether uDT6 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6MSFunctionEntry 10 }
+
+vRtrSrv6MSFuncUdt6Value          OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6Value specifies the uDT6 function
+         value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSFunctionEntry 11 }
+
+vRtrSrv6MSFuncUdt6OperValue      OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6OperValue indicates the operational
+         uDT6 function value."
+    ::= { vRtrSrv6MSFunctionEntry 12 }
+
+vRtrSrv6MSFuncUdt6OperState      OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6OperState indicates the operational
+         uDT6 function state."
+    ::= { vRtrSrv6MSFunctionEntry 13 }
+
+vRtrSrv6MSFuncUdt6OperErrCode    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6OperErrCode indicates the error code
+         for uDT6 function."
+    ::= { vRtrSrv6MSFunctionEntry 14 }
+
+vRtrSrv6MSFuncUdt6OperSidAddrT   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6OperSidAddrT indicates the type of
+         vRtrSrv6MSFuncUdt6OperSidAddr."
+    ::= { vRtrSrv6MSFunctionEntry 15 }
+
+vRtrSrv6MSFuncUdt6OperSidAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt6OperSidAddr indicates the micro
+         segment-identifier"
+    ::= { vRtrSrv6MSFunctionEntry 16 }
+
+vRtrSrv6MSFuncUdt46              OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46 specifies whether uDT46 function is
+         configured or not."
+    DEFVAL      { none }
+    ::= { vRtrSrv6MSFunctionEntry 17 }
+
+vRtrSrv6MSFuncUdt46Value         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46Value specifies the uDT46 function
+         value."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSFunctionEntry 18 }
+
+vRtrSrv6MSFuncUdt46OperValue     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46OperValue indicates the operational
+         uDT46 function value."
+    ::= { vRtrSrv6MSFunctionEntry 19 }
+
+vRtrSrv6MSFuncUdt46OperState     OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46OperState indicates the operational
+         uDT46 function state."
+    ::= { vRtrSrv6MSFunctionEntry 20 }
+
+vRtrSrv6MSFuncUdt46OpErrCode     OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46OpErrCode indicates the error code for
+         DT46 function."
+    ::= { vRtrSrv6MSFunctionEntry 21 }
+
+vRtrSrv6MSFuncUdt46OpSidAddrT    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46OpSidAddrT indicates the type of
+         vRtrSrv6MSFuncUdt46OpSidAddr."
+    ::= { vRtrSrv6MSFunctionEntry 22 }
+
+vRtrSrv6MSFuncUdt46OpSidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUdt46OpSidAddr indicates the micro
+         segment-identifier"
+    ::= { vRtrSrv6MSFunctionEntry 23 }
+
+vRtrSrv6MSFuncUaAutoAllocTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSFuncUaAutoAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSFuncUaAutoAllocTable has an entry for a srv6 locator
+         Endpoint function for each combination of SRH mode and protection
+         type."
+    ::= { vRtrSrv6Configurations 12 }
+
+vRtrSrv6MSFuncUaAutoAllocEntry   OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSFuncUaAutoAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of an segment routing v6 uA
+         SID function used by a locator in the segment routing for a virtual
+         router in the system associated with an adjacency."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocatorName,
+        vRtrSrv6MSFuncUaAASrhMode,
+        vRtrSrv6MSFuncUaAAProtected
+    }
+    ::= { vRtrSrv6MSFuncUaAutoAllocTable 1 }
+
+VRtrSrv6MSFuncUaAutoAllocEntry   ::= SEQUENCE
+{
+    vRtrSrv6MSFuncUaAASrhMode        Srv6SrhMode,
+    vRtrSrv6MSFuncUaAAProtected      Srv6Protection,
+    vRtrSrv6MSFuncUaAALastCh         TimeStamp,
+    vRtrSrv6MSFuncUaAARowStatus      RowStatus
+}
+
+vRtrSrv6MSFuncUaAASrhMode        OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaAASrhMode specifies the Segment Routing
+         Header (SRH) mode for the SID."
+    ::= { vRtrSrv6MSFuncUaAutoAllocEntry 1 }
+
+vRtrSrv6MSFuncUaAAProtected      OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaAAProtected specifies whether the
+         adjacency SID is protected or not."
+    ::= { vRtrSrv6MSFuncUaAutoAllocEntry 2 }
+
+vRtrSrv6MSFuncUaAALastCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaAALastCh indicates the sysUpTime when a
+         configurable object in this row was last modified."
+    ::= { vRtrSrv6MSFuncUaAutoAllocEntry 3 }
+
+vRtrSrv6MSFuncUaAARowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaAARowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6MSFuncUaAutoAllocEntry 4 }
+
+vRtrSrv6MSFuncUaTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSFuncUaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSFuncUaTable has an entry for an segment routing v6
+         locator endpoint (uA) function."
+    ::= { vRtrSrv6Configurations 13 }
+
+vRtrSrv6MSFuncUaEntry            OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSFuncUaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of an segment routing v6
+         endpoint (uA) SID function used by a locator in the segment routing
+         for a virtual router in the system."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocatorName,
+        vRtrSrv6MSFuncUaFunction
+    }
+    ::= { vRtrSrv6MSFuncUaTable 1 }
+
+VRtrSrv6MSFuncUaEntry            ::= SEQUENCE
+{
+    vRtrSrv6MSFuncUaFunction         TSrv6FunctionValue,
+    vRtrSrv6MSFuncUaRowStatus        RowStatus,
+    vRtrSrv6MSFuncUaLastChanged      TimeStamp,
+    vRtrSrv6MSFuncUaSrhMode          Srv6SrhMode,
+    vRtrSrv6MSFuncUaProtected        Srv6Protection,
+    vRtrSrv6MSFuncUaIfName           TNamedItemOrEmpty,
+    vRtrSrv6MSFuncUaOperValue        TSrv6FunctionValue,
+    vRtrSrv6MSFuncUaOperState        TmnxOperState,
+    vRtrSrv6MSFuncUaOperErrCode      TSrv6FunctionErrorCode,
+    vRtrSrv6MSFuncUaOperSidAddrT     InetAddressType,
+    vRtrSrv6MSFuncUaOperSidAddr      InetAddress
+}
+
+vRtrSrv6MSFuncUaFunction         OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSFuncUaFunction specifies the uA SID
+         function."
+    ::= { vRtrSrv6MSFuncUaEntry 1 }
+
+vRtrSrv6MSFuncUaRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6MSFuncUaEntry 2 }
+
+vRtrSrv6MSFuncUaLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaLastChanged indicates the sysUpTime when
+         a configurable object in this row was last modified."
+    ::= { vRtrSrv6MSFuncUaEntry 3 }
+
+vRtrSrv6MSFuncUaSrhMode          OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaSrhMode specifies the Segment Routing
+         Header (SRH) mode for the SID."
+    DEFVAL      { psp }
+    ::= { vRtrSrv6MSFuncUaEntry 4 }
+
+vRtrSrv6MSFuncUaProtected        OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaProtected specifies whether the adjacency
+         SID is protected or not."
+    DEFVAL      { protected }
+    ::= { vRtrSrv6MSFuncUaEntry 5 }
+
+vRtrSrv6MSFuncUaIfName           OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaIfName specifies the local interface name
+         used by the uA function."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6MSFuncUaEntry 6 }
+
+vRtrSrv6MSFuncUaOperValue        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaOperValue indicates the operational value
+         of the uA function."
+    ::= { vRtrSrv6MSFuncUaEntry 7 }
+
+vRtrSrv6MSFuncUaOperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaOperState indicates the uA function
+         operational state."
+    ::= { vRtrSrv6MSFuncUaEntry 8 }
+
+vRtrSrv6MSFuncUaOperErrCode      OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaOperErrCode indicates the error code for
+         the uA function."
+    ::= { vRtrSrv6MSFuncUaEntry 9 }
+
+vRtrSrv6MSFuncUaOperSidAddrT     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaOperSidAddrT indicates the type of
+         vRtrSrv6MSFuncUaOperSidAddr."
+    ::= { vRtrSrv6MSFuncUaEntry 10 }
+
+vRtrSrv6MSFuncUaOperSidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaOperSidAddr indicates the micro
+         segment-identifier"
+    ::= { vRtrSrv6MSFuncUaEntry 11 }
+
+vRtrSrv6MSFuncUaDynTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSFuncUaDynEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSFuncUaDynTable has an entry for an segment routing v6
+         endpoint uA auto allocated SIDs."
+    ::= { vRtrSrv6Configurations 14 }
+
+vRtrSrv6MSFuncUaDynEntry         OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSFuncUaDynEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a auto-allocated segment routing v6 uA SID."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocatorName,
+        vRtrSrv6MSFuncUaDynFunction
+    }
+    ::= { vRtrSrv6MSFuncUaDynTable 1 }
+
+VRtrSrv6MSFuncUaDynEntry         ::= SEQUENCE
+{
+    vRtrSrv6MSFuncUaDynFunction      Unsigned32,
+    vRtrSrv6MSFuncUaDynSidAddrT      InetAddressType,
+    vRtrSrv6MSFuncUaDynSidAddr       InetAddress,
+    vRtrSrv6MSFuncUaDynSrhMode       Srv6SrhMode,
+    vRtrSrv6MSFuncUaDynProtected     Srv6Protection,
+    vRtrSrv6MSFuncUaDynIfName        TNamedItemOrEmpty,
+    vRtrSrv6MSFuncUaDynIsisSidLevel  INTEGER,
+    vRtrSrv6MSFuncUaDynIsisMacAddr   OCTET STRING,
+    vRtrSrv6MSFuncUaDynIsisNbrSysID  OCTET STRING,
+    vRtrSrv6MSFuncUaDynInstId        Unsigned32
+}
+
+vRtrSrv6MSFuncUaDynFunction      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSFuncUaDynFunction specifies the auto
+         allocated uA SID function."
+    ::= { vRtrSrv6MSFuncUaDynEntry 1 }
+
+vRtrSrv6MSFuncUaDynSidAddrT      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynSidAddrT indicates the type of
+         vRtrSrv6MSFuncUaDynSidAddr."
+    ::= { vRtrSrv6MSFuncUaDynEntry 2 }
+
+vRtrSrv6MSFuncUaDynSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynSidAddr indicates the
+         segment-identifier"
+    ::= { vRtrSrv6MSFuncUaDynEntry 3 }
+
+vRtrSrv6MSFuncUaDynSrhMode       OBJECT-TYPE
+    SYNTAX      Srv6SrhMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynSrhMode specifies the  Segment Routing
+         Header (SRH) mode for the SID."
+    ::= { vRtrSrv6MSFuncUaDynEntry 4 }
+
+vRtrSrv6MSFuncUaDynProtected     OBJECT-TYPE
+    SYNTAX      Srv6Protection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynProtected specifies whether the
+         adjacency SID is protected or not."
+    ::= { vRtrSrv6MSFuncUaDynEntry 5 }
+
+vRtrSrv6MSFuncUaDynIfName        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynIfName specifies the local interface
+         name used by the uA function."
+    ::= { vRtrSrv6MSFuncUaDynEntry 6 }
+
+vRtrSrv6MSFuncUaDynIsisSidLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        isisl1   (1),
+        isisl2   (2),
+        isisl1l2 (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynIsisSidLevel specifies the SID level
+         for the uA function. This value is only applicable to ISIS user and
+         for other users the value will be set to 'none'."
+    ::= { vRtrSrv6MSFuncUaDynEntry 7 }
+
+vRtrSrv6MSFuncUaDynIsisMacAddr   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynIsisMacAddr specifies the mac address
+         used by the uA function. This value is only applicable to ISIS user
+         and for other users this value will be 0."
+    ::= { vRtrSrv6MSFuncUaDynEntry 8 }
+
+vRtrSrv6MSFuncUaDynIsisNbrSysID  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynIsisNbrSysID specifies the neighbor
+         system Id used by the uA function. This value is only applicable to
+         ISIS user and for other users this value will be 0."
+    ::= { vRtrSrv6MSFuncUaDynEntry 9 }
+
+vRtrSrv6MSFuncUaDynInstId        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSFuncUaDynInstId specifies the instance Id used
+         by the uA function."
+    ::= { vRtrSrv6MSFuncUaDynEntry 10 }
+
+vRtrSrv6MSBlockTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSBlockEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSBlockTable has an entry for each segment routing micro
+         segment locator configured for a virtual router in the system."
+    ::= { vRtrSrv6Configurations 15 }
+
+vRtrSrv6MSBlockEntry             OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSBlockEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a segment routing v6
+         micro segment block for a virtual router in the system."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSBlockName
+    }
+    ::= { vRtrSrv6MSBlockTable 1 }
+
+VRtrSrv6MSBlockEntry             ::= SEQUENCE
+{
+    vRtrSrv6MSBlockName              TLNamedItem,
+    vRtrSrv6MSBlockRowStatus         RowStatus,
+    vRtrSrv6MSBlockLastChanged       TimeStamp,
+    vRtrSrv6MSBlockAdminState        TmnxAdminState,
+    vRtrSrv6MSBlockTermFpe           Unsigned32,
+    vRtrSrv6MSBlockPrefixAddrT       InetAddressType,
+    vRtrSrv6MSBlockPrefixAddr        InetAddress,
+    vRtrSrv6MSBlockPrefixLength      InetAddressPrefixLength,
+    vRtrSrv6MSBlockMaxEntries        Unsigned32,
+    vRtrSrv6MSBlockUnifLabelBlock    TLNamedItemOrEmpty
+}
+
+vRtrSrv6MSBlockName              OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockName specifies the micro segment block
+         name."
+    ::= { vRtrSrv6MSBlockEntry 1 }
+
+vRtrSrv6MSBlockRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrv6MSBlockEntry 2 }
+
+vRtrSrv6MSBlockLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrv6MSBlockEntry 3 }
+
+vRtrSrv6MSBlockAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockAdminState specifies the administrative
+         state of the srv6 micro segment block."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrv6MSBlockEntry 4 }
+
+vRtrSrv6MSBlockTermFpe           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockTermFpe specifies the termination fpe for
+         the segment routing v6 micro segment block."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSBlockEntry 5 }
+
+vRtrSrv6MSBlockPrefixAddrT       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockPrefixAddrT specifies the type of
+         vRtrSrv6MSBlockPrefixAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrv6MSBlockEntry 6 }
+
+vRtrSrv6MSBlockPrefixAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockPrefixAddr specifies the prefix address."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6MSBlockEntry 7 }
+
+vRtrSrv6MSBlockPrefixLength      OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockPrefixLength specifies the value of the
+         locator prefix length."
+    DEFVAL      { 0 }
+    ::= { vRtrSrv6MSBlockEntry 8 }
+
+vRtrSrv6MSBlockMaxEntries        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockMaxEntries specifies the maximum of static
+         label entries."
+    DEFVAL      { 1 }
+    ::= { vRtrSrv6MSBlockEntry 9 }
+
+vRtrSrv6MSBlockUnifLabelBlock    OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSBlockUnifLabelBlock specifies the reserved
+         label block for this locator.
+
+         It allows to allocate static and dynamic label from configured
+         reserved label block. The reserved label block name is defined by
+         vRtrMplsReservedLblBlkName and is the index for
+         TIMETRA-MPLS-MIB::vRtrMplsReservedLblBlkTable."
+    DEFVAL      { ''H }
+    ::= { vRtrSrv6MSBlockEntry 10 }
+
+vRtrSrv6MSLocalSidTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrv6MSLocalSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrv6MSLocalSidTable has an entry for a SRv6 micro-segment
+         local SIDs."
+    ::= { vRtrSrv6Configurations 16 }
+
+vRtrSrv6MSLocalSidEntry          OBJECT-TYPE
+    SYNTAX      VRtrSrv6MSLocalSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a local SRv6 SID. Entries can be retrieved
+         by SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrv6MSLocalSidAddrType,
+        vRtrSrv6MSLocalSidAddr
+    }
+    ::= { vRtrSrv6MSLocalSidTable 1 }
+
+VRtrSrv6MSLocalSidEntry          ::= SEQUENCE
+{
+    vRtrSrv6MSLocalSidAddrType       InetAddressType,
+    vRtrSrv6MSLocalSidAddr           InetAddress,
+    vRtrSrv6MSLocalSidFunctionType   TSrv6Function,
+    vRtrSrv6MSLocalSidFunctionValue  TSrv6FunctionValue,
+    vRtrSrv6MSLocalSidLocatorName    TLNamedItem,
+    vRtrSrv6MSLocalSidContextType    INTEGER,
+    vRtrSrv6MSLocalSidSvcId          Unsigned32
+}
+
+vRtrSrv6MSLocalSidAddrType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocalSidAddrType specifies the type of
+         vRtrSrv6MSLocalSidAddr."
+    ::= { vRtrSrv6MSLocalSidEntry 1 }
+
+vRtrSrv6MSLocalSidAddr           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6MSLocalSidAddr specifies the segment-identifier"
+    ::= { vRtrSrv6MSLocalSidEntry 2 }
+
+vRtrSrv6MSLocalSidFunctionType   OBJECT-TYPE
+    SYNTAX      TSrv6Function
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSLocalSidFunctionType specifies the
+         SRv6 SID function type."
+    ::= { vRtrSrv6MSLocalSidEntry 3 }
+
+vRtrSrv6MSLocalSidFunctionValue  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSLocalSidFunctionValue specifies the
+         SRv6 SID function."
+    ::= { vRtrSrv6MSLocalSidEntry 4 }
+
+vRtrSrv6MSLocalSidLocatorName    OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSLocalSidLocatorName specifies the
+         SRv6 SID locator."
+    ::= { vRtrSrv6MSLocalSidEntry 5 }
+
+vRtrSrv6MSLocalSidContextType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        base (1),
+        svc  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value specifies the SRv6 SID context.
+
+         none (0) - function is not locally configured.
+         base (1) - function is configured under base-routing context.
+         svc  (2) - function is configured under service segment-routing context"
+    ::= { vRtrSrv6MSLocalSidEntry 6 }
+
+vRtrSrv6MSLocalSidSvcId          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrSrv6MSLocalSidSvcId specifies the SRv6
+         service id if vRtrSrv6MSLocalSidContextType has value 'svc'."
+    ::= { vRtrSrv6MSLocalSidEntry 7 }
+
+vRtrSrv6NotificationObjs         OBJECT IDENTIFIER ::= { vRtrSrv6Objs 3 }
+
+vRtrSrv6LocName                  OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6LocName specifies the name for the segment
+         routing locator."
+    ::= { vRtrSrv6NotificationObjs 1 }
+
+vRtrSrv6FunctionType             OBJECT-TYPE
+    SYNTAX      TSrv6Function
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FunctionType specifies the function for srv6."
+    ::= { vRtrSrv6NotificationObjs 2 }
+
+vRtrSrv6SidIndex                 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6SidIndex specifies a percentage for
+         vRtrSrv6SvcSidIndex notification to be sent."
+    ::= { vRtrSrv6NotificationObjs 3 }
+
+vRtrSrv6SidIndexLevel            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrv6SidIndexLevel specifies whether the service SID
+         index has increased or decreased to vRtrSrv6SidIndex for
+         vRtrSrv6SvcSidIndex notification to be sent."
+    ::= { vRtrSrv6NotificationObjs 4 }
+
+vRtrSrv6FunctionValue            OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object vRtrSrv6FunctionValue specifies the SRv6 function value."
+    ::= { vRtrSrv6NotificationObjs 5 }
+
+vRtrSrv6Conformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 129 }
+
+vRtrSrv6Compliances              OBJECT IDENTIFIER ::= { vRtrSrv6Conformance 1 }
+
+vRtrSrv6Compliance               MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of segment routing v6 (SR)
+          on Nokia SROS series systems 21.5 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            vRtrSrv6Group,
+            vRtrSrv6NotifyObjsV21v0Group,
+            vRtrSrv6NotificationGroup,
+            vRtrSrv6V21V10Group
+        }
+    ::= { vRtrSrv6Compliances 1 }
+
+vRtrSrv6ComplianceV22v0          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of segment routing v6 features
+         added in release R22.X on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            vRtrSrv6UnifiedLabelBlockGroup,
+            vRtrSrv6MicroSegmentGroup,
+            vRtrSrv6LocatorOperStateGroup,
+            vRtrSrv6NotifyObjsV22Group,
+            vRtrSrv6LocResNotificationGroup
+        }
+    ::= { vRtrSrv6Compliances 2 }
+
+vRtrSrv6Groups                   OBJECT IDENTIFIER ::= { vRtrSrv6Conformance 2 }
+
+vRtrSrv6Group                    OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6TblLstChg,
+        vRtrSrv6LocatorTblLstChg,
+        vRtrSrv6FunctionTblLstChg,
+        vRtrSrv6LocatorEndTblLstChg,
+        vRtrSrv6LocEndAutoAllocTblLstChg,
+        vRtrSrv6LocatorEndXTblLstChg,
+        vRtrSrv6RowStatus,
+        vRtrSrv6LastChanged,
+        vRtrSrv6SourceAddrType,
+        vRtrSrv6SourceAddr,
+        vRtrSrv6OriginationFpe,
+        vRtrSrv6LocatorRowStatus,
+        vRtrSrv6LocatorLastChanged,
+        vRtrSrv6LocatorAdminState,
+        vRtrSrv6LocatorBlockLength,
+        vRtrSrv6LocatorFuncLength,
+        vRtrSrv6LocatorTermFpe,
+        vRtrSrv6LocatorPrefixAddrType,
+        vRtrSrv6LocatorPrefixAddr,
+        vRtrSrv6LocatorPrefixLength,
+        vRtrSrv6LocatorMaxEntries,
+        vRtrSrv6LocatorLabelBlock,
+        vRtrSrv6LocatorAlgorithm,
+        vRtrSrv6FuncRowStatus,
+        vRtrSrv6FuncLastChanged,
+        vRtrSrv6FuncDt4,
+        vRtrSrv6FuncDt4Value,
+        vRtrSrv6FuncDt4OperValue,
+        vRtrSrv6FuncDt4OperState,
+        vRtrSrv6FuncDt4OperErrorCode,
+        vRtrSrv6FuncDt4OperSidAddrType,
+        vRtrSrv6FuncDt4OperSidAddr,
+        vRtrSrv6FuncDt6,
+        vRtrSrv6FuncDt6Value,
+        vRtrSrv6FuncDt6OperValue,
+        vRtrSrv6FuncDt6OperState,
+        vRtrSrv6FuncDt6OperErrorCode,
+        vRtrSrv6FuncDt6OperSidAddrType,
+        vRtrSrv6FuncDt6OperSidAddr,
+        vRtrSrv6FuncDt46,
+        vRtrSrv6FuncDt46Value,
+        vRtrSrv6FuncDt46OperValue,
+        vRtrSrv6FuncDt46OperState,
+        vRtrSrv6FuncDt46OpErrorCode,
+        vRtrSrv6FuncDt46OpSidAddrType,
+        vRtrSrv6FuncDt46OpSidAddr,
+        vRtrSrv6LocEndRowStatus,
+        vRtrSrv6LocEndLastChanged,
+        vRtrSrv6LocEndSrhMode,
+        vRtrSrv6LocEndOperValue,
+        vRtrSrv6LocEndOperState,
+        vRtrSrv6LocEndOperErrorCode,
+        vRtrSrv6LocEndOperSidAddrType,
+        vRtrSrv6LocEndOperSidAddr,
+        vRtrSrv6LocEndAALastCh,
+        vRtrSrv6LocEndAARowStatus,
+        vRtrSrv6LocEndXRowStatus,
+        vRtrSrv6LocEndXLastChanged,
+        vRtrSrv6LocEndXSrhMode,
+        vRtrSrv6LocEndXProtected,
+        vRtrSrv6LocEndXIfName,
+        vRtrSrv6LocEndXOperValue,
+        vRtrSrv6LocEndXOperState,
+        vRtrSrv6LocEndXOperErrorCode,
+        vRtrSrv6LocEndXOperSidAddrType,
+        vRtrSrv6LocEndXOperSidAddr,
+        vRtrSrv6LocAAEndXSidAddrType,
+        vRtrSrv6LocAAEndXSidAddr,
+        vRtrSrv6LocAAEndXSrhMode,
+        vRtrSrv6LocAAEndXProtected,
+        vRtrSrv6LocAAEndXIfName,
+        vRtrSrv6LocAAEndXSidLevel,
+        vRtrSrv6LocAAEndXMacAddr,
+        vRtrSrv6LocAAEndXNbrSysID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing system  for ipv6 locator on
+         Nokia SROS series systems 21.5 release."
+    ::= { vRtrSrv6Groups 1 }
+
+vRtrSrv6NotifyObjsV21v0Group     OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6LocName,
+        vRtrSrv6FunctionType,
+        vRtrSrv6SidIndex,
+        vRtrSrv6SidIndexLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notify objects supporting management of SRv6 on Nokia
+         SROS series systems release 21.5."
+    ::= { vRtrSrv6Groups 2 }
+
+vRtrSrv6NotificationGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrSrv6FunctionExhaustion,
+        vRtrSrv6SvcSidIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SRv6  notifications on virtual routers
+         for version 21.5 Nokia  SROS series systems."
+    ::= { vRtrSrv6Groups 3 }
+
+vRtrSrv6V21V10Group              OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6LocalSidFunctionType,
+        vRtrSrv6LocalSidFunctionValue,
+        vRtrSrv6LocalSidLocatorName,
+        vRtrSrv6LocalSidContextType,
+        vRtrSrv6LocalSidSvcId,
+        vRtrSrv6LocAAEndXInstId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing system  for ipv6 locator on
+         Nokia SROS series systems 21.10 release."
+    ::= { vRtrSrv6Groups 4 }
+
+vRtrSrv6UnifiedLabelBlockGroup   OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6LocatorUnifiedLabelBlock
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting unified label block on Nokia SROS
+         series systems."
+    ::= { vRtrSrv6Groups 5 }
+
+vRtrSrv6MicroSegmentGroup        OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6MicroSegmentTblLstChg,
+        vRtrSrv6MSLocatorTblLstChg,
+        vRtrSrv6MSFunctionTblLstChg,
+        vRtrSrv6MSFuncUaAutoAllocTblLCh,
+        vRtrSrv6MSFuncUaTblLstChg,
+        vRtrSrv6MSBlockTblLstChg,
+        vRtrSrv6MSRowStatus,
+        vRtrSrv6MSLastChanged,
+        vRtrSrv6MSBlockLength,
+        vRtrSrv6MSSidLength,
+        vRtrSrv6MSGlobalSidEntries,
+        vRtrSrv6MSLocatorRowStatus,
+        vRtrSrv6MSLocatorLastChanged,
+        vRtrSrv6MSLocatorAdminState,
+        vRtrSrv6MSLocatorAlgorithm,
+        vRtrSrv6MSLocatorUnSrhMode,
+        vRtrSrv6MSLocatorBlock,
+        vRtrSrv6MSLocatorUnValue,
+        vRtrSrv6MSLocatorUnOperValue,
+        vRtrSrv6MSLocatorUnSidAddrT,
+        vRtrSrv6MSLocatorUnSidAddr,
+        vRtrSrv6MSLocatorOperErrorCode,
+        vRtrSrv6MSLocatorOperState,
+        vRtrSrv6MSBlockRowStatus,
+        vRtrSrv6MSBlockLastChanged,
+        vRtrSrv6MSBlockAdminState,
+        vRtrSrv6MSBlockTermFpe,
+        vRtrSrv6MSBlockPrefixAddrT,
+        vRtrSrv6MSBlockPrefixAddr,
+        vRtrSrv6MSBlockPrefixLength,
+        vRtrSrv6MSBlockMaxEntries,
+        vRtrSrv6MSBlockUnifLabelBlock,
+        vRtrSrv6MSFuncRowStatus,
+        vRtrSrv6MSFuncLastChanged,
+        vRtrSrv6MSFuncUdt4,
+        vRtrSrv6MSFuncUdt4Value,
+        vRtrSrv6MSFuncUdt4OperValue,
+        vRtrSrv6MSFuncUdt4OperState,
+        vRtrSrv6MSFuncUdt4OperErrCode,
+        vRtrSrv6MSFuncUdt4OperSidAddrT,
+        vRtrSrv6MSFuncUdt4OperSidAddr,
+        vRtrSrv6MSFuncUdt6,
+        vRtrSrv6MSFuncUdt6Value,
+        vRtrSrv6MSFuncUdt6OperValue,
+        vRtrSrv6MSFuncUdt6OperState,
+        vRtrSrv6MSFuncUdt6OperErrCode,
+        vRtrSrv6MSFuncUdt6OperSidAddrT,
+        vRtrSrv6MSFuncUdt6OperSidAddr,
+        vRtrSrv6MSFuncUdt46,
+        vRtrSrv6MSFuncUdt46Value,
+        vRtrSrv6MSFuncUdt46OperValue,
+        vRtrSrv6MSFuncUdt46OperState,
+        vRtrSrv6MSFuncUdt46OpErrCode,
+        vRtrSrv6MSFuncUdt46OpSidAddrT,
+        vRtrSrv6MSFuncUdt46OpSidAddr,
+        vRtrSrv6MSFuncUaAALastCh,
+        vRtrSrv6MSFuncUaAARowStatus,
+        vRtrSrv6MSFuncUaRowStatus,
+        vRtrSrv6MSFuncUaLastChanged,
+        vRtrSrv6MSFuncUaSrhMode,
+        vRtrSrv6MSFuncUaProtected,
+        vRtrSrv6MSFuncUaIfName,
+        vRtrSrv6MSFuncUaOperValue,
+        vRtrSrv6MSFuncUaOperState,
+        vRtrSrv6MSFuncUaOperErrCode,
+        vRtrSrv6MSFuncUaOperSidAddrT,
+        vRtrSrv6MSFuncUaOperSidAddr,
+        vRtrSrv6MSFuncUaDynSidAddrT,
+        vRtrSrv6MSFuncUaDynSidAddr,
+        vRtrSrv6MSFuncUaDynSrhMode,
+        vRtrSrv6MSFuncUaDynProtected,
+        vRtrSrv6MSFuncUaDynIfName,
+        vRtrSrv6MSFuncUaDynIsisSidLevel,
+        vRtrSrv6MSFuncUaDynIsisMacAddr,
+        vRtrSrv6MSFuncUaDynIsisNbrSysID,
+        vRtrSrv6MSFuncUaDynInstId,
+        vRtrSrv6MSLocalSidFunctionType,
+        vRtrSrv6MSLocalSidFunctionValue,
+        vRtrSrv6MSLocalSidLocatorName,
+        vRtrSrv6MSLocalSidContextType,
+        vRtrSrv6MSLocalSidSvcId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment routing v6 micro segment
+         feature on Nokia SROS series systems."
+    ::= { vRtrSrv6Groups 6 }
+
+vRtrSrv6LocatorOperStateGroup    OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6LocatorOperState,
+        vRtrSrv6LocatorOperErrorCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment-routing-v6 locator operational
+         state on Nokia SROS series systems."
+    ::= { vRtrSrv6Groups 7 }
+
+vRtrSrv6NotifyObjsV22Group       OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrv6FunctionValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SRv6 resource exhaustion notifications
+          on virtual routers for Nokia SROS series systems."
+    ::= { vRtrSrv6Groups 8 }
+
+vRtrSrv6LocResNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrSrv6LocatorResExhaustion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SRv6 locator resource exhaustion
+         notification on virtual routers for Nokia SROS series systems."
+    ::= { vRtrSrv6Groups 9 }
+
+tmnxSrv6NotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 129 }
+
+tmnxSrv6Notifications            OBJECT IDENTIFIER ::= { tmnxSrv6NotifyPrefix 0 }
+
+vRtrSrv6FunctionExhaustion       NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrSrv6LocName,
+        vRtrSrv6FunctionType,
+        vRtrSrv6FunctionValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrSrv6FunctionExhaustion notification is  generated when
+         the function or label allocation fails.
+
+         [EFFECT] A log entry is generated.
+
+         [RECOVERY] if another entity or local config change  returns
+         resources, then it will automatically allocated."
+    ::= { tmnxSrv6Notifications 1 }
+
+vRtrSrv6SvcSidIndex              NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrSrv6SidIndex,
+        vRtrSrv6SidIndexLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrSrv6SvcSidIndex notification is  generated when the
+         service SID index is above or below  vRtrSrv6SidIndex.
+
+         [EFFECT] A log entry is generated.
+
+         [RECOVERY] A config or a policy change to reduce the usage."
+    ::= { tmnxSrv6Notifications 2 }
+
+vRtrSrv6LocatorResExhaustion     NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrSrv6LocName
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrSrv6LocatorResExhaustion notification is  generated
+         when the allocation of locator resources fails.
+
+         [EFFECT] A log entry is generated.
+
+         [RECOVERY] if another entity or local config change  returns
+         resources, then it will automatically allocated."
+    ::= { tmnxSrv6Notifications 3 }
+
+END

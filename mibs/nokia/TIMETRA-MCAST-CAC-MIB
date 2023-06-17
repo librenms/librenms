@@ -1,0 +1,2339 @@
+TIMETRA-MCAST-CAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex
+                                                         FROM IF-MIB
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Gauge32, Integer32,
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    tLagIndex
+                                                         FROM TIMETRA-LAG-MIB
+    svcId
+                                                         FROM TIMETRA-SERV-MIB
+    TItemDescription, TNamedItem,
+    TNamedItemOrEmpty,
+    TmnxAddressAndPrefixAddress,
+    TmnxAddressAndPrefixPrefix,
+    TmnxAddressAndPrefixType,
+    TmnxAdminState, TmnxEncapVal, TmnxPortID
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraMcastCacMIBModule         MODULE-IDENTITY
+    LAST-UPDATED "201903010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This is the SNMP MIB module to manage and provision multicast CAC
+         (Connection Admission Control) policy on Nokia SROS equipment.
+
+         Copyright 2006-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201903010000Z"
+    DESCRIPTION
+        "Rev 19.0               01 Mar 2019 00:00
+         19.0 release of the TIMETRA-MCAST-CAC-MIB."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               01 Jan 2016 00:00
+         14.0 release of the TIMETRA-MCAST-CAC-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               01 Jan 2015 00:00
+         13.0 release of the TIMETRA-MCAST-CAC-MIB."
+
+    REVISION    "201401010000Z"
+    DESCRIPTION
+        "Rev 12.0               01 Jan 2014 00:00
+         12.0 release of the TIMETRA-MCAST-CAC-MIB."
+
+    REVISION    "200801010000Z"
+    DESCRIPTION
+        "Rev 6.1                01 Jul 2008 00:00
+         6.1 release of the TIMETRA-MCAST-CAC-MIB."
+
+    REVISION    "200608100000Z"
+    DESCRIPTION
+        "Rev 0.1 10 Aug 2006 00:00 Initial version of the
+         TIMETRA-MCAST-CAC-MIB."
+
+    ::= { timetraSRMIBModules 41 }
+
+TmnxMcacActionTc                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value TmnxMcacActionTc data type is an enumerated integer that
+         describes the values used to identify mcac policy decision for a
+         requested channel."
+    SYNTAX      INTEGER {
+        accept  (1),
+        discard (2)
+    }
+
+TmnxMcacReasonTc                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value TmnxMcacReasonTc data type is an enumerated integer
+         that describes  the values used to identify the reason for
+         the mcac policy decision for a requested channel."
+    SYNTAX      INTEGER {
+        bundleDisabled     (1),
+        bundleNoAvailBw    (2),
+        interfaceNoAvailBw (3),
+        noChlInPlcy        (4),
+        algoPass           (5),
+        userNoAvailBw      (6),
+        subscrNoMcacPol    (7),
+        ifPolNoAvailBw     (8),
+        lowMemory          (9)
+    }
+
+TmnxMcacApplTc                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value TmnxMcacApplTc data type is an enumerated integer that
+         describes the values used to identify mcac policy applications."
+    SYNTAX      INTEGER {
+        igmp     (1),
+        pim      (2),
+        igmpSnpg (3),
+        mld      (4)
+    }
+
+TmnxMcacChlTypeTc                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value TmnxMcacChlTypeTc data type is an enumerated integer that
+         describes the values used to identify mcac policy channel type."
+    SYNTAX      INTEGER {
+        none         (0),
+        notMandatory (1),
+        mandatory    (2)
+    }
+
+TmnxMcacChlClassTc               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value TmnxMcacChlClassTc data type is an enumerated integer that
+         describes the values used to identify mcac policy channel class."
+    SYNTAX      INTEGER {
+        low  (1),
+        high (2)
+    }
+
+tmnxMcacObjects                  OBJECT IDENTIFIER ::= { tmnxSRObjs 41 }
+
+tmnxMcacPolicyTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacPolicyTable has an entry for each multicast CAC
+         (Connection Admission Control) policy configured on this system."
+    ::= { tmnxMcacObjects 1 }
+
+tmnxMcacPolicyEntry              OBJECT-TYPE
+    SYNTAX      TmnxMcacPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC policy. Entries
+         are created/deleted by the user."
+    INDEX       { tmnxMcacPolicyName }
+    ::= { tmnxMcacPolicyTable 1 }
+
+TmnxMcacPolicyEntry              ::= SEQUENCE
+{
+    tmnxMcacPolicyName               TNamedItem,
+    tmnxMcacPolicyRowStatus          RowStatus,
+    tmnxMcacPolicyDescription        TItemDescription,
+    tmnxMcacPolicyDefaultAction      TmnxMcacActionTc
+}
+
+tmnxMcacPolicyName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyName indicates the name of the multicast
+         CAC policy."
+    ::= { tmnxMcacPolicyEntry 1 }
+
+tmnxMcacPolicyRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyRowStatus is used for creation/deletion of
+         multicast CAC policies."
+    ::= { tmnxMcacPolicyEntry 2 }
+
+tmnxMcacPolicyDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyDescription specifies the textual
+         description of this multicast CAC policy."
+    DEFVAL      { "" }
+    ::= { tmnxMcacPolicyEntry 3 }
+
+tmnxMcacPolicyDefaultAction      OBJECT-TYPE
+    SYNTAX      TmnxMcacActionTc
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyDefaultAction specifies the action to be
+         applied to multicast streams when they do not match any of the
+         multicast addresses defined in the multicast CAC bundles for this
+         policy.
+
+         The default action will be ignored if there is no policy applied for
+         the interface on which the multicast stream is requested. In this case
+         the protocol will handle the request independent of the multicast CAC
+         policy decision.
+
+         The default value of 'discard' for a policy means that any multicast
+         channels not configured (no entry in tmnxMcacBdlChlEntry for this
+         policy) on any bundle in this policy will be dropped. The value of
+         'accept' means that the channel not part of this policy can be
+         accepted."
+    DEFVAL      { discard }
+    ::= { tmnxMcacPolicyEntry 4 }
+
+tmnxMcacBundleTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacBundleTable has an entry for each multicast CAC policy
+         bundle configured on this system."
+    ::= { tmnxMcacObjects 2 }
+
+tmnxMcacBundleEntry              OBJECT-TYPE
+    SYNTAX      TmnxMcacBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC policy bundle.
+         Entries are created/deleted by the user."
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName
+    }
+    ::= { tmnxMcacBundleTable 1 }
+
+TmnxMcacBundleEntry              ::= SEQUENCE
+{
+    tmnxMcacBundleName               TNamedItem,
+    tmnxMcacBundleRowStatus          RowStatus,
+    tmnxMcacBundleDescription        TItemDescription,
+    tmnxMcacBundleAdminState         TmnxAdminState,
+    tmnxMcacBundleBandwidth          Unsigned32,
+    tmnxMcacBundleUseLagPortWeight   TruthValue
+}
+
+tmnxMcacBundleName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleName indicates the name of the multicast
+         CAC policy bundle."
+    ::= { tmnxMcacBundleEntry 1 }
+
+tmnxMcacBundleRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleRowStatus along with value of
+         tmnxMcacBundleBandwidth is used for creation of multicast CAC policy
+         bundle."
+    ::= { tmnxMcacBundleEntry 2 }
+
+tmnxMcacBundleDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleDescription specifies the textual
+         description of this multicast CAC policy bundle."
+    DEFVAL      { "" }
+    ::= { tmnxMcacBundleEntry 3 }
+
+tmnxMcacBundleAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleAdminState specifies the administrative
+         state of this multicast CAC policy bundle."
+    DEFVAL      { outOfService }
+    ::= { tmnxMcacBundleEntry 4 }
+
+tmnxMcacBundleBandwidth          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleBandwidth specifies bundle's bandwidth in
+         kilobits per second(kbps)."
+    DEFVAL      { 100 }
+    ::= { tmnxMcacBundleEntry 5 }
+
+tmnxMcacBundleUseLagPortWeight   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBundleUseLagPortWeight specifies if this system
+         must use the LAG port weight while calculating Multicast CAC
+         constraints.
+
+         The LAG port weight is configured with the object
+         TIMETRA-LAG-MIB::tLagPortWeightSpeed."
+    DEFVAL      { false }
+    ::= { tmnxMcacBundleEntry 6 }
+
+tmnxMcacBdlChlTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacBdlChlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxMcacBdlChlTable has an entry for each multicast CAC policy
+         bundle channel configured on this system.
+
+         This table is obsolete, use tmnxMcacBdlChlNgTable instead."
+    ::= { tmnxMcacObjects 3 }
+
+tmnxMcacBdlChlEntry              OBJECT-TYPE
+    SYNTAX      TmnxMcacBdlChlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC policy bundle
+         channel. Entries are created/deleted by the user."
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        tmnxMcacBdlChlStartAddrType,
+        tmnxMcacBdlChlStartAddr,
+        tmnxMcacBdlChlEndAddrType,
+        tmnxMcacBdlChlEndAddr
+    }
+    ::= { tmnxMcacBdlChlTable 1 }
+
+TmnxMcacBdlChlEntry              ::= SEQUENCE
+{
+    tmnxMcacBdlChlStartAddrType      InetAddressType,
+    tmnxMcacBdlChlStartAddr          InetAddress,
+    tmnxMcacBdlChlEndAddrType        InetAddressType,
+    tmnxMcacBdlChlEndAddr            InetAddress,
+    tmnxMcacBdlChlRowStatus          RowStatus,
+    tmnxMcacBdlChlBW                 Unsigned32,
+    tmnxMcacBdlChlClass              TmnxMcacChlClassTc,
+    tmnxMcacBdlChlType               TmnxMcacChlTypeTc
+}
+
+tmnxMcacBdlChlStartAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlStartAddrType indicates the address type of
+         tmnxMcacBdlChlStartAddr."
+    ::= { tmnxMcacBdlChlEntry 1 }
+
+tmnxMcacBdlChlStartAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlStartAddr indicates the start address of
+         the multicast channel. Its type is specified by
+         tmnxMcacBdlChlStartAddrType."
+    ::= { tmnxMcacBdlChlEntry 2 }
+
+tmnxMcacBdlChlEndAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlEndAddrType indicates the address type of
+         tmnxMcacBdlChlEndAddr."
+    ::= { tmnxMcacBdlChlEntry 3 }
+
+tmnxMcacBdlChlEndAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlEndAddr indicates the end address of the
+         multicast channel. Its type is specified by tmnxMcacBdlChlEndAddrType.
+
+         The value of tmnxMcacBdlChlEndAddr should always be greater than or
+         equal to tmnxMcacBdlChlStartAddr."
+    ::= { tmnxMcacBdlChlEntry 4 }
+
+tmnxMcacBdlChlRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlRowStatus is used for creation/deletion of
+         multicast channel in a CAC policy bundle."
+    ::= { tmnxMcacBdlChlEntry 5 }
+
+tmnxMcacBdlChlBW                 OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..10000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlBW specifies the multicast channel's
+         bandwidth in kilobits per second(kbps)."
+    DEFVAL      { 10 }
+    ::= { tmnxMcacBdlChlEntry 6 }
+
+tmnxMcacBdlChlClass              OBJECT-TYPE
+    SYNTAX      TmnxMcacChlClassTc
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlClass specifies the channel's class. The
+         channel with value of high has higher priority than channel with value
+         of low.
+
+         The combination of tmnxMcacBdlChlClass and tmnxMcacBdlChlType is used
+         to define the priority of channels. If there exists channels with same
+         combination then round robin is used to determine the channels that
+         need to be dropped if any of the CAC constraints are met."
+    DEFVAL      { low }
+    ::= { tmnxMcacBdlChlEntry 7 }
+
+tmnxMcacBdlChlType               OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlType specifies the channel's type. A
+         channel with the value of 'mandatory' has higher priority than a
+         channel with the value of 'notMandatory'.
+
+         Use of the value 'none' is not supported.
+
+         The combination of tmnxMcacBdlChlClass and tmnxMcacBdlChlType is used
+         to define the priority of channels. If there exists channels with the
+         same combination then round robin is used to determine the channels
+         that need to be dropped if any of the CAC constraints are met."
+    DEFVAL      { notMandatory }
+    ::= { tmnxMcacBdlChlEntry 8 }
+
+tmnxMcacLevelTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacLevelTable has an entry for each multicast CAC policy
+         bundle level configured on this system."
+    ::= { tmnxMcacObjects 4 }
+
+tmnxMcacLevelEntry               OBJECT-TYPE
+    SYNTAX      TmnxMcacLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC policy bundle
+         level constraints. Entries are created/deleted by the user."
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        tmnxMcacLevelId
+    }
+    ::= { tmnxMcacLevelTable 1 }
+
+TmnxMcacLevelEntry               ::= SEQUENCE
+{
+    tmnxMcacLevelId                  Unsigned32,
+    tmnxMcacLevelRowStatus           RowStatus,
+    tmnxMcacLevelBW                  Unsigned32
+}
+
+tmnxMcacLevelId                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLevelId indicates the level id of the multicast
+         CAC policy bundle constraint.
+
+         The value of level 1 has the highest priority and level 8 the lowest."
+    ::= { tmnxMcacLevelEntry 1 }
+
+tmnxMcacLevelRowStatus           OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLevelRowStatus is used for creation/deletion of
+         level constraint in a CAC policy."
+    ::= { tmnxMcacLevelEntry 2 }
+
+tmnxMcacLevelBW                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLevelBW specifies the bandwidth in kilobits per
+         second(kbps) for the level."
+    DEFVAL      { 1 }
+    ::= { tmnxMcacLevelEntry 3 }
+
+tmnxMcacLagTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacLagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacLagTable has an entry for each lag port configured for a
+         multicast CAC policy bundle on this system."
+    ::= { tmnxMcacObjects 5 }
+
+tmnxMcacLagEntry                 OBJECT-TYPE
+    SYNTAX      TmnxMcacLagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC lag port
+         constraints. Entries are created/deleted by the user."
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        tLagIndex,
+        tmnxMcacLagPortsDown
+    }
+    ::= { tmnxMcacLagTable 1 }
+
+TmnxMcacLagEntry                 ::= SEQUENCE
+{
+    tmnxMcacLagPortsDown             Unsigned32,
+    tmnxMcacLagRowStatus             RowStatus,
+    tmnxMcacLagBundleLevel           Unsigned32
+}
+
+tmnxMcacLagPortsDown             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLagPortsDown specifies the configured number of
+         ports in a lag group that are down.
+
+         If the number of ports available in the lag is reduced by the number
+         of ports configured for tmnxMcacLagPortsDown object then bandwidth
+         allowed for bundle will be updated to the value of tmnxMcacLevelBW
+         indexed by tmnxMcacLagBundleLevel value."
+    ::= { tmnxMcacLagEntry 1 }
+
+tmnxMcacLagRowStatus             OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLagRowStatus is used for creation/deletion of lag
+         constraint in a CAC policy."
+    ::= { tmnxMcacLagEntry 2 }
+
+tmnxMcacLagBundleLevel           OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacLagBundleLevel specifies the level id to use when
+         the value of tmnxMcacLagPortsDown matches the actual number of ports
+         down in a lag.
+
+         Using the value of tmnxMcacLagBundleLevel as an index, the operation
+         bundle bandwidth will be set to tmnxMcacLevelBW.
+
+         By default for all lag constraints the bundle level will be set to 1
+         at row creation."
+    DEFVAL      { 1 }
+    ::= { tmnxMcacLagEntry 3 }
+
+tmnxMcacStatsTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxMcacStatsTable has an entry for each protocol interface
+         channel that was either accepted/discarded by the applied multicast
+         cac policy.
+
+         This table is obsolete and replaced by tmnxMcacStatsNgTable."
+    ::= { tmnxMcacObjects 6 }
+
+tmnxMcacStatsEntry               OBJECT-TYPE
+    SYNTAX      TmnxMcacStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacStatsTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacStatsBundleName,
+        vRtrID,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacStatsIfIndex,
+        tmnxMcacStatsChlAddrType,
+        tmnxMcacStatsChlAddr
+    }
+    ::= { tmnxMcacStatsTable 1 }
+
+TmnxMcacStatsEntry               ::= SEQUENCE
+{
+    tmnxMcacStatsBundleName          TNamedItemOrEmpty,
+    tmnxMcacStatsProtocolIndex       TmnxMcacApplTc,
+    tmnxMcacStatsIfIndex             InterfaceIndex,
+    tmnxMcacStatsChlAddrType         InetAddressType,
+    tmnxMcacStatsChlAddr             InetAddress,
+    tmnxMcacStatsAction              TmnxMcacActionTc,
+    tmnxMcacStatsReason              TmnxMcacReasonTc,
+    tmnxMcacStatsChannelType         TmnxMcacChlTypeTc,
+    tmnxMcacStatsChannelBW           Unsigned32,
+    tmnxMcacStatsBundleAvailBW       Unsigned32,
+    tmnxMcacStatsIntfAvailBW         Unsigned32,
+    tmnxMcacStatsAlgoReapply         TruthValue,
+    tmnxMcacStatsApplyAttempts       Counter32,
+    tmnxMcacStatsTimeStamp           TimeStamp
+}
+
+tmnxMcacStatsBundleName          OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsBundleName indicates the name of the
+         multicast CAC policy bundle. The value of tmnxMcacStatsBundleName
+         could be an empty string, meaning that this particular statistics
+         entry's channel did not belong to any bundle in the policy."
+    ::= { tmnxMcacStatsEntry 1 }
+
+tmnxMcacStatsProtocolIndex       OBJECT-TYPE
+    SYNTAX      TmnxMcacApplTc
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsProtocolIndex indicates the application that
+         has applied mcac policy."
+    ::= { tmnxMcacStatsEntry 2 }
+
+tmnxMcacStatsIfIndex             OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsIfIndex indicates the application interface
+         index that has applied mcac policy."
+    ::= { tmnxMcacStatsEntry 3 }
+
+tmnxMcacStatsChlAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsChlAddrType indicates the address type of
+         tmnxMcacStatsChlAddr."
+    ::= { tmnxMcacStatsEntry 4 }
+
+tmnxMcacStatsChlAddr             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsChlAddr indicates the address of the
+         multicast channel that mcac policy was applied upon when requested by
+         the application interface. Address type is indicated by
+         tmnxMcacStatsChlAddrType."
+    ::= { tmnxMcacStatsEntry 5 }
+
+tmnxMcacStatsAction              OBJECT-TYPE
+    SYNTAX      TmnxMcacActionTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsAction indicates the action specified by the
+         mcac policy for the application interface to act upon."
+    ::= { tmnxMcacStatsEntry 6 }
+
+tmnxMcacStatsReason              OBJECT-TYPE
+    SYNTAX      TmnxMcacReasonTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsReason indicates the reason for the action
+         specified by the mcac policy for the application interface to act
+         upon."
+    ::= { tmnxMcacStatsEntry 7 }
+
+tmnxMcacStatsChannelType         OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsChannelType indicates the channel type
+         configured at the mcac policy at the time of request from the
+         application interface."
+    ::= { tmnxMcacStatsEntry 8 }
+
+tmnxMcacStatsChannelBW           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsChannelBW indicates the channel bandwidth
+         configured at the mcac policy at the time of request from the
+         application interface."
+    ::= { tmnxMcacStatsEntry 9 }
+
+tmnxMcacStatsBundleAvailBW       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsBundleAvailBW indicates the available bundle
+         bandwidth after the requested channel was either accepted or discarded
+         by the mcac policy."
+    ::= { tmnxMcacStatsEntry 10 }
+
+tmnxMcacStatsIntfAvailBW         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsIntfAvailBW indicates the available
+         interface bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacStatsEntry 11 }
+
+tmnxMcacStatsAlgoReapply         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsAlgoReapply indicates if the mcac policy was
+         reapplied on the already accepted channel due lag constraints or if
+         this was the first request for this channel from the application."
+    ::= { tmnxMcacStatsEntry 12 }
+
+tmnxMcacStatsApplyAttempts       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsApplyAttempts indicates the number of times
+         the mcac policy was applied for a particular channel entry by the
+         application."
+    ::= { tmnxMcacStatsEntry 13 }
+
+tmnxMcacStatsTimeStamp           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacStatsTimeStamp indicates the timestamp of the
+         last time the mcac policy was applied for this channel entry."
+    ::= { tmnxMcacStatsEntry 14 }
+
+tmnxMcacOperTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacOperTable has an entry for each protocol interface that
+         has active channels on a bundle that were accepted by the mcac policy."
+    ::= { tmnxMcacObjects 7 }
+
+tmnxMcacOperEntry                OBJECT-TYPE
+    SYNTAX      TmnxMcacOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacOperTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        vRtrID,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacStatsIfIndex
+    }
+    ::= { tmnxMcacOperTable 1 }
+
+TmnxMcacOperEntry                ::= SEQUENCE
+{
+    tmnxMcacOperActiveChannels       Gauge32,
+    tmnxMcacOperMaxBw                Unsigned32,
+    tmnxMcacOperAvailOptnlBw         Unsigned32,
+    tmnxMcacOperAvailMandBw          Unsigned32,
+    tmnxMcacOperInUseMandBw          Unsigned32,
+    tmnxMcacOperPortsDown            Unsigned32,
+    tmnxMcacOperCurrConstrtLvl       Unsigned32,
+    tmnxMcacOperInUseOptnlBw         Unsigned32,
+    tmnxMcacOperValuesInTransit      TruthValue
+}
+
+tmnxMcacOperActiveChannels       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperActiveChannels indicates the number of active
+         channels for this entry."
+    ::= { tmnxMcacOperEntry 1 }
+
+tmnxMcacOperMaxBw                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperMaxBw indicates the operational maximum
+         bandwidth in kilobits per second(kbps) on the bundle for this protocol
+         interface instance."
+    ::= { tmnxMcacOperEntry 2 }
+
+tmnxMcacOperAvailOptnlBw         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperAvailOptnlBw indicates the operational
+         available bandwidth in kilobits per second(kbps) on the bundle for
+         this protocol interface instance."
+    ::= { tmnxMcacOperEntry 3 }
+
+tmnxMcacOperAvailMandBw          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperAvailMandBw indicates the operational
+         pre-reserved bandwidth in kilobits per second(kbps) for the mandatory
+         channels on the bundle for this protocol interface instance."
+    ::= { tmnxMcacOperEntry 4 }
+
+tmnxMcacOperInUseMandBw          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperInUseMandBw indicates the operational in-use
+         bandwidth in kilobits per second(kbps) for the mandatory channels on
+         the bundle for this protocol interface instance."
+    ::= { tmnxMcacOperEntry 5 }
+
+tmnxMcacOperPortsDown            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperPortsDown indicates the the number of ports
+         down on the application interface. This value is used to index the
+         table tmnxMcacLagTable to get the bundle level id."
+    ::= { tmnxMcacOperEntry 6 }
+
+tmnxMcacOperCurrConstrtLvl       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperCurrConstrtLvl indicates the current lag
+         constraints bundle level id for the number of ports down
+         (tmnxMcacOperPortsDown). This value is used to index the table
+         tmnxMcacLevelTable to get the bundle level bandwidth."
+    ::= { tmnxMcacOperEntry 7 }
+
+tmnxMcacOperInUseOptnlBw         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperInUseOptnlBw indicates the operational in-use
+         bandwidth in kilobits per second(kbps) for the optional channels on
+         the bundle for this protocol interface instance."
+    ::= { tmnxMcacOperEntry 8 }
+
+tmnxMcacOperValuesInTransit      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacOperValuesInTransit indicates that the
+         operational (available and in-use mandatory/optional) value for the
+         following objects are in transition due to configuration change:
+
+         tmnxMcacOperAvailOptnlBw tmnxMcacOperAvailMandBw
+         tmnxMcacOperInUseMandBw tmnxMcacOperInUseOptnlBw
+
+         When Multicast CAC Policy is applied on the interface for the join of
+         the next channel, the operational values will be recalculated and
+         applied to the above objects and the value for
+         tmnxMcacOperValuesInTransit will be set to 'false'.
+
+         If the value of tmnxMcacOperValuesInTransit is 'true' then the values
+         are in transition."
+    ::= { tmnxMcacOperEntry 9 }
+
+tmnxMcacServStatsTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacServStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxMcacServStatsTable has an entry for each service protocol
+         (igmp-snooping on sap/sdp) channel that was either accepted/discarded
+         by the applied multicast cac policy.
+
+         This table is obsolete and replaced by tmnxMcacServStatsNgTable."
+    ::= { tmnxMcacObjects 8 }
+
+tmnxMcacServStatsEntry           OBJECT-TYPE
+    SYNTAX      TmnxMcacServStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacServStatsTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacStatsBundleName,
+        svcId,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacServStatsPortId,
+        tmnxMcacServStatsEncapValue,
+        tmnxMcacStatsChlAddrType,
+        tmnxMcacStatsChlAddr
+    }
+    ::= { tmnxMcacServStatsTable 1 }
+
+TmnxMcacServStatsEntry           ::= SEQUENCE
+{
+    tmnxMcacServStatsPortId          TmnxPortID,
+    tmnxMcacServStatsEncapValue      TmnxEncapVal,
+    tmnxMcacServStatsAction          TmnxMcacActionTc,
+    tmnxMcacServStatsReason          TmnxMcacReasonTc,
+    tmnxMcacServStatsChannelType     TmnxMcacChlTypeTc,
+    tmnxMcacServStatsChannelBW       Unsigned32,
+    tmnxMcacServStatsBundleAvailBW   Unsigned32,
+    tmnxMcacServStatsIntfAvailBW     Unsigned32,
+    tmnxMcacServStatsAlgoReapply     TruthValue,
+    tmnxMcacServStatsApplyAttempts   Counter32,
+    tmnxMcacServStatsTimeStamp       TimeStamp
+}
+
+tmnxMcacServStatsPortId          OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsPortId indicates the port Id of the
+         SAP/SDP on which the mcac policy is applied."
+    ::= { tmnxMcacServStatsEntry 1 }
+
+tmnxMcacServStatsEncapValue      OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsEncapValue indicates the SAP/SDP Encap
+         value of which the mcac policy is applied."
+    ::= { tmnxMcacServStatsEntry 2 }
+
+tmnxMcacServStatsAction          OBJECT-TYPE
+    SYNTAX      TmnxMcacActionTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsAction indicates the action specified by
+         the mcac policy for the service application to act upon."
+    ::= { tmnxMcacServStatsEntry 3 }
+
+tmnxMcacServStatsReason          OBJECT-TYPE
+    SYNTAX      TmnxMcacReasonTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsReason indicates the reason for the
+         action specified by the mcac policy for the service application to act
+         upon."
+    ::= { tmnxMcacServStatsEntry 4 }
+
+tmnxMcacServStatsChannelType     OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsChannelType indicates the channel type
+         configured at the mcac policy at the time of request from the service
+         application."
+    ::= { tmnxMcacServStatsEntry 5 }
+
+tmnxMcacServStatsChannelBW       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsChannelBW indicates the channel
+         bandwidth configured at the mcac policy at the time of request from
+         the service application."
+    ::= { tmnxMcacServStatsEntry 6 }
+
+tmnxMcacServStatsBundleAvailBW   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsBundleAvailBW indicates the available
+         bundle bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacServStatsEntry 7 }
+
+tmnxMcacServStatsIntfAvailBW     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsIntfAvailBW indicates the available
+         interface bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacServStatsEntry 8 }
+
+tmnxMcacServStatsAlgoReapply     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsAlgoReapply indicates if the mcac policy
+         was reapplied on the already accepted channel due lag constraints or
+         if this was the first request for this channel from the service
+         application."
+    ::= { tmnxMcacServStatsEntry 9 }
+
+tmnxMcacServStatsApplyAttempts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsApplyAttempts indicates the number of
+         times the mcac policy was applied for a particular channel entry by
+         the service application."
+    ::= { tmnxMcacServStatsEntry 10 }
+
+tmnxMcacServStatsTimeStamp       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxMcacServStatsTimeStamp indicates the timestamp of the
+         last time the mcac policy was applied for this channel entry."
+    ::= { tmnxMcacServStatsEntry 11 }
+
+tmnxMcacServOperTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacServOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacServOperTable has an entry for each service application
+         (igmp-snooping on sap/sdp) that has active channels on a bundle that
+         were accepted by the mcac policy."
+    ::= { tmnxMcacObjects 9 }
+
+tmnxMcacServOperEntry            OBJECT-TYPE
+    SYNTAX      TmnxMcacServOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacServOperTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        svcId,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacServStatsPortId,
+        tmnxMcacServStatsEncapValue
+    }
+    ::= { tmnxMcacServOperTable 1 }
+
+TmnxMcacServOperEntry            ::= SEQUENCE
+{
+    tmnxMcacServOperActiveChannels   Gauge32,
+    tmnxMcacServOperMaxBw            Unsigned32,
+    tmnxMcacServOperAvailOptnlBw     Unsigned32,
+    tmnxMcacServOperAvailMandBw      Unsigned32,
+    tmnxMcacServOperInUseMandBw      Unsigned32,
+    tmnxMcacServOperPortsDown        Unsigned32,
+    tmnxMcacServOperCurrConstrtLvl   Unsigned32,
+    tmnxMcacServOperInUseOptnlBw     Unsigned32,
+    tmnxMcacServOperValuesInTransit  TruthValue
+}
+
+tmnxMcacServOperActiveChannels   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperActiveChannels indicates the number of
+         active channels for this entry."
+    ::= { tmnxMcacServOperEntry 1 }
+
+tmnxMcacServOperMaxBw            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperMaxBw indicates the operational maximum
+         bandwidth in kilobits per second(kbps) on the bundle for this service
+         application on sap/sdp instance."
+    ::= { tmnxMcacServOperEntry 2 }
+
+tmnxMcacServOperAvailOptnlBw     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperAvailOptnlBw indicates the operational
+         available bandwidth in kilobits per second(kbps) on the bundle for
+         this service application on sap/sdp instance."
+    ::= { tmnxMcacServOperEntry 3 }
+
+tmnxMcacServOperAvailMandBw      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperAvailMandBw indicates the operational
+         pre-reserved bandwidth in kilobits per second(kbps) for the mandatory
+         channels on the bundle for this service application on sap/sdp
+         instance."
+    ::= { tmnxMcacServOperEntry 4 }
+
+tmnxMcacServOperInUseMandBw      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperInUseMandBw indicates the operational
+         in-use bandwidth in kilobits per second(kbps) for the mandatory
+         channels on the bundle for this service application on sap/sdp
+         instance."
+    ::= { tmnxMcacServOperEntry 5 }
+
+tmnxMcacServOperPortsDown        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperPortsDown indicates the the number of
+         ports down on the service application on sap/sdp. This value is used
+         to index the table tmnxMcacLagTable to get the bundle level id."
+    ::= { tmnxMcacServOperEntry 6 }
+
+tmnxMcacServOperCurrConstrtLvl   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperCurrConstrtLvl indicates the current lag
+         constraints bundle level id for the number of ports down
+         (tmnxMcacServOperPortsDown). This value is used to index the table
+         tmnxMcacLevelTable to get the bundle level bandwidth."
+    ::= { tmnxMcacServOperEntry 7 }
+
+tmnxMcacServOperInUseOptnlBw     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperInUseOptnlBw indicates the operational
+         in-use bandwidth in kilobits per second(kbps) for the optional
+         channels on the bundle for this service application on sap/sdp
+         instance."
+    ::= { tmnxMcacServOperEntry 8 }
+
+tmnxMcacServOperValuesInTransit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServOperValuesInTransit indicates that the
+         operational (available and in-use mandatory/optional) value for the
+         following objects are in transition due to configuration change:
+
+         tmnxMcacServOperAvailOptnlBw tmnxMcacServOperAvailMandBw
+         tmnxMcacServOperInUseMandBw tmnxMcacServOperInUseOptnlBw
+
+         When Multicast CAC Policy is applied on the sap/sdp for the join of
+         the next channel, the operational values will be recalculated and
+         applied to the above objects and the value for
+         tmnxMcacServOperValuesInTransit will be set to 'false'.
+
+         If the value of tmnxMcacServOperValuesInTransit is 'true' then the
+         values are in transition."
+    ::= { tmnxMcacServOperEntry 9 }
+
+tmnxMcacPolicyUserTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacPolicyUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacPolicyUserTable has an entry for each protocol interface
+         that is assigned to the mcac policy.
+
+         Entries in this table are created by the system."
+    ::= { tmnxMcacObjects 10 }
+
+tmnxMcacPolicyUserEntry          OBJECT-TYPE
+    SYNTAX      TmnxMcacPolicyUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacPolicyUserTable."
+    INDEX       {
+        tmnxMcacPolicyName,
+        vRtrID,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacStatsIfIndex
+    }
+    ::= { tmnxMcacPolicyUserTable 1 }
+
+TmnxMcacPolicyUserEntry          ::= SEQUENCE
+{ tmnxMcacPolicyUserConfigured     TruthValue }
+
+tmnxMcacPolicyUserConfigured     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyUserConfigured indicates whether the policy
+         assigned to this protocol index is configured."
+    ::= { tmnxMcacPolicyUserEntry 1 }
+
+tmnxMcacPolicyServUserTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacPolicyServUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacPolicyServUserTable has an entry for each service
+         application (igmp-snooping on sap/sdp) assigned to the mcac policy.
+
+         Entries in the table are created by the system."
+    ::= { tmnxMcacObjects 11 }
+
+tmnxMcacPolicyServUserEntry      OBJECT-TYPE
+    SYNTAX      TmnxMcacPolicyServUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacPolicyServUserTable."
+    INDEX       {
+        tmnxMcacPolicyName,
+        svcId,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacServStatsPortId,
+        tmnxMcacServStatsEncapValue
+    }
+    ::= { tmnxMcacPolicyServUserTable 1 }
+
+TmnxMcacPolicyServUserEntry      ::= SEQUENCE
+{ tmnxMcacPolicyServUserConfigured TruthValue }
+
+tmnxMcacPolicyServUserConfigured OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacPolicyServUserConfigured indicates whether the
+         policy assigned to this service application is configured."
+    ::= { tmnxMcacPolicyServUserEntry 1 }
+
+tmnxMcacBdlChlNgTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacBdlChlNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacBdlChlNgTable has an entry for each multicast CAC policy
+         bundle channel configured on this system.
+
+         This table replaces obsolete tmnxMcacBdlChlTable."
+    ::= { tmnxMcacObjects 12 }
+
+tmnxMcacBdlChlNgEntry            OBJECT-TYPE
+    SYNTAX      TmnxMcacBdlChlNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC policy bundle
+         channel. Entries are created/deleted by the user."
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacBundleName,
+        tmnxMcacBdlChlNgStartAddrType,
+        tmnxMcacBdlChlNgStartAddr,
+        tmnxMcacBdlChlNgEndAddrType,
+        tmnxMcacBdlChlNgEndAddr,
+        tmnxMcacBdlChlNgSrcPfxType,
+        tmnxMcacBdlChlNgSrcPfx,
+        tmnxMcacBdlChlNgSrcPfxLen
+    }
+    ::= { tmnxMcacBdlChlNgTable 1 }
+
+TmnxMcacBdlChlNgEntry            ::= SEQUENCE
+{
+    tmnxMcacBdlChlNgStartAddrType    InetAddressType,
+    tmnxMcacBdlChlNgStartAddr        InetAddress,
+    tmnxMcacBdlChlNgEndAddrType      InetAddressType,
+    tmnxMcacBdlChlNgEndAddr          InetAddress,
+    tmnxMcacBdlChlNgSrcPfxType       TmnxAddressAndPrefixType,
+    tmnxMcacBdlChlNgSrcPfx           TmnxAddressAndPrefixAddress,
+    tmnxMcacBdlChlNgSrcPfxLen        TmnxAddressAndPrefixPrefix,
+    tmnxMcacBdlChlNgRowStatus        RowStatus,
+    tmnxMcacBdlChlNgBW               Unsigned32,
+    tmnxMcacBdlChlNgClass            TmnxMcacChlClassTc,
+    tmnxMcacBdlChlNgType             TmnxMcacChlTypeTc
+}
+
+tmnxMcacBdlChlNgStartAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgStartAddrType indicates the address type
+         of tmnxMcacBdlChlNgStartAddr."
+    ::= { tmnxMcacBdlChlNgEntry 1 }
+
+tmnxMcacBdlChlNgStartAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgStartAddr indicates the start address of
+         the multicast channel. Its type is specified by
+         tmnxMcacBdlChlNgStartAddrType."
+    ::= { tmnxMcacBdlChlNgEntry 2 }
+
+tmnxMcacBdlChlNgEndAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgEndAddrType indicates the address type of
+         tmnxMcacBdlChlNgEndAddr."
+    ::= { tmnxMcacBdlChlNgEntry 3 }
+
+tmnxMcacBdlChlNgEndAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgEndAddr indicates the end address of the
+         multicast channel. Its type is specified by
+         tmnxMcacBdlChlNgEndAddrType.
+
+         The value of tmnxMcacBdlChlNgEndAddr should always be greater than or
+         equal to tmnxMcacBdlChlNgStartAddr."
+    ::= { tmnxMcacBdlChlNgEntry 4 }
+
+tmnxMcacBdlChlNgSrcPfxType       OBJECT-TYPE
+    SYNTAX      TmnxAddressAndPrefixType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgSrcPfxType indicates the type of
+         subnet/prefix specified by tmnxMcacBdlChlNgSrcPfx"
+    ::= { tmnxMcacBdlChlNgEntry 5 }
+
+tmnxMcacBdlChlNgSrcPfx           OBJECT-TYPE
+    SYNTAX      TmnxAddressAndPrefixAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxMcacBdlChlNgSrcPfx is the source override subnet/prefix."
+    ::= { tmnxMcacBdlChlNgEntry 6 }
+
+tmnxMcacBdlChlNgSrcPfxLen        OBJECT-TYPE
+    SYNTAX      TmnxAddressAndPrefixPrefix (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxMcacBdlChlNgSrcPfxLen contains the subnet/prefix masking length
+         which is applied to tmnxMcacBdlChlNgSrcPfx to yield the non-host
+         portion of the source address.
+
+         If this field is zero, then no masking length has been included."
+    ::= { tmnxMcacBdlChlNgEntry 7 }
+
+tmnxMcacBdlChlNgRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgRowStatus is used for creation/deletion
+         of multicast channel in a CAC policy bundle."
+    ::= { tmnxMcacBdlChlNgEntry 8 }
+
+tmnxMcacBdlChlNgBW               OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..10000000)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgBW specifies the multicast channel's
+         bandwidth in kilobits per second(kbps)."
+    DEFVAL      { 10 }
+    ::= { tmnxMcacBdlChlNgEntry 9 }
+
+tmnxMcacBdlChlNgClass            OBJECT-TYPE
+    SYNTAX      TmnxMcacChlClassTc
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgClass specifies the channel's class. The
+         channel with value of high has higher priority than channel with value
+         of low.
+
+         The combination of tmnxMcacBdlChlNgClass and tmnxMcacBdlChlNgType is
+         used to define the priority of channels. If there exists channels with
+         same combination then round robin is used to determine the channels
+         that need to be dropped if any of the CAC constraints are met."
+    DEFVAL      { low }
+    ::= { tmnxMcacBdlChlNgEntry 10 }
+
+tmnxMcacBdlChlNgType             OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacBdlChlNgType specifies the channel's type. A
+         channel with the value of 'mandatory' has higher priority than a
+         channel with the value of 'notMandatory'.
+
+         Use of the value 'none' is not supported.
+
+         The combination of tmnxMcacBdlChlNgClass and tmnxMcacBdlChlNgType is
+         used to define the priority of channels. If there exists channels with
+         the same combination then round robin is used to determine the
+         channels that need to be dropped if any of the CAC constraints are
+         met."
+    DEFVAL      { notMandatory }
+    ::= { tmnxMcacBdlChlNgEntry 11 }
+
+tmnxMcacStatsNgTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacStatsNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacStatsNgTable has an entry for each protocol interface
+         channel that was either accepted/discarded by the applied multicast
+         cac policy.
+
+         This table replaces obsolete tmnxMcacStatsTable."
+    ::= { tmnxMcacObjects 13 }
+
+tmnxMcacStatsNgEntry             OBJECT-TYPE
+    SYNTAX      TmnxMcacStatsNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacStatsNgTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacStatsNgBundleName,
+        vRtrID,
+        tmnxMcacStatsNgProtocolIndex,
+        tmnxMcacStatsNgIfIndex,
+        tmnxMcacStatsNgChlAddrType,
+        tmnxMcacStatsNgChlAddr,
+        tmnxMcacStatsNgSrcAddrType,
+        tmnxMcacStatsNgSrcAddr
+    }
+    ::= { tmnxMcacStatsNgTable 1 }
+
+TmnxMcacStatsNgEntry             ::= SEQUENCE
+{
+    tmnxMcacStatsNgBundleName        TNamedItemOrEmpty,
+    tmnxMcacStatsNgProtocolIndex     TmnxMcacApplTc,
+    tmnxMcacStatsNgIfIndex           InterfaceIndex,
+    tmnxMcacStatsNgChlAddrType       InetAddressType,
+    tmnxMcacStatsNgChlAddr           InetAddress,
+    tmnxMcacStatsNgSrcAddrType       InetAddressType,
+    tmnxMcacStatsNgSrcAddr           InetAddress,
+    tmnxMcacStatsNgAction            TmnxMcacActionTc,
+    tmnxMcacStatsNgReason            TmnxMcacReasonTc,
+    tmnxMcacStatsNgChannelType       TmnxMcacChlTypeTc,
+    tmnxMcacStatsNgChannelBW         Unsigned32,
+    tmnxMcacStatsNgBundleAvailBW     Unsigned32,
+    tmnxMcacStatsNgIntfAvailBW       Unsigned32,
+    tmnxMcacStatsNgAlgoReapply       TruthValue,
+    tmnxMcacStatsNgApplyAttempts     Counter32,
+    tmnxMcacStatsNgTimeStamp         TimeStamp
+}
+
+tmnxMcacStatsNgBundleName        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgBundleName indicates the name of the
+         multicast CAC policy bundle. The value of tmnxMcacStatsNgBundleName
+         could be an empty string, meaning that this particular statistics
+         entry's channel did not belong to any bundle in the policy."
+    ::= { tmnxMcacStatsNgEntry 1 }
+
+tmnxMcacStatsNgProtocolIndex     OBJECT-TYPE
+    SYNTAX      TmnxMcacApplTc
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgProtocolIndex indicates the application
+         that has applied mcac policy."
+    ::= { tmnxMcacStatsNgEntry 2 }
+
+tmnxMcacStatsNgIfIndex           OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgIfIndex indicates the application
+         interface index that has applied mcac policy."
+    ::= { tmnxMcacStatsNgEntry 3 }
+
+tmnxMcacStatsNgChlAddrType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgChlAddrType indicates the address type of
+         tmnxMcacStatsChlAddr."
+    ::= { tmnxMcacStatsNgEntry 4 }
+
+tmnxMcacStatsNgChlAddr           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgChlAddr indicates the address of the
+         multicast channel that mcac policy was applied upon when requested by
+         the application interface. Address type is indicated by
+         tmnxMcacStatsNgChlAddrType."
+    ::= { tmnxMcacStatsNgEntry 5 }
+
+tmnxMcacStatsNgSrcAddrType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgSrcAddrType indicates the type of
+         subnet/prefix specified by tmnxMcacStatsNgSrcAddr"
+    ::= { tmnxMcacStatsNgEntry 6 }
+
+tmnxMcacStatsNgSrcAddr           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxMcacStatsNgSrcAddr is the source override subnet/prefix."
+    ::= { tmnxMcacStatsNgEntry 7 }
+
+tmnxMcacStatsNgAction            OBJECT-TYPE
+    SYNTAX      TmnxMcacActionTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgAction indicates the action specified by
+         the mcac policy for the application interface to act upon."
+    ::= { tmnxMcacStatsNgEntry 8 }
+
+tmnxMcacStatsNgReason            OBJECT-TYPE
+    SYNTAX      TmnxMcacReasonTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgReason indicates the reason for the action
+         specified by the mcac policy for the application interface to act
+         upon."
+    ::= { tmnxMcacStatsNgEntry 9 }
+
+tmnxMcacStatsNgChannelType       OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgChannelType indicates the channel type
+         configured at the mcac policy at the time of request from the
+         application interface."
+    ::= { tmnxMcacStatsNgEntry 10 }
+
+tmnxMcacStatsNgChannelBW         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgChannelBW indicates the channel bandwidth
+         configured at the mcac policy at the time of request from the
+         application interface."
+    ::= { tmnxMcacStatsNgEntry 11 }
+
+tmnxMcacStatsNgBundleAvailBW     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgBundleAvailBW indicates the available
+         bundle bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacStatsNgEntry 12 }
+
+tmnxMcacStatsNgIntfAvailBW       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgIntfAvailBW indicates the available
+         interface bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacStatsNgEntry 13 }
+
+tmnxMcacStatsNgAlgoReapply       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgAlgoReapply indicates if the mcac policy
+         was reapplied on the already accepted channel due lag constraints or
+         if this was the first request for this channel from the application."
+    ::= { tmnxMcacStatsNgEntry 14 }
+
+tmnxMcacStatsNgApplyAttempts     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgApplyAttempts indicates the number of
+         times the mcac policy was applied for a particular channel entry by
+         the application."
+    ::= { tmnxMcacStatsNgEntry 15 }
+
+tmnxMcacStatsNgTimeStamp         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacStatsNgTimeStamp indicates the timestamp of the
+         last time the mcac policy was applied for this channel entry."
+    ::= { tmnxMcacStatsNgEntry 16 }
+
+tmnxMcacServStatsNgTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacServStatsNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacServStatsNgTable has an entry for each service protocol
+         (igmp-snooping on sap/sdp) channel that was either accepted/discarded
+         by the applied multicast cac policy.
+
+         This table replaces obsolete tmnxMcacServStatsTable."
+    ::= { tmnxMcacObjects 14 }
+
+tmnxMcacServStatsNgEntry         OBJECT-TYPE
+    SYNTAX      TmnxMcacServStatsNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacServStatsNgTable"
+    INDEX       {
+        tmnxMcacPolicyName,
+        tmnxMcacStatsNgBundleName,
+        svcId,
+        tmnxMcacStatsNgProtocolIndex,
+        tmnxMcacServStatsNgPortId,
+        tmnxMcacServStatsNgEncapValue,
+        tmnxMcacStatsNgChlAddrType,
+        tmnxMcacStatsNgChlAddr,
+        tmnxMcacStatsNgSrcAddrType,
+        tmnxMcacStatsNgSrcAddr
+    }
+    ::= { tmnxMcacServStatsNgTable 1 }
+
+TmnxMcacServStatsNgEntry         ::= SEQUENCE
+{
+    tmnxMcacServStatsNgPortId        TmnxPortID,
+    tmnxMcacServStatsNgEncapValue    TmnxEncapVal,
+    tmnxMcacServStatsNgAction        TmnxMcacActionTc,
+    tmnxMcacServStatsNgReason        TmnxMcacReasonTc,
+    tmnxMcacServStatsNgChannelType   TmnxMcacChlTypeTc,
+    tmnxMcacServStatsNgChannelBW     Unsigned32,
+    tmnxMcacServStatsNgBundleAvailBW Unsigned32,
+    tmnxMcacServStatsNgIntfAvailBW   Unsigned32,
+    tmnxMcacServStatsNgAlgoReapply   TruthValue,
+    tmnxMcacServStatsNgApplyAttempts Counter32,
+    tmnxMcacServStatsNgTimeStamp     TimeStamp
+}
+
+tmnxMcacServStatsNgPortId        OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgPortId indicates the port Id of the
+         SAP/SDP on which the mcac policy is applied."
+    ::= { tmnxMcacServStatsNgEntry 1 }
+
+tmnxMcacServStatsNgEncapValue    OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgEncapValue indicates the SAP/SDP Encap
+         value of which the mcac policy is applied."
+    ::= { tmnxMcacServStatsNgEntry 2 }
+
+tmnxMcacServStatsNgAction        OBJECT-TYPE
+    SYNTAX      TmnxMcacActionTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgAction indicates the action specified
+         by the mcac policy for the service application to act upon."
+    ::= { tmnxMcacServStatsNgEntry 3 }
+
+tmnxMcacServStatsNgReason        OBJECT-TYPE
+    SYNTAX      TmnxMcacReasonTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgReason indicates the reason for the
+         action specified by the mcac policy for the service application to act
+         upon."
+    ::= { tmnxMcacServStatsNgEntry 4 }
+
+tmnxMcacServStatsNgChannelType   OBJECT-TYPE
+    SYNTAX      TmnxMcacChlTypeTc
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgChannelType indicates the channel type
+         configured at the mcac policy at the time of request from the service
+         application."
+    ::= { tmnxMcacServStatsNgEntry 5 }
+
+tmnxMcacServStatsNgChannelBW     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgChannelBW indicates the channel
+         bandwidth configured at the mcac policy at the time of request from
+         the service application."
+    ::= { tmnxMcacServStatsNgEntry 6 }
+
+tmnxMcacServStatsNgBundleAvailBW OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgBundleAvailBW indicates the available
+         bundle bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacServStatsNgEntry 7 }
+
+tmnxMcacServStatsNgIntfAvailBW   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgIntfAvailBW indicates the available
+         interface bandwidth after the requested channel was either accepted or
+         discarded by the mcac policy."
+    ::= { tmnxMcacServStatsNgEntry 8 }
+
+tmnxMcacServStatsNgAlgoReapply   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgAlgoReapply indicates if the mcac
+         policy was reapplied on the already accepted channel due lag
+         constraints or if this was the first request for this channel from the
+         service application."
+    ::= { tmnxMcacServStatsNgEntry 9 }
+
+tmnxMcacServStatsNgApplyAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgApplyAttempts indicates the number of
+         times the mcac policy was applied for a particular channel entry by
+         the service application."
+    ::= { tmnxMcacServStatsNgEntry 10 }
+
+tmnxMcacServStatsNgTimeStamp     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacServStatsNgTimeStamp indicates the timestamp of
+         the last time the mcac policy was applied for this channel entry."
+    ::= { tmnxMcacServStatsNgEntry 11 }
+
+tmnxMcacIfPolicyTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacIfPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacIfPolicyTable has an entry for each multicast CAC
+         (Connection Admission Control) interface policy configured on this
+         system."
+    ::= { tmnxMcacObjects 15 }
+
+tmnxMcacIfPolicyEntry            OBJECT-TYPE
+    SYNTAX      TmnxMcacIfPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular multicast CAC interface policy.
+         Entries are created/deleted by the user."
+    INDEX       { tmnxMcacIfPolicyName }
+    ::= { tmnxMcacIfPolicyTable 1 }
+
+TmnxMcacIfPolicyEntry            ::= SEQUENCE
+{
+    tmnxMcacIfPolicyName             TNamedItem,
+    tmnxMcacIfPolicyRowStatus        RowStatus,
+    tmnxMcacIfPolicyDescription      TItemDescription,
+    tmnxMcacIfPolicyAdminState       TmnxAdminState,
+    tmnxMcacIfPolicyUnconstrainedBW  Integer32,
+    tmnxMcacIfPolicyPreRsvdMandBW    Integer32,
+    tmnxMcacIfPolicyInUseMandBw      Unsigned32,
+    tmnxMcacIfPolicyInUseOpnlBw      Unsigned32
+}
+
+tmnxMcacIfPolicyName             OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyName indicates the name of the multicast
+         CAC interface policy."
+    ::= { tmnxMcacIfPolicyEntry 1 }
+
+tmnxMcacIfPolicyRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyRowStatus is used for creation/deletion
+         of multicast CAC interface policies."
+    ::= { tmnxMcacIfPolicyEntry 2 }
+
+tmnxMcacIfPolicyDescription      OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyDescription specifies the textual
+         description of this multicast CAC interface policy."
+    DEFVAL      { "" }
+    ::= { tmnxMcacIfPolicyEntry 3 }
+
+tmnxMcacIfPolicyAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyAdminState specifies the administrative
+         state of this multicast CAC interface policy."
+    DEFVAL      { inService }
+    ::= { tmnxMcacIfPolicyEntry 4 }
+
+tmnxMcacIfPolicyUnconstrainedBW  OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483647)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyUnconstrainedBW specifies the bandwidth
+         assigned to this subscriber MCAC interface policy in kilobits per
+         second (kbps).
+
+         If the default value of '-1' is set, there is no constraint on
+         bandwidth allocated.
+
+         If the value of tmnxMcacIfPolicyUnconstrainedBW is set to '0' and if
+         an MCAC interface policy is assigned on the subscriber, then no group
+         (channel) from that policy is allowed on that subscriber."
+    DEFVAL      { -1 }
+    ::= { tmnxMcacIfPolicyEntry 5 }
+
+tmnxMcacIfPolicyPreRsvdMandBW    OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483647)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyPreRsvdMandBW specifies the bandwidth
+         pre-reserved for all the mandatory channels on a given subscriber in
+         kilobits per second(kbps).
+
+         If the value of tmnxMcacIfPolicyUnconstrainedBW is '0', no mandatory
+         channels are allowed. If the value of tmnxMcacIfPolicyUnconstrainedBW
+         is '-1', then all mandatory and optional channels are allowed.
+
+         If the value of tmnxMcacIfPolicyPreRsvdMandBW is equal to the value of
+         tmnxMcacIfPolicyUnconstrainedBW, then all the unconstrained bandwidth
+         on a given subscriber is allocated to mandatory channels configured
+         through MCAC interface policy on that subscriber and no optional
+         groups (channels) are allowed.
+
+         The value of tmnxMcacIfPolicyPreRsvdMandBW should always be less than
+         or equal to that of tmnxMcacIfPolicyUnconstrainedBW. An attempt to set
+         the value of tmnxMcacIfPolicyPreRsvdMandBW greater than that of
+         tmnxMcacIfPolicyUnconstrainedBW will result in inconsistent value
+         error."
+    DEFVAL      { -1 }
+    ::= { tmnxMcacIfPolicyEntry 6 }
+
+tmnxMcacIfPolicyInUseMandBw      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyInUseMandBw indicates the operational
+         in-use bandwidth in kilobits per second(kbps) for the mandatory
+         channels for this interface policy."
+    ::= { tmnxMcacIfPolicyEntry 7 }
+
+tmnxMcacIfPolicyInUseOpnlBw      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyInUseOpnlBw indicates the operational
+         in-use bandwidth in kilobits per second(kbps) for the optional
+         channels for this interface policy."
+    ::= { tmnxMcacIfPolicyEntry 8 }
+
+tmnxMcacIfPolicyUserTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacIfPolicyUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacIfPolicyUserTable has an entry for each protocol interface
+         that is assigned to the mcac interface policy.
+
+         Entries in this table are created by the system."
+    ::= { tmnxMcacObjects 16 }
+
+tmnxMcacIfPolicyUserEntry        OBJECT-TYPE
+    SYNTAX      TmnxMcacIfPolicyUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacIfPolicyUserTable."
+    INDEX       {
+        tmnxMcacIfPolicyName,
+        vRtrID,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacStatsIfIndex
+    }
+    ::= { tmnxMcacIfPolicyUserTable 1 }
+
+TmnxMcacIfPolicyUserEntry        ::= SEQUENCE
+{ tmnxMcacIfPolicyUserCfgrd        TruthValue }
+
+tmnxMcacIfPolicyUserCfgrd        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyUserCfgrd indicates whether the interface
+         policy assigned to this protocol index is configured."
+    ::= { tmnxMcacIfPolicyUserEntry 1 }
+
+tmnxMcacIfPolicyServUserTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMcacIfPolicyServUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMcacIfPolicyServUserTable has an entry for each service
+         application (igmp-snooping on sap/sdp) assigned to the mcac interface
+         policy.
+
+         Entries in the table are created by the system."
+    ::= { tmnxMcacObjects 17 }
+
+tmnxMcacIfPolicyServUserEntry    OBJECT-TYPE
+    SYNTAX      TmnxMcacIfPolicyServUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tmnxMcacIfPolicyServUserTable."
+    INDEX       {
+        tmnxMcacIfPolicyName,
+        svcId,
+        tmnxMcacStatsProtocolIndex,
+        tmnxMcacServStatsPortId,
+        tmnxMcacServStatsEncapValue
+    }
+    ::= { tmnxMcacIfPolicyServUserTable 1 }
+
+TmnxMcacIfPolicyServUserEntry    ::= SEQUENCE
+{ tmnxMcacIfPolicyServUserCfgrd    TruthValue }
+
+tmnxMcacIfPolicyServUserCfgrd    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxMcacIfPolicyServUserCfgrd indicates whether the
+         interface policy assigned to this service application is configured."
+    ::= { tmnxMcacIfPolicyServUserEntry 1 }
+
+tmnxMcacConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 41 }
+
+tmnxMcacCompliances              OBJECT IDENTIFIER ::= { tmnxMcacConformance 1 }
+
+tmnxMcacV5v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of multicast CAC policies on
+         version 5.0 of the Nokia 7xx0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMcacV5v0Group,
+            tmnxMcacStatV5v0Group,
+            tmnxMcacOperV5v0Group,
+            tmnxMcacPolicyUserV5v0Group
+        }
+    ::= { tmnxMcacCompliances 1 }
+
+tmnxMcacV6v0Compliance           MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of multicast CAC policies on
+         version 6.0 of the Nokia 7xx0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMcacV5v0Group,
+            tmnxMcacStatV5v0Group,
+            tmnxMcacOperV5v0Group,
+            tmnxMcacPolicyUserV5v0Group
+        }
+    ::= { tmnxMcacCompliances 2 }
+
+tmnxMcacV12v0Compliance          MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of multicast CAC policies on
+         version 12.0 of the Nokia 7xx0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMcacV5v0Group,
+            tmnxMcacV12v0Group,
+            tmnxMcacStatV5v0Group,
+            tmnxMcacStatV12v0Group,
+            tmnxMcacOperV5v0Group,
+            tmnxMcacPolicyUserV5v0Group
+        }
+    ::= { tmnxMcacCompliances 3 }
+
+tmnxMcacV14v0Compliance          MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of multicast CAC policies on
+         version 14.0 of the Nokia 7xx0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMcacV5v0Group,
+            tmnxMcacV12v0Group,
+            tmnxMcacV14v0Group,
+            tmnxMcacStatV5v0Group,
+            tmnxMcacStatV12v0Group,
+            tmnxMcacOperV5v0Group,
+            tmnxMcacPolicyUserV5v0Group
+        }
+    ::= { tmnxMcacCompliances 4 }
+
+tmnxMcacV19v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of multicast CAC policies on
+         version 19.0 of the Nokia 7xx0 series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMcacV12v0Group,
+            tmnxMcacV14v0Group,
+            tmnxMcacV19v0Group,
+            tmnxMcacStatV12v0Group,
+            tmnxMcacOperV5v0Group,
+            tmnxMcacPolicyUserV5v0Group,
+            tmnxMcacObsoleteObjsGroup
+        }
+    ::= { tmnxMcacCompliances 5 }
+
+tmnxMcacGroups                   OBJECT IDENTIFIER ::= { tmnxMcacConformance 2 }
+
+tmnxMcacV5v0Group                OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacPolicyRowStatus,
+        tmnxMcacPolicyDescription,
+        tmnxMcacPolicyDefaultAction,
+        tmnxMcacBundleRowStatus,
+        tmnxMcacBundleDescription,
+        tmnxMcacBundleAdminState,
+        tmnxMcacBundleBandwidth,
+        tmnxMcacBdlChlRowStatus,
+        tmnxMcacBdlChlBW,
+        tmnxMcacBdlChlClass,
+        tmnxMcacBdlChlType,
+        tmnxMcacLevelRowStatus,
+        tmnxMcacLevelBW,
+        tmnxMcacLagRowStatus,
+        tmnxMcacLagBundleLevel
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting multicast CAC policies on version 5.0
+         of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 1 }
+
+tmnxMcacStatV5v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacStatsAction,
+        tmnxMcacStatsReason,
+        tmnxMcacStatsChannelType,
+        tmnxMcacStatsChannelBW,
+        tmnxMcacStatsBundleAvailBW,
+        tmnxMcacStatsIntfAvailBW,
+        tmnxMcacStatsAlgoReapply,
+        tmnxMcacStatsApplyAttempts,
+        tmnxMcacStatsTimeStamp,
+        tmnxMcacServStatsAction,
+        tmnxMcacServStatsReason,
+        tmnxMcacServStatsChannelType,
+        tmnxMcacServStatsChannelBW,
+        tmnxMcacServStatsBundleAvailBW,
+        tmnxMcacServStatsIntfAvailBW,
+        tmnxMcacServStatsAlgoReapply,
+        tmnxMcacServStatsApplyAttempts,
+        tmnxMcacServStatsTimeStamp
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of statistics objects supporting multicast CAC policies on
+         version 5.0 of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 2 }
+
+tmnxMcacOperV5v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacOperActiveChannels,
+        tmnxMcacOperMaxBw,
+        tmnxMcacOperAvailOptnlBw,
+        tmnxMcacOperAvailMandBw,
+        tmnxMcacOperInUseMandBw,
+        tmnxMcacOperPortsDown,
+        tmnxMcacOperCurrConstrtLvl,
+        tmnxMcacOperInUseOptnlBw,
+        tmnxMcacOperValuesInTransit,
+        tmnxMcacServOperActiveChannels,
+        tmnxMcacServOperMaxBw,
+        tmnxMcacServOperAvailOptnlBw,
+        tmnxMcacServOperAvailMandBw,
+        tmnxMcacServOperInUseMandBw,
+        tmnxMcacServOperPortsDown,
+        tmnxMcacServOperCurrConstrtLvl,
+        tmnxMcacServOperInUseOptnlBw,
+        tmnxMcacServOperValuesInTransit
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of operational objects supporting multicast CAC policies on
+         version 5.0 of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 3 }
+
+tmnxMcacPolicyUserV5v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacPolicyUserConfigured,
+        tmnxMcacPolicyServUserConfigured
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of policy user objects supporting multicast CAC policies on
+         version 5.0 of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 4 }
+
+tmnxMcacV12v0Group               OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacBdlChlNgRowStatus,
+        tmnxMcacBdlChlNgBW,
+        tmnxMcacBdlChlNgClass,
+        tmnxMcacBdlChlNgType,
+        tmnxMcacBundleUseLagPortWeight
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting multicast CAC policies added in
+         version 12.0 of Nokia SROS for 7xx0 series systems"
+    ::= { tmnxMcacGroups 5 }
+
+tmnxMcacStatV12v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacStatsNgAction,
+        tmnxMcacStatsNgReason,
+        tmnxMcacStatsNgChannelType,
+        tmnxMcacStatsNgChannelBW,
+        tmnxMcacStatsNgBundleAvailBW,
+        tmnxMcacStatsNgIntfAvailBW,
+        tmnxMcacStatsNgAlgoReapply,
+        tmnxMcacStatsNgApplyAttempts,
+        tmnxMcacStatsNgTimeStamp,
+        tmnxMcacServStatsNgAction,
+        tmnxMcacServStatsNgReason,
+        tmnxMcacServStatsNgChannelType,
+        tmnxMcacServStatsNgChannelBW,
+        tmnxMcacServStatsNgBundleAvailBW,
+        tmnxMcacServStatsNgIntfAvailBW,
+        tmnxMcacServStatsNgAlgoReapply,
+        tmnxMcacServStatsNgApplyAttempts,
+        tmnxMcacServStatsNgTimeStamp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of statistics objects supporting multicast CAC policies on
+         version 12.0 of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 6 }
+
+tmnxMcacV14v0Group               OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacIfPolicyRowStatus,
+        tmnxMcacIfPolicyDescription,
+        tmnxMcacIfPolicyAdminState,
+        tmnxMcacIfPolicyUnconstrainedBW,
+        tmnxMcacIfPolicyPreRsvdMandBW,
+        tmnxMcacIfPolicyInUseMandBw,
+        tmnxMcacIfPolicyInUseOpnlBw,
+        tmnxMcacIfPolicyUserCfgrd,
+        tmnxMcacIfPolicyServUserCfgrd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting multicast CAC policies added in
+         version 14.0 of Nokia SROS for 7xx0 series systems"
+    ::= { tmnxMcacGroups 7 }
+
+tmnxMcacV19v0Group               OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacPolicyRowStatus,
+        tmnxMcacPolicyDescription,
+        tmnxMcacPolicyDefaultAction,
+        tmnxMcacBundleRowStatus,
+        tmnxMcacBundleDescription,
+        tmnxMcacBundleAdminState,
+        tmnxMcacBundleBandwidth,
+        tmnxMcacLevelRowStatus,
+        tmnxMcacLevelBW,
+        tmnxMcacLagRowStatus,
+        tmnxMcacLagBundleLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting multicast CAC policies on version 19.0
+         of the Nokia 7xx0 series systems"
+    ::= { tmnxMcacGroups 8 }
+
+tmnxMcacObsoleteObjsGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcacStatsAction,
+        tmnxMcacStatsReason,
+        tmnxMcacStatsChannelType,
+        tmnxMcacStatsChannelBW,
+        tmnxMcacStatsBundleAvailBW,
+        tmnxMcacStatsIntfAvailBW,
+        tmnxMcacStatsAlgoReapply,
+        tmnxMcacStatsApplyAttempts,
+        tmnxMcacStatsTimeStamp,
+        tmnxMcacServStatsAction,
+        tmnxMcacServStatsReason,
+        tmnxMcacServStatsChannelType,
+        tmnxMcacServStatsChannelBW,
+        tmnxMcacServStatsBundleAvailBW,
+        tmnxMcacServStatsIntfAvailBW,
+        tmnxMcacServStatsAlgoReapply,
+        tmnxMcacServStatsApplyAttempts,
+        tmnxMcacServStatsTimeStamp,
+        tmnxMcacBdlChlRowStatus,
+        tmnxMcacBdlChlBW,
+        tmnxMcacBdlChlClass,
+        tmnxMcacBdlChlType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects."
+    ::= { tmnxMcacGroups 100 }
+
+END

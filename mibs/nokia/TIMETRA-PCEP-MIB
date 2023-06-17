@@ -1,0 +1,2971 @@
+TIMETRA-PCEP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType,
+    InetPortNumber
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Counter64, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TLNamedItemOrEmpty, TNamedItem,
+    TNamedItemOrEmpty, TmnxAdminState,
+    TmnxOperState
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraPcepMIBModule             MODULE-IDENTITY
+    LAST-UPDATED "201601010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of Path Computation Element communications Protocol (PCEP).
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201601010000Z"
+    DESCRIPTION
+        "Rev 14.0               1 Jan 2016 00:00
+         14.0 release of the TIMETRA-PCEP-MIB."
+
+    REVISION    "201501010000Z"
+    DESCRIPTION
+        "Rev 13.0               1 Jan 2015 00:00
+         13.0 release of the TIMETRA-PCEP-MIB."
+
+    ::= { timetraSRMIBModules 101 }
+
+TmnxPcepCapabilities             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxPcepCapabilities specifies the capabilities supported
+         by this Path Computation Element communications Protocol (PCEP) entity"
+    SYNTAX      BITS {
+        statefulDelegate (0),
+        statefulPce      (1),
+        statefulOptimize (2),
+        segmentRtPath    (3),
+        rsvpPath         (4),
+        opticsGmpls      (5),
+        pceInitiatedLsp  (6),
+        stateless        (7),
+        p2mp             (8),
+        p2mp-delegate    (9),
+        p2mp-initiate    (10),
+        association      (11),
+        multipath        (12)
+    }
+
+TmnxPcepLspType                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxPcepLspType indicates the type of Label Switch Path
+         (LSP) connection. The valid options are:
+            rsvpP2p   (1) - Resource Reservation Protocol-Traffic Engineering
+                            (RSVP-TE) Point to Point.
+            rsvpP2mp  (2) - RSVP-TE Point to Multipoint.
+            segRt     (3) - Segment Routing.
+            pceInitSegRt (4) - PCE Init Segment Routing."
+    SYNTAX      INTEGER {
+        rsvpP2p      (1),
+        rsvpP2mp     (2),
+        segRt        (3),
+        pceInitSegRt (4)
+    }
+
+tmnxPcepObjects                  OBJECT IDENTIFIER ::= { tmnxSRObjs 101 }
+
+tmnxPcepTableChangedObjects      OBJECT IDENTIFIER ::= { tmnxPcepObjects 1 }
+
+tmnxPcepEntityTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityTableLastChanged indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPcepEntityTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPcepTableChangedObjects 1 }
+
+tmnxPcepPccEntityTblLastChgd     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityTblLastChgd indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxPcepPccEntityTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPcepTableChangedObjects 2 }
+
+tmnxPcepPccPeerTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerTableLastChanged indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         tmnxPcepPccPeerTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPcepTableChangedObjects 3 }
+
+tmnxPcepConfigObjects            OBJECT IDENTIFIER ::= { tmnxPcepObjects 2 }
+
+tmnxPcepPccConfigObjects         OBJECT IDENTIFIER ::= { tmnxPcepConfigObjects 1 }
+
+tmnxPcepPccEntityTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccEntityTable contains information about PCEP Path
+         Computation Client (PCC) entities.
+
+         Entries, in this table, are created by the system for each row in
+         tmnxPcepEntityTable that have the value of object tmnxPcepEntityType
+         as 'pcc (1)'."
+    ::= { tmnxPcepPccConfigObjects 1 }
+
+tmnxPcepPccEntityEntry           OBJECT-TYPE
+    SYNTAX      TmnxPcepPccEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityEntry represents a PCEP PCC entity.
+
+         Entries in tmnxPcepPccEntityEntry are created when entries in
+         tmnxPcepEntityEntry are created with the value of object
+         tmnxPcepEntityType set to 'pcc (1)."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex
+    }
+    ::= { tmnxPcepPccEntityTable 1 }
+
+TmnxPcepPccEntityEntry           ::= SEQUENCE
+{
+    tmnxPcepPccEntityLastChanged     TimeStamp,
+    tmnxPcepPccEntityAddrType        InetAddressType,
+    tmnxPcepPccEntityAddr            InetAddress,
+    tmnxPcepPccEntityReportPathConst TruthValue,
+    tmnxPcepPccRedelegationTimer     Unsigned32,
+    tmnxPcepPccStateTimer            Unsigned32,
+    tmnxPcepPccStateTimerAction      INTEGER,
+    tmnxPcepPccMaxSrtePceInitLsps    Unsigned32,
+    tmnxPcepPccEntityAddrIpv6Type    InetAddressType,
+    tmnxPcepPccEntityAddrIpv6        InetAddress
+}
+
+tmnxPcepPccEntityLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityLastChanged indicates the sysUpTime at
+         the time of the most recent change to this PCC entity row."
+    ::= { tmnxPcepPccEntityEntry 1 }
+
+tmnxPcepPccEntityAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityAddrType indicates the address type of
+         PCEP PCC entity."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepPccEntityEntry 2 }
+
+tmnxPcepPccEntityAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityAddr indicates the Internet address
+         being used by this PCEP PCC entity.
+
+         If the value of tmnxPcepEntityLocalAddrType is 'unknown', then the
+         value of this object is assigned by the system, otherwise the value of
+         tmnxPcepEntityLocalAddr is copied to this object."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepPccEntityEntry 3 }
+
+tmnxPcepPccEntityReportPathConst OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityReportPathConst specifies whether this
+         this PCEP PCC entity should report path constraints or not."
+    DEFVAL      { true }
+    ::= { tmnxPcepPccEntityEntry 4 }
+
+tmnxPcepPccRedelegationTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccRedelegationTimer specifies the redelegation
+         time in seconds for this PCEP PCC entity."
+    DEFVAL      { 90 }
+    ::= { tmnxPcepPccEntityEntry 5 }
+
+tmnxPcepPccStateTimer            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccStateTimer specifies the state-time in seconds
+         for this PCEP PCC entity."
+    DEFVAL      { 180 }
+    ::= { tmnxPcepPccEntityEntry 6 }
+
+tmnxPcepPccStateTimerAction      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        remove (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccStateTimerAction specific the action upon
+         expiry of the state timer."
+    DEFVAL      { remove }
+    ::= { tmnxPcepPccEntityEntry 7 }
+
+tmnxPcepPccMaxSrtePceInitLsps    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccMaxSrtePceInitLsps specifies the maximum SRTE
+         PCE Init Lsps for this PCEP PCC entity."
+    DEFVAL      { 8191 }
+    ::= { tmnxPcepPccEntityEntry 8 }
+
+tmnxPcepPccEntityAddrIpv6Type    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityAddrIpv6Type indicates the address type
+         of PCEP PCC entity."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepPccEntityEntry 9 }
+
+tmnxPcepPccEntityAddrIpv6        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccEntityAddrIpv6 indicates the Internet address
+         being used by this PCEP PCC entity.
+
+         If the value of tmnxPcepEntityLocalAddrIpv6Type is 'unknown', then the
+         value of this object is assigned by the system, otherwise the value of
+         tmnxPcepEntityLocalAddrIpv6 is copied to this object."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepPccEntityEntry 10 }
+
+tmnxPcepPccPceAssDivTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccPceAssDivEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccPceAssDivTable contains information about PCEP Path
+         Computation Client (PCC) PCE Association diversity entities.
+
+         Entries, in this table, are created by the system for each row in
+         tmnxPcepEntityTable that have the value of object tmnxPcepEntityType
+         as 'pcc (1)'."
+    ::= { tmnxPcepPccConfigObjects 2 }
+
+tmnxPcepPccPceAssDivEntry        OBJECT-TYPE
+    SYNTAX      TmnxPcepPccPceAssDivEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivEntry represents a PCEP PCC entity.
+
+         Entries in tmnxPcepPccEntityEntry are created when entries in
+         tmnxPcepEntityEntry are created with the value of object
+         tmnxPcepEntityType set to 'pcc (1)."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        IMPLIED tmnxPcepPccPceAssDivAssocName
+    }
+    ::= { tmnxPcepPccPceAssDivTable 1 }
+
+TmnxPcepPccPceAssDivEntry        ::= SEQUENCE
+{
+    tmnxPcepPccPceAssDivAssocName    TNamedItem,
+    tmnxPcepPccPceAssDivRowStatus    RowStatus,
+    tmnxPcepPccPceAssDivLastChanged  TimeStamp,
+    tmnxPcepPccPceAssDivIndex        Unsigned32,
+    tmnxPcepPccPceAssDivSrcAddrType  InetAddressType,
+    tmnxPcepPccPceAssDivSrcAddr      InetAddress,
+    tmnxPcepPccPceAssDivType         INTEGER,
+    tmnxPcepPccPceAssDivDsjType      INTEGER,
+    tmnxPcepPccPceAssDivDsjRef       TruthValue
+}
+
+tmnxPcepPccPceAssDivAssocName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivAssocName specifies the association
+         name for this PCEP PCC PCE Assocation Diversity entity."
+    ::= { tmnxPcepPccPceAssDivEntry 1 }
+
+tmnxPcepPccPceAssDivRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivRowStatus controls the creation and
+         deletion of rows in this entity table."
+    ::= { tmnxPcepPccPceAssDivEntry 2 }
+
+tmnxPcepPccPceAssDivLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivLastChanged indicates the sysUpTime
+         at the time of the most recent change to this PCC entity row."
+    ::= { tmnxPcepPccPceAssDivEntry 3 }
+
+tmnxPcepPccPceAssDivIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivIndex specifies the unique identifier
+         for this PCEP PCC PCE Assocation Diversity entity."
+    DEFVAL      { 0 }
+    ::= { tmnxPcepPccPceAssDivEntry 4 }
+
+tmnxPcepPccPceAssDivSrcAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccPceAssDivSrcAddrType indicates the address type
+         for tmnxPcepPccPceAssDivSrcAddr."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepPccPceAssDivEntry 5 }
+
+tmnxPcepPccPceAssDivSrcAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivSrcAddr indicates the source address
+         of the PCC PCE association."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepPccPceAssDivEntry 6 }
+
+tmnxPcepPccPceAssDivType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        link      (1),
+        node      (2),
+        srlg-link (3),
+        srlg-node (4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivType specifies the diversity type of
+         PCC PCE association."
+    DEFVAL      { none }
+    ::= { tmnxPcepPccPceAssDivEntry 7 }
+
+tmnxPcepPccPceAssDivDsjType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        strict (1),
+        loose  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivDsjType specifies the disjointness
+         type of PCC PCE association."
+    DEFVAL      { loose }
+    ::= { tmnxPcepPccPceAssDivEntry 8 }
+
+tmnxPcepPccPceAssDivDsjRef       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssDivDsjRef specifies the disjointness
+         type of PCC PCE association."
+    DEFVAL      { false }
+    ::= { tmnxPcepPccPceAssDivEntry 9 }
+
+tmnxPcepPccPceAssPolTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccPceAssPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccPceAssPolTable contains information about PCEP Path
+         Computation Client (PCC) PCE Association Policy entities.
+
+         Entries, in this table, are created by the system for each row in
+         tmnxPcepEntityTable that have the value of object tmnxPcepEntityType
+         as 'pcc (1)'."
+    ::= { tmnxPcepPccConfigObjects 3 }
+
+tmnxPcepPccPceAssPolEntry        OBJECT-TYPE
+    SYNTAX      TmnxPcepPccPceAssPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolEntry represents a PCEP PCC
+         association policy entity.
+
+         Entries in tmnxPcepPccEntityEntry are created when entries in
+         tmnxPcepEntityEntry are created with the value of object
+         tmnxPcepEntityType set to 'pcc (1)."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        IMPLIED tmnxPcepPccPceAssPolAssocName
+    }
+    ::= { tmnxPcepPccPceAssPolTable 1 }
+
+TmnxPcepPccPceAssPolEntry        ::= SEQUENCE
+{
+    tmnxPcepPccPceAssPolAssocName    TNamedItem,
+    tmnxPcepPccPceAssPolRowStatus    RowStatus,
+    tmnxPcepPccPceAssPolLastChanged  TimeStamp,
+    tmnxPcepPccPceAssPolIndex        Unsigned32,
+    tmnxPcepPccPceAssPolSrcAddrType  InetAddressType,
+    tmnxPcepPccPceAssPolSrcAddr      InetAddress
+}
+
+tmnxPcepPccPceAssPolAssocName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolAssocName specifies the association
+         name for this PCEP PCC PCE Assocation Policy entity."
+    ::= { tmnxPcepPccPceAssPolEntry 1 }
+
+tmnxPcepPccPceAssPolRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolRowStatus controls the creation and
+         deletion of rows in this entity table."
+    ::= { tmnxPcepPccPceAssPolEntry 2 }
+
+tmnxPcepPccPceAssPolLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolLastChanged indicates the sysUpTime
+         at the time of the most recent change to this PCC entity row."
+    ::= { tmnxPcepPccPceAssPolEntry 3 }
+
+tmnxPcepPccPceAssPolIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolIndex specifies the unique identifier
+         for this PCEP PCC PCE Assocation Policy entity."
+    DEFVAL      { 0 }
+    ::= { tmnxPcepPccPceAssPolEntry 4 }
+
+tmnxPcepPccPceAssPolSrcAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccPceAssPolSrcAddrType indicates the address type
+         for tmnxPcepPccPceAssPolSrcAddr."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepPccPceAssPolEntry 5 }
+
+tmnxPcepPccPceAssPolSrcAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPceAssPolSrcAddr indicates the source address
+         of the PCC PCE association."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepPccPceAssPolEntry 6 }
+
+tmnxPcepPceConfigObjects         OBJECT IDENTIFIER ::= { tmnxPcepConfigObjects 2 }
+
+tmnxPcepEntityTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepEntityTable contains information about local Path
+         Computation Element communications Protocol (PCEP) entities."
+    ::= { tmnxPcepConfigObjects 3 }
+
+tmnxPcepEntityEntry              OBJECT-TYPE
+    SYNTAX      TmnxPcepEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityEntry represents a local PCEP entity."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex
+    }
+    ::= { tmnxPcepEntityTable 1 }
+
+TmnxPcepEntityEntry              ::= SEQUENCE
+{
+    tmnxPcepEntityIndex              Unsigned32,
+    tmnxPcepEntityRowStatus          RowStatus,
+    tmnxPcepEntityLastChanged        TimeStamp,
+    tmnxPcepEntityType               INTEGER,
+    tmnxPcepEntityAdminState         TmnxAdminState,
+    tmnxPcepEntityLocalAddrType      InetAddressType,
+    tmnxPcepEntityLocalAddr          InetAddress,
+    tmnxPcepEntityKeepAliveInterval  Unsigned32,
+    tmnxPcepEntityDeadTimer          Unsigned32,
+    tmnxPcepEntityMaxUnknownMsgs     Unsigned32,
+    tmnxPcepEntityCapability         TmnxPcepCapabilities,
+    tmnxPcepEntityIsOverloaded       TruthValue,
+    tmnxPcepEntityLocalAddrIpv6Type  InetAddressType,
+    tmnxPcepEntityLocalAddrIpv6      InetAddress,
+    tmnxPcepPceTLSServerProfName     TNamedItemOrEmpty,
+    tmnxPcepPceTLSWaitTimer          Unsigned32
+}
+
+tmnxPcepEntityIndex              OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityIndex specifies the unique identifier for
+         this PCEP entity.
+
+         The value of tmnxPcepEntityIndex can only be set to 1, when the value
+         of tmnxPcepEntityType is set to 'pcc (1)'. The value of
+         tmnxPcepEntityIndex can only be set to 2, when the value of
+         tmnxPcepEntityType is set to 'pce (2)'."
+    ::= { tmnxPcepEntityEntry 1 }
+
+tmnxPcepEntityRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityRowStatus controls the creation and
+         deletion of rows in this entity table."
+    ::= { tmnxPcepEntityEntry 2 }
+
+tmnxPcepEntityLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityLastChanged indicates the sysUpTime at the
+         time of the most recent change to this entity row."
+    ::= { tmnxPcepEntityEntry 3 }
+
+tmnxPcepEntityType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pcc (1),
+        pce (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityType specifies the type of this PCEP
+         entity. It takes one of the following values:
+             - pcc (1) : this entity is a Path Computation Client (PCC)
+             - pce (2) : this entity is a Path Computation Server (PCE).
+
+         This object can only be set at row creation time and cannot be
+         modified."
+    ::= { tmnxPcepEntityEntry 4 }
+
+tmnxPcepEntityAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityAdminState specifies the desired
+         administrative state of this PCEP entity."
+    DEFVAL      { outOfService }
+    ::= { tmnxPcepEntityEntry 5 }
+
+tmnxPcepEntityLocalAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityLocalAddrType specifies the address type of
+         this PCEP entity's Internet address."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepEntityEntry 6 }
+
+tmnxPcepEntityLocalAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityLocalAddr specifies the local Internet
+         address of this PCEP entity."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepEntityEntry 7 }
+
+tmnxPcepEntityKeepAliveInterval  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityKeepAliveInterval specifies keep alive
+         interval that this PCEP entity proposes in the initial OPEN message of
+         each session it is involved in. This is the maximum time between two
+         consecutive messages sent to a peer."
+    DEFVAL      { 30 }
+    ::= { tmnxPcepEntityEntry 8 }
+
+tmnxPcepEntityDeadTimer          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityDeadTimer specifies the dead timer interval
+         that this PCEP entity proposes in the initial OPEN message of each
+         session it is involved in. This is the time after which a peer should
+         declare a session down if it does not receive any PCEP messages."
+    DEFVAL      { 120 }
+    ::= { tmnxPcepEntityEntry 9 }
+
+tmnxPcepEntityMaxUnknownMsgs     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityMaxUnknownMsgs specifies the maximum number
+         of unknown messages that any session on this PCEP entity is willing to
+         accept per minute before terminating the session."
+    DEFVAL      { 10 }
+    ::= { tmnxPcepEntityEntry 10 }
+
+tmnxPcepEntityCapability         OBJECT-TYPE
+    SYNTAX      TmnxPcepCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityCapability indicates the capabilities
+         associated with this PCEP entity."
+    ::= { tmnxPcepEntityEntry 11 }
+
+tmnxPcepEntityIsOverloaded       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityIsOverloaded indicates whether this PCEP
+         entity is overloaded with the processing of existing requests and is
+         unable to handle new requests leading to unacceptable response times."
+    ::= { tmnxPcepEntityEntry 12 }
+
+tmnxPcepEntityLocalAddrIpv6Type  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityLocalAddrIpv6Type specifies the address
+         type of this PCEP entity's Internet address."
+    DEFVAL      { unknown }
+    ::= { tmnxPcepEntityEntry 13 }
+
+tmnxPcepEntityLocalAddrIpv6      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepEntityLocalAddrIpv6 specifies the local Internet
+         address of this PCEP entity."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepEntityEntry 14 }
+
+tmnxPcepPceTLSServerProfName     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPcepPceTLSServerProfName specifies the
+         name for a TLS server profile referenced by this PCEP PCE entity."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepEntityEntry 15 }
+
+tmnxPcepPceTLSWaitTimer          OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPceTLSWaitTimer specifies the TLS wait time in
+         seconds for this PCEP PCE entity."
+    DEFVAL      { 60 }
+    ::= { tmnxPcepEntityEntry 16 }
+
+tmnxPcepPccPeerTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccPeerTable contains information about peers known by the
+         PCEP entity."
+    ::= { tmnxPcepConfigObjects 4 }
+
+tmnxPcepPccPeerEntry             OBJECT-TYPE
+    SYNTAX      TmnxPcepPccPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerEntry represents information about a
+         single peer which spans all PCEP sessions to that peer."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccPeerAddrType,
+        tmnxPcepPccPeerAddr
+    }
+    ::= { tmnxPcepPccPeerTable 1 }
+
+TmnxPcepPccPeerEntry             ::= SEQUENCE
+{
+    tmnxPcepPccPeerAddrType          InetAddressType,
+    tmnxPcepPccPeerAddr              InetAddress,
+    tmnxPcepPccPeerRowStatus         RowStatus,
+    tmnxPcepPccPeerLastChanged       TimeStamp,
+    tmnxPcepPccPeerAdminState        TmnxAdminState,
+    tmnxPcepPccPeerOperState         TmnxOperState,
+    tmnxPcepPccPeerSpeakerId         OCTET STRING,
+    tmnxPcepPccPeerCapability        TmnxPcepCapabilities,
+    tmnxPcepPccPeerSyncState         INTEGER,
+    tmnxPcepPccPeerIsOverloaded      TruthValue,
+    tmnxPcepPccPeerSessEstablishTime TimeStamp,
+    tmnxPcepPccPeerOperKeepAlive     Unsigned32,
+    tmnxPcepPccPeerOperDeadTimer     Unsigned32,
+    tmnxPcepPccPeerPreference        Unsigned32,
+    tmnxPcepPccTLSClntProfName       TNamedItemOrEmpty,
+    tmnxPcepPccTLSWaitTimer          Unsigned32,
+    tmnxPcepPccPeerRoutePref         INTEGER
+}
+
+tmnxPcepPccPeerAddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerAddrType specifies the address type of the
+         peer's Internet address."
+    ::= { tmnxPcepPccPeerEntry 1 }
+
+tmnxPcepPccPeerAddr              OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerAddr specifies the Internet address of the
+         peer."
+    ::= { tmnxPcepPccPeerEntry 2 }
+
+tmnxPcepPccPeerRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerRowStatus controls the creation and
+         deletion of rows for this peer table."
+    ::= { tmnxPcepPccPeerEntry 3 }
+
+tmnxPcepPccPeerLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerLastChanged indicates the sysUpTime at the
+         time of the most recent change to this peer row."
+    ::= { tmnxPcepPccPeerEntry 4 }
+
+tmnxPcepPccPeerAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerAdminState specifies the desired
+         administrative state of this peer."
+    DEFVAL      { outOfService }
+    ::= { tmnxPcepPccPeerEntry 5 }
+
+tmnxPcepPccPeerOperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerOperState indicated the operational state
+         of this peer."
+    ::= { tmnxPcepPccPeerEntry 6 }
+
+tmnxPcepPccPeerSpeakerId         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerSpeakerId indicates a unique speaker
+         identifier for the peer that does change during the lifetime of the
+         speaker."
+    ::= { tmnxPcepPccPeerEntry 7 }
+
+tmnxPcepPccPeerCapability        OBJECT-TYPE
+    SYNTAX      TmnxPcepCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerCapability indicates the capabilities of
+         this peer."
+    ::= { tmnxPcepPccPeerEntry 8 }
+
+tmnxPcepPccPeerSyncState         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notInitialized (0),
+        inProgress     (1),
+        done           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerSyncState indicates the synchronization
+         state of this peer. The valid options are:
+             notInitialized (0) - Indicates the State Synchronization has not
+                                  yet started or not initialized due to no
+                                  connection with the peer.
+             inProgress     (1) - Indicates the State Synchronization is in
+                                  progress.
+             done           (2) - Indicates the State Synchronization has been
+                                  completed."
+    ::= { tmnxPcepPccPeerEntry 9 }
+
+tmnxPcepPccPeerIsOverloaded      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerIsOverloaded indicates whether the peer is
+         overloaded with the processing of existing requests and is unable to
+         handle new requests leading to unacceptable response times."
+    ::= { tmnxPcepPccPeerEntry 10 }
+
+tmnxPcepPccPeerSessEstablishTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerSessEstablishTime indicates how long this
+         session with the peer has been in the established state."
+    ::= { tmnxPcepPccPeerEntry 11 }
+
+tmnxPcepPccPeerOperKeepAlive     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerOperKeepAlive indicates the operational
+         value of keep alive interval in use by this entity's peer. This is the
+         maximum time between two consecutive messages sent to a peer."
+    ::= { tmnxPcepPccPeerEntry 12 }
+
+tmnxPcepPccPeerOperDeadTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerOperDeadTimer indicates the operational
+         value of dead timer interval in use by this entity's peer. This is the
+         time after which a peer should declare a session down if it does not
+         receive any PCEP messages."
+    ::= { tmnxPcepPccPeerEntry 13 }
+
+tmnxPcepPccPeerPreference        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerPreference indicates the preference value
+         of this entity's peer. If higher preference PCE is unavailable or not
+         connected, PCE with next preference number is used (for path
+         computation)."
+    DEFVAL      { 0 }
+    ::= { tmnxPcepPccPeerEntry 14 }
+
+tmnxPcepPccTLSClntProfName       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPcepPccTLSClntProfName specifies the name
+         for a TLS client profile referenced by this PCEP PCC peer entity."
+    DEFVAL      { ''H }
+    ::= { tmnxPcepPccPeerEntry 15 }
+
+tmnxPcepPccTLSWaitTimer          OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..255)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccTLSWaitTimer specifies the TLS wait time in
+         seconds for this PCEP PCC peer entity."
+    DEFVAL      { 60 }
+    ::= { tmnxPcepPccPeerEntry 16 }
+
+tmnxPcepPccPeerRoutePref         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inband  (1),
+        outband (2),
+        both    (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccPeerRoutePref specifies the route preference
+         this PCEP PCC peer entity."
+    DEFVAL      { both }
+    ::= { tmnxPcepPccPeerEntry 17 }
+
+tmnxPcepPcePeerTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPcePeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPcePeerTable contains information about peers known by the
+         PCEP entity."
+    ::= { tmnxPcepConfigObjects 5 }
+
+tmnxPcepPcePeerEntry             OBJECT-TYPE
+    SYNTAX      TmnxPcepPcePeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerEntry represents information about a
+         single peer which spans all PCEP sessions to that peer."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPcePeerAddrType,
+        tmnxPcepPcePeerAddr
+    }
+    ::= { tmnxPcepPcePeerTable 1 }
+
+TmnxPcepPcePeerEntry             ::= SEQUENCE
+{
+    tmnxPcepPcePeerAddrType          InetAddressType,
+    tmnxPcepPcePeerAddr              InetAddress,
+    tmnxPcepPcePeerPort              InetPortNumber,
+    tmnxPcepPcePeerCapability        TmnxPcepCapabilities,
+    tmnxPcepPcePeerSyncState         INTEGER,
+    tmnxPcepPcePeerSpeakerId         OCTET STRING,
+    tmnxPcepPcePeerSessEstablishTime TimeStamp,
+    tmnxPcepPcePeerOperKeepAlive     Unsigned32,
+    tmnxPcepPcePeerOperDeadTimer     Unsigned32
+}
+
+tmnxPcepPcePeerAddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerAddrType specifies the address type of the
+         PCE peer's Internet address."
+    ::= { tmnxPcepPcePeerEntry 1 }
+
+tmnxPcepPcePeerAddr              OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerAddr specifies the Internet address of the
+         PCE peer."
+    ::= { tmnxPcepPcePeerEntry 2 }
+
+tmnxPcepPcePeerPort              OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerPort indicates PCE peer's port number."
+    ::= { tmnxPcepPcePeerEntry 3 }
+
+tmnxPcepPcePeerCapability        OBJECT-TYPE
+    SYNTAX      TmnxPcepCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerCapability indicates the capabilities of
+         this PCE peer."
+    ::= { tmnxPcepPcePeerEntry 4 }
+
+tmnxPcepPcePeerSyncState         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notInitialized (0),
+        inProgress     (1),
+        done           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerSyncState indicates the synchronization
+         state of this peer. The valid options are:
+             notInitialized (0) - Indicates the State Synchronization has not
+                                  yet started or not initialized due to no
+                                  connection with the peer.
+             inProgress     (1) - Indicates the State Synchronization is in
+                                 progress.
+             done           (2) - Indicates the State Synchronization has been
+                                  completed."
+    ::= { tmnxPcepPcePeerEntry 5 }
+
+tmnxPcepPcePeerSpeakerId         OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerSpeakerId indicates a unique speaker
+         identifier for the peer that does change during the lifetime of the
+         speaker."
+    ::= { tmnxPcepPcePeerEntry 6 }
+
+tmnxPcepPcePeerSessEstablishTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerSessEstablishTime indicates how long this
+         session with the peer has been in the established state."
+    ::= { tmnxPcepPcePeerEntry 7 }
+
+tmnxPcepPcePeerOperKeepAlive     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerOperKeepAlive indicates the operational
+         value of keep alive interval in use by this entity's peer. This is the
+         maximum time between two consecutive messages sent to a peer."
+    ::= { tmnxPcepPcePeerEntry 8 }
+
+tmnxPcepPcePeerOperDeadTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPcePeerOperDeadTimer indicates the operational
+         value of dead timer interval in use by this entity's peer. This is the
+         time after which a peer should declare a session down if it does not
+         receive any PCEP messages."
+    ::= { tmnxPcepPcePeerEntry 9 }
+
+tmnxPcepPccP2mpSrTreeTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccP2mpSrTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPcePeerTable contains information about peers known by the
+         PCEP entity."
+    ::= { tmnxPcepConfigObjects 6 }
+
+tmnxPcepPccP2mpSrTreeEntry       OBJECT-TYPE
+    SYNTAX      TmnxPcepPccP2mpSrTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccLspUpdPLspId
+    }
+    ::= { tmnxPcepPccP2mpSrTreeTable 1 }
+
+TmnxPcepPccP2mpSrTreeEntry       ::= SEQUENCE
+{
+    tmnxPcepPccP2mpSrTreeAssocId     Unsigned32,
+    tmnxPcepPccP2mpSrTreeAssocType   INTEGER,
+    tmnxPcepPccP2mpSrTrAsSrcAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrAsSrcAddr     InetAddress,
+    tmnxPcepPccP2mpSrTrOrgNdAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrCPOrgNdAddr   InetAddress,
+    tmnxPcepPccP2mpSrTrRootAddrType  InetAddressType,
+    tmnxPcepPccP2mpSrTrRootAddr      InetAddress,
+    tmnxPcepPccP2mpSrTreeRootTreeId  Unsigned32,
+    tmnxPcepPccP2mpSrTreeCdtPathName TNamedItem,
+    tmnxPcepPccP2mpSrTreePathInstId  Unsigned32,
+    tmnxPcepPccP2mpSrTrDlPceAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrDlPceAddr     InetAddress,
+    tmnxPcepPccP2mpSrTreeOperStatus  INTEGER,
+    tmnxPcepPccP2mpSrTrOriginatorAsn Unsigned32,
+    tmnxPcepPccP2mpSrTrDiscriminator Unsigned32,
+    tmnxPcepPccP2mpSrTreePreference  Unsigned32
+}
+
+tmnxPcepPccP2mpSrTreeAssocId     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeAssocId specifies  the id associated
+         with this tree-sid policy entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 1 }
+
+tmnxPcepPccP2mpSrTreeAssocType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pcepAssociationTypeP2mpSr (0),
+        pcepMaxAssociationType    (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeAssocType specifies  the type of
+         association to this tree-sid policy entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 2 }
+
+tmnxPcepPccP2mpSrTrAsSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrAsSrcAddrType indicates  the type of
+         address for the source address represented by
+         tmnxPcepPccP2mpSrTrAsSrcAddr."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 3 }
+
+tmnxPcepPccP2mpSrTrAsSrcAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrAsSrcAddr specifies the  source
+         address associated to pcep entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 4 }
+
+tmnxPcepPccP2mpSrTrOrgNdAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrOrgNdAddrType indicates the  type of
+         address for the pcep tree-sid policy entry represented  by
+         tmnxPcepPccP2mpSrTrCPOrgNdAddr."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 5 }
+
+tmnxPcepPccP2mpSrTrCPOrgNdAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrCPOrgNdAddr specifies the  originator
+         address of this tree-sid candidate path entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 6 }
+
+tmnxPcepPccP2mpSrTrRootAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrRootAddrType indicates the  type of
+         address for the pcep tree-sid policy entry represented  by
+         tmnxPcepPccP2mpSrTrRootAddr."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 7 }
+
+tmnxPcepPccP2mpSrTrRootAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrRootAddr specifies the root  address
+         of this pcep tree-sid policy entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 8 }
+
+tmnxPcepPccP2mpSrTreeRootTreeId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeRootTreeId uniquely identifies  a
+         tunnel in the root. This also represents a specific constrain.  Also
+         known as color and/or p2mp-id"
+    ::= { tmnxPcepPccP2mpSrTreeEntry 9 }
+
+tmnxPcepPccP2mpSrTreeCdtPathName OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeCdtPathName specifies a path  name
+         of a given candidate path table instance within a pcep pcc  tree-sid
+         policy table entry and it is equivalent to an LSP."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 10 }
+
+tmnxPcepPccP2mpSrTreePathInstId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreePathInstId specifies the  instance
+         id for the pcep pcc p2mp-policy."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 11 }
+
+tmnxPcepPccP2mpSrTrDlPceAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrDlPceAddrType indicates  the type of
+         address for the pcep tree-sid policy entry  represented by
+         tmnxPcepPccP2mpSrTrDlPceAddr."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 12 }
+
+tmnxPcepPccP2mpSrTrDlPceAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrDlPceAddr specifies the  delegated pce
+         address for the pcep tree-sid policy entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 13 }
+
+tmnxPcepPccP2mpSrTreeOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        active (0),
+        up     (1),
+        down   (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeOperStatus indicates the
+         operational status of the pcep tree-sid policy entry."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 14 }
+
+tmnxPcepPccP2mpSrTrOriginatorAsn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrOriginatorAsn specifies a  4 byte
+         number to represent the originator asn value for a given  candidate
+         path entry inside a pcep pcc tree-sid policy instance."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 15 }
+
+tmnxPcepPccP2mpSrTrDiscriminator OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrDiscriminator indicates a 32 bit value
+         associatied with a tmnxPcepPccP2mpSrTreeEntry that uniquely identifies
+         it within the context of an SR Policy from a specific Protocol-Origin."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 16 }
+
+tmnxPcepPccP2mpSrTreePreference  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1024)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreePreference determines the best
+         preferred  candidate-path among the list of candidate paths towards a
+         leaf. Higher preference is choosen."
+    ::= { tmnxPcepPccP2mpSrTreeEntry 17 }
+
+tmnxPcepPccP2mpSrTreeAddTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccP2mpSrTreeAddEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccP2mpSrTreeAddTable contains information about the set
+         of add leaves known by the PCEP entity."
+    ::= { tmnxPcepConfigObjects 7 }
+
+tmnxPcepPccP2mpSrTreeAddEntry    OBJECT-TYPE
+    SYNTAX      TmnxPcepPccP2mpSrTreeAddEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccLspUpdPLspId
+    }
+    ::= { tmnxPcepPccP2mpSrTreeAddTable 1 }
+
+TmnxPcepPccP2mpSrTreeAddEntry    ::= SEQUENCE
+{
+    tmnxPcepPccP2mpSrTreeAddTreeId   Unsigned32,
+    tmnxPcepPccP2mpSrTrAddRtAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrAddRtAddr     InetAddress,
+    tmnxPcepPccP2mpSrTAdLeafAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTAdLeafAddr     InetAddress
+}
+
+tmnxPcepPccP2mpSrTreeAddTreeId   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeAddTreeId uniquely identifies  a
+         tunnel in the add leaves. This also represents a specific constrain.
+         Also known as color and/or p2mp-id"
+    ::= { tmnxPcepPccP2mpSrTreeAddEntry 1 }
+
+tmnxPcepPccP2mpSrTrAddRtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrAddRtAddrType indicates the type of
+         root address for the entry of add leaves represented by
+         tmnxPcepPccP2mpSrTrAddRtAddr."
+    ::= { tmnxPcepPccP2mpSrTreeAddEntry 2 }
+
+tmnxPcepPccP2mpSrTrAddRtAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrAddRtAddr specifies the root address
+         of the set of add leaves."
+    ::= { tmnxPcepPccP2mpSrTreeAddEntry 3 }
+
+tmnxPcepPccP2mpSrTAdLeafAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTAdLeafAddrType indicates the type of
+         leaf address for the entry of add leaves represented by
+         tmnxPcepPccP2mpSrTAdLeafAddr."
+    ::= { tmnxPcepPccP2mpSrTreeAddEntry 4 }
+
+tmnxPcepPccP2mpSrTAdLeafAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTAdLeafAddr indicates the leaf address
+         of the set of add leaves."
+    ::= { tmnxPcepPccP2mpSrTreeAddEntry 5 }
+
+tmnxPcepPccP2mpSrTreeRemoveTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccP2mpSrTreeRemoveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccP2mpSrTreeRemoveTable contains information about the
+         set of remove leaves known by the PCEP entity."
+    ::= { tmnxPcepConfigObjects 8 }
+
+tmnxPcepPccP2mpSrTreeRemoveEntry OBJECT-TYPE
+    SYNTAX      TmnxPcepPccP2mpSrTreeRemoveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccLspUpdPLspId
+    }
+    ::= { tmnxPcepPccP2mpSrTreeRemoveTable 1 }
+
+TmnxPcepPccP2mpSrTreeRemoveEntry ::= SEQUENCE
+{
+    tmnxPcepPccP2mpSrTrRemoveTrId    Unsigned32,
+    tmnxPcepPccP2mpSrTrRemRtAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrRemRtAddr     InetAddress,
+    tmnxPcepPccP2mpSrTRmLeafAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTRmLeafAddr     InetAddress
+}
+
+tmnxPcepPccP2mpSrTrRemoveTrId    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrRemoveTrId uniquely identifies  a
+         tunnel in the add leaves. This also represents a specific constrain.
+         Also known as color and/or p2mp-id"
+    ::= { tmnxPcepPccP2mpSrTreeRemoveEntry 1 }
+
+tmnxPcepPccP2mpSrTrRemRtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrRemRtAddrType indicates the type of
+         root address for the entry of remove leaves represented by
+         tmnxPcepPccP2mpSrTrRemRtAddr."
+    ::= { tmnxPcepPccP2mpSrTreeRemoveEntry 2 }
+
+tmnxPcepPccP2mpSrTrRemRtAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrRemRtAddr specifies the root address
+         of the set of remove leaves."
+    ::= { tmnxPcepPccP2mpSrTreeRemoveEntry 3 }
+
+tmnxPcepPccP2mpSrTRmLeafAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTRmLeafAddrType indicates the type of
+         leaf address for the entry of remove leaves represented by
+         tmnxPcepPccP2mpSrTRmLeafAddr."
+    ::= { tmnxPcepPccP2mpSrTreeRemoveEntry 4 }
+
+tmnxPcepPccP2mpSrTRmLeafAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTRmLeafAddr indicates the leaf address
+         of the set of remove leaves."
+    ::= { tmnxPcepPccP2mpSrTreeRemoveEntry 5 }
+
+tmnxPcepPccP2mpSrTreeOldTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccP2mpSrTreeOldEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccP2mpSrTreeOldTable contains information about the set
+         of Old leaves known by the PCEP entity."
+    ::= { tmnxPcepConfigObjects 9 }
+
+tmnxPcepPccP2mpSrTreeOldEntry    OBJECT-TYPE
+    SYNTAX      TmnxPcepPccP2mpSrTreeOldEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccLspUpdPLspId
+    }
+    ::= { tmnxPcepPccP2mpSrTreeOldTable 1 }
+
+TmnxPcepPccP2mpSrTreeOldEntry    ::= SEQUENCE
+{
+    tmnxPcepPccP2mpSrTreeOldTreeId   Unsigned32,
+    tmnxPcepPccP2mpSrTrOldRtAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTrOldRtAddr     InetAddress,
+    tmnxPcepPccP2mpSrTOdLeafAddrType InetAddressType,
+    tmnxPcepPccP2mpSrTOdLeafAddr     InetAddress
+}
+
+tmnxPcepPccP2mpSrTreeOldTreeId   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTreeOldTreeId uniquely identifies  a
+         tunnel in the old leaves. This also represents a specific constrain.
+         Also known as color and/or p2mp-id"
+    ::= { tmnxPcepPccP2mpSrTreeOldEntry 1 }
+
+tmnxPcepPccP2mpSrTrOldRtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrOldRtAddrType indicates the type of
+         root address for the entry of old leaves represented by
+         tmnxPcepPccP2mpSrTrOldRtAddr."
+    ::= { tmnxPcepPccP2mpSrTreeOldEntry 2 }
+
+tmnxPcepPccP2mpSrTrOldRtAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTrOldRtAddr specifies the root address
+         of the set of old leaves."
+    ::= { tmnxPcepPccP2mpSrTreeOldEntry 3 }
+
+tmnxPcepPccP2mpSrTOdLeafAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTOdLeafAddrType indicates the type of
+         leaf address for the entry of old leaves represented by
+         tmnxPcepPccP2mpSrTOdLeafAddr."
+    ::= { tmnxPcepPccP2mpSrTreeOldEntry 4 }
+
+tmnxPcepPccP2mpSrTOdLeafAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccP2mpSrTOdLeafAddr indicates the leaf address
+         of the set of old leaves."
+    ::= { tmnxPcepPccP2mpSrTreeOldEntry 5 }
+
+tmnxPcepStatsObjects             OBJECT IDENTIFIER ::= { tmnxPcepObjects 3 }
+
+tmnxPcepPccStatsObjects          OBJECT IDENTIFIER ::= { tmnxPcepStatsObjects 1 }
+
+tmnxPcepPccReqMsgInfoTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccReqMsgInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccReqMsgInfoTable contains Path Computation Request
+         (PCReq) messages information sent by PCC to request a path
+         computation."
+    ::= { tmnxPcepPccStatsObjects 1 }
+
+tmnxPcepPccReqMsgInfoEntry       OBJECT-TYPE
+    SYNTAX      TmnxPcepPccReqMsgInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgInfoEntry represents information related
+         to Path Computation Request (PCReq) messages sent by PCC requesting
+         for path computation."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccReqMsgRequestId
+    }
+    ::= { tmnxPcepPccReqMsgInfoTable 1 }
+
+TmnxPcepPccReqMsgInfoEntry       ::= SEQUENCE
+{
+    tmnxPcepPccReqMsgRequestId       Unsigned32,
+    tmnxPcepPccReqMsgLspType         TmnxPcepLspType,
+    tmnxPcepPccReqMsgTunnelId        Unsigned32,
+    tmnxPcepPccReqMsgLspId           Unsigned32,
+    tmnxPcepPccReqMsgExtTunnelIdType InetAddressType,
+    tmnxPcepPccReqMsgExtTunnelId     InetAddress,
+    tmnxPcepPccReqMsgLspName         TLNamedItemOrEmpty,
+    tmnxPcepPccReqMsgSrcAddrType     InetAddressType,
+    tmnxPcepPccReqMsgSrcAddr         InetAddress,
+    tmnxPcepPccReqMsgDstAddrType     InetAddressType,
+    tmnxPcepPccReqMsgDstAddr         InetAddress,
+    tmnxPcepPccReqMsgState           INTEGER,
+    tmnxPcepPccReqMsgSvecId          Counter64,
+    tmnxPcepPccReqMsgIgpMetric       Unsigned32,
+    tmnxPcepPccReqMsgTeMetric        Unsigned32,
+    tmnxPcepPccReqMsgHopCount        Unsigned32,
+    tmnxPcepPccReqMsgMetricBound     BITS,
+    tmnxPcepPccReqMsgMetricCompute   BITS,
+    tmnxPcepPccReqMsgLclProtDesired  TruthValue,
+    tmnxPcepPccReqMsgSetupPriority   Unsigned32,
+    tmnxPcepPccReqMsgHoldingPriority Unsigned32,
+    tmnxPcepPccReqMsgExcludeAny      Unsigned32,
+    tmnxPcepPccReqMsgIncludeAny      Unsigned32,
+    tmnxPcepPccReqMsgIncludeAll      Unsigned32,
+    tmnxPcepPccReqMsgPriority        Unsigned32,
+    tmnxPcepPccReqMsgReoptimization  TruthValue,
+    tmnxPcepPccReqMsgBidirectional   TruthValue,
+    tmnxPcepPccReqMsgStrictLoose     TruthValue,
+    tmnxPcepPccReqMsgLspBandwidth    Unsigned32,
+    tmnxPcepPccReqMsgMaxSrLabels     Unsigned32
+}
+
+tmnxPcepPccReqMsgRequestId       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgRequestId specifies the unique path
+         computation request identifier represented in PCReq message."
+    ::= { tmnxPcepPccReqMsgInfoEntry 1 }
+
+tmnxPcepPccReqMsgLspType         OBJECT-TYPE
+    SYNTAX      TmnxPcepLspType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgLspType indicates the type of Labeled
+         Switch Path (LSP) connection."
+    ::= { tmnxPcepPccReqMsgInfoEntry 2 }
+
+tmnxPcepPccReqMsgTunnelId        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgTunnelId indicates the unique tunnel
+         identifier that remains constant over the life time of a tunnel."
+    ::= { tmnxPcepPccReqMsgInfoEntry 3 }
+
+tmnxPcepPccReqMsgLspId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgLspId indicates the unique identifier
+         for LSP."
+    ::= { tmnxPcepPccReqMsgInfoEntry 4 }
+
+tmnxPcepPccReqMsgExtTunnelIdType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccReqMsgExtTunnelIdType indicates the address type
+         for tmnxPcepPccReqMsgExtTunnelId."
+    ::= { tmnxPcepPccReqMsgInfoEntry 5 }
+
+tmnxPcepPccReqMsgExtTunnelId     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgExtTunnelId indicates the extended
+         tunnel identifier."
+    ::= { tmnxPcepPccReqMsgInfoEntry 6 }
+
+tmnxPcepPccReqMsgLspName         OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgLspName indicates the LSP path name that
+         is unique in the PCC and remains constant throughout a path's life
+         time."
+    ::= { tmnxPcepPccReqMsgInfoEntry 7 }
+
+tmnxPcepPccReqMsgSrcAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccReqMsgSrcAddrType indicates the address type for
+         tmnxPcepPccReqMsgSrcAddr."
+    ::= { tmnxPcepPccReqMsgInfoEntry 8 }
+
+tmnxPcepPccReqMsgSrcAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgSrcAddr indicates the source address of
+         the path for which path computation is requested. It is the END-POINTS
+         object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.6"
+    ::= { tmnxPcepPccReqMsgInfoEntry 9 }
+
+tmnxPcepPccReqMsgDstAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccReqMsgDstAddrType indicates the address type for
+         tmnxPcepPccReqMsgDstAddr."
+    ::= { tmnxPcepPccReqMsgInfoEntry 10 }
+
+tmnxPcepPccReqMsgDstAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgDstAddr indicates the destination
+         address of the path for which path computation is requested. It is the
+         END-POINTS object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.6"
+    ::= { tmnxPcepPccReqMsgInfoEntry 11 }
+
+tmnxPcepPccReqMsgState           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown          (0),
+        requestParameter (1),
+        sentForCompute   (2),
+        errorReceived    (3),
+        notifyReceived   (4),
+        cancel           (5),
+        computeReceived  (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgState indicates the state of PCReq
+         message:
+             unknown         (0) - The state of PCReq message is unknown.
+             requestParameter(1) - Request Parameter (RP) object is included in
+                                   the PCReq message.
+             sentForCompute  (2) - PCReq message has been sent for path
+                                   computation.
+             errorReceived   (3) - Path Computation Error (PCErr) message is
+                                   received by the PCC.
+             notifyReceived  (4) - Path Computation Notification (PCNtf)
+                                   message is received by the PCC.
+             cancel          (5) - PCReq message has been cancelled.
+             computeReceived (6) - Path computation is received by the PCC."
+    ::= { tmnxPcepPccReqMsgInfoEntry 12 }
+
+tmnxPcepPccReqMsgSvecId          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgSvecId indicates the Synchronization
+         VECtor (SVEC) identifier for Synchronized Dependent Path Computations."
+    ::= { tmnxPcepPccReqMsgInfoEntry 13 }
+
+tmnxPcepPccReqMsgIgpMetric       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgIgpMetric indicates Interior Gateway
+         Protocol (IGP) metric that must be optimized by the path computation
+         algorithm for providing the cost of computed path. It is the METRIC
+         object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.8"
+    ::= { tmnxPcepPccReqMsgInfoEntry 14 }
+
+tmnxPcepPccReqMsgTeMetric        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgTeMetric indicates Traffic Engineering
+         (TE) metric that must be optimized by the path computation algorithm
+         for providing the cost of computed path. It is the METRIC object used
+         in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.8"
+    ::= { tmnxPcepPccReqMsgInfoEntry 15 }
+
+tmnxPcepPccReqMsgHopCount        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgHopCount indicates the number of hops
+         that transversed. It is the METRIC object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.8"
+    ::= { tmnxPcepPccReqMsgInfoEntry 16 }
+
+tmnxPcepPccReqMsgMetricBound     OBJECT-TYPE
+    SYNTAX      BITS {
+        igpMetric (0),
+        teMetric  (1),
+        hopCount  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgMetricBound indicates whether the
+         metric-value specifies a bound (a maximum) for the path metric that
+         must not be exceeded for the PCC to consider the computed path as
+         acceptable. It is the METRIC object used in PCReq message.
+
+         When the value of the bit 'igpMetric (0)' is set to one, it indicates
+         that the metric-value specified by tmnxPcepPccReqMsgIgpMetric is a
+         bound value.
+
+         When the value of the bit 'teMetric (1)' is set to one, it indicates
+         that the metric-value specified by tmnxPcepPccReqMsgTeMetric is a
+         bound value.
+
+         When the value of the bit 'hopCount (2)' is set to one, it indicates
+         that the metric-value specified by tmnxPcepPccReqMsgHopCount is a
+         bound value."
+    REFERENCE
+        "RFC 5440 Section 7.8"
+    ::= { tmnxPcepPccReqMsgInfoEntry 17 }
+
+tmnxPcepPccReqMsgMetricCompute   OBJECT-TYPE
+    SYNTAX      BITS {
+        igpMetric (0),
+        teMetric  (1),
+        hopCount  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgMetricCompute indicates whether PCE must
+         provide the computed path metric value in Path Computation Response
+         (PCRep) message for the corresponding metric. It is the METRIC object
+         used in PCReq message.
+
+         When the value of the bit 'igpMetric (0)' is set to one, it indicates
+         that PCE must provide the computed path metric value for IGP metric in
+         PCRep message.
+
+         When the value of the bit 'teMetric (1)' is set to one, it indicates
+         that PCE must provide the computed path metric value for TE Metric in
+         PCRep message.
+
+         When the value of the bit 'hopCount (2)' is set to one, it indicates
+         that PCE must provide the computed path metric value for Hop Count in
+         PCRep message."
+    REFERENCE
+        "RFC 5440 Section 7.8"
+    ::= { tmnxPcepPccReqMsgInfoEntry 18 }
+
+tmnxPcepPccReqMsgLclProtDesired  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgLclProtDesired indicates whether local
+         protection is desired or not. It is the LSPA (LSP Attribute) object
+         used in PCReq message.
+
+         When the value of this object is set to 'true (1)', it indicates that
+         the computed path must include links protected with Fast Reroute as
+         defined in the maximum number of hops to be transversed that must not
+         be exceeded to consider computed path as acceptable."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 19 }
+
+tmnxPcepPccReqMsgSetupPriority   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgSetupPriority indicates the priority of
+         the TE LSP with respect to taking resources. The value of 0 represents
+         highest priority. The setup priority indicates whether this session
+         can preempt another session. It is the LSPA object used in PCReq
+         message."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 20 }
+
+tmnxPcepPccReqMsgHoldingPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgHoldingPriority indicates the priority
+         of of the TE LSP with respect to holding resources. The value of 0
+         represents highest priority. The holding priority indicates whether
+         this session can be preempted by another session. It is the LSPA
+         object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 21 }
+
+tmnxPcepPccReqMsgExcludeAny      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgExcludeAny indicates a set of attribute
+         filters associated with a tunnel any of which renders a link
+         unacceptable. It is the LSPA object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 22 }
+
+tmnxPcepPccReqMsgIncludeAny      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgIncludeAny indicates a set of attribute
+         filters associated with a tunnel any of which renders a link
+         acceptable. It is the LSPA object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 23 }
+
+tmnxPcepPccReqMsgIncludeAll      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgIncludeAll indicates a set of attribute
+         filters associated with a tunnel all of which much be present for a
+         link to be acceptable. It is the LSPA object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.11"
+    ::= { tmnxPcepPccReqMsgInfoEntry 24 }
+
+tmnxPcepPccReqMsgPriority        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgPriority indicates the priority of the
+         PCReq message. It is the RP object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.4.1"
+    ::= { tmnxPcepPccReqMsgInfoEntry 25 }
+
+tmnxPcepPccReqMsgReoptimization  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgReoptimization indicates whether the
+         PCReq message relates to the reoptimization of an existing TE LSP. It
+         is the RP object used in PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.4.1"
+    ::= { tmnxPcepPccReqMsgInfoEntry 26 }
+
+tmnxPcepPccReqMsgBidirectional   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgBidirectional indicates whether the
+         PCReq message relates to a bi-directional TE LSP that has the same
+         traffic engineering requirements including fate sharing, protection
+         and restoration, LSRs, TE links, and resource requirements (e.g.,
+         latency and jitter) in each direction. It is the RP object used in
+         PCReq message."
+    REFERENCE
+        "RFC 5440 Section 7.4.1"
+    ::= { tmnxPcepPccReqMsgInfoEntry 27 }
+
+tmnxPcepPccReqMsgStrictLoose     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgStrictLoose indicates whether the path
+         is strict or loose. It is the RP object used in PCReq message.
+
+         When the value of this object is set to 'true (1)', it indicates that
+         a loose path is acceptable.
+
+         When the value of this object is set to 'false (2)', it indicates that
+         a path exclusively made of strict hops is required."
+    REFERENCE
+        "RFC 5440 Section 7.4.1"
+    ::= { tmnxPcepPccReqMsgInfoEntry 28 }
+
+tmnxPcepPccReqMsgLspBandwidth    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgLspBandwidth indicates the bandwidth
+         that is being requested by the LSP."
+    REFERENCE
+        "RFC 5440 Section 7.7"
+    ::= { tmnxPcepPccReqMsgInfoEntry 29 }
+
+tmnxPcepPccReqMsgMaxSrLabels     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqMsgMaxSrLabels indicates maximum segment
+         routing label stack size for this LSP."
+    ::= { tmnxPcepPccReqMsgInfoEntry 30 }
+
+tmnxPcepPccReqPathProfInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccReqPathProfInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccReqPathProfInfoTable contains Path Computation Request
+         (PCReq) messages containing path-profile information sent by PCC to
+         request a path computation."
+    ::= { tmnxPcepPccStatsObjects 2 }
+
+tmnxPcepPccReqPathProfInfoEntry  OBJECT-TYPE
+    SYNTAX      TmnxPcepPccReqPathProfInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProfInfoEntry represents path-profile
+         information related to Path Computation Request (PCReq) messages sent
+         by PCC requesting for path computation.
+
+         A valid entry for this table is returned only if the table contains at
+         least one non-zero value."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccReqMsgRequestId
+    }
+    ::= { tmnxPcepPccReqPathProfInfoTable 1 }
+
+TmnxPcepPccReqPathProfInfoEntry  ::= SEQUENCE
+{
+    tmnxPcepPccReqPathProf1          Unsigned32,
+    tmnxPcepPccReqExtendedPathProf1  Unsigned32,
+    tmnxPcepPccReqPathProf2          Unsigned32,
+    tmnxPcepPccReqExtendedPathProf2  Unsigned32,
+    tmnxPcepPccReqPathProf3          Unsigned32,
+    tmnxPcepPccReqExtendedPathProf3  Unsigned32,
+    tmnxPcepPccReqPathProf4          Unsigned32,
+    tmnxPcepPccReqExtendedPathProf4  Unsigned32,
+    tmnxPcepPccReqPathProf5          Unsigned32,
+    tmnxPcepPccReqExtendedPathProf5  Unsigned32
+}
+
+tmnxPcepPccReqPathProf1          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProf1 indicates the path profile
+         identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 1 }
+
+tmnxPcepPccReqExtendedPathProf1  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqExtendedPathProf1 indicates the extended
+         identifier associated with the path profile identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 2 }
+
+tmnxPcepPccReqPathProf2          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProf2 indicates the path profile
+         identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 3 }
+
+tmnxPcepPccReqExtendedPathProf2  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqExtendedPathProf2 indicates the extended
+         identifier associated with the path profile identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 4 }
+
+tmnxPcepPccReqPathProf3          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProf3 indicates the path profile
+         identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 5 }
+
+tmnxPcepPccReqExtendedPathProf3  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqExtendedPathProf3 indicates the extended
+         identifier associated with the path profile identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 6 }
+
+tmnxPcepPccReqPathProf4          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProf4 indicates the path profile
+         identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 7 }
+
+tmnxPcepPccReqExtendedPathProf4  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqExtendedPathProf4 indicates the extended
+         identifier associated with the path profile identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 8 }
+
+tmnxPcepPccReqPathProf5          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqPathProf5 indicates the path profile
+         identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 9 }
+
+tmnxPcepPccReqExtendedPathProf5  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccReqExtendedPathProf5 indicates the extended
+         identifier associated with the path profile identifier."
+    ::= { tmnxPcepPccReqPathProfInfoEntry 10 }
+
+tmnxPcepPccLspUpdateInfoTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPccLspUpdateInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPccLspUpdateInfoTable contains Labeled Switch Path (LSP)
+         update information sent by a PCE to a PCC to update attributes of a
+         LSP."
+    ::= { tmnxPcepPccStatsObjects 3 }
+
+tmnxPcepPccLspUpdateInfoEntry    OBJECT-TYPE
+    SYNTAX      TmnxPcepPccLspUpdateInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdateInfoEntry represents LSP update
+         information sent by a PCE to a PCC to update attributes of a LSP."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPccLspUpdPLspId
+    }
+    ::= { tmnxPcepPccLspUpdateInfoTable 1 }
+
+TmnxPcepPccLspUpdateInfoEntry    ::= SEQUENCE
+{
+    tmnxPcepPccLspUpdPLspId          Unsigned32,
+    tmnxPcepPccLspUpdLspId           Unsigned32,
+    tmnxPcepPccLspUpdLspType         TmnxPcepLspType,
+    tmnxPcepPccLspUpdTunnelId        Unsigned32,
+    tmnxPcepPccLspUpdExtTunnelIdType InetAddressType,
+    tmnxPcepPccLspUpdExtTunnelId     InetAddress,
+    tmnxPcepPccLspUpdLspName         TLNamedItemOrEmpty,
+    tmnxPcepPccLspUpdSenderType      InetAddressType,
+    tmnxPcepPccLspUpdSenderAddr      InetAddress,
+    tmnxPcepPccLspUpdSourceType      InetAddressType,
+    tmnxPcepPccLspUpdSourceAddr      InetAddress,
+    tmnxPcepPccLspUpdDestinationType InetAddressType,
+    tmnxPcepPccLspUpdDestinationAddr InetAddress,
+    tmnxPcepPccLspUpdLspDelegated    TruthValue,
+    tmnxPcepPccLspUpdDelgatdPeerType InetAddressType,
+    tmnxPcepPccLspUpdDelgatdPeerAddr InetAddress,
+    tmnxPcepPccLspUpdOperState       INTEGER,
+    tmnxPcepPccLspUpdLspError        INTEGER,
+    tmnxPcepPccLspUpdState           INTEGER
+}
+
+tmnxPcepPccLspUpdPLspId          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdPLspId specifies a unique PCEP-specific
+         identifier for the LSP created by a PCC that remains constant for the
+         life time of a PCEP session."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 1 }
+
+tmnxPcepPccLspUpdLspId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdLspId indicates the unique identifier
+         for LSP."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 2 }
+
+tmnxPcepPccLspUpdLspType         OBJECT-TYPE
+    SYNTAX      TmnxPcepLspType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdLspType indicates the type of LSP
+         connection."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 3 }
+
+tmnxPcepPccLspUpdTunnelId        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdTunnelId indicates the unique tunnel
+         identifier that remains constant over the life time of a tunnel."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 4 }
+
+tmnxPcepPccLspUpdExtTunnelIdType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccLspUpdExtTunnelIdType indicates the address type
+         for tmnxPcepPccLspUpdExtTunnelId."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 5 }
+
+tmnxPcepPccLspUpdExtTunnelId     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdExtTunnelId indicates the extended
+         tunnel identifier."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 6 }
+
+tmnxPcepPccLspUpdLspName         OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdLspName indicates the LSP path name that
+         is unique in the PCC and remains constant throughout a path's life
+         time."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 7 }
+
+tmnxPcepPccLspUpdSenderType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccLspUpdSenderType indicates the address type for
+         tmnxPcepPccLspUpdSenderAddr."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 8 }
+
+tmnxPcepPccLspUpdSenderAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdSenderAddr indicates the sender node's
+         address."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 9 }
+
+tmnxPcepPccLspUpdSourceType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccLspUpdSourceType indicates the address type for
+         tmnxPcepPccLspUpdSourceAddr."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 10 }
+
+tmnxPcepPccLspUpdSourceAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdSourceAddr indicates the sender address
+         of the LSP."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 11 }
+
+tmnxPcepPccLspUpdDestinationType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccLspUpdDestinationType indicates the address type
+         for tmnxPcepPccLspUpdDestinationAddr."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 12 }
+
+tmnxPcepPccLspUpdDestinationAddr OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdDestinationAddr indicates the
+         destination address of the LSP."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 13 }
+
+tmnxPcepPccLspUpdLspDelegated    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdLspDelegated indicates whether the PCC
+         is delegating the LSP to the PCE."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 14 }
+
+tmnxPcepPccLspUpdDelgatdPeerType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxPcepPccLspUpdDelgatdPeerType indicates the address type
+         for tmnxPcepPccLspUpdDelgatdPeerAddr."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 15 }
+
+tmnxPcepPccLspUpdDelgatdPeerAddr OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdDelgatdPeerAddr indicates the peer
+         address to which the PCC has delegated the LSP."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 16 }
+
+tmnxPcepPccLspUpdOperState       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        down      (0),
+        up        (1),
+        active    (2),
+        goingDown (3),
+        goingUp   (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdOperState indicates the operational
+         status of the LSP:
+             down      (0) - LSP is not active.
+             up        (1) - LSP has been signalled.
+             active    (2) - LSP is up and carrying traffic.
+             goingDown (3) - LSP is being torn down, resources are being
+                             released.
+             goingUp   (4) - LSP is being signalled."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 17 }
+
+tmnxPcepPccLspUpdLspError        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable          (0),
+        unknownReason          (1),
+        limitRchdForPceLsp     (2),
+        manyPendingLspUpdate   (3),
+        unacceptableParameters (4),
+        internalError          (5),
+        lspAdminDown           (6),
+        lspPreempted           (7),
+        rsvpSignalingError     (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdLspError indicates the error information
+         containing the reason for LSP update failure:
+             notApplicable         (0) - Not Applicable.
+             unknownReason         (1) - Unknown reason.
+             limitRchdForPceLsp    (2) - Limit reached for PCE-controlled LSPs.
+             manyPendingLspUpdate  (3) - Too many pending LSP update requests.
+             unacceptableParameters(4) - Unacceptable parameters.
+             internalError         (5) - Internal error.
+             lspAdminDown          (6) - LSP administratively brought down.
+             lspPreempted          (7) - LSP preempted.
+             rsvpSignalingError    (8) - RSVP signaling error."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 18 }
+
+tmnxPcepPccLspUpdState           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable    (0),
+        mbbInProgress    (1),
+        mbbFail          (2),
+        mbbSuccess       (3),
+        updateDelegation (4),
+        lspDown          (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPccLspUpdState indicates the state of LSP:
+         notApplicable    (0) - Make-Before-Break (MBB) is not-applicable
+                                or is not in progress.
+         mbbInProgress    (1) - MBB procedure is in progress.
+         mbbFail          (2) - MBB procedure failed.
+         mbbSuccess       (3) - MBB procedure succeeded.
+         updateDelegation (4) - delegation update is being processed.
+         lspDown          (5) - LSP down update is being processed."
+    ::= { tmnxPcepPccLspUpdateInfoEntry 19 }
+
+tmnxPcepPceStatsObjects          OBJECT IDENTIFIER ::= { tmnxPcepStatsObjects 2 }
+
+tmnxPcepPeerStatsObjects         OBJECT IDENTIFIER ::= { tmnxPcepStatsObjects 3 }
+
+tmnxPcepPeerStatsTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPcepPeerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPcepPeerStatsTable contains statistics information about peers
+         known by the PCEP entity."
+    ::= { tmnxPcepPeerStatsObjects 1 }
+
+tmnxPcepPeerStatsEntry           OBJECT-TYPE
+    SYNTAX      TmnxPcepPeerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerStatsEntry represents statistics information
+         about a single peer which spans all PCEP sessions to that peer."
+    INDEX       {
+        vRtrID,
+        tmnxPcepEntityIndex,
+        tmnxPcepPeerAddrType,
+        tmnxPcepPeerAddr
+    }
+    ::= { tmnxPcepPeerStatsTable 1 }
+
+TmnxPcepPeerStatsEntry           ::= SEQUENCE
+{
+    tmnxPcepPeerAddrType             InetAddressType,
+    tmnxPcepPeerAddr                 InetAddress,
+    tmnxPcepPeerNumPCRptSent         Counter32,
+    tmnxPcepPeerNumPCRptRcvd         Counter32,
+    tmnxPcepPeerNumPCUpdSent         Counter32,
+    tmnxPcepPeerNumPCUpdRcvd         Counter32,
+    tmnxPcepPeerNumRptSent           Counter32,
+    tmnxPcepPeerNumRptRcvd           Counter32,
+    tmnxPcepPeerNumPCInitSent        Counter32,
+    tmnxPcepPeerNumPCInitRcvd        Counter32
+}
+
+tmnxPcepPeerAddrType             OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerAddrType specifies the address type of the
+         peer's Internet address."
+    ::= { tmnxPcepPeerStatsEntry 1 }
+
+tmnxPcepPeerAddr                 OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerAddr specifies the Internet address of the
+         peer."
+    ::= { tmnxPcepPeerStatsEntry 2 }
+
+tmnxPcepPeerNumPCRptSent         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCRptSent indicates the number of PCRpt
+         messages sent to this peer."
+    ::= { tmnxPcepPeerStatsEntry 3 }
+
+tmnxPcepPeerNumPCRptRcvd         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCRptRcvd indicates the number of PCRpt
+         messages received from this peer."
+    ::= { tmnxPcepPeerStatsEntry 4 }
+
+tmnxPcepPeerNumPCUpdSent         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCUpdSent indicates the number of PCUpd
+         messages sent to this peer."
+    ::= { tmnxPcepPeerStatsEntry 5 }
+
+tmnxPcepPeerNumPCUpdRcvd         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCUpdRcvd indicates the number of PCUpd
+         messages received from this peer."
+    ::= { tmnxPcepPeerStatsEntry 6 }
+
+tmnxPcepPeerNumRptSent           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumRptSent indicates the number of report
+         messages sent to this peer.
+
+         This might be greater than tmnxPcepPeerNumPCRptSent because multiple
+         requests can be batched into a single PCRpt message."
+    ::= { tmnxPcepPeerStatsEntry 7 }
+
+tmnxPcepPeerNumRptRcvd           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumRptRcvd indicates the number of report
+         messages received from this peer.
+
+         This might be greater than tmnxPcepPeerNumPCRptRcvd because multiple
+         requests can be batched into a single PCRpt message."
+    ::= { tmnxPcepPeerStatsEntry 8 }
+
+tmnxPcepPeerNumPCInitSent        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCInitSent indicates the number of PC
+         initiated messages sent to this peer."
+    ::= { tmnxPcepPeerStatsEntry 9 }
+
+tmnxPcepPeerNumPCInitRcvd        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPcepPeerNumPCInitRcvd indicates the number of PC
+         initiated messages received from this peer."
+    ::= { tmnxPcepPeerStatsEntry 10 }
+
+tmnxPcepConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 101 }
+
+tmnxPcepCompliances              OBJECT IDENTIFIER ::= { tmnxPcepConformance 1 }
+
+tmnxPcepCompliance               MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PCEP features on Nokia SROS
+         series systems release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPcepTableChngdGroup,
+            tmnxPcepConfigGroup,
+            tmnxPcepPccConfigGroup,
+            tmnxPcepPccPeerConfigGroup,
+            tmnxPcepPcePeerGroup,
+            tmnxPcepPccReqMsgInfoGroup,
+            tmnxPcepPccReqPathProfInfoGroup,
+            tmnxPcepPccLspUpdInfoGroup,
+            tmnxPcepPeerStatsGroup,
+            tmnxPcepPccPeerObjectGroup,
+            tmnxPcepPccTimerObjectGroup,
+            tmnxPcepPccMaxSrteLspObjectGroup,
+            tmnxPcepIpv6ObjectGroup,
+            tmnxPcepPccP2mpSrTreeGroup,
+            tmnxPcepPccP2mpSrTreeAdRmOdGroup,
+            tmnxPcepTLSObjectGroup,
+            tmnxPcepPccPceAssocObjectGroup,
+            tmnxPcepPccRoutePrefObjectGroup
+        }
+    ::= { tmnxPcepCompliances 1 }
+
+tmnxPcepNotificationCompliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of PCEP Notifications on Nokia
+         SROS series systems release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPcepNotificationGroup
+        }
+    ::= { tmnxPcepCompliances 2 }
+
+tmnxPcepGroups                   OBJECT IDENTIFIER ::= { tmnxPcepConformance 2 }
+
+tmnxPcepTableChngdGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepEntityTableLastChanged,
+        tmnxPcepPccEntityTblLastChgd,
+        tmnxPcepPccPeerTableLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP table last changed objects on
+         Nokia SROS series systems release."
+    ::= { tmnxPcepGroups 1 }
+
+tmnxPcepConfigGroup              OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepEntityRowStatus,
+        tmnxPcepEntityLastChanged,
+        tmnxPcepEntityType,
+        tmnxPcepEntityAdminState,
+        tmnxPcepEntityLocalAddrType,
+        tmnxPcepEntityLocalAddr,
+        tmnxPcepEntityKeepAliveInterval,
+        tmnxPcepEntityDeadTimer,
+        tmnxPcepEntityMaxUnknownMsgs,
+        tmnxPcepEntityCapability,
+        tmnxPcepEntityIsOverloaded,
+        tmnxPcepEntityLocalAddrIpv6Type,
+        tmnxPcepEntityLocalAddrIpv6
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP configuration on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 2 }
+
+tmnxPcepPccConfigGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccEntityLastChanged,
+        tmnxPcepPccEntityAddrType,
+        tmnxPcepPccEntityAddr,
+        tmnxPcepPccEntityReportPathConst,
+        tmnxPcepPccEntityAddrIpv6Type,
+        tmnxPcepPccEntityAddrIpv6
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCC configuration on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 3 }
+
+tmnxPcepPccPeerConfigGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccPeerRowStatus,
+        tmnxPcepPccPeerLastChanged,
+        tmnxPcepPccPeerAdminState,
+        tmnxPcepPccPeerOperState,
+        tmnxPcepPccPeerSpeakerId,
+        tmnxPcepPccPeerCapability,
+        tmnxPcepPccPeerSyncState,
+        tmnxPcepPccPeerIsOverloaded,
+        tmnxPcepPccPeerSessEstablishTime,
+        tmnxPcepPccPeerOperKeepAlive,
+        tmnxPcepPccPeerOperDeadTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP Peer configuration on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 5 }
+
+tmnxPcepPcePeerGroup             OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPcePeerPort,
+        tmnxPcepPcePeerCapability,
+        tmnxPcepPcePeerSyncState,
+        tmnxPcepPcePeerSpeakerId,
+        tmnxPcepPcePeerSessEstablishTime,
+        tmnxPcepPcePeerOperKeepAlive,
+        tmnxPcepPcePeerOperDeadTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCE Peer configuration on Nokia
+         SROS series systems release."
+    ::= { tmnxPcepGroups 6 }
+
+tmnxPcepPccReqMsgInfoGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccReqMsgLspType,
+        tmnxPcepPccReqMsgTunnelId,
+        tmnxPcepPccReqMsgLspId,
+        tmnxPcepPccReqMsgExtTunnelIdType,
+        tmnxPcepPccReqMsgExtTunnelId,
+        tmnxPcepPccReqMsgLspName,
+        tmnxPcepPccReqMsgSrcAddrType,
+        tmnxPcepPccReqMsgSrcAddr,
+        tmnxPcepPccReqMsgDstAddrType,
+        tmnxPcepPccReqMsgDstAddr,
+        tmnxPcepPccReqMsgState,
+        tmnxPcepPccReqMsgSvecId,
+        tmnxPcepPccReqMsgIgpMetric,
+        tmnxPcepPccReqMsgTeMetric,
+        tmnxPcepPccReqMsgHopCount,
+        tmnxPcepPccReqMsgMetricBound,
+        tmnxPcepPccReqMsgMetricCompute,
+        tmnxPcepPccReqMsgLclProtDesired,
+        tmnxPcepPccReqMsgSetupPriority,
+        tmnxPcepPccReqMsgHoldingPriority,
+        tmnxPcepPccReqMsgExcludeAny,
+        tmnxPcepPccReqMsgIncludeAny,
+        tmnxPcepPccReqMsgIncludeAll,
+        tmnxPcepPccReqMsgPriority,
+        tmnxPcepPccReqMsgReoptimization,
+        tmnxPcepPccReqMsgBidirectional,
+        tmnxPcepPccReqMsgStrictLoose,
+        tmnxPcepPccReqMsgLspBandwidth,
+        tmnxPcepPccReqMsgMaxSrLabels
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCC request message (PCReq)
+         information on Nokia SROS series systems release."
+    ::= { tmnxPcepGroups 7 }
+
+tmnxPcepPccReqPathProfInfoGroup  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccReqPathProf1,
+        tmnxPcepPccReqExtendedPathProf1,
+        tmnxPcepPccReqPathProf2,
+        tmnxPcepPccReqExtendedPathProf2,
+        tmnxPcepPccReqPathProf3,
+        tmnxPcepPccReqExtendedPathProf3,
+        tmnxPcepPccReqPathProf4,
+        tmnxPcepPccReqExtendedPathProf4,
+        tmnxPcepPccReqPathProf5,
+        tmnxPcepPccReqExtendedPathProf5
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCC request message (PCReq)
+         information related to path-profile on Nokia SROS series systems
+         release."
+    ::= { tmnxPcepGroups 8 }
+
+tmnxPcepPccLspUpdInfoGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccLspUpdLspId,
+        tmnxPcepPccLspUpdLspType,
+        tmnxPcepPccLspUpdTunnelId,
+        tmnxPcepPccLspUpdExtTunnelIdType,
+        tmnxPcepPccLspUpdExtTunnelId,
+        tmnxPcepPccLspUpdLspName,
+        tmnxPcepPccLspUpdSenderType,
+        tmnxPcepPccLspUpdSenderAddr,
+        tmnxPcepPccLspUpdSourceType,
+        tmnxPcepPccLspUpdSourceAddr,
+        tmnxPcepPccLspUpdDestinationType,
+        tmnxPcepPccLspUpdDestinationAddr,
+        tmnxPcepPccLspUpdLspDelegated,
+        tmnxPcepPccLspUpdDelgatdPeerType,
+        tmnxPcepPccLspUpdDelgatdPeerAddr,
+        tmnxPcepPccLspUpdOperState,
+        tmnxPcepPccLspUpdLspError,
+        tmnxPcepPccLspUpdState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCC Label Switched Path (LSP)
+         update information on Nokia SROS series systems release."
+    ::= { tmnxPcepGroups 9 }
+
+tmnxPcepPeerStatsGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPeerNumPCRptSent,
+        tmnxPcepPeerNumPCRptRcvd,
+        tmnxPcepPeerNumPCUpdSent,
+        tmnxPcepPeerNumPCUpdRcvd,
+        tmnxPcepPeerNumRptSent,
+        tmnxPcepPeerNumRptRcvd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP Peer Statistics information on
+         Nokia SROS series systems release."
+    ::= { tmnxPcepGroups 10 }
+
+tmnxPcepPccPeerObjectGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccPeerPreference
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of object/objetcs supporting PCEP PCC Peer on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 11 }
+
+tmnxPcepPccTimerObjectGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccRedelegationTimer,
+        tmnxPcepPccStateTimer,
+        tmnxPcepPccStateTimerAction
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of object/objects supporting PCEP PCC Peer on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 12 }
+
+tmnxPcepPccMaxSrteLspObjectGroup OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccMaxSrtePceInitLsps,
+        tmnxPcepPeerNumPCInitSent,
+        tmnxPcepPeerNumPCInitRcvd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of object/objects supporting PCEP PCC Peer on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 13 }
+
+tmnxPcepIpv6ObjectGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepEntityLocalAddrIpv6Type,
+        tmnxPcepEntityLocalAddrIpv6,
+        tmnxPcepPccEntityAddrIpv6Type,
+        tmnxPcepPccEntityAddrIpv6
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP Ipv6 address on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 14 }
+
+tmnxPcepPccP2mpSrTreeGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccP2mpSrTreeAssocId,
+        tmnxPcepPccP2mpSrTreeAssocType,
+        tmnxPcepPccP2mpSrTrAsSrcAddrType,
+        tmnxPcepPccP2mpSrTrAsSrcAddr,
+        tmnxPcepPccP2mpSrTrOrgNdAddrType,
+        tmnxPcepPccP2mpSrTrCPOrgNdAddr,
+        tmnxPcepPccP2mpSrTrRootAddrType,
+        tmnxPcepPccP2mpSrTrRootAddr,
+        tmnxPcepPccP2mpSrTreeRootTreeId,
+        tmnxPcepPccP2mpSrTreeCdtPathName,
+        tmnxPcepPccP2mpSrTreePathInstId,
+        tmnxPcepPccP2mpSrTrDlPceAddrType,
+        tmnxPcepPccP2mpSrTrDlPceAddr,
+        tmnxPcepPccP2mpSrTreeOperStatus,
+        tmnxPcepPccP2mpSrTrOriginatorAsn,
+        tmnxPcepPccP2mpSrTrOrgNdAddrType,
+        tmnxPcepPccP2mpSrTrDiscriminator,
+        tmnxPcepPccP2mpSrTreePreference
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group opf objects support P2MP-SR-Tree on Nokia SROS series
+         systems release."
+    ::= { tmnxPcepGroups 15 }
+
+tmnxPcepPccP2mpSrTreeAdRmOdGroup OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccP2mpSrTreeAddTreeId,
+        tmnxPcepPccP2mpSrTrAddRtAddrType,
+        tmnxPcepPccP2mpSrTrAddRtAddr,
+        tmnxPcepPccP2mpSrTAdLeafAddrType,
+        tmnxPcepPccP2mpSrTAdLeafAddr,
+        tmnxPcepPccP2mpSrTrRemoveTrId,
+        tmnxPcepPccP2mpSrTrRemRtAddrType,
+        tmnxPcepPccP2mpSrTrRemRtAddr,
+        tmnxPcepPccP2mpSrTRmLeafAddrType,
+        tmnxPcepPccP2mpSrTRmLeafAddr,
+        tmnxPcepPccP2mpSrTreeOldTreeId,
+        tmnxPcepPccP2mpSrTrOldRtAddrType,
+        tmnxPcepPccP2mpSrTrOldRtAddr,
+        tmnxPcepPccP2mpSrTOdLeafAddrType,
+        tmnxPcepPccP2mpSrTOdLeafAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects support P2MP-SR-Tree add leaves on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 16 }
+
+tmnxPcepTLSObjectGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPceTLSServerProfName,
+        tmnxPcepPceTLSWaitTimer,
+        tmnxPcepPccTLSClntProfName,
+        tmnxPcepPccTLSWaitTimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP TLS profiles on Nokia SROS series
+         systems release."
+    ::= { tmnxPcepGroups 17 }
+
+tmnxPcepPccPceAssocObjectGroup   OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccPceAssDivRowStatus,
+        tmnxPcepPccPceAssDivLastChanged,
+        tmnxPcepPccPceAssDivIndex,
+        tmnxPcepPccPceAssDivSrcAddrType,
+        tmnxPcepPccPceAssDivSrcAddr,
+        tmnxPcepPccPceAssDivType,
+        tmnxPcepPccPceAssDivDsjType,
+        tmnxPcepPccPceAssDivDsjRef,
+        tmnxPcepPccPceAssPolRowStatus,
+        tmnxPcepPccPceAssPolLastChanged,
+        tmnxPcepPccPceAssPolIndex,
+        tmnxPcepPccPceAssPolSrcAddrType,
+        tmnxPcepPccPceAssPolSrcAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP PCC PCE Associations on  Nokia
+         SROS series systems release."
+    ::= { tmnxPcepGroups 18 }
+
+tmnxPcepPccRoutePrefObjectGroup  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPcepPccPeerRoutePref
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP route preference on Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 19 }
+
+tmnxPcepNotificationGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPcepPccPeerStateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PCEP notification for the Nokia SROS
+         series systems release."
+    ::= { tmnxPcepGroups 20 }
+
+tmnxPcepNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 101 }
+
+tmnxPcepNotification             OBJECT IDENTIFIER ::= { tmnxPcepNotifyPrefix 0 }
+
+tmnxPcepPccPeerStateChange       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPcepPccPeerOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] This notification is generated when the specified PCC Peer
+         changes operational state.
+
+         [EFFECT] The PCC peer changes state to operationally up or down.
+
+         [RECOVERY] Appropriate investigation or action can be taken."
+    ::= { tmnxPcepNotifyPrefix 1 }
+
+END

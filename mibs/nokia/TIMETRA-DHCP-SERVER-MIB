@@ -1343,11 +1343,11 @@ tmnxDhcpSvrSubnetDrain           OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "If the value of object tmnxDhcpSvrSubnetDrain is set to true(2?) then
-         the subnet is draining, which means no new leases can be assigned from
-         this subnet and existing leases are cleaned up upon renew/rebind.
+        "If the value of object tmnxDhcpSvrSubnetDrain is set to 'true (1)'
+         then the subnet is draining, which means no new leases can be assigned
+         from this subnet and existing leases are cleaned up upon renew/rebind.
 
-         If the value of this object is set to false(1?) then the subnet is
+         If the value of this object is set to 'false (2)' then the subnet is
          active and new leases can be assigned from it."
     DEFVAL      { false }
     ::= { tmnxDhcpServerSubnetEntry 16 }

@@ -1,0 +1,600 @@
+TIMETRA-ELMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp
+                                                         FROM SNMPv2-TC
+    tmnxChassisIndex
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    tmnxPortEtherEntry, tmnxPortPortID
+                                                         FROM TIMETRA-PORT-MIB
+    TmnxEncapVal
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+tmnxElmiMIBModule                MODULE-IDENTITY
+    LAST-UPDATED "200810230000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         Ethernet Link Management Interface (E-LMI) components of the Nokia
+         7x50 device.
+
+         Copyright 2009-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "200810230000Z"
+    DESCRIPTION
+        "Rev 1.0                23 Oct 2008 00:00
+         1.0 release of the TIMETRA-ELMI-MIB."
+
+    ::= { timetraSRMIBModules 68 }
+
+TmnxElmiIdentifierString         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxElmiIdentifierString is a readable description that specifies
+         the Ethernet Link Management Interface Identifier. The value must be
+         unique in the system, and match the identifier on the connected
+         system."
+    SYNTAX      OCTET STRING (SIZE (0..100))
+
+tmnxElmiObjs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 68 }
+
+tmnxElmiConfigurationTimeStamps  OBJECT IDENTIFIER ::= { tmnxElmiObjs 0 }
+
+tmnxElmiIfConfigTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiIfConfigTableLastChanged indicates the time, since system
+         startup, when a row in the tmnxElmiIfConfigTable last changed."
+    ::= { tmnxElmiConfigurationTimeStamps 1 }
+
+tmnxElmiEvcCfgTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiEvcCfgTableLastChanged indicates the time, since system
+         startup, when a row in the tmnxElmiEvcConfigTable last changed."
+    ::= { tmnxElmiConfigurationTimeStamps 2 }
+
+tmnxElmiConfigurations           OBJECT IDENTIFIER ::= { tmnxElmiObjs 1 }
+
+tmnxElmiIfConfigTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxElmiIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiIfConfigTable has an entry for each port in the system
+         that is configured for Ethernet LMI. It contains the service
+         attributes and associated parameters of Ethernet services observable
+         for the User Network Interface (UNI) to User Network Interface."
+    ::= { tmnxElmiConfigurations 1 }
+
+tmnxElmiIfConfigEntry            OBJECT-TYPE
+    SYNTAX      TmnxElmiIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular User Network Interface. Entries cannot
+         be created and deleted via SNMP SET operations.
+
+         Rows in this table are created and destroyed by the system, and can
+         not be created or deleted by SNMP SET operations. Each row references
+         an existing tmnxPortEtherEntry row entry."
+    AUGMENTS    { tmnxPortEtherEntry }
+    ::= { tmnxElmiIfConfigTable 1 }
+
+TmnxElmiIfConfigEntry            ::= SEQUENCE
+{
+    tmnxElmiIfCfgMode                INTEGER,
+    tmnxElmiIfCfgStatus              INTEGER,
+    tmnxElmiIfCfgN393                Unsigned32,
+    tmnxElmiIfCfgT391                Unsigned32,
+    tmnxElmiIfCfgT392                Unsigned32,
+    tmnxElmiIfCfgUniType             INTEGER,
+    tmnxElmiIfCfgUniIdentifier       TmnxElmiIdentifierString
+}
+
+tmnxElmiIfCfgMode                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        uniN (1),
+        uniC (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgMode specifies the mode of the interface. It
+         can be set as User Network Interface Customer (UNI-C), User Network
+         Interface Network (UNI-N), or 'none (0)' to disable E-LMI."
+    DEFVAL      { none }
+    ::= { tmnxElmiIfConfigEntry 1 }
+
+tmnxElmiIfCfgStatus              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgStatus indicates the operational status of
+         the Ethernet LMI interface
+         The valid options are:
+                 up    (1)  -- The E-LMI interface is operational.
+                 down  (2)  -- The E-LMI error threshold exceeded."
+    DEFVAL      { up }
+    ::= { tmnxElmiIfConfigEntry 2 }
+
+tmnxElmiIfCfgN393                OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgN393 specifies the ELMI monitored count of
+         the consecutive errors for both UNI-N and UNI-C. It is used to
+         determine if E-LMI is operational or not."
+    DEFVAL      { 4 }
+    ::= { tmnxElmiIfConfigEntry 3 }
+
+tmnxElmiIfCfgT391                OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgT391 specifies the polling timer for the
+         E-LMI UNI-C."
+    DEFVAL      { 10 }
+    ::= { tmnxElmiIfConfigEntry 4 }
+
+tmnxElmiIfCfgT392                OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgT392 specifies the polling verification
+         timer for the E-LMI UNI-N."
+    DEFVAL      { 15 }
+    ::= { tmnxElmiIfConfigEntry 5 }
+
+tmnxElmiIfCfgUniType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notUsed                (0),
+        allToOneBundling       (1),
+        svcMultiplexNoBundling (2),
+        bundling               (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgUniType indicates the information retrieved
+         from the CE-VLAN ID/EVC Map Type contained in the UNI Status
+         Information Element.
+
+         The valid options are:
+                notUsed                (0) -- unused value.
+                allToOneBundling       (1) -- All VLANs are associated with a
+                                              single EVC.
+                svcMultiplexNoBundling (2) -- One VLAN is associated with a
+                                              single EVC.
+                bundling               (3) -- multiple VLANs can be associated
+                                              with a single EVC."
+    ::= { tmnxElmiIfConfigEntry 6 }
+
+tmnxElmiIfCfgUniIdentifier       OBJECT-TYPE
+    SYNTAX      TmnxElmiIdentifierString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiIfCfgUniIdentifier specifies the UNI identifier
+         of the E-LMI entity."
+    ::= { tmnxElmiIfConfigEntry 7 }
+
+tmnxElmiEvcConfigTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxElmiEvcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiEvcConfigTable has an entry for each SAP in the system
+         that is configured for ELMI. It contains the service attributes for
+         the Ethernet Virtual Connection (EVC). An EVC is an association of two
+         or more UNIs."
+    ::= { tmnxElmiConfigurations 2 }
+
+tmnxElmiEvcConfigEntry           OBJECT-TYPE
+    SYNTAX      TmnxElmiEvcConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular Ethernet Virtual Connection (EVC)
+         Interface. Entries cannot be created and deleted via SNMP SET
+         operations.
+
+         Rows in this table are created and destroyed by the system, and can
+         not be created or deleted by SNMP SET operations.
+
+         Rows are created for q-tag encapsulated Ethernet SAPs."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID,
+        tmnxElmiEvcCfgVlanId
+    }
+    ::= { tmnxElmiEvcConfigTable 1 }
+
+TmnxElmiEvcConfigEntry           ::= SEQUENCE
+{
+    tmnxElmiEvcCfgVlanId             TmnxEncapVal,
+    tmnxElmiEvcCfgIdentifier         TmnxElmiIdentifierString,
+    tmnxElmiEvcCfgType               INTEGER,
+    tmnxElmiEvcCfgStatus             INTEGER,
+    tmnxElmiEvcCfgStatusTimeStamp    TimeStamp
+}
+
+tmnxElmiEvcCfgVlanId             OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiEvcCfgVlanId specifies the third index for the
+         tmnxElmiEvcConfigEntry, as well as the VLAN Identifier of the EVC."
+    ::= { tmnxElmiEvcConfigEntry 1 }
+
+tmnxElmiEvcCfgIdentifier         OBJECT-TYPE
+    SYNTAX      TmnxElmiIdentifierString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiEvcCfgIdentifier specifies the unique value used
+         in ELMI validation."
+    ::= { tmnxElmiEvcConfigEntry 2 }
+
+tmnxElmiEvcCfgType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        p2p   (0),
+        mp2mp (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiEvcCfgType indicates the type of EVC configured.
+         The valid options are:
+                p2p   (0) -- Point-to-point connection
+                mp2mp (1) -- Multipoint-to-multipoint connection."
+    ::= { tmnxElmiEvcConfigEntry 3 }
+
+tmnxElmiEvcCfgStatus             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notActive             (0),
+        newAndNotActive       (1),
+        active                (2),
+        newAndActive          (3),
+        partiallyActive       (4),
+        newAndPartiallyActive (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiEvcCfgStatus indicates the status reported in the
+         EVC Status Information Element.
+
+         An EVC is fully operational when the EVC is capable of transferring
+         traffic among all of the UNIs in the EVC.
+
+         The valid options are:
+                notActive             (0) -- The EVC is not fully operational.
+                newAndNotActive       (1) -- The EVC is newly created and not
+                                             fully operational.
+                active                (2) -- The EVC is fully operational.
+                newAndActive          (3) -- The EVC is newly created and fully
+                                             operational.
+                partiallyActive       (4) -- The EVC is multipoint-to-
+                                             multipoint and some of the EVC
+                                             endpoints are operational.
+
+                newAndPartiallyActive (5) -- The EVC is newly created and
+                                             'partiallyActive'."
+    REFERENCE
+        "MEF 16 Section 5.5.3.7"
+    ::= { tmnxElmiEvcConfigEntry 4 }
+
+tmnxElmiEvcCfgStatusTimeStamp    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiEvcCfgStatusTimeStamp indicates the time, since
+         system startup, when the tmnxElmiEvcCfgStatus changed state."
+    ::= { tmnxElmiEvcConfigEntry 5 }
+
+tmnxElmiStatistics               OBJECT IDENTIFIER ::= { tmnxElmiObjs 2 }
+
+tmnxElmiStatTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxElmiStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiStatTable has an entry for each entry in the
+         tmnxElmiIfConfigEntry."
+    ::= { tmnxElmiStatistics 1 }
+
+tmnxElmiStatEntry                OBJECT-TYPE
+    SYNTAX      TmnxElmiStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Statistics Entry for an E-LMI Configuration Entry. Entries cannot
+         be created and deleted via SNMP SET operations.
+
+         Rows in this table are created and destroyed by the system, and can
+         not be created or deleted by SNMP SET operations. Each row references
+         an existing tmnxElmiIfConfigEntry row entry."
+    AUGMENTS    { tmnxElmiIfConfigEntry }
+    ::= { tmnxElmiStatTable 1 }
+
+TmnxElmiStatEntry                ::= SEQUENCE
+{
+    tmnxElmiStatRxStatusEnqMsgTime   TimeStamp,
+    tmnxElmiStatRxStatusEnqMsgs      Counter32,
+    tmnxElmiStatStatusEnqMsgTimeouts Counter32,
+    tmnxElmiStatTxStatusMsgTime      TimeStamp,
+    tmnxElmiStatTxStatusMsgs         Counter32,
+    tmnxElmiStatRxStatusCheckTime    TimeStamp,
+    tmnxElmiStatTxStatusCheckTime    TimeStamp,
+    tmnxElmiStatDiscardedMsgs        Counter32,
+    tmnxElmiStatInvRxSeqNumMsgs      Counter32,
+    tmnxElmiStatTxAsyncStatusMsgs    Counter32
+}
+
+tmnxElmiStatRxStatusEnqMsgTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatRxStatusEnqMsgTime indicates the time, since
+         system startup, of the last received ELMI Status Enquiry message."
+    ::= { tmnxElmiStatEntry 1 }
+
+tmnxElmiStatRxStatusEnqMsgs      OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatRxStatusEnqMsgs indicates the number of ELMI
+         Status Enquiry messages received on this Ethernet interface."
+    ::= { tmnxElmiStatEntry 2 }
+
+tmnxElmiStatStatusEnqMsgTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatStatusEnqMsgTimeouts indicates the number of
+         times the ELMI agent did not receive a Status Enquiry message within
+         the allotted time."
+    ::= { tmnxElmiStatEntry 3 }
+
+tmnxElmiStatTxStatusMsgTime      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatTxStatusMsgTime indicates the time, since
+         system startup, of the last transmitted ELMI Status message."
+    ::= { tmnxElmiStatEntry 4 }
+
+tmnxElmiStatTxStatusMsgs         OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatTxStatusMsgs indicates the number of ELMI
+         Status messages transmitted on this Ethernet interface."
+    ::= { tmnxElmiStatEntry 5 }
+
+tmnxElmiStatRxStatusCheckTime    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatRxStatusCheckTime indicates the time, since
+         system startup, of the last received ELMI Status Check message."
+    ::= { tmnxElmiStatEntry 6 }
+
+tmnxElmiStatTxStatusCheckTime    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatTxStatusCheckTime indicates the time, since
+         system startup, of the last transmitted ELMI Status Check message."
+    ::= { tmnxElmiStatEntry 7 }
+
+tmnxElmiStatDiscardedMsgs        OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatDiscardedMsgs indicates the number of times
+         the ELMI agent discarded a received message because it wasn't
+         expecting it, the type of message was incorrect, or the contents of
+         the message were invalid."
+    ::= { tmnxElmiStatEntry 8 }
+
+tmnxElmiStatInvRxSeqNumMsgs      OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatInvRxSeqNumMsgs indicates the number of times
+         the ELMI agent received a message with an invalid receive sequence
+         number: i.e. a sequence number that does not match the last
+         transmitted sequence number of the agent."
+    ::= { tmnxElmiStatEntry 9 }
+
+tmnxElmiStatTxAsyncStatusMsgs    OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "messages"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxElmiStatTxAsyncStatusMsgs indicates the number of
+         single EVC Asynchronous Status messages transmitted."
+    ::= { tmnxElmiStatEntry 10 }
+
+tmnxElmiConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 68 }
+
+tmnxElmiCompliances              OBJECT IDENTIFIER ::= { tmnxElmiConformance 1 }
+
+tmnxElmiCompliance               MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 1.0 of TIMETRA-ELMI-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxElmiTimeStampGroup,
+            tmnxElmiIfConfigGroup,
+            tmnxElmiEvcConfigGroup,
+            tmnxElmiStatsGroup,
+            tmnxElmiEventGroup
+        }
+    ::= { tmnxElmiCompliances 1 }
+
+tmnxElmiGroups                   OBJECT IDENTIFIER ::= { tmnxElmiConformance 2 }
+
+tmnxElmiTimeStampGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxElmiIfConfigTableLastChanged,
+        tmnxElmiEvcCfgTableLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiTimeStampGroup consists of the objects used for monitoring
+         overall configuration change of E-LMI configuration for the 7x50."
+    ::= { tmnxElmiGroups 1 }
+
+tmnxElmiIfConfigGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxElmiIfCfgMode,
+        tmnxElmiIfCfgStatus,
+        tmnxElmiIfCfgN393,
+        tmnxElmiIfCfgT391,
+        tmnxElmiIfCfgT392,
+        tmnxElmiIfCfgUniType,
+        tmnxElmiIfCfgUniIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiIfConfigGroup consists of the objects used for management
+         of E-LMI configuration for the 7x50."
+    ::= { tmnxElmiGroups 2 }
+
+tmnxElmiEvcConfigGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxElmiEvcCfgIdentifier,
+        tmnxElmiEvcCfgType,
+        tmnxElmiEvcCfgStatus,
+        tmnxElmiEvcCfgStatusTimeStamp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiEvcConfigGroup consists of the objects used for management
+         of E-LMI EVC configuration for the 7x50."
+    ::= { tmnxElmiGroups 3 }
+
+tmnxElmiStatsGroup               OBJECT-GROUP
+    OBJECTS     {
+        tmnxElmiStatRxStatusEnqMsgTime,
+        tmnxElmiStatRxStatusEnqMsgs,
+        tmnxElmiStatStatusEnqMsgTimeouts,
+        tmnxElmiStatTxStatusMsgTime,
+        tmnxElmiStatTxStatusMsgs,
+        tmnxElmiStatRxStatusCheckTime,
+        tmnxElmiStatTxStatusCheckTime,
+        tmnxElmiStatDiscardedMsgs,
+        tmnxElmiStatInvRxSeqNumMsgs,
+        tmnxElmiStatTxAsyncStatusMsgs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiStatsGroup consists of the objects used for collecting
+         statistics for E-LMI for the 7x50."
+    ::= { tmnxElmiGroups 4 }
+
+tmnxElmiEventGroup               NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxElmiIfStatusChangeEvent,
+        tmnxElmiEVCStatusChangeEvent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiEventGroup consists of the notifications used for
+         generating events for E-LMI for the 7x50."
+    ::= { tmnxElmiGroups 5 }
+
+tmnxElmiNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 68 }
+
+tmnxElmiNotifications            OBJECT IDENTIFIER ::= { tmnxElmiNotifyPrefix 0 }
+
+tmnxElmiIfStatusChangeEvent      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxElmiIfCfgStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiIfStatusChangeEvent notification indicates that the
+         Ethernet LMI Interface has changed state."
+    ::= { tmnxElmiNotifications 1 }
+
+tmnxElmiEVCStatusChangeEvent     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxElmiEvcCfgStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxElmiEVCStatusChangeEvent notification indicates that the
+         indicated Ethernet Virtual Connection (EVC) has changed its active
+         state (i.e. from not active to active).
+
+         The notification is suppressed when the tmnxElmiIfCfgMode is set to
+         'none (0)'."
+    ::= { tmnxElmiNotifications 2 }
+
+END

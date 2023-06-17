@@ -55,14 +55,16 @@ IMPORTS
     TResolveStatus, TSiteOperStatus,
     TSrv6Function, TSrv6FunctionErrorCode,
     TSrv6FunctionType, TSrv6FunctionValue,
-    TTcpUdpPort, TWeight, TmnxActionType,
-    TmnxAdminState, TmnxAiiType,
-    TmnxAncpStringOrZero,
+    TSrv6RouteResolution, TTcpUdpPort,
+    TWeight, TmnxActionType, TmnxAdminState,
+    TmnxAiiType, TmnxAncpStringOrZero,
     TmnxAppProfileStringOrEmpty,
     TmnxBfdIntfSessOperState,
     TmnxBgpEvpnAcEthTag, TmnxCreateOrigin,
     TmnxCustId, TmnxCustIdNoZero,
     TmnxDPathDomainId, TmnxDefSubIdSource,
+    TmnxDestTEPOperFlag,
+    TmnxDestTEPOperState,
     TmnxEnabledDisabled,
     TmnxEnabledDisabledAdminState,
     TmnxEncapVal, TmnxEvpnMHEthSegStatus,
@@ -264,8 +266,6 @@ ServType                         ::= TEXTUAL-CONVENTION
         vprn       (4),
         ies        (5),
         mirror     (6),
-        apipe      (7),
-        fpipe      (8),
         ipipe      (9),
         cpipe      (10),
         intTls     (11),
@@ -393,11 +393,6 @@ SdpBindVcType                    ::= TEXTUAL-CONVENTION
         ether      (2),
         vlan       (4),
         mirror     (5),
-        atmSdu     (6),
-        atmCell    (7),
-        atmVcc     (8),
-        atmVpc     (9),
-        frDlci     (10),
         ipipe      (11),
         satopE1    (12),
         satopT1    (13),
@@ -2984,11 +2979,6 @@ svcLastStatusChange              OBJECT-TYPE
 svcVllType                       OBJECT-TYPE
     SYNTAX      INTEGER {
         undef      (1),
-        atmSdu     (6),
-        atmCell    (7),
-        atmVcc     (8),
-        atmVpc     (9),
-        frDlci     (10),
         satopE1    (12),
         satopT1    (13),
         satopE3    (14),
@@ -3216,7 +3206,7 @@ svcNumMHStandbySaps              OBJECT-TYPE
 svcVsdDomainName                 OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcVsdDomainName indicates the VSD Domain that
          is associated with this service."
@@ -4528,7 +4518,12 @@ TlsFdbInfoEntry                  ::= SEQUENCE
     tlsFdbVxlanInstance              Integer32,
     tlsFdbEvpnMplsTnlId              Unsigned32,
     tlsFdbEvpnMplsTnlResType         TmnxSvcEvpnMplsTransportType,
-    tlsFdbEvpnMplsInstance           Integer32
+    tlsFdbEvpnMplsInstance           Integer32,
+    tlsFdbEvpnSrv6Instance           Integer32,
+    tlsFdbSrv6InstTEPAddrType        InetAddressType,
+    tlsFdbSrv6InstTEPAddress         InetAddress,
+    tlsFdbSrv6InstTEPSidAddrType     InetAddressType,
+    tlsFdbSrv6InstTEPSidAddr         InetAddress
 }
 
 tlsFdbMacAddr                    OBJECT-TYPE
@@ -4596,7 +4591,8 @@ tlsFdbLocale                     OBJECT-TYPE
         endpoint  (4),
         vxlan     (5),
         evpnMpls  (6),
-        blackhole (7)
+        blackhole (7),
+        srv6      (8)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -4611,6 +4607,8 @@ tlsFdbLocale                     OBJECT-TYPE
          of 'vxlan'.
 
          FDB entries defined on EVPN MPLS have the value of 'evpnMpls'.
+
+         FDB entries defined on SRv6 have the value of 'srv6'.
 
          The value of this object must be specified when the row is created and
          cannot be changed while the row status is 'active'."
@@ -4896,6 +4894,51 @@ tlsFdbEvpnMplsInstance           OBJECT-TYPE
          this MAC address is associated."
     ::= { tlsFdbInfoEntry 31 }
 
+tlsFdbEvpnSrv6Instance           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tlsFdbEvpnSrv6Instance indicates the EVPN SRv6 instance on which
+         this MAC address is associated."
+    ::= { tlsFdbInfoEntry 32 }
+
+tlsFdbSrv6InstTEPAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tlsFdbSrv6InstTEPAddrType indicates the type
+         of the address associated with tlsFdbSrv6InstTEPAddress."
+    ::= { tlsFdbInfoEntry 33 }
+
+tlsFdbSrv6InstTEPAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tlsFdbSrv6InstTEPAddress indicates a SRv6
+         Tunnel Endpoint address associated with the MAC address."
+    ::= { tlsFdbInfoEntry 34 }
+
+tlsFdbSrv6InstTEPSidAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tlsFdbSrv6InstTEPSidAddrType indicates the address type
+         of tlsFdbSrv6InstTEPSidAddr."
+    ::= { tlsFdbInfoEntry 35 }
+
+tlsFdbSrv6InstTEPSidAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tlsFdbSrv6InstTEPSidAddr indicates the address of the SID
+         associated with the MAC address."
+    ::= { tlsFdbInfoEntry 36 }
+
 iesIfTable                       OBJECT-TYPE
     SYNTAX      SEQUENCE OF IesIfEntry
     MAX-ACCESS  not-accessible
@@ -4973,7 +5016,9 @@ IesIfEntry                       ::= SEQUENCE
     iesIfIPv6Dhcp6PDManagedRouteNH   INTEGER,
     iesIfIPv6WanMode                 INTEGER,
     iesIfVplsEvpnTnlIp6GwAddrType    INTEGER,
-    iesIfVplsEvpnTnlSupBcastDomain   TruthValue
+    iesIfVplsEvpnTnlSupBcastDomain   TruthValue,
+    iesIfVplsEvpnTnlAllowBfd         TruthValue,
+    iesIfRvplsEnableStats            TruthValue
 }
 
 iesIfIndex                       OBJECT-TYPE
@@ -5769,6 +5814,26 @@ iesIfVplsEvpnTnlSupBcastDomain   OBJECT-TYPE
     DEFVAL      { false }
     ::= { iesIfEntry 58 }
 
+iesIfVplsEvpnTnlAllowBfd         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The iesIfVplsEvpnTnlAllowBfd specifies whether the evpn-tunnel should
+         allow BFD."
+    DEFVAL      { false }
+    ::= { iesIfEntry 59 }
+
+iesIfRvplsEnableStats            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The iesIfRvplsEnableStats specifies whether the enable statistics
+         collection on this interface."
+    DEFVAL      { false }
+    ::= { iesIfEntry 60 }
+
 tlsShgInfoTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF TlsShgInfoEntry
     MAX-ACCESS  not-accessible
@@ -5983,7 +6048,7 @@ tlsShgAutoLearnMacProtectExcList OBJECT-TYPE
 svcApipeInfoTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcApipeInfoEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A table that contains APIPE service information."
     ::= { tmnxSvcObjs 7 }
@@ -5991,7 +6056,7 @@ svcApipeInfoTable                OBJECT-TYPE
 svcApipeInfoEntry                OBJECT-TYPE
     SYNTAX      SvcApipeInfoEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "APIPE specific information about a service."
     INDEX       { svcId }
@@ -6010,7 +6075,7 @@ svcApipeInterworking             OBJECT-TYPE
         frf-8-2-translate (3)
     }
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcApipeInterworking specifies the
          interworking function that should be applied for packets that
@@ -6024,7 +6089,7 @@ svcApipeSignaledVllTypeOverride  OBJECT-TYPE
         atmVcc (8)
     }
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of object svcApipeSignaledVllTypeOverride specifies the type
          of pseudo-wire (PW) signaling configured to override the PW signaling
@@ -9249,7 +9314,8 @@ TlsMFibStatsEntry                ::= SEQUENCE
     tlsMFibStatsSrcInetAddrType      InetAddressType,
     tlsMFibStatsSrcInetAddr          InetAddress,
     tlsMFibStatsForwardedPkts        Counter64,
-    tlsMFibStatsForwardedOctets      Counter64
+    tlsMFibStatsForwardedOctets      Counter64,
+    tlsMFibStatsForwardedRate        Unsigned32
 }
 
 tlsMFibStatsEntryType            OBJECT-TYPE
@@ -9337,6 +9403,15 @@ tlsMFibStatsForwardedOctets      OBJECT-TYPE
          octets that were forwarded to the SAPs and SDPs listed in the
          tlsMFibInfoTable."
     ::= { tlsMFibStatsEntry 8 }
+
+tlsMFibStatsForwardedRate        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tlsMFibStatsForwardedRate indicates the rate forwarded to
+         the SAPs and SDPs listed in the  tlsMFibInfoTable."
+    ::= { tlsMFibStatsEntry 9 }
 
 svcTlsBgpADTableLastChanged      OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -12157,7 +12232,8 @@ SvcEpipeEntry                    ::= SEQUENCE
     svcEpipeFwdWhlSalePortId         TmnxPortID,
     svcEpipeFwdWhlSaleEncapValue     TmnxEncapVal,
     svcEpipeIgnoreL2VpnMtuMismatch   TmnxEnabledDisabled,
-    svcEpipeLblEthOrIpL4TEID         TruthValue
+    svcEpipeLblEthOrIpL4TEID         TruthValue,
+    svcEpipeNetIngIngressClassPlcy   TLNamedItemOrEmpty
 }
 
 svcEpipeLastChngd                OBJECT-TYPE
@@ -12245,6 +12321,15 @@ svcEpipeLblEthOrIpL4TEID         OBJECT-TYPE
          service."
     DEFVAL      { false }
     ::= { svcEpipeEntry 8 }
+
+svcEpipeNetIngIngressClassPlcy   OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Attach ingress classification policy"
+    DEFVAL      { "" }
+    ::= { svcEpipeEntry 9 }
 
 svcEpipeBackboneTableLastChanged OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -15474,7 +15559,8 @@ SvcTlsExtEntry                   ::= SEQUENCE
     svcTlsPbbRestProtSrcMac          TruthValue,
     svcTlsPbbRestProtSrcMacAction    INTEGER,
     svcTlsExtIgnoreL2VpnMtuMismatch  TmnxEnabledDisabled,
-    svcTlsExtLblEthOrIpL4TEID        TruthValue
+    svcTlsExtLblEthOrIpL4TEID        TruthValue,
+    svcTlsExtNetIngIngressClassPlcy  TLNamedItemOrEmpty
 }
 
 svcTlsExtMvrpMaxAttributes       OBJECT-TYPE
@@ -15834,6 +15920,15 @@ svcTlsExtLblEthOrIpL4TEID        OBJECT-TYPE
          service."
     DEFVAL      { false }
     ::= { svcTlsExtEntry 29 }
+
+svcTlsExtNetIngIngressClassPlcy  OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Attach ingress classification policy"
+    DEFVAL      { "" }
+    ::= { svcTlsExtEntry 30 }
 
 svcPwRtLclPrefixTblLastChanged   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -17358,17 +17453,15 @@ svcDhcpLeaseOvrWrrWeight         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of svcDhcpLeaseOvrWrrWeight indicates the weight of this
+        "
+         The value of svcDhcpLeaseOvrWrrWeight indicates the weight of this
          queue for the HSMDA scheduler.
 
          The weight determines how much bandwidth this queue gets out of the
          total rate for the scheduling class.
 
          The value of svcDhcpLeaseOvrWrrWeight is only relevant if the value of
-         svcDhcpLeaseOvrType is equal to 'queue', and if the queue specified in
-         svcDhcpLeaseOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated wit this PPP session."
+         svcDhcpLeaseOvrType is equal to 'queue'"
     ::= { svcDhcpLeaseOvrEntry 9 }
 
 svcDhcpLeaseOvrSummedCIR         OBJECT-TYPE
@@ -18299,7 +18392,13 @@ SvcTlsPmsiEntry                  ::= SEQUENCE
     svcTlsIPmsiRemainDataDelayIntvl  Integer32,
     svcTlsIPmsiLspName               TLNamedItemOrEmpty,
     svcTlsIPmsiOwner                 INTEGER,
-    svcTlsIPmsiOperState             ServiceOperStatus
+    svcTlsIPmsiOperState             ServiceOperStatus,
+    svcTlsSPmsiAdminState            TmnxAdminState,
+    svcTlsSPmsiDataDelayIntvl        Unsigned32,
+    svcTlsSPmsiType                  INTEGER,
+    svcTlsSpmsiWildcard              TruthValue,
+    svcTlsSpmsiMaxP2mp               Unsigned32,
+    svcTlsSPmsiOwner                 INTEGER
 }
 
 svcTlsPmsiRowStatus              OBJECT-TYPE
@@ -18434,6 +18533,80 @@ svcTlsIPmsiOperState             OBJECT-TYPE
         "The value of svcTlsIPmsiOperState indicates the operational state of
          the inclusive provider tunnel in this service."
     ::= { svcTlsPmsiEntry 11 }
+
+svcTlsSPmsiAdminState            OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSPmsiAdminState specifies the
+         administrative state of the selective provider tunnel in this service.
+
+         An 'inconsistentValue' error is returned when attempting to set
+         svcTlsSPmsiAdminState to 'inService' when svcTlsSPmsiType is set to
+         'none'"
+    DEFVAL      { outOfService }
+    ::= { svcTlsPmsiEntry 12 }
+
+svcTlsSPmsiDataDelayIntvl        OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..180)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSPmsiDataDelayIntvl specifies the data
+         delay interval associated for the selective provider tunnel in this
+         service."
+    DEFVAL      { 3 }
+    ::= { svcTlsPmsiEntry 13 }
+
+svcTlsSPmsiType                  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        mLdp (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSPmsiType specifies the type of protocol
+         supported for the selective provider tunnel in this service."
+    DEFVAL      { none }
+    ::= { svcTlsPmsiEntry 14 }
+
+svcTlsSpmsiWildcard              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSpmsiWildcard specifies whether SPMSI is
+         to be used."
+    DEFVAL      { false }
+    ::= { svcTlsPmsiEntry 15 }
+
+svcTlsSpmsiMaxP2mp               OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSpmsiMaxP2mp specifies the maximum
+         number of RSVP/mLDP P2MP S-PMSI tunnels. Once the limit isreached,  no
+         more RSVP/mLDP P2MP S-PMSI are created and traffic over the
+         data-threshold will stay on I-PMSI."
+    DEFVAL      { 10 }
+    ::= { svcTlsPmsiEntry 16 }
+
+svcTlsSPmsiOwner                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none        (0),
+        bgpEvpnMpls (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsSPmsiOwner specifies the owner of the
+         provider-tunnel."
+    DEFVAL      { none }
+    ::= { svcTlsPmsiEntry 17 }
 
 svcDhcpLeaseWppTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcDhcpLeaseWppEntry
@@ -19663,10 +19836,7 @@ svcArpHostOvrWrrWeight           OBJECT-TYPE
          total rate for the scheduling class.
 
          The value of svcArpHostOvrWrrWeight is only relevant if the value of
-         svcArpHostOvrType is equal to 'queue', and if the queue specified in
-         svcArpHostOvrTypeId is referenced in the value of
-         TIMETRA-QOS-MIB::tHsmdaWrrPolicyIncludeQueues of the Weighted Round
-         Robin policy associated with this ARP Host."
+         svcArpHostOvrType is equal to 'queue'"
     ::= { svcArpHostOvrEntry 9 }
 
 svcArpHostOvrSummedCIR           OBJECT-TYPE
@@ -19733,7 +19903,8 @@ IesIfIsaTnlNHEntry               ::= SEQUENCE
     iesIfIsaTnlNHStaticAddrType      InetAddressType,
     iesIfIsaTnlNHStaticAddr          InetAddress,
     iesIfIsaTnlNHDynAddrType         InetAddressType,
-    iesIfIsaTnlNHDynAddr             InetAddress
+    iesIfIsaTnlNHDynAddr             InetAddress,
+    iesIfIsaTnlNHIPsecMCShuntPfName  TNamedItemOrEmpty
 }
 
 iesIfIsaTnlNHLastChanged         OBJECT-TYPE
@@ -19788,6 +19959,16 @@ iesIfIsaTnlNHDynAddr             OBJECT-TYPE
          redundant next-hop for dynamic ISA tunnels on this interface."
     DEFVAL      { ''H }
     ::= { iesIfIsaTnlNHEntry 5 }
+
+iesIfIsaTnlNHIPsecMCShuntPfName  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The iesIfIsaTnlNHIPsecMCShuntPfName specifies the profile name to be
+         used for MC shunting"
+    DEFVAL      { "" }
+    ::= { iesIfIsaTnlNHEntry 6 }
 
 svcBgpVpwsTblLastChanged         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -20627,7 +20808,14 @@ SvcBgpEvpnEntry                  ::= SEQUENCE
     svcBgpEvpnVxlanSendImetIrOnNdf   TruthValue,
     svcBgpEvpnVxlanMaxEcmpRoutes     Integer32,
     svcBgpEvpnSelMcastAdvertise      TruthValue,
-    svcBgpEvpnIpRouteAdvDomainId     TmnxDPathDomainId
+    svcBgpEvpnIpRouteAdvDomainId     TmnxDPathDomainId,
+    svcBgpEvpnIpRouteAdLinkBw        TruthValue,
+    svcBgpEvpnIpRouteAdLinkBwWeight  Unsigned32,
+    svcBgpEvpnIpRouteAdLinkBwMaxWt   Unsigned32,
+    svcBgpEvpnIpRouteWeightedEcmp    TruthValue,
+    svcBgpEvpnIgnoreMtuMismatch      TruthValue,
+    svcBgpEvpnRtIncMcastAdvL2Attr    TruthValue,
+    svcBgpEvpnRtArpNdExtComm         TruthValue
 }
 
 svcBgpEvpnRowStatus              OBJECT-TYPE
@@ -20911,6 +21099,85 @@ svcBgpEvpnIpRouteAdvDomainId     OBJECT-TYPE
     DEFVAL      { '000000000000'H }
     ::= { svcBgpEvpnEntry 26 }
 
+svcBgpEvpnIpRouteAdLinkBw        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnIpRouteAdLinkBw specifies whether to advertise
+         the link bandwidth for evpn-iff routes."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnEntry 27 }
+
+svcBgpEvpnIpRouteAdLinkBwWeight  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnIpRouteAdLinkBwWeight specifies the weight to
+         be advertised with evpn-iff routes. This is effective only when
+         svcBgpEvpnIpRouteAdLinkBw is  enabled."
+    DEFVAL      { 0 }
+    ::= { svcBgpEvpnEntry 28 }
+
+svcBgpEvpnIpRouteAdLinkBwMaxWt   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnIpRouteAdLinkBwMaxWt specifies the maximum
+         weight to be advertised with evpn-iff routes. This is effective only
+         when svcBgpEvpnIpRouteAdLinkBw is enabled."
+    DEFVAL      { 128 }
+    ::= { svcBgpEvpnEntry 29 }
+
+svcBgpEvpnIpRouteWeightedEcmp    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnIpRouteWeightedEcmp specifies whether the
+         unequal ecmp will be performed based on the link bandwidth weights for
+         evpn-iff routes."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnEntry 30 }
+
+svcBgpEvpnIgnoreMtuMismatch      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnIgnoreMtuMismatch specifies whether to ignore
+         the received layer-2 MTU in the L2 Attributed extended community of
+         the IMET route for a peer."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnEntry 31 }
+
+svcBgpEvpnRtIncMcastAdvL2Attr    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnRtIncMcastAdvL2Attr specifies whether to
+         advertise the layer-2 attributes extended community in inclusive-mcast
+         routes."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnEntry 32 }
+
+svcBgpEvpnRtArpNdExtComm         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcBgpEvpnRtArpNdExtComm specifies whether to advertise along with
+         the MAC/IP routes advertised for local static and dynamic proxy-ARP/ND
+         entries.
+
+         It also controls the processing of the arp/nd extended community and
+         the selection of ARP/ND entries based on the Inmutable flag."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnEntry 33 }
+
 tmnxIesIfRtrSolicitTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxIesIfRtrSolicitEntry
     MAX-ACCESS  not-accessible
@@ -21000,7 +21267,7 @@ tmnxIesIfRtrSolInactivityTimer   OBJECT-TYPE
 svcVsdDomainTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcVsdDomainEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "svcVsdDomainTable contains entries for each VSD static+dynamic domain
          configuration in the system. A domain is defined as a logical
@@ -21010,7 +21277,7 @@ svcVsdDomainTable                OBJECT-TYPE
 svcVsdDomainEntry                OBJECT-TYPE
     SYNTAX      SvcVsdDomainEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A VSD domain entry in the svcVsdDomainTable."
     INDEX       { svcVsdDomainName }
@@ -21032,7 +21299,7 @@ SvcVsdDomainEntry                ::= SEQUENCE
 svcVsdDomainRowStatus            OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRowStatus is used for the creation and
          deletion of entries in the svcVsdDomainEntry."
@@ -21041,7 +21308,7 @@ svcVsdDomainRowStatus            OBJECT-TYPE
 svcVsdDomainDescription          OBJECT-TYPE
     SYNTAX      TItemDescription
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainDescription specifies the textual description
          for this domain.
@@ -21059,7 +21326,7 @@ svcVsdDomainType                 OBJECT-TYPE
         l2DomainIrb (4)
     }
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainType specifies the type of the domain.
 
@@ -21070,7 +21337,7 @@ svcVsdDomainType                 OBJECT-TYPE
 svcVsdDomainAdminState           OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainAdminState specifies the administrative state
          of this domain."
@@ -21079,11 +21346,10 @@ svcVsdDomainAdminState           OBJECT-TYPE
 
 svcVsdDomainCreationOrigin       OBJECT-TYPE
     SYNTAX      INTEGER {
-        manual (0),
-        vsd    (1)
+        manual (0)
     }
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainCreationOrigin indicates whether the entry
          was created by the User or by the VSD."
@@ -21092,7 +21358,7 @@ svcVsdDomainCreationOrigin       OBJECT-TYPE
 svcVsdDomainLastErrStr           OBJECT-TYPE
     SYNTAX      TLDisplayString (SIZE (0..320))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainLastErrStr indicates the last error to VSD
          for with this domain."
@@ -21101,7 +21367,7 @@ svcVsdDomainLastErrStr           OBJECT-TYPE
 svcVsdDomainVsdLastErrStr        OBJECT-TYPE
     SYNTAX      TLDisplayString (SIZE (0..320))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainVsdLastErrStr indicates the last error from
          VSD to this domain."
@@ -21110,7 +21376,7 @@ svcVsdDomainVsdLastErrStr        OBJECT-TYPE
 svcVsdDomainRecParams            OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1000))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRecParams indicates the parameter string of
          the script instance last received from the VSD."
@@ -21119,7 +21385,7 @@ svcVsdDomainRecParams            OBJECT-TYPE
 svcVsdDomainExecParams           OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1000))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainExecParams indicates the parameter string of
          the script instance that was last executed successfully."
@@ -21153,7 +21419,8 @@ SvcTlsProxyArpEntry              ::= SEQUENCE
     svcTlsProxyArpMacAddr            MacAddress,
     svcTlsProxyArpType               TmnxProxyEntryType,
     svcTlsProxyArpLastChgd           TimeStamp,
-    svcTlsProxyArpStatus             INTEGER
+    svcTlsProxyArpStatus             INTEGER,
+    svcTlsProxyArpIsImmutable        TruthValue
 }
 
 svcTlsProxyArpIpAddrType         OBJECT-TYPE
@@ -21213,10 +21480,20 @@ svcTlsProxyArpStatus             OBJECT-TYPE
          to ARP request for the IP address corresponding to this entry."
     ::= { svcTlsProxyArpEntry 6 }
 
+svcTlsProxyArpIsImmutable        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The svcTlsProxyArpIsImmutable indicates whether entry can be
+         overwritten in the table and also if is advertised in EVPN with the
+         immutable flag, if EVPN supports the ARP ND extended community."
+    ::= { svcTlsProxyArpEntry 7 }
+
 svcVsdDomainToSvcTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcVsdDomainToSvcEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "svcVsdDomainToSvcTable contains information about services associated
          with the VSD domain."
@@ -21225,7 +21502,7 @@ svcVsdDomainToSvcTable           OBJECT-TYPE
 svcVsdDomainToSvcEntry           OBJECT-TYPE
     SYNTAX      SvcVsdDomainToSvcEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "An entry about a service associated with the VSD domain."
     INDEX       {
@@ -21243,7 +21520,7 @@ SvcVsdDomainToSvcEntry           ::= SEQUENCE
 svcVsdDomainToSvcRowStatus       OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainToSvcRowStatus is used for the creation and
          deletion of entries in the svcVsdDomainToSvcEntry."
@@ -21251,11 +21528,10 @@ svcVsdDomainToSvcRowStatus       OBJECT-TYPE
 
 svcVsdDomainToSvcCreationOrigin  OBJECT-TYPE
     SYNTAX      INTEGER {
-        manual (0),
-        vsd    (1)
+        manual (0)
     }
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of object svcVsdDomainToSvcCreationOrigin indicates whether
          the entry was created by the User or by the VSD."
@@ -21887,7 +22163,7 @@ tmnxSvcIesIfIpoeStatelessRed     OBJECT-TYPE
 svcVsdDomainStatTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcVsdDomainStatEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "svcVsdDomainStatTable contains entries for each VSD static+dynamic
          domain statistics in the system."
@@ -21896,7 +22172,7 @@ svcVsdDomainStatTable            OBJECT-TYPE
 svcVsdDomainStatEntry            OBJECT-TYPE
     SYNTAX      SvcVsdDomainStatEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A VSD domain statistics entry in the svcVsdDomainStatTable."
     INDEX       { svcVsdDomainName }
@@ -21916,7 +22192,7 @@ SvcVsdDomainStatEntry            ::= SEQUENCE
 svcVsdDomainStatCfgChgEvtRcvd    OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatCfgChgEvtRcvd indicates the number of
          publish notification received for this domain."
@@ -21925,7 +22201,7 @@ svcVsdDomainStatCfgChgEvtRcvd    OBJECT-TYPE
 svcVsdDomainStatLastCfgChgEvt    OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatLastCfgChgEvt indicates the time of last
          publish notification received for this domain."
@@ -21934,7 +22210,7 @@ svcVsdDomainStatLastCfgChgEvt    OBJECT-TYPE
 svcVsdDomainStatCfgUpdRcvd       OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatCfgUpdRcvd indicates the number of IQ
          (get) response received for this domain."
@@ -21943,7 +22219,7 @@ svcVsdDomainStatCfgUpdRcvd       OBJECT-TYPE
 svcVsdDomainStatLastCfgUpdRcvd   OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatLastCfgUpdRcvd indicates the time of last
          configuration update request received for this domain."
@@ -21952,7 +22228,7 @@ svcVsdDomainStatLastCfgUpdRcvd   OBJECT-TYPE
 svcVsdDomainStatLastCfgUpdDone   OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatLastCfgUpdDone indicates the time of last
          configuration update request processed for this domain."
@@ -21961,7 +22237,7 @@ svcVsdDomainStatLastCfgUpdDone   OBJECT-TYPE
 svcVsdDomainStatCfgSuccess       OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatCfgSuccess indicates the number of
          successful configuration execution requests for this domain."
@@ -21970,7 +22246,7 @@ svcVsdDomainStatCfgSuccess       OBJECT-TYPE
 svcVsdDomainStatCfgFailed        OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainStatCfgFailed indicates the number of failed
          configuration execution requests for this domain."
@@ -22011,7 +22287,8 @@ SvcTlsProxyArpCfgEntry           ::= SEQUENCE
     svcTlsProxyArpTableSize          Integer32,
     svcTlsProxyArpGarpFloodEvpn      TruthValue,
     svcTlsProxyArpCfgStaticBH        TruthValue,
-    svcTlsProxyArpCfgRouteTag        Unsigned32
+    svcTlsProxyArpCfgRouteTag        Unsigned32,
+    svcTlsProxyArpCfgProbeProcess    TruthValue
 }
 
 svcTlsProxyArpCfgRowStatus       OBJECT-TYPE
@@ -22179,6 +22456,19 @@ svcTlsProxyArpCfgRouteTag        OBJECT-TYPE
          added when the proxy ARP entries are advertised to EVPN."
     DEFVAL      { 0 }
     ::= { svcTlsProxyArpCfgEntry 15 }
+
+svcTlsProxyArpCfgProbeProcess    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsProxyArpCfgProbeProcess specifies whether the user
+         can disable the DAD requests reply in environments where the host  is
+         expected to move.
+
+         When set to false, the DAD requests are flooded normally."
+    DEFVAL      { true }
+    ::= { svcTlsProxyArpCfgEntry 16 }
 
 svcVprnInfoTable                 OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcVprnInfoEntry
@@ -22445,7 +22735,9 @@ SvcTlsProxyNdCfgEntry            ::= SEQUENCE
     svcTlsProxyNdHstUnSolNAFloodEvpn TruthValue,
     svcTlsProxyNdEvpnNdAdvRouter     TruthValue,
     svcTlsProxyNdCfgStaticBH         TruthValue,
-    svcTlsProxyNdCfgRouteTag         Unsigned32
+    svcTlsProxyNdCfgRouteTag         Unsigned32,
+    svcTlsProxyNdCfgNbrSolDadProcess TruthValue,
+    svcTlsProxyNdEvpnNdAdvRtrHost    INTEGER
 }
 
 svcTlsProxyNdCfgRowStatus        OBJECT-TYPE
@@ -22640,6 +22932,33 @@ svcTlsProxyNdCfgRouteTag         OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { svcTlsProxyNdCfgEntry 17 }
 
+svcTlsProxyNdCfgNbrSolDadProcess OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsProxyNdCfgNbrSolDadProcess specifies whether the
+         user can disable the DAD solicitation replies in environments where
+         the host  is expected to move.
+
+         When set to false, the DAD solicitations are flooded normally."
+    DEFVAL      { true }
+    ::= { svcTlsProxyNdCfgEntry 18 }
+
+svcTlsProxyNdEvpnNdAdvRtrHost    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        router     (1),
+        host       (2),
+        routerHost (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcTlsProxyNdEvpnNdAdvRtrHost specifies whether to advertise
+         router and host entries in the EVPN."
+    DEFVAL      { router }
+    ::= { svcTlsProxyNdCfgEntry 19 }
+
 svcTlsProxyNdStaticTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcTlsProxyNdStaticEntry
     MAX-ACCESS  not-accessible
@@ -22761,7 +23080,9 @@ SvcTlsProxyNdEntry               ::= SEQUENCE
     svcTlsProxyNdType                TmnxProxyEntryType,
     svcTlsProxyNdLastChgd            TimeStamp,
     svcTlsProxyNdStatus              INTEGER,
-    svcTlsProxyNdIsRouter            TruthValue
+    svcTlsProxyNdIsRouter            TruthValue,
+    svcTlsProxyNdIsImmutable         TruthValue,
+    svcTlsProxyNdEvpnOverRide        TruthValue
 }
 
 svcTlsProxyNdIpAddrType          OBJECT-TYPE
@@ -22831,43 +23152,27 @@ svcTlsProxyNdIsRouter            OBJECT-TYPE
          type."
     ::= { svcTlsProxyNdEntry 7 }
 
+svcTlsProxyNdIsImmutable         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The svcTlsProxyNdIsImmutable indicates whether entry can be
+         overwritten in the table and also if is advertised in EVPN with the
+         immutable flag, if EVPN supports the ARP ND extended community."
+    ::= { svcTlsProxyNdEntry 8 }
+
+svcTlsProxyNdEvpnOverRide        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The svcTlsProxyNdEvpnOverRide indicates whether entry is advertised in
+         EVPN with the override flag, if EVPN supports the arp nd extended
+         community."
+    ::= { svcTlsProxyNdEntry 9 }
+
 svcVsdGlobalObjs                 OBJECT IDENTIFIER ::= { tmnxSvcObjs 172 }
-
-svcVsdServiceRangeStart          OBJECT-TYPE
-    SYNTAX      TmnxExtServId
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The value of the object svcVsdServiceRangeStart specifies the start of
-         the service identifier range.
-
-         An 'inconsistentValue' error is returned when the value of
-         svcVsdServiceRangeStart is set to larger than the value of
-         svcVsdServiceRangeEnd.
-
-         An 'inconsistentValue' error is also returned when the value of
-         svcVsdServiceRangeEnd is set to non-default value and
-         svcVsdServiceRangeStart is set to the default value."
-    DEFVAL      { 0 }
-    ::= { svcVsdGlobalObjs 1 }
-
-svcVsdServiceRangeEnd            OBJECT-TYPE
-    SYNTAX      TmnxExtServId
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The value of the object svcVsdServiceRangeEnd specifies the end of the
-         service identifier range.
-
-         An 'inconsistentValue' error is returned when the value of
-         svcVsdServiceRangeStart is set to larger than the value of
-         svcVsdServiceRangeEnd.
-
-         An 'inconsistentValue' error is also returned when the value of
-         svcVsdServiceRangeEnd is set to non-default value and
-         svcVsdServiceRangeStart is set to the default value."
-    DEFVAL      { 0 }
-    ::= { svcVsdGlobalObjs 2 }
 
 svcBgpEvpnMplsTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcBgpEvpnMplsEntry
@@ -24253,7 +24558,9 @@ TmnxSvcSysEthSegEntry            ::= SEQUENCE
     tmnxSvcSysEthSegAutoEsi          INTEGER,
     tmnxSvcSysEthSegOperEsi          OCTET STRING,
     tmnxSvcSysEthSegAcDfCap          INTEGER,
-    tmnxSvcSysEthSegPwPortHeadEnd    TruthValue
+    tmnxSvcSysEthSegPwPortHeadEnd    TruthValue,
+    tmnxSvcSysEthSegL3NxtHopType     InetAddressType,
+    tmnxSvcSysEthSegL3NxtHopAddr     InetAddress
 }
 
 tmnxSvcSysEthSegName             OBJECT-TYPE
@@ -24633,6 +24940,26 @@ tmnxSvcSysEthSegPwPortHeadEnd    OBJECT-TYPE
          non-default when tmnxSvcSysEthSegPwPortId is set to default value."
     DEFVAL      { false }
     ::= { tmnxSvcSysEthSegEntry 31 }
+
+tmnxSvcSysEthSegL3NxtHopType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSvcSysEthSegL3NxtHopType specifies the type of  IP
+         address associated with tmnxSvcSysEthSegL3NxtHopAddr."
+    DEFVAL      { unknown }
+    ::= { tmnxSvcSysEthSegEntry 32 }
+
+tmnxSvcSysEthSegL3NxtHopAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSvcSysEthSegL3NxtHopAddr specifies the next-hop IP
+         for ES and  AD per ES routes."
+    DEFVAL      { ''H }
+    ::= { tmnxSvcSysEthSegEntry 33 }
 
 tmnxIesIfIpv6HostInfoTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxIesIfIpv6HostInfoEntry
@@ -25186,489 +25513,6 @@ tmnxSvcDhcpMRtTag                OBJECT-TYPE
     ::= { tmnxSvcDhcpMRtEntry 7 }
 
 svcVsdDynamicSvcObjs             OBJECT IDENTIFIER ::= { tmnxSvcObjs 193 }
-
-tmnxVsdRootObjTable              OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdRootObjEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdRootObjTable contains information of the root objects
-         created by VSD.
-
-         A root object is an object created by a Dynamic Service of which the
-         parent is not created by a Dynamic Service.
-
-         Conceptual rows in this table are created and destroyed automatically
-         by the system."
-    ::= { svcVsdDynamicSvcObjs 1 }
-
-tmnxVsdRootObjEntry              OBJECT-TYPE
-    SYNTAX      TmnxVsdRootObjEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row presents information about a VSD Dynamic Services
-         root object."
-    INDEX       { tmnxVsdRootObjIndex }
-    ::= { tmnxVsdRootObjTable 1 }
-
-TmnxVsdRootObjEntry              ::= SEQUENCE
-{
-    tmnxVsdRootObjIndex              Unsigned32,
-    tmnxVsdRootObjInstance           RowPointer,
-    tmnxVsdRootObjOrphanTime         TimeStamp,
-    tmnxVsdRootObjSnippetName        DisplayString,
-    tmnxVsdRootObjSnippetInstance    DisplayString
-}
-
-tmnxVsdRootObjIndex              OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdRootObjIndex specifies the index that identifies
-         this conceptual row within the scope of a VSD Dynamic Services root
-         object."
-    ::= { tmnxVsdRootObjEntry 1 }
-
-tmnxVsdRootObjInstance           OBJECT-TYPE
-    SYNTAX      RowPointer
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdRootObjInstance indicates the concerned root
-         object."
-    ::= { tmnxVsdRootObjEntry 2 }
-
-tmnxVsdRootObjOrphanTime         OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdRootObjOrphanTime indicates the sysUpTime when the
-         object was orphaned.
-
-         When the object is not orphaned or when the time is unknown, the
-         tmnxVsdRootObjOrphanTime is set to 0."
-    ::= { tmnxVsdRootObjEntry 3 }
-
-tmnxVsdRootObjSnippetName        OBJECT-TYPE
-    SYNTAX      DisplayString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdRootObjSnippetName indicates the type-name from
-         the snippet to which the root object belongs.
-
-         A 'snippet' is the name of a set of python functions to create, modify
-         or destroy configuration; for example: a snippet called 'vprn' in
-         order to create/modify/destroy VPRN services.
-
-         When the tmnxVsdRootObjSnippetName is an empty string it implies that
-         there is no snippet."
-    ::= { tmnxVsdRootObjEntry 4 }
-
-tmnxVsdRootObjSnippetInstance    OBJECT-TYPE
-    SYNTAX      DisplayString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdRootObjSnippetInstance indicates the identifier
-         from the snippet to which the object belongs and is unique within the
-         snippet scope.
-
-         A 'snippet instance' is an instance of the configuration created by a
-         snippet; for example: a particular VPRN service.
-
-         When the tmnxVsdRootObjSnippetInstance is an empty string it implies
-         that there is no snippet."
-    ::= { tmnxVsdRootObjEntry 5 }
-
-tmnxVsdScriptStatsTable          OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdScriptStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdScriptStatsTable shows statistics information of the VSD
-         Dynamic Services."
-    ::= { svcVsdDynamicSvcObjs 2 }
-
-tmnxVsdScriptStatsEntry          OBJECT-TYPE
-    SYNTAX      TmnxVsdScriptStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row represents a statistic counter.
-
-         Entries in this table are created and destroyed by the system.
-
-         Rows are only created where the statistics value is nonzero; this
-         allows faster walking through this table; hence, it is recommended to
-         perform only get-next-request operations to retrieve information from
-         this table."
-    INDEX       { tmnxVsdScriptStatsId }
-    ::= { tmnxVsdScriptStatsTable 1 }
-
-TmnxVsdScriptStatsEntry          ::= SEQUENCE
-{
-    tmnxVsdScriptStatsId             Unsigned32,
-    tmnxVsdScriptStatsDescr          TItemDescription,
-    tmnxVsdScriptStatsVal            Counter32
-}
-
-tmnxVsdScriptStatsId             OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdScriptStatsId specifies the number that identifies
-         this conceptual row within the scope of a VSD Dynamic Services."
-    ::= { tmnxVsdScriptStatsEntry 1 }
-
-tmnxVsdScriptStatsDescr          OBJECT-TYPE
-    SYNTAX      TItemDescription
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptStatsDescr indicates the
-         description of the statistic counter contained in this conceptual row."
-    ::= { tmnxVsdScriptStatsEntry 2 }
-
-tmnxVsdScriptStatsVal            OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptStatsVal indicates the value of
-         the statistics contained in this conceptual row."
-    ::= { tmnxVsdScriptStatsEntry 3 }
-
-tmnxVsdScriptSnippetTable        OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdScriptSnippetEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdScriptSnippetTable contains information of the snippets
-         created by VSD Dynamic Services.
-
-         Conceptual rows in this table are created and destroyed automatically
-         by the system."
-    ::= { svcVsdDynamicSvcObjs 3 }
-
-tmnxVsdScriptSnippetEntry        OBJECT-TYPE
-    SYNTAX      TmnxVsdScriptSnippetEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row presents information about a snippet within the
-         scope of VSD Dynamic Services."
-    INDEX       {
-        tmnxVsdScriptSnippetName,
-        tmnxVsdScriptSnippetInstance
-    }
-    ::= { tmnxVsdScriptSnippetTable 1 }
-
-TmnxVsdScriptSnippetEntry        ::= SEQUENCE
-{
-    tmnxVsdScriptSnippetName         DisplayString,
-    tmnxVsdScriptSnippetInstance     DisplayString,
-    tmnxVsdScriptSnippetRefCount     Counter32,
-    tmnxVsdScriptSnippetDictLength   Unsigned32
-}
-
-tmnxVsdScriptSnippetName         OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..32))
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxVsdScriptSnippetName specifies the type-name from the
-         snippet that identifies this conceptual row within the scope of a VSD
-         Dynamic Service.
-
-         The type-name is used to lookup the set of python functions to create,
-         modify or destroy configuration; for example: a snippet with type-name
-         'vprn' could be used to create/modify/destroy VPRN services."
-    ::= { tmnxVsdScriptSnippetEntry 1 }
-
-tmnxVsdScriptSnippetInstance     OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..48))
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetInstance specifies the
-         identifier from the snippet that in combination with the type-name
-         uniquely identifies a snippet.
-
-         A 'snippet instance' is an instance of the configuration created by a
-         snippet; for example: a particular VPRN service."
-    ::= { tmnxVsdScriptSnippetEntry 2 }
-
-tmnxVsdScriptSnippetRefCount     OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRefCount indicates the
-         number of times this snippet is referenced by other snippets."
-    ::= { tmnxVsdScriptSnippetEntry 3 }
-
-tmnxVsdScriptSnippetDictLength   OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetDictLength indicates the
-         length of the python dictionary stored for this snippet."
-    ::= { tmnxVsdScriptSnippetEntry 4 }
-
-tmnxVsdScriptSnippetRootObjTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdScriptSnippetRootObjEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdScriptSnippetRootObjTable contains information of the root
-         objects created by a snippet within the scope of a VSD Dynamic
-         Service.
-
-         Conceptual rows in this table are created and destroyed automatically
-         by the system."
-    ::= { svcVsdDynamicSvcObjs 4 }
-
-tmnxVsdScriptSnippetRootObjEntry OBJECT-TYPE
-    SYNTAX      TmnxVsdScriptSnippetRootObjEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row presents information about a root object created
-         by a snippet within the scope of a VSD Dynamic Service."
-    INDEX       {
-        tmnxVsdScriptSnippetName,
-        tmnxVsdScriptSnippetInstance,
-        tmnxVsdScriptSnippetRootObjIdx
-    }
-    ::= { tmnxVsdScriptSnippetRootObjTable 1 }
-
-TmnxVsdScriptSnippetRootObjEntry ::= SEQUENCE
-{
-    tmnxVsdScriptSnippetRootObjIdx   Unsigned32,
-    tmnxVsdScriptSnippetRootObjOid   RowPointer
-}
-
-tmnxVsdScriptSnippetRootObjIdx   OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRootObjIdx specifies the
-         index that identifies this conceptual row within the scope of the
-         snippet."
-    ::= { tmnxVsdScriptSnippetRootObjEntry 1 }
-
-tmnxVsdScriptSnippetRootObjOid   OBJECT-TYPE
-    SYNTAX      RowPointer
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRootObjOid indicates the
-         concerned root object that was created by the snippet."
-    ::= { tmnxVsdScriptSnippetRootObjEntry 2 }
-
-tmnxVsdScriptSnippetRefTable     OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdScriptSnippetRefEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdScriptSnippetRefTable contains information of the
-         referenced snippets created by a python script within the scope of a
-         VSD Dynamic Service.
-
-         Conceptual rows in this table are created and destroyed automatically
-         by the system."
-    ::= { svcVsdDynamicSvcObjs 5 }
-
-tmnxVsdScriptSnippetRefEntry     OBJECT-TYPE
-    SYNTAX      TmnxVsdScriptSnippetRefEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row presents information about a referenced snippet
-         created by a python script within the scope of a VSD Dynamic Service."
-    INDEX       {
-        tmnxVsdScriptSnippetName,
-        tmnxVsdScriptSnippetInstance,
-        tmnxVsdScriptSnippetRefIdx
-    }
-    ::= { tmnxVsdScriptSnippetRefTable 1 }
-
-TmnxVsdScriptSnippetRefEntry     ::= SEQUENCE
-{
-    tmnxVsdScriptSnippetRefIdx       Unsigned32,
-    tmnxVsdScriptSnippetRefSnipName  DisplayString,
-    tmnxVsdScriptSnippetRefSnipInst  DisplayString
-}
-
-tmnxVsdScriptSnippetRefIdx       OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRefIdx specifies the index
-         that identifies this conceptual row within the scope of the snippet."
-    ::= { tmnxVsdScriptSnippetRefEntry 1 }
-
-tmnxVsdScriptSnippetRefSnipName  OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..32))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRefSnipName indicates the
-         type-name from the snippet created or referenced by a python script."
-    ::= { tmnxVsdScriptSnippetRefEntry 2 }
-
-tmnxVsdScriptSnippetRefSnipInst  OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..48))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetRefSnipInst indicates the
-         identifier from the snippet created or referenced by a python script."
-    ::= { tmnxVsdScriptSnippetRefEntry 3 }
-
-tmnxVsdScriptSnippetResIdTable   OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TmnxVsdScriptSnippetResIdEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The tmnxVsdScriptSnippetResIdTable contains information of the
-         identifiers reserved by a python script within the scope of a VSD
-         Dynamic Service.
-
-         Conceptual rows in this table are created and destroyed automatically
-         by the system."
-    ::= { svcVsdDynamicSvcObjs 6 }
-
-tmnxVsdScriptSnippetResIdEntry   OBJECT-TYPE
-    SYNTAX      TmnxVsdScriptSnippetResIdEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Each conceptual row presents information about an identifier reserved
-         by a python script within the scope of a VSD Dynamic Service."
-    INDEX       {
-        tmnxVsdScriptSnippetName,
-        tmnxVsdScriptSnippetInstance,
-        tmnxVsdScriptSnippetResIdIdx
-    }
-    ::= { tmnxVsdScriptSnippetResIdTable 1 }
-
-TmnxVsdScriptSnippetResIdEntry   ::= SEQUENCE
-{
-    tmnxVsdScriptSnippetResIdIdx     Unsigned32,
-    tmnxVsdScriptSnippetResIdType    DisplayString,
-    tmnxVsdScriptSnippetResIdValue   DisplayString
-}
-
-tmnxVsdScriptSnippetResIdIdx     OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetResIdIdx specifies the
-         index that identifies this conceptual row within the scope of the
-         snippet."
-    ::= { tmnxVsdScriptSnippetResIdEntry 1 }
-
-tmnxVsdScriptSnippetResIdType    OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..32))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetResIdType indicates the
-         type-name from the identifier reserved by a python script."
-    ::= { tmnxVsdScriptSnippetResIdEntry 2 }
-
-tmnxVsdScriptSnippetResIdValue   OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..48))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdScriptSnippetResIdValue indicates the
-         value from the identifier reserved by a python script."
-    ::= { tmnxVsdScriptSnippetResIdEntry 3 }
-
-tmnxVsdRootObjTableLastCh        OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdRootObjTableLastCh indicates the value
-         of sysUpTime at the time of the last modification of an entry in the
-         tmnxVsdRootObjTable."
-    ::= { svcVsdDynamicSvcObjs 7 }
-
-tmnxVsdNonStoredRootObjCount     OBJECT-TYPE
-    SYNTAX      Counter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdNonStoredRootObjCount indicates the
-         number of root objects that are currently not stored in the
-         tmnxVsdRootObjTable.
-
-         The value of tmnxVsdNonStoredRootObjCount can go back to 0, when the
-         objects that could not be stored in the tmnxVsdRootObjTable, are
-         deleted again."
-    ::= { svcVsdDynamicSvcObjs 8 }
-
-tmnxVsdSnippetTableLastCh        OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdSnippetTableLastCh indicates the value
-         of sysUpTime at the time of the last modification of an entry in the
-         tmnxVsdScriptSnippetTable."
-    ::= { svcVsdDynamicSvcObjs 9 }
-
-tmnxVsdSnipRootObjTblLastCh      OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdSnipRootObjTblLastCh indicates the
-         value of sysUpTime at the time of the last modification of an entry in
-         the tmnxVsdScriptSnippetRootObjTable."
-    ::= { svcVsdDynamicSvcObjs 10 }
-
-tmnxVsdSnippetRefTableLastCh     OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdSnippetRefTableLastCh indicates the
-         value of sysUpTime at the time of the last modification of an entry in
-         the tmnxVsdScriptSnippetRefTable."
-    ::= { svcVsdDynamicSvcObjs 11 }
-
-tmnxVsdSnippetResIdTblLastCh     OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdSnippetResIdTblLastCh indicates the
-         value of sysUpTime at the time of the last modification of an entry in
-         the tmnxVsdScriptSnippetResIdTable."
-    ::= { svcVsdDynamicSvcObjs 12 }
-
-tmnxVsdStatsLastClearedTime      OBJECT-TYPE
-    SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of the object tmnxVsdStatsLastClearedTime indicates the
-         value of sysUpTime at the time when the counters in
-         tmnxVsdScriptStatsTable were last cleared."
-    ::= { svcVsdDynamicSvcObjs 13 }
 
 svcEvpnMplsESDestTEPTable        OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnMplsESDestTEPEntry
@@ -28197,7 +28041,7 @@ svcSysEvpnESDfPrefElecDntPreempt OBJECT-TYPE
 svcVsdDomainParamsExtTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcVsdDomainParamsExtEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "svcVsdDomainParamsExtTable contains entries for parts of the parameter
          string of the script last received and executed from the VSD."
@@ -28206,7 +28050,7 @@ svcVsdDomainParamsExtTable       OBJECT-TYPE
 svcVsdDomainParamsExtEntry       OBJECT-TYPE
     SYNTAX      SvcVsdDomainParamsExtEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A VSD domain parameter entry in the svcVsdDomainParamsExtTable."
     AUGMENTS    { svcVsdDomainEntry }
@@ -28227,7 +28071,7 @@ SvcVsdDomainParamsExtEntry       ::= SEQUENCE
 svcVsdDomainRecParams1           OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRecParams1 indicates the first part of the
          parameter string of the script instance last received from the VSD."
@@ -28236,7 +28080,7 @@ svcVsdDomainRecParams1           OBJECT-TYPE
 svcVsdDomainRecParams2           OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRecParams2 indicates the second part of the
          parameter string of the script instance last received from the VSD."
@@ -28245,7 +28089,7 @@ svcVsdDomainRecParams2           OBJECT-TYPE
 svcVsdDomainRecParams3           OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRecParams3 indicates the third part of the
          parameter string of the script instance last received from the VSD."
@@ -28254,7 +28098,7 @@ svcVsdDomainRecParams3           OBJECT-TYPE
 svcVsdDomainRecParams4           OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainRecParams4 indicates the fourth part of the
          parameter string of the script instance last received from the VSD."
@@ -28263,7 +28107,7 @@ svcVsdDomainRecParams4           OBJECT-TYPE
 svcVsdDomainExecParams1          OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainExecParams1 indicates the first part of the
          parameter string of the script instance that was last executed
@@ -28273,7 +28117,7 @@ svcVsdDomainExecParams1          OBJECT-TYPE
 svcVsdDomainExecParams2          OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainExecParams2 indicates the second part of the
          parameter string of the script instance that was last executed
@@ -28283,7 +28127,7 @@ svcVsdDomainExecParams2          OBJECT-TYPE
 svcVsdDomainExecParams3          OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainExecParams3 indicates the third part of the
          parameter string of the script instance that was last executed
@@ -28293,7 +28137,7 @@ svcVsdDomainExecParams3          OBJECT-TYPE
 svcVsdDomainExecParams4          OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE (0..1024))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainExecParams4 indicates the fourth part of the
          parameter string of the script instance that was last executed
@@ -29465,8 +29309,7 @@ svcBgpEvpnInstSrv6DefLocator     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of svcBgpEvpnInstSrv6DefLocator specifies the default
-         locator name for the SRv6 instance to use for BGP in this VPRN
-         service."
+         locator name for the SRv6 instance to use for BGP in this service."
     DEFVAL      { "" }
     ::= { svcBgpEvpnInstEntry 12 }
 
@@ -29957,7 +29800,8 @@ SvcBgpEvpnInstAutoBndTnlEntry    ::= SEQUENCE
     svcBgpEvpnInstBndTnlRibApi       TruthValue,
     svcBgpEvpnInstAutoBndTnlSrOspf3  TruthValue,
     svcBgpEvpnInstAutoBndTnlEcmp     Unsigned32,
-    svcBgpEvpnInstAutoBndTnlFlxAlgFb TruthValue
+    svcBgpEvpnInstAutoBndTnlFlxAlgFb TruthValue,
+    svcBgpEvpnInstAutoBndTnlWEcmp    TruthValue
 }
 
 svcBgpEvpnInstAutoBndTnlLastChg  OBJECT-TYPE
@@ -30129,6 +29973,21 @@ svcBgpEvpnInstAutoBndTnlFlxAlgFb OBJECT-TYPE
     DEFVAL      { false }
     ::= { svcBgpEvpnInstAutoBndTnlEntry 16 }
 
+svcBgpEvpnInstAutoBndTnlWEcmp    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The svcBgpEvpnInstAutoBndTnlWEcmp specifies the number of tunnels that
+         the auto-bind tunnel can resolve over a VPRN.
+
+         If a weighted ecmp is configured, then a path is selected based on the
+          output of the hash algorithm. Packet paths are then mapped to LSPs in
+          proportion to the configured load balancing weight of the LSP. Note
+         that  the hash is based on the system load balancing configuration."
+    DEFVAL      { false }
+    ::= { svcBgpEvpnInstAutoBndTnlEntry 17 }
+
 svcTlsVxInstVTEPEgrVniTable      OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcTlsVxInstVTEPEgrVniEntry
     MAX-ACCESS  not-accessible
@@ -30163,7 +30022,9 @@ SvcTlsVxInstVTEPEgrVniEntry      ::= SEQUENCE
     svcTlsVxInstVTEPEgrVniL2EsPbr    TruthValue,
     svcTlsVxInstVTEPEgrVniMcast      INTEGER,
     svcTlsVxInstVTEPEgrVniVxlanType  INTEGER,
-    svcTlsVxInstVTEPEgrVniSbdMcast   TruthValue
+    svcTlsVxInstVTEPEgrVniSbdMcast   TruthValue,
+    svcTlsVxInstVTEPEgrVniOperFlag   TmnxDestTEPOperFlag,
+    svcTlsVxInstVTEPEgrVniLastChange TimeStamp
 }
 
 svcTlsVxInstVTEPAddrType         OBJECT-TYPE
@@ -30260,6 +30121,25 @@ svcTlsVxInstVTEPEgrVniSbdMcast   OBJECT-TYPE
          supplementery broadcast-list multicast for this VPLS service."
     ::= { svcTlsVxInstVTEPEgrVniEntry 10 }
 
+svcTlsVxInstVTEPEgrVniOperFlag   OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsVxInstVTEPEgrVniOperFlag indicates all the
+         conditions that affect the operational status of the vxlan TEP."
+    ::= { svcTlsVxInstVTEPEgrVniEntry 11 }
+
+svcTlsVxInstVTEPEgrVniLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsVxInstVTEPEgrVniLastChange indicates the
+         timestamp of the modification of the ethernet segment destination
+         entry."
+    ::= { svcTlsVxInstVTEPEgrVniEntry 12 }
+
 svcTlsVxlanInstARLfRplCndTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcTlsVxlanInstARLfRplCndEntry
     MAX-ACCESS  not-accessible
@@ -30350,7 +30230,9 @@ SvcEvpnVxlanInstESDstTEPEntry    ::= SEQUENCE
     svcEvpnVxlanInstESDstTEPAddrType InetAddressType,
     svcEvpnVxlanInstESDstTEPAddress  InetAddress,
     svcEvpnVxlanInstESDstTEPVni      TmnxVni,
-    svcEvpnVxlanInstESDstTEPLastChg  TimeStamp
+    svcEvpnVxlanInstESDstTEPLastChg  TimeStamp,
+    svcEvpnVxlanInstESDestTEPOpState TmnxDestTEPOperState,
+    svcEvpnVxlanInstESDestTEPOpFlag  TmnxDestTEPOperFlag
 }
 
 svcEvpnVxlanInstESDstTEPAddrType OBJECT-TYPE
@@ -30389,6 +30271,24 @@ svcEvpnVxlanInstESDstTEPLastChg  OBJECT-TYPE
          timestamp of the modification of the ethernet segment destination
          entry."
     ::= { svcEvpnVxlanInstESDstTEPEntry 4 }
+
+svcEvpnVxlanInstESDestTEPOpState OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnVxlanInstESDestTEPOpState indicates the operating
+         state of evpn vxlan destination TEP."
+    ::= { svcEvpnVxlanInstESDstTEPEntry 8 }
+
+svcEvpnVxlanInstESDestTEPOpFlag  OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnVxlanInstESDestTEPOpFlag indicates all the
+         conditions that affect the operational status of the evpn vxlan TEP."
+    ::= { svcEvpnVxlanInstESDstTEPEntry 9 }
 
 svcEvpnVxlanInstESDestTable      OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnVxlanInstESDestEntry
@@ -31876,7 +31776,8 @@ SvcVprnRadiusServerEntry         ::= SEQUENCE
     svcVprnRadiusServerLastChanged   TimeStamp,
     svcVprnRadiusServerTLSClientProf TNamedItemOrEmpty,
     svcVprnRadiusServerSecretErr     SecretError,
-    svcVprnRadiusServerTLSClntPrfErr TlsClientProfileError
+    svcVprnRadiusServerTLSClntPrfErr TlsClientProfileError,
+    svcVprnRadiusServerAuthHashType  INTEGER
 }
 
 svcVprnRadiusServerIndex         OBJECT-TYPE
@@ -31989,6 +31890,19 @@ svcVprnRadiusServerTLSClntPrfErr OBJECT-TYPE
          reason why the Radius server failed to connect using the client TLS
          profile authentication method."
     ::= { svcVprnRadiusServerEntry 10 }
+
+svcVprnRadiusServerAuthHashType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        md5 (1),
+        sm3 (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVprnRadiusServerAuthHashType specifies the type of
+         hash algorithm used for Radius server authentication."
+    DEFVAL      { md5 }
+    ::= { svcVprnRadiusServerEntry 11 }
 
 svcSysVpnGreSrcIpObjs            OBJECT IDENTIFIER ::= { tmnxSvcObjs 252 }
 
@@ -34004,8 +33918,7 @@ svcSrv6LocatorEndDt4StaticValue  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcSrv6LocatorEndDt4StaticValue specifies the static function
-         value used to derive the End.DT4 SID that is associated to IPv4
-         routes."
+         value used to derive the End.DT4 SID routes."
     DEFVAL      { 0 }
     ::= { svcSrv6LocatorEntry 5 }
 
@@ -34024,8 +33937,7 @@ svcSrv6LocatorEndDt6StaticValue  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcSrv6LocatorEndDt6StaticValue specifies the static function
-         value used to derive the End.DT6 SID that is associated to IPv6
-         routes."
+         value used to derive the End.DT6 SID routes."
     DEFVAL      { 0 }
     ::= { svcSrv6LocatorEntry 7 }
 
@@ -34044,8 +33956,7 @@ svcSrv6LocatorEndDt46StaticValue OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcSrv6LocatorEndDt46StaticValue specifies the static function
-         value used to derive the End.DT46 SID that is associated to IPv4/IPv6
-         routes."
+         value used to derive the End.DT46 SID routes."
     DEFVAL      { 0 }
     ::= { svcSrv6LocatorEntry 9 }
 
@@ -34199,7 +34110,7 @@ svcEvpnSrv6Table                 OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcEvpnSrv6Table contains entries for all the BGP SRv6 instances
-         for a particular VPRN service."
+         for a particular service."
     ::= { svcSrv6Objs 6 }
 
 svcEvpnSrv6Entry                 OBJECT-TYPE
@@ -34225,7 +34136,13 @@ SvcEvpnSrv6Entry                 ::= SEQUENCE
     svcEvpnSrv6RtNextHopType         INTEGER,
     svcEvpnSrv6RtNextHopAddrType     InetAddressType,
     svcEvpnSrv6RtNextHopAddr         InetAddress,
-    svcEvpnSrv6Evi3ByteAutoRT        TruthValue
+    svcEvpnSrv6Evi3ByteAutoRT        TruthValue,
+    svcEvpnSrv6ResProtSrcMac         TruthValue,
+    svcEvpnSrv6RPSMacAct             INTEGER,
+    svcEvpnSrv6ShgName               TNamedItemOrEmpty,
+    svcEvpnSrv6Resolution            TSrv6RouteResolution,
+    svcEvpnSrv6ForceQinqVcFwd        INTEGER,
+    svcEvpnSrv6MhMode                INTEGER
 }
 
 svcEvpnSrv6BgpInstance           OBJECT-TYPE
@@ -34324,8 +34241,8 @@ svcEvpnSrv6RtNextHopAddr         OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of svcEvpnSrv6RtNextHopAddr specifies the next-hop IP for ES
-         and  AD per ES routes."
+        "The value of svcEvpnSrv6RtNextHopAddr specifies the next-hop IP for
+         EVPN routes."
     DEFVAL      { ''H }
     ::= { svcEvpnSrv6Entry 9 }
 
@@ -34338,6 +34255,83 @@ svcEvpnSrv6Evi3ByteAutoRT        OBJECT-TYPE
          auto-derivation for EVIs for this service."
     DEFVAL      { false }
     ::= { svcEvpnSrv6Entry 10 }
+
+svcEvpnSrv6ResProtSrcMac         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnSrv6ResProtSrcMac specifies how the agent will
+         handle relearn requests for protected MAC addresses. When the value of
+         this object is 'true', requests to relearn a protected MAC address
+         will be ignored."
+    DEFVAL      { false }
+    ::= { svcEvpnSrv6Entry 11 }
+
+svcEvpnSrv6RPSMacAct             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        discardFrame (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value svcEvpnSrv6RPSMacAct specifies the action to take whenever a
+         relearn request for a protected MAC is received on a restricted SAP.
+
+         When the value of this object is 'discardFrame', the SAP will start
+         discarding the frame."
+    DEFVAL      { discardFrame }
+    ::= { svcEvpnSrv6Entry 12 }
+
+svcEvpnSrv6ShgName               OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the svcEvpnSrv6ShgName specifies the value of
+         split-horizon group associated with this BGP EVPN SRV6. By default,
+         BGP EVPN SRV6 connections do not belong to any user configured
+         split-horizon group."
+    DEFVAL      { ''H }
+    ::= { svcEvpnSrv6Entry 13 }
+
+svcEvpnSrv6Resolution            OBJECT-TYPE
+    SYNTAX      TSrv6RouteResolution
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the svcEvpnSrv6Resolution specifies the route resolution
+         options."
+    DEFVAL      { routeTable }
+    ::= { svcEvpnSrv6Entry 14 }
+
+svcEvpnSrv6ForceQinqVcFwd        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        ctagctag (1),
+        stagctag (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnSrv6ForceQinqVcFwd specifies whether or not the
+         datapath should forcefully insert two VLAN tags which are copied from
+         the qinq service-delimiting vlan values."
+    DEFVAL      { none }
+    ::= { svcEvpnSrv6Entry 15 }
+
+svcEvpnSrv6MhMode                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        access  (0),
+        network (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcEvpnSrv6MhMode specifies the mode of multi-homing for this
+         entry."
+    DEFVAL      { network }
+    ::= { svcEvpnSrv6Entry 16 }
 
 svcEpipeSrv6TblLastCh            OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -34354,7 +34348,7 @@ svcEpipeSrv6Table                OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcEpipeSrv6Table contains entries for all the SRv6 instances for
-         a particular VPRN service."
+         a particular EPIPE service."
     ::= { svcSrv6Objs 8 }
 
 svcEpipeSrv6Entry                OBJECT-TYPE
@@ -34419,7 +34413,7 @@ svcEpipeSrv6LocatorTable         OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcEpipeSrv6LocatorTable contains entries for all the SRv6
-         instances for a particular VPRN service."
+         locators for a particular EPIPE service."
     ::= { svcSrv6Objs 10 }
 
 svcEpipeSrv6LocatorEntry         OBJECT-TYPE
@@ -34427,7 +34421,7 @@ svcEpipeSrv6LocatorEntry         OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A SRv6 instance entry in the svcEpipeSrv6LocatorTable."
+        "A SRv6 locator entry in the svcEpipeSrv6LocatorTable."
     INDEX       {
         svcId,
         svcEpipeSrv6Instance,
@@ -34481,7 +34475,7 @@ svcEpipeSrv6LocatorEndDx2        OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The svcEpipeSrv6LocatorEndDx2 specifies how the END.DT4 is derived."
+        "The svcEpipeSrv6LocatorEndDx2 specifies how the END.DX2 is derived."
     DEFVAL      { none }
     ::= { svcEpipeSrv6LocatorEntry 4 }
 
@@ -34491,8 +34485,7 @@ svcEpipeSrv6LocatorEndDx2Static  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The svcEpipeSrv6LocatorEndDx2Static specifies the static function
-         value used to derive the End.DT4 SID that is associated to IPv4
-         routes."
+         value used to derive the End.DX2 SID routes."
     DEFVAL      { 0 }
     ::= { svcEpipeSrv6LocatorEntry 5 }
 
@@ -34501,8 +34494,8 @@ svcEpipeSrv6LocEndDx2Value       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The object svcEpipeSrv6LocEndDx2Value specifies the operational end
-         value."
+        "The object svcEpipeSrv6LocEndDx2Value specifies the operational
+         END.DX2 value."
     ::= { svcEpipeSrv6LocatorEntry 6 }
 
 svcEpipeSrv6LocEndDx2State       OBJECT-TYPE
@@ -34511,7 +34504,7 @@ svcEpipeSrv6LocEndDx2State       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of svcEpipeSrv6LocEndDx2State indicates the operational
-         state."
+         state of END.DX2 function."
     ::= { svcEpipeSrv6LocatorEntry 7 }
 
 svcEpipeSrv6LocEndDx2ErrorCode   OBJECT-TYPE
@@ -34520,7 +34513,7 @@ svcEpipeSrv6LocEndDx2ErrorCode   OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The object svcEpipeSrv6LocEndDx2ErrorCode specifies the  error code
-         for end function."
+         for END.DX2 function."
     ::= { svcEpipeSrv6LocatorEntry 8 }
 
 svcEpipeSrv6LocEndDx2SidAddrType OBJECT-TYPE
@@ -34546,7 +34539,7 @@ svcSrv6TEPTable                  OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The svcSrv6TEPTable contains entries for all the EVPN MPLS tunnel
+        "The svcSrv6TEPTable contains entries for all the EVPN SRV6 tunnel
          endpoint addresse specific information in the system."
     ::= { svcSrv6Objs 11 }
 
@@ -34642,7 +34635,10 @@ SvcSrv6InstTEPSidEntry           ::= SEQUENCE
     svcSrv6InstTEPSidL2EsPbr         TruthValue,
     svcSrv6InstTEPSidMcast           INTEGER,
     svcSrv6InstTEPSidSrv6Type        INTEGER,
-    svcSrv6InstTEPSidSbdMcast        TruthValue
+    svcSrv6InstTEPSidSbdMcast        TruthValue,
+    svcSrv6InstTEPSidOperState       TmnxDestTEPOperState,
+    svcSrv6InstTEPSidOperFlag        TmnxDestTEPOperFlag,
+    svcSrv6InstTEPSidLastChange      TimeStamp
 }
 
 svcSrv6InstTEPAddrType           OBJECT-TYPE
@@ -34737,6 +34733,34 @@ svcSrv6InstTEPSidSbdMcast        OBJECT-TYPE
          supplementery broadcast-list multicast for this service."
     ::= { svcSrv6InstTEPSidEntry 10 }
 
+svcSrv6InstTEPSidOperState       OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6InstTEPSidOperState indicates the operating state
+         of srv6 TEP."
+    ::= { svcSrv6InstTEPSidEntry 11 }
+
+svcSrv6InstTEPSidOperFlag        OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6InstTEPSidOperFlag indicates all the  conditions
+         that affect the operational status of the srv6 TEP."
+    ::= { svcSrv6InstTEPSidEntry 12 }
+
+svcSrv6InstTEPSidLastChange      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcSrv6InstTEPSidLastChange indicates the
+         timestamp of the modification of the ethernet segment destination
+         entry."
+    ::= { svcSrv6InstTEPSidEntry 13 }
+
 svcSrv6InstESDstTEPTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcSrv6InstESDstTEPEntry
     MAX-ACCESS  not-accessible
@@ -34771,7 +34795,9 @@ SvcSrv6InstESDstTEPEntry         ::= SEQUENCE
     svcSrv6InstESDstTEPAddress       InetAddress,
     svcSrv6InstESDstTEPSidAddrType   InetAddressType,
     svcSrv6InstESDstTEPSidAddr       InetAddress,
-    svcSrv6InstESDstTEPLastChg       TimeStamp
+    svcSrv6InstESDstTEPLastChg       TimeStamp,
+    svcSrv6InstESDstTEPOperState     TmnxDestTEPOperState,
+    svcSrv6InstESDstTEPOperFlag      TmnxDestTEPOperFlag
 }
 
 svcSrv6InstESDstTEPAddrType      OBJECT-TYPE
@@ -34820,6 +34846,24 @@ svcSrv6InstESDstTEPLastChg       OBJECT-TYPE
          entry."
     ::= { svcSrv6InstESDstTEPEntry 5 }
 
+svcSrv6InstESDstTEPOperState     OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6InstESDstTEPOperState indicates the operating
+         state of srv6 TEP."
+    ::= { svcSrv6InstESDstTEPEntry 6 }
+
+svcSrv6InstESDstTEPOperFlag      OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6InstESDstTEPOperFlag indicates all the  conditions
+         that affect the operational status of the srv6 TEP."
+    ::= { svcSrv6InstESDstTEPEntry 7 }
+
 svcSrv6InstESDestTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcSrv6InstESDestEntry
     MAX-ACCESS  not-accessible
@@ -34867,6 +34911,902 @@ svcSrv6InstESDestNumMacs         OBJECT-TYPE
         "The value of the object svcSrv6InstESDestNumMacs indicates the number
          of MAC's associated with this entry."
     ::= { svcSrv6InstESDestEntry 3 }
+
+svcVplsSrv6TblLastCh             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6TblLastCh indicates the sysUpTime at the time
+         of the last modification of an entry in the svcVplsSrv6Table."
+    ::= { svcSrv6Objs 15 }
+
+svcVplsSrv6Table                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcVplsSrv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6Table contains entries for all the SRv6 instances for a
+         particular VPLS service."
+    ::= { svcSrv6Objs 16 }
+
+svcVplsSrv6Entry                 OBJECT-TYPE
+    SYNTAX      SvcVplsSrv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SRv6 instance entry in the svcVplsSrv6Table."
+    INDEX       {
+        svcId,
+        svcVplsSrv6Instance
+    }
+    ::= { svcVplsSrv6Table 1 }
+
+SvcVplsSrv6Entry                 ::= SEQUENCE
+{
+    svcVplsSrv6Instance              Integer32,
+    svcVplsSrv6RowStatus             RowStatus,
+    svcVplsSrv6LastChngd             TimeStamp
+}
+
+svcVplsSrv6Instance              OBJECT-TYPE
+    SYNTAX      Integer32 (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6Instance specifies the SRv6 instance used with
+         this service."
+    ::= { svcVplsSrv6Entry 1 }
+
+svcVplsSrv6RowStatus             OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object  svcVplsSrv6RowStatus
+         specifies the status of this row."
+    ::= { svcVplsSrv6Entry 2 }
+
+svcVplsSrv6LastChngd             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcVplsSrv6LastChngd indicates the timestamp
+         of the modification of this entry."
+    ::= { svcVplsSrv6Entry 3 }
+
+svcVplsSrv6LocatorTblLastCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocatorTblLastCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         svcVplsSrv6LocatorTable."
+    ::= { svcSrv6Objs 17 }
+
+svcVplsSrv6LocatorTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcVplsSrv6LocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorTable contains entries for all the SRv6 locators
+         for a particular VPLS service."
+    ::= { svcSrv6Objs 18 }
+
+svcVplsSrv6LocatorEntry          OBJECT-TYPE
+    SYNTAX      SvcVplsSrv6LocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SRv6 locator entry in the svcVplsSrv6LocatorTable."
+    INDEX       {
+        svcId,
+        svcVplsSrv6Instance,
+        svcVplsSrv6LocatorName
+    }
+    ::= { svcVplsSrv6LocatorTable 1 }
+
+SvcVplsSrv6LocatorEntry          ::= SEQUENCE
+{
+    svcVplsSrv6LocatorName           TLNamedItem,
+    svcVplsSrv6LocatorRowStatus      RowStatus,
+    svcVplsSrv6LocatorLastChngd      TimeStamp,
+    svcVplsSrv6LocatorEndDt2u        TSrv6FunctionType,
+    svcVplsSrv6LocatorEndDt2uStatic  TSrv6FunctionValue,
+    svcVplsSrv6LocEndDt2uValue       TSrv6FunctionValue,
+    svcVplsSrv6LocEndDt2uState       TmnxOperState,
+    svcVplsSrv6LocEndDt2uErrorCode   TSrv6FunctionErrorCode,
+    svcVplsSrv6LocEndDt2uSidAddrType InetAddressType,
+    svcVplsSrv6LocEndDt2uSidAddr     InetAddress,
+    svcVplsSrv6LocatorEndDt2m        TSrv6FunctionType,
+    svcVplsSrv6LocatorEndDt2mStatic  TSrv6FunctionValue,
+    svcVplsSrv6LocEndDt2mValue       TSrv6FunctionValue,
+    svcVplsSrv6LocEndDt2mState       TmnxOperState,
+    svcVplsSrv6LocEndDt2mErrorCode   TSrv6FunctionErrorCode,
+    svcVplsSrv6LocEndDt2mSidAddrType InetAddressType,
+    svcVplsSrv6LocEndDt2mSidAddr     InetAddress
+}
+
+svcVplsSrv6LocatorName           OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorName specifies the SRv6 locator name used with
+         this service."
+    ::= { svcVplsSrv6LocatorEntry 1 }
+
+svcVplsSrv6LocatorRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object  svcVplsSrv6LocatorRowStatus
+         specifies the status of this row."
+    ::= { svcVplsSrv6LocatorEntry 2 }
+
+svcVplsSrv6LocatorLastChngd      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcVplsSrv6LocatorLastChngd indicates the
+         timestamp of the modification of this entry."
+    ::= { svcVplsSrv6LocatorEntry 3 }
+
+svcVplsSrv6LocatorEndDt2u        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorEndDt2u specifies how the END.DT2U is derived."
+    DEFVAL      { none }
+    ::= { svcVplsSrv6LocatorEntry 4 }
+
+svcVplsSrv6LocatorEndDt2uStatic  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorEndDt2uStatic specifies the static function
+         value used to derive the End.DT2U SID routes."
+    DEFVAL      { 0 }
+    ::= { svcVplsSrv6LocatorEntry 5 }
+
+svcVplsSrv6LocEndDt2uValue       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6LocEndDt2uValue specifies the operational
+         END.DT2U value."
+    ::= { svcVplsSrv6LocatorEntry 6 }
+
+svcVplsSrv6LocEndDt2uState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2uState indicates the operational
+         state of END.DT2U function."
+    ::= { svcVplsSrv6LocatorEntry 7 }
+
+svcVplsSrv6LocEndDt2uErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6LocEndDt2uErrorCode specifies the  error code
+         for END.DT2U function."
+    ::= { svcVplsSrv6LocatorEntry 8 }
+
+svcVplsSrv6LocEndDt2uSidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2uSidAddrType specifies the type of
+         svcVplsSrv6LocEndDt2uSidAddr."
+    ::= { svcVplsSrv6LocatorEntry 9 }
+
+svcVplsSrv6LocEndDt2uSidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2uSidAddr specifies the
+         segment-identifier"
+    ::= { svcVplsSrv6LocatorEntry 10 }
+
+svcVplsSrv6LocatorEndDt2m        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorEndDt2m specifies how the END.DT2M is derived."
+    DEFVAL      { none }
+    ::= { svcVplsSrv6LocatorEntry 11 }
+
+svcVplsSrv6LocatorEndDt2mStatic  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6LocatorEndDt2mStatic specifies the static function
+         value used to derive the End.DT2M SID routes."
+    DEFVAL      { 0 }
+    ::= { svcVplsSrv6LocatorEntry 12 }
+
+svcVplsSrv6LocEndDt2mValue       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6LocEndDt2mValue specifies the operational
+         END.DT2M value."
+    ::= { svcVplsSrv6LocatorEntry 13 }
+
+svcVplsSrv6LocEndDt2mState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2mState indicates the operational
+         state of END.DT2M function."
+    ::= { svcVplsSrv6LocatorEntry 14 }
+
+svcVplsSrv6LocEndDt2mErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6LocEndDt2mErrorCode specifies the  error code
+         for END.DT2M function."
+    ::= { svcVplsSrv6LocatorEntry 15 }
+
+svcVplsSrv6LocEndDt2mSidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2mSidAddrType specifies the type of
+         svcVplsSrv6LocEndDt2mSidAddr."
+    ::= { svcVplsSrv6LocatorEntry 16 }
+
+svcVplsSrv6LocEndDt2mSidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6LocEndDt2mSidAddr specifies the
+         segment-identifier"
+    ::= { svcVplsSrv6LocatorEntry 17 }
+
+svcSrv6MSLocatorTblLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocatorTblLastCh indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         svcSrv6MSLocatorTable."
+    ::= { svcSrv6Objs 19 }
+
+svcSrv6MSLocatorTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorTable contains entries for all the SRv6
+         micro-segment instances for a particular VPRN service."
+    ::= { svcSrv6Objs 20 }
+
+svcSrv6MSLocatorEntry            OBJECT-TYPE
+    SYNTAX      SvcSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SRv6 micro-segment instance entry in the svcSrv6MSLocatorTable."
+    INDEX       {
+        svcId,
+        svcSrv6Instance,
+        svcSrv6MSLocatorName
+    }
+    ::= { svcSrv6MSLocatorTable 1 }
+
+SvcSrv6MSLocatorEntry            ::= SEQUENCE
+{
+    svcSrv6MSLocatorName             TLNamedItem,
+    svcSrv6MSLocatorRowStatus        RowStatus,
+    svcSrv6MSLocatorLastChngd        TimeStamp,
+    svcSrv6MSLocatorUdt4             TSrv6FunctionType,
+    svcSrv6MSLocatorUdt4StaticValue  TSrv6FunctionValue,
+    svcSrv6MSLocatorUdt6             TSrv6FunctionType,
+    svcSrv6MSLocatorUdt6StaticValue  TSrv6FunctionValue,
+    svcSrv6MSLocatorUdt46            TSrv6FunctionType,
+    svcSrv6MSLocatorUdt46StaticValue TSrv6FunctionValue,
+    svcSrv6MSLocUdt4OperValue        TSrv6FunctionValue,
+    svcSrv6MSLocUdt4OperState        TmnxOperState,
+    svcSrv6MSLocUdt4OperErrorCode    TSrv6FunctionErrorCode,
+    svcSrv6MSLocUdt4OperSidAddrType  InetAddressType,
+    svcSrv6MSLocUdt4OperSidAddr      InetAddress,
+    svcSrv6MSLocUdt6OperValue        TSrv6FunctionValue,
+    svcSrv6MSLocUdt6OperState        TmnxOperState,
+    svcSrv6MSLocUdt6OperErrorCode    TSrv6FunctionErrorCode,
+    svcSrv6MSLocUdt6OperSidAddrType  InetAddressType,
+    svcSrv6MSLocUdt6OperSidAddr      InetAddress,
+    svcSrv6MSLocUdt46OperValue       TSrv6FunctionValue,
+    svcSrv6MSLocUdt46OperState       TmnxOperState,
+    svcSrv6MSLocUdt46OperErrorCode   TSrv6FunctionErrorCode,
+    svcSrv6MSLocUdt46OpSidAddrType   InetAddressType,
+    svcSrv6MSLocUdt46OpSidAddr       InetAddress
+}
+
+svcSrv6MSLocatorName             OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorName specifies the SRv6 micro segment locator name
+         used with this service."
+    ::= { svcSrv6MSLocatorEntry 1 }
+
+svcSrv6MSLocatorRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object  svcSrv6MSLocatorRowStatus
+         specifies the status of this row."
+    ::= { svcSrv6MSLocatorEntry 2 }
+
+svcSrv6MSLocatorLastChngd        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcSrv6MSLocatorLastChngd indicates the
+         timestamp of the modification of this entry."
+    ::= { svcSrv6MSLocatorEntry 3 }
+
+svcSrv6MSLocatorUdt4             OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt4 specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcSrv6MSLocatorEntry 4 }
+
+svcSrv6MSLocatorUdt4StaticValue  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt4StaticValue specifies the static function
+         value used to derive the UDT4 function SID routes."
+    DEFVAL      { 0 }
+    ::= { svcSrv6MSLocatorEntry 5 }
+
+svcSrv6MSLocatorUdt6             OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt6 specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcSrv6MSLocatorEntry 6 }
+
+svcSrv6MSLocatorUdt6StaticValue  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt6StaticValue specifies the static function
+         value used to derive the function UDT6 SID routes."
+    DEFVAL      { 0 }
+    ::= { svcSrv6MSLocatorEntry 7 }
+
+svcSrv6MSLocatorUdt46            OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt46 specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcSrv6MSLocatorEntry 8 }
+
+svcSrv6MSLocatorUdt46StaticValue OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcSrv6MSLocatorUdt46StaticValue specifies the static function
+         value used to derive the End.DT46 SID routes."
+    DEFVAL      { 0 }
+    ::= { svcSrv6MSLocatorEntry 9 }
+
+svcSrv6MSLocUdt4OperValue        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt4OperValue specifies the operational
+         function UDT4 value."
+    ::= { svcSrv6MSLocatorEntry 10 }
+
+svcSrv6MSLocUdt4OperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt4OperState indicates the operational state
+         of UDT4 function."
+    ::= { svcSrv6MSLocatorEntry 11 }
+
+svcSrv6MSLocUdt4OperErrorCode    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt4OperErrorCode specifies the  error code for
+         the UDT4 function."
+    ::= { svcSrv6MSLocatorEntry 12 }
+
+svcSrv6MSLocUdt4OperSidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt4OperSidAddrType specifies the type of
+         svcSrv6MSLocUdt4OperSidAddr."
+    ::= { svcSrv6MSLocatorEntry 13 }
+
+svcSrv6MSLocUdt4OperSidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt4OperSidAddr specifies the
+         segment-identifier"
+    ::= { svcSrv6MSLocatorEntry 14 }
+
+svcSrv6MSLocUdt6OperValue        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt6OperValue specifies the operational
+         function UDT6 value."
+    ::= { svcSrv6MSLocatorEntry 15 }
+
+svcSrv6MSLocUdt6OperState        OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt6OperState indicates the operational state
+         of UDT6 function."
+    ::= { svcSrv6MSLocatorEntry 16 }
+
+svcSrv6MSLocUdt6OperErrorCode    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt6OperErrorCode specifies the  error code for
+         the UDT6 function."
+    ::= { svcSrv6MSLocatorEntry 17 }
+
+svcSrv6MSLocUdt6OperSidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt6OperSidAddrType specifies the type of
+         svcSrv6MSLocUdt6OperSidAddr."
+    ::= { svcSrv6MSLocatorEntry 18 }
+
+svcSrv6MSLocUdt6OperSidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt6OperSidAddr specifies the
+         segment-identifier"
+    ::= { svcSrv6MSLocatorEntry 19 }
+
+svcSrv6MSLocUdt46OperValue       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt46OperValue specifies the operational
+         function UDT46 value."
+    ::= { svcSrv6MSLocatorEntry 20 }
+
+svcSrv6MSLocUdt46OperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt46OperState indicates the operational
+         state of UDT46 function."
+    ::= { svcSrv6MSLocatorEntry 21 }
+
+svcSrv6MSLocUdt46OperErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6MSLocUdt46OperErrorCode specifies the  error code
+         for UDT46 function."
+    ::= { svcSrv6MSLocatorEntry 22 }
+
+svcSrv6MSLocUdt46OpSidAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt46OpSidAddrType specifies the type of
+         svcSrv6MSLocUdt46OpSidAddr."
+    ::= { svcSrv6MSLocatorEntry 23 }
+
+svcSrv6MSLocUdt46OpSidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcSrv6MSLocUdt46OpSidAddr specifies the
+         segment-identifier"
+    ::= { svcSrv6MSLocatorEntry 24 }
+
+svcEpipeSrv6MSLocatorTblLastCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEpipeSrv6MSLocatorTblLastCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         svcEpipeSrv6MSLocatorTable."
+    ::= { svcSrv6Objs 21 }
+
+svcEpipeSrv6MSLocatorTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcEpipeSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcEpipeSrv6MSLocatorTable contains entries for all the SRv6
+         micro-segment instances for a particular EPIPE service."
+    ::= { svcSrv6Objs 22 }
+
+svcEpipeSrv6MSLocatorEntry       OBJECT-TYPE
+    SYNTAX      SvcEpipeSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SRv6 micro-segment instance entry in the svcEpipeSrv6MSLocatorTable."
+    INDEX       {
+        svcId,
+        svcEpipeSrv6Instance,
+        svcEpipeSrv6MSLocatorName
+    }
+    ::= { svcEpipeSrv6MSLocatorTable 1 }
+
+SvcEpipeSrv6MSLocatorEntry       ::= SEQUENCE
+{
+    svcEpipeSrv6MSLocatorName        TLNamedItem,
+    svcEpipeSrv6MSLocatorRowStatus   RowStatus,
+    svcEpipeSrv6MSLocatorLastChngd   TimeStamp,
+    svcEpipeSrv6MSLocatorUdx2        TSrv6FunctionType,
+    svcEpipeSrv6MSLocatorUdx2Static  TSrv6FunctionValue,
+    svcEpipeSrv6MSLocUdx2Value       TSrv6FunctionValue,
+    svcEpipeSrv6MSLocUdx2State       TmnxOperState,
+    svcEpipeSrv6MSLocUdx2ErrorCode   TSrv6FunctionErrorCode,
+    svcEpipeSrv6MSLocUdx2SidAddrType InetAddressType,
+    svcEpipeSrv6MSLocUdx2SidAddr     InetAddress
+}
+
+svcEpipeSrv6MSLocatorName        OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcEpipeSrv6MSLocatorName specifies the SRv6 micro segment locator
+         name used with this service."
+    ::= { svcEpipeSrv6MSLocatorEntry 1 }
+
+svcEpipeSrv6MSLocatorRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object  svcEpipeSrv6MSLocatorRowStatus
+         specifies the status of this row."
+    ::= { svcEpipeSrv6MSLocatorEntry 2 }
+
+svcEpipeSrv6MSLocatorLastChngd   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcEpipeSrv6MSLocatorLastChngd indicates the
+         timestamp of the modification of this entry."
+    ::= { svcEpipeSrv6MSLocatorEntry 3 }
+
+svcEpipeSrv6MSLocatorUdx2        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcEpipeSrv6MSLocatorUdx2 specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcEpipeSrv6MSLocatorEntry 4 }
+
+svcEpipeSrv6MSLocatorUdx2Static  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcEpipeSrv6MSLocatorUdx2Static specifies the static function
+         value used to derive the function SID."
+    DEFVAL      { 0 }
+    ::= { svcEpipeSrv6MSLocatorEntry 5 }
+
+svcEpipeSrv6MSLocUdx2Value       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcEpipeSrv6MSLocUdx2Value specifies the operational
+         function value."
+    ::= { svcEpipeSrv6MSLocatorEntry 6 }
+
+svcEpipeSrv6MSLocUdx2State       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEpipeSrv6MSLocUdx2State indicates the operational
+         state."
+    ::= { svcEpipeSrv6MSLocatorEntry 7 }
+
+svcEpipeSrv6MSLocUdx2ErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcEpipeSrv6MSLocUdx2ErrorCode specifies the  error code
+         for end function."
+    ::= { svcEpipeSrv6MSLocatorEntry 8 }
+
+svcEpipeSrv6MSLocUdx2SidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEpipeSrv6MSLocUdx2SidAddrType specifies the type of
+         svcEpipeSrv6MSLocUdx2SidAddr."
+    ::= { svcEpipeSrv6MSLocatorEntry 9 }
+
+svcEpipeSrv6MSLocUdx2SidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEpipeSrv6MSLocUdx2SidAddr specifies the
+         segment-identifier"
+    ::= { svcEpipeSrv6MSLocatorEntry 10 }
+
+svcVplsSrv6MSLocatorTblLastCh    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocatorTblLastCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         svcVplsSrv6MSLocatorTable."
+    ::= { svcSrv6Objs 23 }
+
+svcVplsSrv6MSLocatorTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcVplsSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorTable contains entries for all the SRv6
+         micro-segment instances for a particular VPLS service."
+    ::= { svcSrv6Objs 24 }
+
+svcVplsSrv6MSLocatorEntry        OBJECT-TYPE
+    SYNTAX      SvcVplsSrv6MSLocatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SRv6 micro-segment instance entry in the svcVplsSrv6MSLocatorTable."
+    INDEX       {
+        svcId,
+        svcVplsSrv6Instance,
+        svcVplsSrv6MSLocatorName
+    }
+    ::= { svcVplsSrv6MSLocatorTable 1 }
+
+SvcVplsSrv6MSLocatorEntry        ::= SEQUENCE
+{
+    svcVplsSrv6MSLocatorName         TLNamedItem,
+    svcVplsSrv6MSLocatorRowStatus    RowStatus,
+    svcVplsSrv6MSLocatorLastChngd    TimeStamp,
+    svcVplsSrv6MSLocatorUdt2u        TSrv6FunctionType,
+    svcVplsSrv6MSLocatorUdt2uStatic  TSrv6FunctionValue,
+    svcVplsSrv6MSLocUdt2uValue       TSrv6FunctionValue,
+    svcVplsSrv6MSLocUdt2uState       TmnxOperState,
+    svcVplsSrv6MSLocUdt2uErrorCode   TSrv6FunctionErrorCode,
+    svcVplsSrv6MSLocUdt2uSidAddrType InetAddressType,
+    svcVplsSrv6MSLocUdt2uSidAddr     InetAddress,
+    svcVplsSrv6MSLocatorUdt2m        TSrv6FunctionType,
+    svcVplsSrv6MSLocatorUdt2mStatic  TSrv6FunctionValue,
+    svcVplsSrv6MSLocUdt2mValue       TSrv6FunctionValue,
+    svcVplsSrv6MSLocUdt2mState       TmnxOperState,
+    svcVplsSrv6MSLocUdt2mErrorCode   TSrv6FunctionErrorCode,
+    svcVplsSrv6MSLocUdt2mSidAddrType InetAddressType,
+    svcVplsSrv6MSLocUdt2mSidAddr     InetAddress
+}
+
+svcVplsSrv6MSLocatorName         OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorName specifies the SRv6 micro segment locator
+         name used with this service."
+    ::= { svcVplsSrv6MSLocatorEntry 1 }
+
+svcVplsSrv6MSLocatorRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object  svcVplsSrv6MSLocatorRowStatus
+         specifies the status of this row."
+    ::= { svcVplsSrv6MSLocatorEntry 2 }
+
+svcVplsSrv6MSLocatorLastChngd    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcVplsSrv6MSLocatorLastChngd indicates the
+         timestamp of the modification of this entry."
+    ::= { svcVplsSrv6MSLocatorEntry 3 }
+
+svcVplsSrv6MSLocatorUdt2u        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorUdt2u specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcVplsSrv6MSLocatorEntry 4 }
+
+svcVplsSrv6MSLocatorUdt2uStatic  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorUdt2uStatic specifies the static function
+         value used to derive the UDT2U function SID routes."
+    DEFVAL      { 0 }
+    ::= { svcVplsSrv6MSLocatorEntry 5 }
+
+svcVplsSrv6MSLocUdt2uValue       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6MSLocUdt2uValue specifies the operational
+         function UDT2U value."
+    ::= { svcVplsSrv6MSLocatorEntry 6 }
+
+svcVplsSrv6MSLocUdt2uState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2uState indicates the operational
+         state of UD2U function."
+    ::= { svcVplsSrv6MSLocatorEntry 7 }
+
+svcVplsSrv6MSLocUdt2uErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6MSLocUdt2uErrorCode specifies the  error code
+         for UDT2U function."
+    ::= { svcVplsSrv6MSLocatorEntry 8 }
+
+svcVplsSrv6MSLocUdt2uSidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2uSidAddrType specifies the type of
+         svcVplsSrv6MSLocUdt2uSidAddr."
+    ::= { svcVplsSrv6MSLocatorEntry 9 }
+
+svcVplsSrv6MSLocUdt2uSidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2uSidAddr specifies the
+         segment-identifier"
+    ::= { svcVplsSrv6MSLocatorEntry 10 }
+
+svcVplsSrv6MSLocatorUdt2m        OBJECT-TYPE
+    SYNTAX      TSrv6FunctionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorUdt2m specifies how the function is derived."
+    DEFVAL      { none }
+    ::= { svcVplsSrv6MSLocatorEntry 11 }
+
+svcVplsSrv6MSLocatorUdt2mStatic  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The svcVplsSrv6MSLocatorUdt2mStatic specifies the static function
+         value used to derive the UDT2M function SID routes."
+    DEFVAL      { 0 }
+    ::= { svcVplsSrv6MSLocatorEntry 12 }
+
+svcVplsSrv6MSLocUdt2mValue       OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6MSLocUdt2mValue specifies the operational UDT2M
+         function value."
+    ::= { svcVplsSrv6MSLocatorEntry 13 }
+
+svcVplsSrv6MSLocUdt2mState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2mState indicates the operational
+         state of UDT2M function."
+    ::= { svcVplsSrv6MSLocatorEntry 14 }
+
+svcVplsSrv6MSLocUdt2mErrorCode   OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object svcVplsSrv6MSLocUdt2mErrorCode specifies the  error code
+         for UDT2M function."
+    ::= { svcVplsSrv6MSLocatorEntry 15 }
+
+svcVplsSrv6MSLocUdt2mSidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2mSidAddrType specifies the type of
+         svcVplsSrv6MSLocUdt2mSidAddr."
+    ::= { svcVplsSrv6MSLocatorEntry 16 }
+
+svcVplsSrv6MSLocUdt2mSidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcVplsSrv6MSLocUdt2mSidAddr specifies the
+         segment-identifier"
+    ::= { svcVplsSrv6MSLocatorEntry 17 }
 
 svcDhcpLeaseDnsNbnsTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcDhcpLeaseDnsNbnsEntry
@@ -35064,6 +36004,393 @@ svcIfSubStatsEgrOctets           OBJECT-TYPE
          IP packets sent on this interface."
     ::= { svcIfSubStatsEntry 7 }
 
+svcTlsDataMtThdTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcTlsDataMtThdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "svcTlsDataMtThdTable configures Multicast Data Tunnel(Data MT)
+         thresholds for group prefixes.
+
+         Whenever the threshold of a C-(S,G)'s exceeds the configured threshold
+         value specified by svcTlsDataMtThd in this table, a MT interface is
+         created in svcTlsDataMtTable.  If the data-threshold goes
+         below the value specified by svcTlsDataMtThd, the MT
+         interface is automatically deleted."
+    ::= { tmnxSvcObjs 268 }
+
+svcTlsDataMtThdEntry             OBJECT-TYPE
+    SYNTAX      SvcTlsDataMtThdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the svcTlsDataMtThdEntry represents a group prefix
+         and the corresponding Data MT threshold it has to use.
+
+         An entry in  this table can be created or destroyed by an SNMP SET
+         request to svcTlsDataMtThdRowStatus. The SET request must
+         specify the group prefix as well as the threshold, or else the
+         entry will not be created."
+    INDEX       {
+        svcId,
+        svcTlsDataMtThdTblGrpAdrType,
+        svcTlsDataMtThdTblGrpAddr,
+        svcTlsDataMtThdTblGrpAdrMask
+    }
+    ::= { svcTlsDataMtThdTable 1 }
+
+SvcTlsDataMtThdEntry             ::= SEQUENCE
+{
+    svcTlsDataMtThdTblGrpAdrType     InetAddressType,
+    svcTlsDataMtThdTblGrpAddr        InetAddress,
+    svcTlsDataMtThdTblGrpAdrMask     InetAddressPrefixLength,
+    svcTlsDataMtThdRowStatus         RowStatus,
+    svcTlsDataMtThdRowLstChngd       TimeStamp,
+    svcTlsDataMtThd                  Unsigned32,
+    svcTlsDataMtSpmsiAddRxThd        Unsigned32,
+    svcTlsDataMtSpmsiDelRxThd        Unsigned32
+}
+
+svcTlsDataMtThdTblGrpAdrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdTblGrpAdrType indicates the address type
+         of svcTlsDataMtThdTblGrpAddr address."
+    ::= { svcTlsDataMtThdEntry 1 }
+
+svcTlsDataMtThdTblGrpAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdTblGrpAddr indicates the group address for
+         which the threshold can be configured."
+    ::= { svcTlsDataMtThdEntry 2 }
+
+svcTlsDataMtThdTblGrpAdrMask     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdTblGrpAdrMask indicates the mask for the
+         group address svcTlsDataMtThdTblGrpAddr."
+    ::= { svcTlsDataMtThdEntry 3 }
+
+svcTlsDataMtThdRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdRowStatus is used to create or destroy
+         entries in this table.
+
+         A row creation attempt will fail if svcTlsDataMtThd is not explicitly
+         set to a value."
+    ::= { svcTlsDataMtThdEntry 4 }
+
+svcTlsDataMtThdRowLstChngd       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdRowLstChngd indicates the sysUpTime when
+         this row was last modified."
+    ::= { svcTlsDataMtThdEntry 5 }
+
+svcTlsDataMtThd                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967294)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThd specifies the configured threshold
+         in kilo bits per second(bps) for a group prefix.  A MT interface is
+         created only if the traffic rate on the C-(S,G)'s for the group
+         exceeds this configured threshold.
+
+         A row creation attempt will fail if this object is not explicitly set
+         to a value."
+    ::= { svcTlsDataMtThdEntry 6 }
+
+svcTlsDataMtSpmsiAddRxThd        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtSpmsiAddRxThd specifies the number of
+         receiver PEs for this group specified in the svcTlsDataMtThdTblGrpAddr
+          for creating a S-PMSI.
+
+         S-PMSI is created when the bandwidth threshold value specified by
+         svcTlsDataMtThd is reached and the number of receiver PEs reaches  the
+         number specified here"
+    DEFVAL      { 65535 }
+    ::= { svcTlsDataMtThdEntry 7 }
+
+svcTlsDataMtSpmsiDelRxThd        OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtSpmsiDelRxThd specifies the number of
+         receiver PEs for deleting a S-PMSI.
+
+         When the number of receiver PEs goes above the value specified by
+         svcTlsDataMtSpmsiDelRxThd, S-PMSI is deleted and the multicast group
+         will be moved to the next available destination (either evpn IR binds
+         or wildcard s-pmsi if configured). It is recommended that
+         svcTlsDataMtSpmsiDelRxThd to be significantly higher than
+         svcTlsDataMtSpmsiAddRxThd to avoid creating and deleting S-PMSI as the
+         receiver PE count fluctuates."
+    DEFVAL      { 65535 }
+    ::= { svcTlsDataMtThdEntry 8 }
+
+svcTlsDataMtTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcTlsDataMtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table lists the Data Multicast Tunnel(MT) interfaces.
+
+         An MT can be thought of as a connector between a set of PE routers
+         forming a Multicast Domain.  From the perspective of VPN-specific
+         vpls evpn instance, an MT is a single multi-access interface.
+
+         An MT interface is created whenever the threshold of a C-(S,G)
+         exceeds the configured threshold value specified by
+         svcTlsDataMtThd.  If the data-threshold goes below the value
+         specified by svcTlsDataMtThd, the MT interface is automatically
+         deleted.  svcTlsDataMtThd is present in another table
+         svcTlsDataMtThdTable."
+    ::= { tmnxSvcObjs 269 }
+
+svcTlsDataMtEntry                OBJECT-TYPE
+    SYNTAX      SvcTlsDataMtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the svcTlsDataMtTable. This is a read-only table."
+    INDEX       {
+        svcId,
+        svcTlsDataMtSourceAddrType,
+        svcTlsDataMtSourceAddress,
+        svcTlsDataMtGroupAddrType,
+        svcTlsDataMtGroupAddress,
+        svcTlsDataMtOriginIpAddrType,
+        svcTlsDataMtOriginIpAddress,
+        svcTlsDataMtLspIndex,
+        svcTlsDataMtIndexRootAddrType,
+        svcTlsDataMtIndexRootAddr
+    }
+    ::= { svcTlsDataMtTable 1 }
+
+SvcTlsDataMtEntry                ::= SEQUENCE
+{
+    svcTlsDataMtSourceAddrType       InetAddressType,
+    svcTlsDataMtSourceAddress        InetAddress,
+    svcTlsDataMtGroupAddrType        InetAddressType,
+    svcTlsDataMtGroupAddress         InetAddress,
+    svcTlsDataMtOriginIpAddrType     InetAddressType,
+    svcTlsDataMtOriginIpAddress      InetAddress,
+    svcTlsDataMtLspIndex             Unsigned32,
+    svcTlsDataMtIndexRootAddrType    InetAddressType,
+    svcTlsDataMtIndexRootAddr        InetAddress,
+    svcTlsDataMtIfIndex              InterfaceIndexOrZero,
+    svcTlsDataMtUptime               Unsigned32,
+    svcTlsDataMtNumSGs               Unsigned32,
+    svcTlsDataMtMultiStreamId        Unsigned32,
+    svcTlsDataMtLSPId                Unsigned32,
+    svcTlsDataMtRemainDelayIntvl     Unsigned32,
+    svcTlsDataMtRootAddrType         InetAddressType,
+    svcTlsDataMtRootAddr             InetAddress,
+    svcTlsDataMtCounter              Unsigned32,
+    svcTlsDataMtSgOperState          INTEGER
+}
+
+svcTlsDataMtSourceAddrType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtSourceAddrType indicates the address type of
+         svcTlsDataMtSourceAddress."
+    ::= { svcTlsDataMtEntry 1 }
+
+svcTlsDataMtSourceAddress        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtSourceAddress indicates the source address
+         for a Multicast Tunnel."
+    ::= { svcTlsDataMtEntry 2 }
+
+svcTlsDataMtGroupAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtGroupAddrType indicates the address type of
+         svcTlsDataMtGroupAddress."
+    ::= { svcTlsDataMtEntry 3 }
+
+svcTlsDataMtGroupAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtGroupAddress indicates the group address for
+         a Multicast Tunnel."
+    ::= { svcTlsDataMtEntry 4 }
+
+svcTlsDataMtOriginIpAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtOriginIpAddrType indicates the address type
+         of the svcTlsDataMtOriginIpAddress."
+    ::= { svcTlsDataMtEntry 5 }
+
+svcTlsDataMtOriginIpAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtOriginIpAddress indicates the origin address
+         for a Multicast Tunnel."
+    ::= { svcTlsDataMtEntry 6 }
+
+svcTlsDataMtLspIndex             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtLspIndex indicates the LSP index  of the
+         data Multicast Tunnel entry."
+    ::= { svcTlsDataMtEntry 7 }
+
+svcTlsDataMtIndexRootAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtIndexRootAddrType indicates the address type
+         of the svcTlsDataMtIndexRootAddr."
+    ::= { svcTlsDataMtEntry 8 }
+
+svcTlsDataMtIndexRootAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtIndexRootAddr indicates the index root
+         address for a Multicast Tunnel."
+    ::= { svcTlsDataMtEntry 9 }
+
+svcTlsDataMtIfIndex              OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtIfIndex indicates the interface index
+         of the Multicast Data Tunnel(Data MT) interface.  This value will be
+         non-zero integer value specific to the router."
+    ::= { svcTlsDataMtEntry 10 }
+
+svcTlsDataMtUptime               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtUptime indicates the time since this data
+         Multicast Tunnel(MT) entry got created."
+    ::= { svcTlsDataMtEntry 11 }
+
+svcTlsDataMtNumSGs               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtNumSGs indicates the number of
+         C-(S,G)'s mapped to this  Multicast Tunnel(MT) interface."
+    ::= { svcTlsDataMtEntry 12 }
+
+svcTlsDataMtMultiStreamId        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtMultiStreamId indicates the stream Id of this
+         multi stream SPMSI."
+    ::= { svcTlsDataMtEntry 13 }
+
+svcTlsDataMtLSPId                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtLSPId specifies the LSP Id of the data
+         Multicast  Tunnel entry."
+    ::= { svcTlsDataMtEntry 14 }
+
+svcTlsDataMtRemainDelayIntvl     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtRemainDelayIntvl specifies the delay interval
+         in  seconds after which the selective provider multicast tunnel will
+         be created."
+    ::= { svcTlsDataMtEntry 15 }
+
+svcTlsDataMtRootAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtRootAddrType specifies the type of address
+         associated  with svcTlsDataMtRootAddr."
+    ::= { svcTlsDataMtEntry 16 }
+
+svcTlsDataMtRootAddr             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtRootAddr specifies the root IP address to be
+         used for the  Multicast Tunnel."
+    ::= { svcTlsDataMtEntry 17 }
+
+svcTlsDataMtCounter              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtCounter specifies the number of current
+         receiver PE associated  with the multicast tunnel."
+    ::= { svcTlsDataMtEntry 18 }
+
+svcTlsDataMtSgOperState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        txJoinPending    (0),
+        txJoined         (1),
+        rxNotJoined      (2),
+        rxJoined         (3),
+        rxJoinedTracking (4),
+        txLeaving        (5),
+        maxP2mpReached   (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcTlsDataMtSgOperState indicates the state of
+         the  selective provider-tunnel."
+    ::= { svcTlsDataMtEntry 19 }
+
 tmnxSvcSubTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSvcSubEntry
     MAX-ACCESS  not-accessible
@@ -35162,7 +36489,7 @@ tmnxSvcSubMonOperGrpLastCh       OBJECT-TYPE
     ::= { tmnxSvcSubMonOperGrpEntry 2 }
 
 tmnxSvcSubMonOperGrpHlthDrop     OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..255)
+    SYNTAX      Unsigned32 (1..100)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -35272,7 +36599,9 @@ SvcEvpnInstMplsTEPEgrLblTnlEntry ::= SEQUENCE
     svcEvpnInstMplsTEPEgLblTnlInMLst TruthValue,
     svcEvpnInstMplsTEPEgLblTnlRsType TmnxSvcEvpnMplsTransportType,
     svcEvpnInstMplsTEPEgLbTnlSbdMcst TruthValue,
-    svcEvpnInstMplsTEPEgrLblMcast    INTEGER
+    svcEvpnInstMplsTEPEgrLblMcast    INTEGER,
+    svcEvpnInstMplsTEPEgrLblOperStat TmnxDestTEPOperState,
+    svcEvpnInstMplsTEPEgrLblOperFlag TmnxDestTEPOperFlag
 }
 
 svcEvpnInstMplsTEPEgrLblTEPTnlId OBJECT-TYPE
@@ -35347,6 +36676,24 @@ svcEvpnInstMplsTEPEgrLblMcast    OBJECT-TYPE
          forwarding type."
     ::= { svcEvpnInstMplsTEPEgrLblTnlEntry 7 }
 
+svcEvpnInstMplsTEPEgrLblOperStat OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnInstMplsTEPEgrLblOperStat indicates the operating
+         state of evpn-mpls TEP."
+    ::= { svcEvpnInstMplsTEPEgrLblTnlEntry 8 }
+
+svcEvpnInstMplsTEPEgrLblOperFlag OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnInstMplsTEPEgrLblOperFlag indicates all the
+         conditions that affect the operational status of the evpn-mpls TEP."
+    ::= { svcEvpnInstMplsTEPEgrLblTnlEntry 9 }
+
 svcEvpnInstMplsESDestTEPTable    OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnInstMplsESDestTEPEntry
     MAX-ACCESS  not-accessible
@@ -35381,7 +36728,9 @@ SvcEvpnInstMplsESDestTEPEntry    ::= SEQUENCE
     svcEvpnInstMplsESDestTEPLabel    Unsigned32,
     svcEvpnInstMplsESDestTEPLastChgd TimeStamp,
     svcEvpnInstMplsESDestTEPResType  TmnxSvcEvpnMplsTransportType,
-    svcEvpnInstMplsESDestTEPTnlId    Unsigned32
+    svcEvpnInstMplsESDestTEPTnlId    Unsigned32,
+    svcEvpnInstMplsESDestTEPOperStat TmnxDestTEPOperState,
+    svcEvpnInstMplsESDestTEPOperFlag TmnxDestTEPOperFlag
 }
 
 svcEvpnInstMplsESDestTEPAddrType OBJECT-TYPE
@@ -35439,6 +36788,24 @@ svcEvpnInstMplsESDestTEPTnlId    OBJECT-TYPE
          assoicated with the Tunnel Endpoint address."
     ::= { svcEvpnInstMplsESDestTEPEntry 6 }
 
+svcEvpnInstMplsESDestTEPOperStat OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnInstMplsESDestTEPOperStat indicates the operating
+         state of evpn-mpls destination TEP."
+    ::= { svcEvpnInstMplsESDestTEPEntry 8 }
+
+svcEvpnInstMplsESDestTEPOperFlag OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnInstMplsESDestTEPOperFlag indicates all the
+         conditions that affect the operational status of the evpn-mpls TEP."
+    ::= { svcEvpnInstMplsESDestTEPEntry 9 }
+
 svcEvpnInstMplsESDestTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnInstMplsESDestEntry
     MAX-ACCESS  not-accessible
@@ -35487,6 +36854,74 @@ svcEvpnInstMplsESDestLastChanged OBJECT-TYPE
          timestamp of the modification of the ethernet segment destination
          entry."
     ::= { svcEvpnInstMplsESDestEntry 2 }
+
+tmnxEthSegEviRngObjs             OBJECT IDENTIFIER ::= { tmnxSvcObjs 278 }
+
+tmnxEthSegEviRngTblLastCh        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthSegEviRngTblLastCh indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         tmnxEthSegEviRngTable."
+    ::= { tmnxEthSegEviRngObjs 1 }
+
+tmnxEthSegEviRngTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEthSegEviRngEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxEthSegEviRngTable contains EVI entries for ethernet-segment when
+         layer-3 next-hop address is present."
+    ::= { tmnxEthSegEviRngObjs 2 }
+
+tmnxEthSegEviRngEntry            OBJECT-TYPE
+    SYNTAX      TmnxEthSegEviRngEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A tmnxEthSegEviRngEntry maintains the EVI ranges associated with this
+         ethernet segment."
+    INDEX       {
+        tmnxSvcSysEthSegName,
+        tmnxEthSegEviRngFrm
+    }
+    ::= { tmnxEthSegEviRngTable 1 }
+
+TmnxEthSegEviRngEntry            ::= SEQUENCE
+{
+    tmnxEthSegEviRngFrm              TmnxSvcEvi,
+    tmnxEthSegEviRngRowStatus        RowStatus,
+    tmnxEthSegEviRngLastChgd         TimeStamp
+}
+
+tmnxEthSegEviRngFrm              OBJECT-TYPE
+    SYNTAX      TmnxSvcEvi
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthSegEviRngFrm specifies the starting value of the
+         EVI range associated to the virtual ethernet segment."
+    ::= { tmnxEthSegEviRngEntry 1 }
+
+tmnxEthSegEviRngRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthSegEviRngRowStatus specifies the creation and
+         deletion of entries in the tmnxEthSegEviRngTable."
+    ::= { tmnxEthSegEviRngEntry 2 }
+
+tmnxEthSegEviRngLastChgd         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEthSegEviRngLastChgd indicates the sysUpTime at the
+         time of the last modification of this entry."
+    ::= { tmnxEthSegEviRngEntry 3 }
 
 svcEvpnPwPortHdEndMHEthSegTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnPwPortHdEndMHEthSegEntry
@@ -35539,6 +36974,168 @@ svcEvpnPwPortHdEndMHEthSegStatus OBJECT-TYPE
         "The value of svcEvpnPwPortHdEndMHEthSegStatus indicates the status of
          the ethernet segment associated with the given PW port headend."
     ::= { svcEvpnPwPortHdEndMHEthSegEntry 3 }
+
+svcIesInfoTable                  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcIesInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains IES specific service information."
+    ::= { tmnxSvcObjs 280 }
+
+svcIesInfoEntry                  OBJECT-TYPE
+    SYNTAX      SvcIesInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of svcIesInfoEntry has IES specific information about a
+         service."
+    INDEX       { svcId }
+    ::= { svcIesInfoTable 1 }
+
+SvcIesInfoEntry                  ::= SEQUENCE
+{
+    svcIesInfoEntryLastChanged       TimeStamp,
+    svcIesNetIngIngressClassPlcy     TLNamedItemOrEmpty
+}
+
+svcIesInfoEntryLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcIesInfoEntryLastChanged indicates the value of
+         sysUpTime at the time of the last management change to any writable
+         objects of this entry."
+    ::= { svcIesInfoEntry 1 }
+
+svcIesNetIngIngressClassPlcy     OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Attach ingress classification policy"
+    DEFVAL      { "" }
+    ::= { svcIesInfoEntry 2 }
+
+svcTlsSpmsiRootSmetGrpRxPETable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcTlsSpmsiRootSmetGrpRxPEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains list of SMET group reciever PE for a specific
+         VPLS  selective provider-tunnel at the root end."
+    ::= { tmnxSvcObjs 281 }
+
+svcTlsSpmsiRootSmetGrpRxPEEntry  OBJECT-TYPE
+    SYNTAX      SvcTlsSpmsiRootSmetGrpRxPEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry in svcTlsSpmsiRootSmetGrpRxPETable"
+    INDEX       {
+        svcId,
+        svcTlsDataMtGroupAddrType,
+        svcTlsDataMtGroupAddress,
+        svcTlsDataMtRootAddrType,
+        svcTlsDataMtRootAddr
+    }
+    ::= { svcTlsSpmsiRootSmetGrpRxPETable 1 }
+
+SvcTlsSpmsiRootSmetGrpRxPEEntry  ::= SEQUENCE
+{
+    svcTlsSmetGrpRxPeAddrType        InetAddressType,
+    svcTlsSmetGrpRxPeAddress         InetAddress
+}
+
+svcTlsSmetGrpRxPeAddrType        OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsSmetGrpRxPeAddrType specifies the type of address
+         associated  with svcTlsSmetGrpRxPeAddress."
+    ::= { svcTlsSpmsiRootSmetGrpRxPEEntry 1 }
+
+svcTlsSmetGrpRxPeAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsSmetGrpRxPeAddress specifices the receiver PE Smet
+         Origin IP address  for the Spmsi Multicast Tunnel."
+    ::= { svcTlsSpmsiRootSmetGrpRxPEEntry 2 }
+
+svcBgpEvpnTepStateTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcBgpEvpnTepStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "svcBgpEvpnTepStateTable contains entries that indicate whether traffic
+         can  be sent towards an EVPN TEP or not, based on the presence and
+         processing of  the EVPN inclusive-mcast route L2 attribute from that
+         TEP"
+    ::= { tmnxSvcObjs 283 }
+
+svcBgpEvpnTepStateEntry          OBJECT-TYPE
+    SYNTAX      SvcBgpEvpnTepStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the svcBgpEvpnTepStateTable."
+    INDEX       {
+        svcId,
+        svcBgpEvpnInstance,
+        svcBgpEvpnTepStateTEPAddrType,
+        svcBgpEvpnTepStateTEPAddress
+    }
+    ::= { svcBgpEvpnTepStateTable 1 }
+
+SvcBgpEvpnTepStateEntry          ::= SEQUENCE
+{
+    svcBgpEvpnTepStateTEPAddrType    InetAddressType,
+    svcBgpEvpnTepStateTEPAddress     InetAddress,
+    svcBgpEvpnTepStateOperState      TmnxDestTEPOperState,
+    svcBgpEvpnTepStateOperFlags      TmnxDestTEPOperFlag
+}
+
+svcBgpEvpnTepStateTEPAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcBgpEvpnTepStateTEPAddrType indicates the
+         type of the address associated with svcBgpEvpnTepStateTEPAddress."
+    ::= { svcBgpEvpnTepStateEntry 1 }
+
+svcBgpEvpnTepStateTEPAddress     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object svcBgpEvpnTepStateTEPAddress indicates the
+         Tunnel End Point (TEP) IP address of EVPN peer"
+    ::= { svcBgpEvpnTepStateEntry 2 }
+
+svcBgpEvpnTepStateOperState      OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnTepStateOperState indicates the operational
+         status of the EVPN TEP"
+    ::= { svcBgpEvpnTepStateEntry 3 }
+
+svcBgpEvpnTepStateOperFlags      OBJECT-TYPE
+    SYNTAX      TmnxDestTEPOperFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcBgpEvpnTepStateOperFlags indicates all the  conditions
+         that affect the operational status of the EVPN TEP"
+    ::= { svcBgpEvpnTepStateEntry 4 }
+
+svcLdpGroup                      OBJECT IDENTIFIER ::= { tmnxSvcObjs 284 }
 
 tmnxTstpNotifyObjs               OBJECT IDENTIFIER ::= { tmnxServObjs 5 }
 
@@ -36190,6 +37787,55 @@ svcSrv6FunctionType              OBJECT-TYPE
         "The object svcSrv6FunctionType specifies the function for srv6."
     ::= { tmnxSvcNotifyObjs 61 }
 
+svcSrv6FunctionValue             OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object svcSrv6FunctionValue specifies the srv6 function value."
+    ::= { tmnxSvcNotifyObjs 62 }
+
+svcNotifSrv6LocatorType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        locator             (0),
+        microSegmentLocator (1)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object svcNotifSrv6LocatorType specifies the type of the locator
+         specified by the svcNotifSrv6LocatorName object."
+    ::= { tmnxSvcNotifyObjs 63 }
+
+svcNotifSrv6LocatorName          OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object svcNotifSrv6LocatorName specifies the SRv6 locator name."
+    ::= { tmnxSvcNotifyObjs 64 }
+
+svcNotifSrv6Instance             OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object svcNotifSrv6Instance specifies the SRv6 instance."
+    ::= { tmnxSvcNotifyObjs 65 }
+
+svcNotifSrv6ExhaustedResource    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        function (1),
+        label    (2),
+        lif      (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The object svcNotifSrv6ExhaustedResource specifies the resource used
+         by SRv6 that is exhausted."
+    ::= { tmnxSvcNotifyObjs 66 }
+
 tmnxSvcTimeObjs                  OBJECT IDENTIFIER ::= { tmnxServObjs 7 }
 
 tlsCondStaticMacTblLastChanged   OBJECT-TYPE
@@ -36252,7 +37898,7 @@ tmnxIesIfRtrSolTableLastChanged  OBJECT-TYPE
 svcVsdDomainTblLastChngd         OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainTblLastChngd indicates the sysUpTime at the
          time of the last modification of svcVsdDomainTable."
@@ -36270,7 +37916,7 @@ svcTlsProxyArpTblLastChngd       OBJECT-TYPE
 svcVsdDomainToSvcTblLastChngd    OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcVsdDomainToSvcTblLastChngd indicates the sysUpTime at
          the time of the last modification of svcVsdDomainToSvcTable."
@@ -36883,6 +38529,34 @@ svcTlsInfoTableLastChanged       OBJECT-TYPE
          of the local network management subsystem, then this object contains a
          zero value."
     ::= { tmnxSvcTimeObjs 65 }
+
+svcTlsDataMtThdTableLstChngd     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtThdTableLstChngd indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         svcTlsDataMtThdTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSvcTimeObjs 66 }
+
+svcTlsDataMtTableLstChngd        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsDataMtTableLstChngd indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         svcTlsDataMtTableLstChngd.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSvcTimeObjs 67 }
 
 tmnxSvcSubTableLastChanged       OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -39067,7 +40741,6 @@ tmnxSvc7710V13v0Compliance       MODULE-COMPLIANCE
             svcTlsProxyArpNotifGroup,
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             svcBgpEvpnMplsGroup,
             svcBgpEvpnMplsMh1Group,
             svcAutoBindTunnelGroup,
@@ -39083,7 +40756,6 @@ tmnxSvc7710V13v0Compliance       MODULE-COMPLIANCE
             svcSiteMinDnTimerNotifGroup,
             tmnxCustV13v0Group,
             svcArpHostNotifGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             svcEvpnDestNotifGroup,
             svcTlsEsPbrL2Group,
             svcVprnEsPbrL3Group
@@ -39192,7 +40864,6 @@ tmnxSvcV14v0Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             svcBgpEvpnMplsGroup,
             svcBgpEvpnMplsMh1Group,
             svcAutoBindTunnelGroup,
@@ -39208,7 +40879,6 @@ tmnxSvcV14v0Compliance           MODULE-COMPLIANCE
             svcSiteMinDnTimerNotifGroup,
             tmnxSvcShcvPolicyGroup,
             svcArpHostNotifGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             svcTlsEsPbrL2Group,
             svcVprnEsPbrL3Group,
             svcEvpnMhEsDFNotifGroup,
@@ -39385,7 +41055,6 @@ tmnxSvcV15v1Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             svcAutoBindTunnelGroup,
             svcEvpnMplsNotifGroup,
             svcSpiLoadBalGroup,
@@ -39399,7 +41068,6 @@ tmnxSvcV15v1Compliance           MODULE-COMPLIANCE
             svcSiteMinDnTimerNotifGroup,
             tmnxSvcShcvPolicyGroup,
             svcArpHostNotifGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             svcTlsEsPbrL2Group,
             svcVprnEsPbrL3Group,
             svcEvpnMhEsDFNotifGroup,
@@ -39566,7 +41234,6 @@ tmnxSvcV16v0Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             svcAutoBindTunnelGroup,
             svcEvpnMplsNotifGroup,
             svcSpiLoadBalGroup,
@@ -39580,7 +41247,6 @@ tmnxSvcV16v0Compliance           MODULE-COMPLIANCE
             svcSiteMinDnTimerNotifGroup,
             tmnxSvcShcvPolicyGroup,
             svcArpHostNotifGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             svcTlsEsPbrL2Group,
             svcVprnEsPbrL3Group,
             svcEvpnMhEsDFNotifGroup,
@@ -39780,7 +41446,6 @@ tmnxSvcV19v5Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             svcAutoBindTunnelGroup,
             svcEvpnMplsNotifGroup,
             svcSpiLoadBalGroup,
@@ -39794,7 +41459,6 @@ tmnxSvcV19v5Compliance           MODULE-COMPLIANCE
             svcSiteMinDnTimerNotifGroup,
             tmnxSvcShcvPolicyGroup,
             svcArpHostNotifGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             svcTlsEsPbrL2Group,
             svcVprnEsPbrL3Group,
             svcEvpnMhEsDFNotifGroup,
@@ -40001,11 +41665,9 @@ tmnxSvcV20v0Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             tmnxSvcQosRateV13v0Group,
             tmnxSvcGrpIfGroup,
             tmnxSvcShcvPolicyGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             tmnxSvcV14v0Group,
             tmnxSvcRadClassGroup,
             tmnxSvcVllBgpEvpnV16v0Group,
@@ -40158,13 +41820,14 @@ tmnxSvcV20v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxSvcCompliances 133 }
 
 tmnxSvcV21v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of services on Nokia SROS
          series systems release 21.0."
     MODULE
         MANDATORY-GROUPS {
             svcVprnRadiusServerV21v0Group,
+            svcIfIPsecMCShuntPfV21v0Group,
             svcSysBgpEvpnAttrPropV21v0Group,
             svcSrv6V21v0Group,
             svcDhcpLeaseV21v0Group,
@@ -40178,6 +41841,7 @@ tmnxSvcV21v0Compliance           MODULE-COMPLIANCE
             svcIfSubStatsV21v0Group,
             svcEpipeSrv6V21v0Group,
             svcEpipeEvpnSrv6V21v0Group,
+            svcTlsPmsiV21v0Group,
             iesLastChangeV21v0Group,
             svcLastChangeV21v0Group,
             tmnxSvcSubV21v0Group,
@@ -40191,12 +41855,13 @@ tmnxSvcV21v0Compliance           MODULE-COMPLIANCE
             svcVplsEvpnMplsV21v0Group,
             svcEvpnEvi3ByteAutoRTObj21Grp,
             svcRtdVplsEvpnGWV22v0NotifGroup,
-            svcVprnTacPlusAccCmdOp21v0Group
+            svcVprnTacPlusAccCmdOp21v0Group,
+            svcBgpMTUSignalling21v0Grp
         }
     ::= { tmnxSvcCompliances 134 }
 
 tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of services on Nokia SROS
          series systems release 22.0."
@@ -40245,7 +41910,6 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             tmnxSvcEthCfmGroup,
             tmnxSvcV9v0R4Group,
             tmnxSvcMSPwPeV9v0Group,
-            tmnxSvcApipeInfoV9v0Group,
             tmnxSvcMacReNotifyGroup,
             tmnxSvcSpbGroup,
             tmnxSvcVllBgpV15v1Group,
@@ -40275,11 +41939,9 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             tmnxSvcTlsEvpnProxyArpGroup,
             tmnxSvcVprnV13v0Group,
             tmnxSvcIesIfV13v0Group,
-            tmnxSvcVsdGlobalObjsV13v0Group,
             tmnxSvcQosRateV13v0Group,
             tmnxSvcGrpIfGroup,
             tmnxSvcShcvPolicyGroup,
-            tmnxSvcVsdDynamicSvcGroup,
             tmnxSvcV14v0Group,
             tmnxSvcRadClassGroup,
             tmnxSvcVllBgpEvpnV16v0Group,
@@ -40316,7 +41978,6 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             svcV19v0NotifyObjsGroup,
             tmnxCustV9v0Group,
             tmnxCustV14v0Group,
-            tmnxApipeV3v0Group,
             tmnxArpHostV11v0Group,
             tmnxArpHostV13v0Group,
             tmnxArpHostNotifyGroup,
@@ -40396,6 +42057,7 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             svcVprnAaaTacPlusV16v0Group,
             svcVprnAaaLdapV16v0Group,
             svcVprnAaaRadiusV16v0Group,
+            svcVprnRadiusServerV22v0Group,
             svcVprnRibApiV16v0Group,
             svcVprnMgmtIfV19v0Group,
             svcEpipePwPortGroup,
@@ -40424,10 +42086,10 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             svcHostSessionLimitV20v0Group,
             svcEvpnMplsV20v0NotifGroup,
             svcSubStatsV22v0NotifGroup,
-            svcBgpMTUSignalling22v0Grp,
             svcLblEthOrIPL4TEID22v0Grp,
             svcEvpnExtEgLblLmtV22v0Grp,
             svcEvpnESV2v0Group,
+            svcVplsSrv6V22v0Group,
             svcBgpEvpnMplsMh1V22v0Group,
             svcVplsEvpnMplsTnlIdV22Group,
             svcEvpnMplsMhBindsV22Group,
@@ -40442,9 +42104,339 @@ tmnxSvcV22v0Compliance           MODULE-COMPLIANCE
             svcMplsEvpnRvplsEcmpGroup,
             svcEvpnMcastLabelBlockGroup,
             tmnxSvcV19v0Group,
-            svcEpipePwPortTldp22v0Group
+            svcEvpnSrv6V22v0Group,
+            svcEpipePwPortTldp22v0Group,
+            tmnxSvcEvpnL3IpAliasV22v0Group,
+            svcEvpnTnlAllowBgpGroup,
+            svcSrv6NotifGroup,
+            svcTlsPmsiV22v0Group,
+            tmnxSvcEpipeClassOvrrideV22v0Grp,
+            tmnxSvcVplsClassOvrrideV22v0Grp,
+            svcAutoBindTunnelV22v0Group,
+            svcBgpEvpnUnequalEcmpV22v0Group,
+            svcSrv6MSV22v0Group,
+            svcEpipeSrv6MSV22v0Group,
+            svcVplsSrv6MSV22v0Group,
+            svcSrv6MSNotifyObjsGroup,
+            svcSrv6NotifyObjsV22Group,
+            iesIfRvplsStatsGroup,
+            svcVplsProxyReplyDadV22v0Group,
+            tmnxSvcIesV22v0Group,
+            tmnxSvcIesIngClassPlcyV22v0Grp,
+            svcEvpnSrv6MultiHomingV22v0Group,
+            tmnxSvcTlsMFibV22v0Group
         }
     ::= { tmnxSvcCompliances 135 }
+
+tmnxSvcV23v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services on Nokia SROS
+         series systems release 23.0."
+    MODULE
+        MANDATORY-GROUPS {
+            svcVprnRadiusServerV21v0Group,
+            svcIfIPsecMCShuntPfV21v0Group,
+            svcSysBgpEvpnAttrPropV21v0Group,
+            svcSrv6V21v0Group,
+            svcDhcpLeaseV21v0Group,
+            tmnxSvcVprnIngClassPlcyV21v0Grp,
+            tmnxSvcObsoletedV21v0Group,
+            svcBgpEvpnInstV21v0Group,
+            svcEthSegV21v0Group,
+            svcEthSegEvpnV21v0Group,
+            svcEvpnMHAutoEsiV21v0Group,
+            svcEvpnEtreeLeafLabelV21v0Group,
+            svcIfSubStatsV21v0Group,
+            svcEpipeSrv6V21v0Group,
+            svcEpipeEvpnSrv6V21v0Group,
+            svcTlsPmsiV21v0Group,
+            iesLastChangeV21v0Group,
+            svcLastChangeV21v0Group,
+            tmnxSvcSubV21v0Group,
+            svcEvpnSrv6NotifGroup,
+            svcSrv6NotifyObjsGroup,
+            svcEvpnRvplsMcastGwV21v0Group,
+            svcEpipePbbRedEnhV21v0Group,
+            svcDPathAttrObj21Group,
+            svcEvpnCandListPrefDataObj21Grp,
+            svcVplsEvpnMplsV21v0Group,
+            svcEvpnEvi3ByteAutoRTObj21Grp,
+            svcRtdVplsEvpnGWV22v0NotifGroup,
+            svcVprnTacPlusAccCmdOp21v0Group,
+            svcBgpMTUSignalling21v0Grp,
+            svcRvplsEvpnNdHostRouteGroup,
+            tmnxSvcV20v0Group,
+            tmnxSvcTlsFdbV7v0Group,
+            tmnxSvcIesIfV6v0Group,
+            tmnxSvcTlsShgV6v0Group,
+            tmnxSvcTlsMFibV6v0Group,
+            tmnxSvcTlsMFibV13v0Group,
+            tmnxSvcTlsMstiV6v0Group,
+            tmnxSvcDhcpV11v0Group,
+            tmnxSvcDhcpV13v0Group,
+            tmnxSvcEndPointV6v0Group,
+            tmnxSvcIfDHCP6V6v0Group,
+            tmnxSvcTlsBackbone6v1Group,
+            tmnxSvcTlsBgpV8v0Group,
+            tmnxSvcEpipeV6v0Group,
+            tmnxSvcTlsPipV7v0Group,
+            tmnxSvcObsoletedV6v0Group,
+            tmnxSvcRoutedCOV9v0Group,
+            tmnxSvcRoutedCOV10v0Group,
+            tmnxSvcRoutedCOV13v0Group,
+            tmnxSvcBsxV8v0Group,
+            tmnxSvcIpipeV8v0Group,
+            tmnxSvcMCEPNotifyGroup,
+            tmnxSvcDhcpBgpV7v0Group,
+            tmnxSvcV7v0Group,
+            tmnxSvcV8v0Group,
+            tmnxSvcTlsV7v0Group,
+            tmnxSvcIesIfV7v0Group,
+            tmnxSvcPbbMacV7v0Group,
+            tmnxSvcPbbMacV12v0Group,
+            tmnxSvcMrpPolicyV8v0Group,
+            tmnxSvcSiteV15v1Group,
+            tmnxSvcObsoletedV8v0Group,
+            tmnxSvcRoutedVplsV8v0Group,
+            tmnxSvcNotifyV8v0Group,
+            tmnxSvcPwV8v0Group,
+            tmnxSvcMvrpV8v0Group,
+            tmnxSvcIesIfV8v0Group,
+            tmnxSvcTlsPipV8v0Group,
+            tmnxSvcOperGrpV9v0Group,
+            tmnxSvcEthCfmGroup,
+            tmnxSvcV9v0R4Group,
+            tmnxSvcMSPwPeV9v0Group,
+            tmnxSvcMacReNotifyGroup,
+            tmnxSvcSpbGroup,
+            tmnxSvcVllBgpV15v1Group,
+            tmnxSvcV10v0Group,
+            tmnxSvcIesIfV10v0Group,
+            tmnxSvcIesIfNHV10v0Group,
+            tmnxSvcP2mpGroup,
+            tmnxSvcNotifyV10v0Group,
+            tmnxSvcPEObsoletedGroup,
+            tmnxSvcNotifyObsoletedV11v0Group,
+            tmnxSvcIesIfV11v0Group,
+            tmnxSvcIesIfV12v0Group,
+            tmnxSvcSpbV11v0Group,
+            tmnxSvcCondStaticMacGroup,
+            tmnxSvcSchedulerRateV11v0Group,
+            tmnxSvcMHGroup,
+            tmnxSvcV12v0Group,
+            tmnxSvcQosV12v0Group,
+            tmnxSvcTestGroup,
+            tmnxSvcCreation15v1Group,
+            tmnxSvcIesIfIpoeV13v0Group,
+            tmnxSvcIpipeFaultPropGroup,
+            tmnxSvcQosSchedV13v0Group,
+            tmnxSvcTlsProxyArpGroup,
+            tmnxSvcTlsProxyNdGroup,
+            tmnxSvcTlsProxyArpEnhGroup,
+            tmnxSvcTlsEvpnProxyArpGroup,
+            tmnxSvcVprnV13v0Group,
+            tmnxSvcIesIfV13v0Group,
+            tmnxSvcQosRateV13v0Group,
+            tmnxSvcGrpIfGroup,
+            tmnxSvcShcvPolicyGroup,
+            tmnxSvcV14v0Group,
+            tmnxSvcRadClassGroup,
+            tmnxSvcVllBgpEvpnV16v0Group,
+            tmnxSvcNotifyV14v0Group,
+            tmnxSvcNotifyObjsV14v0Group,
+            tmnxSvcSysVxlanARV16v0Group,
+            tmnxSvcSysVxlanTunTermGroup,
+            tmnxSvcSysVirtualEthSegGroup,
+            tmnxSvcSelectiveUrpfGroup,
+            tmnxSvcEpipeVxlanVtepGroup,
+            tmnxSvcEpipeNatOutsideV15v0Group,
+            tmnxSvcTlsV15v0Group,
+            tmnxSvcRateV15v0Group,
+            tmnxSvcDhcpV15v0Group,
+            tmnxSvcSysFdbUsgNotifGroup,
+            tmnxSvcNotifyV15v0Group,
+            tmnxSvcV15v0Group,
+            tmnxSvcCustomerNameGroup,
+            svcV15v0NotifyObjsGroup,
+            tmnxSvcInterAsObsoletedGroup,
+            tmnxSvcEpipeVxlanV16v0Group,
+            tmnxSvcIesIfV16v0Group,
+            svcPppoeRedirectGroup,
+            svcSysGreEthBrgdTnlTrmGroup,
+            svcSysEvpnESDfPrefNotifGroup,
+            tmnxSvcV16v0ObsoletedGroup,
+            tmnxSvcAdminTagsV16v0Group,
+            tmnxSvcEvpnMplsQinqV16v0Group,
+            tmnxSvcEpipePwPortFlexV16v0Group,
+            tmnxSvcSysPwPortListV16v0Group,
+            svcSysVpnGreSrcIpV16v0Group,
+            tmnxSvcEvpnVpwsVxlanV16v0Group,
+            tmnxSvcSrOspf3V16v0Group,
+            svcV19v0NotifyObjsGroup,
+            tmnxCustV9v0Group,
+            tmnxCustV14v0Group,
+            tmnxArpHostV11v0Group,
+            tmnxArpHostV13v0Group,
+            tmnxArpHostNotifyGroup,
+            tmnxArpHostBgpGroup,
+            svcArpHostNotifGroup,
+            tmnxArpHostV15v0Group,
+            svcIgmpTrkGroup,
+            svcTlsMacV7v0Group,
+            svcTlsEndPointV7v0Group,
+            svcTlsFdbMacStatsGroup,
+            svcTlsEtreeGroup,
+            svcTlsProxyNdNotifGroup,
+            svcTlsProxyArpNotifyObjsGroup,
+            svcTlsProxyArpNotifGroup,
+            svcTlsEsPbrL2Group,
+            svcTlsStaticBHGroup,
+            svcTlsPbbV14v0Group,
+            svcVplsEvpnV14v0Group,
+            svcVplsEvpnInclMcastV14v0Group,
+            svcVplsIpv6McastV15v0Group,
+            svcTlsPmsiV15v0Group,
+            svcTlsFdbV15v0Group,
+            svcVplsProxyArpNdRtmV15v0Group,
+            svcTlsFdbMacScaleV15v0Group,
+            svcTlsVxInstVTEPEgrVniGroup,
+            tmnxSvcIesGrpIfV20v0Group,
+            svcTlsVxInstReplicatorNotifGroup,
+            svcTlsStaticVxlanV16v0Group,
+            svcTlsStaticVxlanNotifGroup,
+            svcVplsVxlanRxDiscardGroup,
+            svcVplsResFilterV19v5Group,
+            svcOperGrpBfdGroup,
+            svcOperGroupConfigGroup,
+            tmnxIesIfRtrSolicitGroup,
+            tmnxIesIfVplsEvpnGroup,
+            svcBgpEvpnNotifGroup,
+            svcBgpEvpnIPRouteGroup,
+            svcBgpAutoRDV15v1Group,
+            svcEvpnMplsNotifGroup,
+            svcAutoBindTunnelGroup,
+            svcBgpVpwsGroup,
+            svcBgpMHSiteGroup,
+            svcEvpnMhEsDFNotifGroup,
+            svcBgpEvpnMplsV14v0Group,
+            svcEvpnMhEsDFNotifGroup,
+            svcAutoBindTunnelSRTEGroup,
+            svcBgpEvpnP2mpMldpGroup,
+            svcEvpnAlmpNotifGroup,
+            svcBgpEvpnMplsRSMV16v0Group,
+            svcBgpEvpnMplsMhAdEviRtGroup,
+            svcBgpEvpnMacDupDetBHGroup,
+            svcBgpEvpnMacDupDetBHNotifGroup,
+            svcAutoBindTunnelV15v0Group,
+            svcBgpEvpnMplsMhDfPrefGroup,
+            svcBgpEvpnEtreeV15v0Group,
+            svcBgpEvpnEtreeNotifGroup,
+            svcEvpnMHStandbyNotifGroup,
+            svcBgpEvpnMplsV22v0Group,
+            svcBgpEvpnMhEthSegPwPortGroup,
+            svcBgpEvpnDefRtTagV16v0Group,
+            svcBgpEvpnMplsABTV16v0Group,
+            svcEvpnMplsEPGroup,
+            svcBgpEvpnOperGrpGroup,
+            svcBgpEvpnVxlanMhNotifGroup,
+            svcBgpEvpnV20v0Group,
+            svcBgpEvpnVxlanMhV20v0Group,
+            svcSpiLoadBalGroup,
+            svcTeidLoadBalGroup,
+            svcRipListenerGroup,
+            svcSiteMinDnTimerNotifyObjsGroup,
+            svcSiteMinDnTimerNotifGroup,
+            svcVprnEsPbrL3Group,
+            svcVprnWeightedEcmpGroup,
+            svcVprnEcmpGroup,
+            svcVprnBgpAutoBindUdpTnlGroup,
+            svcVprnAaaTacPlusV16v0Group,
+            svcVprnAaaLdapV16v0Group,
+            svcVprnAaaRadiusV16v0Group,
+            svcVprnRadiusServerV22v0Group,
+            svcVprnRibApiV16v0Group,
+            svcVprnMgmtIfV19v0Group,
+            svcEpipePwPortGroup,
+            svcEpipeVxInstV16v0Group,
+            svcProxyArpNdMacListGroup,
+            svcTlsProxyV20v0Group,
+            svcPbbEvpnIsidRtGroup,
+            svcPbbEvpnEtreeV15v0Group,
+            svcVxlanEvpnMplsDestNotifGroup,
+            svcVxlanMhV16v0Group,
+            svcVxlanEcmpGroup,
+            svcVxlanTermV15v0Group,
+            svcVxlan16v0NotifGroup,
+            svcVxlanV16v0Group,
+            tmnxVxlanV20v0Group,
+            svcMdAutoIdV16v0Group,
+            svcMplsFwdPlcyV16v0Group,
+            svcDHCPLeaseV20v0Group,
+            tmnxSvcDhcpMRtV20v0Group,
+            svcVplsMacProtect,
+            svcNotifyV20v0Group,
+            svcMacListV20v0Group,
+            svcAutoBindTunnelV20v0Group,
+            tmnxSvcBgpEvpnV20v0Group,
+            svcEvpnMpls2SapV20v0Group,
+            svcHostSessionLimitV20v0Group,
+            svcEvpnMplsV20v0NotifGroup,
+            svcSubStatsV22v0NotifGroup,
+            svcLblEthOrIPL4TEID22v0Grp,
+            svcEvpnExtEgLblLmtV22v0Grp,
+            svcEvpnESV2v0Group,
+            svcVplsSrv6V22v0Group,
+            svcBgpEvpnMplsMh1V22v0Group,
+            svcVplsEvpnMplsTnlIdV22Group,
+            svcEvpnMplsMhBindsV22Group,
+            svcSysEthSegOperGrpGroup,
+            svcVllBgpVsiPolicyGroup,
+            svcBgpEvpnMplsIpv6Group,
+            svcEvpnOISMV22Group,
+            svcEvpnRvplsMcastGwGroup,
+            svcBgpEvpnAutoBindOspfGroup,
+            svcRvplsEvpnHostRouteGroup,
+            svcBgpEvpnABTEcmpGroup,
+            svcMplsEvpnRvplsEcmpGroup,
+            svcEvpnMcastLabelBlockGroup,
+            tmnxSvcV19v0Group,
+            svcEvpnSrv6V22v0Group,
+            svcEpipePwPortTldp22v0Group,
+            tmnxSvcEvpnL3IpAliasV22v0Group,
+            svcEvpnTnlAllowBgpGroup,
+            svcSrv6NotifGroup,
+            svcTlsPmsiV22v0Group,
+            tmnxSvcEpipeClassOvrrideV22v0Grp,
+            tmnxSvcVplsClassOvrrideV22v0Grp,
+            svcAutoBindTunnelV22v0Group,
+            svcBgpEvpnUnequalEcmpV22v0Group,
+            svcSrv6MSV22v0Group,
+            svcEpipeSrv6MSV22v0Group,
+            svcVplsSrv6MSV22v0Group,
+            svcSrv6MSNotifyObjsGroup,
+            svcSrv6NotifyObjsV22Group,
+            svcSrv6NotifyObjsV23Group,
+            svcSrv6FuncOutOfRsrcNotifGroup,
+            iesIfRvplsStatsGroup,
+            svcVplsProxyReplyDadV22v0Group,
+            tmnxSvcIesV22v0Group,
+            tmnxSvcIesIngClassPlcyV22v0Grp,
+            svcEvpnSrv6MultiHomingV22v0Group,
+            tmnxSvcTlsMFibV22v0Group,
+            svcBgpEvpnIncMcastL2AttrV23v0Grp,
+            svcBgpEvpnProxyNd9047Group,
+            svcBgpEvpnMplsOperStatusV23v0Grp,
+            svcBgpEvpnProxyNdRtrHostGroup,
+            svcTlsVxlanVTEPOperStatV23v0Grp,
+            svcSrv6TEPOperStatV23v0Grp,
+            svcVplsEvpnMplsV23v0Group,
+            svcBgpEvpnInstV23v0Group,
+            svcEvpnSrv6V23v0Group,
+            svcEvpnV23v0NotifGroup,
+            svcBgpEvpnTepStateV23v0Group
+        }
+    ::= { tmnxSvcCompliances 136 }
 
 tmnxSvcGroups                    OBJECT IDENTIFIER ::= { tmnxSvcConformance 2 }
 
@@ -40927,7 +42919,7 @@ tmnxApipeV3v0Group               OBJECT-GROUP
     OBJECTS     {
         svcApipeInterworking
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The  group  of  objects supporting management of APIPE services on
          Nokia SROS series systems release 3.0."
@@ -42683,7 +44675,7 @@ tmnxSvcApipeInfoV9v0Group        OBJECT-GROUP
     OBJECTS     {
         svcApipeSignaledVllTypeOverride
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of APIPE services on Nokia
          SROS series systems for release 9.0."
@@ -43210,7 +45202,7 @@ svcVsdGroup                      OBJECT-GROUP
         svcVsdDomainExecParams3,
         svcVsdDomainExecParams4
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group objects supporting service VSD (Virtualized Services
          Directory) domain configuration on Nokia SROS series systems R12.4."
@@ -43459,17 +45451,6 @@ svcTlsProxyArpNotifGroup         NOTIFICATION-GROUP
         "The group of objects supporting management of VPLS proxy ARP/ND
          feature in release 13.0."
     ::= { tmnxSvcGroups 452 }
-
-tmnxSvcVsdGlobalObjsV13v0Group   OBJECT-GROUP
-    OBJECTS     {
-        svcVsdServiceRangeStart,
-        svcVsdServiceRangeEnd
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting management of Services VSD Global
-         objects on Nokia SROS series systems in release 13.0."
-    ::= { tmnxSvcGroups 453 }
 
 svcBgpEvpnMplsGroup              OBJECT-GROUP
     OBJECTS     {
@@ -43877,35 +45858,6 @@ svcArpHostNotifGroup             NOTIFICATION-GROUP
         "The group of notifications supporting Subscriber Host Connectivity
          Verification (SHCV) policies."
     ::= { tmnxSvcGroups 478 }
-
-tmnxSvcVsdDynamicSvcGroup        OBJECT-GROUP
-    OBJECTS     {
-        tmnxVsdRootObjInstance,
-        tmnxVsdRootObjOrphanTime,
-        tmnxVsdRootObjSnippetName,
-        tmnxVsdRootObjSnippetInstance,
-        tmnxVsdScriptStatsDescr,
-        tmnxVsdScriptStatsVal,
-        tmnxVsdScriptSnippetRefCount,
-        tmnxVsdScriptSnippetDictLength,
-        tmnxVsdScriptSnippetRootObjOid,
-        tmnxVsdScriptSnippetRefSnipName,
-        tmnxVsdScriptSnippetRefSnipInst,
-        tmnxVsdScriptSnippetResIdType,
-        tmnxVsdScriptSnippetResIdValue,
-        tmnxVsdRootObjTableLastCh,
-        tmnxVsdNonStoredRootObjCount,
-        tmnxVsdSnippetTableLastCh,
-        tmnxVsdSnipRootObjTblLastCh,
-        tmnxVsdSnippetRefTableLastCh,
-        tmnxVsdSnippetResIdTblLastCh,
-        tmnxVsdStatsLastClearedTime
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects supporting management of Dynamic Services using
-         VSD Nokia SROS series systems in release 13.0."
-    ::= { tmnxSvcGroups 479 }
 
 svcEvpnDestNotifGroup            NOTIFICATION-GROUP
     NOTIFICATIONS {
@@ -45315,6 +47267,39 @@ svcSrv6NotifyObjsGroup           OBJECT-GROUP
         "A group of notification objects added in release 19.0 of Nokia SROS
          series systems."
     ::= { tmnxSvcGroups 572 }
+
+svcSrv6MSNotifyObjsGroup         OBJECT-GROUP
+    OBJECTS     {
+        svcSrv6MSLocatorName
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of notification objects added in release 22.0 of Nokia SROS
+         series systems."
+    ::= { tmnxSvcGroups 573 }
+
+svcSrv6NotifyObjsV22Group        OBJECT-GROUP
+    OBJECTS     {
+        svcSrv6FunctionValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of SRv6 notification objects added in release 22 of Nokia SROS
+         series systems."
+    ::= { tmnxSvcGroups 574 }
+
+svcSrv6NotifyObjsV23Group        OBJECT-GROUP
+    OBJECTS     {
+        svcNotifSrv6LocatorType,
+        svcNotifSrv6LocatorName,
+        svcNotifSrv6Instance,
+        svcNotifSrv6ExhaustedResource
+    }
+    STATUS      current
+    DESCRIPTION
+        "A group of SRv6 notification objects added in release 23 of Nokia SROS
+         series systems."
+    ::= { tmnxSvcGroups 575 }
 
 svcBgpEvpnMplsObjectGroup        OBJECT-GROUP
     OBJECTS     {
@@ -46836,6 +48821,16 @@ svcEvpnMplsV20v0NotifGroup       NOTIFICATION-GROUP
          feature on Nokia SROS series systems release 20.0."
     ::= { tmnxSvcConformance 658 }
 
+svcIfIPsecMCShuntPfV21v0Group    OBJECT-GROUP
+    OBJECTS     {
+        iesIfIsaTnlNHIPsecMCShuntPfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group notification supporting MC N TO M feature for IPSEC on Nokia
+         SROS series systems release 21.0."
+    ::= { tmnxSvcConformance 659 }
+
 svcSysBgpEvpnAttrPropV21v0Group  OBJECT-GROUP
     OBJECTS     {
         tmnxSvcSysBgpEvpnIffAttrUnfmProp,
@@ -47120,6 +49115,32 @@ svcEpipeEvpnSrv6V21v0Group       OBJECT-GROUP
          on Nokia SROS series systems release 21.0."
     ::= { tmnxSvcConformance 684 }
 
+svcTlsPmsiV21v0Group             OBJECT-GROUP
+    OBJECTS     {
+        svcTlsSPmsiAdminState,
+        svcTlsSPmsiDataDelayIntvl,
+        svcTlsSPmsiType,
+        svcTlsSpmsiWildcard,
+        svcTlsSpmsiMaxP2mp,
+        svcTlsSPmsiOwner,
+        svcTlsDataMtThdRowStatus,
+        svcTlsDataMtThdRowLstChngd,
+        svcTlsDataMtThd,
+        svcTlsDataMtSpmsiAddRxThd,
+        svcTlsDataMtSpmsiDelRxThd,
+        svcTlsDataMtIfIndex,
+        svcTlsDataMtUptime,
+        svcTlsDataMtNumSGs,
+        svcTlsDataMtMultiStreamId,
+        svcTlsDataMtThdTableLstChngd,
+        svcTlsDataMtTableLstChngd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting EVPN SPMSI feature on Nokia SROS
+         series systems release 21.0."
+    ::= { tmnxSvcConformance 685 }
+
 iesLastChangeV21v0Group          OBJECT-GROUP
     OBJECTS     {
         iesIfTableLastChanged
@@ -47174,7 +49195,7 @@ svcSrv6NotificationGroup         NOTIFICATION-GROUP
     NOTIFICATIONS {
         svcSrv6FunctionExhaustion
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting SRv6  notifications on virtual routers
          for version 21.5 Nokia  SROS series systems."
@@ -47314,7 +49335,7 @@ svcVprnRadiusServerV21v0Group    OBJECT-GROUP
          Nokia SROS series systems since release 21.0."
     ::= { tmnxSvcConformance 700 }
 
-svcBgpMTUSignalling22v0Grp       OBJECT-GROUP
+svcBgpMTUSignalling21v0Grp       OBJECT-GROUP
     OBJECTS     {
         svcVllBgpAdvServiceMtu,
         svcVplsBgpAdvServiceMtu,
@@ -47324,7 +49345,7 @@ svcBgpMTUSignalling22v0Grp       OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "The group of objects suporting service BGP MTU signalling feature for
-         Release 22 on Nokia SROS series systems."
+         Release 21.10R4 on Nokia SROS series systems."
     ::= { tmnxSvcConformance 701 }
 
 svcLblEthOrIPL4TEID22v0Grp       OBJECT-GROUP
@@ -47373,6 +49394,35 @@ svcEvpnESV2v0Group               OBJECT-GROUP
         "The group of objects supporting EVPN Ethernet Segment objects on
          virtual routers for version 22.0 Nokia  SROS series systems."
     ::= { tmnxSvcConformance 705 }
+
+svcVplsSrv6V22v0Group            OBJECT-GROUP
+    OBJECTS     {
+        svcVplsSrv6LocatorEndDt2u,
+        svcVplsSrv6LocatorEndDt2uStatic,
+        svcVplsSrv6LocEndDt2uValue,
+        svcVplsSrv6LocEndDt2uState,
+        svcVplsSrv6LocEndDt2uErrorCode,
+        svcVplsSrv6LocEndDt2uSidAddrType,
+        svcVplsSrv6LocEndDt2uSidAddr,
+        svcVplsSrv6LocatorEndDt2m,
+        svcVplsSrv6LocatorEndDt2mStatic,
+        svcVplsSrv6LocEndDt2mValue,
+        svcVplsSrv6LocEndDt2mState,
+        svcVplsSrv6LocEndDt2mErrorCode,
+        svcVplsSrv6LocEndDt2mSidAddrType,
+        svcVplsSrv6LocEndDt2mSidAddr,
+        svcVplsSrv6RowStatus,
+        svcVplsSrv6LastChngd,
+        svcVplsSrv6LocatorRowStatus,
+        svcVplsSrv6LocatorLastChngd,
+        svcVplsSrv6TblLastCh,
+        svcVplsSrv6LocatorTblLastCh
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber traffice statistics feature
+         on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 706 }
 
 svcBgpEvpnMplsMh1V22v0Group      OBJECT-GROUP
     OBJECTS     {
@@ -47538,6 +49588,25 @@ svcBgpEvpnMplsV22v0Group         OBJECT-GROUP
          feature on Nokia SROS series systems release 22.0."
     ::= { tmnxSvcConformance 715 }
 
+svcEvpnSrv6V22v0Group            OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnSrv6ResProtSrcMac,
+        svcEvpnSrv6RPSMacAct,
+        svcEvpnSrv6ShgName,
+        svcEvpnSrv6Resolution,
+        svcEvpnSrv6ForceQinqVcFwd,
+        tlsFdbEvpnSrv6Instance,
+        tlsFdbSrv6InstTEPAddrType,
+        tlsFdbSrv6InstTEPAddress,
+        tlsFdbSrv6InstTEPSidAddrType,
+        tlsFdbSrv6InstTEPSidAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting service BGP EVPN MPLS feature on Nokia
+         SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 716 }
+
 svcEpipePwPortTldp22v0Group      OBJECT-GROUP
     OBJECTS     {
         svcEpipePwPortDnPeerTldpFault
@@ -47557,6 +49626,453 @@ svcVprnTacPlusAccCmdOp21v0Group  OBJECT-GROUP
         "The group of objects supporting management of TacPlus access operation
          authorization since release 21.10."
     ::= { tmnxSvcConformance 718 }
+
+tmnxSvcEvpnL3IpAliasV22v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSvcSysEthSegL3NxtHopType,
+        tmnxSvcSysEthSegL3NxtHopAddr,
+        tmnxEthSegEviRngTblLastCh,
+        tmnxEthSegEviRngRowStatus,
+        tmnxEthSegEviRngLastChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting EVPN L3 IP aliasing  feature on Nokia
+         SROS series systems in release 22.0."
+    ::= { tmnxSvcConformance 719 }
+
+svcEvpnTnlAllowBgpGroup          OBJECT-GROUP
+    OBJECTS     {
+        iesIfVplsEvpnTnlAllowBfd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management interface protocols
+         configuration for the EVPN Tunnel bfd support on Nokia SROS series
+         systems in release 22.0."
+    ::= { tmnxSvcConformance 720 }
+
+svcSrv6NotifGroup                NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        svcSrv6TEPEgrBndSvcHiUsgSet,
+        svcSrv6TEPEgrBndSvcHiUsgClr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification supporting SRv6  on virtual routers for
+         version 22.2 Nokia  SROS series systems."
+    ::= { tmnxSvcConformance 721 }
+
+svcTlsPmsiV22v0Group             OBJECT-GROUP
+    OBJECTS     {
+        svcTlsDataMtLSPId,
+        svcTlsDataMtRemainDelayIntvl,
+        svcTlsDataMtRootAddrType,
+        svcTlsDataMtRootAddr,
+        svcTlsDataMtCounter,
+        svcTlsDataMtSgOperState,
+        svcTlsSmetGrpRxPeAddrType,
+        svcTlsSmetGrpRxPeAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting EVPN SPMSI feature on Nokia SROS
+         series systems release 22.0."
+    ::= { tmnxSvcConformance 722 }
+
+tmnxSvcEpipeClassOvrrideV22v0Grp OBJECT-GROUP
+    OBJECTS     {
+        svcEpipeNetIngIngressClassPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Epipe network ingress
+         ingress-classification-policy on Nokia SROS series systems for release
+         22.0."
+    ::= { tmnxSvcConformance 723 }
+
+svcVprnRadiusServerV22v0Group    OBJECT-GROUP
+    OBJECTS     {
+        svcVprnRadiusServerAuthHashType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of RADIUS capabilities on
+         Nokia SROS series systems since release 22.0."
+    ::= { tmnxSvcConformance 724 }
+
+tmnxSvcVplsClassOvrrideV22v0Grp  OBJECT-GROUP
+    OBJECTS     {
+        svcTlsExtNetIngIngressClassPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Vpls network ingress
+         ingress-classification-policy on Nokia SROS series systems for release
+         22.0."
+    ::= { tmnxSvcConformance 725 }
+
+svcAutoBindTunnelV22v0Group      OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnInstAutoBndTnlWEcmp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of auto-bind-tunnel feature
+         on BGP-EVPN services on Nokia SROS series systems in release 22.0."
+    ::= { tmnxSvcConformance 726 }
+
+svcBgpEvpnUnequalEcmpV22v0Group  OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnIpRouteAdLinkBw,
+        svcBgpEvpnIpRouteAdLinkBwWeight,
+        svcBgpEvpnIpRouteAdLinkBwMaxWt,
+        svcBgpEvpnIpRouteWeightedEcmp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of unequeal ecmp for
+         evpn-iff routes on Nokia SROS series systems in release 22.0."
+    ::= { tmnxSvcConformance 727 }
+
+svcSrv6MSV22v0Group              OBJECT-GROUP
+    OBJECTS     {
+        svcSrv6MSLocatorTblLastCh,
+        svcSrv6MSLocatorRowStatus,
+        svcSrv6MSLocatorLastChngd,
+        svcSrv6MSLocatorUdt4,
+        svcSrv6MSLocatorUdt4StaticValue,
+        svcSrv6MSLocatorUdt6,
+        svcSrv6MSLocatorUdt6StaticValue,
+        svcSrv6MSLocatorUdt46,
+        svcSrv6MSLocatorUdt46StaticValue,
+        svcSrv6MSLocUdt4OperValue,
+        svcSrv6MSLocUdt4OperState,
+        svcSrv6MSLocUdt4OperErrorCode,
+        svcSrv6MSLocUdt4OperSidAddrType,
+        svcSrv6MSLocUdt4OperSidAddr,
+        svcSrv6MSLocUdt6OperValue,
+        svcSrv6MSLocUdt6OperState,
+        svcSrv6MSLocUdt6OperErrorCode,
+        svcSrv6MSLocUdt6OperSidAddrType,
+        svcSrv6MSLocUdt6OperSidAddr,
+        svcSrv6MSLocUdt46OperValue,
+        svcSrv6MSLocUdt46OperState,
+        svcSrv6MSLocUdt46OperErrorCode,
+        svcSrv6MSLocUdt46OpSidAddrType,
+        svcSrv6MSLocUdt46OpSidAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber traffice statistics feature
+         on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 728 }
+
+svcEpipeSrv6MSV22v0Group         OBJECT-GROUP
+    OBJECTS     {
+        svcEpipeSrv6MSLocatorTblLastCh,
+        svcEpipeSrv6MSLocatorRowStatus,
+        svcEpipeSrv6MSLocatorLastChngd,
+        svcEpipeSrv6MSLocatorUdx2,
+        svcEpipeSrv6MSLocatorUdx2Static,
+        svcEpipeSrv6MSLocUdx2Value,
+        svcEpipeSrv6MSLocUdx2State,
+        svcEpipeSrv6MSLocUdx2ErrorCode,
+        svcEpipeSrv6MSLocUdx2SidAddrType,
+        svcEpipeSrv6MSLocUdx2SidAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber traffice statistics feature
+         on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 729 }
+
+svcVplsSrv6MSV22v0Group          OBJECT-GROUP
+    OBJECTS     {
+        svcVplsSrv6MSLocatorTblLastCh,
+        svcVplsSrv6MSLocatorRowStatus,
+        svcVplsSrv6MSLocatorLastChngd,
+        svcVplsSrv6MSLocatorUdt2u,
+        svcVplsSrv6MSLocatorUdt2uStatic,
+        svcVplsSrv6MSLocUdt2uValue,
+        svcVplsSrv6MSLocUdt2uState,
+        svcVplsSrv6MSLocUdt2uErrorCode,
+        svcVplsSrv6MSLocUdt2uSidAddrType,
+        svcVplsSrv6MSLocUdt2uSidAddr,
+        svcVplsSrv6MSLocatorUdt2m,
+        svcVplsSrv6MSLocatorUdt2mStatic,
+        svcVplsSrv6MSLocUdt2mValue,
+        svcVplsSrv6MSLocUdt2mState,
+        svcVplsSrv6MSLocUdt2mErrorCode,
+        svcVplsSrv6MSLocUdt2mSidAddrType,
+        svcVplsSrv6MSLocUdt2mSidAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber traffice statistics feature
+         on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 730 }
+
+iesIfRvplsStatsGroup             OBJECT-GROUP
+    OBJECTS     {
+        iesIfRvplsEnableStats
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting RVPLS IP interface statistics feature
+         on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 731 }
+
+svcVplsProxyReplyDadV22v0Group   OBJECT-GROUP
+    OBJECTS     {
+        svcTlsProxyArpCfgProbeProcess,
+        svcTlsProxyNdCfgNbrSolDadProcess
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting enabling/disabling reply to  proxy
+         arp/nd DAD request/solicitations feature on Nokia SROS  series systems
+         release 22.0."
+    ::= { tmnxSvcConformance 732 }
+
+tmnxSvcIesV22v0Group             OBJECT-GROUP
+    OBJECTS     {
+        svcIesInfoEntryLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IES network capabilities
+         on Nokia SROS series systems for release 22.0."
+    ::= { tmnxSvcConformance 733 }
+
+tmnxSvcIesIngClassPlcyV22v0Grp   OBJECT-GROUP
+    OBJECTS     {
+        svcIesNetIngIngressClassPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting IES network ingress
+         ingress-classification-policy on Nokia SROS series systems for release
+         22.0."
+    ::= { tmnxSvcConformance 734 }
+
+svcEvpnSrv6MultiHomingV22v0Group OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnSrv6MhMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting multihoming mode for  bgp-evpn srv6
+         feature on Nokia SROS series sytems release  22.0."
+    ::= { tmnxSvcConformance 735 }
+
+tmnxSvcTlsMFibV22v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tlsMFibStatsForwardedRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Services TLS MFib
+         capabilities on Nokia SROS series systems release 22.0."
+    ::= { tmnxSvcConformance 736 }
+
+svcBgpEvpnIncMcastL2AttrV23v0Grp OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnIgnoreMtuMismatch,
+        svcBgpEvpnRtIncMcastAdvL2Attr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting L2 MTU signalling capabilities on
+         Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 737 }
+
+svcBgpEvpnProxyNd9047Group       OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnRtArpNdExtComm,
+        svcTlsProxyNdEvpnNdAdvRtrHost,
+        svcTlsProxyArpIsImmutable,
+        svcTlsProxyNdIsImmutable,
+        svcTlsProxyNdEvpnOverRide
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting BGP EVPN proxy-ND RFC9047 capabilities
+         on Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 738 }
+
+svcBgpEvpnMplsOperStatusV23v0Grp OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnInstMplsTEPEgrLblOperFlag,
+        svcEvpnInstMplsESDestTEPOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of opjects supporting operatoinal status for evpn-mpls
+         capabilities on Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 739 }
+
+svcBgpEvpnProxyNdRtrHostGroup    OBJECT-GROUP
+    OBJECTS     {
+        svcTlsProxyNdEvpnNdAdvRtrHost
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting BGP EVPN proxy-ND capabilities on
+         Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 740 }
+
+tmnxApipeObsoleteGroup           OBJECT-GROUP
+    OBJECTS     {
+        svcApipeInterworking,
+        svcApipeSignaledVllTypeOverride
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of APIPE services
+         obsoleted on Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 741 }
+
+svcTlsVxlanVTEPOperStatV23v0Grp  OBJECT-GROUP
+    OBJECTS     {
+        svcTlsVxInstVTEPEgrVniOperFlag,
+        svcEvpnVxlanInstESDestTEPOpFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporitng operational status for vxlan
+         capabilities on Nokia SROS series systems release 23.0"
+    ::= { tmnxSvcConformance 743 }
+
+svcSrv6TEPOperStatV23v0Grp       OBJECT-GROUP
+    OBJECTS     {
+        svcSrv6InstTEPSidOperFlag,
+        svcSrv6InstESDstTEPOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporitng operational status for srv6
+         capabilities on Nokia SROS series systems release 23.0"
+    ::= { tmnxSvcConformance 744 }
+
+svcVplsEvpnMplsV23v0Group        OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnInstMplsTEPEgrLblOperStat,
+        svcEvpnInstMplsESDestTEPOperStat
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Multi-instance EVPN-MPLS
+          VPLS services on Nokia SROS series systems in release 23.0."
+    ::= { tmnxSvcConformance 745 }
+
+svcBgpEvpnInstV23v0Group         OBJECT-GROUP
+    OBJECTS     {
+        svcTlsVxInstVTEPEgrVniLastChange,
+        svcEvpnVxlanInstESDestTEPOpState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting BGP-EVPN instance  feature on Nokia
+         SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 746 }
+
+svcEvpnSrv6V23v0Group            OBJECT-GROUP
+    OBJECTS     {
+        svcSrv6InstTEPSidOperState,
+        svcSrv6InstESDstTEPOperState,
+        svcSrv6InstTEPSidLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber traffice statistics feature
+         on Nokia SROS series systems release 23.0."
+    ::= { tmnxSvcConformance 747 }
+
+svcVsdObsoletedGroup             OBJECT-GROUP
+    OBJECTS     {
+        svcVsdDomainName,
+        svcVsdDomainTblLastChngd,
+        svcVsdDomainAdminState,
+        svcVsdDomainDescription,
+        svcVsdDomainRowStatus,
+        svcVsdDomainType,
+        svcVsdDomainCreationOrigin,
+        svcVsdDomainToSvcTblLastChngd,
+        svcVsdDomainToSvcRowStatus,
+        svcVsdDomainToSvcCreationOrigin,
+        svcVsdDomainLastErrStr,
+        svcVsdDomainVsdLastErrStr,
+        svcVsdDomainStatCfgChgEvtRcvd,
+        svcVsdDomainStatLastCfgChgEvt,
+        svcVsdDomainStatCfgUpdRcvd,
+        svcVsdDomainStatLastCfgUpdRcvd,
+        svcVsdDomainStatLastCfgUpdDone,
+        svcVsdDomainStatCfgSuccess,
+        svcVsdDomainStatCfgFailed,
+        svcVsdDomainRecParams,
+        svcVsdDomainExecParams,
+        svcVsdDomainRecParams1,
+        svcVsdDomainRecParams2,
+        svcVsdDomainRecParams3,
+        svcVsdDomainRecParams4,
+        svcVsdDomainExecParams1,
+        svcVsdDomainExecParams2,
+        svcVsdDomainExecParams3,
+        svcVsdDomainExecParams4
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted objects in 23.3 supporting management of
+         service Vsd tables on Nokia SROS series systems."
+    ::= { tmnxSvcConformance 748 }
+
+svcEvpnV23v0NotifGroup           NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        svcEvpnMplsTEPEgrLblStateChgd,
+        svcTlsVxInstVTEPEgrVniStateChgd,
+        svcEvpnVxInstESDstTEPStateChgd,
+        svcSrv6InstTEPSidOperStateChgd,
+        svcSrv6InstESDstTEPOperStateChgd,
+        svcEvpnMplsESDestTEPStateChgd,
+        svcBgpEvpnTepStateChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group notifications supporting service BGP EVPN MPLS feature on
+         Nokia SROS series systems release 23.0 SROS series systems."
+    ::= { tmnxSvcConformance 749 }
+
+svcBgpEvpnTepStateV23v0Group     OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnTepStateOperState,
+        svcBgpEvpnTepStateOperFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting EVPN TEP state information on Nokia
+         SROS series systems release  23.0 SROS series systems."
+    ::= { tmnxSvcConformance 750 }
+
+svcSrv6NotifV23v0ObsoleteGroup   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        svcSrv6FunctionExhaustion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects obsoleted in release 23 Nokia SROS
+         series systems."
+    ::= { tmnxSvcConformance 753 }
+
+svcSrv6FuncOutOfRsrcNotifGroup   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        svcSrv6FunctionOutOfResources
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SRv6 notifications on virtual routers
+         for version 23.3 Nokia SROS series systems."
+    ::= { tmnxSvcConformance 754 }
 
 tmnxTstpConformance              OBJECT IDENTIFIER ::= { tmnxServConformance 5 }
 
@@ -49174,9 +51690,10 @@ svcSrv6FunctionExhaustion        NOTIFICATION-TYPE
     OBJECTS     {
         svcSrv6LocatorName,
         svcSrv6FunctionType,
-        svcType
+        svcType,
+        svcSrv6FunctionValue
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "[CAUSE] The svcSrv6FunctionExhaustion notification is  generated when
          the function or label allocation fails.
@@ -49238,6 +51755,177 @@ svcRoutedVplsEvpnGWDrStateChgd   NOTIFICATION-TYPE
          evpn-mcast-gw configuration leads to change in the state based on
          DF election algorithm the node chooses, and generates trap."
     ::= { svcTraps 110 }
+
+svcSrv6TEPEgrBndSvcHiUsgSet      NOTIFICATION-TYPE
+    OBJECTS     {
+        svcId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The svcSrv6TEPEgrBndSvcHiUsgSet notification is generated when
+         the number of SRv6 tunnel endpoint-egress multicast binds in a VPLS
+         service exceeds 95% of the per-service limit.
+
+         [EFFECT] The VPLS service has reached 95% of the SRv6 tunnel
+         endpoint-egress multicast binds limit.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 111 }
+
+svcSrv6TEPEgrBndSvcHiUsgClr      NOTIFICATION-TYPE
+    OBJECTS     {
+        svcId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The svcSrv6TEPEgrBndSvcHiUsgClr notification is generated when
+         the number of SRv6 tunnel endpoint-egress multicast binds in a VPLS
+         service drops below 90% of the per-service limit.
+
+         [EFFECT] The VPLS service has reached 90% of the SRv6 tunnel
+         endpoint-egress multicast binds limit.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 112 }
+
+svcEvpnMplsTEPEgrLblStateChgd    NOTIFICATION-TYPE
+    OBJECTS     {
+        svcEvpnInstMplsTEPEgrLblOperStat,
+        svcEvpnInstMplsTEPEgrLblOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 113 }
+
+svcTlsVxInstVTEPEgrVniStateChgd  NOTIFICATION-TYPE
+    OBJECTS     {
+        svcTlsVxInstVTEPEgrVniOperState,
+        svcTlsVxInstVTEPEgrVniOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 114 }
+
+svcEvpnVxInstESDstTEPStateChgd   NOTIFICATION-TYPE
+    OBJECTS     {
+        svcEvpnVxlanInstESDestTEPOpState,
+        svcEvpnVxlanInstESDestTEPOpFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 115 }
+
+svcSrv6InstTEPSidOperStateChgd   NOTIFICATION-TYPE
+    OBJECTS     {
+        svcSrv6InstTEPSidOperState,
+        svcSrv6InstTEPSidOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 116 }
+
+svcSrv6InstESDstTEPOperStateChgd NOTIFICATION-TYPE
+    OBJECTS     {
+        svcSrv6InstESDstTEPOperState,
+        svcSrv6InstESDstTEPOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 117 }
+
+svcEvpnMplsESDestTEPStateChgd    NOTIFICATION-TYPE
+    OBJECTS     {
+        svcEvpnInstMplsESDestTEPOperStat,
+        svcEvpnInstMplsESDestTEPOperFlag
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any addition of new unicast/multicast destination or any
+         change to the operational status of the unicast and multicast
+         destinations generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 118 }
+
+svcBgpEvpnTepStateChgd           NOTIFICATION-TYPE
+    OBJECTS     {
+        svcBgpEvpnTepStateOperState,
+        svcBgpEvpnTepStateOperFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Any change to the operational status of the evpn TEP  due to
+         the processing of incl-mcast L2 attribute generates the trap.
+
+         [EFFECT] A log entry that the operational status has changed is
+         generated.
+
+         [RECOVERY] None needed."
+    ::= { svcTraps 119 }
+
+svcSrv6FunctionOutOfResources    NOTIFICATION-TYPE
+    OBJECTS     {
+        svcType,
+        svcNotifSrv6Instance,
+        svcNotifSrv6LocatorType,
+        svcNotifSrv6LocatorName,
+        svcSrv6FunctionType,
+        svcSrv6FunctionValue,
+        svcNotifSrv6ExhaustedResource
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The svcSrv6FunctionOutOfResources notification is  generated
+         when the function or hardware resource allocation fails.
+
+         [EFFECT] A log entry is generated.
+
+         [RECOVERY] if another entity or local config change  returns
+         resources, then it will be automatically allocated."
+    ::= { svcTraps 120 }
 
 tstpTrapsPrefix                  OBJECT IDENTIFIER ::= { tmnxServNotifications 5 }
 

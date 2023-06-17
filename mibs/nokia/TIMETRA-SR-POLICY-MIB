@@ -1,0 +1,2774 @@
+TIMETRA-SR-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter64, MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TLNamedItem, TLNamedItemOrEmpty,
+    TNamedItem, TNamedItemOrEmpty,
+    TSrv6FunctionErrorCode,
+    TSrv6FunctionValue, TmnxAdminState,
+    TmnxEnabledDisabled, TmnxMplsLabelOrZero
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraSrPolicyMIBModule         MODULE-IDENTITY
+    LAST-UPDATED "201710030000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the MPLS
+         extensions for the Nokia SROS device.
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201710030000Z"
+    DESCRIPTION
+        "Rev 16.0               3 Oct 2017 00:00
+         16.0 release of the TIMETRA-SR-POLICY-MIB."
+
+    ::= { timetraSRMIBModules 120 }
+
+TSrPolicyType                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Segment routing policy type."
+    SYNTAX      INTEGER {
+        srMpls (1),
+        srv6   (2)
+    }
+
+vRtrSrPolicyObjs                 OBJECT IDENTIFIER ::= { tmnxSRObjs 120 }
+
+vRtrSrPlcyConfigTimeStamps       OBJECT IDENTIFIER ::= { vRtrSrPolicyObjs 1 }
+
+vRtrSrPlcySysTblLstChg           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcySysTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrPlcySysTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 1 }
+
+vRtrSrPlcyStatsTblLstChg         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyStatsTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrPlcyStatsTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 2 }
+
+vRtrSrStaticPlcyTblLstChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the
+         vRtrSrStaticPlcyTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 3 }
+
+vRtrSrStPlcySegListTblLstChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrSrStPlcySegListTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 4 }
+
+vRtrSrStPlcySegTblLstChg         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrStPlcySegTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 5 }
+
+vRtrSrMainPlcyTblLstChg          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyTblLstChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrSrMainPlcyTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 6 }
+
+vRtrSrStPSrv6BindingSidTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPSrv6BindingSidTblLstChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrSrStPSrv6BindingSidTable."
+    ::= { vRtrSrPlcyConfigTimeStamps 7 }
+
+vRtrSrPlcyConfigurations         OBJECT IDENTIFIER ::= { vRtrSrPolicyObjs 2 }
+
+vRtrSrPlcySysTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcySysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcySysTable contains objects for general control and
+         management of segment routing policies for a virtual router in the
+         system."
+    ::= { vRtrSrPlcyConfigurations 1 }
+
+vRtrSrPlcySysEntry               OBJECT-TYPE
+    SYNTAX      VRtrSrPlcySysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the general configuration of segment routing
+          policies for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       { vRtrID }
+    ::= { vRtrSrPlcySysTable 1 }
+
+VRtrSrPlcySysEntry               ::= SEQUENCE
+{
+    vRtrSrPlcySysLastChanged         TimeStamp,
+    vRtrSrPlcySysAdminState          TmnxAdminState,
+    vRtrSrPlcySysLabelBlkName        TLNamedItemOrEmpty
+}
+
+vRtrSrPlcySysLastChanged         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcySysLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrPlcySysEntry 1 }
+
+vRtrSrPlcySysAdminState          OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcySysAdminState specifies the administrative
+         state of the segment routing policy system instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrPlcySysEntry 2 }
+
+vRtrSrPlcySysLabelBlkName        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcySysLabelBlkName specifies the name for the
+         reserved label block to be used with the associated segment routing
+         policy routes.
+
+         The reserved label block name is defined by vRtrMplsReservedLblBlkName
+         and is the index for TIMETRA-MPLS-MIB::vRtrMplsReservedLblBlkTable."
+    DEFVAL      { ''H }
+    ::= { vRtrSrPlcySysEntry 3 }
+
+vRtrSrPlcyStatsTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrPlcyStatsTable controls Statistics in the ess data path for
+         segment routing policy routes"
+    ::= { vRtrSrPlcyConfigurations 2 }
+
+vRtrSrPlcyStatsEntry             OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table represents information about the Statistics
+         collection for all segment routing policy routes in the routing
+         instance."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyStatsType
+    }
+    ::= { vRtrSrPlcyStatsTable 1 }
+
+VRtrSrPlcyStatsEntry             ::= SEQUENCE
+{
+    vRtrSrPlcyStatsType              INTEGER,
+    vRtrSrPlcyStatsRowStatus         RowStatus,
+    vRtrSrPlcyStatsLastChanged       TimeStamp,
+    vRtrSrPlcyStatsAdminState        TmnxAdminState
+}
+
+vRtrSrPlcyStatsType              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ingress (1),
+        egress  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyStatsType indicates the type of statistics."
+    ::= { vRtrSrPlcyStatsEntry 1 }
+
+vRtrSrPlcyStatsRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrPlcyStatsRowStatus is used for the creation or deletion of
+         entries in the vRtrSrPlcyStatsTable."
+    ::= { vRtrSrPlcyStatsEntry 2 }
+
+vRtrSrPlcyStatsLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyStatsLastChanged indicates the time stamp of
+         the last change to this row of this table."
+    ::= { vRtrSrPlcyStatsEntry 3 }
+
+vRtrSrPlcyStatsAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyStatsAdminState specifies whether  statistics
+         are enabled for segment routing policies."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrPlcyStatsEntry 4 }
+
+vRtrSrStaticPlcyTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrStaticPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrStaticPlcyTable has an entry for each segment routing static
+         policy configured for a virtual router in the system."
+    ::= { vRtrSrPlcyConfigurations 3 }
+
+vRtrSrStaticPlcyEntry            OBJECT-TYPE
+    SYNTAX      VRtrSrStaticPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a static Policy in the
+         segment routing for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrStaticPlcyName
+    }
+    ::= { vRtrSrStaticPlcyTable 1 }
+
+VRtrSrStaticPlcyEntry            ::= SEQUENCE
+{
+    vRtrSrStaticPlcyName             TLNamedItem,
+    vRtrSrStaticPlcyRowStatus        RowStatus,
+    vRtrSrStaticPlcyLastChanged      TimeStamp,
+    vRtrSrStaticPlcyAdminState       TmnxAdminState,
+    vRtrSrStaticPlcyColor            Unsigned32,
+    vRtrSrStaticPlcyEndPtAddrType    InetAddressType,
+    vRtrSrStaticPlcyEndPtAddr        InetAddress,
+    vRtrSrStaticPlcyHeadEndAddrType  InetAddressType,
+    vRtrSrStaticPlcyHeadEndAddr      InetAddress,
+    vRtrSrStaticPlcyPreference       Unsigned32,
+    vRtrSrStaticPlcyBindSid          TmnxMplsLabelOrZero,
+    vRtrSrStaticPlcyDistinguisher    Unsigned32,
+    vRtrSrStaticPlcyColorSet         TruthValue,
+    vRtrSrStaticPlcyMainPlcyName     TNamedItemOrEmpty,
+    vRtrSrStaticPlcyType             TSrPolicyType,
+    vRtrSrStaticPlcySegmentRoutingV6 TruthValue,
+    vRtrSrStaticPlcyPrefTransFrr     TruthValue,
+    vRtrSrStPlcySrv6RetPathBfdSidT   InetAddressType,
+    vRtrSrStPlcySrv6RetPathBfdSid    InetAddress
+}
+
+vRtrSrStaticPlcyName             OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyName specifies the name for the segment
+         routing static policy."
+    ::= { vRtrSrStaticPlcyEntry 1 }
+
+vRtrSrStaticPlcyRowStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrStaticPlcyEntry 2 }
+
+vRtrSrStaticPlcyLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrStaticPlcyEntry 3 }
+
+vRtrSrStaticPlcyAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyAdminState specifies the administrative
+         state of the segment routing static policy instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrStaticPlcyEntry 4 }
+
+vRtrSrStaticPlcyColor            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyColor specifies the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance.
+
+         The value of vRtrSrStaticPlcyColorSet must be set to 'true' to specify
+         that vRtrSrStaticPlcyColor has been configured"
+    DEFVAL      { 0 }
+    ::= { vRtrSrStaticPlcyEntry 5 }
+
+vRtrSrStaticPlcyEndPtAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyEndPtAddrType specifies the type of
+         vRtrSrStaticPlcyEndPtAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrStaticPlcyEntry 6 }
+
+vRtrSrStaticPlcyEndPtAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyEndPtAddr specifies the far-end router that
+         is destination of the source routed path associated with the
+         segment routing  static policy instance."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStaticPlcyEntry 7 }
+
+vRtrSrStaticPlcyHeadEndAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyHeadEndAddrType specifies the type of
+         vRtrSrStaticPlcyHeadEndAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrStaticPlcyEntry 8 }
+
+vRtrSrStaticPlcyHeadEndAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyHeadEndAddr specifies the ip-address of
+         the head-end  node. The head-end node steers a packet flow into the SR
+         policy. The zero ipv4-address specifies that the local node is the
+         head-end node."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStaticPlcyEntry 9 }
+
+vRtrSrStaticPlcyPreference       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyPreference specifies the preference value
+         of the segment routing policy instance. A path with higher preference
+         value is preferable."
+    DEFVAL      { 100 }
+    ::= { vRtrSrStaticPlcyEntry 10 }
+
+vRtrSrStaticPlcyBindSid          OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyBindSid specifies the binding SID
+         (segment ID) value that opaquely represents the SR policy to upstream
+         routers."
+    DEFVAL      { 0 }
+    ::= { vRtrSrStaticPlcyEntry 11 }
+
+vRtrSrStaticPlcyDistinguisher    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrStaticPlcyDistinguisher specifies a unique
+         value  for the policy. The value must be non-zero if the head-end of
+         the policy is not  the local node. The distinguisher value of the
+         non-local policy selected for advertisement is used in the
+         distinguisher field in the NLRI of the advertised route."
+    DEFVAL      { 0 }
+    ::= { vRtrSrStaticPlcyEntry 12 }
+
+vRtrSrStaticPlcyColorSet         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrStaticPlcyColorSet specifies whether
+         vRtrSrStaticPlcyColor  has been configured.
+
+         The value of vRtrSrStaticPlcyColorSet must be set to 'true' to specify
+         that vRtrSrStaticPlcyColor has been configured"
+    DEFVAL      { false }
+    ::= { vRtrSrStaticPlcyEntry 13 }
+
+vRtrSrStaticPlcyMainPlcyName     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrStaticPlcyMainPlcyName is a named maintenance policy to the
+         static SR policy path. The maintenance policy must exist in
+         vRtrSrMainPlcyTable."
+    DEFVAL      { "" }
+    ::= { vRtrSrStaticPlcyEntry 14 }
+
+vRtrSrStaticPlcyType             OBJECT-TYPE
+    SYNTAX      TSrPolicyType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyType specifies the static policy type."
+    DEFVAL      { srMpls }
+    ::= { vRtrSrStaticPlcyEntry 15 }
+
+vRtrSrStaticPlcySegmentRoutingV6 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcySegmentRoutingV6 specifies whether or not
+         segment routing V6 capabilities are enabled on this instance of static
+         policy.
+
+         When the value of vRtrSrStaticPlcyType is 'srv6' the value of
+         vRtrSrStaticPlcySegmentRoutingV6 must be set to 'true' to be able to
+         administratively enable the static policy.
+
+         When the value of vRtrSrStaticPlcySegmentRoutingV6 is set to 'false'
+         the binding SID configuration pertaining to this policy will be
+         automatically removed by the system."
+    DEFVAL      { false }
+    ::= { vRtrSrStaticPlcyEntry 16 }
+
+vRtrSrStaticPlcyPrefTransFrr     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStaticPlcyPrefTransFrr specifies if transport
+         fast-re-route should be preferred"
+    DEFVAL      { false }
+    ::= { vRtrSrStaticPlcyEntry 17 }
+
+vRtrSrStPlcySrv6RetPathBfdSidT   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySrv6RetPathBfdSidT specifies the type of the
+         vRtrSrStPlcySrv6RetPathBfdSid IP address.
+
+         If the value of vRtrSrStPlcySrv6RetPathBfdSidT is 'unknown', it means
+         that BFD asynchronous mode is used and no return path SRv6 SID will be
+         pushed on the BFD packet at the initiator.
+
+         When vRtrSrStaticPlcyMainPlcyName for this entry is not default then
+         the vRtrSrMainPlcyReturnPathLabel for the policy specified by
+         vRtrSrStaticPlcyMainPlcyName can't be set to other value than default
+         when SRv6 SID (vRtrSrStPlcySrv6RetPathBfdSidT and
+         vRtrSrStPlcySrv6RetPathBfdSid) is set to other value than default."
+    DEFVAL      { unknown }
+    ::= { vRtrSrStaticPlcyEntry 18 }
+
+vRtrSrStPlcySrv6RetPathBfdSid    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySrv6RetPathBfdSid specifies the BFD return
+         path SRv6 SID for the static-policy.
+
+         When vRtrSrStaticPlcyMainPlcyName for this entry is not default then
+         the vRtrSrMainPlcyReturnPathLabel for the policy specified by
+         vRtrSrStaticPlcyMainPlcyName can't be set to other value than default
+         when SRv6 SID (vRtrSrStPlcySrv6RetPathBfdSidT and
+         vRtrSrStPlcySrv6RetPathBfdSid) is set to other value than default."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStaticPlcyEntry 19 }
+
+vRtrSrStPlcySegListTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrStPlcySegListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrStPlcySegListTable has an entry for each segment list
+         associated with a  segment routing static policy configured for a
+         virtual router in the system."
+    ::= { vRtrSrPlcyConfigurations 4 }
+
+vRtrSrStPlcySegListEntry         OBJECT-TYPE
+    SYNTAX      VRtrSrStPlcySegListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a segment list of a
+         static Policy in the segment routing for a virtual router in the
+         system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrStaticPlcyName,
+        vRtrSrStPlcySegListIndex
+    }
+    ::= { vRtrSrStPlcySegListTable 1 }
+
+VRtrSrStPlcySegListEntry         ::= SEQUENCE
+{
+    vRtrSrStPlcySegListIndex         Unsigned32,
+    vRtrSrStPlcySegListRowStatus     RowStatus,
+    vRtrSrStPlcySegListLastChanged   TimeStamp,
+    vRtrSrStPlcySegListAdminState    TmnxAdminState,
+    vRtrSrStPlcySegListWeight        Unsigned32
+}
+
+vRtrSrStPlcySegListIndex         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListIndex specifies the index
+         that identifies a segment list associated with a
+         segment routing static policy."
+    ::= { vRtrSrStPlcySegListEntry 1 }
+
+vRtrSrStPlcySegListRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrStPlcySegListEntry 2 }
+
+vRtrSrStPlcySegListLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrSrStPlcySegListEntry 3 }
+
+vRtrSrStPlcySegListAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListAdminState specifies the
+         administrative state of the segment list instance associated with a
+         segment routing static policy."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrStPlcySegListEntry 4 }
+
+vRtrSrStPlcySegListWeight        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegListWeight specifies the relative weight
+         of the segment list associated with a static policy. Traffic that is
+         steered into the segment routing policy is load-shared  over all the
+         associated segment lists based on the relative weights."
+    DEFVAL      { 1 }
+    ::= { vRtrSrStPlcySegListEntry 5 }
+
+vRtrSrStPlcySegTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrStPlcySegEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrStPlcySegTable has an entry for each segment associated with
+         a  segment routing static policy configured for a virtual router in
+         the system."
+    ::= { vRtrSrPlcyConfigurations 5 }
+
+vRtrSrStPlcySegEntry             OBJECT-TYPE
+    SYNTAX      VRtrSrStPlcySegEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a segment in a static
+         Policy in the segment routing for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrStaticPlcyName,
+        vRtrSrStPlcySegListIndex,
+        vRtrSrStPlcySegIndex
+    }
+    ::= { vRtrSrStPlcySegTable 1 }
+
+VRtrSrStPlcySegEntry             ::= SEQUENCE
+{
+    vRtrSrStPlcySegIndex             Unsigned32,
+    vRtrSrStPlcySegRowStatus         RowStatus,
+    vRtrSrStPlcySegLastChanged       TimeStamp,
+    vRtrSrStPlcySegMplsLabel         Unsigned32,
+    vRtrSrStPlcySegSrv6SidAddrType   InetAddressType,
+    vRtrSrStPlcySegSrv6SidAddr       InetAddress
+}
+
+vRtrSrStPlcySegIndex             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..11)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegIndex specifies the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance.
+
+         Maximum segments supported may vary depending on platform."
+    ::= { vRtrSrStPlcySegEntry 1 }
+
+vRtrSrStPlcySegRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrStPlcySegEntry 2 }
+
+vRtrSrStPlcySegLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrStPlcySegEntry 3 }
+
+vRtrSrStPlcySegMplsLabel         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1048575 | 4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegMplsLabel specifies the MPLS label used by
+         the segment in the segment routing static policy segment list."
+    DEFVAL      { 4294967295 }
+    ::= { vRtrSrStPlcySegEntry 4 }
+
+vRtrSrStPlcySegSrv6SidAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegSrv6SidAddrType specifies the type of
+         vRtrSrStPlcySegSrv6SidAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrSrStPlcySegEntry 5 }
+
+vRtrSrStPlcySegSrv6SidAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPlcySegSrv6SidAddr specifies the IPv6 address of
+         segment routing v6 SID."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStPlcySegEntry 6 }
+
+vRtrSrPlcySysOperTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcySysOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcySysOperTable has an entry for each router instance
+         associated with  segment routing policies configured for a virtual
+         router in the system."
+    ::= { vRtrSrPlcyConfigurations 6 }
+
+vRtrSrPlcySysOperEntry           OBJECT-TYPE
+    SYNTAX      VRtrSrPlcySysOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the state of sr-policies  in the segment
+         routing for a virtual router in the system.
+
+         Entries can be read with SNMP GET operations."
+    AUGMENTS    { vRtrSrPlcySysEntry }
+    ::= { vRtrSrPlcySysOperTable 1 }
+
+VRtrSrPlcySysOperEntry           ::= SEQUENCE
+{
+    vRtrSrPlcyTTMPref                Unsigned32,
+    vRtrSrPlcyTotBSIDAlloc           Unsigned32,
+    vRtrSrPlcyTotStaticLocalPol      Unsigned32,
+    vRtrSrPlcyTotActStaticLocalPol   Unsigned32,
+    vRtrSrPlcyTotStaticNonLocalPol   Unsigned32,
+    vRtrSrPlcyTotBgpPol              Unsigned32,
+    vRtrSrPlcyTotActBgpPol           Unsigned32
+}
+
+vRtrSrPlcyTTMPref                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTTMPref indicates the TTM preferences used for
+         sr-policy  tunnels."
+    ::= { vRtrSrPlcySysOperEntry 1 }
+
+vRtrSrPlcyTotBSIDAlloc           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotBSIDAlloc indicates the number of
+         binding-sids allocated."
+    ::= { vRtrSrPlcySysOperEntry 2 }
+
+vRtrSrPlcyTotStaticLocalPol      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotStaticLocalPol indicates the number of
+         static local policies."
+    ::= { vRtrSrPlcySysOperEntry 3 }
+
+vRtrSrPlcyTotActStaticLocalPol   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotActStaticLocalPol indicates the number of
+         active static local policies."
+    ::= { vRtrSrPlcySysOperEntry 4 }
+
+vRtrSrPlcyTotStaticNonLocalPol   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotStaticNonLocalPol indicates the number of
+         static non local policies."
+    ::= { vRtrSrPlcySysOperEntry 5 }
+
+vRtrSrPlcyTotBgpPol              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotBgpPol indicates the number of BGP policies."
+    ::= { vRtrSrPlcySysOperEntry 6 }
+
+vRtrSrPlcyTotActBgpPol           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyTotActBgpPol indicates the number of active BGP
+         policies."
+    ::= { vRtrSrPlcySysOperEntry 7 }
+
+vRtrSrPlcyPathTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcyPathTable has an entry for each segment routing policies
+         configured for a virtual router in the system."
+    ::= { vRtrSrPlcyConfigurations 7 }
+
+vRtrSrPlcyPathEntry              OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the state of an SR policy  in the segment
+         routing for a virtual router in the system.
+
+         Entries can be be read via SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyPathHeadEndAddrType,
+        vRtrSrPlcyPathHeadEndAddr,
+        vRtrSrPlcyPathColor,
+        vRtrSrPlcyPathEndPtAddrType,
+        vRtrSrPlcyPathEndPtAddr,
+        vRtrSrPlcyPathOwner,
+        vRtrSrPlcyPathPreference,
+        vRtrSrPlcyPathDistinguisher
+    }
+    ::= { vRtrSrPlcyPathTable 1 }
+
+VRtrSrPlcyPathEntry              ::= SEQUENCE
+{
+    vRtrSrPlcyPathHeadEndAddrType    InetAddressType,
+    vRtrSrPlcyPathHeadEndAddr        InetAddress,
+    vRtrSrPlcyPathColor              Unsigned32,
+    vRtrSrPlcyPathEndPtAddrType      InetAddressType,
+    vRtrSrPlcyPathEndPtAddr          InetAddress,
+    vRtrSrPlcyPathOwner              INTEGER,
+    vRtrSrPlcyPathPreference         Unsigned32,
+    vRtrSrPlcyPathDistinguisher      Unsigned32,
+    vRtrSrPlcyPathLastChanged        TimeStamp,
+    vRtrSrPlcyPathTunnelId           Unsigned32,
+    vRtrSrPlcyPathActiveState        TruthValue,
+    vRtrSrPlcyPathAge                Unsigned32,
+    vRtrSrPlcyPathNumReEval          Unsigned32,
+    vRtrSrPlcyPathNumActPathCh       Unsigned32,
+    vRtrSrPlcyPathLastReEvalReason   INTEGER,
+    vRtrSrPlcyPathBindSid            TmnxMplsLabelOrZero,
+    vRtrSrPlcyPathOriginAddrType     InetAddressType,
+    vRtrSrPlcyPathOriginAddr         InetAddress,
+    vRtrSrPlcyPathOriginASN          Unsigned32,
+    vRtrSrPlcyPathMainPlcy           TNamedItemOrEmpty,
+    vRtrSrPlcyPathType               TSrPolicyType,
+    vRtrSrPathSrv6RetPathBfdSidT     InetAddressType,
+    vRtrSrPathSrv6RetPathBfdSid      InetAddress
+}
+
+vRtrSrPlcyPathHeadEndAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathHeadEndAddrType specifies the type of
+         vRtrSrPlcyPathHeadEndAddr."
+    ::= { vRtrSrPlcyPathEntry 1 }
+
+vRtrSrPlcyPathHeadEndAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathHeadEndAddr specifies the ip-address of the
+         head-end  node. The head-end node steers a packet flow into the SR
+         policy. The zero ipv4-address specifies that the local node is the
+         head-end node. Only ipv4-address is supported now."
+    ::= { vRtrSrPlcyPathEntry 2 }
+
+vRtrSrPlcyPathColor              OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathColor specifies the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance."
+    ::= { vRtrSrPlcyPathEntry 3 }
+
+vRtrSrPlcyPathEndPtAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathEndPtAddrType specifies the type of
+         vRtrSrPlcyPathEndPtAddr."
+    ::= { vRtrSrPlcyPathEntry 4 }
+
+vRtrSrPlcyPathEndPtAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathEndPtAddr specifies the far-end router that
+         is destination of the source routed path associated with the
+         segment routing  static policy instance. Only ipv4-address is supported now."
+    ::= { vRtrSrPlcyPathEntry 5 }
+
+vRtrSrPlcyPathOwner              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        bgp    (1),
+        static (2),
+        nsp    (3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathOwner specifies the owner of segment
+         routing policy instance."
+    ::= { vRtrSrPlcyPathEntry 6 }
+
+vRtrSrPlcyPathPreference         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathPreference specifies the preference value
+         of the segment routing policy instance. A path with higher preference
+         value is preferable."
+    ::= { vRtrSrPlcyPathEntry 7 }
+
+vRtrSrPlcyPathDistinguisher      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathDistinguisher specifies a unique value
+          for the policy. The value must be non-zero if the head-end of the
+         policy is not  the local node. The distinguisher value of the
+         non-local policy selected for advertisement is used in the
+         distinguisher field in the NLRI of the advertised route."
+    ::= { vRtrSrPlcyPathEntry 8 }
+
+vRtrSrPlcyPathLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrPlcyPathEntry 9 }
+
+vRtrSrPlcyPathTunnelId           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathTunnelId indicates the Tunnel ID used
+         by the segment routing path."
+    ::= { vRtrSrPlcyPathEntry 10 }
+
+vRtrSrPlcyPathActiveState        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathActiveState indicates whether segment
+         routing  path is active."
+    ::= { vRtrSrPlcyPathEntry 11 }
+
+vRtrSrPlcyPathAge                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathAge indicates the age of a  segment
+         routing path."
+    ::= { vRtrSrPlcyPathEntry 12 }
+
+vRtrSrPlcyPathNumReEval          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathNumReEval indicates the number of
+         re-evaluations  for segment routing path."
+    ::= { vRtrSrPlcyPathEntry 13 }
+
+vRtrSrPlcyPathNumActPathCh       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathNumActPathCh indicates the number of
+         active  path changes for segment routing path."
+    ::= { vRtrSrPlcyPathEntry 14 }
+
+vRtrSrPlcyPathLastReEvalReason   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none        (0),
+        routeAdd    (1),
+        routeMod    (2),
+        routeDel    (3),
+        tunnelDown  (4),
+        srFailure   (5),
+        routeAudit  (6),
+        adminNoShut (7),
+        bsidFailure (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathLastReEvalReason indicates the reason
+         for the last re-evaluation of the segment routing path."
+    ::= { vRtrSrPlcyPathEntry 15 }
+
+vRtrSrPlcyPathBindSid            OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathBindSid indicates the binding SID (segment
+         ID) value that opaquely represents the SR policy to upstream routers."
+    ::= { vRtrSrPlcyPathEntry 16 }
+
+vRtrSrPlcyPathOriginAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathOriginAddrType specifies the type of
+         vRtrSrPlcyPathOriginAddr."
+    ::= { vRtrSrPlcyPathEntry 17 }
+
+vRtrSrPlcyPathOriginAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathOriginAddr specifies the address of the
+         originating  BGP router ID. Only ipv4-address is supported now."
+    ::= { vRtrSrPlcyPathEntry 18 }
+
+vRtrSrPlcyPathOriginASN          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathOriginASN indicates the ASN of the
+         node/controller  signalling the candidate path when it has a BGP
+         session to the headend."
+    ::= { vRtrSrPlcyPathEntry 19 }
+
+vRtrSrPlcyPathMainPlcy           OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathMainPlcy specifies the maintenance policy
+         for a specified path."
+    ::= { vRtrSrPlcyPathEntry 20 }
+
+vRtrSrPlcyPathType               OBJECT-TYPE
+    SYNTAX      TSrPolicyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathType specifies the path type."
+    ::= { vRtrSrPlcyPathEntry 21 }
+
+vRtrSrPathSrv6RetPathBfdSidT     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPathSrv6RetPathBfdSidT specifies the type of the
+         vRtrSrPathSrv6RetPathBfdSid IP address
+
+         If the value of vRtrSrStPlcySrv6RetPathBfdSid is 'unknown', it means
+         that BFD asynchronous mode is used and no return path SRv6 SID will be
+         pushed on the BFD packet at the initiator."
+    ::= { vRtrSrPlcyPathEntry 22 }
+
+vRtrSrPathSrv6RetPathBfdSid      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPathSrv6RetPathBfdSid specifies the BFD return path
+         SRv6 SID for the path."
+    ::= { vRtrSrPlcyPathEntry 23 }
+
+vRtrSrPlcyPathSegListTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyPathSegListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcyPathSegListTable has an entry that specifies the list of
+         segments that specify a path from ingress to egress node."
+    ::= { vRtrSrPlcyConfigurations 8 }
+
+vRtrSrPlcyPathSegListEntry       OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyPathSegListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the state of an SR policy segment list
+         specifies the list of 1/more segment(s) [max 11] that specifies  a
+         path from ingress to egress node.
+
+         Entries can be be read via SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyPathSLHeadEndAddrType,
+        vRtrSrPlcyPathSLHeadEndAddr,
+        vRtrSrPlcyPathSLColor,
+        vRtrSrPlcyPathSLEndPtAddrType,
+        vRtrSrPlcyPathSLEndPtAddr,
+        vRtrSrPlcyPathSLOwner,
+        vRtrSrPlcyPathSLPreference,
+        vRtrSrPlcyPathSLDistinguisher,
+        vRtrSrPlcyPathSegListIndex
+    }
+    ::= { vRtrSrPlcyPathSegListTable 1 }
+
+VRtrSrPlcyPathSegListEntry       ::= SEQUENCE
+{
+    vRtrSrPlcyPathSLHeadEndAddrType  InetAddressType,
+    vRtrSrPlcyPathSLHeadEndAddr      InetAddress,
+    vRtrSrPlcyPathSLColor            Unsigned32,
+    vRtrSrPlcyPathSLEndPtAddrType    InetAddressType,
+    vRtrSrPlcyPathSLEndPtAddr        InetAddress,
+    vRtrSrPlcyPathSLOwner            INTEGER,
+    vRtrSrPlcyPathSLPreference       Unsigned32,
+    vRtrSrPlcyPathSLDistinguisher    Unsigned32,
+    vRtrSrPlcyPathSegListIndex       Unsigned32,
+    vRtrSrPlcyPathSLLastChanged      TimeStamp,
+    vRtrSrPlcyPathSLWeight           Unsigned32,
+    vRtrSrPlcyPathSLNumSegments      Unsigned32,
+    vRtrSrPlcyPathSLSeg1Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg1State        INTEGER,
+    vRtrSrPlcyPathSLSeg2Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg2State        INTEGER,
+    vRtrSrPlcyPathSLSeg3Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg3State        INTEGER,
+    vRtrSrPlcyPathSLSeg4Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg4State        INTEGER,
+    vRtrSrPlcyPathSLSeg5Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg5State        INTEGER,
+    vRtrSrPlcyPathSLSeg6Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg6State        INTEGER,
+    vRtrSrPlcyPathSLSeg7Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg7State        INTEGER,
+    vRtrSrPlcyPathSLSeg8Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg8State        INTEGER,
+    vRtrSrPlcyPathSLSeg9Label        Unsigned32,
+    vRtrSrPlcyPathSLSeg9State        INTEGER,
+    vRtrSrPlcyPathSLSeg10Label       Unsigned32,
+    vRtrSrPlcyPathSLSeg10State       INTEGER,
+    vRtrSrPlcyPathSLSeg11Label       Unsigned32,
+    vRtrSrPlcyPathSLSeg11State       INTEGER,
+    vRtrSrPlcyPathSLSBfdState        INTEGER,
+    vRtrSrPlcyPathSLSBfdTransitions  Unsigned32,
+    vRtrSrPlcyPathSLSeg1SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg1SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg2SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg2SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg3SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg3SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg4SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg4SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg5SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg5SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg6SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg6SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg7SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg7SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg8SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg8SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg9SidAddrType  InetAddressType,
+    vRtrSrPlcyPathSLSeg9SidAddr      InetAddress,
+    vRtrSrPlcyPathSLSeg10SidAddrType InetAddressType,
+    vRtrSrPlcyPathSLSeg10SidAddr     InetAddress,
+    vRtrSrPlcyPathSLSeg11SidAddrType InetAddressType,
+    vRtrSrPlcyPathSLSeg11SidAddr     InetAddress
+}
+
+vRtrSrPlcyPathSLHeadEndAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLHeadEndAddrType specifies the type of
+         vRtrSrPlcyPathSLHeadEndAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 1 }
+
+vRtrSrPlcyPathSLHeadEndAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLHeadEndAddr specifies the ip-address of
+         the head-end  node. The head-end node steers a packet flow into the SR
+         policy. The zero ipv4-address specifies that the local node is the
+         head-end node. Only ipv4-address is supported now."
+    ::= { vRtrSrPlcyPathSegListEntry 2 }
+
+vRtrSrPlcyPathSLColor            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLColor specifies the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance."
+    ::= { vRtrSrPlcyPathSegListEntry 3 }
+
+vRtrSrPlcyPathSLEndPtAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLEndPtAddrType specifies the type of
+         vRtrSrPlcyPathSLEndPtAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 4 }
+
+vRtrSrPlcyPathSLEndPtAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLEndPtAddr specifies the far-end router that
+         is destination of the source routed path associated with the
+         segment routing  static policy instance. Only ipv4-address is supported now."
+    ::= { vRtrSrPlcyPathSegListEntry 5 }
+
+vRtrSrPlcyPathSLOwner            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        bgp    (1),
+        static (2),
+        nsp    (3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLOwner specifies the owner of segment
+         routing policy instance."
+    ::= { vRtrSrPlcyPathSegListEntry 6 }
+
+vRtrSrPlcyPathSLPreference       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLPreference specifies the preference value
+         of the segment routing policy instance. A path with higher preference
+         value is preferable."
+    ::= { vRtrSrPlcyPathSegListEntry 7 }
+
+vRtrSrPlcyPathSLDistinguisher    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLDistinguisher specifies a unique
+         value  for the policy. The value must be non-zero if the head-end of
+         the policy is not  the local node. The distinguisher value of the
+         non-local policy selected for advertisement is used in the
+         distinguisher field in the NLRI of the advertised route."
+    ::= { vRtrSrPlcyPathSegListEntry 8 }
+
+vRtrSrPlcyPathSegListIndex       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSegListIndex specifies the index
+         that identifies a segment list associated with a
+         segment routing static policy."
+    ::= { vRtrSrPlcyPathSegListEntry 9 }
+
+vRtrSrPlcyPathSLLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrPlcyPathSegListEntry 10 }
+
+vRtrSrPlcyPathSLWeight           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLWeight specifies the relative weight of
+         the segment list associated with a static policy. Traffic that is
+         steered into the segment routing policy is load-shared  over all the
+         associated segment lists based on the relative weights."
+    ::= { vRtrSrPlcyPathSegListEntry 11 }
+
+vRtrSrPlcyPathSLNumSegments      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLNumSegments indicates the number of
+         segments segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 12 }
+
+vRtrSrPlcyPathSLSeg1Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg1Label indicates the label used
+         by segment 1 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 13 }
+
+vRtrSrPlcyPathSLSeg1State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg1State indicates whether segment 1 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 14 }
+
+vRtrSrPlcyPathSLSeg2Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg2Label indicates the label used
+         by segment 2 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 15 }
+
+vRtrSrPlcyPathSLSeg2State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg2State indicates whether segment 2 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 16 }
+
+vRtrSrPlcyPathSLSeg3Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg3Label indicates the label used
+         by segment 3 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 17 }
+
+vRtrSrPlcyPathSLSeg3State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg3State indicates whether segment 3 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 18 }
+
+vRtrSrPlcyPathSLSeg4Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg4Label indicates the label used
+         by segment 4 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 19 }
+
+vRtrSrPlcyPathSLSeg4State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg4State indicates whether segment 4 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 20 }
+
+vRtrSrPlcyPathSLSeg5Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg5Label indicates the label used
+         by segment 5 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 21 }
+
+vRtrSrPlcyPathSLSeg5State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg5State indicates whether segment 5 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 22 }
+
+vRtrSrPlcyPathSLSeg6Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg6Label indicates the label used
+         by segment 6 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 23 }
+
+vRtrSrPlcyPathSLSeg6State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg6State indicates whether segment 6 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 24 }
+
+vRtrSrPlcyPathSLSeg7Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg7Label indicates the label used
+         by segment 7 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 25 }
+
+vRtrSrPlcyPathSLSeg7State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg7State indicates whether segment 7 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 26 }
+
+vRtrSrPlcyPathSLSeg8Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg8Label indicates the label used
+         by segment 8 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 27 }
+
+vRtrSrPlcyPathSLSeg8State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg8State indicates whether segment 8 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 28 }
+
+vRtrSrPlcyPathSLSeg9Label        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg9Label indicates the label used
+         by segment 9 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 29 }
+
+vRtrSrPlcyPathSLSeg9State        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg9State indicates whether segment 9 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 30 }
+
+vRtrSrPlcyPathSLSeg10Label       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg10Label indicates the label used
+         by segment 10 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 31 }
+
+vRtrSrPlcyPathSLSeg10State       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg10State indicates whether segment 10 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 32 }
+
+vRtrSrPlcyPathSLSeg11Label       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg11Label indicates the label used
+         by segment 11 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 33 }
+
+vRtrSrPlcyPathSLSeg11State       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none         (0),
+        resolvedUp   (1),
+        resolvedDown (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSeg11State indicates whether segment 11 of the
+         path is 'resolvedUp' or 'resolvedDown'. A value of 'none' indicates segment is not present."
+    ::= { vRtrSrPlcyPathSegListEntry 34 }
+
+vRtrSrPlcyPathSLSBfdState        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        down (0),
+        up   (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSBfdState indicates the S-BFD state
+         for the segment list."
+    ::= { vRtrSrPlcyPathSegListEntry 35 }
+
+vRtrSrPlcyPathSLSBfdTransitions  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyPathSLSBfdTransitions indicates the S-BFD
+         number of transitions for the segment list."
+    ::= { vRtrSrPlcyPathSegListEntry 36 }
+
+vRtrSrPlcyPathSLSeg1SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg1SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg1SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 37 }
+
+vRtrSrPlcyPathSLSeg1SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg1SidAddr indicates the SID used by
+         segment 1 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 38 }
+
+vRtrSrPlcyPathSLSeg2SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg2SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg2SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 39 }
+
+vRtrSrPlcyPathSLSeg2SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg2SidAddr indicates the SID used by
+         segment 2 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 40 }
+
+vRtrSrPlcyPathSLSeg3SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg3SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg3SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 41 }
+
+vRtrSrPlcyPathSLSeg3SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg3SidAddr indicates the SID used by
+         segment 3 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 42 }
+
+vRtrSrPlcyPathSLSeg4SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg4SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg4SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 43 }
+
+vRtrSrPlcyPathSLSeg4SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg4SidAddr indicates the SID used by
+         segment 4 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 44 }
+
+vRtrSrPlcyPathSLSeg5SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg5SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg5SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 45 }
+
+vRtrSrPlcyPathSLSeg5SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg5SidAddr indicates the SID used by
+         segment 5 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 46 }
+
+vRtrSrPlcyPathSLSeg6SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg6SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg6SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 47 }
+
+vRtrSrPlcyPathSLSeg6SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg6SidAddr indicates the SID used by segment 6 in the
+           segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 48 }
+
+vRtrSrPlcyPathSLSeg7SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg7SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg7SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 49 }
+
+vRtrSrPlcyPathSLSeg7SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg7SidAddr indicates the SID used by
+         segment 7 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 50 }
+
+vRtrSrPlcyPathSLSeg8SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg8SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg8SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 51 }
+
+vRtrSrPlcyPathSLSeg8SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg8SidAddr indicates the SID used by
+         segment 8 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 52 }
+
+vRtrSrPlcyPathSLSeg9SidAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg9SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg9SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 53 }
+
+vRtrSrPlcyPathSLSeg9SidAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg9SidAddr indicates the SID used by
+         segment 9 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 54 }
+
+vRtrSrPlcyPathSLSeg10SidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg10SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg10SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 55 }
+
+vRtrSrPlcyPathSLSeg10SidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg10SidAddr indicates the SID used by
+         segment 10 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 56 }
+
+vRtrSrPlcyPathSLSeg11SidAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg11SidAddrType indicates the type of
+         vRtrSrPlcyPathSLSeg11SidAddr."
+    ::= { vRtrSrPlcyPathSegListEntry 57 }
+
+vRtrSrPlcyPathSLSeg11SidAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathSLSeg11SidAddr indicates the SID used by
+         segment 11 in the  segment routing path."
+    ::= { vRtrSrPlcyPathSegListEntry 58 }
+
+vRtrSrPlcyIngrStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyIngrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcyIngrStatsTable has an entry for each segment routing
+         endpoint/color color for which a tunnel and an incoming label mapping
+         entry is created in the node."
+    ::= { vRtrSrPlcyConfigurations 9 }
+
+vRtrSrPlcyIngrStatsEntry         OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyIngrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an endpoint in the segment route for a
+         virtual router in the system.
+
+         Entries can be retrieved by SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyIngrStatsColor,
+        vRtrSrPlcyIngrStatsEndPtAddrType,
+        vRtrSrPlcyIngrStatsEndPtAddr
+    }
+    ::= { vRtrSrPlcyIngrStatsTable 1 }
+
+VRtrSrPlcyIngrStatsEntry         ::= SEQUENCE
+{
+    vRtrSrPlcyIngrStatsColor         Unsigned32,
+    vRtrSrPlcyIngrStatsEndPtAddrType InetAddressType,
+    vRtrSrPlcyIngrStatsEndPtAddr     InetAddress,
+    vRtrSrPlcyIngrStatsTunnelId      Unsigned32,
+    vRtrSrPlcyIngrStatsBindSid       TmnxMplsLabelOrZero,
+    vRtrSrPlcyIngrStatsPktCnt        Counter64,
+    vRtrSrPlcyIngrStatsByteCnt       Counter64
+}
+
+vRtrSrPlcyIngrStatsColor         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyIngrStatsColor indicates the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance."
+    ::= { vRtrSrPlcyIngrStatsEntry 2 }
+
+vRtrSrPlcyIngrStatsEndPtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyIngrStatsEndPtAddrType indicates the type of
+         vRtrSrPlcyIngrStatsEndPtAddr."
+    ::= { vRtrSrPlcyIngrStatsEntry 3 }
+
+vRtrSrPlcyIngrStatsEndPtAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyIngrStatsEndPtAddr indicates the far-end router
+         that  is destination of the source routed path associated with the
+         segment routing static and bgp policy instances. Only ipv4-address is
+         supported now."
+    ::= { vRtrSrPlcyIngrStatsEntry 4 }
+
+vRtrSrPlcyIngrStatsTunnelId      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyIngrStatsTunnelId indicates the Tunnel ID
+         used by the segment routing endpoint."
+    ::= { vRtrSrPlcyIngrStatsEntry 5 }
+
+vRtrSrPlcyIngrStatsBindSid       OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyIngrStatsBindSid indicates the binding SID
+         (segment ID) value that opaquely represents the SR policy to upstream
+         routers."
+    ::= { vRtrSrPlcyIngrStatsEntry 6 }
+
+vRtrSrPlcyIngrStatsPktCnt        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyIngrStatsPktCnt indicates the packet
+         count."
+    ::= { vRtrSrPlcyIngrStatsEntry 7 }
+
+vRtrSrPlcyIngrStatsByteCnt       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyIngrStatsByteCnt indicates the byte count."
+    ::= { vRtrSrPlcyIngrStatsEntry 8 }
+
+vRtrSrPlcyEgrStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcyEgrStatsTable has an entry for each segment routing
+         endpoint/color color for which a tunnel and an outgoing label mapping
+         entry is created in the node."
+    ::= { vRtrSrPlcyConfigurations 10 }
+
+vRtrSrPlcyEgrStatsEntry          OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an endpoint in the segment route for a
+         virtual router in the system.
+
+         Entries can be retrieved by SNMP GET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyEgrStatsColor,
+        vRtrSrPlcyEgrStatsEndPtAddrType,
+        vRtrSrPlcyEgrStatsEndPtAddr,
+        vRtrSrPlcyEgrStatsSegListIndex
+    }
+    ::= { vRtrSrPlcyEgrStatsTable 1 }
+
+VRtrSrPlcyEgrStatsEntry          ::= SEQUENCE
+{
+    vRtrSrPlcyEgrStatsColor          Unsigned32,
+    vRtrSrPlcyEgrStatsEndPtAddrType  InetAddressType,
+    vRtrSrPlcyEgrStatsEndPtAddr      InetAddress,
+    vRtrSrPlcyEgrStatsSegListIndex   Unsigned32,
+    vRtrSrPlcyEgrStatsTunnelId       Unsigned32,
+    vRtrSrPlcyEgrStatsBindSid        TmnxMplsLabelOrZero,
+    vRtrSrPlcyEgrStatsPktCnt         Counter64,
+    vRtrSrPlcyEgrStatsByteCnt        Counter64
+}
+
+vRtrSrPlcyEgrStatsColor          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyEgrStatsColor indicates the property that
+         determines the set of traffic flows that is steered by the segment
+         routing policy instance."
+    ::= { vRtrSrPlcyEgrStatsEntry 2 }
+
+vRtrSrPlcyEgrStatsEndPtAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyEgrStatsEndPtAddrType indicates the type of
+         vRtrSrPlcyEgrStatsEndPtAddr."
+    ::= { vRtrSrPlcyEgrStatsEntry 3 }
+
+vRtrSrPlcyEgrStatsEndPtAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyEgrStatsEndPtAddr indicates the far-end router
+         that  is destination of the source routed path associated with the
+         dynamic segment routing (bgp) policy instances. Only ipv4-address is
+         supported now."
+    ::= { vRtrSrPlcyEgrStatsEntry 4 }
+
+vRtrSrPlcyEgrStatsSegListIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyEgrStatsSegListIndex specifies the index
+         that identifies a segment list associated with a
+         segment routing static policy."
+    ::= { vRtrSrPlcyEgrStatsEntry 5 }
+
+vRtrSrPlcyEgrStatsTunnelId       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyEgrStatsTunnelId indicates the Tunnel ID
+         used by the segment routing endpoint."
+    ::= { vRtrSrPlcyEgrStatsEntry 6 }
+
+vRtrSrPlcyEgrStatsBindSid        OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyEgrStatsBindSid indicates the binding SID
+         (segment ID) value that opaquely represents the SR policy to upstream
+         routers.
+
+         The vRtrSrPlcyEgrStatsBindSid value 0 indicates that this object is
+         not applicable. The vRtrSrPlcyEgrStatsBindSid is applicable only for
+         SR policies of type 'sr-mpls'."
+    ::= { vRtrSrPlcyEgrStatsEntry 7 }
+
+vRtrSrPlcyEgrStatsPktCnt         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyEgrStatsPktCnt indicates the packet count
+         aggregate of  all forwarding policies."
+    ::= { vRtrSrPlcyEgrStatsEntry 8 }
+
+vRtrSrPlcyEgrStatsByteCnt        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of leaf vRtrSrPlcyEgrStatsByteCnt indicates the byte count
+         aggregate of  all forwarding policies."
+    ::= { vRtrSrPlcyEgrStatsEntry 9 }
+
+vRtrSrMainPlcyTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrMainPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrMainPlcyTable has an entry for each segment routing
+         maintenance policy configured for a virtual router in the system."
+    ::= { vRtrSrPlcyConfigurations 11 }
+
+vRtrSrMainPlcyEntry              OBJECT-TYPE
+    SYNTAX      VRtrSrMainPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a maintenance Policy in
+         the segment routing for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrSrMainPlcyName
+    }
+    ::= { vRtrSrMainPlcyTable 1 }
+
+VRtrSrMainPlcyEntry              ::= SEQUENCE
+{
+    vRtrSrMainPlcyName               TNamedItem,
+    vRtrSrMainPlcyRowStatus          RowStatus,
+    vRtrSrMainPlcyLastChanged        TimeStamp,
+    vRtrSrMainPlcyAdminState         TmnxAdminState,
+    vRtrSrMainPlcyBfdLiveness        TmnxEnabledDisabled,
+    vRtrSrMainPlcyBfdTemplate        TNamedItemOrEmpty,
+    vRtrSrMainPlcyMode               INTEGER,
+    vRtrSrMainPlcyThreshold          Unsigned32,
+    vRtrSrMainPlcyHoldDownTimer      Unsigned32,
+    vRtrSrMainPlcyRevertTimer        Unsigned32,
+    vRtrSrMainPlcyReturnPathLabel    Unsigned32
+}
+
+vRtrSrMainPlcyName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyName specifies the name for the segment
+         routing maintenance policy."
+    ::= { vRtrSrMainPlcyEntry 1 }
+
+vRtrSrMainPlcyRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrMainPlcyEntry 2 }
+
+vRtrSrMainPlcyLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrMainPlcyEntry 3 }
+
+vRtrSrMainPlcyAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyAdminState specifies the administrative
+         state of the segment routing maintenance policy instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrSrMainPlcyEntry 4 }
+
+vRtrSrMainPlcyBfdLiveness        OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyBfdLiveness enables seamless BFD of every segment list
+         of an SR policy candidate  path to which the maintenance policy is
+         applied. BFD session parameters are taken  from the bfd-template
+         configured for the maintenance policy."
+    DEFVAL      { disabled }
+    ::= { vRtrSrMainPlcyEntry 5 }
+
+vRtrSrMainPlcyBfdTemplate        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyBfdTemplate references a named BFD template to be used
+         by LSP BFD."
+    DEFVAL      { "" }
+    ::= { vRtrSrMainPlcyEntry 6 }
+
+vRtrSrMainPlcyMode               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none           (0),
+        ecmp-protected (1),
+        linear         (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyMode specifies the data path programming and protection
+         mechanism  for SR policy candidate paths to which the
+         maintenance-policy is applied."
+    DEFVAL      { none }
+    ::= { vRtrSrMainPlcyEntry 7 }
+
+vRtrSrMainPlcyThreshold          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyThreshold configures the minimum number of S-BFD
+         sessions that must be UP to consider the SR policy candidate path to
+         which  the maintenance template is bound to be UP."
+    DEFVAL      { 1 }
+    ::= { vRtrSrMainPlcyEntry 8 }
+
+vRtrSrMainPlcyHoldDownTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5000)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyHoldDownTimer is intended to prevent bouncing of the
+         sr-policy  path state if one or more S-BFD sessions associated with
+         segment lists  flap so causing the threshold to be repeatedly crossed
+         in a short period of time"
+    DEFVAL      { 0 }
+    ::= { vRtrSrMainPlcyEntry 9 }
+
+vRtrSrMainPlcyRevertTimer        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4320)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "vRtrSrMainPlcyRevertTimer for SR Policy candidate paths is started when the primary path
+         (i.e. the best preference programmed candidate path) recovers
+         (i.e. after the number of SBFD sessions that are up is  >= threshold
+         and the hold-down-time has expired) and switch back when the timer expires."
+    DEFVAL      { 0 }
+    ::= { vRtrSrMainPlcyEntry 10 }
+
+vRtrSrMainPlcyReturnPathLabel    OBJECT-TYPE
+    SYNTAX      Unsigned32 (32..1048512 | 4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrMainPlcyReturnPathLabel indicates the return path
+         label for segment-routing maintenance-policy.
+
+         If the value of vRtrSrMainPlcyReturnPathLabel is default, it means
+         that BFD asynchronous mode is used and no return path MPLS label will
+         be pushed on the BFD packet at the initiator."
+    DEFVAL      { 4294967295 }
+    ::= { vRtrSrMainPlcyEntry 11 }
+
+vRtrSrStPSrv6BindingSidTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrStPSrv6BindingSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrStPSrv6BindingSidTable has an entry for each
+         segment-routing-v6 static-policy binding SID."
+    ::= { vRtrSrPlcyConfigurations 12 }
+
+vRtrSrStPSrv6BindingSidEntry     OBJECT-TYPE
+    SYNTAX      VRtrSrStPSrv6BindingSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a SRv6 static policy
+         binding SID. Binding SID entries can be configured only for static
+         policies with the value of vRtrSrStaticPlcyType set to 'srv6' and the
+         value of vRtrSrStaticPlcySegmentRoutingV6 set to 'true'. Each static
+         policy of type 'srv6' must have binding SID configured before it can
+         be administratively enabled."
+    INDEX       {
+        vRtrID,
+        vRtrSrStaticPlcyName,
+        vRtrSrStPSrv6BindingSidId
+    }
+    ::= { vRtrSrStPSrv6BindingSidTable 1 }
+
+VRtrSrStPSrv6BindingSidEntry     ::= SEQUENCE
+{
+    vRtrSrStPSrv6BindingSidId        Unsigned32,
+    vRtrStPSrv6BindingSidRowStatus   RowStatus,
+    vRtrStPSrv6BindingSidLstChg      TimeStamp,
+    vRtrStPSrv6BindingSidAddrType    InetAddressType,
+    vRtrStPSrv6BindingSidAddr        InetAddress,
+    vRtrStPSrv6BSidLocatorName       TLNamedItemOrEmpty,
+    vRtrStPSrv6BSidLocFunction       INTEGER,
+    vRtrStPSrv6BSidLocFunctionVal    TSrv6FunctionValue,
+    vRtrStPSrv6BSidLocOperFuncVal    TSrv6FunctionValue,
+    vRtrStPSrv6BSidLocFuncOpErrCode  TSrv6FunctionErrorCode,
+    vRtrStPSrv6BSidOperAddrType      InetAddressType,
+    vRtrStPSrv6BSidOperAddr          InetAddress
+}
+
+vRtrSrStPSrv6BindingSidId        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrStPSrv6BindingSidId specifies the index of binding
+         SID. Only one binding SID is supported at this time."
+    ::= { vRtrSrStPSrv6BindingSidEntry 1 }
+
+vRtrStPSrv6BindingSidRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BindingSidRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrSrStPSrv6BindingSidEntry 2 }
+
+vRtrStPSrv6BindingSidLstChg      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BindingSidLstChg indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrSrStPSrv6BindingSidEntry 3 }
+
+vRtrStPSrv6BindingSidAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BindingSidAddrType specifies the type of the
+         binding SID address.
+
+         Binding SID address (vRtrStPSrv6BindingSidAddrType,
+         vRtrStPSrv6BindingSidAddr) and locator (vRtrStPSrv6BSidLocatorName)
+         can't be both configured at the same time."
+    DEFVAL      { unknown }
+    ::= { vRtrSrStPSrv6BindingSidEntry 4 }
+
+vRtrStPSrv6BindingSidAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BindingSidAddr specifies the binding SID for a
+         non-local SRv6 policy.
+
+         vRtrStPSrv6BindingSidAddr must be configured if the head-end of the
+         policy is not the local node.
+
+         Binding SID address (vRtrStPSrv6BindingSidAddrType,
+         vRtrStPSrv6BindingSidAddr) and locator (vRtrStPSrv6BSidLocatorName)
+         can't be both configured at the same time."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStPSrv6BindingSidEntry 5 }
+
+vRtrStPSrv6BSidLocatorName       OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidLocatorName specifies the locator for the
+         static policy.
+
+         If the value of vRtrStPSrv6BSidLocatorName is not default, then an
+         entry must exist in vRtrSrv6LocatorTable in TIMETRA-SRV6-MIB that has
+         value of vRtrSrv6LocatorName equal to value of
+         vRtrStPSrv6BSidLocatorName.
+
+         The value of vRtrStPSrv6BSidLocatorName must be not default when the
+         head-end of the policy is the local node.
+
+         Binding SID address (vRtrStPSrv6BindingSidAddrType,
+         vRtrStPSrv6BindingSidAddr) and locator (vRtrStPSrv6BSidLocatorName)
+         can't be both configured at the same time."
+    DEFVAL      { ''H }
+    ::= { vRtrSrStPSrv6BindingSidEntry 6 }
+
+vRtrStPSrv6BSidLocFunction       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none           (0),
+        endB6EncapsRed (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidLocFunction specifies the function for the
+         locator specified by the value of vRtrStPSrv6BSidLocatorName.
+
+         The vRtrStPSrv6BSidLocFunction can be set to a not default value only
+         when vRtrStPSrv6BSidLocatorName is set to a not default value."
+    DEFVAL      { none }
+    ::= { vRtrSrStPSrv6BindingSidEntry 7 }
+
+vRtrStPSrv6BSidLocFunctionVal    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidLocFunctionVal specifies the function
+         value for the locator specified by the value of
+         vRtrStPSrv6BSidLocatorName.
+
+         If the value is not specified (set to the default) it will be
+         dynamically assigned by the system.  The value of
+         vRtrStPSrv6BSidLocFunctionVal can be not default only when the value of
+         vRtrStPSrv6BSidLocFunction and vRtrStPSrv6BSidLocatorName is not
+         default "
+    DEFVAL      { 0 }
+    ::= { vRtrSrStPSrv6BindingSidEntry 8 }
+
+vRtrStPSrv6BSidLocOperFuncVal    OBJECT-TYPE
+    SYNTAX      TSrv6FunctionValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidLocOperFuncVal indicates the operational
+         value of the locator function, for locator specified by the value of
+         vRtrStPSrv6BSidLocatorName. If the value is equal to 0 it means there
+         is no function value allocated for this locator."
+    ::= { vRtrSrStPSrv6BindingSidEntry 9 }
+
+vRtrStPSrv6BSidLocFuncOpErrCode  OBJECT-TYPE
+    SYNTAX      TSrv6FunctionErrorCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidLocFuncOpErrCode indicates the  error code
+         for the function."
+    ::= { vRtrSrStPSrv6BindingSidEntry 10 }
+
+vRtrStPSrv6BSidOperAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidOperAddrType indicates the type of
+         vRtrStPSrv6BSidOperAddr."
+    ::= { vRtrSrStPSrv6BindingSidEntry 11 }
+
+vRtrStPSrv6BSidOperAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStPSrv6BSidOperAddr indicates the operational value
+         of the SRv6 binding SID."
+    ::= { vRtrSrStPSrv6BindingSidEntry 12 }
+
+vRtrSrPlcyPathBSidTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSrPlcyPathBSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSrPlcyPathBSidTable has an entry for SR path binding SID."
+    ::= { vRtrSrPlcyConfigurations 13 }
+
+vRtrSrPlcyPathBSidEntry          OBJECT-TYPE
+    SYNTAX      VRtrSrPlcyPathBSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents SR path binding SID."
+    INDEX       {
+        vRtrID,
+        vRtrSrPlcyPathHeadEndAddrType,
+        vRtrSrPlcyPathHeadEndAddr,
+        vRtrSrPlcyPathColor,
+        vRtrSrPlcyPathEndPtAddrType,
+        vRtrSrPlcyPathEndPtAddr,
+        vRtrSrPlcyPathOwner,
+        vRtrSrPlcyPathPreference,
+        vRtrSrPlcyPathDistinguisher,
+        vRtrSrPlcyPathBSidIndex
+    }
+    ::= { vRtrSrPlcyPathBSidTable 1 }
+
+VRtrSrPlcyPathBSidEntry          ::= SEQUENCE
+{
+    vRtrSrPlcyPathBSidIndex          Unsigned32,
+    vRtrSrPlcyPathBSidSRv6AddrType   InetAddressType,
+    vRtrSrPlcyPathBSidSRv6Addr       InetAddress
+}
+
+vRtrSrPlcyPathBSidIndex          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathBSidIndex specifies the binding SID index."
+    ::= { vRtrSrPlcyPathBSidEntry 1 }
+
+vRtrSrPlcyPathBSidSRv6AddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathBSidSRv6AddrType specifies the type of
+         vRtrSrPlcyPathBSidSRv6Addr."
+    ::= { vRtrSrPlcyPathBSidEntry 2 }
+
+vRtrSrPlcyPathBSidSRv6Addr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSrPlcyPathBSidSRv6Addr specifies the SRv6 binding
+         SID."
+    ::= { vRtrSrPlcyPathBSidEntry 3 }
+
+vRtrSrPolicyConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 120 }
+
+vRtrSrPolicyCompliances          OBJECT IDENTIFIER ::= { vRtrSrPolicyConformance 1 }
+
+vRtrSrPolicyCompliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of segment routing (SR)
+         policies on Nokia SROS series systems 16.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            vRtrSrPolicySysGroup,
+            vRtrSrPolicyStatsGroup,
+            vRtrSrStaticPolicyGroup,
+            vRtrSrStaticPolicySegListGroup,
+            vRtrSrStaticPolicySegGroup,
+            vRtrSrPolicySysOperGroup,
+            vRtrSrPlcyPathGroup,
+            vRtrSrPlcyPathSegListGroup,
+            vRtrSrPlcyIngrStatsGroup,
+            vRtrSrPlcyEgrStatsGroup,
+            vRtrSrMainPlcyGroup
+        }
+    ::= { vRtrSrPolicyCompliances 1 }
+
+vRtrSrPolicyComplianceV22v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for segment routing (SR) policy features
+         added in release R22.X on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            vRtrSrv6StaticPolicyGroup,
+            vRtrSrStaticPlcyFrrGroup,
+            vRtrSrMainPlcyReturnPathLabelGrp
+        }
+    ::= { vRtrSrPolicyCompliances 2 }
+
+vRtrSrPolicyComplianceV23v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for segment routing (SR) policy features
+         added in release R23.X on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            vRtrSrStPlcySrv6RetPthBfdSidGrp
+        }
+    ::= { vRtrSrPolicyCompliances 3 }
+
+vRtrSrPolicyGroups               OBJECT IDENTIFIER ::= { vRtrSrPolicyConformance 2 }
+
+vRtrSrPolicySysGroup             OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcySysTblLstChg,
+        vRtrSrPlcySysLastChanged,
+        vRtrSrPlcySysAdminState,
+        vRtrSrPlcySysLabelBlkName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 1 }
+
+vRtrSrPolicyStatsGroup           OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyStatsTblLstChg,
+        vRtrSrPlcyStatsRowStatus,
+        vRtrSrPlcyStatsLastChanged,
+        vRtrSrPlcyStatsAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy statistics
+         on Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 2 }
+
+vRtrSrStaticPolicyGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStaticPlcyTblLstChg,
+        vRtrSrStaticPlcyRowStatus,
+        vRtrSrStaticPlcyLastChanged,
+        vRtrSrStaticPlcyAdminState,
+        vRtrSrStaticPlcyColor,
+        vRtrSrStaticPlcyEndPtAddrType,
+        vRtrSrStaticPlcyEndPtAddr,
+        vRtrSrStaticPlcyHeadEndAddrType,
+        vRtrSrStaticPlcyHeadEndAddr,
+        vRtrSrStaticPlcyPreference,
+        vRtrSrStaticPlcyBindSid,
+        vRtrSrStaticPlcyDistinguisher,
+        vRtrSrStaticPlcyColorSet
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Static Policy on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 3 }
+
+vRtrSrStaticPolicySegListGroup   OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStPlcySegListTblLstChg,
+        vRtrSrStPlcySegListRowStatus,
+        vRtrSrStPlcySegListLastChanged,
+        vRtrSrStPlcySegListAdminState,
+        vRtrSrStPlcySegListWeight
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in  segment routing Static Policy
+         segment lists on Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 4 }
+
+vRtrSrStaticPolicySegGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStPlcySegTblLstChg,
+        vRtrSrStPlcySegRowStatus,
+        vRtrSrStPlcySegLastChanged,
+        vRtrSrStPlcySegMplsLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in  segment routing Static Policy
+         segment lists on Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 5 }
+
+vRtrSrPolicySysOperGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyTTMPref,
+        vRtrSrPlcyTotBSIDAlloc,
+        vRtrSrPlcyTotStaticLocalPol,
+        vRtrSrPlcyTotActStaticLocalPol,
+        vRtrSrPlcyTotStaticNonLocalPol,
+        vRtrSrPlcyTotBgpPol,
+        vRtrSrPlcyTotActBgpPol
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 6 }
+
+vRtrSrPlcyPathGroup              OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyPathLastChanged,
+        vRtrSrPlcyPathTunnelId,
+        vRtrSrPlcyPathActiveState,
+        vRtrSrPlcyPathAge,
+        vRtrSrPlcyPathNumReEval,
+        vRtrSrPlcyPathNumActPathCh,
+        vRtrSrPlcyPathLastReEvalReason,
+        vRtrSrPlcyPathBindSid,
+        vRtrSrPlcyPathOriginAddrType,
+        vRtrSrPlcyPathOriginAddr,
+        vRtrSrPlcyPathOriginASN
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 7 }
+
+vRtrSrPlcyPathSegListGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyPathSLLastChanged,
+        vRtrSrPlcyPathSLWeight,
+        vRtrSrPlcyPathSLNumSegments,
+        vRtrSrPlcyPathSLSeg1Label,
+        vRtrSrPlcyPathSLSeg1State,
+        vRtrSrPlcyPathSLSeg2Label,
+        vRtrSrPlcyPathSLSeg2State,
+        vRtrSrPlcyPathSLSeg3Label,
+        vRtrSrPlcyPathSLSeg3State,
+        vRtrSrPlcyPathSLSeg4Label,
+        vRtrSrPlcyPathSLSeg4State,
+        vRtrSrPlcyPathSLSeg5Label,
+        vRtrSrPlcyPathSLSeg5State,
+        vRtrSrPlcyPathSLSeg6Label,
+        vRtrSrPlcyPathSLSeg6State,
+        vRtrSrPlcyPathSLSeg7Label,
+        vRtrSrPlcyPathSLSeg7State,
+        vRtrSrPlcyPathSLSeg8Label,
+        vRtrSrPlcyPathSLSeg8State,
+        vRtrSrPlcyPathSLSeg9Label,
+        vRtrSrPlcyPathSLSeg9State,
+        vRtrSrPlcyPathSLSeg10Label,
+        vRtrSrPlcyPathSLSeg10State,
+        vRtrSrPlcyPathSLSeg11Label,
+        vRtrSrPlcyPathSLSeg11State,
+        vRtrSrPlcyPathSLSeg9State
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 8 }
+
+vRtrSrPlcyIngrStatsGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyIngrStatsTunnelId,
+        vRtrSrPlcyIngrStatsBindSid,
+        vRtrSrPlcyIngrStatsPktCnt,
+        vRtrSrPlcyIngrStatsByteCnt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 16.0 release."
+    ::= { vRtrSrPolicyGroups 9 }
+
+vRtrSrPlcyEgrStatsGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrPlcyEgrStatsTunnelId,
+        vRtrSrPlcyEgrStatsBindSid,
+        vRtrSrPlcyEgrStatsPktCnt,
+        vRtrSrPlcyEgrStatsByteCnt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing supporting Policy system on
+         Nokia SROS series systems 19.0 release."
+    ::= { vRtrSrPolicyGroups 10 }
+
+vRtrSrMainPlcyGroup              OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrMainPlcyTblLstChg,
+        vRtrSrMainPlcyRowStatus,
+        vRtrSrMainPlcyLastChanged,
+        vRtrSrMainPlcyAdminState,
+        vRtrSrMainPlcyBfdLiveness,
+        vRtrSrMainPlcyBfdTemplate,
+        vRtrSrMainPlcyMode,
+        vRtrSrMainPlcyThreshold,
+        vRtrSrMainPlcyHoldDownTimer,
+        vRtrSrMainPlcyRevertTimer,
+        vRtrSrStaticPlcyMainPlcyName,
+        vRtrSrPlcyPathSLSBfdState,
+        vRtrSrPlcyPathSLSBfdTransitions,
+        vRtrSrPlcyPathMainPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in segment routing maintenance Policy system on
+         Nokia SROS series systems 20.0 release."
+    ::= { vRtrSrPolicyGroups 11 }
+
+vRtrSrv6StaticPolicyGroup        OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStaticPlcyType,
+        vRtrSrStPlcySegSrv6SidAddrType,
+        vRtrSrStPlcySegSrv6SidAddr,
+        vRtrSrStPSrv6BindingSidTblLstChg,
+        vRtrStPSrv6BindingSidRowStatus,
+        vRtrStPSrv6BindingSidLstChg,
+        vRtrStPSrv6BindingSidAddrType,
+        vRtrStPSrv6BindingSidAddr,
+        vRtrStPSrv6BSidLocatorName,
+        vRtrStPSrv6BSidLocFunction,
+        vRtrStPSrv6BSidLocFunctionVal,
+        vRtrStPSrv6BSidLocOperFuncVal,
+        vRtrStPSrv6BSidLocFuncOpErrCode,
+        vRtrStPSrv6BSidOperAddrType,
+        vRtrStPSrv6BSidOperAddr,
+        vRtrSrStaticPlcySegmentRoutingV6,
+        vRtrSrPlcyPathType,
+        vRtrSrPlcyPathSLSeg1SidAddrType,
+        vRtrSrPlcyPathSLSeg1SidAddr,
+        vRtrSrPlcyPathSLSeg2SidAddrType,
+        vRtrSrPlcyPathSLSeg2SidAddr,
+        vRtrSrPlcyPathSLSeg3SidAddrType,
+        vRtrSrPlcyPathSLSeg3SidAddr,
+        vRtrSrPlcyPathSLSeg4SidAddrType,
+        vRtrSrPlcyPathSLSeg4SidAddr,
+        vRtrSrPlcyPathSLSeg5SidAddrType,
+        vRtrSrPlcyPathSLSeg5SidAddr,
+        vRtrSrPlcyPathSLSeg6SidAddrType,
+        vRtrSrPlcyPathSLSeg6SidAddr,
+        vRtrSrPlcyPathSLSeg7SidAddrType,
+        vRtrSrPlcyPathSLSeg7SidAddr,
+        vRtrSrPlcyPathSLSeg8SidAddrType,
+        vRtrSrPlcyPathSLSeg8SidAddr,
+        vRtrSrPlcyPathSLSeg9SidAddrType,
+        vRtrSrPlcyPathSLSeg9SidAddr,
+        vRtrSrPlcyPathSLSeg10SidAddrType,
+        vRtrSrPlcyPathSLSeg10SidAddr,
+        vRtrSrPlcyPathSLSeg11SidAddrType,
+        vRtrSrPlcyPathSLSeg11SidAddr,
+        vRtrSrPlcyPathBSidSRv6AddrType,
+        vRtrSrPlcyPathBSidSRv6Addr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment routing v6 static policy on
+         Nokia SROS series systems."
+    ::= { vRtrSrPolicyGroups 12 }
+
+vRtrSrStaticPlcyFrrGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStaticPlcyPrefTransFrr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting sr-policy prefer-transport-frr on
+         Nokia SROS series systems."
+    ::= { vRtrSrPolicyGroups 13 }
+
+vRtrSrMainPlcyReturnPathLabelGrp OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrMainPlcyReturnPathLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment-routing maintenance-policy
+         return-path-label on Nokia SROS series systems."
+    ::= { vRtrSrPolicyGroups 14 }
+
+vRtrSrStPlcySrv6RetPthBfdSidGrp  OBJECT-GROUP
+    OBJECTS     {
+        vRtrSrStPlcySrv6RetPathBfdSidT,
+        vRtrSrStPlcySrv6RetPathBfdSid,
+        vRtrSrPathSrv6RetPathBfdSidT,
+        vRtrSrPathSrv6RetPathBfdSid
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment-routing static-policy BFD
+         return path SRv6 SID on Nokia SROS series systems."
+    ::= { vRtrSrPolicyGroups 16 }
+
+END

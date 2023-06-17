@@ -1,0 +1,779 @@
+TIMETRA-RPKI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressPrefixLength,
+    InetAddressType,
+    InetAutonomousSystemNumber
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, RowStatus, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    BgpConnectRetryTime, BgpHoldTime,
+    TmnxAdminState, TmnxVRtrID
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraRpkiOriginValidMIBModule  MODULE-IDENTITY
+    LAST-UPDATED "201403100000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of origin validation for rpki session.
+
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201403100000Z"
+    DESCRIPTION
+        "Rev 0.1                10 March 2014 00:00
+         Initial version of the TIMETRA-RPKI-MIB."
+
+    ::= { timetraSRMIBModules 96 }
+
+tmnxRpkiObjs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 96 }
+
+vRtrRpkiSessInstanceTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrRpkiSessInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vRtrRpkiSessInstanceTable consists of information about each running
+         instance of Rpki-Session."
+    ::= { tmnxRpkiObjs 1 }
+
+vRtrRpkiSessInstanceEntry        OBJECT-TYPE
+    SYNTAX      VRtrRpkiSessInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the vRtrRpkiSessInstanceTable. Each entry
+         represents an instance of Rpki-Session running on the virtual router."
+    INDEX       {
+        vRtrID,
+        vRtrRpkiSessInstanceAddressType,
+        vRtrRpkiSessInstanceAddress
+    }
+    ::= { vRtrRpkiSessInstanceTable 1 }
+
+VRtrRpkiSessInstanceEntry        ::= SEQUENCE
+{
+    vRtrRpkiSessInstanceAddressType  InetAddressType,
+    vRtrRpkiSessInstanceAddress      InetAddress,
+    vRtrRpkiSessInstanceRowStatus    RowStatus,
+    vRtrRpkiSessInstanceConnectRetry BgpConnectRetryTime,
+    vRtrRpkiSessInstanceDescription  DisplayString,
+    vRtrRpkiSessInstanceHoldTime     BgpHoldTime,
+    vRtrRpkiSessLocalAddressType     InetAddressType,
+    vRtrRpkiSessLocalAddress         InetAddress,
+    vRtrRpkiSessInstancePort         Unsigned32,
+    vRtrRpkiSessInstanceRefreshTime  Unsigned32,
+    vRtrRpkiSessInstanceAdminState   TmnxAdminState,
+    vRtrRpkiSessInstanceStaleRoutTim Unsigned32,
+    vRtrRpkiSessInstanceSessionState INTEGER,
+    vRtrRpkiSessInstanceSessionFlaps Unsigned32,
+    vRtrRpkiSessInstanceUptime       TimeStamp,
+    vRtrRpkiSessInstanceActIpv4Rec   Unsigned32,
+    vRtrRpkiSessInstanceActIpv6Rec   Unsigned32,
+    vRtrRpkiSessInstanceSerialId     Unsigned32,
+    vRtrRpkiSessInstanceSessionId    Unsigned32,
+    vRtrRpkiSessInstanceLastChange   TimeStamp
+}
+
+vRtrRpkiSessInstanceAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceAddressType indicates the IP address
+         type of the RPKI session configuration.
+
+         vRtrRpkiSessInstanceAddressType supports InetAddressType values 'ipv4
+         (1)','ipv6 (2)' and 'ipv6z(4)'."
+    ::= { vRtrRpkiSessInstanceEntry 1 }
+
+vRtrRpkiSessInstanceAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16|20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceAddress indicates the IPv4,IPv6 or a
+         link local address of a local cache server."
+    ::= { vRtrRpkiSessInstanceEntry 2 }
+
+vRtrRpkiSessInstanceRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceRowStatus specifies the row status
+         for this RPKI instance for the virtual router. It is used to create
+         and delete row entries in this table."
+    ::= { vRtrRpkiSessInstanceEntry 3 }
+
+vRtrRpkiSessInstanceConnectRetry OBJECT-TYPE
+    SYNTAX      BgpConnectRetryTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceConnectRetry specifies the value (in
+         seconds) for the RPKI Connect Retry timer."
+    REFERENCE
+        "BGP4-MIB.bgpPeerConnectRetryInterval"
+    DEFVAL      { 120 }
+    ::= { vRtrRpkiSessInstanceEntry 4 }
+
+vRtrRpkiSessInstanceDescription  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceDescription specifies the textual
+         description of this RPKI instance."
+    DEFVAL      { ''H }
+    ::= { vRtrRpkiSessInstanceEntry 5 }
+
+vRtrRpkiSessInstanceHoldTime     OBJECT-TYPE
+    SYNTAX      BgpHoldTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceHoldTime specifies the length of time
+         in seconds that the session is to be considered UP without any
+         indication that the cache server is alive and reachable.
+
+         The default value of vRtrRpkiSessInstanceHoldTime is 600 seconds and
+         must be set to a value at least 2 times the value of
+         vRtrRpkiSessInstanceRefreshTime.
+
+         When object vRtrRpkiSessInstanceHoldTime is set, object
+         vRtrRpkiSessInstanceRefreshTime needs to be set as well.
+
+         Reception of any PDU from the cache server resets the hold timer. When
+         the hold-time expires the session is considered to be DOWN and the
+         stale timer is started."
+    DEFVAL      { 600 }
+    ::= { vRtrRpkiSessInstanceEntry 6 }
+
+vRtrRpkiSessLocalAddressType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessLocalAddressType specifies the type of
+         vRtrRpkiSessLocalAddress."
+    DEFVAL      { unknown }
+    ::= { vRtrRpkiSessInstanceEntry 7 }
+
+vRtrRpkiSessLocalAddress         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessLocalAddress specifies the address of the local
+         end of the Rpki session. In order for Rpki to function at least one
+         peer must be configured.  This address is used to validate incoming
+         connections to the peer and to establish connections to the remote peer.
+
+         The default value of vRtrRpkiSessLocalAddress is the system IP
+         address."
+    DEFVAL      { ''H }
+    ::= { vRtrRpkiSessInstanceEntry 8 }
+
+vRtrRpkiSessInstancePort         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstancePort specifies the destination port
+         number to be used to connect the cache server. The default port number
+         is 323."
+    DEFVAL      { 323 }
+    ::= { vRtrRpkiSessInstanceEntry 9 }
+
+vRtrRpkiSessInstanceRefreshTime  OBJECT-TYPE
+    SYNTAX      Unsigned32 (30..32767)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceRefreshTime triggers the sending of
+         periodic Serial Query PDUs for purposes of liveness detection.
+
+         The default value of vRtrRpkiSessInstanceRefreshTime is 300 seconds.
+         and is reset whenever a Reset Query or Serial Query PDU is sent to the
+         cache server. When the timer expires a new Serial Query PDU is sent
+         with the last known serial number.
+
+         When object vRtrRpkiSessInstanceRefreshTime is set, object
+         vRtrRpkiSessInstanceHoldTime needs to be set as well."
+    DEFVAL      { 300 }
+    ::= { vRtrRpkiSessInstanceEntry 10 }
+
+vRtrRpkiSessInstanceAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceAdminState specifies the
+         administrative state of Rpki session in this virtual router instance."
+    DEFVAL      { outOfService }
+    ::= { vRtrRpkiSessInstanceEntry 11 }
+
+vRtrRpkiSessInstanceStaleRoutTim OBJECT-TYPE
+    SYNTAX      Unsigned32 (60..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceStaleRoutTim specifies the maximum
+         length of time that prefix origin records learned from the cache
+         server remain valid after the session with the cache server goes down.
+
+         The default value of vRtrRpkiSessInstanceStaleRoutTim is 3600 seconds
+         (1 hour). When the timer expires all remaining stale entries
+         associated with the session are deleted."
+    DEFVAL      { 3600 }
+    ::= { vRtrRpkiSessInstanceEntry 12 }
+
+vRtrRpkiSessInstanceSessionState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle        (0),
+        connect     (1),
+        established (2),
+        cleanup     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceSessionState indicates the current
+         state of a particular session."
+    ::= { vRtrRpkiSessInstanceEntry 13 }
+
+vRtrRpkiSessInstanceSessionFlaps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceSessionFlaps indicates the number of
+         times the session has transitioned from 'established' state to 'idle'
+         state."
+    ::= { vRtrRpkiSessInstanceEntry 14 }
+
+vRtrRpkiSessInstanceUptime       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceUptime indicates the time since this
+         session is active."
+    ::= { vRtrRpkiSessInstanceEntry 15 }
+
+vRtrRpkiSessInstanceActIpv4Rec   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceActIpv4Rec indicates the number of
+         active, non-withdrawn IPv4 records."
+    ::= { vRtrRpkiSessInstanceEntry 16 }
+
+vRtrRpkiSessInstanceActIpv6Rec   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceActIpv6Rec indicates the number of
+         active, non-withdrawn IPv6 records."
+    ::= { vRtrRpkiSessInstanceEntry 17 }
+
+vRtrRpkiSessInstanceSerialId     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceSerialId indicates the serial id
+         associated with this session."
+    ::= { vRtrRpkiSessInstanceEntry 18 }
+
+vRtrRpkiSessInstanceSessionId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceSessionId indicates the session id of
+         this session."
+    ::= { vRtrRpkiSessInstanceEntry 19 }
+
+vRtrRpkiSessInstanceLastChange   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrRpkiSessInstanceLastChange indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrRpkiSessInstanceEntry 20 }
+
+vRtrOriginValStaticTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrOriginValStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vRtrOriginValStaticTable consists of information about static-entry
+         under origin-validation. A static-entry can express validity or
+         invalidity information about an entry."
+    ::= { tmnxRpkiObjs 2 }
+
+vRtrOriginValStaticEntry         OBJECT-TYPE
+    SYNTAX      VRtrOriginValStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the vRtrOriginValStaticTable.Each entry
+         represents a static-entry about the AS numbers that are authorized to
+         originate routes for different prefixes."
+    INDEX       {
+        vRtrID,
+        vRtrOrigValStaticIpPrefixType,
+        vRtrOrigValStaticIpPrefix,
+        vRtrOrigValStaticMinPrefixLen,
+        vRtrOrigValStaticMaxPrefixLen,
+        vRtrOrigValStaticAS4Byte
+    }
+    ::= { vRtrOriginValStaticTable 1 }
+
+VRtrOriginValStaticEntry         ::= SEQUENCE
+{
+    vRtrOrigValStaticIpPrefixType    InetAddressType,
+    vRtrOrigValStaticIpPrefix        InetAddress,
+    vRtrOrigValStaticMinPrefixLen    InetAddressPrefixLength,
+    vRtrOrigValStaticMaxPrefixLen    InetAddressPrefixLength,
+    vRtrOrigValStaticAS4Byte         InetAutonomousSystemNumber,
+    vRtrOrigValStaticRowStatus       RowStatus,
+    vRtrOrigValStaticASValidity      TruthValue
+}
+
+vRtrOrigValStaticIpPrefixType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticIpPrefixType specifies the address type
+         of vRtrOrigValStaticIpPrefix address."
+    ::= { vRtrOriginValStaticEntry 1 }
+
+vRtrOrigValStaticIpPrefix        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticIpPrefix specifies the IP address prefix
+         to match for the origin validation."
+    DEFVAL      { ''H }
+    ::= { vRtrOriginValStaticEntry 2 }
+
+vRtrOrigValStaticMinPrefixLen    OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticMinPrefixLen specifies the min value of
+         the prefix length for vRtrOrigValStaticIpPrefix, to match for the
+         aggregation."
+    DEFVAL      { 0 }
+    ::= { vRtrOriginValStaticEntry 3 }
+
+vRtrOrigValStaticMaxPrefixLen    OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticMaxPrefixLen specifies the max value of
+         the prefix length for vRtrOrigValStaticIpPrefix, to match for the
+         aggregation."
+    DEFVAL      { 0 }
+    ::= { vRtrOriginValStaticEntry 4 }
+
+vRtrOrigValStaticAS4Byte         OBJECT-TYPE
+    SYNTAX      InetAutonomousSystemNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticAS4Byte specifies the autonomous system
+         number to be advertised to this peer."
+    DEFVAL      { 0 }
+    ::= { vRtrOriginValStaticEntry 5 }
+
+vRtrOrigValStaticRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticRowStatus specifies the row status for
+         this static entry instance for the virtual router. It is used to
+         create and delete row entries in this table."
+    ::= { vRtrOriginValStaticEntry 6 }
+
+vRtrOrigValStaticASValidity      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValStaticASValidity specifies whether the route
+         entry corresponding to the autonomous number is valid (true) or
+         invalid (false)."
+    DEFVAL      { true }
+    ::= { vRtrOriginValStaticEntry 7 }
+
+vRtrOriginValRouteTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrOriginValRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vRtrOriginValRouteTable consists of information about the route
+         database which includes both static and dynamic route information
+         under origin-validation rpki."
+    ::= { tmnxRpkiObjs 3 }
+
+vRtrOriginValRouteEntry          OBJECT-TYPE
+    SYNTAX      VRtrOriginValRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the vRtrOriginValRouteTable. Each entry
+         represents the AS numbers that are authorized to originate routes for
+         different prefixes. Entries cannot be created or deleted via a SNMP
+         SET operation."
+    INDEX       {
+        vRtrID,
+        vRtrOrigValRouteIpPrefixType,
+        vRtrOrigValRouteIpPrefix,
+        vRtrOrigValRouteMinPrefixLen,
+        vRtrOrigValRouteMaxPrefixLen,
+        vRtrOrigValRouteAS4Byte,
+        vRtrOrigValRouteType,
+        vRtrOrigValRouteRpkiVrId,
+        vRtrOrigValRouteRpkiAddrType,
+        vRtrOrigValRouteRpkiAddress
+    }
+    ::= { vRtrOriginValRouteTable 1 }
+
+VRtrOriginValRouteEntry          ::= SEQUENCE
+{
+    vRtrOrigValRouteIpPrefixType     InetAddressType,
+    vRtrOrigValRouteIpPrefix         InetAddress,
+    vRtrOrigValRouteMinPrefixLen     InetAddressPrefixLength,
+    vRtrOrigValRouteMaxPrefixLen     InetAddressPrefixLength,
+    vRtrOrigValRouteAS4Byte          InetAutonomousSystemNumber,
+    vRtrOrigValRouteType             INTEGER,
+    vRtrOrigValRouteRpkiVrId         TmnxVRtrID,
+    vRtrOrigValRouteRpkiAddrType     InetAddressType,
+    vRtrOrigValRouteRpkiAddress      InetAddress,
+    vRtrOrigValASRouteValidity       TruthValue
+}
+
+vRtrOrigValRouteIpPrefixType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteIpPrefixType specify the address type of
+         vRtrOrigValRouteIpPrefix address."
+    ::= { vRtrOriginValRouteEntry 1 }
+
+vRtrOrigValRouteIpPrefix         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteIpPrefix specify the IP address prefix to
+         match for the origin validation."
+    ::= { vRtrOriginValRouteEntry 2 }
+
+vRtrOrigValRouteMinPrefixLen     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteMinPrefixLen specify the min value of the
+         prefix length for vRtrOrigValRouteIpPrefix, to match for the
+         aggregation."
+    ::= { vRtrOriginValRouteEntry 3 }
+
+vRtrOrigValRouteMaxPrefixLen     OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteMaxPrefixLen specify the max value of the
+         prefix length for vRtrOrigValRouteIpPrefix, to match for the
+         aggregation."
+    ::= { vRtrOriginValRouteEntry 4 }
+
+vRtrOrigValRouteAS4Byte          OBJECT-TYPE
+    SYNTAX      InetAutonomousSystemNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteAS4Byte specify the autonomous system
+         number to be advertised to this peer."
+    ::= { vRtrOriginValRouteEntry 5 }
+
+vRtrOrigValRouteType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        static  (1),
+        dynamic (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrOrigValRouteType is an enumerated value that specifies whether
+         type of the route entry is static or dynamic."
+    ::= { vRtrOriginValRouteEntry 6 }
+
+vRtrOrigValRouteRpkiVrId         OBJECT-TYPE
+    SYNTAX      TmnxVRtrID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteRpkiVrId specify if the type of the Rpki
+         Session is base or management."
+    ::= { vRtrOriginValRouteEntry 7 }
+
+vRtrOrigValRouteRpkiAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteRpkiAddrType specify the type of
+         vRtrRpkiSessLocalAddress."
+    ::= { vRtrOriginValRouteEntry 8 }
+
+vRtrOrigValRouteRpkiAddress      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16|20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValRouteRpkiAddress specify the address of the
+         local end of the Rpki session. In order for Rpki to function at least
+         one peer must be configured.  This address is used to validate incoming
+         connections to the peer and to establish connections to the remote peer.
+
+         When the value of vRtrOrigValRouteType is static the value of
+         vRtrOrigValRouteRpkiAddress is null."
+    ::= { vRtrOriginValRouteEntry 9 }
+
+vRtrOrigValASRouteValidity       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrOrigValASRouteValidity indicates whether the route
+         entry corresponding to the autonomous number is valid (true) or
+         invalid (false) if the route is static. Default value for this object
+         is valid(true)."
+    ::= { vRtrOriginValRouteEntry 10 }
+
+tmnxRpkiNotificationObjs         OBJECT IDENTIFIER ::= { tmnxRpkiObjs 4 }
+
+tmnxRpkiPeerAddrType             OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRpkiPeerAddrType indicates the type of address for
+         the BGP peer represented by tmnxRpkiPeerAddr."
+    ::= { tmnxRpkiNotificationObjs 1 }
+
+tmnxRpkiPeerAddr                 OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRpkiPeerAddr indicates the address for the Rpki peer."
+    ::= { tmnxRpkiNotificationObjs 2 }
+
+tmnxRpkiErrorType                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        holdTimerExpired     (1),
+        tcpConnectionFailure (2),
+        sessionIdMismatch    (3),
+        fatalErrorCode       (4),
+        sessionEstablished   (5),
+        adminDown            (6)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRpkiErrorType indicates the type of the error message
+         seen on the Rpki session."
+    ::= { tmnxRpkiNotificationObjs 3 }
+
+tmnxRpkiTrapStatus               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRpkiTrapStatus indicates the state of the trap."
+    ::= { tmnxRpkiNotificationObjs 4 }
+
+tmnxRpkiConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 96 }
+
+tmnxRpkiCompliances              OBJECT IDENTIFIER ::= { tmnxRpkiConformance 1 }
+
+tmnxOriginValidV12v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of origin validation instances
+         on Nokia SROS series systems release R12.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxRpkiOriginValidGroup,
+            tmnxRpkiNotificationGroup
+        }
+    ::= { tmnxRpkiCompliances 1 }
+
+tmnxRpkiGroups                   OBJECT IDENTIFIER ::= { tmnxRpkiConformance 2 }
+
+tmnxRpkiOriginValidGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrRpkiSessInstanceRowStatus,
+        vRtrRpkiSessInstanceConnectRetry,
+        vRtrRpkiSessInstanceDescription,
+        vRtrRpkiSessInstanceHoldTime,
+        vRtrRpkiSessLocalAddressType,
+        vRtrRpkiSessLocalAddress,
+        vRtrRpkiSessInstancePort,
+        vRtrRpkiSessInstanceRefreshTime,
+        vRtrRpkiSessInstanceAdminState,
+        vRtrRpkiSessInstanceStaleRoutTim,
+        vRtrRpkiSessInstanceSessionState,
+        vRtrRpkiSessInstanceSessionFlaps,
+        vRtrRpkiSessInstanceUptime,
+        vRtrRpkiSessInstanceActIpv4Rec,
+        vRtrRpkiSessInstanceActIpv6Rec,
+        vRtrOrigValStaticRowStatus,
+        vRtrOrigValStaticASValidity,
+        vRtrOrigValASRouteValidity,
+        vRtrRpkiSessInstanceSerialId,
+        vRtrRpkiSessInstanceSessionId,
+        vRtrRpkiSessInstanceLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the management of RPKI
+         session in version 12.0 of Nokia SROS series systems."
+    ::= { tmnxRpkiGroups 1 }
+
+tmnxRpkiNotifyObjsGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxRpkiErrorType,
+        tmnxRpkiPeerAddr,
+        tmnxRpkiPeerAddrType,
+        tmnxRpkiTrapStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting extended MPLS notifications on Nokia
+         SROS series systems."
+    ::= { tmnxRpkiGroups 2 }
+
+tmnxRpkiNotificationGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxRpkiNotifySession,
+        tmnxRpkiStaleTimerExpiry
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the RPKI feature on Nokia SROS
+         series systems 12.0 Release."
+    ::= { tmnxRpkiGroups 3 }
+
+tmnxRpkiNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 96 }
+
+tmnxRpkiNotifications            OBJECT IDENTIFIER ::= { tmnxRpkiNotifyPrefix 0 }
+
+tmnxRpkiNotifySession            NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxRpkiPeerAddrType,
+        tmnxRpkiPeerAddr,
+        tmnxRpkiErrorType,
+        tmnxRpkiTrapStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tmnxRpkiNotifySession notification is generated when a rpki
+         session either comes up or goes down. Possible reasons for this to
+         happen is listed below:
+          (a) a session goes down due to hold-timer expiry.
+          (b) a session goes down due to failure of the TCP connection.
+          (c) a session goes down due to session ID mismatch.
+          (d) a session goes down due to sent or received Error Report PDU
+          containing fatal error code
+          (e) a session comes up (established state)
+
+          [EFFECT] This may remove the routes learned from a particular
+          rpki server if session goes down. Or start learning routes
+          from a rpki session which was newly established.
+
+          [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxRpkiNotifications 1 }
+
+tmnxRpkiStaleTimerExpiry         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxRpkiPeerAddrType,
+        tmnxRpkiPeerAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] This notification is generated when a stale timer expires. The
+         stale timer expires due to the following reasons:
+           1) The peer goes down, and never comes up within the  stale timer
+           interval
+           2) Peer goes down and comes back up and refreshes the databases. The
+           stale timer is expired to remove unrefreshed entries in the database.
+           3) The peer goes down and comes back again and again goes down before
+           refreshing any entries. Here again the stale timer is expired due to
+           unstable connection.
+           4) The RPKI server sends a Cache Reset in response to a Serial Query
+           instead of doing an incremental update.
+          [EFFECT]  This may remove the routes learned from a particular
+          rpki server if session goes down. Or start learning routes
+          from a rpki session which was newly established.
+
+          [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxRpkiNotifications 2 }
+
+END

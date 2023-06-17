@@ -1,0 +1,1642 @@
+ALU-IP-TRANSPORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                        FROM SNMPv2-CONF
+
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Unsigned32,
+        Counter32, Counter64                      FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, RowStatus,
+        TimeStamp, DisplayString                  FROM SNMPv2-TC
+
+        aluSARMIBModules, aluSARObjs,
+        aluSARConfs, aluSARNotifyPrefix           FROM ALU-SAR-GLOBAL-MIB
+
+        InetAddress, InetAddressType              FROM INET-ADDRESS-MIB
+
+        TmnxCustId, TmnxServId, TmnxPortID,
+        TItemDescription, TLNamedItemOrEmpty,
+        TmnxAdminState, TmnxEnabledDisabled,
+        TTcpUdpPort, TmnxOperState,
+        TDSCPName, TFCName, TProfile,
+        TmnxActionType                            FROM TIMETRA-TC-MIB
+
+        svcId, svcBaseInfoEntry                   FROM TIMETRA-SERV-MIB
+        ;
+
+aluIpTransportMIBModule MODULE-IDENTITY
+        LAST-UPDATED "201602010000Z"
+        ORGANIZATION "Nokia"
+        CONTACT-INFO
+            "Nokia 7705 Support
+             Web: http://support.nokia.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        IP Transport components of the Nokia 7705 device.
+
+        Copyright (c) 2016-2018 Nokia. All rights reserved.
+        Reproduction of this document is authorized on the condition that the
+        foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property. Nokia retains all title
+        and ownership in the Specification, including any revisions.
+
+        Nokia grants all interested parties a non-exclusive license to
+        use and distribute an unmodified copy of this Specification in
+        connection with management of Nokia products, and without fee,
+        provided this copyright notice and license appear on all copies.
+
+        This Specification is supplied `as is', and Nokia makes no
+        warranty, either express or implied, as to the use, operation,
+        condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION                 "201602010000Z"
+        DESCRIPTION              "Rev 0.1                1 Feb 2016 00:00
+                                  Initial release of the ALU-IP-TRANSPORT-MIB."
+
+        ::= { aluSARMIBModules 20 }
+
+
+aluIpTransportObjs               OBJECT IDENTIFIER ::= { aluSARObjs 22 }
+aluIpTransportConformance        OBJECT IDENTIFIER ::= { aluSARConfs 22 }
+aluIpTransportNotifyPrefix       OBJECT IDENTIFIER
+    ::= { aluSARNotifyPrefix 18 }
+
+-- Object Groups in the Nokia IP Transport MIB Module
+aluIpTransportConfigTimestamps   OBJECT IDENTIFIER ::= { aluIpTransportObjs 1 }
+aluIpTransportConfigurations     OBJECT IDENTIFIER ::= { aluIpTransportObjs 2 }
+aluIpTransportNameObjects        OBJECT IDENTIFIER ::= { aluIpTransportObjs 3 }
+aluIpTransportStatus             OBJECT IDENTIFIER ::= { aluIpTransportObjs 4 }
+aluIpTransportStatsObjects       OBJECT IDENTIFIER ::= { aluIpTransportObjs 5 }
+aluIpTransportNotifyObjects      OBJECT IDENTIFIER ::= { aluIpTransportObjs 6 }
+
+-- Notification Groups in the Nokia IP Transport MIB Module
+aluIpTransportNotifications      OBJECT IDENTIFIER
+    ::= { aluIpTransportNotifyPrefix 0 }
+
+-- Compliance Groups in the Nokia IP Transport MIB Module
+aluIpTransportCompliances        OBJECT IDENTIFIER
+    ::= { aluIpTransportConformance 1 }
+aluIpTransportGroups             OBJECT IDENTIFIER
+    ::= { aluIpTransportConformance 2 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Textual Conventions
+--
+
+AluIpTransportRemHostId          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A number used to identify a Remote Host."
+    SYNTAX      Unsigned32 (1..2147483647)
+
+AluIpTransportRemHostSessState   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostSessState indicates the
+         session state of this IP Transport Remote Host.
+
+         invalid (0)    - session state is unknown or not applicable
+         ready (1)      - session is ready to start
+         connecting (2) - session establishment is ongoing
+         connected (3)  - session is established (aka up)
+        "
+    SYNTAX      INTEGER {
+         invalid (0),
+         ready (1),
+         connecting (2),
+         connected (3)
+    }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Configuration Objects
+--
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Configuration Table
+-- ----------------------------------------------------------------------------
+aluIpTransportTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportTableLastChanged indicates the
+         time, since system startup, when aluIpTransportTable last changed
+         configuration."
+    ::= { aluIpTransportConfigTimestamps 1 }
+
+aluIpTransportTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportTable contains the IP Transport configuration
+         information.
+
+         IP Transport offers a method of transporting data over an IP network
+         using L3-based services. This method is an alternative to C-pipes when
+         the transport medium is a L3 IP/MPLS service instead of L2."
+    ::= { aluIpTransportConfigurations 1 }
+
+aluIpTransportEntry              OBJECT-TYPE
+    SYNTAX      AluIpTransportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An aluIpTransportEntry is an entry (conceptual row) in the
+         aluIpTransportTable. Each entry represents the configuration for an
+         IP Transport entity.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to aluIpTransportRowStatus.
+
+         The index svcId must correspond to an already created service whose
+         TIMETRA-SERV-MIB::svcType is 'ies' or 'vprn'.
+
+         The objects aluIpTransportLocHostIpAddrType,
+         aluIpTransportLocHostIpAddr, aluIpTransportIpProtocol, and
+         aluIpTransportLocHostPortNum define an IP Transport Local Host. An IP
+         Transport Local Host is a listener/server to a client or remote host
+         within the same IP transport."
+    INDEX       { svcId, aluIpTransportPortId }
+    ::= { aluIpTransportTable 1 }
+
+AluIpTransportEntry              ::= SEQUENCE {
+    aluIpTransportPortId             TmnxPortID,
+    aluIpTransportLastMgmtChange     TimeStamp,
+    aluIpTransportRowStatus          RowStatus,
+    aluIpTransportAdminState         TmnxAdminState,
+    aluIpTransportDescription        TItemDescription,
+    aluIpTransportTcpConnMaxRetries  Unsigned32,
+    aluIpTransportTcpConnRetryIntvl  Unsigned32,
+    aluIpTransportTcpConnInactTimout Unsigned32,
+    aluIpTransportFilterUnknownHost  TmnxEnabledDisabled,
+    aluIpTransportDscpName           TDSCPName,
+    aluIpTransportFcName             TFCName,
+    aluIpTransportProfile            TProfile,
+    aluIpTransportLocHostIpAddrType  InetAddressType,
+    aluIpTransportLocHostIpAddr      InetAddress,
+    aluIpTransportLocHostPortNum     TTcpUdpPort,
+    aluIpTransportLocHostIpProtocol  INTEGER,
+    aluIpTransportNumRemHosts        Unsigned32,
+    aluIpTransportOperState          TmnxOperState,
+    aluIpTransportOperFlags          BITS,
+    aluIpTransportLastOperChange     TimeStamp
+}
+
+aluIpTransportPortId             OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of object aluIpTransportPortId specifies the ID of the
+         access port where this IP Transport (IPT) is defined.
+
+         This port may be a physical RS232 serial port, or a GNSS receiver.
+
+         For systems with a GNSS receiver, the value 1275068416 (0x4C000000)
+         specifies the port id of the GNSS receiver.  This port id is only
+         meaningful in the context of an IP transport, and does not have a
+         corresponding entry in TmnxPortTable.
+
+         The value is unique across the system."
+    ::= { aluIpTransportEntry 1 }
+
+aluIpTransportLastMgmtChange     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportLastMgmtChange indicates the
+         time, since system startup, that the configuration of this IP
+         Transport entry was created or modified."
+    ::= { aluIpTransportEntry 2 }
+
+aluIpTransportRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRowStatus specifies the row
+         status. It allows the creation and deletion of IP Transport entries."
+    ::= { aluIpTransportEntry 3 }
+
+aluIpTransportAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportAdminState specifies the
+         administrative state for this IP Transport entry."
+    DEFVAL      { outOfService }
+    ::= { aluIpTransportEntry 4 }
+
+aluIpTransportDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportDescription specifies the
+         description of this IP Transport entry.
+
+         An empty string value indicates that the description is not set."
+    DEFVAL      { ''H }
+    ::= { aluIpTransportEntry 5 }
+
+aluIpTransportTcpConnMaxRetries  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportTcpConnMaxRetries specifies the
+         maximum number of consecutive attempts to establish a TCP connection."
+    DEFVAL      { 5 }
+    ::= { aluIpTransportEntry 6 }
+
+aluIpTransportTcpConnRetryIntvl  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportTcpConnRetryIntvl specifies the
+         period of time between consecutive attempts to establish a TCP connection."
+    DEFVAL      { 5 }
+    ::= { aluIpTransportEntry 7 }
+
+aluIpTransportTcpConnInactTimout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportTcpConnInactTimout specifies the
+         maximum period of time a TCP connection can remain idle before
+         tear-down is initiated."
+    DEFVAL      { 30 }
+    ::= { aluIpTransportEntry 8 }
+
+aluIpTransportFilterUnknownHost  OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportFilterUnknownHost specifies
+         whether to allow a connection/session with an unknown remote host. An
+         unknown remote host is one that is not configured (as per
+         aluIpTransportRemHostEntry)."
+   DEFVAL       { disabled }
+   ::= { aluIpTransportEntry 9 }
+
+aluIpTransportDscpName           OBJECT-TYPE
+    SYNTAX      TDSCPName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportDscpName specifies the
+         Differentiated Services Code Point (DSCP) for all packets sent to
+         Remote Hosts (within the same IP Transport)."
+    DEFVAL      { "ef" }
+    ::= { aluIpTransportEntry 10 }
+
+aluIpTransportFcName             OBJECT-TYPE
+    SYNTAX      TFCName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportFcName specifies the Forwarding
+         Class (FC) for all packets sent to Remote Hosts (within the same IP
+         Transport)."
+    DEFVAL      { "ef" }
+    ::= { aluIpTransportEntry 11 }
+
+aluIpTransportProfile            OBJECT-TYPE
+    SYNTAX      TProfile
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportProfile specifies the profile
+         marking (used in association with the FC, aluIpTransportFcName) for
+         all packets sent to Remote Hosts (within the same IP Transport)."
+    DEFVAL      { in }
+    ::= { aluIpTransportEntry 12 }
+
+aluIpTransportLocHostIpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType { unknown(0), ipv4(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportLocHostIpAddrType specifies the
+         type of aluIpTransportLocHostIpAddr.
+
+         The value 'unknown' signifies unset.
+         Otherwise, only 'ipv4' is supported.
+
+         The value must be set at the same time as these other objects:
+           aluIpTransportLocHostIpAddr
+           aluIpTransportLocHostPortNum
+           aluIpTransportLocHostIpProtocol
+         Same restriction applies to unset."
+    DEFVAL      { unknown } 
+    ::= { aluIpTransportEntry 13 }
+
+aluIpTransportLocHostIpAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportLocHostIpAddr specifies the IP
+         address of the IP Transport Local Host.
+
+         The value ''H (a zero-length octet-string) signifies unset.
+         Otherwise, the value must be a valid unicast IP address.
+
+         The value must be set at the same time as these other objects:
+           aluIpTransportLocHostIpAddrType
+           aluIpTransportLocHostPortNum
+           aluIpTransportLocHostIpProtocol
+         Same restriction applies to unset."
+    DEFVAL      { ''H } 
+    ::= { aluIpTransportEntry 14 }
+
+aluIpTransportLocHostPortNum     OBJECT-TYPE
+    SYNTAX      TTcpUdpPort (0|1026..49150)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportLocHostPortNum specifies the
+         Internet socket port number to be used by the protocol specified by
+         aluIpTransportLocHostIpProtocol.
+
+         The value 0 signifies unset.
+
+         The value must be set at the same time as these other objects:
+           aluIpTransportLocHostIpAddrType
+           aluIpTransportLocHostIpAddr
+           aluIpTransportLocHostIpProtocol
+         Same restriction applies to unset."
+    DEFVAL      { 0 } 
+    ::= { aluIpTransportEntry 15 }
+
+aluIpTransportLocHostIpProtocol  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unset (-1),
+                    tcp (6),
+                    udp (17)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportLocHostIpProtocol specifies the
+         IP protocol that the Local Host shall use when initiating
+         connections/sessions with Remote Hosts (within the same IP Transport).
+
+         The value -1 signifies unset.
+         Otherwise, only 6 (tcp) and 17 (udp) are supported.
+
+         The value must be set at the same time as these other objects:
+           aluIpTransportLocHostIpAddrType
+           aluIpTransportLocHostIpAddr
+           aluIpTransportLocHostPortNum
+         Same restriction applies to unset."
+    DEFVAL      { unset } 
+    ::= { aluIpTransportEntry 16 }
+
+aluIpTransportNumRemHosts        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportNumRemHosts indicates the
+         number of Remote Hosts configured within this IP Transport."
+    ::= { aluIpTransportEntry 17 }
+
+aluIpTransportOperState          OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportOperState indicates the
+         operational state of this IP Transport entry."
+    ::= { aluIpTransportEntry 18 }
+
+aluIpTransportOperFlags          OBJECT-TYPE
+    SYNTAX          BITS {
+                        iptAdminDown         (0),
+                        svcAdminDown         (1),
+                        portOperDown         (2),
+                        noIfAddress          (3),
+                        ifOperDown           (4),
+                        portNumInUse         (5),
+                        portNumReserved      (6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the object aluIpTransportOperFlags indicates all the
+         conditions that affect the operational state of this IP Transport.
+
+         The bit values are:
+         iptAdminDown         (0) - IP Transport is administratively down
+         svcAdminDown         (1) - Service is administratively down
+         portOperDown         (2) - Port is operationally down
+         noIfAddress          (3) - no interface address within the virtual
+                                    router matches aluIpTransportLocHostIpAddr
+         ifOperDown           (4) - matching interface is operationally down
+         portNumInUse         (5) - port number already in use in system
+         portNumReserved      (6) - port number detected as reserved by system
+        "
+    ::= { aluIpTransportEntry 19 }
+
+aluIpTransportLastOperChange     OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the object aluIpTransportLastOperChange indicates the
+         time, since system startup, of the most recent change to
+         aluIpTransportOperState."
+    ::= { aluIpTransportEntry 20 }
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Remote Host Configuration Table
+-- ----------------------------------------------------------------------------
+aluIpTransportRemHostTblLastChgd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostTblLastChgd indicates the
+         time, since system startup, when aluIpTransportRemHostTable last
+         changed configuration."
+    ::= { aluIpTransportConfigTimestamps 2 }
+
+aluIpTransportRemHostTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportRemHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportRemHostTable contains the IP Transport Remote Host
+         configuration information.
+
+         An IP Transport Remote Host is also known as a client (to a server or
+         Local Host within the same IP Transport)."
+    ::= { aluIpTransportConfigurations 2 }
+
+aluIpTransportRemHostEntry       OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An aluIpTransportRemHostEntry is an entry (conceptual row) in the
+         aluIpTransportRemHostTable. Each entry represents the configuration
+         for a remote host that is part of a IP Transport entity.
+
+         Entries in this table can be created and deleted via SNMP SET
+         operations to aluIpTransportRemHostRowStatus."
+    INDEX       { svcId, aluIpTransportPortId, aluIpTransportRemHostId }
+    ::= { aluIpTransportRemHostTable 1 }
+
+AluIpTransportRemHostEntry       ::= SEQUENCE {
+    aluIpTransportRemHostId          AluIpTransportRemHostId,
+    aluIpTransportRemHostLastChanged TimeStamp,
+    aluIpTransportRemHostRowStatus   RowStatus,
+    aluIpTransportRemHostName        TLNamedItemOrEmpty,
+    aluIpTransportRemHostDescription TItemDescription,
+    aluIpTransportRemHostIpAddrType  InetAddressType,
+    aluIpTransportRemHostIpAddr      InetAddress,
+    aluIpTransportRemHostPortNum     TTcpUdpPort,
+    aluIpTransportRemHostSessState   AluIpTransportRemHostSessState,
+    aluIpTransportRemHostSessUpTime  Unsigned32,
+    aluIpTransportRemHostLastConnect DisplayString,
+    aluIpTransportRemHostCheckTcp    TmnxActionType,
+    aluIpTransportRemHostCheckTcpRes INTEGER,
+    aluIpTransportRemHostCheckTcpInf DisplayString
+}
+
+aluIpTransportRemHostId          OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of object aluIpTransportRemHostId specifies the identifier
+         for this IP Transport Remote Host entry.
+
+         The value is unique across the corresponding IP Transport entry."
+    ::= { aluIpTransportRemHostEntry 1 }
+
+aluIpTransportRemHostLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostLastChanged indicates the
+         time, since system startup, that the configuration of this IP
+         Transport Remote Host entry was created or modified."
+    ::= { aluIpTransportRemHostEntry 2 }
+
+aluIpTransportRemHostRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostRowStatus specifies the
+         row status. It allows the creation and deletion of IP Transport Remote
+         Host entries.
+
+         A row cannot be created if the corresponding IP Transport entry in
+         aluIpTransportTable is not already created."
+    ::= { aluIpTransportRemHostEntry 3 }
+
+aluIpTransportRemHostName        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostName specifies the name
+         assigned to this IP Transport Remote Host entry.
+
+         The value is unique across the corresponding IP Transport entry.
+
+         An empty string value indicates that the name is not set."
+    DEFVAL      { ''H }
+    ::= {aluIpTransportRemHostEntry 4 }
+
+aluIpTransportRemHostDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostDescription specifies the
+         description of this IP Transport Remote Host entry.
+
+         An empty string value indicates that the description is not set."
+    DEFVAL      { ''H }
+    ::= { aluIpTransportRemHostEntry 5 }
+
+aluIpTransportRemHostIpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostIpAddrType specifies the
+         type of aluIpTransportRemHostIpAddr.
+         
+         Only 'ipv4' is supported.
+
+         The value must be set, and can only be set, at time of row creation."
+    ::= { aluIpTransportRemHostEntry 6 }
+
+aluIpTransportRemHostIpAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostIpAddr specifies the IP
+         address of the IP Transport Remote Host.
+
+         The value must be set, and can only be set, at time of row creation."
+    ::= { aluIpTransportRemHostEntry 7 }
+
+aluIpTransportRemHostPortNum     OBJECT-TYPE
+    SYNTAX      TTcpUdpPort (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostPortNum specifies the
+         number of a TCP or UDP port.
+
+         The value must be set, and can only be set, at time of row creation."
+    ::= { aluIpTransportRemHostEntry 8 }
+
+aluIpTransportRemHostSessState   OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostSessState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostSessState indicates the
+         session state of this IP Transport Remote Host.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'.
+        "
+    ::= { aluIpTransportRemHostEntry 9 }
+
+aluIpTransportRemHostSessUpTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostSessUpTime indicates the
+         time elapsed, in seconds, since the most recent transition of
+         aluIpTransportRemHostSessState to 'connected (3)'. If
+         aluIpTransportRemHostSessState is not 'connected (3)', zero is
+         returned."
+    ::= { aluIpTransportRemHostEntry 10 }
+
+aluIpTransportRemHostLastConnect OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostLastConnect indicates
+         contextual information about the last connection. It can be viewed as
+         the causal reason for having entered the current state,
+         aluIpTransportRemHostSessState.
+
+         The information is in printable string format. Examples are:
+         timeout due to inactivity, retrying connection, successful.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'.
+        "
+    ::= { aluIpTransportRemHostEntry 11 }
+
+aluIpTransportRemHostCheckTcp    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting aluIpTransportRemHostCheckTcp to 'doAction' causes a check
+         TCP connection test to be initiated.
+
+         The process is much like that of a regular TCP connection attempt
+         except that:
+         - only a single attempt is made
+         - it has a fixed timeout period of 5 seconds
+         - upon success, the connection is torn down immediately
+
+         If a TCP connection is already established, no test is initiated and
+         aluIpTransportRemHostCheckTcpRes will indicate an immediate pass
+         result.
+
+         If a TCP connection test is already in progress, the request is
+         ignored."
+    DEFVAL { notApplicable }
+    ::= { aluIpTransportRemHostEntry 12 }
+
+aluIpTransportRemHostCheckTcpRes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (1),
+                    pass (2),
+                    fail (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostCheckTcpRes indicates
+         the result of the check TCP connection test (which is initiated by
+         aluIpTransportRemHostCheckTcp).
+
+         unknown (1)  - indeterminate result (eg. initial value, in progress)
+         pass (2)     - test successful
+         fail (3)     - test unsuccessful
+         "
+    ::= { aluIpTransportRemHostEntry 13 }
+
+aluIpTransportRemHostCheckTcpInf OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostCheckTcpInf indicates
+         any extra information about the check TCP connection test result,
+         aluIpTransportRemHostCheckTcpRes.
+
+         The information is in printable string format. Examples are:
+         in progress, already connected, connection refused.
+        "
+    ::= { aluIpTransportRemHostEntry 14 }
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Extension of Base Service Table
+-- ----------------------------------------------------------------------------
+aluIpTransportSvcBaseExtTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportSvcBaseExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportSvcBaseExtTable contains configuration information
+         about the collection of IP Transports within a particular Service."
+    ::= { aluIpTransportConfigurations 3 }
+
+aluIpTransportSvcBaseExtEntry    OBJECT-TYPE
+    SYNTAX      AluIpTransportSvcBaseExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An aluIpTransportSvcBaseExtEntry is an entry in the
+         aluIpTransportSvcBaseExtTable. An entry represents a collection of
+         IP Transports. There is only one collection of IP Transports per
+         Service.
+
+         Only information that is relevant at the Service level context is
+         available."
+    AUGMENTS    { svcBaseInfoEntry }
+    ::= { aluIpTransportSvcBaseExtTable 1 }
+
+AluIpTransportSvcBaseExtEntry ::= SEQUENCE {
+    aluIpTransportSvcBaseExtNumIpts  Unsigned32
+}
+
+aluIpTransportSvcBaseExtNumIpts  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportSvcBaseExtNumIpts indicates the
+         number of IP Transports that exist within the Service."
+    ::= { aluIpTransportSvcBaseExtEntry 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Name Objects
+--
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Remote Host Name Table
+-- ----------------------------------------------------------------------------
+aluIpTransportRemHostNameTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportRemHostNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains basic Remote Host information. Entries
+         are created/deleted automatically by the system when the
+         corresponding aluIpTransportRemHostName object is set/unset."
+    ::= { aluIpTransportNameObjects 1 }
+
+aluIpTransportRemHostNameEntry   OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Basic information about a specific Remote Host."
+    INDEX       { svcId, aluIpTransportPortId, aluIpTransportRemHostName }
+    ::= { aluIpTransportRemHostNameTable 1 }
+
+AluIpTransportRemHostNameEntry ::= SEQUENCE {
+    aluIpTransportRemHostNameId      AluIpTransportRemHostId
+}
+
+aluIpTransportRemHostNameId      OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostNameId indicates the
+         Remote Host associated with this name."
+    ::= { aluIpTransportRemHostNameEntry 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Status/Operational Objects
+--
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Statistics Objects
+--
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Statistics Table
+-- ----------------------------------------------------------------------------
+aluIpTransportStatsTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportStatsTable contains an entry for each IP Transport
+         that exists in the system. Each row contains traffic and event
+         counters."
+    ::= { aluIpTransportStatsObjects 1 }
+
+aluIpTransportStatsEntry         OBJECT-TYPE
+    SYNTAX      AluIpTransportStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the aluIpTransportStatsTable. Entries are
+         created and deleted by the system depending on the IP Transport 
+         configuration.
+
+         A known remote host is one that is configured (as per
+         aluIpTransportRemHostEntry).
+         An unknown remote host is one that is not configured."
+    INDEX       { svcId, aluIpTransportPortId }
+    ::= { aluIpTransportStatsTable 1 }
+
+AluIpTransportStatsEntry         ::= SEQUENCE {
+        aluIpTransportKnwRemPktsSent     Counter64,
+        aluIpTransportKnwRemCharsSent    Counter64,
+        aluIpTransportKnwRemPktsRcvd     Counter64,
+        aluIpTransportKnwRemCharsRcvd    Counter64,
+        aluIpTransportKnwRemConnsTo      Counter32,
+        aluIpTransportKnwRemConnsFrom    Counter32,
+        aluIpTransportKnwRemConnRetries  Counter32,
+        aluIpTransportKnwRemConnFails    Counter32,
+        aluIpTransportKnwRemCurrConns    Unsigned32,
+        aluIpTransportUnkRemPktsSent     Counter64,
+        aluIpTransportUnkRemCharsSent    Counter64,
+        aluIpTransportUnkRemPktsRcvd     Counter64,
+        aluIpTransportUnkRemCharsRcvd    Counter64,
+        aluIpTransportUnkRemSuccConnsFrm Counter32,
+        aluIpTransportUnkRemRejectsFiltr Counter32,
+        aluIpTransportUnkRemRejectsResrc Counter32,
+        aluIpTransportUnkRemInactTimouts Counter32,
+        aluIpTransportUnkRemLastIpAddrTy InetAddressType,
+        aluIpTransportUnkRemLastIpAddr   InetAddress,
+        aluIpTransportUnkRemLastPortNum  TTcpUdpPort,
+        aluIpTransportUnkRemCurrConns    Unsigned32,
+        aluIpTransportPktsDropNoRemHost  Counter64
+}
+
+aluIpTransportKnwRemPktsSent     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemPktsSent indicates the
+         total number of packets sent to known remote hosts."
+    ::= { aluIpTransportStatsEntry 1 }
+
+aluIpTransportKnwRemCharsSent    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemCharsSent indicates the
+         total number of characters sent to known remote hosts."
+    ::= { aluIpTransportStatsEntry 2 }
+
+aluIpTransportKnwRemPktsRcvd     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemPktsRcvd indicates the
+         total number of packets received from known remote hosts."
+    ::= { aluIpTransportStatsEntry 3 }
+
+aluIpTransportKnwRemCharsRcvd    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemCharsRcvd indicates the
+         total number of characters received from known remote hosts."
+    ::= { aluIpTransportStatsEntry 4 }
+
+aluIpTransportKnwRemConnsTo      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemConnsTo indicates the
+         total number of successful connections to known remote hosts.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 5 }
+
+aluIpTransportKnwRemConnsFrom    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemConnsFrom indicates the
+         total number of successful connections from known remote hosts.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 6 }
+
+aluIpTransportKnwRemConnRetries  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemConnRetries indicates the
+         total number of connection retry attempts to known remote hosts.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 7 }
+
+aluIpTransportKnwRemConnFails    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemConnFails indicates the
+         total number of connection attempts to known remote hosts that failed.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 8 }
+
+aluIpTransportKnwRemCurrConns    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportKnwRemCurrConns indicates the
+         number of concurrent connections with known remote hosts.
+
+         This object is not affected by tmnxClear.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 9 }
+
+aluIpTransportUnkRemPktsSent     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemPktsSent indicates the
+         total number of packets sent to unknown remote hosts."
+    ::= { aluIpTransportStatsEntry 10 }
+
+aluIpTransportUnkRemCharsSent    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemCharsSent indicates the
+         total number of characters sent to unknown remote hosts."
+    ::= { aluIpTransportStatsEntry 11 }
+
+aluIpTransportUnkRemPktsRcvd     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemPktsRcvd indicates the
+         total number of packets received from unknown remote hosts."
+    ::= { aluIpTransportStatsEntry 12 }
+
+aluIpTransportUnkRemCharsRcvd    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemCharsRcvd indicates the
+         total number of characters received from unknown remote hosts."
+    ::= { aluIpTransportStatsEntry 13 }
+
+aluIpTransportUnkRemSuccConnsFrm OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemSuccConnsFrm indicates the
+         total number of connections that were accepted from unknown remote
+         hosts.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 14 }
+
+aluIpTransportUnkRemRejectsFiltr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemRejectsFiltr indicates the
+         total number of communication attempts from unknown remote hosts that
+         were rejected due to filter (see aluIpTransportFilterUnknownHost)."
+    ::= { aluIpTransportStatsEntry 15 }
+
+aluIpTransportUnkRemRejectsResrc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemRejectsResrc indicates the
+         total number of communication attempts from unknown remote hosts that
+         were rejected due to resource exhaustion (eg. no more sessions
+         available)."
+    ::= { aluIpTransportStatsEntry 16 }
+
+aluIpTransportUnkRemInactTimouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemInactTimouts indicates the
+         total number of connections with unknown remote hosts that were
+         terminated by the system due to inactivity (see
+         aluIpTransportTcpConnInactTimout).
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 17 }
+
+aluIpTransportUnkRemLastIpAddrTy OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemLastIpAddrTy indicates the
+         type of aluIpTransportUnkRemLastIpAddr.
+
+         This object is not affected by tmnxClear."
+    ::= { aluIpTransportStatsEntry 18 }
+
+aluIpTransportUnkRemLastIpAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemLastIpAddr indicates the
+         IP address of the last unknown remote host that attempted
+         communication (successful or not).
+
+         This object is not affected by tmnxClear."
+    ::= { aluIpTransportStatsEntry 19 }
+
+aluIpTransportUnkRemLastPortNum  OBJECT-TYPE
+    SYNTAX      TTcpUdpPort (0|1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemLastPortNum indicates the
+         number of the TCP/UDP port of the last unknown remote host that
+         attempted communication (successful or not).
+
+         The value 0 signifies no last unknown remote host (initial condition).
+
+         This object is not affected by tmnxClear."
+    ::= { aluIpTransportStatsEntry 20 }
+
+aluIpTransportUnkRemCurrConns    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportUnkRemCurrConns indicates the
+         number of concurrent connections with unknown remote hosts.
+
+         This object is not affected by tmnxClear.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportStatsEntry 21 }
+
+aluIpTransportPktsDropNoRemHost  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportPktsDropNoRemHost indicates the
+         total number of packets that were dropped due to no destination
+         availabe (ie. no known remote hosts and no unknown remote hosts)."
+    ::= { aluIpTransportStatsEntry 22 }
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Remote Host Statistics Table
+-- ----------------------------------------------------------------------------
+aluIpTransportRemHostStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportRemHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportRemHostStatsTable contains an entry for each IP
+         Transport Remote Host that exists in the system. Each row contains
+         traffic and event counters."
+    ::= { aluIpTransportStatsObjects 2 }
+
+aluIpTransportRemHostStatsEntry  OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the aluIpTransportRemHostStatsTable. Entries are
+         created and deleted by the system depending on the IP Transport 
+         configuration."
+    INDEX       { svcId, aluIpTransportPortId, aluIpTransportRemHostId }
+    ::= { aluIpTransportRemHostStatsTable 1 }
+
+AluIpTransportRemHostStatsEntry  ::= SEQUENCE {
+        aluIpTransportRemHostPktsSent    Counter64,
+        aluIpTransportRemHostCharsSent   Counter64,
+        aluIpTransportRemHostPktsDrop    Counter64,
+        aluIpTransportRemHostCharsDrop   Counter64,
+        aluIpTransportRemHostPktsRcvd    Counter64,
+        aluIpTransportRemHostCharsRcvd   Counter64,
+        aluIpTransportRemHostConnsTo     Counter32,
+        aluIpTransportRemHostConnsFrom   Counter32,
+        aluIpTransportRemHostConnRetries Counter32,
+        aluIpTransportRemHostConnFails   Counter32,
+        aluIpTransportRemHostConnsCloFar Counter32,
+        aluIpTransportRemHostInactTmouts Counter32
+}
+
+aluIpTransportRemHostPktsSent    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostPktsSent indicates the
+         number of packets sent to the remote host."
+    ::= { aluIpTransportRemHostStatsEntry 1 }
+
+aluIpTransportRemHostCharsSent   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostCharsSent indicates the
+         number of characters sent to the remote host."
+    ::= { aluIpTransportRemHostStatsEntry 2 }
+
+aluIpTransportRemHostPktsDrop    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostPktsDrop indicates the
+         number of packets, destined for the remote host, that were dropped."
+    ::= { aluIpTransportRemHostStatsEntry 3 }
+
+aluIpTransportRemHostCharsDrop   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostCharsDrop indicates
+         number of characters, destined for the remote host, that were
+         dropped."
+    ::= { aluIpTransportRemHostStatsEntry 4 }
+
+aluIpTransportRemHostPktsRcvd    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostPktsRcvd indicates the
+         number of packets received from the remote host."
+    ::= { aluIpTransportRemHostStatsEntry 5 }
+
+aluIpTransportRemHostCharsRcvd   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostCharsRcvd indicates the
+         number of characters received from the remote host."
+    ::= { aluIpTransportRemHostStatsEntry 6 }
+
+aluIpTransportRemHostConnsTo     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostConnsTo indicates the
+         number of successful connections to the remote host.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 7 }
+
+aluIpTransportRemHostConnsFrom   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostConnsFrom indicates the
+         number of successful connections from the remote host.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 8 }
+
+aluIpTransportRemHostConnRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostConnRetries indicates
+         the number of connection retry attempts to the remote host.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 9 }
+
+aluIpTransportRemHostConnFails   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostConnFails indicates the
+         number of connection attempts to the remote host that failed.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 10 }
+
+aluIpTransportRemHostConnsCloFar OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostConnsCloFar indicates the
+         number of connections that were closed by the far end.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 11 }
+
+aluIpTransportRemHostInactTmouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportRemHostInactTmouts indicates the
+         number of connections that were terminated by the system due to
+         inactivity (see aluIpTransportTcpConnInactTimout).
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'."
+    ::= { aluIpTransportRemHostStatsEntry 12 }
+
+-- ----------------------------------------------------------------------------
+-- IP Transport Unknown Remote Host Statistics Table
+-- ----------------------------------------------------------------------------
+aluIpTransportURemHostStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluIpTransportURemHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportRemHostStatsTable contains an entry for each IP
+         Transport Remote Host that exists in the system. Each row contains
+         traffic and event counters."
+    ::= { aluIpTransportStatsObjects 3 }
+
+aluIpTransportURemHostStatsEntry OBJECT-TYPE
+    SYNTAX      AluIpTransportURemHostStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the aluIpTransportRemHostStatsTable. Entries are
+         created and deleted by the system depending on the IP Transport 
+         configuration."
+    INDEX       { svcId,
+                  aluIpTransportPortId,
+                  aluIpTransportURemHostIpAddrType,
+                  aluIpTransportURemHostIpAddr,
+                  aluIpTransportURemHostPortNum }
+    ::= { aluIpTransportURemHostStatsTable 1 }
+
+AluIpTransportURemHostStatsEntry ::= SEQUENCE {
+        aluIpTransportURemHostIpAddrType InetAddressType,
+        aluIpTransportURemHostIpAddr     InetAddress,
+        aluIpTransportURemHostPortNum    TTcpUdpPort,
+        aluIpTransportURemHostPktsSent   Counter64,
+        aluIpTransportURemHostCharsSent  Counter64,
+        aluIpTransportURemHostPktsDrop   Counter64,
+        aluIpTransportURemHostCharsDrop  Counter64,
+        aluIpTransportURemHostPktsRcvd   Counter64,
+        aluIpTransportURemHostCharsRcvd  Counter64,
+        aluIpTransportURemHostSessState  AluIpTransportRemHostSessState,
+        aluIpTransportURemHostSessUpTime Unsigned32
+}
+
+aluIpTransportURemHostIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of object aluIpTransportURemHostIpAddrType indicates the
+         IP address type for this IP Transport Unknown Remote Host entry."
+    ::= { aluIpTransportURemHostStatsEntry 1 }
+
+aluIpTransportURemHostIpAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of object aluIpTransportURemHostIpAddr indicates the
+         IP address for this IP Transport Unknown Remote Host entry."
+    ::= { aluIpTransportURemHostStatsEntry 2 }
+
+aluIpTransportURemHostPortNum    OBJECT-TYPE
+    SYNTAX      TTcpUdpPort (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of object aluIpTransportURemHostPortNum indicates the
+         number of a TCP or UDP port for this IP Transport Unknown Remote Host
+         entry."
+    ::= { aluIpTransportURemHostStatsEntry 3 }
+
+aluIpTransportURemHostPktsSent   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostPktsSent indicates the
+         number of packets sent to the remote host."
+    ::= { aluIpTransportURemHostStatsEntry 4 }
+
+aluIpTransportURemHostCharsSent  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostCharsSent indicates the
+         number of characters sent to the remote host."
+    ::= { aluIpTransportURemHostStatsEntry 5 }
+
+aluIpTransportURemHostPktsDrop   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostPktsDrop indicates the
+         number of packets, destined for the remote host, that were dropped."
+    ::= { aluIpTransportURemHostStatsEntry 6 }
+
+aluIpTransportURemHostCharsDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostCharsDrop indicates
+         number of characters, destined for the remote host, that were
+         dropped."
+    ::= { aluIpTransportURemHostStatsEntry 7 }
+
+aluIpTransportURemHostPktsRcvd   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostPktsRcvd indicates the
+         number of packets received from the remote host."
+    ::= { aluIpTransportURemHostStatsEntry 8 }
+
+aluIpTransportURemHostCharsRcvd  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostCharsRcvd indicates the
+         number of characters received from the remote host."
+    ::= { aluIpTransportURemHostStatsEntry 9 }
+
+aluIpTransportURemHostSessState  OBJECT-TYPE
+    SYNTAX      AluIpTransportRemHostSessState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostSessState indicates the
+         session state of this IP Transport Remote Host.
+
+         This object is not affected by tmnxClear.
+
+         The value of this object is not applicable while
+         aluIpTransportLocHostIpProtocol is set to 'udp (17)'.
+        "
+    ::= { aluIpTransportURemHostStatsEntry 10 }
+
+aluIpTransportURemHostSessUpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportURemHostSessUpTime indicates the
+         time elapsed, in seconds, since the most recent transition of
+         aluIpTransportURemHostSessState to 'connected (3)'. If
+         aluIpTransportURemHostSessState is not 'connected (3)', zero is
+         returned.
+
+         This object is not affected by tmnxClear."
+
+    ::= { aluIpTransportURemHostStatsEntry 11 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Notification Objects
+--
+
+aluIpTransportNotifyCustId       OBJECT-TYPE
+    SYNTAX      TmnxCustId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportNotifyCustId indicates the
+         customer identifier. This object is used by IP Transport
+         notifications."
+    ::= { aluIpTransportNotifyObjects 1 }
+
+aluIpTransportNotifySvcId        OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportNotifySvcId indicates the
+         service ID of the IP Transport. This object is used by IP Transport
+         notifications."
+    ::= { aluIpTransportNotifyObjects 2 }
+
+aluIpTransportNotifyPortId       OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object aluIpTransportNotifyPortId indicates the ID of
+         the access port where this IP Transport is defined. This object is
+         used by IP Transport notifications."
+    ::= { aluIpTransportNotifyObjects 3 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Notifications
+--
+
+aluIpTransportStateChanged       NOTIFICATION-TYPE
+    OBJECTS {
+        aluIpTransportNotifyCustId,
+        aluIpTransportNotifySvcId,
+        aluIpTransportNotifyPortId,
+        aluIpTransportAdminState,
+        aluIpTransportOperState,
+        aluIpTransportOperFlags 
+    }
+    STATUS      current
+    DESCRIPTION
+        "The aluIpTransportStateChanged notification is generated when there
+         is a change in the administrative or operational state of the IP
+         Transport. This notification is a point-in-time status change event.
+
+         [CAUSE] This notification may be triggered for a number of reasons,
+         including but not limited to the following:
+
+         1) The user has administratively set the IP Transport up or down
+         2) The access port (or socket) has gone operationally up or down
+         3) The user has added or removed an IP address from the interface
+
+         [EFFECT] When aluIpTransportOperState indicates outOfService (or
+         down), the IP Transport can no longer carry data over the network.
+
+         [RECOVERY] The value of aluIpTransportOperFlags will indicate what
+         needs attention."
+    ::= { aluIpTransportNotifications 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Compliance Statements
+--
+aluIpTransport7705V8v0Compliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of IP Transport features
+         on Nokia 7705 SAR series systems release R8.0."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            aluIpTransportV8v0Group,
+            aluIpTransportNotifyGroup,
+            aluIpTransportNotifyObjsGroup,
+            aluIpTransportStatsGroup
+        }
+    ::= { aluIpTransportCompliances 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  ALU-IP-TRANSPORT-MIB Group Statements
+--
+aluIpTransportV8v0Groups         OBJECT IDENTIFIER
+    ::= { aluIpTransportGroups 1 }
+     
+aluIpTransportV8v0Group OBJECT-GROUP
+    OBJECTS {
+        aluIpTransportTableLastChanged,
+        aluIpTransportLastMgmtChange,
+        aluIpTransportRowStatus,
+        aluIpTransportAdminState,
+        aluIpTransportDescription,
+        aluIpTransportTcpConnMaxRetries,
+        aluIpTransportTcpConnRetryIntvl,
+        aluIpTransportTcpConnInactTimout,
+        aluIpTransportFilterUnknownHost,
+        aluIpTransportDscpName,
+        aluIpTransportFcName,
+        aluIpTransportProfile,
+        aluIpTransportLocHostIpAddrType,
+        aluIpTransportLocHostIpAddr,
+        aluIpTransportLocHostPortNum,
+        aluIpTransportLocHostIpProtocol,
+        aluIpTransportNumRemHosts,
+        aluIpTransportOperState,
+        aluIpTransportOperFlags,
+        aluIpTransportLastOperChange,
+        aluIpTransportRemHostTblLastChgd,
+        aluIpTransportRemHostLastChanged,
+        aluIpTransportRemHostRowStatus,
+        aluIpTransportRemHostName,
+        aluIpTransportRemHostDescription,
+        aluIpTransportRemHostIpAddrType,
+        aluIpTransportRemHostIpAddr,
+        aluIpTransportRemHostPortNum,
+        aluIpTransportSvcBaseExtNumIpts,
+        aluIpTransportRemHostNameId,
+        aluIpTransportRemHostSessState,
+        aluIpTransportRemHostSessUpTime,
+        aluIpTransportRemHostLastConnect,
+        aluIpTransportRemHostCheckTcp,
+        aluIpTransportRemHostCheckTcpRes,
+        aluIpTransportRemHostCheckTcpInf
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IP Transport
+         configurations in release 8.0 on Nokia 7705 series systems."
+    ::= { aluIpTransportV8v0Groups 1 }
+
+aluIpTransportNotifyGroup        NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+        aluIpTransportStateChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for the IP Transport feature
+         in release 8.0 on Nokia 7705 series systems."
+    ::= { aluIpTransportV8v0Groups 2 }
+
+aluIpTransportNotifyObjsGroup    OBJECT-GROUP
+    OBJECTS {
+        aluIpTransportNotifyCustId,
+        aluIpTransportNotifySvcId,
+        aluIpTransportNotifyPortId
+    }
+    STATUS  current
+    DESCRIPTION
+        "The group of notification objects supporting IP Transport 
+         notifications in release 8.0 on Nokia 7705 series systems."
+    ::= { aluIpTransportV8v0Groups 3 }
+
+aluIpTransportStatsGroup         OBJECT-GROUP
+    OBJECTS {
+        aluIpTransportKnwRemPktsSent,
+        aluIpTransportKnwRemCharsSent,
+        aluIpTransportKnwRemPktsRcvd,
+        aluIpTransportKnwRemCharsRcvd,
+        aluIpTransportKnwRemConnsTo,
+        aluIpTransportKnwRemConnsFrom,
+        aluIpTransportKnwRemConnRetries,
+        aluIpTransportKnwRemConnFails,
+        aluIpTransportKnwRemCurrConns,
+        aluIpTransportUnkRemPktsSent,
+        aluIpTransportUnkRemCharsSent,
+        aluIpTransportUnkRemPktsRcvd,
+        aluIpTransportUnkRemCharsRcvd,
+        aluIpTransportUnkRemSuccConnsFrm,
+        aluIpTransportUnkRemRejectsFiltr,
+        aluIpTransportUnkRemRejectsResrc,
+        aluIpTransportUnkRemInactTimouts,
+        aluIpTransportUnkRemLastIpAddrTy,
+        aluIpTransportUnkRemLastIpAddr,
+        aluIpTransportUnkRemLastPortNum,
+        aluIpTransportUnkRemCurrConns,
+        aluIpTransportPktsDropNoRemHost,
+        aluIpTransportRemHostPktsSent,
+        aluIpTransportRemHostCharsSent,
+        aluIpTransportRemHostPktsDrop,
+        aluIpTransportRemHostCharsDrop,
+        aluIpTransportRemHostPktsRcvd,
+        aluIpTransportRemHostCharsRcvd,
+        aluIpTransportRemHostConnsTo,
+        aluIpTransportRemHostConnsFrom,
+        aluIpTransportRemHostConnRetries,
+        aluIpTransportRemHostConnFails,
+        aluIpTransportRemHostConnsCloFar,
+        aluIpTransportRemHostInactTmouts,
+        aluIpTransportURemHostPktsSent,
+        aluIpTransportURemHostCharsSent,
+        aluIpTransportURemHostPktsDrop,
+        aluIpTransportURemHostCharsDrop,
+        aluIpTransportURemHostPktsRcvd,
+        aluIpTransportURemHostCharsRcvd,
+        aluIpTransportURemHostSessState,
+        aluIpTransportURemHostSessUpTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "The group of objects supporting retrieval of the detailed IP
+         Transport statistics in release 8.0 on Nokia 7705 series systems."
+    ::= { aluIpTransportV8v0Groups 4 }
+
+END

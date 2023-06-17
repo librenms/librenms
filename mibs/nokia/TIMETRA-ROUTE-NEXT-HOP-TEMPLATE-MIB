@@ -1,0 +1,418 @@
+TIMETRA-ROUTE-NEXT-HOP-TEMPLATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TItemDescription, TNamedItem,
+    TNamedItemOrEmpty
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraRouteNextHopTemplateMIBModule MODULE-IDENTITY
+    LAST-UPDATED "201401010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia 7xxx Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision Route
+         next-hop templates for the Nokia 7xxx device.
+
+         Copyright 2013-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's proprietary
+         intellectual property. Nokia retains all title and ownership in the
+         Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201401010000Z"
+    DESCRIPTION
+        "Rev 0.1                1 Jan 2014 00:00
+         Initial version of the TIMETRA-ROUTE-NEXT-HOP-TEMPLATE-MIB."
+
+    ::= { timetraSRMIBModules 90 }
+
+TmnxRouteNHVersion               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxRouteNHVersion specifies either the administrative or the
+         operational version of the objects in this MIB. Configuration changes
+         can only be made to the administrative version of these objects. The
+         operational copy is updated when a 'commit' operation is done."
+    SYNTAX      INTEGER {
+        admin (0),
+        oper  (1)
+    }
+
+tmnxRouteNextHop                 OBJECT IDENTIFIER ::= { tmnxSRObjs 90 }
+
+tmnxRouteNextHopObjs             OBJECT IDENTIFIER ::= { tmnxRouteNextHop 1 }
+
+tmnxRouteNHAdminControl          OBJECT IDENTIFIER ::= { tmnxRouteNextHopObjs 1 }
+
+tmnxRouteNHAdminLastChangeTime   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHAdminLastChangeTime indicates the last time a
+         successful set was performed of tmnxRouteNHAdminControlApply to
+         'commit'."
+    ::= { tmnxRouteNHAdminControl 1 }
+
+tmnxRouteNHAdminOwner            OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHAdminOwner specifies who has last initialized
+         the configuration tables, who is making all the changes, and who is
+         expected to either commit or re-initialize (abort) the transaction.
+
+         tmnxRouteNHAdminOwner is advisory only.  Before beginning a
+         transaction, read tmnxRouteNHAdminOwner.
+         If it is empty then proceed with the configuration.
+         Set tmnxRouteNHAdminOwner after setting tmnxRouteNHAdminControlApply
+         so that other users will be advised to not make changes to the tables.
+
+         The agent automatically sets tmnxRouteNHAdminOwner to an empty string
+         after tmnxRouteNHAdminControlApply is set, either by the user
+         re-initializing or committing, or by the agent timing out the
+         uncommitted transaction."
+    DEFVAL      { "" }
+    ::= { tmnxRouteNHAdminControl 2 }
+
+tmnxRouteNHAdminControlApply     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none       (1),
+        initialize (2),
+        commit     (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHAdminControlApply specifies the copying of
+         tmnxRouteNextHopObjs tables from one instance of
+         tmnxRouteNHTemplateVersion to another.  This object reads as
+         'none(1)' when not editing this table and 'initialize(2)' when
+         editing it.
+
+         When set to 'initialize(2)', the rows in tmnxRouteNextHopObjs tables
+         with the version index set to 'admin' are set to the values with the
+         index set to 'oper' in the same tables. Any uncommitted changes are
+         lost, so setting this value corresponds to both BEGIN-TRANSACTION and
+         ABORT-TRANSACTION.
+
+         When set to 'commit(3)' (END-TRANSACTION), all of the rows in
+         tmnxRouteNextHopObjs tables with the version set to 'admin' are copied
+         to the same rows with the index set to 'oper'. Then, the new values
+         are applied in the system.
+
+         In this way, the (expensive) application can be performed at one time,
+         ensuring a coherent route next-hop configuration."
+    ::= { tmnxRouteNHAdminControl 3 }
+
+tmnxRouteNHTemplateTblLastCh     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateTblLastCh indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         tmnxRouteNHTemplateTable."
+    ::= { tmnxRouteNextHopObjs 3 }
+
+tmnxRouteNHTemplateTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxRouteNHTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxRouteNHTemplateTable contains the templates used to apply
+         specific criteria to the prefixes protected by a loop-free alternate."
+    ::= { tmnxRouteNextHopObjs 4 }
+
+tmnxRouteNHTemplateEntry         OBJECT-TYPE
+    SYNTAX      TmnxRouteNHTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a route next-hop template."
+    INDEX       {
+        tmnxRouteNHTemplateVersion,
+        tmnxRouteNHTemplateName
+    }
+    ::= { tmnxRouteNHTemplateTable 1 }
+
+TmnxRouteNHTemplateEntry         ::= SEQUENCE
+{
+    tmnxRouteNHTemplateVersion       TmnxRouteNHVersion,
+    tmnxRouteNHTemplateName          TNamedItem,
+    tmnxRouteNHTemplateRowStatus     RowStatus,
+    tmnxRouteNHTemplateRowLstChng    TimeStamp,
+    tmnxRouteNHTemplateDescription   TItemDescription,
+    tmnxRouteNHTemplateSrlgEnable    TruthValue,
+    tmnxRouteNHTemplProtectionType   INTEGER,
+    tmnxRouteNHTemplateNextHopType   INTEGER
+}
+
+tmnxRouteNHTemplateVersion       OBJECT-TYPE
+    SYNTAX      TmnxRouteNHVersion
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateVersion specifies
+         the version of the table being accessed.  The table
+         is read-create only for the 'admin' version of the
+         table.  The 'oper' version is read-only. Only rows
+         with version 'oper' take operational effect."
+    ::= { tmnxRouteNHTemplateEntry 1 }
+
+tmnxRouteNHTemplateName          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateName specifies the name defined for
+         the next-hop template."
+    ::= { tmnxRouteNHTemplateEntry 2 }
+
+tmnxRouteNHTemplateRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxRouteNHTemplateEntry 3 }
+
+tmnxRouteNHTemplateRowLstChng    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxRouteNHTemplateRowLstChng indicates the sysUpTime at the
+         time of the most recent management-initiated change to this row."
+    ::= { tmnxRouteNHTemplateEntry 4 }
+
+tmnxRouteNHTemplateDescription   OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateDescription specifies the description
+         of this next-hop template."
+    DEFVAL      { "" }
+    ::= { tmnxRouteNHTemplateEntry 5 }
+
+tmnxRouteNHTemplateSrlgEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateSrlgEnable specifies
+         whether the selected next-hop can use the same outgoing
+          interface as the primary next-hop."
+    DEFVAL      { false }
+    ::= { tmnxRouteNHTemplateEntry 6 }
+
+tmnxRouteNHTemplProtectionType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        link (1),
+        node (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplProtectionType specifies whether link
+         protection or node protection is preferred for IP prefixes and LDP FEC
+         prefixes protected by a backup LFA next-hop."
+    DEFVAL      { node }
+    ::= { tmnxRouteNHTemplateEntry 7 }
+
+tmnxRouteNHTemplateNextHopType   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ip     (1),
+        tunnel (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplateNextHopType specifies whether tunneled
+         backup next-hop 'tunnel(2)' or IP backup next-hop 'ip(1)' is
+         preferred."
+    DEFVAL      { ip }
+    ::= { tmnxRouteNHTemplateEntry 8 }
+
+tmnxRouteNHTemplAdminGrpTblLstCh OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplAdminGrpTblLstCh indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         tmnxRouteNHTemplAdminGrpTable."
+    ::= { tmnxRouteNextHopObjs 5 }
+
+tmnxRouteNHTemplAdminGrpTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxRouteNHTemplAdminGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxRouteNHTemplAdminGrpTable specifies the admin groups out of
+         which the next-hop template can select a link for the next-hop."
+    ::= { tmnxRouteNextHopObjs 6 }
+
+tmnxRouteNHTemplAdminGrpEntry    OBJECT-TYPE
+    SYNTAX      TmnxRouteNHTemplAdminGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a route next-hop template."
+    INDEX       {
+        tmnxRouteNHTemplateVersion,
+        tmnxRouteNHTemplateName,
+        tmnxRouteNHTemplAdminGrpType,
+        tmnxRouteNHTemplAdminGrpName
+    }
+    ::= { tmnxRouteNHTemplAdminGrpTable 1 }
+
+TmnxRouteNHTemplAdminGrpEntry    ::= SEQUENCE
+{
+    tmnxRouteNHTemplAdminGrpType     INTEGER,
+    tmnxRouteNHTemplAdminGrpName     TNamedItem,
+    tmnxRouteNHTemplAdmGrpRowStatus  RowStatus,
+    tmnxRouteNHTemplAdmGrpRowLstCh   TimeStamp,
+    tmnxRouteNHTemplAdminGrpPref     Integer32
+}
+
+tmnxRouteNHTemplAdminGrpType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        include (1),
+        exclude (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplAdminGrpType specifies whether the links
+         in the specified IP admin group should be used for the next-hop or
+         not.
+
+         A value of 'include(1)' specifies the next-hop template can select a
+         link from the IP admin group to be used as the next-hop.
+
+         A value of 'exclude(2)' specifies the links of the IP admin group will
+         never be used for the next-hop."
+    ::= { tmnxRouteNHTemplAdminGrpEntry 1 }
+
+tmnxRouteNHTemplAdminGrpName     OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplAdminGrpName specifies the name of the IP
+         admin group that is used in this next-hop template."
+    ::= { tmnxRouteNHTemplAdminGrpEntry 2 }
+
+tmnxRouteNHTemplAdmGrpRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplAdmGrpRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { tmnxRouteNHTemplAdminGrpEntry 3 }
+
+tmnxRouteNHTemplAdmGrpRowLstCh   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxRouteNHTemplAdmGrpRowLstCh indicates the sysUpTime at
+         the time of the most recent management-initiated change to this row."
+    ::= { tmnxRouteNHTemplAdminGrpEntry 4 }
+
+tmnxRouteNHTemplAdminGrpPref     OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxRouteNHTemplAdminGrpPref specifies a relative
+         preference for the admin group to select. The system will first
+         attempt to select a next-hop in the IP admin groups with the highest
+         preference.
+
+         If tmnxRouteNHTemplAdminGrpType is set to 'exclude(2)' the preference
+         must be set to 0.
+
+         If tmnxRouteNHTemplAdminGrpType is set to 'include(1)' the preference
+         can never be set to 0. In this case the default value of this field
+         will be set to 255."
+    ::= { tmnxRouteNHTemplAdminGrpEntry 5 }
+
+tmnxRouteNHNotificationObjs      OBJECT IDENTIFIER ::= { tmnxRouteNextHop 2 }
+
+tmnxRouteNHConformance           OBJECT IDENTIFIER ::= { tmnxSRConfs 90 }
+
+tmnxRouteNHCompliances           OBJECT IDENTIFIER ::= { tmnxRouteNHConformance 1 }
+
+tmnxRouteNextHopCompliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of route next-hop template on
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxRouteNextHopTemplateGroup
+        }
+    ::= { tmnxRouteNHCompliances 1 }
+
+tmnxRouteNHGroups                OBJECT IDENTIFIER ::= { tmnxRouteNHConformance 2 }
+
+tmnxRouteNextHopTemplateGroup    OBJECT-GROUP
+    OBJECTS     {
+        tmnxRouteNHAdminLastChangeTime,
+        tmnxRouteNHAdminOwner,
+        tmnxRouteNHAdminControlApply,
+        tmnxRouteNHTemplateTblLastCh,
+        tmnxRouteNHTemplateRowStatus,
+        tmnxRouteNHTemplateRowLstChng,
+        tmnxRouteNHTemplateDescription,
+        tmnxRouteNHTemplateSrlgEnable,
+        tmnxRouteNHTemplProtectionType,
+        tmnxRouteNHTemplateNextHopType,
+        tmnxRouteNHTemplAdminGrpTblLstCh,
+        tmnxRouteNHTemplAdmGrpRowStatus,
+        tmnxRouteNHTemplAdmGrpRowLstCh,
+        tmnxRouteNHTemplAdminGrpPref
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing configuration of route next-hop
+         templates on Nokia SROS series systems."
+    ::= { tmnxRouteNHGroups 1 }
+
+tmnxRouteNHNotifGroups           OBJECT IDENTIFIER ::= { tmnxRouteNHConformance 3 }
+
+tmnxRouteNHNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 90 }
+
+tmnxRouteNHNotifications         OBJECT IDENTIFIER ::= { tmnxRouteNHNotifyPrefix 0 }
+
+END

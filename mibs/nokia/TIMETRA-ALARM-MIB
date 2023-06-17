@@ -1,0 +1,106 @@
+TIMETRA-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+                                                         FROM SNMPv2-SMI
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TmnxEnabledDisabled
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraAlarmMIBModule            MODULE-IDENTITY
+    LAST-UPDATED "201102010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document, an extension of ALARM-MIB defined in RFC 3877, is the
+         SNMP MIB module to manage and provision the alarm management
+         components of the Nokia SROS device.
+
+         Copyright (c) 2010-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201102010000Z"
+    DESCRIPTION
+        "Rev 1.0                1 Feb 2011 00:00
+         1.0 release of the TIMETRA-ALARM-MIB."
+
+    ::= { timetraSRMIBModules 77 }
+
+tmnxAlarmObjs                    OBJECT IDENTIFIER ::= { tmnxSRObjs 77 }
+
+tmnxAlarmConfigTimeStamps        OBJECT IDENTIFIER ::= { tmnxAlarmObjs 1 }
+
+tmnxAlarmConfigurations          OBJECT IDENTIFIER ::= { tmnxAlarmObjs 2 }
+
+tmnxAlarmSystemConfig            OBJECT IDENTIFIER ::= { tmnxAlarmConfigurations 1 }
+
+tmnxAlarmAdminState              OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxAlarmAdminState specifies whether or not alarm
+         management is enabled on the system. As a result of setting
+         tmnxAlarmAdminState to 'disabled(2)', all alarms present in MIB table
+         ALARM-MIB::alarmActiveTable will be cleared, all rows in MIB table
+         ALARM-MIB::alarmClearTable will be destroyed, and no new alarms will
+         be raised."
+    DEFVAL      { enabled }
+    ::= { tmnxAlarmSystemConfig 1 }
+
+tmnxAlarmConformance             OBJECT IDENTIFIER ::= { tmnxSRConfs 77 }
+
+tmnxAlarmCompliances             OBJECT IDENTIFIER ::= { tmnxAlarmConformance 1 }
+
+tmnxAlarmCompliance              MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of alarms for Release 9.0
+         on SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxAlarmSystemConfigGroup
+        }
+    ::= { tmnxAlarmCompliances 1 }
+
+tmnxAlarmGroups                  OBJECT IDENTIFIER ::= { tmnxAlarmConformance 2 }
+
+tmnxAlarmV9v0Groups              OBJECT IDENTIFIER ::= { tmnxAlarmGroups 1 }
+
+tmnxAlarmSystemConfigGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxAlarmAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining system configuration for alarm
+         management on SROS series systems."
+    ::= { tmnxAlarmV9v0Groups 1 }
+
+tmnxAlarmNotifyPrefix            OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 77 }
+
+tmnxAlarmNotifications           OBJECT IDENTIFIER ::= { tmnxAlarmNotifyPrefix 0 }
+
+END

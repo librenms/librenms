@@ -64,8 +64,8 @@ IMPORTS
     TPlcyAcctPolicerId,
     TPolicyStatementNameOrEmpty,
     TPriorityOrUndefined,
-    TQosQGrpInstanceIDorZero,
-    TResolveStatus,
+    TQosQGrpInstanceIDorZero, TRateType,
+    TResolveStatus, TSrv6RouteResolution,
     TXLPolicyNameOrExpOrEmpty,
     TmnxAddressAndPrefixAddress,
     TmnxAddressAndPrefixPrefix,
@@ -85,7 +85,7 @@ IMPORTS
     TmnxDistCpuProtProtocolId,
     TmnxDistCpuProtState,
     TmnxEnabledDisabled, TmnxEncapVal,
-    TmnxFlexAlgoIdOrZero,
+    TmnxFPNumber, TmnxFlexAlgoIdOrZero,
     TmnxIpv6AddressAndPrefixAddress,
     TmnxIpv6AddressAndPrefixPrefix,
     TmnxIsaBbGrpId, TmnxLagPerLinkHashClass,
@@ -301,7 +301,8 @@ TDSCPAppId                       ::= TEXTUAL-CONVENTION
         http              (41),
         mpls-udp-return   (42),
         pfcp              (43),
-        ibcp              (44)
+        ibcp              (44),
+        bfd               (45)
     }
 
 TDot1pAppId                      ::= TEXTUAL-CONVENTION
@@ -368,7 +369,11 @@ TmnxInetCidrNextHopOwner         ::= TEXTUAL-CONVENTION
          srBgp         :  Next hop owner is BGP-SR TE.
          mplsFwdPolicy :  Next hop owner is MPLS-Fwd-Policy.
          srPolicy      :  Next hop owner is SR-POLICY.
-         ribApi        :  Next hop owner is RIB-API."
+         ribApi        :  Next hop owner is RIB-API.
+         srv6          :  Next hop owner is SRV6.
+         srv6Isis      :  Next hop owner is SRV6-ISIS.
+         srv6Policy    :  Next hop owner is SRV6-POLICY.
+         video         :  Next hop owner is VIDEO."
     SYNTAX      INTEGER {
         unknown       (0),
         rsvp          (1),
@@ -385,7 +390,9 @@ TmnxInetCidrNextHopOwner         ::= TEXTUAL-CONVENTION
         srPolicy      (12),
         ribApi        (13),
         srv6          (14),
-        srv6Isis      (15)
+        srv6Isis      (15),
+        srv6Policy    (16),
+        video         (17)
     }
 
 TmnxL3RouteOwner                 ::= TEXTUAL-CONVENTION
@@ -3048,7 +3055,8 @@ vRtrIfType                       OBJECT-TYPE
          serviceIesAa          - defined on an AA (Application Assurance) SAP.
          serviceVprnAa         - defined on an AA SAP.
          unnumMplsTp           - defined for an unnumbered mpls tp interface.
-         controlTunnel         - can have an IP tunnel.
+         gmplsLoopback         - obsoleted.
+         controlTunnel         - obsoleted.
          pdn                   - defined for a packet data network interface."
     ::= { vRtrIfEntry 3 }
 
@@ -8116,6 +8124,37 @@ vRtrNotifIgnorePortState         OBJECT-TYPE
          ignore non-operational port associated with the IP interface with the
          SAP."
     ::= { tmnxVRtrNotificationObjects 46 }
+
+vRtrNotifyFpNum                  OBJECT-TYPE
+    SYNTAX      TmnxFPNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrNotifyFpNum identifies the Forwarding Plane."
+    ::= { tmnxVRtrNotificationObjects 51 }
+
+vRtrNotifyBgpInstType            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ipVpnMpls (1),
+        ipVpnSrv6 (2),
+        evpnMpls  (3),
+        evpnSrv6  (4)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The vRtrNotifyBgpInstType specifies the BGP protocol family used with
+         this service."
+    ::= { tmnxVRtrNotificationObjects 52 }
+
+vRtrNotifyBgpInstance            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The vRtrNotifyBgpInstance specifies the BGP instance used with this
+         service."
+    ::= { tmnxVRtrNotificationObjects 53 }
 
 vRtrIfDHCPLeaseStateTable        OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfDHCPLeaseStateEntry
@@ -15855,7 +15894,8 @@ VRtrConfExtEntry                 ::= SEQUENCE
     vRtrMvpnIpmsiSRPolicy            TruthValue,
     vRtrMvpnSpmsiSRPolicy            TruthValue,
     vRtrBgpIpVpnMplsAdminState       TmnxEnabledDisabled,
-    vRtrBgpIpVpnMplsDynEgrLblLmt     TruthValue
+    vRtrBgpIpVpnMplsDynEgrLblLmt     TruthValue,
+    vRtrBgpIpVpnMplsOperState        TmnxEnabledDisabled
 }
 
 vRtrLdpShortcut                  OBJECT-TYPE
@@ -16865,6 +16905,15 @@ vRtrBgpIpVpnMplsDynEgrLblLmt     OBJECT-TYPE
     DEFVAL      { false }
     ::= { vRtrConfExtEntry 75 }
 
+vRtrBgpIpVpnMplsOperState        OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBgpIpVpnMplsOperState indicates the operational state of BGP
+         IP VPN MPLs for this service."
+    ::= { vRtrConfExtEntry 76 }
+
 vRtrIfExtTable                   OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfExtEntry
     MAX-ACCESS  not-accessible
@@ -17025,7 +17074,8 @@ vRtrIfQosRouteLookup             OBJECT-TYPE
     SYNTAX      INTEGER {
         none        (0),
         destination (1),
-        source      (2)
+        source      (2),
+        reserved3   (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -17044,7 +17094,12 @@ vRtrIfQosRouteLookup             OBJECT-TYPE
 
          When the value of vRtrIfQosRouteLookup is 'source (2)', the QoS route
          lookup is enabled and the Qos classification of incoming IP packets is
-         based on the source address matching."
+         based on the source address matching.
+
+         When the value of vRtrIfQosRouteLookup is 'source-and-dest (3)', the
+         QoS route lookup is enabled and the Qos classification of incoming IP
+         packets is based on the source address and destination address
+         matching."
     DEFVAL      { none }
     ::= { vRtrIfExtEntry 5 }
 
@@ -17052,7 +17107,8 @@ vRtrIfIpv6QosRouteLookup         OBJECT-TYPE
     SYNTAX      INTEGER {
         none        (0),
         destination (1),
-        source      (2)
+        source      (2),
+        reserved3   (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -17071,7 +17127,12 @@ vRtrIfIpv6QosRouteLookup         OBJECT-TYPE
 
          When the value of vRtrIfIpv6QosRouteLookup is 'source (2)', the QoS
          route lookup is enabled and the Qos classification of incoming IP
-         packets is based on the source address matching."
+         packets is based on the source address matching.
+
+         When the value of vRtrIfIpv6QosRouteLookup is 'source-and-dest (3)',
+         the QoS route lookup is enabled and the Qos classification of incoming
+         IP packets is based on the source address and destination address
+         matching."
     DEFVAL      { none }
     ::= { vRtrIfExtEntry 6 }
 
@@ -18006,7 +18067,7 @@ vRtrIfUrpfSelectedVprnsOnly      OBJECT-TYPE
 vRtrIfIpTunnelRemoteIpAddrType   OBJECT-TYPE
     SYNTAX      InetAddressType
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpTunnelRemoteIpAddrType specifies the type of
          vRtrIfIpTunnelRemoteIpAddr."
@@ -18016,7 +18077,7 @@ vRtrIfIpTunnelRemoteIpAddrType   OBJECT-TYPE
 vRtrIfIpTunnelRemoteIpAddr       OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpTunnelRemoteIpAddr specifies the IP address of
          the remote end of the IP tunnel associated with this interface (the
@@ -19833,7 +19894,21 @@ VRtrStatExtEntry                 ::= SEQUENCE
     vRtrStatActiveSrV6IsisTunnels    Gauge32,
     vRtrStatTotalSrV6IsisTunnels     Gauge32,
     vRtrStatSrV6ActiveRoutes         Gauge32,
-    vRtrStatSrV6TotalRoutes          Gauge32
+    vRtrStatSrV6TotalRoutes          Gauge32,
+    vRtrStatActiveSrV6PolicyTunnels  Gauge32,
+    vRtrStatTotalSrV6PolicyTunnels   Gauge32,
+    vRtrStatActiveSrV6PolicyRoutes   Gauge32,
+    vRtrStatTotalSrV6PolicyRoutes    Gauge32,
+    vRtrStatActiveV4VideoRoutes      Gauge32,
+    vRtrStatTotalV4VideoRoutes       Gauge32,
+    vRtrStatActiveV6VideoRoutes      Gauge32,
+    vRtrStatTotalV6VideoRoutes       Gauge32,
+    vRtrMcastIpv4ActiveVideoRoutes   Gauge32,
+    vRtrMcastIpv4TotalVideoRoutes    Gauge32,
+    vRtrMcastIpv6ActiveVideoRoutes   Gauge32,
+    vRtrMcastIpv6TotalVideoRoutes    Gauge32,
+    vRtrStatV6NdRaRoutes             Gauge32,
+    vRtrStatV6NdRaActiveRoutes       Gauge32
 }
 
 vRtrISISAltRoutes                OBJECT-TYPE
@@ -20637,6 +20712,136 @@ vRtrStatSrV6TotalRoutes          OBJECT-TYPE
         "vRtrStatSrV6TotalRoutes indicates the current number of total SR V6
          routes."
     ::= { vRtrStatExtEntry 83 }
+
+vRtrStatActiveSrV6PolicyTunnels  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatActiveSrV6PolicyTunnels indicates the current number of both
+         active and inactive SR V6 Policy tunnels."
+    ::= { vRtrStatExtEntry 84 }
+
+vRtrStatTotalSrV6PolicyTunnels   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatTotalSrV6PolicyTunnels indicates the current number of total
+         SR V6 Policy tunnels."
+    ::= { vRtrStatExtEntry 85 }
+
+vRtrStatActiveSrV6PolicyRoutes   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatActiveSrV6PolicyRoutes indicates the current number of both
+         active and inactive SR V6 Policy routes."
+    ::= { vRtrStatExtEntry 86 }
+
+vRtrStatTotalSrV6PolicyRoutes    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatTotalSrV6PolicyRoutes indicates the current number of total SR
+         V6 Policy routes."
+    ::= { vRtrStatExtEntry 87 }
+
+vRtrStatActiveV4VideoRoutes      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatActiveV4VideoRoutes indicates the current number of both
+         active and inactive IPv4 video routes."
+    ::= { vRtrStatExtEntry 88 }
+
+vRtrStatTotalV4VideoRoutes       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatTotalV4VideoRoutes indicates the current number of total IPv4
+         video routes."
+    ::= { vRtrStatExtEntry 89 }
+
+vRtrStatActiveV6VideoRoutes      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatActiveV6VideoRoutes indicates the current number of both
+         active and inactive IPv6 video routes."
+    ::= { vRtrStatExtEntry 90 }
+
+vRtrStatTotalV6VideoRoutes       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrStatTotalV6VideoRoutes indicates the current number of total IPv6
+         video routes."
+    ::= { vRtrStatExtEntry 91 }
+
+vRtrMcastIpv4ActiveVideoRoutes   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMcastIpv4ActiveVideoRoutes indicates the number of
+         active and inactive IPv4 Multicast Video route entries for  the
+         specified virtual router in the system."
+    ::= { vRtrStatExtEntry 92 }
+
+vRtrMcastIpv4TotalVideoRoutes    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMcastIpv4TotalVideoRoutes indicates the number of
+         total IPv4 Multicast Video route entries for the specified virtual
+         router in the system."
+    ::= { vRtrStatExtEntry 93 }
+
+vRtrMcastIpv6ActiveVideoRoutes   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMcastIpv6ActiveVideoRoutes indicates the number of
+         active and inactive IPv6 Multicast Video route entries for the
+         specified virtual router in the system."
+    ::= { vRtrStatExtEntry 94 }
+
+vRtrMcastIpv6TotalVideoRoutes    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMcastIpv6TotalVideoRoutes indicates the number of
+         total IPv6 Multicast Video route entries for  the specified virtual
+         router in the system."
+    ::= { vRtrStatExtEntry 95 }
+
+vRtrStatV6NdRaRoutes             OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStatV6NdRaRoutes indicates the current number of IPv6
+         ND-RA routes for this instance of the route table."
+    ::= { vRtrStatExtEntry 96 }
+
+vRtrStatV6NdRaActiveRoutes       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrStatV6NdRaActiveRoutes indicates the current number
+         of IPv6 active ND-RA routes for this instance of the route table."
+    ::= { vRtrStatExtEntry 97 }
 
 vRtrVrfPolicyTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrVrfPolicyEntry
@@ -22174,7 +22379,10 @@ VRtrIfQosEntry                   ::= SEQUENCE
     vRtrIfQosEgrAggRatePIRLmt        Integer32,
     vRtrIfQosEgrAggRateCIRLmt        Integer32,
     vRtrIfQosEgrOperVlanQosPlcy      TLNamedItemOrEmpty,
-    vRtrIfQosEgrVlanPlcyPortRedirect TruthValue
+    vRtrIfQosEgrVlanPlcyPortRedirect TruthValue,
+    vRtrIfQosEgrAggRatePIRPercent    Unsigned32,
+    vRtrIfQosEgrAggRateCIRPercent    Unsigned32,
+    vRtrIfQosEgrAggRateType          TRateType
 }
 
 vRtrIfQosNetworkPolicyId         OBJECT-TYPE
@@ -22310,6 +22518,51 @@ vRtrIfQosEgrVlanPlcyPortRedirect OBJECT-TYPE
          vRtrIfQosEgrVlanQosPlcy."
     DEFVAL      { false }
     ::= { vRtrIfQosEntry 12 }
+
+vRtrIfQosEgrAggRatePIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative PIR percentage, in centipercent. An
+         'inconsistentValue' error is returned if vRtrIfQosEgrAggRatePIRPercent
+         is set to non-default value when the object vRtrIfQosEgrAggRateType is
+         set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { vRtrIfQosEntry 13 }
+
+vRtrIfQosEgrAggRateCIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative CIR percentage, in centipercent. An
+         'inconsistentValue' error is returned if vRtrIfQosEgrAggRateCIRPercent
+         is set to non-default value when the object vRtrIfQosEgrAggRateType is
+         set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { vRtrIfQosEntry 14 }
+
+vRtrIfQosEgrAggRateType          OBJECT-TYPE
+    SYNTAX      TRateType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfQosEgrAggRateType specifies the type of Egress Agg
+         rate.
+
+         When the value of the object is set to 'kbps', the ingresss queue
+         rates are specified in kbps. The objects vRtrIfQosEgrAggRateCIRPercent
+         and vRtrIfQosEgrAggRatePIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percent', the egress queue
+         rates are specified in percentage. The objects
+         vRtrIfQosEgrAggRateCIRPercent and vRtrIfQosEgrAggRatePIRPercent will
+         be set to their default values."
+    DEFVAL      { kbps }
+    ::= { vRtrIfQosEntry 15 }
 
 vRtrDnsTableLastCh               OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -22798,7 +23051,9 @@ VRtrIfDcpFpStaticStatEntry       ::= SEQUENCE
     vRtrIfDcpFpStaticExcdCountHi     Counter32,
     vRtrIfDcpFpStaticExcdCountLo     Counter32,
     vRtrIfDcpFpStaticHoldDown        TmnxDistCpuProtActionDuration,
-    vRtrIfDcpFpStaticDetectionTime   Unsigned32
+    vRtrIfDcpFpStaticDetectionTime   Unsigned32,
+    vRtrIfDcpFpStaticTotalExcdCount  Counter64,
+    vRtrIfDcpFpStaticExtCnfrmStCount Counter32
 }
 
 vRtrIfDcpFpStaticPlcrName        OBJECT-TYPE
@@ -22867,6 +23122,24 @@ vRtrIfDcpFpStaticDetectionTime   OBJECT-TYPE
          time remaining for a given static-policer."
     ::= { vRtrIfDcpFpStaticStatEntry 7 }
 
+vRtrIfDcpFpStaticTotalExcdCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpStaticTotalExcdCount indicates the total
+         number of packets exceeding the policing parameters."
+    ::= { vRtrIfDcpFpStaticStatEntry 8 }
+
+vRtrIfDcpFpStaticExtCnfrmStCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpStaticExtCnfrmStCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { vRtrIfDcpFpStaticStatEntry 9 }
+
 vRtrIfDcpFpDynStatTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfDcpFpDynStatEntry
     MAX-ACCESS  not-accessible
@@ -22904,7 +23177,9 @@ VRtrIfDcpFpDynStatEntry          ::= SEQUENCE
     vRtrIfDcpFpDynExcdCountLo        Counter32,
     vRtrIfDcpFpDynHoldDown           TmnxDistCpuProtActionDuration,
     vRtrIfDcpFpDynDetectionTime      Unsigned32,
-    vRtrIfDcpFpDynAllocated          TruthValue
+    vRtrIfDcpFpDynAllocated          TruthValue,
+    vRtrIfDcpFpDynTotalExcdCount     Counter64,
+    vRtrIfDcpFpDynExtCnfrmStateCount Counter32
 }
 
 vRtrIfDcpFpProtocol              OBJECT-TYPE
@@ -22984,6 +23259,24 @@ vRtrIfDcpFpDynAllocated          OBJECT-TYPE
          has been allocated for this protocol."
     ::= { vRtrIfDcpFpDynStatEntry 8 }
 
+vRtrIfDcpFpDynTotalExcdCount     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpDynTotalExcdCount indicates the total number
+         of packets exceeding the policing parameters."
+    ::= { vRtrIfDcpFpDynStatEntry 9 }
+
+vRtrIfDcpFpDynExtCnfrmStateCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpDynExtCnfrmStateCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { vRtrIfDcpFpDynStatEntry 10 }
+
 vRtrIfDcpFpLocMonStatTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfDcpFpLocMonStatEntry
     MAX-ACCESS  not-accessible
@@ -23020,7 +23313,9 @@ VRtrIfDcpFpLocMonStatEntry       ::= SEQUENCE
     vRtrIfDcpFpLocMonExcdCount       Counter64,
     vRtrIfDcpFpLocMonExcdCountHi     Counter32,
     vRtrIfDcpFpLocMonExcdCountLo     Counter32,
-    vRtrIfDcpFpLocMonAllDynAlloc     TruthValue
+    vRtrIfDcpFpLocMonAllDynAlloc     TruthValue,
+    vRtrIfDcpFpLocMonTotalExcdCount  Counter64,
+    vRtrIfDcpFpLocMonExtCnfrmStCount Counter32
 }
 
 vRtrIfDcpFpLocMonPlcrName        OBJECT-TYPE
@@ -23079,6 +23374,24 @@ vRtrIfDcpFpLocMonAllDynAlloc     OBJECT-TYPE
          dynamic policers associated with this local-monitor have been
          allocated."
     ::= { vRtrIfDcpFpLocMonStatEntry 6 }
+
+vRtrIfDcpFpLocMonTotalExcdCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpLocMonTotalExcdCount indicates the total
+         number of packets exceeding the policing parameters."
+    ::= { vRtrIfDcpFpLocMonStatEntry 7 }
+
+vRtrIfDcpFpLocMonExtCnfrmStCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfDcpFpLocMonExtCnfrmStCount indicates the total
+         number of transition of the policer to the exceed state."
+    ::= { vRtrIfDcpFpLocMonStatEntry 8 }
 
 vRtrIfDHCP6ProxyDuidTableLastCh  OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -24076,7 +24389,7 @@ tmnxAdminGrpRowLstChng           OBJECT-TYPE
     ::= { tmnxAdminGroupEntry 3 }
 
 tmnxAdminGrpValue                OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..31)
+    SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26832,7 +27145,8 @@ VRtrIfExtParmsEntry              ::= SEQUENCE
     vRtrIfAcctPolicyId               Unsigned32,
     vRtrIfCollectStats               TruthValue,
     vRtrIfUnidirectionalLinkDelay    Integer32,
-    vRtrIfIngrDestinationClassLookup TruthValue
+    vRtrIfIngrDestinationClassLookup TruthValue,
+    vRtrIfIcmpTtlExpiredMatchingAddr TruthValue
 }
 
 vRtrIfIpv4ArpPopulateHost        OBJECT-TYPE
@@ -27034,6 +27348,19 @@ vRtrIfIngrDestinationClassLookup OBJECT-TYPE
          vRtrIfType is equal to 'network', 'serviceIes' or 'serviceVprn'."
     DEFVAL      { false }
     ::= { vRtrIfExtParmsEntry 13 }
+
+vRtrIfIcmpTtlExpiredMatchingAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When vRtrIfIcmpTtlExpiredMatchingAddr is set to 'true', the reply will
+         use a matching subscriber interface IP address as source address.
+
+         Value 'true' is allowed only for group interfaces and will be 'false'
+         otherwise."
+    DEFVAL      { false }
+    ::= { vRtrIfExtParmsEntry 14 }
 
 vRtrAdminTagsTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrAdminTagsEntry
@@ -27502,7 +27829,9 @@ vRtrInetExtTunnelFlags           OBJECT-TYPE
         isAdjacencyTunnel          (11),
         lspBfdDown                 (12),
         hasColor                   (13),
-        preferTransportFRR         (14)
+        preferTransportFRR         (14),
+        allowSrOverSrTe            (15),
+        encryptedTunnel            (16)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -27555,7 +27884,13 @@ vRtrInetExtTunnelFlags           OBJECT-TYPE
 
          If value of 'preferTransportFRR' is set, it indicates that for this
          tunnel, if it is over another transport tunnel, the underlying
-         transport tunnel's FRR is deferred to if that tunnel is in FRR."
+         transport tunnel's FRR is deferred to if that tunnel is in FRR.
+
+         If value of 'allowSrOverSrTe' is set, it indicates that SR over SR-TE
+         is allowed for this tunnel.
+
+         If value of 'encryptedTunnel' is set, it indicates that this tunnel is
+         encrypted."
     ::= { vRtrInetExtTunnelEntry 19 }
 
 vRtrInetExtTunnelRelativeMetric  OBJECT-TYPE
@@ -31137,7 +31472,13 @@ VRtrBgpEvpnEntry                 ::= SEQUENCE
     vRtrBgpEvpnOperRDType            TmnxRouteDistType,
     vRtrBgpEvpnVrfTarget             TNamedItemOrEmpty,
     vRtrBgpEvpnDomainId              TmnxDPathDomainId,
-    vRtrBgpEvpnDynEgrLblLmt          TruthValue
+    vRtrBgpEvpnDynEgrLblLmt          TruthValue,
+    vRtrBgpEvpnEvi                   Unsigned32,
+    vRtrBgpEvpnAdLinkBw              TruthValue,
+    vRtrBgpEvpnAdLinkBwWeight        Unsigned32,
+    vRtrBgpEvpnAdLinkBwMaxWeight     Unsigned32,
+    vRtrBgpEvpnWeightedEcmp          TruthValue,
+    vRtrBgpEvpnOperState             TmnxEnabledDisabled
 }
 
 vRtrBgpEvpnInstance              OBJECT-TYPE
@@ -31303,6 +31644,68 @@ vRtrBgpEvpnDynEgrLblLmt          OBJECT-TYPE
          ethernet-segment label etc or not."
     DEFVAL      { false }
     ::= { vRtrBgpEvpnEntry 17 }
+
+vRtrBgpEvpnEvi                   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "BGP EVPN identifier used for the service-carving algorithm used for
+         multi-homing and for auto-deriving the route-distinguisher and
+         route-target."
+    DEFVAL      { 0 }
+    ::= { vRtrBgpEvpnEntry 18 }
+
+vRtrBgpEvpnAdLinkBw              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBgpEvpnAdLinkBw specifies whether to advertise link
+         bandwidth for evpn-ifl routes."
+    DEFVAL      { false }
+    ::= { vRtrBgpEvpnEntry 19 }
+
+vRtrBgpEvpnAdLinkBwWeight        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBgpEvpnAdLinkBwWeight specifies the weight to be
+         advertised with evpn-ifl routes. This is effective only when
+         vRtrBgpEvpnAdLinkBwWeight is enabled."
+    DEFVAL      { 0 }
+    ::= { vRtrBgpEvpnEntry 20 }
+
+vRtrBgpEvpnAdLinkBwMaxWeight     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBgpEvpnAdLinkBwMaxWeight specifies the maximum weight
+         to be advertised with evpn-ifl routes. This is effective only when
+         vRtrBgpEvpnAdLinkBwMaxWeight is enabled."
+    DEFVAL      { 128 }
+    ::= { vRtrBgpEvpnEntry 21 }
+
+vRtrBgpEvpnWeightedEcmp          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBgpEvpnWeightedEcmp specifies whether uneqal ecmp
+         will be performed based on link bandwidth weights for evpn-ifl routes."
+    DEFVAL      { false }
+    ::= { vRtrBgpEvpnEntry 22 }
+
+vRtrBgpEvpnOperState             OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBgpEvpnOperState indicates if the VPRN BGP EVPN MPLS instance
+         is enabled or not."
+    ::= { vRtrBgpEvpnEntry 23 }
 
 vRtrBgpEvpnMplsTblLastCh         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -32714,7 +33117,10 @@ VRtrBgpSrv6Entry                 ::= SEQUENCE
     vRtrBgpSrv6SrcAddrType           InetAddressType,
     vRtrBgpSrv6SrcAddr               InetAddress,
     vRtrBgpSrv6DefRtTag              Unsigned32,
-    vRtrBgpSrv6DomainId              TmnxDPathDomainId
+    vRtrBgpSrv6DomainId              TmnxDPathDomainId,
+    vRtrBgpSrv6Evi                   Unsigned32,
+    vRtrBgpSrv6Resolution            TSrv6RouteResolution,
+    vRtrBgpSrv6OperState             TmnxEnabledDisabled
 }
 
 vRtrBgpSrv6BgpInstType           OBJECT-TYPE
@@ -32922,6 +33328,36 @@ vRtrBgpSrv6DomainId              OBJECT-TYPE
          Segment-Routing-V6 service."
     DEFVAL      { '000000000000'H }
     ::= { vRtrBgpSrv6Entry 19 }
+
+vRtrBgpSrv6Evi                   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "BGP EVPN identifier used for the service-carving algorithm used for
+         multi-homing and for auto-deriving the route-distinguisher and
+         route-target."
+    DEFVAL      { 0 }
+    ::= { vRtrBgpSrv6Entry 20 }
+
+vRtrBgpSrv6Resolution            OBJECT-TYPE
+    SYNTAX      TSrv6RouteResolution
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrBgpSrv6Resolution specifies the resolution options
+         for routes for BGP IPVPN or EVPN Segment-Routing-V6 service."
+    DEFVAL      { routeTable }
+    ::= { vRtrBgpSrv6Entry 21 }
+
+vRtrBgpSrv6OperState             OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vRtrBgpSrv6OperState indiates if the VPRN BGP  SRv6 instance is
+         enabled or not."
+    ::= { vRtrBgpSrv6Entry 22 }
 
 vRtrBgpSrv6VrfPolicyTblLastCh    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -34025,6 +34461,84 @@ vRtrDPathAttrLastChanged         OBJECT-TYPE
     DESCRIPTION
         "Time stamp of last change of any object for this entry."
     ::= { vRtrDPathAttrEntry 4 }
+
+vRtrSubDhcp4Table                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrSubDhcp4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrSubDhcp4Table contains DHCP configuration per virtual router."
+    ::= { tmnxVRtrObjs 221 }
+
+vRtrSubDhcp4Entry                OBJECT-TYPE
+    SYNTAX      VRtrSubDhcp4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains information for DHCP in IPv4.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS    { vRtrConfEntry }
+    ::= { vRtrSubDhcp4Table 1 }
+
+VRtrSubDhcp4Entry                ::= SEQUENCE
+{
+    vRtrSubDhcp4LastChanged          TimeStamp,
+    vRtrSubDhcp4TransparentForward   TruthValue,
+    vRtrSubDhcp4TranspFwdClntPkts    Counter64,
+    vRtrSubDhcp4TranspFwdServPkts    Counter64,
+    vRtrSubDhcp4TranspFwdOtherPkts   Counter64
+}
+
+vRtrSubDhcp4LastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSubDhcp4LastChanged indicates the sysUpTime when an
+         object in this table was last modified."
+    ::= { vRtrSubDhcp4Entry 1 }
+
+vRtrSubDhcp4TransparentForward   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSubDhcp4TransparentForward specifies the transparent
+         forwarding of DHCPv4 over IPoE sessions."
+    DEFVAL      { false }
+    ::= { vRtrSubDhcp4Entry 2 }
+
+vRtrSubDhcp4TranspFwdClntPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSubDhcp4TranspFwdClntPkts indicates the number of
+         client packets forwarded using transparent forwarding of DHCPv4 over
+         IPoE sessions, where the 'op' opcode matches BOOTREQUEST."
+    ::= { vRtrSubDhcp4Entry 3 }
+
+vRtrSubDhcp4TranspFwdServPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSubDhcp4TranspFwdServPkts indicates the number of
+         server packets forwarded using transparent forwarding of DHCPv4 over
+         IPoE sessions, where the 'op' opcode matches BOOTREPLY."
+    ::= { vRtrSubDhcp4Entry 4 }
+
+vRtrSubDhcp4TranspFwdOtherPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrSubDhcp4TranspFwdOtherPkts indicates the number of
+         packets forwarded using transparent forwarding of DHCPv4 over IPoE
+         sessions, where the 'op' opcode is different from either BOOTREQUEST
+         or BOOTREPLY."
+    ::= { vRtrSubDhcp4Entry 5 }
 
 tmnxVRtrConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 3 }
 
@@ -35177,7 +35691,7 @@ tmnxVRtr7xx0V16v0Compliance      MODULE-COMPLIANCE
     ::= { tmnxVRtrCompliances 25 }
 
 tmnxVRtr7xx0V19v0Compliance      MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of virtual router instances on
          Nokia SROS series systems release R19."
@@ -35350,6 +35864,162 @@ tmnxVRtr7xx0V20v0Compliance      MODULE-COMPLIANCE
          Nokia SROS series systems release R20."
     MODULE
         MANDATORY-GROUPS {
+            tmnxVRtrGlobalV6v0Group,
+            tmnxVRtrIPv6V4v0Group,
+            tmnxVRtrIPv6IpV5v0Group,
+            tmnxVRtrIPv6IfV4v0Group,
+            tmnxVRtrIfDhcpServerGroup,
+            tmnxVRtrIfSubscrAuthV3v0Group,
+            tmnxVRtrStaticRteCPEChkV6v0Group,
+            tmnxVRtrIfIpcpV6v0Group,
+            tmnxVRtrIfCpmProtectGroup,
+            tmnxDscpAppV6v0Group,
+            tmnxVRtrIfDHCPRelayV9v0Group,
+            tmnxVRtrIfDHCPRelayV11v0Group,
+            tmnxVRtrV6v1Group,
+            tmnxVRtrInetAllCidrRouteV7v0Group,
+            tmnxVRtrInetStaticRouteV7v0Group,
+            tmnxVRtruRPFV7v0Group,
+            tmnxVRtrV9v0Group,
+            tmnxVRtrPolicyGroup,
+            tmnxVRtrNetDomainGroup,
+            tmnxVRtrTunIntV8v0Group,
+            tmnxVRtrFibStatsV8v0Group,
+            tmnxVRtrMvpnPmsiV8v0Group,
+            tmnxVRtrIfDHCPRelayV6v1Group,
+            tmnxVRtrQPPBV9v0R4Group,
+            tmnxVRtrIfDHCP6V9v0Group,
+            tmnxVRtrIfDHCP6V10v0Group,
+            tmnxVRtrIfDHCP6V11v0Group,
+            tmnxVRtrIfDHCP6V12v0Group,
+            tmnxVrtrIfDHCP6ProxyDuidGroup,
+            tmnxVRtrIfStatsV9v0Group,
+            tmnxVRtrIfStatsV11v0Group,
+            tmnxVRtrIfIpReasV9v0Group,
+            tmnxVRtrMSPwV9v0Group,
+            tmnxVRtrNatRedGroup,
+            tmnxVRtrMvpnSrcRedV9v0R4Group,
+            tmnxVRtrStatV9v0Group,
+            tmnxVRtruRPFV10v0Group,
+            tmnxVRtrIpPoolGroup,
+            tmnxVRtrQosQGrplV10v0Group,
+            tmnxVRtrStatV10v0Group,
+            tmnxVRtrStatV11v0Group,
+            tmnxVRtrIPv6MgtIfV7v0Group,
+            tmnxMGVRtrIfV4v0Group,
+            tmnxVRtrFlowSpecV11v0Group,
+            tmnxVRtrGrtLocalMgmtV10v0Group,
+            tmnxVRtrMcastV11v0Group,
+            tmnxVrtrIfDCpuProtV11v0Group,
+            tmnxVrtrDcpNotifyObjsV11v0Group,
+            tmnxVrtrIfDcpNotifyV11v0Group,
+            tmnxVRtrIfMacStatsV11v0Group,
+            tmnxVRtrIpv6RtrAdvertV11v0Group,
+            tmnxVRtrBfdV11v0Group,
+            tmnxVRtrV12v0Group,
+            tmnxVRtrRAV12v0Group,
+            tmnxVRtrExportBgpVpnV11v0Group,
+            tmnxVRtrGenerateICMPV12v0Group,
+            tmnxVRtrIfSendV12v0Group,
+            tmnxvRtrIfAttributeGroup,
+            tmnxVRtrCreation12v0Group,
+            tmnxVRtrIPsecStatGroup,
+            tmnxVRtrVirtualCPE12v0Group,
+            tmnxVRtrBgpEvpn12v0Group,
+            tmnxVRtrLagHashLoadBal12v0Group,
+            tmnxVRtrPlcyAcctTempl12v0Group,
+            tmnxVRtrLagEgrLoadBal12v0Group,
+            tmnxVRtrVccvBfd12v0Group,
+            tmnxVRtrIcmpTunnelingGroup,
+            tmnxVRtrAggrRouteV12v0Group,
+            tmnxVRtrConfExtV12v0Group,
+            tmnxVRtrStickyHashEcmp12v0Group,
+            tmnxVRtrV14v0Group,
+            tmnxVRtrNotifyObjsNHRvplsArpGrp,
+            tmnxVRtrNotificationNHRvplsArpGr,
+            tmnxVRtrMcastSpmsiEnhV13v0Group,
+            tmnxVRtrHoldDownTimeV12v0Group,
+            tmnxVRtrLoadBalEnhV13v0Group,
+            tmnxVRtrInetSRIndirectV13v0Group,
+            tmnxVRtrIfExtIfArpRetryTimerGrp,
+            tmnxVRtrBgpAutoRDGroup,
+            tmnxVRtrTunnelTableStatGroup,
+            tmnxVRtrIfDHCPRelayV13v0Group,
+            tmnxVRtrLdpIpv613v0Group,
+            tmnxVRtrIfLagPerLinkHashGroup,
+            tmnxVRtrCidrNextHopOwnInstGroup,
+            tmnxVRtrIpV13v0ObsoletedGroup,
+            tmnxVRtrV13v0GenObsoletedGroup,
+            tmnxVRtrIfArpNbrLimitGroup,
+            tmnxVRtrIfExtV13v0Group,
+            tmnxVRtrV13v0IfStatsGroup,
+            tmnxVRtrIfArpNbrNotifGroup,
+            tmnxVRtrIPv6IPsecStatGroup,
+            tmnxVRtrUniqueIfIndexGroup,
+            tmnxVRtrStaticRoutePrefixGroup,
+            tmnxVRtrEntropyLabelGroup,
+            tmnxVRtrLspBfdGroup,
+            tmnxVRtrConfFlowspecV14v0Group,
+            tmnxVRtrInetSRIndirectV14v0Group,
+            tmnxVRtrFibStatsV14v0Group,
+            tmnxVRtrIfDHCPRelayV14v0Group,
+            tmnxVRtrBgpLblIpRoutes14v0Group,
+            tmnxVRtrV6TunnelTableStatGroup,
+            tmnxVRtrSrTeV14v0Group,
+            tmnxVRtrIfExtV14v0Group,
+            tmnxVRtrLoopbackNotifGroup,
+            tmnxVRtrV14v0NotifyObjsGroup,
+            tmnxVRtrIcmpV4StatsV14v0Group,
+            tmnxVRtrIcmpV4ParamV14v0Group,
+            tmnxVRtrFpeV14v0Group,
+            tmnxVRtrV15v0Group,
+            tmnxVrtrDDosDCpuProtPolicyGrp,
+            tmnxVRtrUdpTunnelGroup,
+            tmnxVRtrIpV15v0Group,
+            tmnxVRtrQinQNetworkIntfGroup,
+            tmnxVRtrIfExtV15v0ObjectGroup,
+            tmnxVRtrClassFwdingV15v0Group,
+            tmnxVRtrIfExtHostRteV20v0Group,
+            tmnxVRtrIfStatsV16v0Group,
+            tmnxVRtrIfNgeStatsGroup,
+            tmnxVRtrAdminTagsV16v0Group,
+            tmnxVRtrLargeCommValV16v0Group,
+            tmnxVRtrIfStatsDBCastV16v0Group,
+            tmnxVRtrIfV16v0Group,
+            tmnxVRtrLocalPrefV16v0Group,
+            tmnxVRtrIpV16v0Group,
+            tmnxVRtrLoadBalWeightV16v0Group,
+            tmnxVRtrInetExtTunnelV16v0Group,
+            tmnxVRtrGrtLeakImpPolV16v0Group,
+            tmnxVRtrInetTunnStatV16v0Group,
+            tmnxVRtrGlobalV16v0Group,
+            tmnxVRtrInetRouteV16v0Group,
+            tmnxVRtrSrTnlStatV16v0Group,
+            tmnxVRtrBierV16v0Group,
+            tmnxVRtrDhcpClientGroup,
+            tmnxVRtrRibApiV16v0Group,
+            tmnxVRtrRibTelemetryV16v0Group,
+            tmnxVRtrMplsFwdPlcyV16v0Group,
+            tmnxVRtrIcmpV4StatsV19v0Group,
+            tmnxVRtrLeakExportLimNotifGroup,
+            tmnxVRtrInetSRIndirectV16v0Group,
+            tmnxVRtrDhcpRoutesV19v0Group,
+            tmnxVRtrV19v0Group,
+            tmnxVRtrIfV19v0Group,
+            tmnxVRtrNotificationV19v0Group,
+            vRtrIfEgressQueueV19v0Group,
+            tmnxVRtrIfQosV19v0Group,
+            vRtrIfIngressPolicerV19v0Group,
+            vRtrMplsTunnelModeV19v0Group,
+            tmnxVRtrDiscardCV19v0Group,
+            vRtrMplsTunnelModeV19v0Group,
+            tmnxVRtrConfFlowspecV19v0Group,
+            tmnxVRtrIfHostRouteGroup,
+            tmnxVRtrTunTerminationV19v0Group,
+            tmnxVRtrIfPhysStatsV19v0Group,
+            tmnxVRtrSrTnlStatV19v10Group,
+            vRtrIfEgressQueueV19v01Group,
+            tmnxVRtrSrTeV6Group,
             tmnxVRtrIfNdHostRouteGroup,
             tmnxVRtrDnsV20v0Group,
             tmnxVRtrHelperRedirectPkts,
@@ -35395,7 +36065,11 @@ tmnxVRtr7xx0V21v0Compliance      MODULE-COMPLIANCE
             tmnxVRtrFibStatObj21Group,
             tmnxVRtrNotificationObj21Group,
             tmnxVRtrDPathAttrObj21Group,
-            tmnxVRtrIfHQosOnLagV21v0Group
+            tmnxVRtrIfHQosOnLagV21v0Group,
+            tmnxVRtrNotifyObjsV21v0Group,
+            tmnxVRtrNotificationV21v0Group,
+            tmnxVRtrV21Group,
+            tmnxVRtrBgpIpVpnV21Group
         }
     ::= { tmnxVRtrCompliances 28 }
 
@@ -35407,9 +36081,32 @@ tmnxVRtr7xx0V22v0Compliance      MODULE-COMPLIANCE
     MODULE
         MANDATORY-GROUPS {
             tmnxVRtrDynEgLblLmtObj22Group,
-            tmnxVRtrIfV22v0Group
+            tmnxVRtrIfV22v0Group,
+            tmnxVRtrIfExtParmsV22v0Group,
+            tmnxVRtrBgpEvpnEviGroup,
+            tmnxVRtrIfDcpFpCountV22v0Group,
+            vRtrSrV6PolicyGroup,
+            vRtrBgpEvpnSrv6EviGroup,
+            vRtrBgpEvpnUneqalEcmpV22v0Group,
+            tmnxVRtrIfQosV22v0Group,
+            tmnxvRtrEsaVideoRoutesGroup,
+            tmnxVRtrNdRaRoutesGroup
         }
     ::= { tmnxVRtrCompliances 29 }
+
+tmnxVRtr7xx0V23v0Compliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The incremental compliance statement for management of virtual router
+         instances on Nokia SROS series systems release R23."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxVRtrNotifyObjsV23v0Group,
+            tmnxVRtrNotificationV23v0Group,
+            tmnxVRtrSubDhcp4V23v0Group,
+            tmnxVRtrV23Group
+        }
+    ::= { tmnxVRtrCompliances 30 }
 
 tmnxVRtrGroups                   OBJECT IDENTIFIER ::= { tmnxVRtrConformance 2 }
 
@@ -40595,7 +41292,7 @@ tmnxVRtrIfExtV15v0Group          OBJECT-GROUP
         vRtrIfIpTunnelRemoteIpAddrType,
         vRtrIfIpTunnelRemoteIpAddr
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of basic router interface specific additional objects added
          for release 15.0 on Nokia SROS series systems."
@@ -42466,6 +43163,218 @@ tmnxVRtrObsoleteV22v0Group       OBJECT-GROUP
          systems."
     ::= { tmnxVRtrGroups 301 }
 
+tmnxVRtrBgpEvpnEviGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrBgpEvpnEvi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of VPRN BGP EVPN
+         capabilities on version 4.0 Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 302 }
+
+tmnxVRtrIfExtParmsV22v0Group     OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfIcmpTtlExpiredMatchingAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific additional objects
+         associated for release 22.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 303 }
+
+tmnxVRtrIfDcpFpCountV22v0Group   OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfDcpFpStaticTotalExcdCount,
+        vRtrIfDcpFpStaticExtCnfrmStCount,
+        vRtrIfDcpFpDynTotalExcdCount,
+        vRtrIfDcpFpDynExtCnfrmStateCount,
+        vRtrIfDcpFpLocMonTotalExcdCount,
+        vRtrIfDcpFpLocMonExtCnfrmStCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of DCPU objects for which exceed counter will not reset for
+         release 22.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 304 }
+
+vRtrSrV6PolicyGroup              OBJECT-GROUP
+    OBJECTS     {
+        vRtrStatActiveSrV6PolicyTunnels,
+        vRtrStatTotalSrV6PolicyTunnels,
+        vRtrStatActiveSrV6PolicyRoutes,
+        vRtrStatTotalSrV6PolicyRoutes,
+        vRtrBgpSrv6Resolution
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting segment routing v6 policies on Nokia
+         SROS series systems."
+    ::= { tmnxVRtrGroups 306 }
+
+vRtrBgpEvpnSrv6EviGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrBgpSrv6Evi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of VPRN BGP EVPN  SRv6
+         capabilities on version 4.0 Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 307 }
+
+vRtrBgpEvpnUneqalEcmpV22v0Group  OBJECT-GROUP
+    OBJECTS     {
+        vRtrBgpEvpnAdLinkBw,
+        vRtrBgpEvpnAdLinkBwWeight,
+        vRtrBgpEvpnAdLinkBwMaxWeight,
+        vRtrBgpEvpnWeightedEcmp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of unequeal ecmp for
+         evpn-ifl routes on Nokia SROS series systems in release 22.0."
+    ::= { tmnxVRtrGroups 308 }
+
+tmnxVRtrIfQosV22v0Group          OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfQosEgrAggRatePIRPercent,
+        vRtrIfQosEgrAggRateCIRPercent,
+        vRtrIfQosEgrAggRateType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific objects in release 22.0
+         on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 309 }
+
+tmnxvRtrEsaVideoRoutesGroup      OBJECT-GROUP
+    OBJECTS     {
+        vRtrStatActiveV4VideoRoutes,
+        vRtrStatTotalV4VideoRoutes,
+        vRtrStatActiveV6VideoRoutes,
+        vRtrStatTotalV6VideoRoutes,
+        vRtrMcastIpv4ActiveVideoRoutes,
+        vRtrMcastIpv4TotalVideoRoutes,
+        vRtrMcastIpv6ActiveVideoRoutes,
+        vRtrMcastIpv6TotalVideoRoutes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting video routes in release 22.0 on Nokia
+         SROS series systems."
+    ::= { tmnxVRtrGroups 310 }
+
+tmnxVRtrNdRaRoutesGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrStatV6NdRaRoutes,
+        vRtrStatV6NdRaActiveRoutes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting ND-RA routes in release 22.0 on Nokia
+         SROS series systems."
+    ::= { tmnxVRtrGroups 311 }
+
+tmnxVRtrNotificationV23v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxVRtrBfdMultiHopFpMismatch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the transport and virtual router
+         capabilities added in release 23 Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 312 }
+
+tmnxVRtrNotifyObjsV23v0Group     OBJECT-GROUP
+    OBJECTS     {
+        vRtrNotifyFpNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications added in Release 23 on
+         Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 313 }
+
+tmnxVRtrSubDhcp4V23v0Group       OBJECT-GROUP
+    OBJECTS     {
+        vRtrSubDhcp4LastChanged,
+        vRtrSubDhcp4TransparentForward,
+        vRtrSubDhcp4TranspFwdClntPkts,
+        vRtrSubDhcp4TranspFwdServPkts,
+        vRtrSubDhcp4TranspFwdOtherPkts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting DHCPv4 settings per virtual router on
+         Nokia SROS series systems since release 23.0."
+    ::= { tmnxVRtrGroups 314 }
+
+tmnxVRtrObsoleteV23v0Group       OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfIpTunnelRemoteIpAddrType,
+        vRtrIfIpTunnelRemoteIpAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IP capabilities for
+         transport and virtual routers on version 23.3.0 Nokia SROS series
+         systems."
+    ::= { tmnxVRtrGroups 315 }
+
+tmnxVRtrV23Group                 OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfUrpfSelectedVprnsOnly,
+        vRtrBgpEvpnOperState,
+        vRtrBgpSrv6OperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific additional objects added
+         for release 23.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 316 }
+
+tmnxVRtrBgpIpVpnV21Group         OBJECT-GROUP
+    OBJECTS     {
+        vRtrBgpIpVpnMplsOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of BGP IP-VPN specific additional objects added for release
+         21.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 317 }
+
+tmnxVRtrNotificationV21v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrBgpInstanceError
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the transport and virtual router
+         capabilities added in release 21 Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 318 }
+
+tmnxVRtrNotifyObjsV21v0Group     OBJECT-GROUP
+    OBJECTS     {
+        vRtrNotifyBgpInstType,
+        vRtrNotifyBgpInstance
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting notifications added in Release 21 on
+         Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 319 }
+
+tmnxVRtrV21Group                 OBJECT-GROUP
+    OBJECTS     {
+        vRtrBgpEvpnOperState,
+        vRtrBgpSrv6OperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific additional objects added
+         for release 21.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 320 }
+
 tmnxVRtrMobGatewayCompliances    OBJECT IDENTIFIER ::= { tmnxVRtrConformance 3 }
 
 tmnxVRtrMobGatewayGroups         OBJECT IDENTIFIER ::= { tmnxVRtrConformance 4 }
@@ -43135,8 +44044,8 @@ tmnxVRtrBfdNoCpmNpResources      NOTIFICATION-TYPE
     DESCRIPTION
         "The tmnxVRtrBfdNoCpmNpResources notification is generated when a BFD
          session could not be established because the session requires a cpmNp
-         session termination resource (see vRtrIfBfdExtType), and no cpmNp
-         session termination resources are available."
+         or fp session termination resource (see vRtrIfBfdExtType), and no
+         cpmNp or fp session termination resources are available."
     ::= { tmnxVRtrNotifications 43 }
 
 tmnxVRtrGrtV6ExportLimitReached  NOTIFICATION-TYPE
@@ -43599,8 +44508,9 @@ tmnxVRtrBfdExtNoCpmNpResources   NOTIFICATION-TYPE
     DESCRIPTION
         "[CAUSE] The tmnxVRtrBfdExtNoCpmNpResources notification is generated
          when a BFD session could not be established because the session
-         requires a cpmNp session termination resource (see vRtrIfBfdExtType),
-         and no cpmNp session termination resources are available.
+         requires a cpmNp or fp session termination resource (see
+         vRtrIfBfdExtType), and no cpmNp or fp session termination resources
+         are available.
 
          [EFFECT] There is no effect of this notification.
 
@@ -43769,11 +44679,12 @@ tmnxVRtrNgBfdNoCpmNpResources    NOTIFICATION-TYPE
     DESCRIPTION
         "[CAUSE] The tmnxVRtrNgBfdNoCpmNpResources notification is generated
          when a BFD session could not be established because the session
-         requires a cpmNp session termination resource (see vRtrIfBfdExtType),
-         and no cpmNp session termination resources are available.
+         requires a cpmNp or fp session termination resource (see
+         vRtrIfBfdExtType), and no cpmNp or fp session termination resources
+         are available.
 
-         [EFFECT] The BFD session cannot be established until a cpmNp session
-         termination resource is available
+         [EFFECT] The BFD session cannot be established until a cpmNp or fp
+         session termination resource is available
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tmnxVRtrNotifications 73 }
@@ -44233,5 +45144,43 @@ tmnxVRtrFibVPNOccupancyThreshold NOTIFICATION-TYPE
          the VPN FIB on an IOM card transitions between experiencing persistent
          normal and high occupancy."
     ::= { tmnxVRtrNotifications 99 }
+
+tmnxVRtrBfdMultiHopFpMismatch    NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrIfBfdSessExtLclDisc,
+        vRtrBfdSlotNumber,
+        vRtrNotifyFpNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxVRtrBfdMultiHopFpMismatch is generated on certain
+         platforms when a BFD session is created where:
+         - the stream of the BFD packets that this system transmits
+           could change from one FP to another, or
+         - this system could receive the BFD packets on another FP
+           than the one that transmits them.
+         [EFFECT] BFD packets could be dropped and the BFD session could report a loss.
+
+         [RECOVERY] Design the network such that this system always transmits and receives
+          the streams of packets for any given BFD session using the same FP."
+    ::= { tmnxVRtrNotifications 100 }
+
+vRtrBgpInstanceError             NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrNotifyBgpInstType,
+        vRtrNotifyBgpInstance,
+        vRtrFailureDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrBgpInstanceError is generated on certain platforms
+         when BGP instance generates an error.
+
+         [EFFECT] Associated BGP instance may be operationally down.
+
+         [RECOVERY] Design the network such that this system uses resources
+         properly."
+    ::= { tmnxVRtrNotifications 101 }
 
 END

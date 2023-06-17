@@ -1,0 +1,2117 @@
+TIMETRA-NTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex
+                                                         FROM IF-MIB
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Counter32, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION,
+    TimeStamp, TruthValue
+                                                         FROM SNMPv2-TC
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    TmnxAdminState, TmnxVRtrID
+                                                         FROM TIMETRA-TC-MIB
+    vRtrID
+                                                         FROM TIMETRA-VRTR-MIB
+    ;
+
+timetraNtpMIBModule              MODULE-IDENTITY
+    LAST-UPDATED "200801010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+         Network Time Protocol (NTP) on Nokia SROS systems.
+
+         Copyright 2005-2018 Nokia.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification.
+
+         This MIB is derived from the Technical Report #Management of the NTP
+         with SNMP# TR No. 98-09 authored by A.S. Sethi and Dave Mills in the
+         University of Delaware."
+
+    REVISION    "200801010000Z"
+    DESCRIPTION
+        "Rev 6.0                01 Jan 2008 00:00
+         6.0 release of the TIMETRA-NTP-MIB."
+
+    REVISION    "200603270000Z"
+    DESCRIPTION
+        "Rev 0.1                27 Mar 2006 00:00
+         Initial version of the TIMETRA-NTP-MIB."
+
+    ::= { timetraSRMIBModules 38 }
+
+NTPTimeStamp                     ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4d.4d"
+    STATUS      current
+    DESCRIPTION
+        "NTPTimeStamp is an octet string encoding of an NTP
+         timestamp that is represented as a 64-bit
+         unsigned fixed-point number, in seconds relative to
+         00:00 on 1 January 1900.  The integer part is in the
+         first 32 bits and the fraction part is in the last
+         32 bits."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.1"
+    SYNTAX      OCTET STRING (SIZE (8))
+
+NTPLeapIndicator                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPLeapIndicator is an enumerated integer that
+         represents a two-bit code warning of an impending leap
+         second to be inserted in the NTP timescale.  The bits
+         are set before 23:59 on the day of insertion and reset
+         after 00:00 on the following day.  This causes the
+         number of seconds (rollover interval) in the day of
+         insertion to be increased or decreased by one.  The two
+         bits are coded as below,
+         00, no warning
+         01, last minute has 61 seconds
+         10, last minute has 59 seconds
+         11, alarm condition (clock not synchronized)"
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol(Version 3)',
+         RFC-1305, March 1992, Section 3.2.1"
+    SYNTAX      INTEGER {
+        noWarning      (0),
+        addSecond      (1),
+        subtractSecond (2),
+        alarm          (3)
+    }
+
+NTPSignedTimeValue               ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4d.4d"
+    STATUS      current
+    DESCRIPTION
+        "NTPSignedTimeValue is an octet string that indicates
+         the time in seconds that could represent signed
+         quantities like time delay with respect to some
+         source.  The signed integer part is in the first 32
+         bits and the fraction part is in the last 32 bits."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Sections 2,  3.2.1"
+    SYNTAX      OCTET STRING (SIZE (8))
+
+NTPUnsignedTimeValue             ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4d.4d"
+    STATUS      current
+    DESCRIPTION
+        "NTPUnsignedTimeValue is an octet string that indicates
+         the time in seconds that could represent unsigned
+         quantities like maximum error of the local clock
+         with respect to some source.  The unsigned integer
+         part is in the first 32 bits and the fraction part is in
+         the last 32 bits."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Sections 2, 3.2.1"
+    SYNTAX      OCTET STRING (SIZE (8))
+
+NTPStratum                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPStratum is an integer value that indicates the
+         stratum of the clock.  The stratum defines the accuracy
+         of a time server.  The higher the stratum value is the
+         lower the accuracy.
+         0, unspecified
+         1, primary reference (e.g., calibrated atomic clock,
+            radio clock)
+         2-255, secondary reference (via NTP)"
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 2.2"
+    SYNTAX      Integer32 (0..255)
+
+NTPRefId                         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPRefId is an octet string that indicates the
+         reference clock identifier.  In the case of
+         stratum 0 (unspecified) or stratum 1 (primary
+         reference source), this is a four-octet,
+         left-justified, zero-padded ASCII string as defined
+         in RFC-1305.  In the case of stratum 2 and greater
+         (secondary reference) this is the four-octet Internet
+         address of the peer selected for synchronization.
+
+         Some examples of stratum 0 identifiers are, DCN, DCN routing protocol
+         NIST, NIST public modem TSP, TSP time protocol DTS, Digital Time
+         Service
+
+         Some examples of stratum 1 identifiers are, ATOM, Atomic clock
+         (calibrated) VLF, VLF radio (OMEGA,, etc.) LORC, LORAN-C
+         radionavigation GOES, GOES UHF environment satellite GPS, GPS UHF
+         satellite positioning"
+    REFERENCE
+        "D.L. Mills, Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.2.1"
+    SYNTAX      OCTET STRING (SIZE (4))
+
+NTPPollInterval                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPPollInterval is a signed integer that indicates
+         the minimum interval between transmitted NTP
+         messages, in seconds as a power of two.  For
+         instance, a value of six indicates a minimum
+         interval of 64 seconds."
+    SYNTAX      Integer32 (-20..20)
+
+NTPAssocIdentifier               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPAssocIdentifier is an integer that indicates
+         the association identifier of a peer.  Every peer
+         with which an NTP server is associated is
+         identified by an association identifier."
+    SYNTAX      Integer32 (0..2147483647)
+
+NTPVersion                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPVersion is an integer whose value specifies the version of an NTP
+         packet."
+    SYNTAX      Unsigned32 (2..4)
+
+NTPVersionPeerServer             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "NTPVersion is an integer whose value specifies the version of an NTP
+         packet for an NTP peer or server. When tmnxNtpConfigServer has a value
+         of 'false(2)' (client mode) and tmnxNtpServersVersion or
+         tmnxNtpPeersVersion has a value of '0', all versions are accepted.
+         When tmnxNtpConfigServer has a value of 'true(1)' (server mode), an
+         attempt to set tmnxNtpServersVersion or tmnxNtpPeersVersion to '0'
+         will be rejected"
+    SYNTAX      Unsigned32 (0 | 2..4)
+
+TmnxNtpDirection                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxNtpDirection is an enumerated integer that specifies the
+         communication direction."
+    SYNTAX      INTEGER {
+        transmit (1),
+        receive  (2)
+    }
+
+tmnxNtpObjs                      OBJECT IDENTIFIER ::= { tmnxSRObjs 38 }
+
+tmnxNtpSysObjs                   OBJECT IDENTIFIER ::= { tmnxNtpObjs 1 }
+
+tmnxNtpSystem                    OBJECT IDENTIFIER ::= { tmnxNtpSysObjs 1 }
+
+tmnxNtpSysLeap                   OBJECT-TYPE
+    SYNTAX      NTPLeapIndicator
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysLeap indicates the two-bit code
+         warning of an impending leap second to be inserted in the NTP
+         timescale.  This object can only be set when tmnxNtpSysStratum
+         has a value of 1, primary reference."
+    ::= { tmnxNtpSystem 1 }
+
+tmnxNtpSysStratum                OBJECT-TYPE
+    SYNTAX      NTPStratum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysStratum indicates the stratum of the
+         local clock.  A higher stratum value has lower accuracy.
+
+         0, unspecified 1, primary reference (e.g.,, calibrated atomic clock,
+         radio clock) 2-255, secondary reference (via NTP)"
+    ::= { tmnxNtpSystem 2 }
+
+tmnxNtpSysRefId                  OBJECT-TYPE
+    SYNTAX      NTPRefId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysRefId indicates the particular reference
+         identifier of the local clock. In the case of stratum 0 (unspecified)
+         or stratum 1 (primary reference source), this is a four-octet,
+         left-justified, zero-padded ASCII string. For stratum 2 and greater
+         (secondary reference), in the case of IPv4, this is the four-octet
+         Internet Address of the peer selected for synchronization. For stratum
+         2 and greater IPv6 addresses, this is the bottom four octets of the
+         MD5 hash of the IPv6 address of the peer selected for synchronization."
+    ::= { tmnxNtpSystem 3 }
+
+tmnxNtpSysRefTime                OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysRefTime indicates the local time when the local
+         clock was last updated. If the local clock has never been
+         synchronized, the value is zero."
+    ::= { tmnxNtpSystem 4 }
+
+tmnxNtpSysPoll                   OBJECT-TYPE
+    SYNTAX      NTPPollInterval
+    UNITS       "seconds as a power of two"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysPoll indicates the minimum interval, in seconds
+         as a power of two, at which this NTP host polls other NTP servers to
+         synchronize its clock. For instance, a value of six indicates a
+         minimum interval of 64 seconds."
+    ::= { tmnxNtpSystem 5 }
+
+tmnxNtpSysPeer                   OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysPeer indicates the association identifier
+         of the current synchronization source.  This is the index value
+         for tmnxNtpPeersAssocId of the row in the tmnxNtpPeersVarTable
+         that represents the peer acting as the current synchronization
+         source.
+
+         The special value 0 indicates there is no currently valid
+         synchronization source."
+    ::= { tmnxNtpSystem 6 }
+
+tmnxNtpSysClock                  OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpSysClock indicates the current local time for this
+         system."
+    ::= { tmnxNtpSystem 7 }
+
+tmnxNtp                          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled  (1),
+        disabled (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxNtp specifies whether or not NTP is configured to
+         execute in the system.
+
+         When the value if tmnxNtp is 'disabled', all other objects in this MIB
+         are not instantiated or return meaningless values.
+
+         This scalar object was made obsolete in R8.0."
+    DEFVAL      { disabled }
+    ::= { tmnxNtpSystem 8 }
+
+tmnxNtpAdminState                OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noop         (1),
+        inService    (2),
+        outOfService (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxNtpAdminState specifies the desired administrative
+         state for NTP.
+
+         This scalar object was made obsolete in R8.0; it was replaced by
+         tmnxNtpConfigAdminState."
+    DEFVAL      { outOfService }
+    ::= { tmnxNtpSystem 9 }
+
+tmnxNtpOperState                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown      (1),
+        inService    (2),
+        outOfService (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpOperState indicates the current operational state
+         for NTP."
+    ::= { tmnxNtpSystem 10 }
+
+tmnxNtpServer                    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxNtpServer specifies whether or not the
+         system assumes the role of an NTP server.  If the value of
+         tmnxNtpServer is 'false' the system will function as an
+         NTP client or peer and will not distribute the time to
+         downstream network elements.
+
+         This scalar object was made obsolete in R8.0; it was replaced by
+         tmnxNtpConfigServer."
+    DEFVAL      { false }
+    ::= { tmnxNtpSystem 11 }
+
+tmnxNtpServerKeyId               OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxNtpServerKeyId specifies the key-id of
+         the authentication key used by this node to transmit NTP packets.  When
+         tmnxNtpServerKeyId has a value of '0', no authentication is performed.
+
+         This scalar object was made obsolete in R8.0; it was replaced by
+         tmnxNtpConfigServerAuthenticate."
+    DEFVAL      { 0 }
+    ::= { tmnxNtpSystem 12 }
+
+tmnxNtpAuthCheck                 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The value of tmnxNtpAuthCheck specifies whether or not to
+         skip the rejection of NTP PDUs that do not match the
+         authentication key or authentication type requirements.
+         When tmnxNtpAuthCheck has a value of 'true', authentication
+         PDUs are generated and NTP PDUs are authenticated upon
+         receipt.  Mismatches cause a counter to be incremented for
+         a type mismatch and a counter for a key value mismatch.
+
+         This scalar object was made obsolete in R8.0; it was replaced by
+         tmnxNtpConfigAuthCheck."
+    DEFVAL      { true }
+    ::= { tmnxNtpSystem 13 }
+
+tmnxNtpBroadcastTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpBroadcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpBroadcastTable contains an entry for each NTP broadcast address
+         associated with the NTP application on this system."
+    ::= { tmnxNtpSysObjs 2 }
+
+tmnxNtpBroadcastEntry            OBJECT-TYPE
+    SYNTAX      TmnxNtpBroadcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpBroadcastEntry represents a row in the tmnxNtpBroadcastTable
+         that contains the variables of a specific broadcast address associated
+         with the NTP application on this system.
+
+         A row entry can be created and deleted through the
+         tmnxNtpBroadcastEntryStatus object."
+    INDEX       {
+        tmnxNtpBroadcastDirection,
+        vRtrID,
+        tmnxNtpBroadcastIfIndex
+    }
+    ::= { tmnxNtpBroadcastTable 1 }
+
+TmnxNtpBroadcastEntry            ::= SEQUENCE
+{
+    tmnxNtpBroadcastDirection        TmnxNtpDirection,
+    tmnxNtpBroadcastIfIndex          InterfaceIndex,
+    tmnxNtpBroadcastEntryStatus      RowStatus,
+    tmnxNtpBroadcastLastChanged      TimeStamp,
+    tmnxNtpBroadcastAuthKeyId        Unsigned32,
+    tmnxNtpBroadcastVersion          NTPVersion,
+    tmnxNtpBroadcastTtl              Unsigned32,
+    tmnxNtpBroadcastAuthErrs         Counter32,
+    tmnxNtpBroadcastAuthenticate     TruthValue,
+    tmnxNtpBroadcastAssocId          NTPAssocIdentifier
+}
+
+tmnxNtpBroadcastDirection        OBJECT-TYPE
+    SYNTAX      TmnxNtpDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastDirection specifies the this broadcast
+         address is used to transmit or receive NTP packets."
+    ::= { tmnxNtpBroadcastEntry 1 }
+
+tmnxNtpBroadcastIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastIfIndex indicates the local interface on
+         which to transmit or receive NTP broadcast packets."
+    ::= { tmnxNtpBroadcastEntry 2 }
+
+tmnxNtpBroadcastEntryStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpBroadcastEntryStatus is the object used for creating and
+         deleting row entries in this table."
+    ::= { tmnxNtpBroadcastEntry 3 }
+
+tmnxNtpBroadcastLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastLastChanged indicates the last time the
+         value of a writable object in this row was modified."
+    ::= { tmnxNtpBroadcastEntry 4 }
+
+tmnxNtpBroadcastAuthKeyId        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastAuthKeyId specifies the key-id of the
+         authentication key and its authentication type used by this node when
+         acting as an NTP server to receive and transmit NTP packets to and
+         from an NTP node. When an NTP packet is received by this node the
+         authentication key type, key id, and key must be valid otherwise the
+         packet will be rejected and an tmnxNtpAuthMismatch notification
+         generated.
+
+         $else { When the value of tmnxNtpBroadcastAuthKeyId has a value of
+         '0', no authentication is performed. }"
+    DEFVAL      { 0 }
+    ::= { tmnxNtpBroadcastEntry 5 }
+
+tmnxNtpBroadcastVersion          OBJECT-TYPE
+    SYNTAX      NTPVersion
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastVersion specifies the NTP version number
+         generated or accepted by this node in NTP broadcast packets."
+    DEFVAL      { 4 }
+    ::= { tmnxNtpBroadcastEntry 6 }
+
+tmnxNtpBroadcastTtl              OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastTtl specifies the time-to-live value of
+         messages transmitted by this broadcast address."
+    DEFVAL      { 127 }
+    ::= { tmnxNtpBroadcastEntry 7 }
+
+tmnxNtpBroadcastAuthErrs         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastAuthErrs indicates the number of times
+         the tmnxNtpAuthMismatch notification has been generated because of an
+         authentication check failure on this broadcast interface."
+    ::= { tmnxNtpBroadcastEntry 8 }
+
+tmnxNtpBroadcastAuthenticate     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastAuthenticate specifies whether or not to
+         require authentication of NTP PDUs when acting as a broadcast client.
+
+         When tmnxNtpBroadcastAuthenticate has a value of 'true', NTP PDUs are
+         authenticated upon receipt."
+    DEFVAL      { false }
+    ::= { tmnxNtpBroadcastEntry 9 }
+
+tmnxNtpBroadcastAssocId          OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpBroadcastAssocId indicates the association
+         identifier of this NTP broadcast server.  This is the index value
+         for tmnxNtpPeersAssocId of the row in the tmnxNtpPeersVarTable
+         that represents this NTP broadcast server."
+    ::= { tmnxNtpBroadcastEntry 10 }
+
+tmnxNtpMulticastTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpMulticastTable contains an entry for each NTP multicast address
+         associated with the NTP server on this system."
+    ::= { tmnxNtpSysObjs 3 }
+
+tmnxNtpMulticastEntry            OBJECT-TYPE
+    SYNTAX      TmnxNtpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpMulticastEntry represents a row in the tmnxNtpMulticastTable
+         that contains the variables of a specific broadcast address associated
+         with the NTP server on this system.
+
+         A row entry can be created and deleted through the
+         tmnxNtpMulticastEntryStatus object."
+    INDEX       {
+        tmnxNtpMulticastDirection,
+        tmnxNtpMulticastIfIndex
+    }
+    ::= { tmnxNtpMulticastTable 1 }
+
+TmnxNtpMulticastEntry            ::= SEQUENCE
+{
+    tmnxNtpMulticastDirection        TmnxNtpDirection,
+    tmnxNtpMulticastIfIndex          InterfaceIndex,
+    tmnxNtpMulticastAddressType      InetAddressType,
+    tmnxNtpMulticastAddress          InetAddress,
+    tmnxNtpMulticastEntryStatus      RowStatus,
+    tmnxNtpMulticastLastChanged      TimeStamp,
+    tmnxNtpMulticastAuthKeyId        Unsigned32,
+    tmnxNtpMulticastVersion          NTPVersion,
+    tmnxNtpMulticastTtl              Unsigned32,
+    tmnxNtpMulticastAuthErrs         Counter32,
+    tmnxNtpMulticastAuthenticate     TruthValue,
+    tmnxNtpMulticastAssocId          NTPAssocIdentifier
+}
+
+tmnxNtpMulticastDirection        OBJECT-TYPE
+    SYNTAX      TmnxNtpDirection
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastDirection specifies the whether this
+         multicast address is used to transmit or receive NTP packets to a
+         specific multicast subnet."
+    ::= { tmnxNtpMulticastEntry 1 }
+
+tmnxNtpMulticastIfIndex          OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastIfIndex indicates the local interface
+         used to transmit or receive NTP multicast packets for a specific
+         multicast subnet."
+    ::= { tmnxNtpMulticastEntry 2 }
+
+tmnxNtpMulticastAddressType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAddressType specifies the address type of
+         the tmnxNtpMulticastAddress object."
+    DEFVAL      { ipv4 }
+    ::= { tmnxNtpMulticastEntry 3 }
+
+tmnxNtpMulticastAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAddress specifies the multicast address
+         used to transmit or receive NTP packets transmitted for this
+         interface."
+    DEFVAL      { 'E0000101'H }
+    ::= { tmnxNtpMulticastEntry 4 }
+
+tmnxNtpMulticastEntryStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpMulticastEntryStatus is the object used for creating and
+         deleting row entries in this table."
+    ::= { tmnxNtpMulticastEntry 5 }
+
+tmnxNtpMulticastLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastLastChanged indicates the last time the
+         value of a writable object in this row was modified."
+    ::= { tmnxNtpMulticastEntry 6 }
+
+tmnxNtpMulticastAuthKeyId        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAuthKeyId specifies the key-id of the
+         authentication key and its authentication type used by this node when
+         acting as an NTP server to receive and transmit NTP packets to and
+         from an NTP node. When an NTP packet is received by this node the
+         authentication key type, key id, and key must be valid otherwise the
+         packet will be rejected and an tmnxNtpAuthMismatch notification
+         generated.
+
+         $else { When the value of tmnxNtpMulticastAuthKeyId has a value of
+         '0', no authentication is performed. }"
+    DEFVAL      { 0 }
+    ::= { tmnxNtpMulticastEntry 7 }
+
+tmnxNtpMulticastVersion          OBJECT-TYPE
+    SYNTAX      NTPVersion
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastVersion specifies the NTP version number
+         generated or accepted by this node in NTP broadcast packets."
+    DEFVAL      { 4 }
+    ::= { tmnxNtpMulticastEntry 8 }
+
+tmnxNtpMulticastTtl              OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastTtl specifies the time-to-live value of
+         messages transmitted by this broadcast address."
+    DEFVAL      { 127 }
+    ::= { tmnxNtpMulticastEntry 9 }
+
+tmnxNtpMulticastAuthErrs         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAuthErrs indicates the number of times
+         the tmnxNtpAuthMismatch notification has been generated because of an
+         authentication check failure on this multicast interface."
+    ::= { tmnxNtpMulticastEntry 10 }
+
+tmnxNtpMulticastAuthenticate     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAuthenticate specifies whether or not to
+         require authentication of NTP PDUs when acting as a multicast client.
+
+         When tmnxNtpMulticastAuthenticate has a value of 'true', NTP PDUs are
+         authenticated upon receipt."
+    DEFVAL      { false }
+    ::= { tmnxNtpMulticastEntry 11 }
+
+tmnxNtpMulticastAssocId          OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpMulticastAssocId indicates the association
+         identifier of this NTP multicast server.  This is the index value
+         for tmnxNtpPeersAssocId of the row in the tmnxNtpPeersVarTable
+         that represents this NTP multicast server."
+    ::= { tmnxNtpMulticastEntry 12 }
+
+tmnxNtpServers                   OBJECT IDENTIFIER ::= { tmnxNtpObjs 2 }
+
+tmnxNtpServersTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpServersTable contains an entry for each NTP server associated
+         with the NTP client on this system."
+    ::= { tmnxNtpServers 1 }
+
+tmnxNtpServersEntry              OBJECT-TYPE
+    SYNTAX      TmnxNtpServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpServersEntry represents a row in the tmnxNtpServersTable that
+         contains the variables of a specific server associated with the NTP
+         client on this system.
+
+         A row entry can be created and deleted through the
+         tmnxNtpServersEntryStatus object."
+    INDEX       {
+        tmnxNtpServersAddrType,
+        tmnxNtpServersAddress,
+        vRtrID
+    }
+    ::= { tmnxNtpServersTable 1 }
+
+TmnxNtpServersEntry              ::= SEQUENCE
+{
+    tmnxNtpServersAddrType           InetAddressType,
+    tmnxNtpServersAddress            InetAddress,
+    tmnxNtpServersEntryStatus        RowStatus,
+    tmnxNtpServersLastChanged        TimeStamp,
+    tmnxNtpServersAuthKeyId          Unsigned32,
+    tmnxNtpServersVersion            NTPVersionPeerServer,
+    tmnxNtpServersPrefer             TruthValue,
+    tmnxNtpServersAssocId            NTPAssocIdentifier,
+    tmnxNtpServersAuthErrs           Counter32
+}
+
+tmnxNtpServersAddrType           OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersAddrType indicates the address type of the
+         tmnxNtpServersAddress address."
+    ::= { tmnxNtpServersEntry 1 }
+
+tmnxNtpServersAddress            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersAddress is an index that uniquely
+         identifies a node that will provide time to the NTP client of this
+         system.
+
+         The special IPv4 Address, 127.127.1.0, specifies the internal PTP
+         process as the preferred Stratum 0 server. To create this row, one
+         must specify tmnxNtpServersPrefer with the value 'true (1)'."
+    ::= { tmnxNtpServersEntry 2 }
+
+tmnxNtpServersEntryStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpServersEntryStatus is the object used for creating and deleting
+         row entries in this table."
+    ::= { tmnxNtpServersEntry 3 }
+
+tmnxNtpServersLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersLastChanged indicates the last time the
+         value of a writable object in this row was modified."
+    ::= { tmnxNtpServersEntry 4 }
+
+tmnxNtpServersAuthKeyId          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersAuthKeyId specifies the key-id of
+         the authentication key and its authentication type used by this
+         node to receive and transmit NTP packets to and from
+         an NTP node.  When an NTP packet is received by this node
+         both authentication key and authentication type must be valid
+         otherwise the packet will be rejected and an tmnxNtpAuthMismatch
+         notification generated.
+
+         $else { When the value of tmnxNtpServersAuthKeyId has a value of '0',
+         no authentication is performed. }"
+    DEFVAL      { 0 }
+    ::= { tmnxNtpServersEntry 5 }
+
+tmnxNtpServersVersion            OBJECT-TYPE
+    SYNTAX      NTPVersionPeerServer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersVersion specifies the NTP version number
+         generated or accepted by this node in NTP packets."
+    DEFVAL      { 4 }
+    ::= { tmnxNtpServersEntry 6 }
+
+tmnxNtpServersPrefer             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersPrefer specifies whether or not
+         this is the preferred NTP server to receive time from.
+         Only one row in this table can have tmnxNtpServersPrefer
+         set to 'true'.  When this object is set to 'true' if another
+         row in this table already has the value 'true', its value
+         will be changed to 'false'."
+    DEFVAL      { false }
+    ::= { tmnxNtpServersEntry 7 }
+
+tmnxNtpServersAssocId            OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersAssocId indicates the association
+         identifier of this NTP server.  This is the index value
+         for tmnxNtpPeersAssocId of the row in the tmnxNtpPeersVarTable
+         that represents this NTP server."
+    ::= { tmnxNtpServersEntry 8 }
+
+tmnxNtpServersAuthErrs           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpServersAuthErrs indicates the number of times the
+         tmnxNtpAuthMismatch notification has been generated because of an
+         authentication check failure for this NTP server."
+    ::= { tmnxNtpServersEntry 9 }
+
+tmnxNtpPeers                     OBJECT IDENTIFIER ::= { tmnxNtpObjs 3 }
+
+tmnxNtpPeersTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpPeersTable contains an entry for each NTP server associated
+         with the NTP client on this system."
+    ::= { tmnxNtpPeers 1 }
+
+tmnxNtpPeersEntry                OBJECT-TYPE
+    SYNTAX      TmnxNtpPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpPeersEntry represents a row in the tmnxNtpPeersTable that
+         contains the variables of a specific server associated with the NTP
+         client on this system.
+
+         A row entry can be created and deleted through the
+         tmnxNtpPeersEntryStatus object."
+    INDEX       {
+        tmnxNtpPeersAddrType,
+        tmnxNtpPeersAddress,
+        vRtrID
+    }
+    ::= { tmnxNtpPeersTable 1 }
+
+TmnxNtpPeersEntry                ::= SEQUENCE
+{
+    tmnxNtpPeersAddrType             InetAddressType,
+    tmnxNtpPeersAddress              InetAddress,
+    tmnxNtpPeersEntryStatus          RowStatus,
+    tmnxNtpPeersLastChanged          TimeStamp,
+    tmnxNtpPeersAuthKeyId            Unsigned32,
+    tmnxNtpPeersVersion              NTPVersionPeerServer,
+    tmnxNtpPeersPrefer               TruthValue,
+    tmnxNtpPeersAssocId              NTPAssocIdentifier,
+    tmnxNtpPeersAuthErrs             Counter32
+}
+
+tmnxNtpPeersAddrType             OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersAddrType indicates the address type of the
+         tmnxNtpPeersAddress address."
+    ::= { tmnxNtpPeersEntry 1 }
+
+tmnxNtpPeersAddress              OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersAddress is an index that uniquely identifies
+         a node that will provide time to the NTP client of this system."
+    ::= { tmnxNtpPeersEntry 2 }
+
+tmnxNtpPeersEntryStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpPeersEntryStatus is the object used for creating and deleting
+         row entries in this table."
+    ::= { tmnxNtpPeersEntry 3 }
+
+tmnxNtpPeersLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersLastChanged indicates the last time the value
+         of a writable object in this row was modified."
+    ::= { tmnxNtpPeersEntry 4 }
+
+tmnxNtpPeersAuthKeyId            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersAuthKeyId specifies the key-id of
+         the authentication key and its authentication type used by this
+         node to receive and transmit NTP packets to and from
+         an NTP server and peers.  When an NTP packet is received
+         by this node both authentication key and authentication type
+         must be valid otherwise the packet will be rejected and an
+         tmnxNtpAuthMismatch notification generated.
+
+         $else { When the value of tmnxNtpPeersAuthKeyId has a value of '0', no
+         authentication is performed. }"
+    DEFVAL      { 0 }
+    ::= { tmnxNtpPeersEntry 5 }
+
+tmnxNtpPeersVersion              OBJECT-TYPE
+    SYNTAX      NTPVersionPeerServer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersVersion specifies the NTP version number
+         generated or accepted by this node in NTP packets."
+    DEFVAL      { 4 }
+    ::= { tmnxNtpPeersEntry 6 }
+
+tmnxNtpPeersPrefer               OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPrefer specifies whether or not
+         this is the preferred NTP server to receive time from.
+         Only one row in this table can have tmnxNtpPeersPrefer
+         set to 'true'.  When this object is set to 'true' if another
+         row in this table already has the value 'true', its value
+         will be changed to 'false'."
+    DEFVAL      { false }
+    ::= { tmnxNtpPeersEntry 7 }
+
+tmnxNtpPeersAssocId              OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersAssocId indicates the association
+         identifier of this NTP peer.  This is the index value
+         for tmnxNtpPeersVarAssocId of the row in the tmnxNtpPeersVarTable
+         that represents this NTP peer."
+    ::= { tmnxNtpPeersEntry 8 }
+
+tmnxNtpPeersAuthErrs             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersAuthErrs indicates the number of times the
+         tmnxNtpAuthMismatch notification has been generated because of an
+         authentication check failure on this peer."
+    ::= { tmnxNtpPeersEntry 9 }
+
+tmnxNtpPeersVarTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpPeersVarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpPeersVarTable contains an entry for each peer associated with
+         the NTP server."
+    ::= { tmnxNtpPeers 2 }
+
+tmnxNtpPeersVarEntry             OBJECT-TYPE
+    SYNTAX      TmnxNtpPeersVarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpPeersVarEntry represents a row in the tmnxNtpPeersVarTable
+         that contains the variables of a specific node associated with the
+         NTP server.  A row is created in this table when:
+         an associated server is configured in the tmnxNtpServersTable,
+         an associated peer is configured in the tmnxNtpPeersTable, or
+         a peer is dynamically discovered by NTP."
+    INDEX       { tmnxNtpPeersVarAssocId }
+    ::= { tmnxNtpPeersVarTable 1 }
+
+TmnxNtpPeersVarEntry             ::= SEQUENCE
+{
+    tmnxNtpPeersVarAssocId           NTPAssocIdentifier,
+    tmnxNtpPeersConfigured           TruthValue,
+    tmnxNtpPeersPeerAddrType         InetAddressType,
+    tmnxNtpPeersPeerAddress          InetAddress,
+    tmnxNtpPeersPeerPort             Unsigned32,
+    tmnxNtpPeersHostAddrType         InetAddressType,
+    tmnxNtpPeersHostAddress          InetAddress,
+    tmnxNtpPeersHostPort             Unsigned32,
+    tmnxNtpPeersMode                 INTEGER,
+    tmnxNtpPeersStratum              NTPStratum,
+    tmnxNtpPeersPeerPoll             NTPPollInterval,
+    tmnxNtpPeersHostPoll             NTPPollInterval,
+    tmnxNtpPeersRefId                NTPRefId,
+    tmnxNtpPeersReceiveTime          NTPTimeStamp,
+    tmnxNtpPeersReach                Unsigned32,
+    tmnxNtpPeersOffset               NTPSignedTimeValue,
+    tmnxNtpPeersPrefPeer             TruthValue,
+    tmnxNtpPeersStatus               INTEGER,
+    tmnxNtpPeersStatusFlags          BITS,
+    tmnxNtpPeersPeerVRtrID           TmnxVRtrID
+}
+
+tmnxNtpPeersVarAssocId           OBJECT-TYPE
+    SYNTAX      NTPAssocIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersVarAssocId specifies an integer value greater
+         than 0 that uniquely identifies a peer with which the local NTP node
+         is associated."
+    ::= { tmnxNtpPeersVarEntry 1 }
+
+tmnxNtpPeersConfigured           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersConfigured indicates whether or not the
+         association was created from configuration information. When the value
+         is 'true' this association was configured and it will not be
+         demobilized if the peer becomes unreachable."
+    ::= { tmnxNtpPeersVarEntry 2 }
+
+tmnxNtpPeersPeerAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPeerAddrType indicates the address type of
+         the tmnxNtpPeersPeerAddress Internet address."
+    ::= { tmnxNtpPeersVarEntry 3 }
+
+tmnxNtpPeersPeerAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPeerAddress specifies the Internet address of
+         this peer."
+    ::= { tmnxNtpPeersVarEntry 4 }
+
+tmnxNtpPeersPeerPort             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPeerPort indicates 16-bit UDP port number on
+         which this peer receives NTP messages."
+    ::= { tmnxNtpPeersVarEntry 5 }
+
+tmnxNtpPeersHostAddrType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersHostAddrType indicates the address type of
+         the tmnxNtpPeersHostAddress Internet address."
+    ::= { tmnxNtpPeersVarEntry 6 }
+
+tmnxNtpPeersHostAddress          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersHostAddress specifies the Internet address of
+         the local host."
+    ::= { tmnxNtpPeersVarEntry 7 }
+
+tmnxNtpPeersHostPort             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersHostPort indicates the 16-bit UDP port number
+         on which the local host receives NTP messages."
+    ::= { tmnxNtpPeersVarEntry 8 }
+
+tmnxNtpPeersMode                 OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unspecified      (0),
+        symmetricActive  (1),
+        symmetricPassive (2),
+        client           (3),
+        server           (4),
+        broadcast        (5),
+        reservedControl  (6),
+        reservedPrivate  (7),
+        broadcastclient  (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersMode indicates the association mode, with
+         values coded as follows:
+
+         0, unspecified
+         1, symmetric active - The host sends periodic messages regardless
+                 of the reachability state or stratum of this peer and so
+                 announces its willingness to synchronize and be synchronized
+                 by the peer.
+         2, symmetric passive - This association type is created upon receipt
+                 of a message from a peer operating in the symmetric active
+                 mode and lasts as long as the peer is reachable and operating
+                 at a stratum level less than or equal to the host.  Else the
+                 association is dissolved.  Such an association always lasts
+                 until at least one message has been sent in reply.  A host in
+                 this mode announces its willingness to synchronize and be
+                 synchronized by the peer.
+         3, client - Periodic messages are sent regardless of the reachability
+                 state or stratum of the peer.  A host in this mode announces
+                 its willingness to be synchronized by but not to synchronize
+                 the peer.
+         4, server - This association is created upon receipt of a client
+                 request message and exists only in order to reply to that
+                 request, after which the association is dissolved.  A host
+                 in this mode announces its willingness to synchronize,
+                 but not to be synchronized by the peer.
+         5, broadcast - Periodic messages are sent regardless of the
+                 reachability state or stratum of the peers.  A host in this
+                 mode announces its willingness to synchronize all of the
+                 peers but not to be synchronized by any of them.
+         6, reserved for NTP control messages
+         7, reserved for private use
+         8, broadcastclient - Messages are sent only in response to messages
+                 received from a broadcast server. A host in this mode is
+                 willing to be synchronized by any broadcast server."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.3"
+    ::= { tmnxNtpPeersVarEntry 9 }
+
+tmnxNtpPeersStratum              OBJECT-TYPE
+    SYNTAX      NTPStratum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersStratum indicates the stratum of the peer
+         clock.
+
+         0, unspecified 1, primary reference (e.g.,, calibrated atomic clock,
+         radio clock) 2-255, secondary reference (via NTP)"
+    ::= { tmnxNtpPeersVarEntry 10 }
+
+tmnxNtpPeersPeerPoll             OBJECT-TYPE
+    SYNTAX      NTPPollInterval
+    UNITS       "seconds as a power of two"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPeerPoll indicates the interval at which the
+         peer polls the local host."
+    ::= { tmnxNtpPeersVarEntry 11 }
+
+tmnxNtpPeersHostPoll             OBJECT-TYPE
+    SYNTAX      NTPPollInterval
+    UNITS       "seconds as a power of two"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersHostPoll indicates the interval at which the
+         local host polls the peer."
+    ::= { tmnxNtpPeersVarEntry 12 }
+
+tmnxNtpPeersRefId                OBJECT-TYPE
+    SYNTAX      NTPRefId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersRefId indicates the particular reference
+         clock for this peer. In the case of stratum 0 (unspecified) or stratum
+         1 (primary reference source), this is a four-octet,
+         left-justified,zero-padded ASCII string. In the case of stratum 2 and
+         greater (secondary reference) this is the four-octet Internet Address
+         of the peer"
+    ::= { tmnxNtpPeersVarEntry 13 }
+
+tmnxNtpPeersReceiveTime          OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersReceiveTime indicates the local time when the
+         latest NTP message from this peer arrived. If this peer becomes
+         unreachable the value is set to zero."
+    ::= { tmnxNtpPeersVarEntry 14 }
+
+tmnxNtpPeersReach                OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersReach indicates a shift register used
+         to determine the reachability status of the peer.  Bits enter
+         from the least significant (rightmost) end.
+         A peer is considered reachable if at least one bit in this register is
+         set to one.  The data in this shift register is populated by
+         the NTP protocol processing."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.2.3"
+    ::= { tmnxNtpPeersVarEntry 15 }
+
+tmnxNtpPeersOffset               OBJECT-TYPE
+    SYNTAX      NTPSignedTimeValue
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersOffset indicates the estimated offset
+         of the peer clock relative to the local clock, in seconds.  The
+         host determines the value of this object using the NTP clock-filter
+         algorithms."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.2.5"
+    ::= { tmnxNtpPeersVarEntry 16 }
+
+tmnxNtpPeersPrefPeer             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPrefPeer indicates whether this peer is
+         the preferred one over the others.  If this object has a
+         value of 'true', NTP will use this peer to synchronize the time."
+    ::= { tmnxNtpPeersVarEntry 17 }
+
+tmnxNtpPeersStatus               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        reject     (0),
+        inaccurate (1),
+        excess     (2),
+        outlyer    (3),
+        candidate  (4),
+        selected   (5),
+        syspeer    (6),
+        ppspeer    (7)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersStatus indicates the status of the peer, with
+         values coded as follows:
+
+         0, reject - The peer is rejected and will not be used for
+                 synchronization. Rejection reasons could be the peer is
+                 unreachable, the peer is synchronized to this local server
+                 so synchronizing with it would create a sync loop, or the
+                 synchronization distance is too large.
+         1, inaccurate - The peer is not maintaining an accurate clock. This
+                 peer will not be used for synchronization.
+         2, excess - The peer's synchronization distance is greater than ten
+                 other peers. This peer will not be used for synchronization.
+         3, outlyer - The peer is discarded as an outlyer. This peer will not
+                 be used for synchronization.
+         4, candidate - The peer is accepted as a possible source of
+                 synchronization.
+         5, selected - The peer is an acceptable source of synchronization,
+                 but it's synchronization distance is greater than six other
+                 peers.
+         6, syspeer - The peer is chosen as the source of synchronization.
+         7, ppspeer - The peer is chosen as the source of synchronization, but
+                 the actual synchronization is occurring from a
+                 pulse-per-second (PPS) signal."
+    ::= { tmnxNtpPeersVarEntry 18 }
+
+tmnxNtpPeersStatusFlags          OBJECT-TYPE
+    SYNTAX      BITS {
+        config          (0),
+        authenable      (1),
+        authentic       (2),
+        reachable       (3),
+        broadcastclient (4),
+        multicastclient (5),
+        broadcast       (6),
+        multicast       (7)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersStatusFlags contains bits which indicate the
+         status of the peer, where 1 or more bits may be set, with values coded
+         as follows:
+
+         0, config - If 1, the peer is a configured association. If 0, the peer
+                 is a temporary association.
+         1, authenable - If 1, the peer requires authentication. If 0, the peer
+                 does not require authentication.
+         2, authentic - If authenable is 1, if 1 the peer has passed
+                 authentication, if 0, the peer has failed authentication. If
+                 authenable is 0, this bit has no meaning.
+         3, reachable - If 1, the peer has been reached in 1 of the last 8
+                 polls. If 0, the peer is not reachable in the last 8 polls.
+         4, broadcastclient - If 1, the peer is a broadcast client temporary
+                 association created in response to discovering a broadcast
+                 server. If 0, the peer is not a broadcast client association.
+         5, multicastclient - If 1, the peer is a multicast client temporary
+                 association created in response to discovering a multicast
+                 server. If 0, the peer is not a multicast client association.
+         6, broadcast - If 1, the peer is a broadcast server association. If 0,
+                 the peer is not a broadcast association.
+         7, multicast - If 1, the peer is a multicast server association. If 0,
+                 the peer is not a multicast association."
+    ::= { tmnxNtpPeersVarEntry 19 }
+
+tmnxNtpPeersPeerVRtrID           OBJECT-TYPE
+    SYNTAX      TmnxVRtrID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpPeersPeerVRtrID indicates the virtual router ID of
+         the NTP server or peer associated with this entry."
+    ::= { tmnxNtpPeersVarEntry 20 }
+
+tmnxNtpFilter                    OBJECT IDENTIFIER ::= { tmnxNtpObjs 4 }
+
+tmnxNtpAuthKeys                  OBJECT IDENTIFIER ::= { tmnxNtpObjs 5 }
+
+tmnxNtpAuthKeyTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpAuthKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpAuthKeyTable contains an entry for each configured
+         authentication key."
+    ::= { tmnxNtpAuthKeys 1 }
+
+tmnxNtpAuthKeyEntry              OBJECT-TYPE
+    SYNTAX      TmnxNtpAuthKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       {
+        vRtrID,
+        tmnxNtpAuthKeyId
+    }
+    ::= { tmnxNtpAuthKeyTable 1 }
+
+TmnxNtpAuthKeyEntry              ::= SEQUENCE
+{
+    tmnxNtpAuthKeyId                 Unsigned32,
+    tmnxNtpAuthKeyEntryStatus        RowStatus,
+    tmnxNtpAuthKeyLastChanged        TimeStamp,
+    tmnxNtpAuthKey                   OCTET STRING,
+    tmnxNtpAuthKeyType               INTEGER
+}
+
+tmnxNtpAuthKeyId                 OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpAuthKeyId is an index into the tmnxNtpAuthKeyTable
+         that uniquely identifies a authentication key and type to authenticate
+         NTP packets."
+    ::= { tmnxNtpAuthKeyEntry 1 }
+
+tmnxNtpAuthKeyEntryStatus        OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpAuthKeyEntryStatus is the object used for creating and deleting
+         row entries in this table.
+
+         A value must be set for tmnxNtpAuthKeyType in order for
+         tmnxNtpAuthKeyEntryStatus to successfully transition to the 'active'
+         state.
+
+         An attempt to 'destroy' a row entry will fail with an
+         inconsistentValue error if the key-id is associated with a configured
+         NTP server, peer, multicast or broadcast address."
+    ::= { tmnxNtpAuthKeyEntry 2 }
+
+tmnxNtpAuthKeyLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpAuthKeyLastChanged indicates the last time the
+         value of a writable object in this row was modified."
+    ::= { tmnxNtpAuthKeyEntry 3 }
+
+tmnxNtpAuthKey                   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpAuthKey is the actual valued compared
+         by other network elements to authenticate an NTP packet.
+         The key can be any combination of up to 32 ASCII characters,
+         including spaces.  For authentication to succeed both the
+         authentication key and the authentication type defined by the
+         tmnxNtpAuthKeyType variable must match.
+
+         When the tmnxNtpAuthKeyType is des, the key must be a maximum
+         of 8 octets.  When the tmnxNtpAuthKeyType is messageDigest,
+         the key may be up to 32 octets long.
+
+         When read, tmnxNtpAuthKey always returns an OCTET STRING of zero
+         length."
+    DEFVAL      { ''H }
+    ::= { tmnxNtpAuthKeyEntry 4 }
+
+tmnxNtpAuthKeyType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        des           (1),
+        messageDigest (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpAuthKeyType specifies the type of authentication
+         method used to authenticate and NTP packet.
+
+         des (1)           - Use DES authentication
+         messageDigest (2) - Use MD5 authentication as specified
+                             in RFC-2104.
+
+         A value must be set for tmnxNtpAuthKeyType in order for
+         tmnxNtpAuthKeyEntryStatus to successfully transition to the 'active'
+         state."
+    ::= { tmnxNtpAuthKeyEntry 5 }
+
+tmnxNtpNotifyObjs                OBJECT IDENTIFIER ::= { tmnxNtpObjs 6 }
+
+tmnxNtpUTCOffset                 OBJECT-TYPE
+    SYNTAX      NTPSignedTimeValue
+    UNITS       "seconds"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpUTCOffset is used by tmnxNtpUtcOffsetExThreshold to specify the
+         estimated offset of the local clock relative to UTC (Universal
+         Coordinated Time), in seconds."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.2.5"
+    ::= { tmnxNtpNotifyObjs 1 }
+
+tmnxNtpUTCOffsetThreshold        OBJECT-TYPE
+    SYNTAX      NTPSignedTimeValue
+    UNITS       "seconds"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpUTCOffsetThreshold is used by tmnxNtpUtcOffsetExThreshold to
+         specify the threshold, in seconds, which the UTC (Universal
+         Coordinated Time) offset must not exceed."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)',
+         RFC-1305, March 1992, Section 3.2.5"
+    ::= { tmnxNtpNotifyObjs 2 }
+
+tmnxNtpAuthKeyFailType           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        invalidAuthKeyType (1),
+        invalidAuthKey     (2),
+        invalidAuthKeyId   (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "tmnxNtpAuthKeyFailType is used by tmnxNtpAuthMismatch to specify if
+         invalid authentication key, key id, or key type was the cause for its
+         generation."
+    ::= { tmnxNtpNotifyObjs 3 }
+
+tmnxNtpConfigs                   OBJECT IDENTIFIER ::= { tmnxNtpObjs 7 }
+
+tmnxNtpConfigTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpConfigTable contains an entry for each router instance with
+         NTP configured."
+    ::= { tmnxNtpConfigs 1 }
+
+tmnxNtpConfigEntry               OBJECT-TYPE
+    SYNTAX      TmnxNtpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpConfigEntry consists of the information pertaining to the
+         management of supporting NTP clients on a router instance.
+
+         Entries are created and destroyed using the tmnxNtpConfigRowStatus
+         object. In order to create a new row in the tmnxNtpConfigTable, the
+         transport router (vRtrID=1) must be defined first. Likewise, to delete
+         the transport router, all virtual routers must be destroyed first."
+    INDEX       { vRtrID }
+    ::= { tmnxNtpConfigTable 1 }
+
+TmnxNtpConfigEntry               ::= SEQUENCE
+{
+    tmnxNtpConfigRowStatus           RowStatus,
+    tmnxNtpConfigAdminState          TmnxAdminState,
+    tmnxNtpConfigServer              TruthValue,
+    tmnxNtpConfigServerAuthenticate  TruthValue,
+    tmnxNtpConfigAuthCheck           TruthValue
+}
+
+tmnxNtpConfigRowStatus           OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpConfigRowStatus manages the creation and deletion
+         of the tmnxNtpConfigEntry row."
+    ::= { tmnxNtpConfigEntry 1 }
+
+tmnxNtpConfigAdminState          OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpConfigAdminState specifies the administrative
+         state of the NTP Configuration entry."
+    DEFVAL      { outOfService }
+    ::= { tmnxNtpConfigEntry 2 }
+
+tmnxNtpConfigServer              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpConfigServer specifies whether or not the NTP
+         configuration is acting as a NTP server or not.
+
+         This object is fixed to 'true(1)' for rows consisting of a vRtrID
+         value greater than 1.
+
+         For the entry with vRtrID set to 1, the default value is 'false(2)'."
+    DEFVAL      { true }
+    ::= { tmnxNtpConfigEntry 3 }
+
+tmnxNtpConfigServerAuthenticate  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpConfigServerAuthenticate specifies whether or not
+         to require authentication of NTP PDUs when acting as a server.
+
+         When tmnxNtpConfigServerAuthenticate has a value of 'true', NTP PDUs
+         are authenticated upon receipt."
+    DEFVAL      { false }
+    ::= { tmnxNtpConfigEntry 4 }
+
+tmnxNtpConfigAuthCheck           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpConfigAuthCheck specifies whether or not to skip
+         the rejection of NTP PDUs that do not match the authentication key or
+         authentication type requirements.  When tmnxNtpConfigAuthCheck has a
+         value of 'true', authentication PDUs are generated and NTP PDUs are
+         authenticated upon receipt.  Mismatches cause a counter to be
+         incremented for a type mismatch and a counter for a key value
+         mismatch."
+    DEFVAL      { true }
+    ::= { tmnxNtpConfigEntry 5 }
+
+tmnxNtpClientInfoTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxNtpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpClientInfoTable contains an entry for NTP client requests."
+    ::= { tmnxNtpConfigs 2 }
+
+tmnxNtpClientInfoEntry           OBJECT-TYPE
+    SYNTAX      TmnxNtpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpClientInfoEntry represents a row in the tmnxNtpConfigTable
+         that consists of the variables for a specific client associated with
+         the NTP server on this system.
+
+         Row entries are created and deleted by the system."
+    INDEX       {
+        vRtrID,
+        tmnxNtpClientAddressType,
+        tmnxNtpClientAddress
+    }
+    ::= { tmnxNtpClientInfoTable 1 }
+
+TmnxNtpClientInfoEntry           ::= SEQUENCE
+{
+    tmnxNtpClientAddressType         InetAddressType,
+    tmnxNtpClientAddress             InetAddress,
+    tmnxNtpClientInfoLastRequestTime TimeStamp
+}
+
+tmnxNtpClientAddressType         OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpClientAddressType specifies the address type of
+         the tmnxNtpClientAddress object."
+    ::= { tmnxNtpClientInfoEntry 1 }
+
+tmnxNtpClientAddress             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpClientAddress specifies the address of an NTP
+         client who requested the NTP time."
+    ::= { tmnxNtpClientInfoEntry 2 }
+
+tmnxNtpClientInfoLastRequestTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNtpClientInfoLastRequestTime indicates the time of
+         the last NTP time request from this IP address."
+    ::= { tmnxNtpClientInfoEntry 3 }
+
+tmnxNtpConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 38 }
+
+tmnxNtpCompliances               OBJECT IDENTIFIER ::= { tmnxNtpConformance 1 }
+
+tmnxNtpCompliance                MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of NTP features on Nokia 7x50
+         SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxNtpGlobalGroup,
+            tmnxNtpBroadcastGroup,
+            tmnxNtpMulticastGroup,
+            tmnxNtpServersGroup,
+            tmnxNtpPeersGroup,
+            tmnxNtpAuthKeyGroup,
+            tmnxNtpNotificationGroup
+        }
+    ::= { tmnxNtpCompliances 1 }
+
+tmnxNtpV4v0Compliance            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of NTP features on Nokia 7xxx
+         SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxNtpGlobalGroup,
+            tmnxNtpBroadcastGroup,
+            tmnxNtpMulticastGroup,
+            tmnxNtpServersGroup,
+            tmnxNtpPeersGroup,
+            tmnxNtpAuthKeyGroup,
+            tmnxNtpNotificationV4v0Group
+        }
+    ::= { tmnxNtpCompliances 2 }
+
+tmnxNtpV6v0Compliance            MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for management of NTP features on Nokia 7xxx
+         SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxNtpGlobalGroup,
+            tmnxNtpBroadcastGroup,
+            tmnxNtpMulticastGroup,
+            tmnxNtpServersGroup,
+            tmnxNtpPeersGroup,
+            tmnxNtpAuthKeyGroup,
+            tmnxNtpNotificationV6v0Group
+        }
+    ::= { tmnxNtpCompliances 3 }
+
+tmnxNtpV8v0Compliance            MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of NTP features on the Nokia
+         7xxx SR series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxNtpGlobalV8v0Group,
+            tmnxNtpV8v0Group,
+            tmnxNtpBroadcastGroup,
+            tmnxNtpMulticastGroup,
+            tmnxNtpServersGroup,
+            tmnxNtpPeersGroup,
+            tmnxNtpAuthKeyGroup,
+            tmnxNtpNotificationV6v0Group
+        }
+    ::= { tmnxNtpCompliances 4 }
+
+tmnxNtpGroups                    OBJECT IDENTIFIER ::= { tmnxNtpConformance 2 }
+
+tmnxNtpGlobalGroup               OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpSysLeap,
+        tmnxNtpSysStratum,
+        tmnxNtpSysRefId,
+        tmnxNtpSysRefTime,
+        tmnxNtpSysPoll,
+        tmnxNtpSysPeer,
+        tmnxNtpSysClock,
+        tmnxNtp,
+        tmnxNtpAdminState,
+        tmnxNtpOperState,
+        tmnxNtpServer,
+        tmnxNtpServerKeyId,
+        tmnxNtpAuthCheck
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of objects supporting management of the local system NTP
+         instance capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 1 }
+
+tmnxNtpBroadcastGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpBroadcastEntryStatus,
+        tmnxNtpBroadcastLastChanged,
+        tmnxNtpBroadcastAuthKeyId,
+        tmnxNtpBroadcastVersion,
+        tmnxNtpBroadcastTtl,
+        tmnxNtpBroadcastAuthErrs,
+        tmnxNtpBroadcastAuthenticate,
+        tmnxNtpBroadcastAssocId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NTP servers
+         associations capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 2 }
+
+tmnxNtpMulticastGroup            OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpMulticastAddressType,
+        tmnxNtpMulticastAddress,
+        tmnxNtpMulticastEntryStatus,
+        tmnxNtpMulticastLastChanged,
+        tmnxNtpMulticastAuthKeyId,
+        tmnxNtpMulticastVersion,
+        tmnxNtpMulticastTtl,
+        tmnxNtpMulticastAuthErrs,
+        tmnxNtpMulticastAuthenticate,
+        tmnxNtpMulticastAssocId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NTP servers
+         associations capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 3 }
+
+tmnxNtpServersGroup              OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpServersEntryStatus,
+        tmnxNtpServersLastChanged,
+        tmnxNtpServersAuthKeyId,
+        tmnxNtpServersVersion,
+        tmnxNtpServersPrefer,
+        tmnxNtpServersAssocId,
+        tmnxNtpServersAuthErrs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NTP servers
+         associations capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 4 }
+
+tmnxNtpPeersGroup                OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpPeersEntryStatus,
+        tmnxNtpPeersLastChanged,
+        tmnxNtpPeersAuthKeyId,
+        tmnxNtpPeersVersion,
+        tmnxNtpPeersPrefer,
+        tmnxNtpPeersAssocId,
+        tmnxNtpPeersAuthErrs,
+        tmnxNtpPeersConfigured,
+        tmnxNtpPeersPeerAddrType,
+        tmnxNtpPeersPeerAddress,
+        tmnxNtpPeersPeerPort,
+        tmnxNtpPeersHostAddrType,
+        tmnxNtpPeersHostAddress,
+        tmnxNtpPeersHostPort,
+        tmnxNtpPeersMode,
+        tmnxNtpPeersStratum,
+        tmnxNtpPeersPeerPoll,
+        tmnxNtpPeersHostPoll,
+        tmnxNtpPeersRefId,
+        tmnxNtpPeersReceiveTime,
+        tmnxNtpPeersReach,
+        tmnxNtpPeersOffset,
+        tmnxNtpPeersPrefPeer,
+        tmnxNtpPeersStatus,
+        tmnxNtpPeersStatusFlags,
+        tmnxNtpPeersPeerVRtrID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NTP peers
+         associations capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 5 }
+
+tmnxNtpAuthKeyGroup              OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpAuthKeyEntryStatus,
+        tmnxNtpAuthKeyLastChanged,
+        tmnxNtpAuthKey,
+        tmnxNtpAuthKeyType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NTP authentication
+         key capabilities on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 6 }
+
+tmnxNtpNotificationGroup         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNtpAuthMismatch,
+        tmnxNtpNoServersAvail,
+        tmnxNtpServersAvail,
+        tmnxNtpMaxFreqDftExceed,
+        tmnxNtpUtcOffsetExThreshold,
+        tmnxNtpUtcOffsetInThreshold,
+        tmnxNtpOperChange
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting management of the NTP operations
+         on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 7 }
+
+tmnxNtpNotifyObjsGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpUTCOffset,
+        tmnxNtpUTCOffsetThreshold,
+        tmnxNtpAuthKeyFailType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects used by notifications supporting management of
+         the NTP operations on Nokia 7x50 SR series systems."
+    ::= { tmnxNtpGroups 8 }
+
+tmnxNtpObsoleteNotificationV4v0Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNtpUtcOffsetExThreshold,
+        tmnxNtpUtcOffsetInThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete notifications supporting management of the NTP
+         operations on Nokia 7xxx SR series systems."
+    ::= { tmnxNtpGroups 9 }
+
+tmnxNtpNotificationV4v0Group     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNtpAuthMismatch,
+        tmnxNtpNoServersAvail,
+        tmnxNtpServersAvail,
+        tmnxNtpMaxFreqDftExceed,
+        tmnxNtpOperChange
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The group of notifications supporting management of the NTP operations
+         on Nokia 7xxx SR series systems."
+    ::= { tmnxNtpGroups 10 }
+
+tmnxNtpNotificationV6v0Group     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNtpAuthMismatch,
+        tmnxNtpNoServersAvail,
+        tmnxNtpServersAvail,
+        tmnxNtpOperChange,
+        tmnxNtpServerChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting management of the NTP operations
+         on Nokia 7xxx SR series systems."
+    ::= { tmnxNtpGroups 11 }
+
+tmnxNtpObsoleteNotficatnV6v0Grp  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxNtpMaxFreqDftExceed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete notifications supporting management of the NTP
+         operations on Nokia 7xxx SR v6.0 series systems."
+    ::= { tmnxNtpGroups 12 }
+
+tmnxNtpObsoleteV8v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtp,
+        tmnxNtpAdminState,
+        tmnxNtpServer,
+        tmnxNtpServerKeyId,
+        tmnxNtpAuthCheck
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects removed from the Nokia 7x50 SR series systems in
+         release 8.0."
+    ::= { tmnxNtpGroups 13 }
+
+tmnxNtpGlobalV8v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpSysLeap,
+        tmnxNtpSysStratum,
+        tmnxNtpSysRefId,
+        tmnxNtpSysRefTime,
+        tmnxNtpSysPoll,
+        tmnxNtpSysPeer,
+        tmnxNtpSysClock,
+        tmnxNtpOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the local system NTP
+         instance capabilities on Nokia 7x50 SR series systems in release 8.0."
+    ::= { tmnxNtpGroups 14 }
+
+tmnxNtpV8v0Group                 OBJECT-GROUP
+    OBJECTS     {
+        tmnxNtpConfigRowStatus,
+        tmnxNtpConfigAdminState,
+        tmnxNtpConfigServer,
+        tmnxNtpConfigServerAuthenticate,
+        tmnxNtpConfigAuthCheck,
+        tmnxNtpClientInfoLastRequestTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting virtual router instance management of
+         the NTP operations on Nokia 7xxx SR series systems."
+    ::= { tmnxNtpGroups 15 }
+
+tmnxNtpNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 38 }
+
+tmnxNtpNotifications             OBJECT IDENTIFIER ::= { tmnxNtpNotifyPrefix 0 }
+
+tmnxNtpAuthMismatch              NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNtpPeersPeerAddrType,
+        tmnxNtpPeersPeerAddress,
+        tmnxNtpAuthKeyFailType,
+        tmnxNtpPeersPeerVRtrID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpAuthMismatch notification is generated when
+         tmnxNtpAuthCheck has a value of true and an NTP message is received
+         with an incorrect authentication key, key id, or key type.
+
+         tmnxNtpPeersPeerAddrType and tmnxNtpPeersPeerAddress indicate the
+         Internet address of the peer that sent the message that failed
+         authentication. The value of tmnxNtpPeersPeerVRtrID indicates the
+         virtual router ID of the NTP peer."
+    ::= { tmnxNtpNotifications 1 }
+
+tmnxNtpNoServersAvail            NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpNoServersAvail notification is generated when no NTP
+         servers are available."
+    ::= { tmnxNtpNotifications 2 }
+
+tmnxNtpServersAvail              NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpServersAvail notification is generated when NTP servers are
+         available."
+    ::= { tmnxNtpNotifications 3 }
+
+tmnxNtpMaxFreqDftExceed          NOTIFICATION-TYPE
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxNtpMaxFreqDftExceed notification is generated when
+         tmnxNtpDriftAmount has exceeded the maximum frequency drift of + or -
+         500 parts per million."
+    ::= { tmnxNtpNotifications 4 }
+
+tmnxNtpUtcOffsetExThreshold      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNtpUTCOffset,
+        tmnxNtpUTCOffsetThreshold
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxNtpUtcOffsetExThreshold event is generated when
+         tmnxNtpUTCOffset has exceeded the threshold as specified in
+         tmnxNtpUTCOffsetThreshold.
+
+         This notification was made obsolete in 4.0 R-12 release and 5.0 R-2
+         release."
+    ::= { tmnxNtpNotifications 5 }
+
+tmnxNtpUtcOffsetInThreshold      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNtpUTCOffset,
+        tmnxNtpUTCOffsetThreshold
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "The tmnxNtpUtcOffsetInThreshold event is generated when
+         tmnxNtpUTCOffset is back within the threshold as specified in
+         tmnxNtpUTCOffsetThreshold.
+
+         This notification was made obsolete in 4.0 R-12 release and 5.0 R-2
+         release."
+    ::= { tmnxNtpNotifications 6 }
+
+tmnxNtpOperChange                NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNtpOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpOperChange notification is generated whenever there is a
+         change in the operational state of NTP."
+    ::= { tmnxNtpNotifications 7 }
+
+tmnxNtpServerChange              NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNtpPeersPeerAddrType,
+        tmnxNtpPeersPeerAddress,
+        tmnxNtpPeersPeerVRtrID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxNtpServerChange notification is generated when more than one
+         NTP servers are configured in a system and a different NTP server is
+         selected because the operational status of the earlier NTP server has
+         changed.
+
+         The value of tmnxNtpPeersPeerAddress indicates the address of the new
+         NTP server. The value of tmnxNtpPeersPeerVRtrID indicates the virtual
+         router ID of the new NTP server."
+    ::= { tmnxNtpNotifications 8 }
+
+END
