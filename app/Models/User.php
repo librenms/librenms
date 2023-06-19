@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
+use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasFactory, HasPushSubscriptions;
+    use HasRolesAndAbilities, Notifiable, HasFactory, HasPushSubscriptions;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
