@@ -12,7 +12,6 @@ if (!isset($vars['privoxyPage'])) {
     $vars['privoxyPage']='general';
 }
 
-
 print_optionbar_start();
 
 $link_tmp = generate_link('General', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'general']);
@@ -55,11 +54,9 @@ $link_tmp = generate_link('HTTP Version', $link_array, ['app'=>'privoxy', 'privo
 if ($vars['privoxyPage'] == 'http_ver') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
-
+echo $link_tmp;
 
 print_optionbar_end();
-
 
 if ($vars['privoxyPage'] == 'general') {
     $graphs = [
