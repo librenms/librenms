@@ -23,7 +23,7 @@ class User extends Authenticatable
     use HasRolesAndAbilities, Notifiable, HasFactory, HasPushSubscriptions;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
+    protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
@@ -43,31 +43,29 @@ class User extends Authenticatable
 
     public function toFlare(): array
     {
-        return $this->only(['level', 'auth_type', 'enabled']);
+        return $this->only(['auth_type', 'enabled']);
     }
 
     // ---- Helper Functions ----
 
     /**
      * Test if this user has global read access
-     * these users have a level of 5, 10 or 11 (demo).
      *
      * @return bool
      */
     public function hasGlobalRead()
     {
-        return $this->hasGlobalAdmin() || $this->level == 5;
+        return $this->isA('admin', 'global-read');
     }
 
     /**
      * Test if this user has global admin access
-     * these users have a level of 10 or 11 (demo).
      *
      * @return bool
      */
     public function hasGlobalAdmin()
     {
-        return $this->level >= 10;
+        return $this->isA('admin');
     }
 
     /**
@@ -77,7 +75,7 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return $this->level == 10;
+        return $this->isA('admin');
     }
 
     /**
@@ -87,7 +85,7 @@ class User extends Authenticatable
      */
     public function isDemo()
     {
-        return $this->level == 11;
+        return $this->isA('demo');
     }
 
     /**

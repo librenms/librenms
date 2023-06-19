@@ -2110,7 +2110,6 @@ users:
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: email, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: descr, Type: char(30), 'Null': false, Extra: '' }
-    - { Field: level, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: can_modify_passwd, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
     - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
