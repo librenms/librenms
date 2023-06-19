@@ -40,19 +40,19 @@
                 },
                 {
                     "metric": "bytes_to_client",
-                    "value": 128168,
+                    "value": 11398923,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
                 {
                     "metric": "client_cons",
-                    "value": "22",
+                    "value": 27,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
                 {
                     "metric": "client_requests",
-                    "value": "19",
+                    "value": 20,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -100,7 +100,7 @@
                 },
                 {
                     "metric": "imp_accounted",
-                    "value": 3,
+                    "value": 7,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -112,7 +112,7 @@
                 },
                 {
                     "metric": "nog_conns",
-                    "value": "New",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -124,7 +124,7 @@
                 },
                 {
                     "metric": "req_connect",
-                    "value": 19,
+                    "value": 20,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -184,13 +184,13 @@
                 },
                 {
                     "metric": "resp_200",
-                    "value": 19,
+                    "value": 20,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
                 {
                     "metric": "resp_2xx",
-                    "value": 19,
+                    "value": 20,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -334,13 +334,13 @@
                 },
                 {
                     "metric": "unique_domains",
-                    "value": 6,
+                    "value": 10,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
                 {
                     "metric": "unique_domains_np",
-                    "value": 6,
+                    "value": 10,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
@@ -352,7 +352,7 @@
                 },
                 {
                     "metric": "ver_1_1",
-                    "value": 19,
+                    "value": 20,
                     "value_prev": null,
                     "app_type": "privoxy"
                 },
