@@ -15,7 +15,7 @@ foreach (explode("\n", $oids) as $data) {
         if ($status == 2) {
             // 2 = normal, 0 = not connected
             $split_oid = explode('.', $oid);
-            $temperature_id = $split_oid[(count($split_oid) - 1)];
+            $temperature_id = $split_oid[count($split_oid) - 1];
             $descr_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.1.$temperature_id";
             $temperature_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.3.$temperature_id";
             $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.7.$temperature_id";

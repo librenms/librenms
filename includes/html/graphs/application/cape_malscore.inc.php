@@ -51,7 +51,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'descr'    => 'Mode',
         'ds'       => 's5malscore',
     ];
-    if ($vars['stddev'] == on) {
+    if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr'    => 'StdDev',

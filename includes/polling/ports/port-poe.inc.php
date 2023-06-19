@@ -9,7 +9,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('PortConsumption', 'GAUGE', 0)
     ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
 
-if (($device['os'] == 'vrp')) {
+if ($device['os'] == 'vrp') {
     //Tested against Huawei 5720 access switches
     if (isset($this_port['hwPoePortEnable'])) {
         $upd = "$polled:" . $this_port['hwPoePortReferencePower'] . ':' . $this_port['hwPoePortMaximumPower'] . ':' . $this_port['hwPoePortConsumingPower'] . ':' . $this_port['hwPoePortPeakPower'];
@@ -25,7 +25,7 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(vrp) ';
     }
-} elseif (($device['os'] == 'linksys-ss')) {
+} elseif ($device['os'] == 'linksys-ss') {
     //Tested 318P
     if (isset($this_port['pethPsePortAdminEnable'])) {
         $upd = "$polled:" . $this_port['rlPethPsePortPowerLimit'] . ':' . $this_port['rlPethPsePortOutputPower'];
@@ -59,7 +59,7 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(IOS) ';
     }//end if
-} elseif (($device['os'] == 'jetstream')) {
+} elseif ($device['os'] == 'jetstream') {
     if (isset($this_port['tpPoePortStatus'])) {
         // TP-Link uses .1W for their units; convert to milliwatts.
         $fields = [

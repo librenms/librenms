@@ -26,8 +26,8 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Component;
-use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ComponentStatusController extends WidgetController

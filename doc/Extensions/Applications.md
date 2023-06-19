@@ -488,30 +488,36 @@ Extend` heading top of page.
 
 ## Docker Stats
 
-It allows you to know which container docker run and their stats.
+It gathers metrics about the docker containers, including:
+- cpu percentage 
+- memory usage 
+- container size
+- uptime 
+- Totals per status
 
-This script require: jq
+This script requires python3 and the pip module python-dateutil 
 
 ### SNMP Extend
 
-1. Install jq
+1. Install pip module
 ```
-sudo apt install jq
+pip3 install python-dateutil
 ```
 
 2. Copy the shell script to the desired host.
+By default, it will only show the status for containers that are running. To include all containers modify the constant in the script at the top of the file and change it to `ONLY_RUNNING_CONTAINERS = False`
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.sh -O /etc/snmp/docker-stats.sh
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.py -O /etc/snmp/docker-stats.py
 ```
 
 3. Make the script executable
 ```
-chmod +x /etc/snmp/docker-stats.sh
+chmod +x /etc/snmp/docker-stats.py
 ```
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend docker /etc/snmp/docker-stats.sh
+extend docker /etc/snmp/docker-stats.py
 ```
 
 5. If your run Debian, you need to add the Debian-snmp user to the docker group
@@ -954,6 +960,68 @@ extend dhcpstats /etc/snmp/dhcp.py
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## linux_config_files
+
+linux_config_files is an application intended to monitor a Linux distribution's configuration files via that distribution's configuration management tool/system.  At this time, ONLY RPM-based (Fedora/RHEL) SYSTEMS ARE SUPPORTED utilizing the rpmconf tool.  The linux_config_files application collects and graphs the total count of configuration files that are out of sync and graphs that number.
+
+Fedora/RHEL: Rpmconf is a utility that analyzes rpm configuration files using the RPM Package Manager.  Rpmconf reports when a new configuration file standard has been issued for an upgraded/downgraded piece of software.  Typically, rpmconf is used to provide a diff of the current configuration file versus the new, standard configuration file.  The administrator can then choose to install the new configuration file or keep the old one.
+
+### SNMP Extend
+
+1. Copy the python script, linux_config_files.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/linux_config_files.py -O /etc/snmp/linux_config_files.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/linux_config_files.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend linux_config_files /etc/snmp/linux_config_files.py
+```
+
+4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
+a.) "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+```
+{
+    "pkg_system": "rpm",
+    "pkg_tool_cmd": "/bin/rpmconf",
+}
+```
+
+5. Restart snmpd.
+
+## Linux Softnet Stat
+
+### SNMP Extend
+
+1: Install the depends, which on a Debian based system would be as below.
+```
+apt-get install -y cpanminus zlib1g-dev
+cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+```
+
+2. Download the script into the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_softnet_stat -O /etc/snmp/linux_softnet_stat
+```
+
+3. Make the script executable
+```
+chmod +x /etc/snmp/linux_softnet_stat
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend linux_softnet_stat /etc/snmp/linux_softnet_stat -b
+```
+
+Then either enable the application Linux Softnet Stat or wait for it to be re-discovered.
 
 ## mailcow-dockerized postfix
 
@@ -1522,6 +1590,11 @@ chances are that packages are already updated periodically .
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
 
 ## PHP-FPM
 
@@ -2435,6 +2508,101 @@ Also if the system you are using uses non-static device naming based
 on bus information, it may be worthwhile just using the SN as the
 device ID is going to be irrelevant in that case.
 
+## Sneck
+
+This is for replacing Nagios/Icinga or the LibreNMS service
+integration in regards to NRPE. This allows LibreNMS to query what
+checks were ran on the server and keep track of totals of OK, WARNING,
+CRITICAL, and UNKNOWN statuses.
+
+The big advantage over this compared to a NRPE are as below.
+
+- It does not need to know what checks are configured on it.
+- Also does not need to wait for the tests to run as sneck is meant to
+  be ran via cron and the then return the cache when queried via SNMP,
+  meaning a lot faster response time, especially if slow checks are
+  being performed.
+- Works over proxied SNMP connections.
+
+Included are alert examples. Although for setting up custom ones, the
+metrics below are provided.
+
+| Metric              | Description                                                                                                           |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------|
+| ok                  | Total OK checks                                                                                                       |
+| warning             | Total WARNING checks                                                                                                  |
+| critical            | Total CRITICAL checks                                                                                                 |
+| unknown             | Total UNKNOWN checks                                                                                                  |
+| errored             | Total checks that errored                                                                                             |
+| time_to_polling     | Differnce in seconds between when polling data was generated and when polled                                          |
+| time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
+| check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
+
+The standard Nagios/Icinga style exit codes are used and those are as
+below.
+
+| Exit | Meaning  |
+|------|----------|
+| 0    | okay     |
+| 1    | warning  |
+| 2    | critical |
+| 3+   | unknown  |
+
+To use `time_to_polling`, it will need to enabled via setting the
+config item below. The default is false. Unless set to true, this
+value will default to 0. If enabling this, one will want to make sure
+that NTP is in use every were or it will alert if it goes over a
+difference of 540s.
+
+```
+lnms config:set app.sneck.polling_time_diff true
+```
+
+For more information on Sneck, check it out at
+[MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck) or
+[Github](https://github.com/VVelox/Monitoring-Sneck).
+
+For poking systems using Sneck, also check out boop_snoot
+if one wants to query those systems via the CLI. Docs on it
+at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
+[Github](https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot).
+
+### SNMP Extend
+
+1. Install the extend.
+
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+cpanm Monitoring::Sneck
+# Debian based systems
+apt-get install zlib1g-dev cpanminus
+cpanm Monitoring::Sneck
+```
+
+2. Configure any of the checks you want to run in
+   `/usr/local/etc/sneck.conf`. You con find it documented
+   [here](https://metacpan.org/pod/Monitoring::Sneck#CONFIG-FORMAT).
+
+3. Set it up in cron. This will mean you don't need to wait for all
+   the checks to complete when polled via SNMP, which for like SMART
+   or other long running checks will mean it timing out. Also means it
+   does not need called via sudo as well.
+
+```
+*/5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
+```
+
+4. Set it up in the snmpd config and restart snmpd. The `-c` flag will
+   tell read it to read from cache instead of rerunning the checks.
+
+```
+extend sneck /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -c
+```
+
+5. In LibreNMS, enable the application for the server in question or wait for auto
+   discovery to find it.
+
 ## Squid
 
 ### SNMP Proxy
@@ -2859,32 +3027,22 @@ b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publick
 
 ### SNMP Extend
 
-`zfs-linux` requires python3 >=python3.5.
-
-The installation steps are:
-
-1. Copy the polling script to the desired host (the host must be added
-   to LibreNMS devices)
-2. Make the script executable
-3. Edit snmpd.conf to include ZFS stats
-
-#### FreeBSD
+1: Install the depends.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
-chmod +x /etc/snmp/zfs-freebsd
-echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
+### FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+### Debian
+apt-get install -y cpanminus zlib1g-dev
+cpanm Mime::Base64 JSON Gzip::Faster
 ```
 
-#### Linux
+2: Fetch the script in question and make it executable.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
-chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
-```
-
-Edit your sudo users (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp/zfs
+chmod +x /etc/snmp/zfs
 ```
 
-Now restart snmpd and you're all set.
+3: Add the following to snmpd.conf and restart snmpd.
+```
+extend zfs /etc/snmp/zfs
+```

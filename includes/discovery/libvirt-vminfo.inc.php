@@ -38,7 +38,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
             exec(Config::get('virsh') . ' -rc ' . $uri . ' list', $domlist);
 
             foreach ($domlist as $dom) {
-                [$dom_id,] = explode(' ', trim($dom), 2);
+                [$dom_id] = explode(' ', trim($dom), 2);
 
                 if (is_numeric($dom_id)) {
                     // Fetch the Virtual Machine information.
@@ -132,7 +132,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                         ) {
                             dbUpdate(['vmwVmState' => $vmwVmState, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus], 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?", [$device['device_id'], $dom_id]);
                             echo 'U';
-                        // FIXME eventlog
+                            // FIXME eventlog
                         } else {
                             echo '.';
                         }

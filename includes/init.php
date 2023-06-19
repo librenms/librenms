@@ -60,7 +60,6 @@ if (! function_exists('module_selected')) {
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/datastore.inc.php';
-require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
@@ -112,7 +111,7 @@ try {
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     echo $exception->getMessage() . PHP_EOL;
-    exit();
+    exit;
 }
 
 if (module_selected('web', $init_modules)) {

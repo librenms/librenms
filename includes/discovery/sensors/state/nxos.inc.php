@@ -24,7 +24,7 @@ if (is_array($fan_trays)) {
     foreach ($fan_trays as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 1];
         $current_oid = "$fan_tray_oid.$index";
 
         $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';

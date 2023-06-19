@@ -75,7 +75,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             $nummonbssid = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.10.$radioid"]);
             $interference = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.3.1.6.1.11.$radioid"]);
 
-            $radionum = substr($radioid, (strlen($radioid) - 1), 1);
+            $radionum = substr($radioid, strlen($radioid) - 1, 1);
 
             d_echo($key . PHP_EOL);
             d_echo($value . PHP_EOL);

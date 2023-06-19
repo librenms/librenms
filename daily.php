@@ -164,8 +164,8 @@ if ($options['f'] === 'handle_notifiable') {
             Notifications::create($title, "The daily update script (daily.sh) has failed on $poller_name."
                 . 'Please check output by hand. If you need assistance, '
                 . 'visit the <a href="https://www.librenms.org/#support">LibreNMS Website</a> to find out how.',
-            'daily.sh',
-            2
+                'daily.sh',
+                2
             );
         }
     } elseif ($options['t'] === 'phpver') {

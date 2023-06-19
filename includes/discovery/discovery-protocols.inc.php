@@ -128,7 +128,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }//end foreach
     }
     echo PHP_EOL;
-} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom')) {
+} elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom') {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -161,7 +161,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'timos')) {
+} elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'tmnxLldpRemoteSystemsData', 'TIMETRA-LLDP-MIB');
     foreach ($lldp_array as $key => $lldp) {
@@ -195,7 +195,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'jetstream')) {
+} elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
     $lldp_array = snmpwalk_group($device, 'lldpNeighborInfoEntry', 'TPLINK-LLDPINFO-MIB');
@@ -259,7 +259,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
                 }
             }
         }
-        if (($device['os'] == 'aos7')) {
+        if ($device['os'] == 'aos7') {
             $lldp_local = snmpwalk_cache_oid($device, 'lldpLocPortEntry', [], 'LLDP-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
         } else {
@@ -270,14 +270,14 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
 
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
                 $ifIndex = $entry_key;
             }
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
