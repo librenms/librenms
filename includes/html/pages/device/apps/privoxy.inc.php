@@ -1,7 +1,7 @@
 <?php
 
-if (!isset($vars['privoxyPage'])) {
-    $vars['privoxyPage']='general';
+if (! isset($vars['privoxyPage'])) {
+    $vars['privoxyPage'] = 'general';
 } elseif ($vars['privoxyPage'] != 'general' &&
          $vars['privoxyPage'] != 'blocks' &&
          $vars['privoxyPage'] != 'http_ver' &&
@@ -9,7 +9,7 @@ if (!isset($vars['privoxyPage'])) {
          $vars['privoxyPage'] != 'http_resp' &&
          $vars['privoxyPage'] != 'domains' &&
          $vars['privoxyPage'] != 'conn') {
-    $vars['privoxyPage']='general';
+    $vars['privoxyPage'] = 'general';
 }
 
 print_optionbar_start();
@@ -18,37 +18,37 @@ $link_tmp = generate_link('General', $link_array, ['app'=>'privoxy', 'privoxyPag
 if ($vars['privoxyPage'] == 'general') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('Blocks', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'blocks']);
 if ($vars['privoxyPage'] == 'blocks') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('Connections', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'conn']);
 if ($vars['privoxyPage'] == 'conn') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('Domains', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'domains']);
 if ($vars['privoxyPage'] == 'domains') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('HTTP Req Type', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_type']);
 if ($vars['privoxyPage'] == 'http_type') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('HTTP Response Codes', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_resp']);
 if ($vars['privoxyPage'] == 'http_resp') {
     $link_tmp = '<span class="pagemenu-selected">' . $link_tmp . '</span>';
 }
-echo $link_tmp.' | ';
+echo $link_tmp . ' | ';
 
 $link_tmp = generate_link('HTTP Version', $link_array, ['app'=>'privoxy', 'privoxyPage'=>'http_ver']);
 if ($vars['privoxyPage'] == 'http_ver') {

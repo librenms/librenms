@@ -134,7 +134,7 @@ $rrd_def = RrdDefinition::make()
 
 foreach ($fields as $key => $value) {
     if (isset($returned['data'][$key])) {
-        $fields[$key]=$returned['data'][$key];
+        $fields[$key] = $returned['data'][$key];
     }
 }
 
