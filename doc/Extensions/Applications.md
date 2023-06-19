@@ -2044,6 +2044,16 @@ systemctl reload snmpd
 
 ## Privoxy
 
+For this to work, the following log items need enabled for Privoxy.
+
+```
+debug     2 # show each connection status
+debug   512 # Common Log Format
+debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
+debug  4096 # Startup banner and warnings
+debug  8192 # Non-fatal errors
+```
+
 ### SNMP Extend
 
 1. Download the extend and make sure it is executable.
