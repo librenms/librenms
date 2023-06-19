@@ -11,11 +11,8 @@ $float_precision = 3;
 
 $descr = 'Uptime';
 
-$munge = \LibreNMS\Config::get('graph_uptime_days');
+$munge = true;
 
 $unit_text = 'Days';
-if (! $munge) {
-    $unit_text = 'Seconds';
-}
 
 require 'includes/html/graphs/generic_stats.inc.php';

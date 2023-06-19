@@ -1779,13 +1779,6 @@
             "order": 7,
             "type": "boolean"
         },
-        "graph_uptime_days": {
-            "default": true,
-            "group": "webui",
-            "section": "graph",
-            "order": 8,
-            "type": "boolean"
-        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
