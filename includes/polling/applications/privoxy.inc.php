@@ -145,4 +145,4 @@ data_update($device, 'app', $tags, $fields);
 //
 // all done so update the app metrics
 //
-update_application($app, 'OK', $metrics);
+update_application($app, 'OK', $fields);
