@@ -2055,10 +2055,10 @@ chmod +x /etc/snmp/privoxy
 2. Install the depdenencies.
 ```
 # FreeBSD
-pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster
+pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
 # Debian
 apt-get install cpanminus zlib1g
-cpanm File::ReadBackwards Time::Piece JSON IPC::Run3
+cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
