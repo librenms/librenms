@@ -470,6 +470,16 @@ $graphs['linux_softnet_stat'] = [
     'received_rps',
     'budget',
 ];
+$graphs['privoxy'] = [
+    'client_requests',
+    'blocks',
+    'crunches',
+    'unique_bdomains',
+    'bytes_to_client',
+    'req',
+    'resp_xxx',
+    'ver',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
