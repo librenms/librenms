@@ -27,8 +27,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Silber\Bouncer\BouncerFacade as Bouncer;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class RolesSeeder extends Seeder
 {
@@ -36,6 +34,8 @@ class RolesSeeder extends Seeder
     {
         // set abilities for default rules
         Bouncer::allow('admin')->everything();
-        Bouncer::allow('global-read')->to('viewAny', '*', []);
+        Bouncer::allow(Bouncer::role()->firstOrCreate(['name' => 'global-read'], ['title' => 'Global Read']))
+            ->to('viewAny', '*', []);
+        Bouncer::role()->firstOrCreate(['name' => 'user'], ['title' => 'User']);
     }
 }
