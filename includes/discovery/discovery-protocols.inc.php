@@ -41,7 +41,7 @@ if ($device['os'] == 'ironware') {
     echo PHP_EOL;
 }//end if
 
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe' || $device['os'] == 'nxos') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo ' CISCO-CDP-MIB: ';
     $cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
 
