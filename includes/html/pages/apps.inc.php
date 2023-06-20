@@ -96,6 +96,10 @@ $graphs['powerdns'] = [
     'queries',
     'queries_udp',
 ];
+$graphs['sneck'] = [
+    'results',
+    'time',
+];
 $graphs['ntp-client'] = [
     'stats',
     'freq',
@@ -455,6 +459,16 @@ $graphs['wireguard'] = [
 ];
 $graphs['linux_config_files'] = [
     'number_of_confs',
+];
+$graphs['linux_softnet_stat'] = [
+    'packets',
+    'time_squeeze',
+    'backlog_length',
+    'packet_dropped',
+    'cpu_collision',
+    'flow_limit',
+    'received_rps',
+    'budget',
 ];
 
 echo '<div class="panel panel-default">';

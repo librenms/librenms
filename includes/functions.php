@@ -121,7 +121,7 @@ function percent_colour($perc)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
  */
 function getIcon($device)
@@ -130,7 +130,7 @@ function getIcon($device)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string an image tag with the icon for this device.  Close to square.
  */
 function getIconTag($device)
@@ -1341,7 +1341,7 @@ function get_schema_list()
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return int|null
  */
 function get_device_oid_limit($device)

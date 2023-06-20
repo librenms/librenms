@@ -35,7 +35,7 @@ function bulk_sensor_snmpget($device, $sensors)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @param  string  $type  type/class of sensor
  * @return array
  */
@@ -131,8 +131,8 @@ function poll_sensor($device, $class)
 }//end poll_sensor()
 
 /**
- * @param $device
- * @param $all_sensors
+ * @param  $device
+ * @param  $all_sensors
  */
 function record_sensor_data($device, $all_sensors)
 {

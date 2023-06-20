@@ -825,7 +825,7 @@ function dynamic_override_config($type, $name, $device)
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
  * any of the types in the array are returned.
  *
- * @param $types mixed String or strings matching 'port_descr_type's.
+ * @param  $types  mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
 function get_ports_from_type($given_types)
@@ -877,8 +877,8 @@ function get_ports_from_type($given_types)
 }
 
 /**
- * @param $filename
- * @param $content
+ * @param  $filename
+ * @param  $content
  */
 function file_download($filename, $content)
 {
@@ -938,7 +938,7 @@ function search_oxidized_config($search_in_conf_textbox)
 }
 
 /**
- * @param $data
+ * @param  $data
  * @return bool|mixed
  */
 function array_to_htmljson($data)
