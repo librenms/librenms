@@ -59,6 +59,15 @@ try {
     return;
 }
 
+$old_data=$app->data;
+if (!isset($old_data['disks_with_failed_tests'])) {
+    $old_data['disks_with_failed_tests']=[];
+}
+if (!isset($old_data['disks_with_failed_health'])) {
+    $old_data['disks_with_failed_health']=[];
+}
+
+
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id5', 'GAUGE', 0)
@@ -89,30 +98,47 @@ $rrd_def = RrdDefinition::make()
 $rrd_def_id9 = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
 
-$disks_with_failed_tests=[];
+$new_disks_with_failed_tests=[];
+$new_disks_with_failed_health=[];
+$data['disks_with_failed_tests']=[];
+$data['disks_with_failed_health']=[];
+$data['has']=[
+    'id5'=>0,
+    'id9'=>0,
+    'id10'=>0,
+    'id173'=>0,
+    'id177'=>0,
+    'id183'=>0,
+    'id184'=>0,
+    'id188'=>0,
+    'id190'=>0,
+    'id194'=>0,
+    'id199'=>0,
+    'id231'=>0,
+    'id233'=>0,
+];
 
-$int = 0;
 $metrics = [];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
 
     $fields = [
-        'id5' => is_numeric($disk['5']) ? $id5 : null,
-        'id10' => is_numeric($disk['10']) ? $id10 : null,
-        'id173' => is_numeric($disk['173']) ? $id173 : null,
-        'id177' => is_numeric($disk['177']) ? $id177 : null,
-        'id183' => is_numeric($disk['183']) ? $id183 : null,
-        'id184' => is_numeric($disk['184']) ? $id184 : null,
-        'id187' => is_numeric($disk['187']) ? $id187 : null,
-        'id188' => is_numeric($disk['188']) ? $id188 : null,
-        'id190' => is_numeric($disk['190']) ? $id190 : null,
-        'id194' => is_numeric($disk['194']) ? $id194 : null,
-        'id196' => is_numeric($disk['196']) ? $id196 : null,
-        'id197' => is_numeric($disk['197']) ? $id197 : null,
-        'id198' => is_numeric($disk['198']) ? $id198 : null,
-        'id199' => is_numeric($disk['199']) ? $id199 : null,
-        'id231' => is_numeric($disk['231']) ? $id231 : null,
-        'id233' => is_numeric($disk['233']) ? $id233 : null,
+        'id5' => is_numeric($disk['5']) ? $disk['5'] : null,
+        'id10' => is_numeric($disk['10']) ? $disk['10'] : null,
+        'id173' => is_numeric($disk['173']) ? $disk['173'] : null,
+        'id177' => is_numeric($disk['177']) ? $disk['177'] : null,
+        'id183' => is_numeric($disk['183']) ? $disk['183'] : null,
+        'id184' => is_numeric($disk['184']) ? $disk['184'] : null,
+        'id187' => is_numeric($disk['187']) ? $disk['187'] : null,
+        'id188' => is_numeric($disk['188']) ? $disk['188'] : null,
+        'id190' => is_numeric($disk['190']) ? $disk['190'] : null,
+        'id194' => is_numeric($disk['194']) ? $disk['194'] : null,
+        'id196' => is_numeric($disk['196']) ? $disk['196'] : null,
+        'id197' => is_numeric($disk['197']) ? $disk['197'] : null,
+        'id198' => is_numeric($disk['198']) ? $disk['198'] : null,
+        'id199' => is_numeric($disk['199']) ? $disk['199'] : null,
+        'id231' => is_numeric($disk['231']) ? $disk['231'] : null,
+        'id233' => is_numeric($disk['233']) ? $disk['233'] : null,
         'completed' => is_numeric($disk['completed']) ? $disk['completed'] : null,
         'interrupted' => is_numeric($disk['interrupted']) ? $disk['interrupted'] : null,
         'readfailure' => is_numeric($disk['read_failure']) ? $disk['read_failure'] : null,
@@ -126,17 +152,61 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
-    $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk];
+    $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
     $fields_id9 = ['id9' => $id9];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
 
+    // check if it has any failed tests
+    // only counting failures, ignoring ones that have been interrupted
     if ((is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) ||
       (is_numeric($disk['unknown_failure']) && $disk['unknown_failure'] > 0)) {
-        array_push($disks_with_failed_tests, $disk_id);
+        $data['disks_with_failed_tests'][$disk_id]=1;
+        // add it to the list to alert on if it is a new failure
+        if (!isset($old_data['disks_with_failed_tests'])) {
+            $new_disks_with_failed_tests[]=$disk_id;
+        }
     }
 
-    $int++;
+    // check for what IDs we actually got
+    foreach (array('5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '233') as $id_check) {
+        if (is_numeric($disk[$id_check])) {
+            $data['has']['id'.$id_check]=1;
+        }
+    }
+
+    // checks if the health has failed
+    if (isset($disk['health_pass']) && is_numeric($disk['health_pass']) && $disk['health_pass'] < 1) {
+        $data['disks_with_failed_health'][$disk_id]=1;
+        // add it to the list to alert on if it is a new failure
+        if (!isset($old_data['disks_with_failed_health'])) {
+            $new_disks_with_failed_health[]=$disk_id;
+        }
+    }
+}
+
+// log any disks with failed tests found
+if (sizeof($new_disks_with_failed_tests) > 0) {
+    $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
+    log_event($log_message, $device, 'application', 5);
+}
+
+// log when there when we go to having no failed disks from having them previously
+if (sizeof($new_disks_with_failed_tests) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
+    $log_message = 'SMART is no longer finding any disks with failed tests';
+    log_event($log_message, $device, 'application', 1);
+}
+
+// log any disks with failed tests found
+if (sizeof($new_disks_with_failed_health) > 0) {
+    $log_message = 'SMART found new disks with failed health checks: ' . json_encode($new_disks_with_failed_health);
+    log_event($log_message, $device, 'application', 5);
+}
+
+// log when there when we go to having no failed disks from having them previously
+if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
+    $log_message = 'SMART is no longer finding any disks with failed health checks';
+    log_event($log_message, $device, 'application', 1);
 }
 
 $app->data=$data;
