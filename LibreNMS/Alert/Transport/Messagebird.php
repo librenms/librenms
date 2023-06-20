@@ -41,6 +41,7 @@ class Messagebird extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, $this->config['messagebird-limit'] - 3, '...');
+        $api_url = 'https://rest.messagebird.com/messages';
         $fields = [
             'recipients' => $this->config['messagebird-recipient'],
             'originator' => $this->config['messagebird-origin'],
@@ -51,7 +52,7 @@ class Messagebird extends Transport
             ->withHeaders([
                 'Authorization' => 'AccessKey ' . $this->config['messagebird-key'],
             ])
-            ->post($this->config['messagebird-url'], $fields);
+            ->post($api_url, $fields);
 
         if ($res->successful() && $res->status() == '201') {
             return true;
@@ -64,13 +65,6 @@ class Messagebird extends Transport
     {
         return [
             'config' => [
-                [
-                    'title' => 'Messagebird API URL',
-                    'name' => 'messagebird-url',
-                    'descr' => 'Messagebird API URL',
-                    'type' => 'text',
-                    'default' => 'https://rest.messagebird.com/messages',
-                ],
                 [
                     'title' => 'Messagebird API key',
                     'name' => 'messagebird-key',
@@ -98,7 +92,6 @@ class Messagebird extends Transport
                 ],
             ],
             'validation' => [
-                'messagebird-url' => 'required|url',
                 'messagebird-key' => 'required',
                 'messagebird-origin' => 'required',
                 'messagebird-recipient' => 'required',
