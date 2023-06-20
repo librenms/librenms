@@ -67,7 +67,6 @@ if (!isset($old_data['disks_with_failed_health'])) {
     $old_data['disks_with_failed_health']=[];
 }
 
-
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id5', 'GAUGE', 0)
@@ -208,6 +207,12 @@ if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_f
     $log_message = 'SMART is no longer finding any disks with failed health checks';
     log_event($log_message, $device, 'application', 1);
 }
+
+// get these to make metrics checking easy
+$data['disks_with_failed_tests_count']=sizeof($data['disks_with_failed_tests']);
+$data['disks_with_failed_health_count']=sizeof($data['disks_with_failed_health']);
+$data['new_disks_with_failed_tests_count']=sizeof($new_disks_with_failed_tests);
+$data['new_disks_with_failed_health_count']=sizeof($new_disks_with_failed_health);
 
 $app->data=$data;
 
