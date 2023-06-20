@@ -4,6 +4,8 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
+$name = 'smart';
+
 try {
     $data = json_app_get($device, $name)['data'];
 } catch (JsonAppParsingFailedException $e) {
@@ -91,7 +93,7 @@ $disks_with_failed_tests=[];
 
 $int = 0;
 $metrics = [];
-foreach ($data as $disk_id => $disk)) {
+foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
 
     $fields = [
@@ -129,7 +131,7 @@ foreach ($data as $disk_id => $disk)) {
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
 
-    if ( (is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) || 
+    if ((is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) ||
       (is_numeric($disk['unknown_failure']) && $disk['unknown_failure'] > 0)) {
         array_push($disks_with_failed_tests, $disk_id);
     }
