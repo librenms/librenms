@@ -156,7 +156,7 @@ foreach ($data['disks'] as $disk_id => $disk) {
     data_update($device, 'app', $tags, $fields);
 
     $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
-    $fields_id9 = ['id9' => $id9];
+    $fields_id9 = ['id9' => $disk['9']];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
 
