@@ -13,9 +13,11 @@
 */
 echo 'JunOS ';
 
+$junos_ifotn_oids = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMFECCurrentTable', [], 'JNX-OPT-IF-EXT-MIB', 'junos', '-OQUsb');
+
 $multiplier = 1;
 $divisor = 1;
-foreach ($pre_cache['junos_ifotn_oids'] as $index => $entry) {
+foreach ($junos_ifotn_oids as $index => $entry) {
     if (is_numeric($entry['jnxoptIfOTNPMCurrentFECBERMantissa'])) {
         $index = substr_replace($index, '', -2);
         $oid = '.1.3.6.1.4.1.2636.3.73.1.3.3.8.1.5.' . $index . '.1';
