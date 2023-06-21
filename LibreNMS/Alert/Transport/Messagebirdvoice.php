@@ -38,6 +38,8 @@ use LibreNMS\Util\Http;
 
 class Messagebirdvoice extends Transport
 {
+    protected string $name = 'Messagebird Voice';
+
     public function deliverAlert(array $alert_data): bool
     {
         $messagebird_msg = mb_strimwidth($alert_data['msg'], 0, 1000, '...');
