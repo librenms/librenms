@@ -11,11 +11,9 @@ try {
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = $e->getOutput();
+    $lines = explode("\n", $legacy);
 
-
-    $lines = explode("\n", $output);
-
-    $data=['disks'=>[]];
+    $data=['disks'=>[],'legacy'=>1];
 
     $int = 0;
     while (isset($lines[$int])) {
@@ -229,4 +227,4 @@ $data['new_disks_with_failed_health_count']=sizeof($new_disks_with_failed_health
 
 $app->data=$data;
 
-update_application($app, $output, $data);
+update_application($app, 'OK', $data);
