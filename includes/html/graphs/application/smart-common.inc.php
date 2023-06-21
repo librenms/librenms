@@ -14,7 +14,7 @@ if (isset($vars['disk'])) {
     $disks = Rrd::getRrdApplicationArrays($device, $app->app_id, $name);
 }
 
-$smart_enhancements = ['id9'];
+$smart_enhancements = ['id9', 'maxtemp'];
 
 $int = 0;
 $rrd_list = [];

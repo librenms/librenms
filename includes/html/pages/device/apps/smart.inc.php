@@ -109,6 +109,10 @@ if (isset($vars['disk'])) {
         $graphs['smart_id188'] = 'ID# 188, Command Timeout';
     }
 
+    if ($app_data['has']['id190'] == 1 || $app_data['has']['id194'] == 1){
+        $graphs['smart_maxtemp'] = 'Max Temp(C), Airflow Temperature or Device';
+    }
+
     if ($app_data['has']['id190'] == 1){
         $graphs['smart_id190'] = 'ID# 190, Airflow Temperature (C)';
     }
