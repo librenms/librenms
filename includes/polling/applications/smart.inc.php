@@ -95,6 +95,10 @@ $rrd_def = RrdDefinition::make()
 $rrd_def_id9 = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
 
+$rrd_def_id232 = RrdDefinition::make()
+    ->addDataset('id232', 'GAUGE', 0);
+
+
 $rrd_def_maxtemp = RrdDefinition::make()
     ->addDataset('maxtemp', 'GAUGE', 0);
 
@@ -120,6 +124,7 @@ $data['has']=[
     'id198'=>0,
     'id199'=>0,
     'id231'=>0,
+    'id232'=>0,
     'id233'=>0,
 ];
 
@@ -162,6 +167,11 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
 
+    $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
+    $fields_id232 = ['id232' => $disk['232']];
+    $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
+    data_update($device, 'app', $tags_id232, $fields_id232);
+
     $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
     $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
     $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
@@ -179,10 +189,17 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 
     // check for what IDs we actually got
-    foreach (array('5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '233') as $id_check) {
+    foreach (array('5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '232', '233') as $id_check) {
         if (is_numeric($disk[$id_check])) {
             $data['has']['id'.$id_check]=1;
         }
+    }
+
+    // figure out if this disk is a SSD or not
+    if(is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])){
+        $data['disks'][$disk_id]['is_ssd']=1;
+    }else{
+        $data['disks'][$disk_id]['is_ssd']=0;
     }
 
     // checks if the health has failed
