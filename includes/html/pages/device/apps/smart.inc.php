@@ -57,6 +57,9 @@ if (isset($vars['disk'])) {
     if (isset($app_data['disks'][$vars['disk']]['fw_version'])) {
         echo 'FW Version: '.$app_data['disks'][$vars['disk']]['fw_version'] ."<br>\n";
     }
+    if (isset($app_data['disks'][$vars['disk']]['selftest_log'])) {
+        echo '<pre>'.str_replace("n#", "\n#", $app_data['disks'][$vars['disk']]['selftest_log']) ."</pre><br>\n";
+    }
     print_optionbar_end();
     $graphs = [
         'smart_big5'        => 'Reliability / Age',
