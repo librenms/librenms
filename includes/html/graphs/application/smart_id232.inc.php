@@ -5,6 +5,6 @@ $unitlen = 20;
 $bigdescrlen = 15;
 $smalldescrlen = 15;
 
-$rrdVar = '232';
+$rrdVar = 'id232';
 
 require 'smart-common.inc.php';

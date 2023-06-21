@@ -150,6 +150,10 @@ if (isset($vars['disk'])) {
         $graphs['smart_id231'] = 'ID# 231, SSD Life Left';
     }
 
+    if ($app_data['has']['id232'] == 1) {
+        $graphs['smart_id232'] = 'ID# 232, Available Reservd Space';
+    }
+
     if ($app_data['has']['id233'] == 1) {
         $graphs['smart_id233'] = 'ID# 233, Media Wearout Indicator';
     }
