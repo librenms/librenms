@@ -97,6 +97,10 @@ $rrd_def = RrdDefinition::make()
 $rrd_def_id9 = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
 
+$rrd_def_maxtemp = RrdDefinition::make()
+    ->addDataset('maxtemp', 'GAUGE', 0);
+
+
 $new_disks_with_failed_tests=[];
 $new_disks_with_failed_health=[];
 $data['disks_with_failed_tests']=[];
@@ -159,6 +163,11 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $fields_id9 = ['id9' => $disk['9']];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
+
+    $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
+    $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
+    $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
+    data_update($device, 'app', $tags_maxtemp, $fields_maxtemp);
 
     // check if it has any failed tests
     // only counting failures, ignoring ones that have been interrupted
