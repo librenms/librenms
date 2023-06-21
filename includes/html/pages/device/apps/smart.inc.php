@@ -21,7 +21,16 @@ foreach ($app_data['disks'] as $label => $disk_data) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
-    array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]));
+
+    if (isset($app_data['disks'][$disk]['health_pass'])) {
+        if ($app_data['disks'][$disk]['health_pass'] == 1) {
+            $health_status='(OK)';
+        } else {
+            $health_status='(FAIL)';
+        }
+    }
+
+    array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]) . $health_status);
 }
 
 printf('%s | drives: %s', generate_link('All Drives', $link_array), implode(', ', $drives));
@@ -73,75 +82,75 @@ if (isset($vars['disk'])) {
 } else {
     $graphs = [];
 
-    if ($app_data['has']['id5'] == 1){
+    if ($app_data['has']['id5'] == 1) {
         $graphs['smart_id5'] ='ID# 5, Reallocated Sectors Count';
     }
 
-    if ($app_data['has']['id9'] == 1){
+    if ($app_data['has']['id9'] == 1) {
         $graphs['smart_id9'] = 'ID# 9, Power On Hours';
     }
 
-    if ($app_data['has']['id10'] == 1){
+    if ($app_data['has']['id10'] == 1) {
         $graphs['smart_id10'] = 'ID# 10, Spin Retry Count';
     }
 
-    if ($app_data['has']['id173'] == 1){
+    if ($app_data['has']['id173'] == 1) {
         $graphs['smart_id173'] = 'ID# 173, SSD Wear Leveller Worst Case Erase Count';
     }
 
-    if ($app_data['has']['id177'] == 1){
+    if ($app_data['has']['id177'] == 1) {
         $graphs['smart_id177'] = 'ID# 177, SSD Wear Leveling Count';
     }
 
-    if ($app_data['has']['id183'] == 1){
+    if ($app_data['has']['id183'] == 1) {
         $graphs['smart_id183'] = 'ID# 183, Detected Uncorrectable Bad Blocks';
     }
 
-    if ($app_data['has']['id184'] == 1){
+    if ($app_data['has']['id184'] == 1) {
         $graphs['smart_id184'] = 'ID# 184, End-to-End error / IOEDC';
     }
 
-    if ($app_data['has']['id187'] == 1){
+    if ($app_data['has']['id187'] == 1) {
         $graphs['smart_id187'] = 'ID# 187, Reported Uncorrectable Errors';
     }
 
-    if ($app_data['has']['id188'] == 1){
+    if ($app_data['has']['id188'] == 1) {
         $graphs['smart_id188'] = 'ID# 188, Command Timeout';
     }
 
-    if ($app_data['has']['id190'] == 1 || $app_data['has']['id194'] == 1){
+    if ($app_data['has']['id190'] == 1 || $app_data['has']['id194'] == 1) {
         $graphs['smart_maxtemp'] = 'Max Temp(C), Airflow Temperature or Device';
     }
 
-    if ($app_data['has']['id190'] == 1){
+    if ($app_data['has']['id190'] == 1) {
         $graphs['smart_id190'] = 'ID# 190, Airflow Temperature (C)';
     }
 
-    if ($app_data['has']['id194'] == 1){
+    if ($app_data['has']['id194'] == 1) {
         $graphs['smart_id194'] = 'ID# 194, Temperature (C)';
     }
 
-    if ($app_data['has']['id196'] == 1){
+    if ($app_data['has']['id196'] == 1) {
         $graphs['smart_id196'] = 'ID# 196, Reallocation Event Count';
     }
 
-    if ($app_data['has']['id197'] == 1){
+    if ($app_data['has']['id197'] == 1) {
         $graphs['smart_id197'] = 'ID# 197, Current Pending Sector Count';
     }
 
-    if ($app_data['has']['id198'] == 1){
+    if ($app_data['has']['id198'] == 1) {
         $graphs['smart_id198'] = 'ID# 198, Uncorrectable Sector Count / Offline Uncorrectable / Off-Line Scan Uncorrectable Sector Count';
     }
 
-    if ($app_data['has']['id199'] == 1){
+    if ($app_data['has']['id199'] == 1) {
         $graphs['smart_id199'] = 'ID# 199, UltraDMA CRC Error Count';
     }
 
-    if ($app_data['has']['id231'] == 1){
+    if ($app_data['has']['id231'] == 1) {
         $graphs['smart_id231'] = 'ID# 231, SSD Life Left';
     }
 
-    if ($app_data['has']['id233'] == 1){
+    if ($app_data['has']['id233'] == 1) {
         $graphs['smart_id233'] = 'ID# 233, Media Wearout Indicator';
     }
 }
