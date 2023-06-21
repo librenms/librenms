@@ -79,6 +79,9 @@ if (isset($vars['disk'])) {
         'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
         'smart_runtime'     => 'Power On Hours',
     ];
+    if ($app_data['disks'][$vars['disk']]['is_ssd'] != 1) {
+        unset($graphs['smart_ssd']);
+    }
 } else {
     $graphs = [];
 
