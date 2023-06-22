@@ -106,14 +106,14 @@ modules:
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneRxLaserPower
                     num_oid: '.1.3.6.1.4.1.2636.3.60.1.2.1.1.6.{{ $index }}'
-                    descr: '{{ $ifDescr }} lane {{ $subindex1 }} Rx Power'
+                    descr: '{{ ifDescr:0 }} lane {{ $subindex1 }} Rx Power'
                     divisor: 100
                     skip_values: 0
-                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold
-                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold
-                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold
-                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold
-                    entPhysicalIndex: '{{ $index }}'
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold:0
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold:0
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold:0
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold:0
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     index: 'rx-{{ $index }}'
                     group: 'Modules'
@@ -121,16 +121,16 @@ modules:
                     oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
                     value: JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower
                     num_oid: '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.{{ $index }}'
-                    descr: '{{ $ifDescr }} lane {{ $subindex1 }} Tx Power'
+                    descr: '{{ ifDescr:0 }} lane {{ $subindex1 }} Tx Power'
                     divisor: 100
                     skip_values: 0
-                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold
-                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold
-                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold
-                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold
-                    entPhysicalIndex: '{{ $index }}'
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold:0
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold:0
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold:0
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold:0
+                    entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
-                    index: 'rx-{{ $index }}'
+                    index: 'tx-{{ $index }}'
                     group: 'Modules'
                 -
                     oid: jnxOpticsPMCurrentTable
