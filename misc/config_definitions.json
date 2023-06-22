@@ -5094,6 +5094,13 @@
             "order": 7,
             "type": "boolean"
         },
+        "radius.default_roles": {
+            "default": [],
+            "group": "auth",
+            "section": "radius",
+            "order": 3,
+            "type": "array"
+        },
         "rancid_configs": {
             "default": [],
             "type": "array"

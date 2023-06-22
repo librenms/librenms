@@ -291,23 +291,23 @@ setsebool -P httpd_can_connect_ldap 1
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
-successfully. User level 1 is assigned by default to those accounts 
-unless radius sends a reply attribute with the correct userlevel. 
+successfully. Users are assigned the `user` role by default,
+unless radius sends a reply attribute with a role. 
 
-You can change the default userlevel by setting
-`radius.userlevel` to something other than 1.
+You can change the default role(s) by setting
+!!! setting "auth/radius"
+```bash
+lnms config:set radius.default_roles '["csr"]'
+```
 
 The attribute `Filter-ID` is a standard Radius-Reply-Attribute (string) that
-can be assigned a value which translates into a userlevel in LibreNMS. 
+can be assigned a specially formatted string to assign a single role to the user. 
 
-The strings to send in `Filter-ID` reply attribute is *one* of the following:
-
-- `librenms_role_normal` - Sets the value `1`, which is the normal user level.
-- `librenms_role_admin` - Sets the value `5`, which is the administrator level.
-- `librenms_role_global-read` - Sets the value `10`, which is the global read level.
+The string to send in `Filter-ID` reply attribute must start with `librenms_role_` followed by the role name.
+For example to set the admin role send `librenms_role_admin`
 
 LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
-userlevel that is set in your config.
+role that is set in your config.
 
 ```php
 $config['radius']['hostname']      = 'localhost';
