@@ -98,8 +98,8 @@ class UserController extends Controller
 
         $user = User::create($user);
 
-        $user->assign($request->get('roles', []));
         $user->setPassword($request->new_password);
+        $user->setRoles($request->get('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
         $this->updateTimezone($user, $request->get('timezone'));
@@ -185,7 +185,7 @@ class UserController extends Controller
         }
 
         $user->fill($request->validated());
-        $user->assign($request->get('roles', []));
+        $user->setRoles($request->get('roles', []));
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             $flasher->addSuccess(__('Updated dashboard for :username', ['username' => $user->username]));

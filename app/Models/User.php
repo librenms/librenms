@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 /**
@@ -107,6 +108,20 @@ class User extends Authenticatable
     public function setPassword($password)
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
+    }
+
+    /**
+     * Set roles and remove extra roles, optionally creating non-existent roles, flush permissions cache for this user if roles changed
+     */
+    public function setRoles(array $roles, bool $create = false): void
+    {
+        if ($roles != $this->getRoles()) {
+            if ($create) {
+                $this->assign($roles);
+            }
+            Bouncer::sync($this)->roles($roles);
+            Bouncer::refresh($this);
+        }
     }
 
     /**
