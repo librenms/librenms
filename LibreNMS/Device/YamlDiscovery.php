@@ -246,7 +246,7 @@ class YamlDiscovery
             // if subindex is a range, get them all, otherwise just get the first
             $index = isset($matches[3])
                 ? implode('.', array_slice($sub_indexes, (int) $matches[2], (int) $matches[3]))
-                : $sub_indexes[$matches[2]];
+                : $sub_indexes[(int) $matches[2]];
         }
 
         // look for the data in pre_cache
