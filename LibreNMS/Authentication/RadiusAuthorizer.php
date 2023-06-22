@@ -38,7 +38,6 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
-            // attribute 11 is "Filter-Id", apply and enforce user role (level) if set
             $user = User::thisAuth()->firstOrNew(['username' => $credentials['username']], [
                 'auth_type' => LegacyAuth::getType(),
                 'can_modify_passwd' => 0,

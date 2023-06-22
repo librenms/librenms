@@ -43,7 +43,6 @@ interface Authorizer
      * realname
      * email
      * descr
-     * level
      * can_modify_passwd
      *
      * @param  int  $user_id

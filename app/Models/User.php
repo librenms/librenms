@@ -65,7 +65,7 @@ class User extends Authenticatable
      */
     public function hasGlobalAdmin()
     {
-        return $this->isA('admin');
+        return $this->isA('admin', 'demo');
     }
 
     /**
@@ -166,7 +166,7 @@ class User extends Authenticatable
 
     public function scopeAdminOnly($query)
     {
-        $query->where('level', 10);
+        $query->whereIs('admin');
     }
 
     // ---- Accessors/Mutators ----
