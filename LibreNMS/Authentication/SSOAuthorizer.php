@@ -32,7 +32,6 @@ use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 /**
  * Some functionality in this mechanism is inspired by confluence_http_authenticator (@chauth) and graylog-plugin-auth-sso (@Graylog)
@@ -64,11 +63,6 @@ class SSOAuthorizer extends MysqlAuthorizer
                 $user->email = $this->authSSOGetAttr(Config::get('sso.email_attr'));
                 $user->descr = $this->authSSOGetAttr(Config::get('sso.descr_attr')) ?: 'SSO User';
                 $user->save();
-
-                $roles = $this->authSSOCalculateRoles();
-                $user->assign($roles); // assign and create roles
-                Bouncer::sync($user)->roles($roles); // remove extra roles
-                Bouncer::refresh($user);
             }
         }
 
@@ -162,7 +156,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @return string|array
      */
-    public function authSSOCalculateRoles(): array
+    public function getRoles(string $username): array
     {
         if (Config::get('sso.group_strategy') === 'attribute') {
             if (Config::get('sso.level_attr')) {

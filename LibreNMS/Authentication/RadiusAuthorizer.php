@@ -10,7 +10,6 @@ use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class RadiusAuthorizer extends MysqlAuthorizer
 {
@@ -19,6 +18,8 @@ class RadiusAuthorizer extends MysqlAuthorizer
     protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected Radius $radius;
+
+    private array $roles = []; // temp cache of roles
 
     public function __construct()
     {
@@ -44,22 +45,23 @@ class RadiusAuthorizer extends MysqlAuthorizer
             ]);
             $user->save();
 
-            $roles = $this->getDefaultRoles();
+            $this->roles[$credentials['username']] = $this->getDefaultRoles();
 
-            // assign a single role from the Filter-ID attribute
+            // cache a single role from the Filter-ID attribute now because attributes are cleared every accessRequest
             $filter_id_attribute = $this->radius->getAttribute(11);
             if ($filter_id_attribute && Str::startsWith($filter_id_attribute, 'librenms_role_')) {
-                $roles = [substr($filter_id_attribute, 14)];
+                $this->roles[$credentials['username']] = [substr($filter_id_attribute, 14)];
             }
-
-            $user->assign($roles);
-            Bouncer::sync($user)->roles($roles);
-            Bouncer::refresh($user);
 
             return true;
         }
 
         throw new AuthenticationException();
+    }
+
+    public function getRoles(string $username): array
+    {
+        return $this->roles[$username] ?? $this->getDefaultRoles();
     }
 
     private function getDefaultRoles(): array

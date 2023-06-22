@@ -35,6 +35,7 @@ use LibreNMS\Util\Debug;
 use Log;
 use Request;
 use Session;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class LegacyUserProvider implements UserProvider
 {
@@ -207,6 +208,14 @@ class LegacyUserProvider implements UserProvider
         $user->auth_type = $type; // doing this here in case it was null (legacy)
         $user->auth_id = (string) $auth_id;
         $user->save();
+
+        // update roles
+        $roles = $auth->getRoles($user->username);
+        if ($roles != $user->getRoles()) {
+            $user->assign($roles);
+            Bouncer::sync($user)->roles($roles);
+            Bouncer::refresh($user);
+        }
 
         return $user;
     }
