@@ -62,7 +62,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
         throw new AuthenticationException();
     }
 
-    public static function getDefaultRoles(): array
+    private function getDefaultRoles(): array
     {
         // return roles or translate from the old radius.default_level
         return Config::get('radius.default_roles')
