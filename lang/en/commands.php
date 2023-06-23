@@ -44,7 +44,7 @@ return [
             'fail-fast' => 'Stop checks when any failure is encountered',
             'full' => 'Run full checks ignoring changed file filtering',
             'module' => 'Specific Module to run tests on. Implies unit, --db, --snmpsim',
-            'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
+            'os' => 'Specific OS to run tests on. May be a regex or comma seperated list. Implies unit, --db, --snmpsim',
             'os-modules-only' => 'Skip os detection test when specifying a specific OS.  Speeds up test time when checking non-detection changes.',
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
