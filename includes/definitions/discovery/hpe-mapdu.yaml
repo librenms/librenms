@@ -181,7 +181,7 @@ modules:
                     descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Power'
                     skip_values:
                     -
-                        oid: 'pdu2InputType'
+                        oid: 'pdu2InputType:0'
                         op: '!='
                         value: '1'
                 -
@@ -211,7 +211,7 @@ modules:
                     descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Power'
                     skip_values:
                     -
-                        oid: 'pdu3InputType'
+                        oid: 'pdu3InputType:0'
                         op: '!='
                         value: '1'
                 -
@@ -242,7 +242,7 @@ modules:
                     divisor: 1000
                     skip_values:
                     -
-                        oid: 'pdu2InputType'
+                        oid: 'pdu2InputType:0'
                         op: '!='
                         value: '1'
                     -
