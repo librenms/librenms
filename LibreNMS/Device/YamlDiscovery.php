@@ -131,7 +131,7 @@ class YamlDiscovery
      */
     public static function fillValues($name, $index, $discovery_data, $count, $pre_cache, $value): mixed
     {
-        if (Str::contains($value, '{{')) {
+        if (str_contains($value, '{{')) {
             // replace embedded values
             return static::replaceValues($name, $index, $count, $discovery_data, $pre_cache);
         } elseif (! str_contains($value, ' ')) {
@@ -314,7 +314,7 @@ class YamlDiscovery
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
-                                } elseif (Str::contains($oid, '::')) {
+                                } elseif (str_contains($oid, '::')) {
                                     $snmp_flag = ['-OteQUSa'];
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
@@ -366,7 +366,7 @@ class YamlDiscovery
                 } else {
                     // oid previously fetched from the device
                     $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
-                    if (Str::contains($skip_value['oid'], '.')) {
+                    if (str_contains($skip_value['oid'], '.')) {
                         [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
                         $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
                     }
