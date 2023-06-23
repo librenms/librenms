@@ -2042,6 +2042,50 @@ systemctl reload snmpd
 7. You're now ready to enable the application in LibreNMS.
 
 
+## Privoxy
+
+For this to work, the following log items need enabled for Privoxy.
+
+```
+debug     2 # show each connection status
+debug   512 # Common Log Format
+debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
+debug  4096 # Startup banner and warnings
+debug  8192 # Non-fatal errors
+```
+
+### SNMP Extend
+
+1. Download the extend and make sure it is executable.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/privoxy -O /etc/snmp/privoxy
+chmod +x /etc/snmp/privoxy
+```
+
+2. Install the depdenencies.
+```
+# FreeBSD
+pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+# Debian
+apt-get install cpanminus zlib1g
+cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+```
+
+3. Add the extend to snmpd.conf and restart snmpd.
+```
+extend privoxy /etc/snmp/privoxy
+```
+
+If your logfile is not at `/var/log/privoxy/logfile`, that may be
+changed via the `-f` option.
+
+If `privoxy-log-parser.pl` is not found in your standard `$PATH`
+setting, you may will need up call the extend via `/usr/bin/env` with
+a `$PATH` set to something that includes it.
+
+Once that is done, just wait for the server to be rediscovered or just
+enable it manually.
+
 ## Pwrstatd
 
 Pwrstatd (commonly known as powerpanel) is an application/service available from CyberPower to monitor their PSUs over USB.  It is currently capable of reading the status of only one PSU connected via USB at a time.  The powerpanel software is available here:
