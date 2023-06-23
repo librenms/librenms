@@ -198,7 +198,7 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }
