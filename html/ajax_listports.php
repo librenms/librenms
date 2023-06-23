@@ -26,10 +26,8 @@ if (is_numeric($_GET['device_id'])) {
         $interface = cleanPort($interface);
         $interface_map[$interface['label']] = $interface;
     }
-    $interface_names = array_keys($interface_map);
-    sort($interface_names);
-    foreach ($interface_names as $interface_name) {
-        $interface = $interface_map[$interface_name];
+    ksort($interface_map);
+    foreach ($interface_map as _ => $interface) {
         $string = addslashes(html_entity_decode($interface['label'] . ' - ' . $interface['ifAlias']));
         echo "obj.options[obj.options.length] = new Option('" . $string . "','" . $interface['port_id'] . "');\n";
     }
