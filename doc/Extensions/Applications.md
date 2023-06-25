@@ -2806,6 +2806,20 @@ setup. If the default does not work, check the docs for it at
 suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
 
 
+## Suricata Extract
+
+### SNMP
+
+1. Add the following to your snmpd config and restart. Path may have
+to be adjusted depending on where `suricata_extract_submit_extend` is
+installed to.
+```
+extend suricata_extract /usr/local/bin/suricata_extract_submit_extend
+```
+
+Then just wait for the system to be rediscovered or enable it manually
+for the server in question.
+
 ## Systemd
 
 The systemd application polls systemd and scrapes systemd units' load, activation, and sub states.
