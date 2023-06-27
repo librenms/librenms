@@ -126,7 +126,7 @@ class YamlDiscovery
      * @param  array  $discovery_data  The yaml discovery data
      * @param  int  $count  The count of where we are in the discovery data
      * @param  array  $pre_cache  Data that has been previously fetched (should contain all snmp data)
-     * @param  int|string  $value  The current value of the data that we might need to transform (or return as is)
+     * @param  int|string|null  $value  The current value of the data that we might need to transform (or return as is)
      * @return mixed
      */
     public static function fillValues($name, $index, $discovery_data, $count, $pre_cache, $value): mixed
@@ -198,7 +198,7 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }

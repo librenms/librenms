@@ -937,8 +937,8 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
-                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
-                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
+                    $divisor = (int) (isset($data['divisor']) ? (YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['divisor'] ?? 1));
+                    $multiplier = (int) (isset($data['multiplier']) ? (YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['multiplier'] ?? 1));
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
