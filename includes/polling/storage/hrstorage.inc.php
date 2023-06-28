@@ -1,37 +1,33 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+
 // HOST-RESOURCES-MIB - Storage Objects
 if (! isset($storage_cache['hrstorage'])) {
     $storage_cache['hrstorage'] = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
     d_echo($storage_cache);
 }
 
-$entry = $storage_cache['hrstorage'][$storage['storage_index']];
+// find storage entry
+if (isset($storage_cache['hrstorage'][$storage['storage_index']]) && $storage_cache['hrstorage'][$storage['storage_index']]['hrStorageDescr'] == $storage['storage_descr']) {
+    $entry = $storage_cache['hrstorage'][$storage['storage_index']];
+} else {
+    // couldn't find a match, check by storage_descr in case the index changed
+    $entry = collect($storage_cache['hrstorage'])->firstWhere('hrStorageDescr', $storage['storage_descr']);
 
-/*
- * It is possible that the HOST-RESOURCES-MIB::hrStorageTable has updated between
- * discovery and polling.    If we assume it hasn't we can end up assigning the
- * values of the wrong mount point to another mount point.   This can cause
- * issues with not only display, but also alarming.
- *
- * We can compare the description expected with one from the hrStorageIndex entry
- * and if they are not equal then we can filter the table to return an entry
- * that does match.
- *
- * (example of how to debug --> ./poller.php -h 42 -r -f -m storage -d)
- *
- */
+    if (empty($entry)) {
+        Log::error('%rCould not find storage data for ' . $storage['storage_descr'] . '%n', ['color' => true]);
+        // keep last known values
+        $storage['units'] = $storage['storage_units'];
+        $storage['used'] = $storage['storage_used'];
+        $storage['size'] = $storage['storage_size'];
+        $storage['free'] = $storage['storage_free'];
 
-if( $entry['hrStorageDescr'] !== $descr && is_array( $storage_cache['hrstorage'] ) ){
-    d_echo( '🚨 We are after [' . $descr . '] but hrStorageIndex entry has [' . $entry['hrStorageDescr'] . '] ' );
-    d_echo( 'Before: ' . var_export( $entry, true ));
-    $entry = array_values( array_filter( $storage_cache['hrstorage'], function($entry) use ($descr) {
-        return $entry['hrStorageDescr'] === $descr;
-    }))[0];
-    d_echo( 'After: ' . var_export( $entry, true ) );
-    d_echo( '🚨 updated to [' . $entry['hrStorageDescr'] . ']' );
+        return;
+    }
+
+    Log::debug("Storage changed index {$storage['storage_index']} > {$entry['hrStorageIndex']}, applying quickfix until discovery runs");
 }
-
 
 $storage['units'] = $entry['hrStorageAllocationUnits'];
 $entry['hrStorageUsed'] = fix_integer_value($entry['hrStorageUsed'] ?? 0);
