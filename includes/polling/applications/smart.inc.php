@@ -137,6 +137,7 @@ $metrics = [
     'disks_with_failed_health_count' => 0,
     'new_disks_with_failed_tests_count' => 0,
     'new_disks_with_failed_health_count' => 0,
+    'exit_nonzero' => $data['exit_nonzero_count'];
 ];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
@@ -257,6 +258,7 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 
     $metrics['disk_'.$disk_id.'_health'] = $disk['health_pass'];
+    $metrics['disk_'.$disk_id.'_exit'] = $disk['exit'];
 }
 
 // log any disks with failed tests found
