@@ -15,7 +15,6 @@ if (($entry['hrStorageDescr'] ?? null) !== $storage['storage_descr']) {
     // couldn't find a match, check by storage_descr or fall back to data found by index in case descr changed
     $entry = collect($storage_cache['hrstorage'])->firstWhere('hrStorageDescr', $storage['storage_descr']) ?? $entry;
 }
-dump($entry);
 
 if (empty($entry)) {
     Log::error("%rCould not find storage data for {$storage['storage_descr']}%n", ['color' => true]);
