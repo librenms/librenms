@@ -166,20 +166,28 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
+    $metrics['disk_'.$disk_id] = $fields;
+
     $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
     $fields_id9 = ['id9' => $disk['9']];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
+
+    $metrics['disk_'.$disk_id]['id9']=$disk['9'];
 
     $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
     $fields_id232 = ['id232' => $disk['232']];
     $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
     data_update($device, 'app', $tags_id232, $fields_id232);
 
+    $metrics['disk_'.$disk_id]['id232']=$disk['232'];
+
     $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
     $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
     $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
     data_update($device, 'app', $tags_maxtemp, $fields_maxtemp);
+
+    $metrics['disk_'.$disk_id]['max_temp']=$disk['max_temp'];
 
     // check if it has any failed tests
     // only counting failures, ignoring ones that have been interrupted
@@ -202,8 +210,10 @@ foreach ($data['disks'] as $disk_id => $disk) {
     // figure out if this disk is a SSD or not
     if(is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])){
         $data['disks'][$disk_id]['is_ssd']=1;
+        $metrics['disk_'.$disk_id]['is_ssd']=1;
     }else{
         $data['disks'][$disk_id]['is_ssd']=0;
+        $metrics['disk_'.$disk_id]['is_ssd']=0;
     }
 
     // checks if the health has failed
@@ -241,11 +251,11 @@ if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_f
 }
 
 // get these to make metrics checking easy
-$data['disks_with_failed_tests_count']=sizeof($data['disks_with_failed_tests']);
-$data['disks_with_failed_health_count']=sizeof($data['disks_with_failed_health']);
-$data['new_disks_with_failed_tests_count']=sizeof($new_disks_with_failed_tests);
-$data['new_disks_with_failed_health_count']=sizeof($new_disks_with_failed_health);
+$metrics['disks_with_failed_tests_count']=sizeof($data['disks_with_failed_tests']);
+$metrics['disks_with_failed_health_count']=sizeof($data['disks_with_failed_health']);
+$metrics['new_disks_with_failed_tests_count']=sizeof($new_disks_with_failed_tests);
+$metrics['new_disks_with_failed_health_count']=sizeof($new_disks_with_failed_health);
 
 $app->data=$data;
 
-update_application($app, 'OK', $data);
+update_application($app, 'OK', $metric);
