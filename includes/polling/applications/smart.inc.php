@@ -22,33 +22,37 @@ try {
             $unknown_failure, $extended, $short, $conveyance, $selective] = explode(',', $lines[$int]);
         $int++;
 
-        $data['disks'][$disk] = [
-            '10' => $id10,
-            '173' => $id173,
-            '177' => $id177,
-            '183' => $id183,
-            '184' => $id184,
-            '187' => $id187,
-            '188' => $id188,
-            '190' => $id190,
-            '194' => $id194,
-            '196' => $id196,
-            '197' => $id197,
-            '198' => $id198,
-            '199' => $id199,
-            '231' => $id231,
-            '233' => $id233,
-            '5' => $id5,
-            '9' => $id9,
-            'completed' => $completed,
-            'interrupted' => $interrupted,
-            'read_failure' => $read_failure,
-            'unknown_failure' => $unknown_failure,
-            'extended' => $extended,
-            'short' => $short,
-            'conveyance' => $conveyance,
-            'selective' => 'selective',
-        ];
+        // could really be any of these, but make sure we have something defined,
+        // otherwise there is something wrong with the line
+        if (isset($id173)) {
+            $data['disks'][$disk] = [
+                '10' => $id10,
+                '173' => $id173,
+                '177' => $id177,
+                '183' => $id183,
+                '184' => $id184,
+                '187' => $id187,
+                '188' => $id188,
+                '190' => $id190,
+                '194' => $id194,
+                '196' => $id196,
+                '197' => $id197,
+                '198' => $id198,
+                '199' => $id199,
+                '231' => $id231,
+                '233' => $id233,
+                '5' => $id5,
+                '9' => $id9,
+                'completed' => $completed,
+                'interrupted' => $interrupted,
+                'read_failure' => $read_failure,
+                'unknown_failure' => $unknown_failure,
+                'extended' => $extended,
+                'short' => $short,
+                'conveyance' => $conveyance,
+                'selective' => 'selective',
+            ];
+        }
     }
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
