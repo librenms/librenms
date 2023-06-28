@@ -48,7 +48,7 @@ if (isset($vars['disk'])) {
             echo 'Vendor: '.$app_data['disks'][$vars['disk']]['vendor'] ."<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['product'])) {
-            echo ': '.$app_data['disks'][$vars['disk']]['product'] ."<br>\n";
+            echo 'Product: '.$app_data['disks'][$vars['disk']]['product'] ."<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['model_family'])) {
             echo 'Model Family: '.$app_data['disks'][$vars['disk']]['model_family'] ."<br>\n";
