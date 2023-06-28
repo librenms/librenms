@@ -132,7 +132,12 @@ $data['has']=[
     'id233'=>0,
 ];
 
-$metrics = [];
+$metrics = [
+    'disks_with_failed_tests_count' => 0,
+    'disks_with_failed_health_count' => 0,
+    'new_disks_with_failed_tests_count' => 0,
+    'new_disks_with_failed_health_count' => 0,
+];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
 
@@ -194,9 +199,11 @@ foreach ($data['disks'] as $disk_id => $disk) {
     if ((is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) ||
       (is_numeric($disk['unknown_failure']) && $disk['unknown_failure'] > 0)) {
         $data['disks_with_failed_tests'][$disk_id]=1;
+        $metrics['disks_with_failed_tests']++;
         // add it to the list to alert on if it is a new failure
         if (!isset($old_data['disks_with_failed_tests'])) {
             $new_disks_with_failed_tests[]=$disk_id;
+            $metrics['new_disks_with_failed_tests']++;
         }
     }
 
@@ -219,9 +226,11 @@ foreach ($data['disks'] as $disk_id => $disk) {
     // checks if the health has failed
     if (isset($disk['health_pass']) && is_numeric($disk['health_pass']) && $disk['health_pass'] < 1) {
         $data['disks_with_failed_health'][$disk_id]=1;
+        $metrics['disks_with_failed_health_count']++;
         // add it to the list to alert on if it is a new failure
         if (!isset($old_data['disks_with_failed_health'])) {
             $new_disks_with_failed_health[]=$disk_id;
+            $metrics['new_disks_with_failed_health_count']++;
         }
     }
 }
@@ -249,12 +258,6 @@ if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_f
     $log_message = 'SMART is no longer finding any disks with failed health checks';
     log_event($log_message, $device, 'application', 1);
 }
-
-// get these to make metrics checking easy
-$metrics['disks_with_failed_tests_count']=sizeof($data['disks_with_failed_tests']);
-$metrics['disks_with_failed_health_count']=sizeof($data['disks_with_failed_health']);
-$metrics['new_disks_with_failed_tests_count']=sizeof($new_disks_with_failed_tests);
-$metrics['new_disks_with_failed_health_count']=sizeof($new_disks_with_failed_health);
 
 $app->data=$data;
 
