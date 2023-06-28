@@ -261,4 +261,4 @@ if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_f
 
 $app->data=$data;
 
-update_application($app, 'OK', $metric);
+update_application($app, 'OK', $metrics);
