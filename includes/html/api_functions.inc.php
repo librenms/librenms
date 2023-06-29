@@ -2424,7 +2424,7 @@ function list_fdb(Illuminate\Http\Request $request)
            ->get();
 
     if ($fdb->isEmpty()) {
-        return api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb entry does not exist');
     }
 
     return api_success($fdb, 'ports_fdb');
