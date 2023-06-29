@@ -192,7 +192,7 @@ class YamlDiscovery
                             return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
                         }
                     }
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }
