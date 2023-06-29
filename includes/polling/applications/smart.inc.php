@@ -137,7 +137,7 @@ $metrics = [
     'disks_with_failed_health_count' => 0,
     'new_disks_with_failed_tests_count' => 0,
     'new_disks_with_failed_health_count' => 0,
-    'exit_nonzero' => $data['exit_nonzero_count'];
+    'exit_nonzero' => $data['exit_nonzero_count'],
 ];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
@@ -238,10 +238,10 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 
     // figure out if this disk is a SSD or not
-    if(is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])){
+    if (is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])) {
         $data['disks'][$disk_id]['is_ssd']=1;
         $metrics['disk_'.$disk_id]['is_ssd']=1;
-    }else{
+    } else {
         $data['disks'][$disk_id]['is_ssd']=0;
         $metrics['disk_'.$disk_id]['is_ssd']=0;
     }
@@ -267,8 +267,9 @@ if (sizeof($new_disks_with_failed_tests) > 0) {
     log_event($log_message, $device, 'application', 5);
 }
 
+
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($new_disks_with_failed_tests) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
+if (sizeof($data['disks_with_failed_tests']) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed tests';
     log_event($log_message, $device, 'application', 1);
 }
