@@ -2456,7 +2456,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
            ->limit(1000)->get();
 
     if (count($fdb) == 0) {
-        return api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb entry does not exist');
     }
 
     foreach ($fdb as $i => $fdb_entry) {
