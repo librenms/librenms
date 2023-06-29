@@ -359,6 +359,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.sneck.polling_time_diff": {
+            "default": false,
+            "type": "boolean"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
@@ -3757,7 +3761,25 @@
             "group": "system",
             "section": "proxy",
             "order": 0,
-            "type": "text"
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
+        },
+        "https_proxy": {
+            "group": "system",
+            "section": "proxy",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
         },
         "icmp_check": {
             "default": true,
@@ -4351,6 +4373,13 @@
             "section": "binaries",
             "order": 5,
             "type": "executable"
+        },
+        "no_proxy": {
+            "group": "system",
+            "default": "localhost,127.0.0.1,::1",
+            "section": "proxy",
+            "order": 2,
+            "type": "text"
         },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",

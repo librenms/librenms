@@ -316,7 +316,7 @@ class Cisco extends OS implements
         return $processors;
     }
 
-    public function discoverSlas()
+    public function discoverSlas(): Collection
     {
         $slas = new Collection();
 
@@ -414,7 +414,7 @@ class Cisco extends OS implements
         return $nac;
     }
 
-    public function pollSlas($slas)
+    public function pollSlas($slas): void
     {
         $device = $this->getDeviceArray();
 

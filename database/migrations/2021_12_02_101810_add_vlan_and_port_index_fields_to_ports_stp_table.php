@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->unsignedInteger('vlan')->nullable()->after('device_id');
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->dropColumn(['vlan', 'port_index']);

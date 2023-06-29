@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 use LibreNMS\Config;
 use Validator;
 
+#[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
     public $name;

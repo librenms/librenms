@@ -31,6 +31,7 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
@@ -299,8 +300,8 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
-                $o = sizeof($alert['details']['rule']);
-                $n = sizeof($chk);
+                $o = count($alert['details']['rule']);
+                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
                 if ($n > $o) {
@@ -506,7 +507,7 @@ class RunAlerts
                 $obj['msg'] = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
                 try {
-                    $instance = new $class($item['transport_id']);
+                    $instance = new $class(AlertTransport::find($item['transport_id']));
                     $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {

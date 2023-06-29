@@ -13,7 +13,7 @@ class DeviceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'hostname' => $this->faker->domainWord() . '-' . $this->faker->domainWord() . '-' . $this->faker->domainWord() . '.' . $this->faker->domainName(),
