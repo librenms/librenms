@@ -307,6 +307,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
         return false;
     } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
         $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
+
         return $data;
     } elseif ($data || $data === '0') {
         return $data;
