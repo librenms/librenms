@@ -281,7 +281,7 @@ if (sizeof($new_disks_with_failed_health) > 0) {
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($new_disks_with_failed_health) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
+if (sizeof($data['disks_with_failed_health']) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed health checks';
     log_event($log_message, $device, 'application', 1);
 }
