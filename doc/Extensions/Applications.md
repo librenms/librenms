@@ -2421,7 +2421,7 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 
 1. Copy the Perl script, smart, to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
 2. Make the script executable
@@ -2479,7 +2479,7 @@ you should consider adding this to cron. Also make sure the cache file
 is some place it can be written to.
 
 ```
- */3 * * * * /etc/snmp/smart -u
+ */5 * * * * /etc/snmp/smart -u
 ```
 
 6. If your snmp agent runs as user "snmp", edit your sudo users
@@ -2488,7 +2488,8 @@ is some place it can be written to.
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
 ```
 
-and modify your snmpd.conf file accordingly:
+and modify your snmpd.conf file accordingly, sudo can be excluded if
+running it via cron:
 
 ```
 extend smart /usr/bin/sudo /etc/snmp/smart
@@ -2497,16 +2498,6 @@ extend smart /usr/bin/sudo /etc/snmp/smart
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
-
-If you set useSN to 1, it is worth noting that you will loose
-history(not able to access it from the web interface) for that device
-each time you change it. You will also need to run camcontrol or the
-like on said server to figure out what device actually corresponds
-with that serial number.
-
-Also if the system you are using uses non-static device naming based
-on bus information, it may be worthwhile just using the SN as the
-device ID is going to be irrelevant in that case.
 
 ## Sneck
 
