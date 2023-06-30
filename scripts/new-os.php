@@ -96,7 +96,7 @@ discovery:
             exit(1);
         }
         preg_match('/(.* DEFINITIONS ::)/', $mib_data, $matches);
-        [$mib_name,] = explode(' ', $matches[0], 2);
+        [$mib_name] = explode(' ', $matches[0], 2);
         if (file_exists(Config::get('install_dir') . "/mibs/$vendor/") == false) {
             mkdir(Config::get('install_dir') . "/mibs/$vendor/");
         }

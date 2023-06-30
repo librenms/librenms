@@ -177,6 +177,7 @@ Artisan::command('poller:billing-calculate
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
     {--P|ping-only : ' . __('Add the device as a ping only device if it replies to ping but not SNMP') . '}
+    {--o|dns-only : ' . __('Only DNS resolved Devices') . '}
     {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
     {--l|legend : ' . __('Print the legend') . '}
 ', function () {
@@ -187,6 +188,10 @@ Artisan::command('scan
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
+    }
+
+    if ($this->option('dns-only')) {
+        $command[] = '-o';
     }
 
     if ($this->option('ping-only')) {

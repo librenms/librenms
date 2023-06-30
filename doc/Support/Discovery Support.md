@@ -63,53 +63,54 @@ a module by setting it to 0. If you just want to disable it for one
 device then you can do this within the WebUI -> Device -> Settings ->
 Modules.
 
-```php
-$config['discovery_modules']['os']                   = true;
-$config['discovery_modules']['ports']                = true;
-$config['discovery_modules']['ports-stack']          = true;
-$config['discovery_modules']['entity-physical']      = true;
-$config['discovery_modules']['entity-state']         = false;
-$config['discovery_modules']['processors']           = true;
-$config['discovery_modules']['mempools']             = true;
-$config['discovery_modules']['cisco-vrf-lite']       = true;
-$config['discovery_modules']['cisco-mac-accounting'] = false;
-$config['discovery_modules']['cisco-pw']             = false;
-$config['discovery_modules']['vrf']                  = false;
-$config['discovery_modules']['cisco-cef']            = false;
-$config['discovery_modules']['slas']                 = false;
-$config['discovery_modules']['cisco-cbqos']          = false;
-$config['discovery_modules']['cisco-otv']            = false;
-$config['discovery_modules']['ipv4-addresses']       = true;
-$config['discovery_modules']['ipv6-addresses']       = true;
-$config['discovery_modules']['route']                = false;
-$config['discovery_modules']['sensors']              = true;
-$config['discovery_modules']['storage']              = true;
-$config['discovery_modules']['hr-device']            = true;
-$config['discovery_modules']['discovery-protocols']  = true;
-$config['discovery_modules']['arp-table']            = true;
-$config['discovery_modules']['discovery-arp']        = false;
-$config['discovery_modules']['junose-atm-vp']        = false;
-$config['discovery_modules']['bgp-peers']            = true;
-$config['discovery_modules']['vlans']                = true;
-$config['discovery_modules']['vmware-vminfo']        = false;
-$config['discovery_modules']['libvirt-vminfo']       = false;
-$config['discovery_modules']['printer-supplies']     = false;
-$config['discovery_modules']['ucd-diskio']           = true;
-$config['discovery_modules']['applications']         = false;
-$config['discovery_modules']['services']             = true;
-$config['discovery_modules']['stp']                  = true;
-$config['discovery_modules']['ntp']                  = true;
-$config['discovery_modules']['loadbalancers']        = false;
-$config['discovery_modules']['mef']                  = false;
-$config['discovery_modules']['wireless']             = true;
-$config['discovery_modules']['fdb-table']            = true;
-$config['discovery_modules']['xdsl']                 = false;
-```
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.os true
+    lnms config:set discovery_modules.ports true
+    lnms config:set discovery_modules.ports-stack true
+    lnms config:set discovery_modules.entity-physical true
+    lnms config:set discovery_modules.entity-state false
+    lnms config:set discovery_modules.processors true
+    lnms config:set discovery_modules.mempools true
+    lnms config:set discovery_modules.cisco-vrf-lite true
+    lnms config:set discovery_modules.cisco-mac-accounting false
+    lnms config:set discovery_modules.cisco-pw false
+    lnms config:set discovery_modules.vrf false
+    lnms config:set discovery_modules.cisco-cef false
+    lnms config:set discovery_modules.slas false
+    lnms config:set discovery_modules.cisco-cbqos false
+    lnms config:set discovery_modules.cisco-otv false
+    lnms config:set discovery_modules.ipv4-addresses true
+    lnms config:set discovery_modules.ipv6-addresses true
+    lnms config:set discovery_modules.route false
+    lnms config:set discovery_modules.sensors true
+    lnms config:set discovery_modules.storage true
+    lnms config:set discovery_modules.hr-device true
+    lnms config:set discovery_modules.discovery-protocols true
+    lnms config:set discovery_modules.arp-table true
+    lnms config:set discovery_modules.discovery-arp false
+    lnms config:set discovery_modules.junose-atm-vp false
+    lnms config:set discovery_modules.bgp-peers true
+    lnms config:set discovery_modules.vlans true
+    lnms config:set discovery_modules.vmware-vminfo false
+    lnms config:set discovery_modules.libvirt-vminfo false
+    lnms config:set discovery_modules.printer-supplies false
+    lnms config:set discovery_modules.ucd-diskio true
+    lnms config:set discovery_modules.applications false
+    lnms config:set discovery_modules.services true
+    lnms config:set discovery_modules.stp true
+    lnms config:set discovery_modules.ntp true
+    lnms config:set discovery_modules.loadbalancers false
+    lnms config:set discovery_modules.mef false
+    lnms config:set discovery_modules.wireless true
+    lnms config:set discovery_modules.fdb-table true
+    lnms config:set discovery_modules.xdsl false
+    ```
 
 ## OS based Discovery config
 
-You can enable or disable modules for a specific OS by add
-corresponding line in `config.php` OS based settings have preference
+You can enable or disable modules for a specific OS by using
+`lnms config:set` OS based settings have preference
 over global. Device based settings have preference over all others
 
 Discover performance improvement can be achieved by deactivating all
@@ -117,10 +118,11 @@ modules that are not supported by specific OS.
 
 E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
 
-```php
-$config['os']['linux']['discovery_modules']['stp'] = false;
-$config['os']['linux']['discovery_modules']['discovery-arp'] = true;
-```
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set os.linux.discovery_modules.stp false
+    lnms config:set os.linux.discovery_modules.discovery-arp true
+    ```
 
 ## Discovery modules
 
@@ -146,8 +148,7 @@ configured to be ignored by config options.
 `ipv6-addresses`: IPv6 Address detection
 
 `route`: This module will load the routing table of the device. The default route
- limit is 1000 (configurable in config.php with
- ```$config['routes']['max_number'] = 1000;```), with history data.
+ limit is 1000 (configurable with `lnms config:set routes.max_number 1000`), with history data.
 
 `sensors`: Sensor detection such as Temperature, Humidity, Voltages + More
 

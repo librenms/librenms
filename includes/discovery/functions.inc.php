@@ -24,6 +24,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\UserFuncHelper;
 
 function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {
@@ -156,6 +157,11 @@ function discover_device(&$device, $force_module = false)
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
                 report($e);
+
+                // Re-throw exception if we're in CI
+                if (getenv('CI') == true) {
+                    throw $e;
+                }
             }
 
             $module_time = microtime(true) - $module_start;
@@ -793,7 +799,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-            if ($device['os'] == 'routeros' && version_compare($device['version'], '6.47', '<')) {
+            if ($device['os'] == 'routeros' && $device['version'] && version_compare($device['version'], '6.47', '<')) {
                 return 60;
             }
 
@@ -841,10 +847,10 @@ function ignore_storage($os, $descr)
 }
 
 /**
- * @param $valid
+ * @param  $valid
  * @param  OS  $os
- * @param $sensor_type
- * @param $pre_cache
+ * @param  $sensor_type
+ * @param  $pre_cache
  */
 function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
@@ -931,8 +937,8 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
-                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
-                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
+                    $divisor = (int) (isset($data['divisor']) ? (YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['divisor'] ?? 1));
+                    $multiplier = (int) (isset($data['multiplier']) ? (YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['multiplier'] ?? 1));
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
@@ -943,8 +949,12 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
-                            if (is_numeric($$limit) && isset($user_function) && is_callable($user_function)) {
-                                $$limit = $user_function($$limit);
+                            if (is_numeric($$limit) && isset($user_function)) {
+                                if (is_callable($user_function)) {
+                                    $$limit = $user_function($$limit);
+                                } else {
+                                    $$limit = (new UserFuncHelper($$limit))->{$user_function}();
+                                }
                             }
                         }
                     }
@@ -959,13 +969,17 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         $value = ($value / $divisor) * $multiplier;
                     }
 
-                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
+                    echo "$descr: Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     //user_func must be applied after divisor/multiplier
-                    if (isset($user_function) && is_callable($user_function)) {
-                        $value = $user_function($value);
+                    if (isset($user_function)) {
+                        if (is_callable($user_function)) {
+                            $value = $user_function($value);
+                        } else {
+                            $value = (new UserFuncHelper($value, $snmp_data[$data['value']], $data))->{$user_function}();
+                        }
                     }
 
                     $uindex = $index;
@@ -977,7 +991,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type']);
+                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
 
                     if ($sensor_class === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);
@@ -989,7 +1003,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 }
 
 /**
- * @param $types
+ * @param  $types
  * @param  OS  $os
  * @param  array  $pre_cache
  */
@@ -1186,7 +1200,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 /**
  * check if we should skip this sensor from discovery
  *
- * @param $device
+ * @param  $device
  * @param  string  $sensor_class
  * @param  string  $sensor_descr
  * @return bool

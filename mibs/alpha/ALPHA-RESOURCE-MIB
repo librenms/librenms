@@ -1,0 +1,1146 @@
+	ALPHA-RESOURCE-MIB DEFINITIONS ::= BEGIN
+
+	--==========================================================================
+	--
+	-- Alpha Technologies Ltd.
+	-- Copyright 2019
+	--                      
+	--==========================================================================
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, enterprises,
+			Unsigned32, Integer32
+			FROM SNMPv2-SMI          -- [RFC2578]               
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC           -- [RFC2579]        
+   		MODULE-COMPLIANCE, OBJECT-GROUP
+     	 	FROM SNMPv2-CONF;   			
+
+	alpha MODULE-IDENTITY
+		LAST-UPDATED "201904120000Z"
+		ORGANIZATION "Alpha Technologies Ltd."
+		CONTACT-INFO
+		  	"Alpha Technologies Ltd.
+			 7700 Riverfront Gate
+			 Burnaby, BC  V5J 5M4
+			 Canada
+
+			 Tel: 1-604-436-5900
+			 Fax: 1-604-436-1233"         
+		DESCRIPTION
+		  	"This MIB defines the information block(s) available in system controllers."         
+		
+		REVISION	"201904120000Z"  -- April 12, 2019
+		DESCRIPTION
+			"Added alert table and conformance group.
+			Tested with SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+	  	
+		REVISION	"201611150000Z"  -- November 15, 2016
+		DESCRIPTION
+			"Added conformance group for alarms to follow MIB structure conformance rules. Tested with
+			SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+		
+		REVISION    "201510190000Z"  -- October 19, 2015
+		DESCRIPTION
+			"
+			Added alarm table(s) to allow active polling of alarm states available in the Cordex HP.
+			"
+
+		REVISION    "201507280000Z"  -- July 28, 2015
+		DESCRIPTION
+			"
+			Updated to follow MIB structure conformance rules.  Tested with 
+			SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+			
+		REVISION    "201506230000Z"  -- June 23, 2015
+		DESCRIPTION
+			"General version, Cordex HP Controller"
+			
+	::= { enterprises 7309 }
+
+
+	-- Textual convention
+	
+	ScaledNumber ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-3"
+	STATUS 			current
+	DESCRIPTION
+	"
+	Fixed point, 3 decimal places.
+	"
+	SYNTAX 			Integer32       
+	                                     
+	controller			OBJECT IDENTIFIER ::= { alpha 5 } 
+	controllerInfo		OBJECT IDENTIFIER ::= { controller 1 } 
+	
+ 	resource			OBJECT IDENTIFIER ::= { controller 2 }  
+ 	simple				OBJECT IDENTIFIER ::= { controller 3 }      
+  	                                                            
+ 	                                                            
+	-- Well known data points for controller level information.  
+    -----------------------------------------------------------
+    	    
+ 	controllerInfoName OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE(0..64))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+       "User configurable text name of the Controller."
+    ::= { controllerInfo 1 }
+
+ 	controllerInfoDescription OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE(0..256))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+       "User configurable description of the Controller."
+    ::= { controllerInfo 2 }       
+    
+    controllerInfoSoftwareVersion OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE(0..32))
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+       "Software version of the Controller application."
+    ::= { controllerInfo 3 }  
+                                  
+    controllerInfoOperatingSystemVersion OBJECT-TYPE
+	   SYNTAX      OCTET STRING 
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+       "Operating system version number."
+    ::= { controllerInfo 4 }                                    
+                                
+    controllerInfoHardwareVersion OBJECT-TYPE
+	   SYNTAX      OCTET STRING 
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+       "Hardware version number."
+    ::= { controllerInfo 5 }                                    
+                                   
+    -- Table for all general controller information.  Table Identifier starts at 100.
+                                   
+    controllerExtInfoTable OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF ControllerExtInfoEntry  
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Controller specific information table.
+       	"
+   		::= { controllerInfo 100 }
+
+    controllerExtInfoEntry OBJECT-TYPE
+   		SYNTAX      ControllerExtInfoEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Entries appear in this table for each possible alarm state.
+       	This table MUST be persistent across system reboots.
+       	"
+   		INDEX       { controllerExtInfoIndex }
+   		::= { controllerExtInfoTable 1 }
+
+	ControllerExtInfoEntry ::= SEQUENCE {
+	   controllerExtInfoIndex           		Unsigned32,
+	   controllerExtInfoName            		OCTET STRING, 
+	   controllerExtInfoStringValue     		OCTET STRING,
+	   controllerExtInfoUnit					OCTET STRING,
+	   controllerExtInfoNumberValue			ScaledNumber
+	   }
+
+	controllerExtInfoIndex OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Incremental integer value for each instance of the .
+		"
+	::= { controllerExtInfoEntry 1 }  
+	
+	controllerExtInfoName OBJECT-TYPE
+	    SYNTAX OCTET STRING 
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Name of the data value presented in the instance of the entry.
+	    "
+	::= { controllerExtInfoEntry 2 }
+	                                           
+	controllerExtInfoStringValue OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..64))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    String value of the data field presented by the controller info entry.
+	    "
+	::= { controllerExtInfoEntry 3 }      
+	
+	controllerExtInfoUnit OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..10))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Unit name of the numeric value of the controller info entry.
+	    "
+	::= { controllerExtInfoEntry 4 }      	
+                     
+	controllerExtInfoNumberValue OBJECT-TYPE
+		SYNTAX ScaledNumber
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		Number value of the data field presented by the controller info entry.
+		"
+	::= { controllerExtInfoEntry 5 } 		                     
+	                     
+    -- Resource
+    -----------
+                   
+                   
+	-- Component Table                   
+                   
+    componentList				OBJECT IDENTIFIER	::=		{ resource 1 }                        
+                            
+    componentListCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		The number of available objects in componentList.
+		"
+	::= { componentList 1 }               
+                  
+    componentListTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF ComponentListEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Object componentList describes the following:
+		
+			Systems ( DC System, AC System, Converter System, etc. )
+			Devices ( ADIO, Rectifier, Converter, Inverter, etc. )
+       	"
+   		::= { componentList 2 }
+                                        
+	componentListEntry	OBJECT-TYPE
+		SYNTAX      ComponentListEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Entry to the component list describing the available systems and devices
+       	within the Cordex controller.
+       	
+       	Indexing:
+       	
+       	1. Component type - please refer to componentListType
+       	2. Snmp ID - please refer to componentListReference
+       	       		
+       		Configurable ID allow for component monitoring on a specific index if the 
+       		method of monitoring is locked on the index value.
+       	"
+   		INDEX       { componentListType, componentListReference }
+   		::= { componentListTable 1 }
+		
+	
+	ComponentListEntry ::= SEQUENCE {
+	   componentListReference          	Unsigned32,
+	   componentListStaticName       	OCTET STRING, 
+	   componentListConfiguredName		OCTET STRING,
+	   componentListType      			Unsigned32, 
+	   componentListModelNumber			OCTET STRING,
+	   componentListSerialNumber		OCTET STRING,
+	   componentListSystemPointer		OBJECT IDENTIFIER
+	   }  
+	   
+	componentListReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Indentification number assigned to the component." 
+	::= { componentListEntry 1 }  
+	
+	componentListStaticName OBJECT-TYPE
+	    SYNTAX OCTET STRING 
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Non-configurable name permanently assigned to the component.  Filtering on this data
+	    value is possible and recommended due to its static nature.
+	    "
+	::= { componentListEntry 2 }                
+	
+	componentListConfiguredName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    User configurable name of the component. Filtering on this data value is not
+	    recommended.
+	    "
+	::= { componentListEntry 3 }
+	
+	componentListType OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		The type of the component based on power system terminology.
+		
+      		1  - Controller
+       		2  - DC System
+       		3  - ADIO
+       		4  - Rectifier
+       		5  - Converter
+       		6  - Inverter
+       		7  - BCMC
+       		8  - T2S
+       		9  - AC Input Bus
+       		10 - Battery String
+       		11 - Disconnect
+       		12 - Load
+       		13 - Shunt
+       		14 - SNMP Destinations
+       		15 - CAN Bus
+			
+			See SNMP Integrators Guide for complete list www.alpha.ca
+		"
+	::= { componentListEntry 4 }  
+	
+	componentListModelNumber OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Component model number where applicable.  This is available on component entries
+	    which describes hardware modules.
+	    "
+	::= { componentListEntry 5 } 
+	
+	componentListSerialNumber OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Serial number of the device only if the component is of physical device type.
+	    "
+	::= { componentListEntry 6 }
+	                           
+	componentListSystemPointer OBJECT-TYPE
+	    SYNTAX OBJECT IDENTIFIER 
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Table entry reference to the component table of the system component that the
+	    described item belongs to.
+	    
+	    Example:  A rectifier component will have a reference to the Rectifier System that it
+	    belongs to.
+	    "
+	::= { componentListEntry 7 }
+
+            
+	-- Data List            
+
+    dataList				OBJECT IDENTIFIER	::=		{ resource 2 }                        
+                            
+    dataListCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined data fields available for query."
+	::= { dataList 1 }               
+                  
+    dataListTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF DataListEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of data fields available for query.  
+       	"
+   		::= { dataList 2 }
+                                        
+	dataListEntry	OBJECT-TYPE
+		SYNTAX      DataListEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Data field entry of available fields.  
+       	
+       	Indexes:
+       	
+       		1. componentListType - indicates which component can provide the field of 
+       								  interest.
+       		2. dataListReference - the ID permanently assigned to the field.
+       	"
+   		INDEX       { componentListType, dataListReference }
+   		::= { dataListTable 1 }
+		
+	
+	DataListEntry ::= SEQUENCE {
+	   dataListReference		Unsigned32,
+	   dataListName       		OCTET STRING,
+	   dataListType				Unsigned32,
+	   dataListUnit				OCTET STRING
+	   }  
+	   
+	dataListReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295) 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Non-configurable ID permanently assigned to the field entry.
+		"
+	::= { dataListEntry 1 }  
+	
+	
+	dataListName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Non-configurable string name of the field represented in the entry.
+	    "
+	::= { dataListEntry 2 }    
+	
+	dataListType OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Canonical data type of the field entry.  
+		
+		0 - None  
+        1 - Numeric
+        2 - Boolean
+        3 - Time
+        4 - String
+        5 - Choice / Selected options     
+		"
+	::= { dataListEntry 3 }  
+
+	dataListUnit OBJECT-TYPE
+	    SYNTAX OCTET STRING
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Unit type of the value represented by the entry.
+	    "
+	::= { dataListEntry 4 } 
+                                                        
+                                                        
+	-- Data Entry                                                        
+                                                        
+    data				OBJECT IDENTIFIER	::=		{ resource 3 }                        
+                            
+    dataCount OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined data points available for query."
+	::= { data 1 }               
+                  
+    dataTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF DataEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"Table of data values associated to live data availabe from the Cordex HP controller."
+   		::= { data 2 }
+                                        
+	dataEntry	OBJECT-TYPE
+		SYNTAX      DataEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"Conceptual row of data value for the referencing data field type and component that it belongs to."
+   		INDEX       { componentListType, dataListReference, componentListReference }
+   		::= { dataTable 1 }
+		
+	
+	DataEntry ::= SEQUENCE {        
+	   	dataReference		    Unsigned32,
+	   	dataNumberValue     	ScaledNumber,
+	   	dataStringValue			OCTET STRING
+	   	}  
+	                       
+	dataReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295) 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Non-configurable ID permanently assigned to the field entry.
+		"
+	::= { dataEntry 1 }  
+	                       
+	                       
+	dataNumberValue OBJECT-TYPE
+		SYNTAX ScaledNumber
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		Numeric value of the data field.
+		"
+	::= { dataEntry 2 } 
+	 	
+	dataStringValue OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..128))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    String value of the data field.
+	    "
+	::= { dataEntry 3 } 
+           
+           
+	-- Configuration
+	----------------
+	                        
+    configurationList				OBJECT IDENTIFIER	::=		{ resource 4 }                        
+                            
+    configurationListCount OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined configuration fields available for query."
+	::= { configurationList 1 }               
+                  
+    configurationListTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF ConfigurationListEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of configuration entries.
+       	"
+   		::= { configurationList 2 }
+                                        
+	configurationListEntry	OBJECT-TYPE
+		SYNTAX      ConfigurationListEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Configuration field entries available for GET and SET.
+       	"
+   		INDEX       { componentListType, configurationListReference }
+   		::= { configurationListTable 1 }
+		
+	
+	ConfigurationListEntry ::= SEQUENCE {
+	   configurationListReference       Unsigned32,
+	   configurationListName       		OCTET STRING,
+	   configurationListType   			Integer32, 
+	   configurationListUnit 			OCTET STRING
+	   }  
+	   
+	configurationListReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295) 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		A numerical ID value permanently assigned to the configuration field.
+		"
+	::= { configurationListEntry 1 }  
+	
+	configurationListName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    A non-configurable string name of the configuration field.
+	    "
+	::= { configurationListEntry 2 }  
+	
+	configurationListType OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		Conanical data type of the configuration field.    
+		
+		0 - Unknown  
+        1 - Numeric
+        2 - Boolean
+        3 - Time
+        4 - String
+        5 - Choice / Selected Options      
+		"
+	::= { configurationListEntry 3 }  
+	
+	configurationListUnit OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..10))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Unit of the numeric value of the configuration field.
+	    "
+	::= { configurationListEntry 4 } 
+	   
+	   
+	-- Configuration Fields	   
+                   
+    configuration				OBJECT IDENTIFIER	::=		{ resource 5 }                        
+                            
+    configurationCount OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		The number of defined configuration points available for query.
+		"
+	::= { configuration 1 }               
+                  
+    configurationTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF ConfigurationEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of configuration entries.
+       	"
+   		::= { configuration 2 }
+                                        
+	configurationEntry	OBJECT-TYPE
+		SYNTAX      ConfigurationEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Configuration field entry.
+       	"
+   		INDEX       { componentListType, configurationListReference, componentListReference }
+   		::= { configurationTable 1 }
+		
+	
+	ConfigurationEntry ::= SEQUENCE {   
+		configurationReference				Unsigned32,
+	   	configurationNumberValue 		   	ScaledNumber,
+	   	configurationStringValue			OCTET STRING
+	   	}  
+	                                        
+	configurationReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295) 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Non-configurable ID permanently assigned to the field entry.
+		"
+	::= { configurationEntry 1 }  
+	                                        
+	configurationNumberValue OBJECT-TYPE
+		SYNTAX ScaledNumber 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION	
+		"
+		Numbered value of the configuration referenced by the Configuration Type and the Component Reference.
+		"
+	::= { configurationEntry 2 }
+	
+	configurationStringValue OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..128))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    String value of the configuration referenced by the Configuration Type and the Component Reference.
+	    "
+	::= { configurationEntry 3 } 
+                                      
+	              
+	-- Commands
+	-----------    
+	                        
+    commandList				OBJECT IDENTIFIER	::=		{ resource 6 }                        
+                            
+    commandListCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined data points available for query."
+	::= { commandList 1 }               
+                  
+    commandListTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF CommandListEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of commands available from the Cordex HP Controller.
+       	"
+   		::= { commandList 2 }
+                                        
+	commandListEntry	OBJECT-TYPE
+		SYNTAX      CommandListEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Conceptual row of a command item in the Command List Table.
+       	"
+   		INDEX       { componentListType, commandListReference }
+   		::= { commandListTable 1 }
+		
+	
+	CommandListEntry ::= SEQUENCE {
+	   commandListReference     Unsigned32,
+	   commandListName       	OCTET STRING
+	   }  
+	   
+	commandListReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Reference value to identify available commands published by the Cordex HP Controller.
+		"
+	::= { commandListEntry 1 }  
+	
+	commandListName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..32))
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Name of the command.
+	    "
+	::= { commandListEntry 2 }
+
+                   
+    command				OBJECT IDENTIFIER	::=		{ resource 7 }                        
+                            
+    commandCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined command points available for query."
+	::= { command 1 }               
+                  
+    commandTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF CommandEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of command fields that are available in the Cordex HP Controller.
+       	"
+   		::= { command 2 }
+                                        
+	commandEntry	OBJECT-TYPE
+		SYNTAX      CommandEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Conceptual row of the Command Table.
+       	"
+   		INDEX       { componentListType, commandListReference, componentListReference }
+   		::= { commandTable 1 }
+		
+	
+	CommandEntry ::= SEQUENCE {  
+		commandReference			    Unsigned32,
+	   	commandTrigger      			Integer32	   
+	   	}  
+	                                        
+	commandReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295) 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Non-configurable ID permanently assigned to the field entry.
+		"
+	::= { commandEntry 1 }  
+	
+	commandTrigger OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION	
+		"
+		Command field that is the trigger to send command referenced by the Command Type and the Component that it belongs to.
+		"
+	::= { commandEntry 2 }  
+     
+                    
+	-- Alarms
+	-----------    
+	                        
+    alarmType				OBJECT IDENTIFIER	::=		{ resource 8 }                        
+                            
+    alarmTypeCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined alarm points available for query."
+	::= { alarmType 1 }               
+                  
+    alarmTypeTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF AlarmTypeEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of alarms available from the Cordex HP Controller.
+       	"
+   		::= { alarmType 2 }
+                                        
+	alarmTypeEntry	OBJECT-TYPE
+		SYNTAX      AlarmTypeEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Conceptual row of a alarm item in the Alarm List Table.
+       	"
+   		INDEX       { componentListType, alarmTypeReference }
+   		::= { alarmTypeTable 1 }
+		
+	
+	AlarmTypeEntry ::= SEQUENCE {
+	   alarmTypeReference     Unsigned32,
+	   alarmTypeName       	OCTET STRING
+	   }  
+	   
+	alarmTypeReference OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	
+		"
+		Reference value to identify available alarms published by the Cordex HP Controller.
+		"
+	::= { alarmTypeEntry 1 }  
+	
+	alarmTypeName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..256))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	    "
+	    Name of the alarm.
+	    "
+	::= { alarmTypeEntry 2 }
+
+    alarm				OBJECT IDENTIFIER	::=		{ resource 9 }                        
+                            
+    alarmCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined alarm points available for query."
+	::= { alarm 1 }               
+                  
+    alarmTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF AlarmEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of alarm fields that are available in the Cordex HP Controller.
+       	"
+   		::= { alarm 2 }
+                                        
+	alarmEntry	OBJECT-TYPE
+		SYNTAX      AlarmEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Conceptual row of the Alarm Table.
+       	"
+   		INDEX       { componentListType, alarmTypeReference, componentListReference }
+   		::= { alarmTable 1 }
+		
+	
+	AlarmEntry ::= SEQUENCE {  
+		alarmState		    Unsigned32
+	   	}  
+	                                        
+	alarmState OBJECT-TYPE
+		SYNTAX Unsigned32 (1..128) 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"
+		Integer representation of the state of the alarm and its priority level.
+		0 - Normal
+		1 - Warning
+		2 - Minor
+		3 - Major
+		4 - Critical
+		"
+	::= { alarmEntry 1 }  
+	
+	alert				OBJECT IDENTIFIER	::=		{ resource 10 }                        
+                            
+    alertCount OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+		"The number of defined alert points available for query. Alerts
+		are indications of the state of modules. Alerts are not configurable
+		and do not send notifications"
+	::= { alert 1 }               
+                  
+    alertTable 	OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF AlertEntry
+   		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Table of active module alerts fields.
+       	"
+   		::= { alert 2 }
+                                        
+	alertEntry	OBJECT-TYPE
+		SYNTAX      AlertEntry               
+ 		MAX-ACCESS  not-accessible
+   		STATUS      current
+   		DESCRIPTION
+       	"
+       	Conceptual row of the Alert Table.
+       	"
+   		INDEX       { componentListType }
+   		::= { alertTable 1 }
+		
+	
+	AlertEntry ::= SEQUENCE {  
+		alertTypeName       OCTET STRING,
+		alertState		    Unsigned32
+   	}  
+	        
+
+	alertTypeName OBJECT-TYPE
+	    SYNTAX OCTET STRING (SIZE(0..256))
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+		"
+		the name of the alert
+		"
+	::= { alertEntry 1 }           
+	              
+	-- Conformance
+	
+	resourceConformance OBJECT IDENTIFIER ::= { resource 100 }
+	
+	resourceCompliances OBJECT IDENTIFIER ::= { resourceConformance 1 }
+	
+	resourceCompliance MODULE-COMPLIANCE
+	      STATUS  current
+	      DESCRIPTION
+	          "The compliance statement for systems supporting the Alpha Resource MIB."
+	      MODULE -- this module
+	          MANDATORY-GROUPS {
+	           alphaControllerGroup,
+	           alphaComponentGroup,
+	           alphaDataTypeGroup, 
+	           alphaDataGroup
+	          }      
+	      	GROUP alphaConfigurationTypeGroup
+	      	DESCRIPTION
+	      	"  	
+	      	This group is optional. (in development)
+	      	"  
+	      	GROUP alphaConfigurationGroup
+	      	DESCRIPTION
+	      	"  	
+	      	This group is optional. (in development)
+	      	"      
+	      	GROUP alphaCommandTypeGroup
+	      	DESCRIPTION
+	      	"  	
+	      	This group is optional. (in development)
+	      	"      
+	      	GROUP alphaCommandGroup
+	      	DESCRIPTION
+	      	"  	
+	      	This group is optional. (in development)
+	      	"          
+	      	GROUP alphaAlarmGroup
+	      	DESCRIPTION
+	      	"
+	      	This group is optional. (in development)
+	      	"
+	      	GROUP alphaAlertGroup
+	      	DESCRIPTION
+	      	"
+	      	This group is optional. (in development)
+	      	"
+	      	
+	   ::= { resourceCompliances 1 }
+	
+	resourceGroups OBJECT IDENTIFIER ::= { resourceCompliances 2 }
+         
+	alphaControllerGroup OBJECT-GROUP
+	    OBJECTS {
+			controllerInfoName,
+			controllerInfoDescription,
+			controllerInfoSoftwareVersion,
+			controllerInfoOperatingSystemVersion,
+			controllerInfoHardwareVersion,
+			controllerExtInfoName,
+			controllerExtInfoStringValue,
+			controllerExtInfoUnit,
+			controllerExtInfoNumberValue
+		}
+		STATUS   current
+		DESCRIPTION
+		     "Alpha controller data list group."
+		::= { resourceGroups 1 }
+                 
+	alphaComponentGroup OBJECT-GROUP
+		OBJECTS {
+			componentListCount,
+			componentListStaticName,
+			componentListConfiguredName,
+			componentListModelNumber,
+			componentListSerialNumber,
+			componentListSystemPointer
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Component data list group."
+		::= { resourceGroups 2 }
+		
+	alphaDataTypeGroup OBJECT-GROUP
+		OBJECTS {  
+			dataListCount,
+			dataListName,
+			dataListUnit
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Data type list group."
+		::= { resourceGroups 3 }
+      
+	alphaDataGroup OBJECT-GROUP
+		OBJECTS {  
+			dataCount, 
+			dataNumberValue,
+			dataStringValue
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Data list group."
+		::= { resourceGroups 4 } 
+		
+	alphaConfigurationTypeGroup OBJECT-GROUP
+		OBJECTS {  
+			configurationListCount, 
+			configurationListName, 
+			configurationListType,
+			configurationListUnit
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Configuration type list group."
+		::= { resourceGroups 5 }    
+		
+	alphaConfigurationGroup OBJECT-GROUP
+		OBJECTS {  
+			configurationCount, 
+			configurationStringValue,
+			configurationNumberValue
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Configuration list group."
+		::= { resourceGroups 6}
+
+	alphaCommandTypeGroup OBJECT-GROUP
+		OBJECTS {  
+			commandListCount, 
+			commandListName
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Command type list group."
+		::= { resourceGroups 7}
+                                      
+	alphaCommandGroup OBJECT-GROUP
+		OBJECTS {  
+			commandCount, 
+			commandTrigger
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Command list group."
+		::= { resourceGroups 8}    
+		
+	alphaAlarmGroup OBJECT-GROUP
+		OBJECTS {  
+			alarmTypeCount, 
+			alarmTypeName,
+			alarmCount,
+			alarmState
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Alarm list group."
+		::= { resourceGroups 9}
+
+	alphaAlertGroup OBJECT-GROUP
+		OBJECTS {  
+			alertCount, 
+			alertTypeName
+		}		          
+		STATUS   current
+		DESCRIPTION
+		     "Alert type list group."
+		::= { resourceGroups 10}
+
+
+END

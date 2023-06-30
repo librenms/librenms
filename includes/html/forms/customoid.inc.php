@@ -18,7 +18,7 @@ $action = $_POST['action'];
 $name = strip_tags($_POST['name']);
 $oid = strip_tags($_POST['oid']);
 $datatype = strip_tags($_POST['datatype']);
-if (! empty(($_POST['unit']))) {
+if (! empty($_POST['unit'])) {
     $unit = $_POST['unit'];
 } else {
     $unit = ['NULL'];
@@ -31,7 +31,7 @@ $alerts = ($_POST['alerts'] == 'on' ? 1 : 0);
 $passed = ($_POST['passed'] == 'on' ? 1 : 0);
 $divisor = set_numeric($_POST['divisor'], 1);
 $multiplier = set_numeric($_POST['multiplier'], 1);
-if (! empty(($_POST['user_func']))) {
+if (! empty($_POST['user_func'])) {
     $user_func = $_POST['user_func'];
 } else {
     $user_func = ['NULL'];

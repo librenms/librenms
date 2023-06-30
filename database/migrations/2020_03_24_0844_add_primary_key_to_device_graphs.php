@@ -10,14 +10,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddPrimaryKeyToDeviceGraphs extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasColumn('device_graphs', 'id')) {
             Schema::table('device_graphs', function (Blueprint $table) {
@@ -31,7 +31,7 @@ class AddPrimaryKeyToDeviceGraphs extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
-}
+};

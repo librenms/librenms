@@ -35,6 +35,7 @@ class LocationController extends TableController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function searchFields($request)

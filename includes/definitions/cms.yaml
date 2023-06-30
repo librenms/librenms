@@ -2,6 +2,7 @@ os: cms
 text: 'Corero CMS'
 type: appliance
 icon: corero
+mib_dir: corero
 group: Corero
 over:
     - { graph: device_ping_perf, text: 'Ping Repsonse' }

@@ -24,4 +24,4 @@ if ($type && $descr) {
     d_echo($port_ifAlias);
 }
 
-unset($port_type, $port_descr, $port_circuit, $port_notes, $port_speed, $split);
+unset($type, $descr, $circuit, $notes, $speed, $split);

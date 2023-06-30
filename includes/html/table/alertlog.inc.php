@@ -74,7 +74,7 @@ if (! isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 
@@ -82,7 +82,12 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT R.severity, D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+if (session('preferences.timezone')) {
+    $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+    $param = array_merge([session('preferences.timezone')], $param);
+} else {
+    $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+}
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
@@ -111,9 +116,9 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     $response[] = [
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
-        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
+        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $rulei . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
-        'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
+        'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . $rulei . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",
         'severity' => $alertlog['severity'],

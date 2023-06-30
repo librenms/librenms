@@ -32,7 +32,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use Log;
 
 class PrinterSupplies implements Module
 {
@@ -112,7 +111,7 @@ class PrinterSupplies implements Module
                     'toner',
                     Alert::NOTICE,
                     $toner['supply_id']
-                 );
+                );
             }
 
             $toner->supply_current = $tonerperc;
@@ -235,7 +234,7 @@ class PrinterSupplies implements Module
                 // at least one piece of paper in tray
                 $current = 50;
             } else {
-                $current = $current / $capacity * 100;
+                $current = Number::calculatePercent($current, $capacity);
             }
 
             $papers->push(new PrinterSupply([

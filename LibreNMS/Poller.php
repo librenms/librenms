@@ -31,8 +31,8 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\PollerException;
@@ -264,8 +264,10 @@ class Poller
         } elseif ($this->device_spec == 'all') {
             return $query;
         } elseif ($this->device_spec == 'even') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 0);
         } elseif ($this->device_spec == 'odd') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 1);
         } elseif (is_numeric($this->device_spec)) {
             return $query->where('device_id', $this->device_spec);

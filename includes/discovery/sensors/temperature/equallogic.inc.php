@@ -23,9 +23,9 @@ if (! empty($oids)) {
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
-            $num_index = $split_oid[(count($split_oid) - 1)];
+            $num_index = $split_oid[count($split_oid) - 1];
             $index = $num_index;
-            $part_oid = $split_oid[(count($split_oid) - 2)];
+            $part_oid = $split_oid[count($split_oid) - 2];
             $num_index = $part_oid . '.' . $num_index;
             $base_oid = '.1.3.6.1.4.1.12740.2.1.6.1.3.1.';
             $oid = $base_oid . $num_index;

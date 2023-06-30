@@ -9,7 +9,6 @@
  */
 
 use App\Models\Device;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
@@ -23,7 +22,6 @@ use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -123,7 +121,7 @@ function percent_colour($perc)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
  */
 function getIcon($device)
@@ -132,7 +130,7 @@ function getIcon($device)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string an image tag with the icon for this device.  Close to square.
  */
 function getIconTag($device)
@@ -245,7 +243,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
+        if (! (new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success()) {
             throw new HostUnreachablePingException($host);
         }
     }
@@ -759,14 +757,6 @@ function guidv4($data)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-/**
- * @param $curl
- */
-function set_curl_proxy($curl)
-{
-    \LibreNMS\Util\Proxy::applyToCurl($curl);
-}
-
 function target_to_id($target)
 {
     if ($target[0] . $target[1] == 'g:') {
@@ -970,7 +960,7 @@ function create_sensor_to_state_index($device, $state_name, $index)
 
 function delta_to_bits($delta, $period)
 {
-    return round(($delta * 8 / $period), 2);
+    return round($delta * 8 / $period, 2);
 }
 
 function report_this($message)
@@ -1197,7 +1187,7 @@ function cache_mac_oui()
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
 
             echo '  -> Downloading ...' . PHP_EOL;
-            $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($mac_oui_url);
+            $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
             foreach (explode("\n", $csv_data) as $csv_line) {
@@ -1255,7 +1245,7 @@ function cache_peeringdb()
             $ix_keep = [];
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
@@ -1276,7 +1266,7 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $ix_keep[] = $pdb_ix_id;
-                    $get_ix = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get("$peeringdb_url/netixlan?ix_id=$ixid");
+                    $get_ix = \LibreNMS\Util\Http::client()->get("$peeringdb_url/netixlan?ix_id=$ixid");
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
@@ -1351,7 +1341,7 @@ function get_schema_list()
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return int|null
  */
 function get_device_oid_limit($device)
