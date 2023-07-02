@@ -2424,17 +2424,26 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
-2. Make the script executable
+2. Install the depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 smartmontools
+# Debian
+apt-get install cpanminus smartmontools
+cpanm MIME::Base64 JSON
+```
+
+3. Make the script executable
 ```
 chmod +x /etc/snmp/smart
 ```
 
-3. Edit your snmpd.conf file and add:
+4. Edit your snmpd.conf file and add:
 ```
 extend smart /etc/snmp/smart
 ```
 
-4. You will also need to create the config file, which defaults to the same path as the script,
+5. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2472,7 +2481,7 @@ used for reporting and everything after that is used as the argument to be passe
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
 it should be.
 
-5. Restart snmpd on your host
+6. Restart snmpd on your host
 
 If you have a large number of more than one or two disks on a system,
 you should consider adding this to cron. Also make sure the cache file
@@ -2482,7 +2491,7 @@ is some place it can be written to.
  */5 * * * * /etc/snmp/smart -u
 ```
 
-6. If your snmp agent runs as user "snmp", edit your sudo users
+7. If your snmp agent runs as user "snmp", edit your sudo users
    (usually `visudo`) and add at the bottom:
 ```
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
@@ -2498,6 +2507,14 @@ extend smart /usr/bin/sudo /etc/snmp/smart
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+8. Optionally setup nightly self tests for the disks. The exend will
+   run the specified test on all configured disks if called with the
+   -t flag and the name of the SMART test to run.
+
+```
+ 0 0 * * * /etc/snmp/smart -t long
+```
 
 ## Sneck
 
