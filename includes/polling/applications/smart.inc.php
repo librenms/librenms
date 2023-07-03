@@ -8,6 +8,7 @@ $name = 'smart';
 
 try {
     $data = json_app_get($device, $name)['data'];
+    $data['is_legacy']=false;
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = $e->getOutput();
@@ -54,6 +55,8 @@ try {
             ];
         }
     }
+
+    $data['is_legacy']=true;
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
