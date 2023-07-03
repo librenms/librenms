@@ -11,7 +11,7 @@ $link_array = [
 
 $drives = [];
 
-$app_data=$app->data;
+$app_data = $app->data;
 
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;
@@ -22,9 +22,9 @@ foreach ($app_data['disks'] as $label => $disk_data) {
 
     if (isset($app_data['disks'][$disk]['health_pass'])) {
         if ($app_data['disks'][$disk]['health_pass'] == 1) {
-            $health_status='(OK)';
+            $health_status = '(OK)';
         } else {
-            $health_status='(FAIL)';
+            $health_status = '(FAIL)';
         }
     }
 
@@ -36,37 +36,37 @@ printf('%s | drives: %s', generate_link('All Drives', $link_array), implode(', '
 print_optionbar_end();
 
 if (isset($vars['disk'])) {
-    if (!isset($app_data['legacy'])) {
+    if (! isset($app_data['legacy'])) {
         print_optionbar_start();
         if (isset($app_data['disks'][$vars['disk']]['disk'])) {
-            echo 'Disk: '.$app_data['disks'][$vars['disk']]['disk'] ."<br>\n";
+            echo 'Disk: '. $app_data['disks'][$vars['disk']]['disk'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['serial'])) {
-            echo 'Serial: '.$app_data['disks'][$vars['disk']]['serial'] ."<br>\n";
+            echo 'Serial: '. $app_data['disks'][$vars['disk']]['serial'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['vendor'])) {
-            echo 'Vendor: '.$app_data['disks'][$vars['disk']]['vendor'] ."<br>\n";
+            echo 'Vendor: '. $app_data['disks'][$vars['disk']]['vendor'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['product'])) {
-            echo 'Product: '.$app_data['disks'][$vars['disk']]['product'] ."<br>\n";
+            echo 'Product: '. $app_data['disks'][$vars['disk']]['product'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['model_family'])) {
-            echo 'Model Family: '.$app_data['disks'][$vars['disk']]['model_family'] ."<br>\n";
+            echo 'Model Family: '. $app_data['disks'][$vars['disk']]['model_family'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['model_number'])) {
-            echo 'Model Number: '.$app_data['disks'][$vars['disk']]['model_number'] ."<br>\n";
+            echo 'Model Number: '. $app_data['disks'][$vars['disk']]['model_number'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['device_model'])) {
-            echo 'Device Model: '.$app_data['disks'][$vars['disk']]['device_model'] ."<br>\n";
+            echo 'Device Model: '. $app_data['disks'][$vars['disk']]['device_model'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['revision'])) {
-            echo 'Revision: '.$app_data['disks'][$vars['disk']]['revision'] ."<br>\n";
+            echo 'Revision: '. $app_data['disks'][$vars['disk']]['revision'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['fw_version'])) {
-            echo 'FW Version: '.$app_data['disks'][$vars['disk']]['fw_version'] ."<br>\n";
+            echo 'FW Version: '. $app_data['disks'][$vars['disk']]['fw_version'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['selftest_log'])) {
-            echo '<pre>'.str_replace("n#", "\n#", $app_data['disks'][$vars['disk']]['selftest_log']) ."</pre><br>\n";
+            echo '<pre>'.str_replace("n#", "\n#", $app_data['disks'][$vars['disk']]['selftest_log']) . "</pre><br>\n";
         }
     }
     print_optionbar_end();
@@ -86,7 +86,7 @@ if (isset($vars['disk'])) {
     $graphs = [];
 
     if ($app_data['has']['id5'] == 1) {
-        $graphs['smart_id5'] ='ID# 5, Reallocated Sectors Count';
+        $graphs['smart_id5'] = 'ID# 5, Reallocated Sectors Count';
     }
 
     if ($app_data['has']['id9'] == 1) {

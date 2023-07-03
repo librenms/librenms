@@ -8,13 +8,12 @@ $name = 'smart';
 
 try {
     $data = json_app_get($device, $name)['data'];
-    $data['is_legacy']=false;
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = $e->getOutput();
     $lines = explode("\n", $legacy);
 
-    $data=['disks'=>[],'legacy'=>1];
+    $data = ['disks'=>[],'legacy'=>1];
 
     $int = 0;
     while (isset($lines[$int])) {
@@ -55,8 +54,6 @@ try {
             ];
         }
     }
-
-    $data['is_legacy']=true;
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
@@ -65,11 +62,11 @@ try {
 }
 
 $old_data=$app->data;
-if (!isset($old_data['disks_with_failed_tests'])) {
-    $old_data['disks_with_failed_tests']=[];
+if (! isset($old_data['disks_with_failed_tests'])) {
+    $old_data['disks_with_failed_tests'] = [];
 }
-if (!isset($old_data['disks_with_failed_health'])) {
-    $old_data['disks_with_failed_health']=[];
+if (! isset($old_data['disks_with_failed_health'])) {
+    $old_data['disks_with_failed_health'] = [];
 }
 
 $rrd_name = ['app', $name, $app->app_id];
@@ -110,10 +107,10 @@ $rrd_def_maxtemp = RrdDefinition::make()
     ->addDataset('maxtemp', 'GAUGE', 0);
 
 
-$new_disks_with_failed_tests=[];
-$new_disks_with_failed_health=[];
-$data['disks_with_failed_tests']=[];
-$data['disks_with_failed_health']=[];
+$new_disks_with_failed_tests = [];
+$new_disks_with_failed_health = [];
+$data['disks_with_failed_tests'] = [];
+$data['disks_with_failed_health'] = [];
 $data['has']=[
     'id5'=>0,
     'id9'=>0,
@@ -174,61 +171,61 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
-    $metrics['disk_'.$disk_id.'_id5'] = $fields['id5'];
-    $metrics['disk_'.$disk_id.'_id10'] = $fields['id10'];
-    $metrics['disk_'.$disk_id.'_id173'] = $fields['id173'];
-    $metrics['disk_'.$disk_id.'_id177'] = $fields['id177'];
-    $metrics['disk_'.$disk_id.'_id183'] = $fields['id183'];
-    $metrics['disk_'.$disk_id.'_id184'] = $fields['id184'];
-    $metrics['disk_'.$disk_id.'_id187'] = $fields['id187'];
-    $metrics['disk_'.$disk_id.'_id188'] = $fields['id188'];
-    $metrics['disk_'.$disk_id.'_id190'] = $fields['id190'];
-    $metrics['disk_'.$disk_id.'_id194'] = $fields['id194'];
-    $metrics['disk_'.$disk_id.'_id196'] = $fields['id196'];
-    $metrics['disk_'.$disk_id.'_id197'] = $fields['id197'];
-    $metrics['disk_'.$disk_id.'_id198'] = $fields['id198'];
-    $metrics['disk_'.$disk_id.'_id199'] = $fields['id199'];
-    $metrics['disk_'.$disk_id.'_id231'] = $fields['id231'];
-    $metrics['disk_'.$disk_id.'_id233'] = $fields['id233'];
-    $metrics['disk_'.$disk_id.'_completed'] = $fields['completed'];
-    $metrics['disk_'.$disk_id.'_interrupted'] = $fields['interrupted'];
-    $metrics['disk_'.$disk_id.'_readfailure'] = $fields['readfailure'];
-    $metrics['disk_'.$disk_id.'_unknownfail'] = $fields['unknownfail'];
-    $metrics['disk_'.$disk_id.'_extended'] = $fields['extended'];
-    $metrics['disk_'.$disk_id.'_short'] = $fields['short'];
-    $metrics['disk_'.$disk_id.'_conveyance'] = $fields['conveyance'];
-    $metrics['disk_'.$disk_id.'_selective'] = $fields['selective'];
+    $metrics['disk_' . $disk_id . '_id5'] = $fields['id5'];
+    $metrics['disk_' . $disk_id . '_id10'] = $fields['id10'];
+    $metrics['disk_' . $disk_id . '_id173'] = $fields['id173'];
+    $metrics['disk_' . $disk_id . '_id177'] = $fields['id177'];
+    $metrics['disk_' . $disk_id . '_id183'] = $fields['id183'];
+    $metrics['disk_' . $disk_id . '_id184'] = $fields['id184'];
+    $metrics['disk_' . $disk_id . '_id187'] = $fields['id187'];
+    $metrics['disk_' . $disk_id . '_id188'] = $fields['id188'];
+    $metrics['disk_' . $disk_id . '_id190'] = $fields['id190'];
+    $metrics['disk_' . $disk_id . '_id194'] = $fields['id194'];
+    $metrics['disk_' . $disk_id . '_id196'] = $fields['id196'];
+    $metrics['disk_' . $disk_id . '_id197'] = $fields['id197'];
+    $metrics['disk_' . $disk_id . '_id198'] = $fields['id198'];
+    $metrics['disk_' . $disk_id . '_id199'] = $fields['id199'];
+    $metrics['disk_' . $disk_id . '_id231'] = $fields['id231'];
+    $metrics['disk_' . $disk_id . '_id233'] = $fields['id233'];
+    $metrics['disk_' . $disk_id . '_completed'] = $fields['completed'];
+    $metrics['disk_' . $disk_id . '_interrupted'] = $fields['interrupted'];
+    $metrics['disk_' . $disk_id . '_readfailure'] = $fields['readfailure'];
+    $metrics['disk_' . $disk_id . '_unknownfail'] = $fields['unknownfail'];
+    $metrics['disk_' . $disk_id . '_extended'] = $fields['extended'];
+    $metrics['disk_' . $disk_id . '_short'] = $fields['short'];
+    $metrics['disk_' . $disk_id . '_conveyance'] = $fields['conveyance'];
+    $metrics['disk_' . $disk_id . '_selective'] = $fields['selective'];
 
     $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
     $fields_id9 = ['id9' => $disk['9']];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
     data_update($device, 'app', $tags_id9, $fields_id9);
 
-    $metrics['disk_'.$disk_id.'_id9']=$disk['9'];
+    $metrics['disk_' . $disk_id . '_id9'] = $disk['9'];
 
     $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
     $fields_id232 = ['id232' => $disk['232']];
     $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
     data_update($device, 'app', $tags_id232, $fields_id232);
 
-    $metrics['disk_'.$disk_id.'_id232']=$disk['232'];
+    $metrics['disk_' . $disk_id . '_id232'] = $disk['232'];
 
     $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
     $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
     $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
     data_update($device, 'app', $tags_maxtemp, $fields_maxtemp);
 
-    $metrics['disk_'.$disk_id.'_max_temp']=$disk['max_temp'];
+    $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
 
     // check if it has any failed tests
     // only counting failures, ignoring ones that have been interrupted
     if ((is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) ||
       (is_numeric($disk['unknown_failure']) && $disk['unknown_failure'] > 0)) {
-        $data['disks_with_failed_tests'][$disk_id]=1;
+        $data['disks_with_failed_tests'][$disk_id] = 1;
         $metrics['disks_with_failed_tests']++;
         // add it to the list to alert on if it is a new failure
-        if (!isset($old_data['disks_with_failed_tests'])) {
-            $new_disks_with_failed_tests[]=$disk_id;
+        if (! isset($old_data['disks_with_failed_tests'])) {
+            $new_disks_with_failed_tests[] = $disk_id;
             $metrics['new_disks_with_failed_tests']++;
         }
     }
@@ -236,26 +233,26 @@ foreach ($data['disks'] as $disk_id => $disk) {
     // check for what IDs we actually got
     foreach (array('5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '232', '233') as $id_check) {
         if (is_numeric($disk[$id_check])) {
-            $data['has']['id'.$id_check]=1;
+            $data['has']['id'.$id_check] = 1;
         }
     }
 
     // figure out if this disk is a SSD or not
     if (is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])) {
-        $data['disks'][$disk_id]['is_ssd']=1;
-        $metrics['disk_'.$disk_id]['is_ssd']=1;
+        $data['disks'][$disk_id]['is_ssd'] = 1;
+        $metrics['disk_'.$disk_id]['is_ssd'] = 1;
     } else {
-        $data['disks'][$disk_id]['is_ssd']=0;
-        $metrics['disk_'.$disk_id]['is_ssd']=0;
+        $data['disks'][$disk_id]['is_ssd'] = 0;
+        $metrics['disk_'.$disk_id]['is_ssd'] = 0;
     }
 
     // checks if the health has failed
     if (isset($disk['health_pass']) && is_numeric($disk['health_pass']) && $disk['health_pass'] < 1) {
-        $data['disks_with_failed_health'][$disk_id]=1;
+        $data['disks_with_failed_health'][$disk_id] = 1;
         $metrics['disks_with_failed_health_count']++;
         // add it to the list to alert on if it is a new failure
         if (!isset($old_data['disks_with_failed_health'])) {
-            $new_disks_with_failed_health[]=$disk_id;
+            $new_disks_with_failed_health[] = $disk_id;
             $metrics['new_disks_with_failed_health_count']++;
         }
     }
@@ -289,6 +286,6 @@ if (sizeof($data['disks_with_failed_health']) == 0 && sizeof($old_data['disks_wi
     log_event($log_message, $device, 'application', 1);
 }
 
-$app->data=$data;
+$app->data = $data;
 
 update_application($app, 'OK', $metrics);

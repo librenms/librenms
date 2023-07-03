@@ -12,7 +12,7 @@ $addarea = 1;
 $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['disk']]);
-$rrd_filename_232 = Rrd::name($device['hostname'], ['app', $name.'_id232', $app->app_id, $vars['disk']]);
+$rrd_filename_232 = Rrd::name($device['hostname'], ['app', $name . '_id232', $app->app_id, $vars['disk']]);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
