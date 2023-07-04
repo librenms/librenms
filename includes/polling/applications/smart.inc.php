@@ -13,7 +13,7 @@ try {
     $legacy = $e->getOutput();
     $lines = explode("\n", $legacy);
 
-    $data = ['disks'=>[],'legacy'=>1];
+    $data = ['disks'=>[], 'legacy'=>1];
 
     $int = 0;
     while (isset($lines[$int])) {
@@ -61,7 +61,7 @@ try {
     return;
 }
 
-$old_data=$app->data;
+$old_data = $app->data;
 if (! isset($old_data['disks_with_failed_tests'])) {
     $old_data['disks_with_failed_tests'] = [];
 }
@@ -111,7 +111,7 @@ $new_disks_with_failed_tests = [];
 $new_disks_with_failed_health = [];
 $data['disks_with_failed_tests'] = [];
 $data['disks_with_failed_health'] = [];
-$data['has']=[
+$data['has'] = [
     'id5'=>0,
     'id9'=>0,
     'id10'=>0,
@@ -231,19 +231,19 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 
     // check for what IDs we actually got
-    foreach (array('5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '232', '233') as $id_check) {
+    foreach (['5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '232', '233'] as $id_check) {
         if (is_numeric($disk[$id_check])) {
-            $data['has']['id'.$id_check] = 1;
+            $data['has']['id' . $id_check] = 1;
         }
     }
 
     // figure out if this disk is a SSD or not
     if (is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])) {
         $data['disks'][$disk_id]['is_ssd'] = 1;
-        $metrics['disk_'.$disk_id]['is_ssd'] = 1;
+        $metrics['disk_' . $disk_id]['is_ssd'] = 1;
     } else {
         $data['disks'][$disk_id]['is_ssd'] = 0;
-        $metrics['disk_'.$disk_id]['is_ssd'] = 0;
+        $metrics['disk_' . $disk_id]['is_ssd'] = 0;
     }
 
     // checks if the health has failed
@@ -251,14 +251,14 @@ foreach ($data['disks'] as $disk_id => $disk) {
         $data['disks_with_failed_health'][$disk_id] = 1;
         $metrics['disks_with_failed_health_count']++;
         // add it to the list to alert on if it is a new failure
-        if (!isset($old_data['disks_with_failed_health'])) {
+        if (! isset($old_data['disks_with_failed_health'])) {
             $new_disks_with_failed_health[] = $disk_id;
             $metrics['new_disks_with_failed_health_count']++;
         }
     }
 
-    $metrics['disk_'.$disk_id.'_health'] = $disk['health_pass'];
-    $metrics['disk_'.$disk_id.'_exit'] = $disk['exit'];
+    $metrics['disk_' . $disk_id . '_health'] = $disk['health_pass'];
+    $metrics['disk_' . $disk_id . '_exit'] = $disk['exit'];
 }
 
 // log any disks with failed tests found
@@ -266,7 +266,6 @@ if (sizeof($new_disks_with_failed_tests) > 0) {
     $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
     log_event($log_message, $device, 'application', 5);
 }
-
 
 // log when there when we go to having no failed disks from having them previously
 if (sizeof($data['disks_with_failed_tests']) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {

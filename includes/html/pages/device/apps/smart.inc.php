@@ -39,34 +39,34 @@ if (isset($vars['disk'])) {
     if (! isset($app_data['legacy'])) {
         print_optionbar_start();
         if (isset($app_data['disks'][$vars['disk']]['disk'])) {
-            echo 'Disk: '. $app_data['disks'][$vars['disk']]['disk'] . "<br>\n";
+            echo 'Disk: ' . $app_data['disks'][$vars['disk']]['disk'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['serial'])) {
-            echo 'Serial: '. $app_data['disks'][$vars['disk']]['serial'] . "<br>\n";
+            echo 'Serial: ' . $app_data['disks'][$vars['disk']]['serial'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['vendor'])) {
-            echo 'Vendor: '. $app_data['disks'][$vars['disk']]['vendor'] . "<br>\n";
+            echo 'Vendor: ' . $app_data['disks'][$vars['disk']]['vendor'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['product'])) {
-            echo 'Product: '. $app_data['disks'][$vars['disk']]['product'] . "<br>\n";
+            echo 'Product: ' . $app_data['disks'][$vars['disk']]['product'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['model_family'])) {
-            echo 'Model Family: '. $app_data['disks'][$vars['disk']]['model_family'] . "<br>\n";
+            echo 'Model Family: ' . $app_data['disks'][$vars['disk']]['model_family'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['model_number'])) {
-            echo 'Model Number: '. $app_data['disks'][$vars['disk']]['model_number'] . "<br>\n";
+            echo 'Model Number: ' . $app_data['disks'][$vars['disk']]['model_number'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['device_model'])) {
-            echo 'Device Model: '. $app_data['disks'][$vars['disk']]['device_model'] . "<br>\n";
+            echo 'Device Model: ' . $app_data['disks'][$vars['disk']]['device_model'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['revision'])) {
-            echo 'Revision: '. $app_data['disks'][$vars['disk']]['revision'] . "<br>\n";
+            echo 'Revision: ' . $app_data['disks'][$vars['disk']]['revision'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['fw_version'])) {
-            echo 'FW Version: '. $app_data['disks'][$vars['disk']]['fw_version'] . "<br>\n";
+            echo 'FW Version: ' . $app_data['disks'][$vars['disk']]['fw_version'] . "<br>\n";
         }
         if (isset($app_data['disks'][$vars['disk']]['selftest_log'])) {
-            echo '<pre>'.str_replace("n#", "\n#", $app_data['disks'][$vars['disk']]['selftest_log']) . "</pre><br>\n";
+            echo '<pre>' . str_replace("n#", "\n#", $app_data['disks'][$vars['disk']]['selftest_log']) . "</pre><br>\n";
         }
     }
     print_optionbar_end();
