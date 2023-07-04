@@ -63,200 +63,160 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_10",
+                    "metric": "disk_Z304VCFY_id10",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_173",
+                    "metric": "disk_Z304VCFY_id173",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_177",
+                    "metric": "disk_Z304VCFY_id177",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_183",
+                    "metric": "disk_Z304VCFY_id183",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_184",
+                    "metric": "disk_Z304VCFY_id184",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_187",
+                    "metric": "disk_Z304VCFY_id187",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_188",
+                    "metric": "disk_Z304VCFY_id188",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_190",
+                    "metric": "disk_Z304VCFY_id190",
                     "value": "34",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_194",
+                    "metric": "disk_Z304VCFY_id194",
                     "value": "34",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_196",
+                    "metric": "disk_Z304VCFY_id196",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_197",
+                    "metric": "disk_Z304VCFY_id197",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_198",
+                    "metric": "disk_Z304VCFY_id198",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_199",
+                    "metric": "disk_Z304VCFY_id199",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_231",
+                    "metric": "disk_Z304VCFY_id231",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_232",
+                    "metric": "disk_Z304VCFY_id232",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_233",
+                    "metric": "disk_Z304VCFY_id233",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_5",
+                    "metric": "disk_Z304VCFY_id5",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_9",
+                    "metric": "disk_Z304VCFY_id9",
                     "value": "63417",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_completed",
-                    "value": 5,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_conveyance",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_device_model",
-                    "value": "ST4000DM000-1F2168",
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_disk",
-                    "value": "da0 -d sat",
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_exit",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_extended",
-                    "value": 6,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_health_pass",
+                    "metric": "disk_Z304VCFY_interrupted",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_Z304VCFY_interrupted",
+                    "metric": "disk_Z304VCFY_max_temp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_Z304VCFY_readfailure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_Z304VCFY_selective",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+
+
+                {
+                    "metric": "disk_Z304VCFY_short",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_Z304VCFY_unknownfail",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_failed_tests_count",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_max_temp",
-                    "value": 34,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_model_family",
-                    "value": "Seagate Desktop HDD.15",
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_offline",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_read_failure",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_selective",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_short",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disks_Z304VCFY_unknown_failure",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -267,7 +227,13 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "unhealthy",
+                    "metric": "new_disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_failed_tests_count",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
