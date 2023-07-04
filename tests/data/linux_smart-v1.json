@@ -45,6 +45,24 @@
                     "app_type": "smart"
                 },
                 {
+                    "metric": "disk_da0_exit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_extended",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_health",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
                     "metric": "disk_da0_10",
                     "value": 0,
                     "value_prev": null,
@@ -152,25 +170,6 @@
                     "value_prev": null,
                     "app_type": "smart"
                 },
-
-                {
-                    "metric": "disk_da0_disk",
-                    "value": "da0 -d sat",
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disk_da0_exit",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disk_da0_extended",
-                    "value": 6,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
                 {
                     "metric": "disk_da0_health_pass",
                     "value": 1,
@@ -202,19 +201,19 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_selective",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
                     "metric": "disk_da0_short",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_unknown_failure",
+                    "metric": "disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_failed_tests_count",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
@@ -226,7 +225,13 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "unhealthy",
+                    "metric": "new_disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_failed_tests_count",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
