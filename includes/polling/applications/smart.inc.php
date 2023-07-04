@@ -102,10 +102,8 @@ $rrd_def_id9 = RrdDefinition::make()
 $rrd_def_id232 = RrdDefinition::make()
     ->addDataset('id232', 'GAUGE', 0);
 
-
 $rrd_def_maxtemp = RrdDefinition::make()
     ->addDataset('maxtemp', 'GAUGE', 0);
-
 
 $new_disks_with_failed_tests = [];
 $new_disks_with_failed_health = [];
