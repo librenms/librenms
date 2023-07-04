@@ -70,13 +70,13 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_id173",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_Z304VCFY_id177",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -106,19 +106,19 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_id190",
-                    "value": "34",
+                    "value": 35,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_Z304VCFY_id194",
-                    "value": "34",
+                    "value": 35,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_Z304VCFY_id196",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -142,19 +142,19 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_id231",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_Z304VCFY_id232",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_Z304VCFY_id233",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -166,7 +166,7 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_id9",
-                    "value": "63417",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -216,7 +216,7 @@
                 },
                 {
                     "metric": "disks_with_failed_tests_count",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
