@@ -34,7 +34,7 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_completed",
-                    "value": 0,
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -57,13 +57,13 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_da0_10",
+                    "metric": "disk_Z304VCFY_health",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_Z304VCFY_health",
+                    "metric": "disks_da0_10",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
