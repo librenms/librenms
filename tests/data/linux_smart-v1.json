@@ -52,7 +52,7 @@
                 },
                 {
                     "metric": "disk_da0_extended",
-                    "value": 0,
+                    "value": 6,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -70,13 +70,13 @@
                 },
                 {
                     "metric": "disk_da0_id173",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_da0_id177",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -106,7 +106,7 @@
                 },
                 {
                     "metric": "disk_da0_id190",
-                    "value": "34",
+                    "value": 34,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -118,7 +118,7 @@
                 },
                 {
                     "metric": "disk_da0_id196",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -142,19 +142,19 @@
                 },
                 {
                     "metric": "disk_da0_id231",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_da0_id232",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_da0_id233",
-                    "value": "null",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -166,7 +166,7 @@
                 },
                 {
                     "metric": "disk_da0_id9",
-                    "value": "63417",
+                    "value": 63417,
                     "value_prev": null,
                     "app_type": "smart"
                 },
