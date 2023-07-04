@@ -63,116 +63,110 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_10",
+                    "metric": "disk_da0_id10",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_173",
+                    "metric": "disk_da0_id173",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_177",
+                    "metric": "disk_da0_id177",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_183",
+                    "metric": "disk_da0_id183",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_184",
+                    "metric": "disk_da0_id184",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_187",
+                    "metric": "disk_da0_id187",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_188",
+                    "metric": "disk_da0_id188",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_190",
+                    "metric": "disk_da0_id190",
                     "value": "34",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_194",
+                    "metric": "disk_da0_id194",
                     "value": "34",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_196",
+                    "metric": "disk_da0_id196",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_197",
+                    "metric": "disk_da0_id197",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_198",
+                    "metric": "disk_da0_id198",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_199",
+                    "metric": "disk_da0_id199",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_231",
+                    "metric": "disk_da0_id231",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_232",
+                    "metric": "disk_da0_id232",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_233",
+                    "metric": "disk_da0_id233",
                     "value": "null",
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_5",
+                    "metric": "disk_da0_id5",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_9",
+                    "metric": "disk_da0_id9",
                     "value": "63417",
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disk_da0_health_pass",
-                    "value": 1,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -189,19 +183,25 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_offline",
+                    "metric": "disk_da0_readfailure",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_da0_read_failure",
+                    "metric": "disk_da0_selective",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
                     "metric": "disk_da0_short",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_unknownfail",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
