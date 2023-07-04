@@ -30,7 +30,7 @@ class StoreUserRequest extends FormRequest
         return [
             'username' => [
                 'required',
-                'alpha_dots',
+                'alpha_dash',
                 'max:255',
                 Rule::unique('users', 'username')->where('auth_type', LegacyAuth::getType()),
             ],

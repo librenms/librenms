@@ -150,10 +150,6 @@ class AppServiceProvider extends ServiceProvider
             return preg_match('/^[\w\s]+$/u', $value);
         });
 
-        Validator::extend('alpha_dots', function ($attribute, $value) {
-            return preg_match('/^(?=.{8,20}$)(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+(?<![_.-])$/i', $value);
-        });
-
         Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
 
