@@ -453,6 +453,15 @@ $graphs['wireguard'] = [
     'traffic',
     'time',
 ];
+$graphs['logsize'] = [
+    'size',
+    'set_sizes',
+    'max_size',
+    'mean_size',
+    'median_size',
+    'mode_size',
+    'min_size',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
