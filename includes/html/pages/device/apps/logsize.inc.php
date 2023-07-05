@@ -7,14 +7,14 @@ $link_array = [
     'app'    => 'logsize',
 ];
 
-$no_minus_d=$app->data['no_minus_d'] ?? false;
+$no_minus_d = $app->data['no_minus_d'] ?? false;
 
 print_optionbar_start();
 
 echo generate_link('Basics', $link_array);
 echo ' | Sets:';
 $sets = $app->data['sets'] ?? [];
-$sets_list=array_keys($sets);
+$sets_list = array_keys($sets);
 sort($sets_list);
 foreach ($sets_list as $index => $log_set) {
     $label = $vars['log_set'] == $log_set
@@ -28,10 +28,10 @@ foreach ($sets_list as $index => $log_set) {
     }
 }
 
-if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
-    $log_files=$sets[$vars['log_set']]['files'];
-    $log_count=count($log_files);
-    echo "<br>\nFiles Count: ".$log_count."<br>\nFiles: \n";
+if (isset($vars['log_set']) && isset($sets[$vars['log_set']])) {
+    $log_files = $sets[$vars['log_set']]['files'];
+    $log_count = count($log_files);
+    echo "<br>\nFiles Count: " . $log_count . "<br>\nFiles: \n";
     sort($log_files);
 
     foreach ($log_files as $index => $log_file) {
@@ -49,31 +49,31 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']]) ) {
 
 print_optionbar_end();
 
-if (isset($vars['log_file']) && isset($vars['log_set'])){
+if (isset($vars['log_file']) && isset($vars['log_set'])) {
     $graphs = [
-       'logsize_size'=>'Log Size',
+       'logsize_size' => 'Log Size',
     ];
-}elseif(isset($vars['log_set'])){
+} elseif (isset($vars['log_set'])) {
     $graphs = [
-        'logsize_size'=>'Set Size',
-        'logsize_log_sizes'=>'Log Sizes, Top 12',
+        'logsize_size' => 'Set Size',
+        'logsize_log_sizes' => 'Log Sizes, Top 12',
         'logsize_combined_stats' => 'Combined Log Stats',
-        'logsize_max_size'=>'Max Log Size',
-        'logsize_mean_size'=>'Mean Log Size',
-        'logsize_median_size'=>'Median Log Size',
-        'logsize_mode_size'=>'Mode Log Size',
-        'logsize_min_size'=>'Min Log Size',
+        'logsize_max_size' => 'Max Log Size',
+        'logsize_mean_size' => 'Mean Log Size',
+        'logsize_median_size' => 'Median Log Size',
+        'logsize_mode_size' => 'Mode Log Size',
+        'logsize_min_size' => 'Min Log Size',
     ];
-}else{
+} else {
     $graphs = [
-        'logsize_size'=>'Total Size',
-        'logsize_set_sizes'=>'Set Sizes',
+        'logsize_size' => 'Total Size',
+        'logsize_set_sizes' => 'Set Sizes',
         'logsize_combined_stats' => 'Combined Set Stats',
-        'logsize_max_size'=>'Max Set Size',
-        'logsize_mean_size'=>'Mean Set Size',
-        'logsize_median_size'=>'Median Set Size',
-        'logsize_mode_size'=>'Mode Set Size',
-        'logsize_min_size'=>'Min Set Size',
+        'logsize_max_size' => 'Max Set Size',
+        'logsize_mean_size' => 'Mean Set Size',
+        'logsize_median_size' => 'Median Set Size',
+        'logsize_mode_size' => 'Mode Set Size',
+        'logsize_min_size' => 'Min Set Size',
     ];
 }
 

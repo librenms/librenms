@@ -10,13 +10,13 @@ $addarea = 0;
 $transparency = 0;
 $float_precision = 3;
 
-$log_files_sizes=$app->data['sets'][$vars['log_set']]['log_sizes'] ?? [];
+$log_files_sizes = $app->data['sets'][$vars['log_set']]['log_sizes'] ?? [];
 
-$log_files=array_slice(array_keys( $log_files_sizes ), 0, 12);
+$log_files = array_slice(array_keys( $log_files_sizes ), 0, 12);
 
 $rrd_list = [];
 foreach ($log_files as $index => $log_file) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'].'_____-_____'.$log_file]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => $log_file,

@@ -14,7 +14,7 @@ $log_sets = Rrd::getRrdApplicationArrays($device, $app['app_id'],'logsize');
 
 $rrd_list = [];
 foreach ($log_sets as $index => $log_set) {
-    if(!preg_match('/\_\_\_\_\_\-\_\_\_\_\_/', $log_set)){
+    if (!preg_match('/\_\_\_\_\_\-\_\_\_\_\_/', $log_set)) {
         $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $log_set]);
         $rrd_list[] = [
             'filename' => $rrd_filename,

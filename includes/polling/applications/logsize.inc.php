@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'logsize';
@@ -12,10 +11,11 @@ try {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
 
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$data=$returned['data'];
+$data = $returned['data'];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('size', 'GAUGE');
@@ -28,10 +28,10 @@ $set_rrd_def = RrdDefinition::make()
     ->addDataset('min_size', 'GAUGE')
     ->addDataset('size', 'GAUGE');
 
-$app_data=['sets'=>[], 'no_minus_d'=>$data['no_minus_d']];
+$app_data = ['sets'=>[], 'no_minus_d'=>$data['no_minus_d']];
 
 $rrd_name = ['app', $name, $app->app_id];
-$fields=[
+$fields = [
     'max_size' => $data['max'],
     'mean_size' => $data['mean'],
     'median_size' => $data['median'],
@@ -42,10 +42,10 @@ $fields=[
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-$metrics=$fields;
+$metrics = $fields;
 
 foreach ($data['sets'] as $set_name => $set_data) {
-    $app_data['sets'][$set_name]=[
+    $app_data['sets'][$set_name] = [
         'files' => array_keys($set_data['files']),
         'max_size' => $set_data['max_size'],
         'mean_size' => $set_data['mean_size'],
@@ -64,7 +64,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
     $metrics['set_' . $set_name . '_size'] = $set_data['size'];
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
-    $fields=[
+    $fields = [
         'max_size' => $set_data['max'],
         'mean_size' => $set_data['mean'],
         'median_size' => $set_data['median'],
@@ -76,8 +76,8 @@ foreach ($data['sets'] as $set_name => $set_data) {
     data_update($device, 'app', $tags, $fields);
 
     foreach ($set_data['files'] as $log_name => $log_size) {
-        $rrd_name = ['app', $name, $app->app_id, $set_name.'_____-_____'.$log_name];
-        $fields=[
+        $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        $fields = [
             'size' => $log_size,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
@@ -89,8 +89,8 @@ foreach ($data['sets'] as $set_name => $set_data) {
     }
 
     foreach ($set_data['unseen'] as $log_name) {
-        $rrd_name = ['app', $name, $app->app_id, $set_name.'_____-_____'.$log_name];
-        $fields=[
+        $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        $fields = [
             'size' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
@@ -106,6 +106,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
         if ($a == $b) {
             return 0;
         }
+
         return ($a > $b) ? -1 : 1;
     });
 }
