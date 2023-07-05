@@ -84,6 +84,8 @@ foreach ($data['sets'] as $set_name => $set_data) {
         data_update($device, 'app', $tags, $fields);
 
         $app_data['sets'][$set_name]['log_sizes'][$log_name] = $log_size;
+
+        //$metrics['set_' . $set_name . '_files_' .$log_name] = $log_size;
     }
 
     foreach ($set_data['unseen'] as $log_name) {
@@ -96,6 +98,8 @@ foreach ($data['sets'] as $set_name => $set_data) {
 
         $app_data['sets'][$set_name]['log_sizes'][$log_name] = 0;
         $app_data['sets'][$set_name]['files'][] = $log_name;
+
+        //$metrics['set_' . $set_name . '_files_' .$log_name] = 0;
     }
 
     uasort($app_data['sets'][$set_name]['log_sizes'], function ($a, $b) {

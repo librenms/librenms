@@ -1,1 +1,104 @@
-Nothing JSON file specified via -j.
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "logsize",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "logsize",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "max_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "mean_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "median_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "min_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "mode_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_max_size",
+                    "value": 212661,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_mean_size",
+                    "value": 32019.9,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_median_size",
+                    "value": 2273.5,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_min_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_mode_size",
+                    "value": 62,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "sets_var_log_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                },
+                {
+                    "metric": "size_size",
+                    "value": 640398,
+                    "value_prev": null,
+                    "app_type": "logsize"
+                }
+            ]
+        }
+    }
+}
