@@ -7,7 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'logsize';
 
 try {
-    $returned = json_app_get($device, $name ,1);
+    $returned = json_app_get($device, $name, 1);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
 
@@ -28,7 +28,7 @@ $set_rrd_def = RrdDefinition::make()
     ->addDataset('min_size', 'GAUGE')
     ->addDataset('size', 'GAUGE');
 
-$app_data=['sets'=>[],'no_minus_d'=>$data['no_minus_d']];
+$app_data=['sets'=>[], 'no_minus_d'=>$data['no_minus_d']];
 
 $rrd_name = ['app', $name, $app->app_id];
 $fields=[
@@ -42,7 +42,9 @@ $fields=[
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-foreach ($data['sets'] as $set_name => $set_data ) {
+$metrics=$fields;
+
+foreach ($data['sets'] as $set_name => $set_data) {
     $app_data['sets'][$set_name]=[
         'files' => array_keys($set_data['files']),
         'max_size' => $set_data['max_size'],
@@ -53,6 +55,13 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         'size' => $set_data['size'],
         'log_sizes' => [],
     ];
+
+    $metrics['set_' . $set_name . '_max_size'] = $set_data['max_size'];
+    $metrics['set_' . $set_name . '_mean_size'] = $set_data['mean_size'];
+    $metrics['set_' . $set_name . '_median_size'] = $set_data['median_size'];
+    $metrics['set_' . $set_name . '_mode_size'] = $set_data['mode_size'];
+    $metrics['set_' . $set_name . '_min_size'] = $set_data['min_size'];
+    $metrics['set_' . $set_name . '_size'] = $set_data['size'];
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
     $fields=[
@@ -66,7 +75,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
-    foreach ($set_data['files'] as $log_name => $log_size ) {
+    foreach ($set_data['files'] as $log_name => $log_size) {
         $rrd_name = ['app', $name, $app->app_id, $set_name.'_____-_____'.$log_name];
         $fields=[
             'size' => $log_size,
@@ -77,7 +86,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         $app_data['sets'][$set_name]['log_sizes'][$log_name] = $log_size;
     }
 
-    foreach ($set_data['unseen'] as $log_name ) {
+    foreach ($set_data['unseen'] as $log_name) {
         $rrd_name = ['app', $name, $app->app_id, $set_name.'_____-_____'.$log_name];
         $fields=[
             'size' => 0,
@@ -89,8 +98,7 @@ foreach ($data['sets'] as $set_name => $set_data ) {
         $app_data['sets'][$set_name]['files'][] = $log_name;
     }
 
-
-    uasort($app_data['sets'][$set_name]['log_sizes'], function ($a,$b){
+    uasort($app_data['sets'][$set_name]['log_sizes'], function ($a, $b) {
         if ($a == $b) {
             return 0;
         }
@@ -98,5 +106,5 @@ foreach ($data['sets'] as $set_name => $set_data ) {
     });
 }
 
-$app->data=$app_data;
-update_application($app, 'OK', $fields);
+$app->data = $app_data;
+update_application($app, 'OK', $metrics);
