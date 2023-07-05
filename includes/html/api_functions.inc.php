@@ -248,6 +248,24 @@ function get_graph_generic_by_hostname(Request $request)
     });
 }
 
+function get_graph_by_service(Request $request)
+{
+    $vars = [];
+    $vars['id'] = $request->route('id');
+    $vars['type'] = 'service_graph';
+    $vars['ds'] = $request->route('datasource');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+    $vars['device'] = $device['device_id'];
+
+    return check_device_permission($device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
+    });
+}
+
 function list_locations()
 {
     $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');
