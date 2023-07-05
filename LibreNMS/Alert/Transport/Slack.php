@@ -92,8 +92,8 @@ class Slack extends Transport
             ],
             'validation' => [
                 'slack-url' => 'required|url',
+                'slack-channel' => 'string',
                 'slack-author' => 'string',
-                'slack-username' => 'string',
                 'slack-icon_emoji' => 'string',
             ],
         ];
