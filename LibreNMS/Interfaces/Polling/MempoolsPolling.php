@@ -25,11 +25,13 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use Illuminate\Database\Eloquent\Collection;
+
 interface MempoolsPolling
 {
     /**
-     * @param  \Illuminate\Support\Collection  $mempools  \App\Models\Mempool
-     * @return \Illuminate\Support\Collection \App\Models\Mempool
+     * @param  Collection<int, \App\Models\Mempool>  $mempools
+     * @return Collection<int, \App\Models\Mempool>
      */
-    public function pollMempools($mempools);
+    public function pollMempools(Collection $mempools);
 }

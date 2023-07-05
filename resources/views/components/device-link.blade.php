@@ -17,10 +17,14 @@
         </span>
     </x-slot>
     <x-slot name="body">
-        @foreach($graphs as $graph)
-            @isset($graph['text'], $graph['graph'])
-                <x-graph-row loading="lazy" :device="$device" :type="$graph['graph']" :title="$graph['text']" :graphs="[['from' => '-1d'], ['from' => '-7d']]"></x-graph-row>
-            @endisset
-        @endforeach
+        <template x-if="loadGraphs" x-data="{loadGraphs: false}" x-init="$watch('popupShow', shown => {if(shown) loadGraphs = true})">
+            <div>
+            @foreach($graphs as $graph)
+                @isset($graph['text'], $graph['graph'])
+                    <x-graph-row loading="lazy" :device="$device" :type="$graph['graph']" :title="$graph['text']" :graphs="[['from' => '-1d'], ['from' => '-7d']]"></x-graph-row>
+                @endisset
+            @endforeach
+            </div>
+        </template>
     </x-slot>
 </x-popup>

@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreatePdbIxPeersTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('pdb_ix_peers', function (Blueprint $table) {
             $table->increments('pdb_ix_peers_id');
@@ -29,8 +29,8 @@ class CreatePdbIxPeersTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('pdb_ix_peers');
     }
-}
+};

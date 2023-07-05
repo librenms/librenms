@@ -92,7 +92,7 @@ class Os implements Module
 
             if (! empty($location)) { // legacy support, remove when no longer needed
                 $deviceModel->setLocation($location);
-                optional($deviceModel->location)->save();
+                $deviceModel->location?->save();
             }
         }
 
@@ -127,7 +127,7 @@ class Os implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
+        echo trans('device.attributes.location') . ': ' . $device->location?->display() . PHP_EOL;
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
                 $device->$attribute = trim($device->$attribute);
@@ -143,7 +143,7 @@ class Os implements Module
         $device = $os->getDevice();
         $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
         $device->setLocation($new_location, true); // set location and lookup coordinates if needed
-        optional($device->location)->save();
+        $device->location?->save();
     }
 
     private function sysContact(\LibreNMS\OS $os): void

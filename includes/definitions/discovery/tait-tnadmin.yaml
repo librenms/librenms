@@ -8,7 +8,7 @@ modules:
             -
                 oid: TAIT-TNADMIN-MIB::tnAdminTaitServiceTable
                 num_oid: '.1.3.6.1.4.1.3570.3.15.2.1.1.1.6.{{ $index }}'
-                value: tnAdminTaitServiceCpu
+                value: TAIT-TNADMIN-MIB::tnAdminTaitServiceCpu
                 descr: '{{ $TAIT-TNADMIN-MIB::tnAdminTaitServiceName }} CPU pct'
                 index: 'tnServiceCpu.{{ $index }}'
     sensors:
@@ -180,21 +180,21 @@ modules:
                     descr: '{{ $TAIT-TN9300-MIB::tn9300RemoteNodeName }} Nb Connections switched on remote node'
                     index: 'tn9300RemoteNodeConnectSw.{{ $index }}'
                     group: Tn9300RemoteNode
-                - 
+                -
                     oid: TAIT-TN9300-MIB::tn9300NodeObjs
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.3.{{ $index }}'
                     value: TAIT-TN9300-MIB::tn9300Priority
                     descr: 'Priority of the local node'
                     index: 'tn9300Priority.{{ $index }}'
                     group: Tn9300LocalNode
-                - 
+                -
                     oid: TAIT-TN9300-MIB::tn9300NodeObjs
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.13.{{ $index }}'
                     value: TAIT-TN9300-MIB::tn9300CallsSwitching
                     descr: 'Nb Calls Switching'
                     index: 'tn9300CallsSwitching.{{ $index }}'
                     group: Tn9300LocalNode
-                - 
+                -
                     oid: TAIT-TN9300-MIB::tn9300NodeObjs
                     num_oid: '.1.3.6.1.4.1.3570.3.6.2.1.14.{{ $index }}'
                     value: TAIT-TN9300-MIB::tn9300ConnectionsSwitching

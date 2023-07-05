@@ -12,7 +12,7 @@ class TestScheduledMaintenance extends DBTestCase
 {
     private $timezone;
 
-    public function testNormal()
+    public function testNormal(): void
     {
         $now = CarbonImmutable::now();
 
@@ -35,7 +35,7 @@ class TestScheduledMaintenance extends DBTestCase
         $this->assertScheduleSet($now->subHours(2), $schedule);
     }
 
-    public function testRecurringNormal()
+    public function testRecurringNormal(): void
     {
         $this->setTimezone('America/New_York');
         $schedule = AlertSchedule::factory()->recurring()->make();

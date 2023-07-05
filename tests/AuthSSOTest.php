@@ -104,7 +104,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow
-    public function testValidAuthNoCreateUpdate()
+    public function testValidAuthNoCreateUpdate(): void
     {
         $this->basicConfig();
         $a = LegacyAuth::reset();
@@ -123,7 +123,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow with creation enabled
-    public function testValidAuthCreateOnly()
+    public function testValidAuthCreateOnly(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -139,9 +139,9 @@ class AuthSSOTest extends DBTestCase
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
+        $this->assertSame($dbuser['realname'], $a->authSSOGetAttr(Config::get('sso.realname_attr')));
         $this->assertTrue($dbuser['level'] == -1);
-        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
+        $this->assertSame($dbuser['email'], $a->authSSOGetAttr(Config::get('sso.email_attr')));
 
         // Change a few things and reauth
         $_SERVER['mail'] = 'test@example.net';
@@ -157,7 +157,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow with updates enabled
-    public function testValidAuthUpdate()
+    public function testValidAuthUpdate(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -176,13 +176,13 @@ class AuthSSOTest extends DBTestCase
 
         // Retrieve it and validate the update persisted
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
+        $this->assertSame($dbuser['realname'], $a->authSSOGetAttr(Config::get('sso.realname_attr')));
         $this->assertTrue($dbuser['level'] == 10);
-        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
+        $this->assertSame($dbuser['email'], $a->authSSOGetAttr(Config::get('sso.email_attr')));
     }
 
     // Check some invalid authentication modes
-    public function testBadAuth()
+    public function testBadAuth(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -202,7 +202,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Test some missing attributes
-    public function testNoAttribute()
+    public function testNoAttribute(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -222,7 +222,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
-    public function testCapabilityFunctions()
+    public function testCapabilityFunctions(): void
     {
         $a = LegacyAuth::reset();
 
@@ -234,7 +234,7 @@ class AuthSSOTest extends DBTestCase
 
     /* Everything from here comprises of targeted tests to excercise single methods */
 
-    public function testGetExternalUserName()
+    public function testGetExternalUserName(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -269,7 +269,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertNull($a->getExternalUsername());
     }
 
-    public function testGetAttr()
+    public function testGetAttr(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -292,7 +292,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertIsString($a->authSSOGetAttr('VALID-ATTR'));
     }
 
-    public function testTrustedProxies()
+    public function testTrustedProxies(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -345,7 +345,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertFalse($a->authSSOProxyTrusted());
     }
 
-    public function testLevelCaulculationFromAttr()
+    public function testLevelCaulculationFromAttr(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -356,12 +356,12 @@ class AuthSSOTest extends DBTestCase
         //Integer
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 9;
-        $this->assertTrue($a->authSSOCalculateLevel() === 9);
+        $this->assertSame(9, $a->authSSOCalculateLevel());
 
         //String
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = '9';
-        $this->assertTrue($a->authSSOCalculateLevel() === 9);
+        $this->assertSame(9, $a->authSSOCalculateLevel());
 
         //Invalid String
         Config::set('sso.level_attr', 'level');
@@ -388,7 +388,7 @@ class AuthSSOTest extends DBTestCase
         $a->authSSOCalculateLevel();
     }
 
-    public function testGroupParsing()
+    public function testGroupParsing(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -404,68 +404,68 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Valid options
-        $this->assertTrue($a->authSSOParseGroups() === 10);
+        $this->assertSame(10, $a->authSSOParseGroups());
 
         // No match
         $_SERVER['member'] = 'confluence-admins';
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Delimiter only
         $_SERVER['member'] = ';;;;';
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Empty
         $_SERVER['member'] = '';
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Empty with default access level
         Config::set('sso.static_level', 5);
-        $this->assertTrue($a->authSSOParseGroups() === 5);
+        $this->assertSame(5, $a->authSSOParseGroups());
         Config::forget('sso.static_level');
 
         // Null
         $_SERVER['member'] = null;
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Unset
         unset($_SERVER['member']);
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         $_SERVER['member'] = 'librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins';
 
         // Empty
         Config::set('sso.group_level_map', []);
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Not associative
         Config::set('sso.group_level_map', ['foo', 'bar', 'librenms-admins']);
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Null
         Config::set('sso.group_level_map', null);
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Unset
         Config::forget('sso.group_level_map');
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // No delimiter
         Config::forget('sso.group_delimiter');
-        $this->assertTrue($a->authSSOParseGroups() === 0);
+        $this->assertSame(0, $a->authSSOParseGroups());
 
         // Test group filtering by regex
         Config::set('sso.group_filter', '/confluence-(.*)/i');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7]);
-        $this->assertTrue($a->authSSOParseGroups() === 7);
+        $this->assertSame(7, $a->authSSOParseGroups());
 
         // Test group filtering by empty regex
         Config::set('sso.group_filter', '');
-        $this->assertTrue($a->authSSOParseGroups() === 10);
+        $this->assertSame(10, $a->authSSOParseGroups());
 
         // Test group filtering by null regex
         Config::set('sso.group_filter', null);
-        $this->assertTrue($a->authSSOParseGroups() === 10);
+        $this->assertSame(10, $a->authSSOParseGroups());
     }
 
     protected function tearDown(): void

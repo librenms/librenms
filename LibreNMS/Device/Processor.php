@@ -236,7 +236,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     private static function processData($data, $precision)
     {
         preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches);
-        $value = $matches[1];
+        $value = (float) $matches[1];
 
         if ($precision < 0) {
             // idle value, subtract from 100

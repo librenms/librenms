@@ -26,12 +26,12 @@
 namespace App\ApiClients;
 
 use App\Models\Device;
-use GuzzleHttp\Client;
 use LibreNMS\Config;
+use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private Client $client;
+    private \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
     public function __construct(array $config = [])
@@ -53,7 +53,7 @@ class GraylogApi
             ];
         }
 
-        $this->client = new Client($config);
+        $this->client = Http::client()->withOptions($config);
     }
 
     public function getStreams(): array
@@ -65,9 +65,8 @@ class GraylogApi
         $uri = $this->api_prefix . '/streams';
 
         $response = $this->client->get($uri);
-        $data = json_decode($response->getBody(), true);
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**
@@ -93,10 +92,9 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-        $response = $this->client->get($uri, ['query' => $data]);
-        $data = json_decode($response->getBody(), true);
+        $response = $this->client->get($uri, $data);
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**

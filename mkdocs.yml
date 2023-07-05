@@ -68,7 +68,7 @@ plugins:
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
         'Extensions/Prometheus.md': 'Extensions/metrics/Prometheus.md'
         'General/Contributing.md': 'Developing/Getting-Started.md'
-        'Installation/CentOS-image.md': 'Installation/Images.md'
+        'Installation/CentOS-image.md': 'Installation/Install-LibreNMS.md'
         'Installation/index.md': 'Installation/Install-LibreNMS.md'
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
         'Installation/Ubuntu-image.md': 'Installation/Images.md'

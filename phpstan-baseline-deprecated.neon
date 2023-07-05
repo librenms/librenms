@@ -350,7 +350,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 3
-			path: includes/billing.php
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
@@ -358,7 +358,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 4
-			path: includes/billing.php
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
@@ -366,7 +366,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 3
-			path: includes/billing.php
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
@@ -374,7 +374,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 8
-			path: includes/billing.php
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
@@ -382,7 +382,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/billing.php
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
