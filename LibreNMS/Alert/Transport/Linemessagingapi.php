@@ -28,7 +28,7 @@ class LineMessagingAPI extends Transport
      * @param  array<string, string>  $alert_data  Alert data
      * @return bool True if message sent successfully
      */
-    public function deliverAlert($alert_data)
+    public function deliverAlert($alert_data): bool
     {
         $apiURL = 'https://api.line.me/v2/bot/message/push';
         $data = [
@@ -58,7 +58,7 @@ class LineMessagingAPI extends Transport
      *
      * @return array<string, mixed> config template
      */
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
