@@ -719,7 +719,7 @@
     "severity": "warning"
   },
   {
-    "rule": "applications.app_type = \"logsize\" && application_metrics.metric like \"sets_%_max_size\" && application_metrics.value > \"5000000000\"",
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric like \"set_%_max_size\" && application_metrics.value > \"5000000000\"",
     "name": "Logsize: set(s) has a log file(s) with a size > 5GB",
     "severity": "warning"
   },

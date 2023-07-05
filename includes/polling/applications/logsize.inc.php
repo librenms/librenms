@@ -47,20 +47,20 @@ $metrics = $fields;
 foreach ($data['sets'] as $set_name => $set_data) {
     $app_data['sets'][$set_name] = [
         'files' => array_keys($set_data['files']),
-        'max_size' => $set_data['max_size'],
-        'mean_size' => $set_data['mean_size'],
-        'median_size' => $set_data['median_size'],
-        'mode_size' => $set_data['mode_size'],
-        'min_size' => $set_data['min_size'],
+        'max_size' => $set_data['max'],
+        'mean_size' => $set_data['mean'],
+        'median_size' => $set_data['median'],
+        'mode_size' => $set_data['mode'],
+        'min_size' => $set_data['min'],
         'size' => $set_data['size'],
         'log_sizes' => [],
     ];
 
-    $metrics['set_' . $set_name . '_max_size'] = $set_data['max_size'];
-    $metrics['set_' . $set_name . '_mean_size'] = $set_data['mean_size'];
-    $metrics['set_' . $set_name . '_median_size'] = $set_data['median_size'];
-    $metrics['set_' . $set_name . '_mode_size'] = $set_data['mode_size'];
-    $metrics['set_' . $set_name . '_min_size'] = $set_data['min_size'];
+    $metrics['set_' . $set_name . '_max_size'] = $set_data['max'];
+    $metrics['set_' . $set_name . '_mean_size'] = $set_data['mean'];
+    $metrics['set_' . $set_name . '_median_size'] = $set_data['median'];
+    $metrics['set_' . $set_name . '_mode_size'] = $set_data['mode'];
+    $metrics['set_' . $set_name . '_min_size'] = $set_data['min'];
     $metrics['set_' . $set_name . '_size'] = $set_data['size'];
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
