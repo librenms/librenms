@@ -136,7 +136,7 @@ if ($options['f'] === 'device_perf') {
 
 if ($options['f'] === 'ports_purge') {
     if (Config::get('ports_purge')) {
-        $lock = Cache::lock('syslog_purge', 86000);
+        $lock = Cache::lock('ports_purge', 86000);
         if ($lock->get()) {
             \App\Models\Port::query()->with(['device' => function ($query) {
                 $query->select('device_id', 'hostname');
