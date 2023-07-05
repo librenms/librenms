@@ -86,6 +86,19 @@
 </div>
 @endif
 
+<div class="form-group @if($errors->has('timezone')) has-error @endif">
+    <label for="timezone" class="control-label col-sm-3">{{ __('Timezone') }}</label>
+    <div class="col-sm-9">
+        <select id="timezone" name="timezone" class="form-control">
+            <option value="default">Browser Timezone</option>
+            @foreach(timezone_identifiers_list() as $tz)
+                <option value="{{ $tz }}" @if(old('timezone', $timezone) == $tz) selected @endif>{{ $tz }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ $errors->first('timezone') }}</span>
+    </div>
+</div>
+
 <script>
 $("[type='checkbox']").bootstrapSwitch();
 </script>

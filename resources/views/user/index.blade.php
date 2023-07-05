@@ -18,7 +18,8 @@
                     <th data-column-id="realname" data-formatter="text">{{ __('Real Name') }}</th>
                     <th data-column-id="level" data-formatter="level" data-type="numeric">{{ __('Access') }}</th>
                     <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">{{ __('auth.title') }}</th>
-                    <th data-column-id="email" data-formatter="text">{{ __('Email') }}</th>
+                    <th data-column-id="email">{{ __('Email') }}</th>
+                    <th data-column-id="timezone">{{ __('Timezone') }}</th>
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">{{ __('Enabled') }}</th>
                     @endif
@@ -38,6 +39,7 @@
                             <td>{{ $user->level }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
+                            <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
                             @endif

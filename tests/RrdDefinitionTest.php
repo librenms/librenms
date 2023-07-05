@@ -30,12 +30,12 @@ use LibreNMS\RRD\RrdDefinition;
 
 class RrdDefinitionTest extends TestCase
 {
-    public function testEmpty()
+    public function testEmpty(): void
     {
         $this->assertEmpty((string) new RrdDefinition());
     }
 
-    public function testWrongType()
+    public function testWrongType(): void
     {
         $this->expectException(\LibreNMS\Exceptions\InvalidRrdTypeException::class);
         Config::set('rrd.step', 300);
@@ -44,7 +44,7 @@ class RrdDefinitionTest extends TestCase
         $def->addDataset('badtype', 'Something unexpected');
     }
 
-    public function testNameEscaping()
+    public function testNameEscaping(): void
     {
         Config::set('rrd.step', 300);
         Config::set('rrd.heartbeat', 600);
@@ -54,7 +54,7 @@ class RrdDefinitionTest extends TestCase
         $this->assertEquals($expected, (string) $def);
     }
 
-    public function testCreation()
+    public function testCreation(): void
     {
         Config::set('rrd.step', 300);
         Config::set('rrd.heartbeat', 600);

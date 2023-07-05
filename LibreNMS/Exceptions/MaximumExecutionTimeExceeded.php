@@ -56,7 +56,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     public function render(\Illuminate\Http\Request $request)
     {
         $title = preg_match('/ (\d+) /', $this->message, $matches)
-            ? trans_choice('exceptions.maximum_execution_time_exceeded.title', $matches[1], ['seconds' => $matches[1]])
+            ? trans_choice('exceptions.maximum_execution_time_exceeded.title', (int) $matches[1], ['seconds' => (int) $matches[1]])
             : $this->getMessage();
 
         $message = trans('exceptions.maximum_execution_time_exceeded.message');

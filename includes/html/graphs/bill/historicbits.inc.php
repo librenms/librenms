@@ -2,6 +2,7 @@
 
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Billing;
 
 $bill_hist_id = $vars['bill_hist_id'];
 $reducefactor = $vars['reducefactor'];
@@ -16,7 +17,7 @@ if (is_numeric($bill_hist_id)) {
             $reducefactor = 2;
         }
     }
-    $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+    $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
 } else {
     if ($reducefactor < 2) {
         $dur = $vars['to'] - $vars['from'];
@@ -26,7 +27,7 @@ if (is_numeric($bill_hist_id)) {
             $reducefactor = 2;
         }
     }
-    $graph_data = getBillingBitsGraphData($bill_id, $vars['from'], $vars['to'], $reducefactor);
+    $graph_data = Billing::getBitsGraphData($bill_id, $vars['from'], $vars['to'], $reducefactor);
 }
 
 // header('Content-Type: application/json');
