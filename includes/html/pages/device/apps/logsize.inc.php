@@ -51,7 +51,7 @@ print_optionbar_end();
 
 if (isset($vars['log_file']) && isset($vars['log_set'])) {
     $graphs = [
-       'logsize_size' => 'Log Size',
+        'logsize_size' => 'Log Size',
     ];
 } elseif (isset($vars['log_set'])) {
     $graphs = [

@@ -12,7 +12,7 @@ $float_precision = 3;
 
 $log_files_sizes = $app->data['sets'][$vars['log_set']]['log_sizes'] ?? [];
 
-$log_files = array_slice(array_keys( $log_files_sizes ), 0, 12);
+$log_files = array_slice(array_keys($log_files_sizes), 0, 12);
 
 $rrd_list = [];
 foreach ($log_files as $index => $log_file) {
