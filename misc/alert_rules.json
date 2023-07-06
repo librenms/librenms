@@ -727,5 +727,15 @@
     "rule": "applications.app_type = \"linux_config_files\" && application_metrics.metric = \"number_of_confs\" && application_metrics.value > \"0\"",
     "name": "linux_config_files Configuration Files Out-Of-Sync > 0",
     "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"smart\" && application_metrics.metric = \"unhealthy\" && application_metrics.value > \"0\"",
+    "name": "SMART: one or more disk is unhealthy",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"smart\" && application_metrics.metric = \"exit_nonzero\" && application_metrics.value > \"0\"",
+    "name": "SMART: one or more disk could not be polled",
+    "severity": "critical"
   }
 ]
