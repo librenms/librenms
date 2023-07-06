@@ -104,7 +104,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow
-    public function testValidAuthNoCreateUpdate()
+    public function testValidAuthNoCreateUpdate(): void
     {
         $this->basicConfig();
         $a = LegacyAuth::reset();
@@ -123,7 +123,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow with creation enabled
-    public function testValidAuthCreateOnly()
+    public function testValidAuthCreateOnly(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -157,7 +157,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Excercise general auth flow with updates enabled
-    public function testValidAuthUpdate()
+    public function testValidAuthUpdate(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -182,7 +182,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Check some invalid authentication modes
-    public function testBadAuth()
+    public function testBadAuth(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -202,7 +202,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Test some missing attributes
-    public function testNoAttribute()
+    public function testNoAttribute(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -222,7 +222,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
-    public function testCapabilityFunctions()
+    public function testCapabilityFunctions(): void
     {
         $a = LegacyAuth::reset();
 
@@ -234,7 +234,7 @@ class AuthSSOTest extends DBTestCase
 
     /* Everything from here comprises of targeted tests to excercise single methods */
 
-    public function testGetExternalUserName()
+    public function testGetExternalUserName(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
@@ -269,7 +269,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertNull($a->getExternalUsername());
     }
 
-    public function testGetAttr()
+    public function testGetAttr(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -292,7 +292,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertIsString($a->authSSOGetAttr('VALID-ATTR'));
     }
 
-    public function testTrustedProxies()
+    public function testTrustedProxies(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -345,7 +345,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertFalse($a->authSSOProxyTrusted());
     }
 
-    public function testLevelCaulculationFromAttr()
+    public function testLevelCaulculationFromAttr(): void
     {
         /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
@@ -388,7 +388,7 @@ class AuthSSOTest extends DBTestCase
         $a->authSSOCalculateLevel();
     }
 
-    public function testGroupParsing()
+    public function testGroupParsing(): void
     {
         $this->basicConfig();
         /** @var \LibreNMS\Authentication\SSOAuthorizer */

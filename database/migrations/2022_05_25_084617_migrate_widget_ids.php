@@ -15,7 +15,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $this->map = DB::table('widgets')->pluck('widget', 'widget_id');
 
@@ -36,7 +36,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('users_widgets', function (Blueprint $table) {
             $table->string('widget', 32)->default('')->change();

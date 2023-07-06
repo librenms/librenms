@@ -13,7 +13,7 @@ class ComponentFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'device_id' => $this->faker->randomDigit(),

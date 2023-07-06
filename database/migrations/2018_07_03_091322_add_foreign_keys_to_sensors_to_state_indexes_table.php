@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('sensors_to_state_indexes', function (Blueprint $table) {
             $table->foreign('state_index_id', 'sensors_to_state_indexes_ibfk_1')->references('state_index_id')->on('state_indexes')->onUpdate('RESTRICT')->onDelete('RESTRICT');
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('sensors_to_state_indexes', function (Blueprint $table) {

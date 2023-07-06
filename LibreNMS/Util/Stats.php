@@ -26,9 +26,9 @@
 namespace LibreNMS\Util;
 
 use App\Models\Callback;
-use DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Stats
@@ -38,7 +38,7 @@ class Stats
         $stats = new static;
 
         if ($stats->isEnabled()) {
-            $response = \Http::withOptions(['proxy' => Proxy::forGuzzle()])
+            Http::client()
                 ->asForm()
                 ->post(\LibreNMS\Config::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
@@ -63,7 +63,7 @@ class Stats
     {
         $uuid = Callback::get('uuid');
 
-        $response = \Http::withOptions(['proxy' => Proxy::forGuzzle()])
+        $response = Http::client()
             ->asForm()
             ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
 
