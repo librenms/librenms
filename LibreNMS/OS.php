@@ -262,7 +262,7 @@ class OS implements
             }
         }
 
-        d_echo("OS initialized as Generic\n");
+        d_echo("OS initialized as Generic ({$device['os']})\n");
 
         return new Generic($device);
     }

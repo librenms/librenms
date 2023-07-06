@@ -41,6 +41,18 @@ modules:
                         - { descr: chargerSpotmode, graph: 0, value: 21, generic: 0 }
                         - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
                 -
+                    oid: memInputsConfigTable
+                    state_name: memInputNormalState
+                    value: memInputNormalState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.4.1.7.{{ $index }}'
+                    index: 'memInputNormalState.{{ $index }}'
+                    descr: memInputName
+                    states:
+                        - { descr: Closed, graph: 1, value: 1, generic: 0 }
+                        - { descr: Open, graph: 1, value: 2, generic: 0 }
+                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: No State, graph: 1, value: 4, generic: 0 }
+                -
                     oid: airIRRP100UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
@@ -1092,6 +1104,25 @@ modules:
                     descr: 'Apparent Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
+                -
+                    oid: rPDUIdentDevicePowerWatts
+                    num_oid: '.1.3.6.1.4.1.318.1.1.12.1.16.{{ $index }}'
+                    index: 'rPDUIdentDevicePowerWatts.{{ $index }}'
+                    descr: 'Total power'
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_starts'
+                            value: 'AP7'
+        power_consumed:
+            data:
+                -
+                    oid: rPDU2DeviceStatusTable
+                    value: rPDU2DeviceStatusEnergy
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.9.{{ $index }}'
+                    divisor: 100
+                    index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
+                    descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
         pressure:
             data:
                 -

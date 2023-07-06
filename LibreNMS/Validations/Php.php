@@ -66,7 +66,7 @@ class Php extends BaseValidation
     {
         $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
-        if (Config::get('distributed_poller')) {
+        if (Config::get('distributed_poller') && env('CACHE_DRIVER') == 'memcached') {
             $required_modules[] = 'memcached';
         }
 
