@@ -49,7 +49,7 @@ if (Auth::user()->isDemo()) {
           <div><h2>Delete Device</h2></div>
             <div class="alert alert-danger" role="alert">
                 <center>
-                  <p>Warning, this will remove the device from being monitered!</p>
+                  <p>Warning, this will remove the device from being monitored!</p>
                   <p>It will also remove historical data about this device such as <mark>Syslog</mark>, <mark>Eventlog</mark> and <mark>Alert log</mark> data.</p>
                 </center>
               </div>
