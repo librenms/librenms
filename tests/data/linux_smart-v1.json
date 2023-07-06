@@ -235,6 +235,12 @@
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
+                },
+                {
+                    "metric": "unhealthy",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
                 }
             ]
         }
