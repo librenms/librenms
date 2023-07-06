@@ -574,6 +574,8 @@ Route: `/api/v0/devices/:hostname/services/:service_id/graphs/:datasource`
 - service id
 - datasource is the name of the service datasource
 
+Input:
+
 - from: This is the date you would like the graph to start - See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
