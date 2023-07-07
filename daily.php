@@ -140,7 +140,7 @@ if ($options['f'] === 'ports_purge') {
         if ($lock->get()) {
             \App\Models\Port::query()->with(['device' => function ($query) {
                 $query->select('device_id', 'hostname');
-            }])->isDeleted()->chunk(100, function ($ports) {
+            }])->isDeleted()->chunkById(100, function ($ports) {
                 foreach ($ports as $port) {
                     $port->delete();
                 }
@@ -380,7 +380,7 @@ if ($options['f'] === 'recalculate_device_dependencies') {
     $lock = Cache::lock('recalculate_device_dependencies', 86000);
     if ($lock->get()) {
         // update all root nodes and recurse, chunk so we don't blow up
-        Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
+        Device::doesntHave('parents')->with('children')->chunkById(100, function (Collection $devices) {
             // anonymous recursive function
             $recurse = function (Device $device) use (&$recurse) {
                 $device->updateMaxDepth();

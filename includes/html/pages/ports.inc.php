@@ -236,7 +236,7 @@ if (isset($vars['purge'])) {
     if ($vars['purge'] === 'all') {
         Port::hasAccess(Auth::user())->with(['device' => function ($query) {
             $query->select('device_id', 'hostname');
-        }])->isDeleted()->chunk(100, function ($ports) {
+        }])->isDeleted()->chunkById(100, function ($ports) {
             foreach ($ports as $port) {
                 $port->delete();
             }

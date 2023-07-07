@@ -166,7 +166,7 @@ class DeviceObserver
 
         $device->ports()
             ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
-            ->chunk(100, function ($ports) {
+            ->chunkById(100, function ($ports) {
                 foreach ($ports as $port) {
                     $port->delete();
                 }
