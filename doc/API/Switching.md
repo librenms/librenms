@@ -234,3 +234,46 @@ Output:
     "count": 100
 }
 ```
+
+
+### `list_fdb_detail`
+
+Get a list of all ports FDB with human readable device  and interface names.
+
+Route: `/api/v0/resources/fdb/:mac/detail`
+
+  - mac is the specific MAC address you would like to query
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/fdb/1aaa2bbb3ccc/detail
+```
+
+Output:
+```json
+{
+    'count': 7,
+    'mac': '9c:93:aa:bb:cc:dd',
+    'mac_oui': 'Xerox Corporation',
+    'ports_fdb': [
+        {
+            'hostname': 'hq-core1',
+            'ifName': 'ae10',
+            'last_seen': '2 hours ago',
+            'updated_at': '2023-05-17 03:19:15'
+        },
+        {
+            'hostname': 'hq-sw1',
+            'ifName': 'ge-0/0/0',
+            'last_seen': '3 hours ago',
+            'updated_at': '2023-05-17 02:02:06'
+        },
+        ...
+    ],
+    'status': 'ok'
+}
+```
