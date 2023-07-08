@@ -2424,10 +2424,49 @@ function list_fdb(Illuminate\Http\Request $request)
            ->get();
 
     if ($fdb->isEmpty()) {
-        return api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb entry does not exist');
     }
 
     return api_success($fdb, 'ports_fdb');
+}
+
+function list_fdb_detail(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('mac'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => Rewrite::readableOUI($macAddress)];
+
+    $fdb = PortsFdb::hasAccess(Auth::user())
+           ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
+               return $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
+                      ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
+                      ->where('mac_address', $macAddress)
+                      ->orderBy('ports_fdb.updated_at', 'desc')
+                      ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
+           })
+           ->limit(1000)->get();
+
+    if (count($fdb) == 0) {
+        return api_error(404, 'Fdb entry does not exist');
+    }
+
+    foreach ($fdb as $i => $fdb_entry) {
+        if ($fdb_entry['updated_at']) {
+            $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
+            $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
+        }
+    }
+
+    return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
 function list_sensors()
