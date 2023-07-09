@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Port;
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
