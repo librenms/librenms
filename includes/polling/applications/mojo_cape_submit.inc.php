@@ -108,5 +108,12 @@ if (isset($new_slugs[0])) {
     log_event('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device, 'application', 1);
 }
 
+uasort($app_data['slugs'], function ($a, $b) {
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a > $b) ? -1 : 1;
+});
+
 $app->data = $app_data;
 update_application($app, 'OK', $data['totals']);
