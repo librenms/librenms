@@ -49,6 +49,7 @@ $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_
 data_update($device, 'app', $tags, $fields);
 
 $new_slugs=[];
+$seen_slugs=[];
 foreach ($data['slugs'] as $slug => $slug_data) {
     $fields = [
         'app_protos' => $slug_data['app_protos'],
@@ -68,7 +69,35 @@ foreach ($data['slugs'] as $slug => $slug_data) {
     if (!isset($app_data['slugs'][$slug])) {
         array_push($new_slugs, $slug);
     }
-    $app_data['slugs'][$slug] = 1;
+    $app_data['slugs'][$slug] = $slug_data['sub_count'];
+    $seen_slugs[$slug]=1;
+}
+
+// make sure we update the RRDs for slugs that have not been seen
+// if this is not done slugs that do not generate data regularly
+// will only display nan
+foreach ($app_data['slugs'] as $slug => $slug_data) {
+    if (! isset($seen_slugs[$slug])) {
+        $fields = [
+            'app_protos' => 0,
+            'hash_changed' => 0,
+            'size_max' => 0,
+            'size_mean' => 0,
+            'size_median' => 0,
+            'size_min' => 0,
+            'size_mode' => 0,
+            'size_stddev' => 0,
+            'size_sum' => 0,
+            'sub_count' => 0,
+        ];
+        $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
+        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+        if (!isset($app_data['slugs'][$slug])) {
+            array_push($new_slugs, $slug);
+        }
+        $app_data['slugs'][$slug] = 0;
+    }
 }
 
 if ($data['totals']['hash_changed'] >= 1) {
