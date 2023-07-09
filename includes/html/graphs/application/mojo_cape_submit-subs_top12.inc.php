@@ -10,9 +10,9 @@ $addarea = 0;
 $transparency = 0;
 $float_precision = 3;
 
-$slugs_all=$app->data['slugs'] ?? [];
+$slugs_all = $app->data['slugs'] ?? [];
 
-$slugs=array_slice(array_keys( $slugs_all ), 0, 12);
+$slugs = array_slice(array_keys($slugs_all), 0, 12);
 
 $rrd_list = [];
 foreach ($slugs as $index => $slug) {
@@ -24,7 +24,7 @@ foreach ($slugs as $index => $slug) {
     ];
 }
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant log file RRDs found');
 }
 

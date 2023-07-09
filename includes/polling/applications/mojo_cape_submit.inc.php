@@ -14,7 +14,7 @@ try {
     return;
 }
 
-$app_data=$app->data;
+$app_data = $app->data;
 if (! is_array($app_data['slugs'])) {
     $app_data['slugs'] = [];
 }
@@ -48,8 +48,8 @@ $fields = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-$new_slugs=[];
-$seen_slugs=[];
+$new_slugs = [];
+$seen_slugs = [];
 foreach ($data['slugs'] as $slug => $slug_data) {
     $fields = [
         'app_protos' => $slug_data['app_protos'],
@@ -66,11 +66,11 @@ foreach ($data['slugs'] as $slug => $slug_data) {
     $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
-    if (!isset($app_data['slugs'][$slug])) {
+    if (! isset($app_data['slugs'][$slug])) {
         array_push($new_slugs, $slug);
     }
     $app_data['slugs'][$slug] = $slug_data['sub_count'];
-    $seen_slugs[$slug]=1;
+    $seen_slugs[$slug] = 1;
 }
 
 // make sure we update the RRDs for slugs that have not been seen
@@ -93,7 +93,7 @@ foreach ($app_data['slugs'] as $slug => $slug_data) {
         $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
-        if (!isset($app_data['slugs'][$slug])) {
+        if (! isset($app_data['slugs'][$slug])) {
             array_push($new_slugs, $slug);
         }
         $app_data['slugs'][$slug] = 0;
@@ -112,6 +112,7 @@ uasort($app_data['slugs'], function ($a, $b) {
     if ($a == $b) {
         return 0;
     }
+
     return ($a > $b) ? -1 : 1;
 });
 

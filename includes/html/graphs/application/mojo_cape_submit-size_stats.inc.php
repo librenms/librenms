@@ -10,10 +10,9 @@ $transparency = 15;
 
 if (isset($vars['slug'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'slugs___-___' . $vars['slug']]);
-}else{
+} else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {

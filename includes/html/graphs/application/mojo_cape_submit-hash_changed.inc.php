@@ -8,7 +8,7 @@ $ds = 'hash_changed';
 
 if (isset($vars['slug'])) {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'slugs___-___' . $vars['slug']]);
-}else{
+} else {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
