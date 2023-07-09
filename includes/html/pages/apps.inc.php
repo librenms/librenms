@@ -460,6 +460,23 @@ $graphs['wireguard'] = [
 $graphs['linux_config_files'] = [
     'number_of_confs',
 ];
+$graphs['suricata_extract'] = [
+    'errors',
+    'ignored_host',
+    'ignored_ip',
+    'ignored_ip_dest',
+    'ignored_ip_src',
+    'sub',
+    'sub_2xx',
+    'sub_3xx',
+    'sub_4xx',
+    'sub_5xx',
+    'sub_codes',
+    'sub_fail',
+    'truncated',
+    'zero_sized',
+    'sub_size',
+];
 $graphs['linux_softnet_stat'] = [
     'packets',
     'time_squeeze',
@@ -469,6 +486,16 @@ $graphs['linux_softnet_stat'] = [
     'flow_limit',
     'received_rps',
     'budget',
+];
+$graphs['privoxy'] = [
+    'client_requests',
+    'blocks',
+    'crunches',
+    'unique_bdomains',
+    'bytes_to_client',
+    'req',
+    'resp_xxx',
+    'ver',
 ];
 
 echo '<div class="panel panel-default">';
