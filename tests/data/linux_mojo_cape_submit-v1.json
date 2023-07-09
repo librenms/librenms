@@ -22,10 +22,16 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": "{\"slugs\":[]}"
                 }
             ],
             "application_metrics": [
+                {
+                    "metric": "app_proto",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
                 {
                     "metric": "app_protos",
                     "value": 0,
