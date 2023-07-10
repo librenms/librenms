@@ -1,3 +1,68 @@
+## 23.6.0
+*(2023-06-23)*
+
+A big thank you to the following 14 contributors this last month:
+
+  - [VVelox](https://github.com/VVelox) (4)
+  - [Jellyfrog](https://github.com/Jellyfrog) (4)
+  - [murrant](https://github.com/murrant) (2)
+  - [si458](https://github.com/si458) (1)
+  - [netravnen](https://github.com/netravnen) (1)
+  - [tuxgasy](https://github.com/tuxgasy) (1)
+  - [jepke](https://github.com/jepke) (1)
+  - [ajsiersema](https://github.com/ajsiersema) (1)
+  - [wrongecho](https://github.com/wrongecho) (1)
+  - [peejaychilds](https://github.com/peejaychilds) (1)
+  - [tim427](https://github.com/tim427) (1)
+  - [kg6uyz](https://github.com/kg6uyz) (1)
+  - [d-k-7](https://github.com/d-k-7) (1)
+  - [electrocret](https://github.com/electrocret) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (9)
+  - [murrant](https://github.com/murrant) (6)
+  - [electrocret](https://github.com/electrocret) (4)
+  - [ottorei](https://github.com/ottorei) (2)
+
+#### Feature
+* Alert transport cleanup, no_proxy support and other proxy cleanups ([#14763](https://github.com/librenms/librenms/pull/14763)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Improve OpenWRT detection ([#15096](https://github.com/librenms/librenms/pull/15096)) - [tuxgasy](https://github.com/tuxgasy)
+* TEG-S50ES and TPE-P521ES device detection ([#15052](https://github.com/librenms/librenms/pull/15052)) - [kg6uyz](https://github.com/kg6uyz)
+* Add sensor support for cefcModuleOperStatus ([#15026](https://github.com/librenms/librenms/pull/15026)) - [d-k-7](https://github.com/d-k-7)
+* Extend Avocent Support ([#14914](https://github.com/librenms/librenms/pull/14914)) - [electrocret](https://github.com/electrocret)
+
+#### Alerting
+* Messagebird transport ([#15079](https://github.com/librenms/librenms/pull/15079)) - [jepke](https://github.com/jepke)
+* Remove asterisk from recurring input ([#15074](https://github.com/librenms/librenms/pull/15074)) - [wrongecho](https://github.com/wrongecho)
+* Fix syslog transport output format ([#15070](https://github.com/librenms/librenms/pull/15070)) - [peejaychilds](https://github.com/peejaychilds)
+* Fixed Markdown/Parse mode for Telegram ([#15066](https://github.com/librenms/librenms/pull/15066)) - [tim427](https://github.com/tim427)
+
+#### Applications
+* Add ZFS L2 support ([#15095](https://github.com/librenms/librenms/pull/15095)) - [VVelox](https://github.com/VVelox)
+* Add Linux Softnet Stat app ([#15094](https://github.com/librenms/librenms/pull/15094)) - [VVelox](https://github.com/VVelox)
+* Add Sneck support, making it very trivial to use Nagios style checks in a NRPE like manner ([#13954](https://github.com/librenms/librenms/pull/13954)) - [VVelox](https://github.com/VVelox)
+
+#### Bug
+* Fixes #14975 Services in Device Groups not displayed correctly in Availability widget ([#15076](https://github.com/librenms/librenms/pull/15076)) - [ajsiersema](https://github.com/ajsiersema)
+* Fix Dusk tests after 13626 ([#15057](https://github.com/librenms/librenms/pull/15057)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Cleanup
+* Add AllowDynamicProperties to DynamicConfigItem ([#15058](https://github.com/librenms/librenms/pull/15058)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Documentation
+* Add archlinux example ([#15113](https://github.com/librenms/librenms/pull/15113)) - [si458](https://github.com/si458)
+* Fix minor typo in Applications.md ([#15111](https://github.com/librenms/librenms/pull/15111)) - [VVelox](https://github.com/VVelox)
+
+#### Mibs
+* Update MIKROTIK-MIB to v7.10 release ([#15110](https://github.com/librenms/librenms/pull/15110)) - [netravnen](https://github.com/netravnen)
+
+#### Dependencies
+* Laravel 10.x Shift ([#14995](https://github.com/librenms/librenms/pull/14995)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 23.5.0
 *(2023-05-19)*
 
