@@ -49,6 +49,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
         echo "{$interface['ifName']}: \n";
         foreach ($port_arp as $ip => $raw_mac) {
+            $ip = preg_replace('{^\.}', '', $ip, 1);
             if (empty($ip) || empty($raw_mac) || $raw_mac == '0:0:0:0:0:0' || isset($arp_table[$port_id][$ip])) {
                 continue;
             }
