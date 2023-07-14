@@ -338,6 +338,9 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function deviceIsResolvable($hostname)
     {
+        if (empty($hostname)) {
+            return false;
+        }
         // First we check for IP literals, then for a dns entry, finally for a hosts entry due to a PHP/libc limitation
         // We look for the hosts entry last (and separately) as this only works for v4 - v6 host entries won't be found
         if (filter_var($hostname, FILTER_VALIDATE_IP) || checkdnsrr($hostname, 'ANY') || is_array(gethostbynamel($hostname))) {
