@@ -9,9 +9,9 @@ modules:
                     index: 'ponStatus.{{ $index }}'
                     state_name: E7-Calix-MIB::e7OltPonPortStatus
                     states:
-                        - { value: 0, descr: invalid, graph: 1, generic: 0 }
+                        - { value: 0, descr: invalid, graph: 1, generic: 3 }
                         - { value: 1, descr: linkUp, graph: 1, generic: 0 }
-                        - { value: 2, descr: linkDown, graph: 1, generic: 1 }
+                        - { value: 2, descr: linkDown, graph: 1, generic: 2 }
         temperature:
             data:
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
