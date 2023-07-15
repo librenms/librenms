@@ -26,8 +26,8 @@ modules:
                     skip_values:
                         -
                             oid: E7-Calix-MIB::e7OltPonPortStatus
-                            op: '='
-                            value: 2
+                            op: '!='
+                            value: 1
         dbm:
             data:
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
@@ -44,8 +44,8 @@ modules:
                     index: 'tx.{{ $index }}'
                     skip_values:
                         -   oid: E7-Calix-MIB::e7OltPonPortStatus
-                            op: '='
-                            value: 2
+                            op: '!='
+                            value: 1
 
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
                     value: E7-Calix-MIB::e7OltPonPortRxPower
@@ -62,8 +62,8 @@ modules:
                     skip_values:
                         -
                             oid: E7-Calix-MIB::e7OltPonPortStatus
-                            op: '='
-                            value: 2
+                            op: '!='
+                            value: 1
         voltage:
             data:
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
@@ -79,8 +79,8 @@ modules:
                     skip_values:
                         -
                             oid: E7-Calix-MIB::e7OltPonPortStatus
-                            op: '='
-                            value: 2
+                            op: '!='
+                            value: 1
         current:
             data:
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
@@ -94,5 +94,5 @@ modules:
                     skip_values:
                         -
                             oid: E7-Calix-MIB::e7OltPonPortStatus
-                            op: '='
-                            value: 2
+                            op: '!='
+                            value: 1
