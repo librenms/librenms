@@ -24,7 +24,7 @@ modules:
                             oid: E7-Calix-MIB::e7OltPonPortStatus
                             op: '='
                             value: 2
-        power:
+        dbm:
             data:
                 -   oid: E7-Calix-MIB::e7OltPonPortTable
                     value: E7-Calix-MIB::e7OltPonPortTxPower
@@ -32,6 +32,7 @@ modules:
                     descr: '{{ $subindex0 }}/{{ $subindex1 }}/{{ $subindex2 }} TX Power'
                     group: PON
                     divisor: 10000
+                    user_func: mw_to_dbm
                     index: 'tx.{{ $index }}'
                     skip_values:
                         -   oid: E7-Calix-MIB::e7OltPonPortStatus
@@ -44,6 +45,7 @@ modules:
                     descr: '{{ $subindex0 }}/{{ $subindex1 }}/{{ $subindex2 }} RX Power'
                     group: PON
                     divisor: 10000
+                    user_func: mw_to_dbm
                     index: 'rx.{{ $index }}'
                     skip_values:
                         -
