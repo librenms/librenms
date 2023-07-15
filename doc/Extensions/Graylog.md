@@ -81,7 +81,7 @@ the FQDN or IP address specified in
 !!! setting "external/graylog"
     ```bash
     lnms config:set graylog.server example.com
-```
+    ```
 
 ## Match Any Address
 If you want to match the source address of the log entries against any
