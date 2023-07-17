@@ -111,11 +111,6 @@ parameters:
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
-			count: 1
-			path: LibreNMS/OS/Comware.php
-
-		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
 			count: 3
 			path: LibreNMS/OS/HarmonyEnhanced.php
@@ -128,11 +123,6 @@ parameters:
 		-
 			message: "#^If condition is always false\\.$#"
 			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
-			count: 3
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
