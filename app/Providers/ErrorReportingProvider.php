@@ -63,6 +63,10 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
                 dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
             }
 
+            if (defined('PHPUNIT_RUNNING')) {
+                throw $e; // raise exceptions during testing
+            }
+
             return $this->isReportingEnabled();
         });
 
