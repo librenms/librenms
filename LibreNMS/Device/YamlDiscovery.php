@@ -331,7 +331,10 @@ class YamlDiscovery
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
                                 }
-                                $snmp_flag[] = '-Ih';
+                                
+                                if (! isset($data['snmp_no_Ih_flag'])) {
+                                    $snmp_flag[] = '-Ih';
+                                }
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
