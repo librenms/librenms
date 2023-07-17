@@ -32,6 +32,7 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
 class YamlDiscovery
