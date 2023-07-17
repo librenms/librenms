@@ -62,10 +62,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param  int|string  $index
      * @param  string  $description
      * @param  int  $precision  The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
-     * @param  int  $current_usage
-     * @param  int  $warn_percent
-     * @param  int  $entPhysicalIndex
-     * @param  int  $hrDeviceIndex
+     * @param  int|null  $current_usage
+     * @param  int|null  $warn_percent
+     * @param  int|null  $entPhysicalIndex
+     * @param  int|null  $hrDeviceIndex
      * @return static
      */
     public static function discover(
