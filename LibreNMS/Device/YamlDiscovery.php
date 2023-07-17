@@ -331,7 +331,7 @@ class YamlDiscovery
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
                                 }
-                                
+
                                 if (! isset($data['snmp_no_Ih_flag'])) {
                                     $snmp_flag[] = '-Ih';
                                 }
