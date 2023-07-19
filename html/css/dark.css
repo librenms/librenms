@@ -1170,6 +1170,12 @@
   .glyphicon-menu-up:before {
     content: "\e260";
   }
+  .page-availability-report-select {
+    color: #000000;
+  }
+  .device-availability {
+    color: #ffffff;
+  }
   * {
     box-sizing: border-box;
   }
