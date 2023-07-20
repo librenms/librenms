@@ -219,9 +219,6 @@ if (! empty($peers)) {
                             $oid = explode('.', $key);
                             $vrfInstance = $oid[0];
                             $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
-                            if (strlen($address) > 15) {
-                                $address = IP::fromHexString($address)->compressed();
-                            }
                             $bgpPeers[$vrfInstance][$address] = $value;
                         }
                     }
