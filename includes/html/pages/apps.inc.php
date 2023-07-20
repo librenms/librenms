@@ -457,6 +457,15 @@ $graphs['wireguard'] = [
     'traffic',
     'time',
 ];
+$graphs['logsize'] = [
+    'size',
+    'set_sizes',
+    'max_size',
+    'mean_size',
+    'median_size',
+    'mode_size',
+    'min_size',
+];
 $graphs['linux_config_files'] = [
     'number_of_confs',
 ];

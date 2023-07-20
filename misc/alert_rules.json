@@ -714,6 +714,21 @@
     "severity": "warning"
   },
   {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric = \"max_size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: set(s) have a size > 5GB",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric like \"set_%_max_size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: set(s) has a log file(s) with a size > 5GB",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric = \"size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: total size > 5GB",
+    "severity": "warning"
+  },
+  {
     "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"l2_errors\" && application_metrics.value >= \"1\"",
     "name": "ZFS L2 errors present",
     "severity": "critical"
