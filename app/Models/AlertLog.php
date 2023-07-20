@@ -16,8 +16,8 @@ class AlertLog extends DeviceRelatedModel
     protected function details(): Attribute
     {
         return Attribute::make(
-            get: fn($details) => json_decode(@gzuncompress($details), true) ?? [],
-            set: fn($details) => gzcompress(json_encode($details)),
+            get: fn ($details) => json_decode(@gzuncompress($details), true) ?? [],
+            set: fn ($details) => gzcompress(json_encode($details)),
         )->shouldCache();
     }
 }
