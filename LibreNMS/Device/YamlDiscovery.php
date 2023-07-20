@@ -32,6 +32,7 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
 class YamlDiscovery
@@ -198,6 +199,17 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
+                    // allow parsing of InetAddress hex data representing ipv4 or ipv6
+                    // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
+                    // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
+                    // snmp_flags: '-OteQUsax'
+                    // snmp_no_Ih_flag: ''
+                    if (str_starts_with($matches[1], 'InetAddress_')) {
+                        $inetaddr = explode('_', $matches[1]);
+                        if (count($inetaddr) == 2) {
+                            return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
+                        }
+                    }
                     \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
@@ -319,7 +331,10 @@ class YamlDiscovery
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
                                 }
-                                $snmp_flag[] = '-Ih';
+
+                                if (! isset($data['snmp_no_Ih_flag'])) {
+                                    $snmp_flag[] = '-Ih';
+                                }
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
