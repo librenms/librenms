@@ -486,6 +486,20 @@ $graphs['suricata_extract'] = [
     'zero_sized',
     'sub_size',
 ];
+$graphs['mojo_cape_submit'] = [
+    'subs',
+    'subs_top12',
+    'hash_changed',
+    'app_protos',
+    'size_sum',
+    'size_stats',
+    'size_max',
+    'size_mean',
+    'size_median',
+    'size_mode',
+    'size_min',
+    'size_stddev',
+];
 $graphs['linux_softnet_stat'] = [
     'packets',
     'time_squeeze',
