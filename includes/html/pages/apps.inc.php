@@ -457,6 +457,15 @@ $graphs['wireguard'] = [
     'traffic',
     'time',
 ];
+$graphs['logsize'] = [
+    'size',
+    'set_sizes',
+    'max_size',
+    'mean_size',
+    'median_size',
+    'mode_size',
+    'min_size',
+];
 $graphs['linux_config_files'] = [
     'number_of_confs',
 ];
@@ -476,6 +485,20 @@ $graphs['suricata_extract'] = [
     'truncated',
     'zero_sized',
     'sub_size',
+];
+$graphs['mojo_cape_submit'] = [
+    'subs',
+    'subs_top12',
+    'hash_changed',
+    'app_protos',
+    'size_sum',
+    'size_stats',
+    'size_max',
+    'size_mean',
+    'size_median',
+    'size_mode',
+    'size_min',
+    'size_stddev',
 ];
 $graphs['linux_softnet_stat'] = [
     'packets',
