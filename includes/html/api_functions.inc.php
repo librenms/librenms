@@ -352,8 +352,8 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = '`d`.`type`=?';
         $param[] = $query;
     } elseif ($type == 'display') {
-        $sql = '`d`.`display`=?';
-        $param[] = $query;
+        $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
