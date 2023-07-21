@@ -359,9 +359,9 @@ if ($options['f'] === 'peeringdb') {
 }
 
 if ($options['f'] === 'mac_oui') {
-    $lock = Cache::lock('macouidb', 86000);
+    $lock = Cache::lock('vendor_oui_db', 86000);
     if ($lock->get()) {
-        $res = cache_mac_oui();
+        $res = mac_oui_to_database();
         $lock->release();
         exit($res);
     }

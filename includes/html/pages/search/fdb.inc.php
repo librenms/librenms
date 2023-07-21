@@ -95,6 +95,14 @@ if ($vars['searchby'] == 'description') {
 ?>
 
                 ">Description</option>"+
+                "<option value=\"vendor\" "+
+<?php
+if ($vars['searchby'] == 'vendor') {
+    echo '" selected "+';
+}
+?>
+
+                ">Vendor</option>"+
                 "<option value=\"vlan\" "+
 <?php
 if ($vars['searchby'] == 'vlan') {

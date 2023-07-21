@@ -31,6 +31,7 @@ use App\Models\PortsFdb;
 use App\Models\Vlan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -91,6 +92,10 @@ class FdbTablesController extends TableController
                     return $query->whereIn('ports_fdb.mac_address', $this->findMacs($search));
                 case 'description':
                     return $query->whereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search));
+                case 'vendor':
+                    $vendor_ouis = $this->ouisFromVendor($search);
+
+                    return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search) {
                         $query->where('ports_fdb.mac_address', 'like', $mac_search)
@@ -295,5 +300,40 @@ class FdbTablesController extends TableController
         }
 
         return $this->macCountCache[$port->port_id];
+    }
+
+    /**
+     * Get the OUI list for a specific vendor
+     *
+     * @param  string  $vendor
+     * @return array
+     */
+    protected function ouisFromVendor($vendor)
+    {
+        $matching_ouis = DB::table('vendor_ouis')
+            ->where('vendor', 'LIKE', '%' . $vendor . '%')
+            ->pluck('oui')
+            ->toArray();
+
+        return $matching_ouis;
+    }
+
+    /**
+     * Get all port ids from vendor OUIs
+     *
+     * @param  array  $vendor_ouis
+     * @return Builder
+     */
+    protected function findPortsByOui($vendor_ouis, $query)
+    {
+        $condition = '';
+        foreach ($vendor_ouis as $oui) {
+            $clean_oui = str_replace(':', '', $oui);
+            $condition .= " ports_fdb.mac_address LIKE '$clean_oui%' OR";
+        }
+        $condition = rtrim($condition, ' OR');
+        $query->whereRaw($condition);
+
+        return $query; // Return the query builder instance
     }
 }
