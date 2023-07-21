@@ -26,7 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
-use Cache;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
 class Rewrite
@@ -148,20 +148,23 @@ class Rewrite
     }
 
     /**
-     * Extract the OUI and match it against cached values
+     * Extract the OUI and match it against database values
      *
      * @param  string  $mac
-     * @return string
+     * @return string|null
      */
     public static function readableOUI($mac)
     {
-        $cached = Cache::get('OUIDB-' . substr($mac, 0, 6), '');
-        if ($cached == 'IEEE Registration Authority') {
-            // Then we may have a shorter prefix, so let's try them one ater the other, ordered by probability
-            return Cache::get('OUIDB-' . substr($mac, 0, 9)) ?: Cache::get('OUIDB-' . substr($mac, 0, 7));
+        $oui = substr($mac, 0, 6);
+
+        $result = DB::table('vendor_ouis')->where('oui', $oui)->value('vendor');
+
+        if ($result === 'IEEE Registration Authority') {
+            // Then we may have a shorter prefix, so let's try them one after the other, ordered by probability
+            $result = DB::table('vendor_ouis')->whereIn('oui', [substr($mac, 0, 9), substr($mac, 0, 7)])->value('vendor');
         }
 
-        return $cached;
+        return $result ?: '';
     }
 
     /**

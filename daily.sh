@@ -341,7 +341,7 @@ main () {
                 # and clean up the db.
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
                 status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
-                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
+                status_run 'Updating Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             post-pull)
                 # re-check dependencies after pull with the new code
