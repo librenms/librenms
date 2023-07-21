@@ -1166,13 +1166,12 @@ function q_bridge_bits2indices($hex_data)
 /**
  * Function to generate Mac OUI Cache
  */
-function cache_mac_oui()
+function mac_oui_to_database()
 {
-    // timers:
+    // Refresh timer
     $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
-    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
 
-    $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
+    $lock = Cache::lock('vendor_oui_db_refresh', $mac_oui_refresh_int_min); // We want to refresh after at least $mac_oui_refresh_int_min
 
     if (Config::get('mac_oui.enabled') !== true) {
         echo 'Mac OUI integration disabled' . PHP_EOL;
@@ -1181,7 +1180,7 @@ function cache_mac_oui()
     }
 
     if ($lock->get()) {
-        echo 'Caching Mac OUI' . PHP_EOL;
+        echo 'Storing Mac OUI in the database' . PHP_EOL;
         try {
             $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
@@ -1190,12 +1189,15 @@ function cache_mac_oui()
             $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
+
+            // Process each line of the CSV data
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
 
                 $length = strlen($entry[0]);
                 $prefix = strtolower(str_replace(':', '', $entry[0]));
+                $vendor = $entry[2];
 
                 if (is_array($entry) && count($entry) >= 3 && $length == 8) {
                     // We have a standard OUI xx:xx:xx
@@ -1208,18 +1210,23 @@ function cache_mac_oui()
                         $oui = substr($prefix, 0, 9);
                     }
                 }
+
                 if (isset($oui)) {
-                    echo "Adding $oui, $entry[2]" . PHP_EOL;
-                    $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry[2], $mac_oui_cache_time);
+                    // Store the OUI for the vendor in the database
+                    DB::table('vendor_ouis')->insert([
+                        'vendor' => $vendor,
+                        'oui' => $oui,
+                    ]);
+
+                    echo "Adding $oui for $vendor" . PHP_EOL;
                 }
             }
         } catch (Exception $e) {
-            echo 'Error processing Mac OUI :' . PHP_EOL;
+            echo 'Error processing Mac OUI:' . PHP_EOL;
             echo 'Exception: ' . get_class($e) . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
 
-            $lock->release(); // we did not succeed so we'll try again next time
+            $lock->release(); // We did not succeed, so we'll try again next time
 
             return 1;
         }
