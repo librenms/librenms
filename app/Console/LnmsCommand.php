@@ -36,8 +36,10 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
-    /** @var string[][]|null */
+    /** @var string[][]|callable[]|null */
     protected $optionValues;
+    /** @var string[][]|callable[]|null */
+    protected $optionDefaults;
 
     /**
      * Create a new command instance.
@@ -69,10 +71,10 @@ abstract class LnmsCommand extends Command
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function addArgument($name, $mode = null, $description = null, $default = null)
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
@@ -94,18 +96,25 @@ abstract class LnmsCommand extends Command
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption($name, $shortcut = null, $mode = null, $description = null, $default = null)
+    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 
-        if (isset($this->optionValues[$name])) {
-            $description .= ' [' . implode(', ', $this->optionValues[$name]) . ']';
-        }
-
-        parent::addOption($name, $shortcut, $mode, $description, $default);
+        // inject our custom InputOption to allow callable option enums
+        $this->getDefinition()->addOption(
+            new DynamicInputOption(
+                $name,
+                $shortcut,
+                $mode,
+                $description,
+                $default,
+                $this->getCallable('Defaults', $name),
+                $this->getCallable('Values', $name),
+            )
+        );
 
         return $this;
     }
@@ -118,8 +127,10 @@ abstract class LnmsCommand extends Command
     {
         // auto create option value rules if they don't exist
         if (isset($this->optionValues)) {
-            foreach ($this->optionValues as $option => $values) {
-                if (empty($rules[$option])) {
+            foreach (array_keys($this->optionValues) as $option) {
+                $callable = $this->getCallable('Values', $option);
+                if (empty($rules[$option]) && $callable) {
+                    $values = call_user_func($callable);
                     $rules[$option] = Rule::in($values);
                     $messages[$option . '.in'] = trans('commands.lnms.validation-errors.optionValue', [
                         'option' => $option,
@@ -157,5 +168,21 @@ abstract class LnmsCommand extends Command
                 Debug::setVerbose();
             }
         }
+    }
+
+    private function getCallable(string $type, string $name): ?callable
+    {
+        if (empty($this->{'option' . $type}[$name])) {
+            return null;
+        }
+
+        $values = $this->{'option' . $type}[$name];
+        if (is_callable($values)) {
+            return $values;
+        }
+
+        return function () use ($values) {
+            return $values;
+        };
     }
 }

@@ -21,7 +21,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.1.51.7.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.1.51.7.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -42,7 +43,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.4.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.4.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -63,7 +65,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.9.1.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.9.1.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -84,7 +87,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.29.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.29.0\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -109,7 +113,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.1.51.7.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.1.51.7.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -130,7 +135,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.4.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.4.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -151,7 +157,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.9.1.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.9.1.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -172,7 +179,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.29.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.4458.1000.1.5.29.0\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         }
@@ -188,11 +196,11 @@
                     "version": "4.9.00_b0016_Jan  8 2017",
                     "hardware": "RW5000/HSU/5550/F58/FCC/SFF/INT/23 - RW-5550-0H50",
                     "features": "Ver. 6",
+                    "location": "<private>",
                     "os": "radwin",
                     "type": "wireless",
                     "serial": "P10700I500A00377",
-                    "icon": "radwin.svg",
-                    "location": "<private>"
+                    "icon": "radwin.svg"
                 }
             ]
         },
@@ -214,7 +222,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -224,15 +231,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Management Port on Odu",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -323,7 +326,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -333,15 +335,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Management Port on Odu",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,

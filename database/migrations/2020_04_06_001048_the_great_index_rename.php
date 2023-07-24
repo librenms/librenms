@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class TheGreatIndexRename extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // try to run index like this to hopefully allow mysql to optimize away the reindex
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
@@ -164,7 +164,7 @@ class TheGreatIndexRename extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }
@@ -197,4 +197,4 @@ class TheGreatIndexRename extends Migration
             DB::statement($query);
         }
     }
-}
+};

@@ -36,15 +36,16 @@ interface Transport
      * Gets called when an alert is sent
      *
      * @param  array  $alert_data  An array created by DescribeAlert
-     * @param  array|true  $opts  The options from the alert_transports transport_config column
-     * @return mixed Returns if the call was successful
+     * @return bool Returns true if the call was successful.
+     *
+     * @throws \LibreNMS\Exceptions\AlertTransportDeliveryException
      */
-    public function deliverAlert($alert_data, $opts);
+    public function deliverAlert(array $alert_data): bool;
 
     /**
      * @return array
      */
-    public static function configTemplate();
+    public static function configTemplate(): array;
 
     /**
      * Display the configuration details of this alert transport

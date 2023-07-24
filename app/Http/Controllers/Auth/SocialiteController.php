@@ -40,6 +40,7 @@ class SocialiteController extends Controller
 
     public function __construct()
     {
+        app()->register(\SocialiteProviders\Manager\ServiceProvider::class);
         $this->injectConfig();
     }
 

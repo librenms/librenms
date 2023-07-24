@@ -26,13 +26,13 @@
 namespace App\ApiClients;
 
 use App\Models\Device;
-use GuzzleHttp\Client;
 use LibreNMS\Config;
+use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private $client;
-    private $api_prefix = '';
+    private \Illuminate\Http\Client\PendingRequest $client;
+    private string $api_prefix = '';
 
     public function __construct(array $config = [])
     {
@@ -53,10 +53,10 @@ class GraylogApi
             ];
         }
 
-        $this->client = new Client($config);
+        $this->client = Http::client()->withOptions($config);
     }
 
-    public function getStreams()
+    public function getStreams(): array
     {
         if (! $this->isConfigured()) {
             return [];
@@ -65,23 +65,14 @@ class GraylogApi
         $uri = $this->api_prefix . '/streams';
 
         $response = $this->client->get($uri);
-        $data = json_decode($response->getBody(), true);
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**
      * Query the Graylog server
-     *
-     * @param  string  $query
-     * @param  int  $range
-     * @param  int  $limit
-     * @param  int  $offset
-     * @param  string  $sort  field:asc or field:desc
-     * @param  string  $filter
-     * @return array
      */
-    public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
+    public function query(string $query = '*', int $range = 0, int $limit = 0, int $offset = 0, ?string $sort = null, ?string $filter = null): array
     {
         if (! $this->isConfigured()) {
             return [];
@@ -101,20 +92,15 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-        $response = $this->client->get($uri, ['query' => $data]);
-        $data = json_decode($response->getBody(), true);
+        $response = $this->client->get($uri, $data);
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**
      * Build a simple query string that searches the messages field and/or filters by device
-     *
-     * @param  string  $search  Search the message field for this string
-     * @param  Device  $device
-     * @return string
      */
-    public function buildSimpleQuery($search = null, $device = null)
+    public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
         $query = [];
         if ($search) {
@@ -132,11 +118,12 @@ class GraylogApi
         return implode(' && ', $query);
     }
 
-    public function getAddresses(Device $device)
+    public function getAddresses(Device $device): \Illuminate\Support\Collection
     {
         $addresses = collect([
             gethostbyname($device->hostname),
             $device->hostname,
+            $device->displayName(),
             $device->ip,
         ]);
 
@@ -157,8 +144,8 @@ class GraylogApi
         return $addresses->filter()->unique();
     }
 
-    public function isConfigured()
+    public function isConfigured(): bool
     {
-        return isset($this->client->getConfig()['base_uri']);
+        return (bool) Config::get('graylog.server');
     }
 }

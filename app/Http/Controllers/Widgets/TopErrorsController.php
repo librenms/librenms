@@ -61,7 +61,7 @@ class TopErrorsController extends WidgetController
             ->where(function ($query) {
                 return $query
                     ->where('ifInErrors_rate', '>', 0)
-                    ->orwhere('ifOutErrors_rate', '>', 0);
+                    ->orWhere('ifOutErrors_rate', '>', 0);
             })
             ->isUp()
             ->when($data['device_group'], function ($query) use ($data) {

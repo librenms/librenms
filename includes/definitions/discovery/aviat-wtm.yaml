@@ -9,7 +9,7 @@ modules:
             data:
                 -
                     oid: aviatModemCurModulationRx
-                    num_oid: '.1.3.6.1.4.1.2509.9.3.2.1.1.13.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2509.9.3.2.1.1.14.{{ $index }}'
                     descr: Tx Mod Rate (Carrier1/{{ $index }})
                     index: '{{ $index }}'
                     state_name: aviatModemCurModulationRx

@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateUcdDiskioTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('ucd_diskio', function (Blueprint $table) {
             $table->increments('diskio_id');
@@ -25,8 +25,8 @@ class CreateUcdDiskioTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('ucd_diskio');
     }
-}
+};

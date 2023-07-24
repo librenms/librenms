@@ -68,12 +68,12 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         //vlan does not exist
         if (! $vlanDB->exists) {
-            Log::event("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
         }
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
-            Log::event("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
         }
 
         $vlanDB->save();
@@ -81,9 +81,9 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id; //populate device['vlans'] with ID's
 
         //portmap for untagged ports
-        $untagged_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts']);
+        $untagged_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts'] ?? '');
         //portmap for members ports (might be tagged)
-        $egress_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts']);
+        $egress_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts'] ?? '');
         foreach ($egress_ids as $port_id) {
             if (isset($base_to_index[$port_id])) {
                 $ifIndex = $base_to_index[$port_id];

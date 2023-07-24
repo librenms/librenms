@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.4526.100.4.32",
                     "sysDescr": "GS724Tv4 ProSafe 24-port Gigabit Ethernet Smart Switch, 6.3.1.11, B1.0.0.4",
                     "sysContact": null,
                     "version": "6.3.1.11",
                     "hardware": "GS724Tv4",
                     "features": null,
+                    "location": null,
                     "os": "netgear",
                     "type": "network",
                     "serial": null,
-                    "icon": "netgear.svg",
-                    "location": null
+                    "icon": "netgear.svg"
                 }
             ]
         },
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -93,6 +95,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -117,6 +120,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -141,6 +145,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -165,6 +170,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -189,6 +195,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -213,6 +220,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -237,6 +245,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -261,6 +270,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -285,6 +295,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -309,6 +320,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesFanItemState"
                 },
                 {
@@ -333,6 +345,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -357,6 +370,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -381,6 +395,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

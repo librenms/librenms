@@ -10,11 +10,11 @@
                     "version": "2.3.0.54-C.BT",
                     "hardware": "2.2.4",
                     "features": null,
+                    "location": "<private>",
                     "os": "topvision",
                     "type": "network",
                     "serial": "1705CC8800D360039",
-                    "icon": "sumavision.png",
-                    "location": "<private>"
+                    "icon": "sumavision.png"
                 }
             ]
         },

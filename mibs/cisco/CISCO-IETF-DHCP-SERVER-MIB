@@ -1,0 +1,1405 @@
+-- *********************************************************************
+-- CISCO-IETF-DHCP-SERVER-MIB.my : Cisco-ized version of the Dynamic
+-- Host Configuration Protocol for IPv4 (DHCPv4) Server MIB.
+--
+-- March 2004, Mike Chidzik
+--
+-- Copyright (c) 2004, 2007 by cisco Systems, Inc.
+-- All rights reserved.
+-- *********************************************************************
+--
+-- This MIB module is based on the Internet Draft
+-- <draft-ieft-dhc-server-mib-10.txt>. In terms of object syntax and
+-- semantics, the content of this Cisco MIB is the same as
+-- the corresponding Internet Draft revision. This Cisco MIB was
+-- created due to the "subject to change" nature of Internet Drafts.
+-- This Cisco MIB may later be deprecated, and the stable RFC, which
+-- may replace the Internet Draft, may be implemented in its place.
+--
+-- Caution.  This MIB is temporary and experimental.  In the future it
+-- will be removed from products, perhaps with short notice, in favor
+-- of more standard or generic MIBs.  Application developers should not
+-- depend on long-term access to this MIB.
+--
+-- Note: This MIB is a subset of the objects contained in the
+-- Internet Draft. The comparison of this MIB and the Internet Draft
+-- is outlined in the below:
+--
+-- Internet Draft                  CISCO-IETF-DHCP-SERVER-MIB
+-- ~~~~~~~~~~~~~~                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- dhcpv4ServerObjects             cDhcpv4SrvObjects
+-- bootpCounterObjects             cBootpCounterObjects
+-- dhcpv4CounterObjects            cDhcpv4CounterObjects -
+-- (excluding dhcpv4CountForcedRenews)
+-- dhcpv4ServerSharedNetObjects    cDhcpv4ServerSharedNetObjects
+-- dhcpv4ServerSubnetObjects       cDhcpv4ServerSubnetObjects
+-- dhcpv4ServerRangeObjects        cDhcpv4ServerRangeObjects
+-- dhcpv4ServerClientObjects       cDhcpv4ServerClientObjects
+-- dhcpv4ServerNotifyObjectsGroup  cDhcpv4ServerNotifyObjects
+
+CISCO-IETF-DHCP-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter32,
+    Counter64,
+    Unsigned32,
+    Gauge32,
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    TEXTUAL-CONVENTION,
+    DateAndTime
+        FROM SNMPv2-TC
+    InetAddressIPv4,
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    ciscoExperiment
+        FROM CISCO-SMI;
+
+
+ciscoIetfDhcpSrvMIB MODULE-IDENTITY
+    LAST-UPDATED    "200703270000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-dhcp-mib@cisco.com"
+    DESCRIPTION
+        "The MIB module for entities implementing the server side of
+        the Bootstrap Protocol (BOOTP) and the Dynamic Host
+        Configuration protocol (DHCP) for Internet Protocol version
+        4(IPv4).  This MIB does not include support for Dynamic DNS
+        (DDNS) updating nor for the DHCP Failover Protocol."
+    REVISION        "200703270000Z"
+    DESCRIPTION
+        "Added cDhcpv4ServerSharedNetObjects, cDhcpv4ServerSubnetObjects,
+        cDhcpv4ServerRangeObjects, cDhcpv4ServerClientObjects,
+        cDhcpv4ServerNotifyObjects and cDhcpv4ServerNotificationsGroup.
+
+        The data types of the OIDs below are modified so they can be
+        retrieved.
+
+          cDhcpv4ServerSharedNetFreeAddrLowThreshold (read-write)
+          cDhcpv4ServerSharedNetFreeAddrHighThreshold (read-write)
+          cDhcpv4ServerSharedNetFreeAddresses (read-only)
+          cDhcpv4ServerSharedNetReservedAddresses (read-only)
+          cDhcpv4ServerSharedNetTotalAddresses (read-only)
+
+          cDhcpv4ServerSubnetFreeAddrLowThreshold (read-write)
+          cDhcpv4ServerSubnetFreeAddrHighThreshold (read-write)
+          cDhcpv4ServerSubnetFreeAddresses (read-only)
+
+        Added cDhcpv4SrvComplianceRev1 MODULE-COMPLIANCE"
+    REVISION        "200702141200Z"
+    DESCRIPTION
+        "Add BOOTP/DHCP high capacity counter."
+    REVISION        "200403011200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoExperiment 102 }
+
+
+ciscoIetfDhcpv4SrvMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpSrvMIB 0 }
+
+ciscoIetfDhcpv4SrvMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpSrvMIB 1 }
+
+ciscoIetfDhcpv4SrvMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpSrvMIB 2 }
+
+
+CDhcpv4PhysicalAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d,1d,1x:1x:1x:1x:1x:1x"
+    STATUS          current
+    DESCRIPTION
+        "A DHCP-specific encoding of the physical address type and
+        physical address, intended to mirror the representation of
+        physical addresses in DHCP messages.  The first octet of this
+        object contains the hardware type from the 'htype' field of
+        the DHCP message, the second octet of this object contains the
+        hardware length from the 'hlen' field, and the remaining
+        octets contain the hardware address from the 'chaddr' field."
+
+    REFERENCE       "RFC 2131"
+    SYNTAX          OCTET STRING (SIZE (18))
+
+cDhcpv4SrvSystem OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Group of objects that are related to the overall system."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 1 }
+
+
+cBootpCounters OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Group of objects that count various BOOTP events."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 2 }
+
+
+cDhcpv4Counters OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Group of objects that count various DHCPv4 events."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 3 }
+
+
+cDhcpv4SrvConfiguration OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Objects that contain pre-configured and dynamic configuration
+        information."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 4 }
+
+
+cDhcpv4ServerNotifyObjects OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Objects that are used only in notifications."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 7 }
+
+
+cBootpHCCounters OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Group of high capacity objects that count various BOOTP events."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 8 }
+
+
+cDhcpv4HCCounters OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "Group of high capacity objects that count various DHCPv4 events."
+    ::= { ciscoIetfDhcpv4SrvMIBObjects 9 }
+
+
+-- cDhcpv4SrvSystemObjects Group
+
+cDhcpv4SrvSystemDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A textual description of the server.  This value should
+        include the full name and version identification of the
+        server."
+    ::= { cDhcpv4SrvSystem 1 }
+
+cDhcpv4SrvSystemObjectID OBJECT-TYPE
+    SYNTAX          OBJECT IDENTIFIER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The vendor's authoritative identification of the network
+        management subsystem contained in this entity.  This value is
+        allocated within the SMI enterprise subtree (1.3.6.1.4.1) and
+        provides an easy and unambiguous means for determining what
+        kind of server is being managed.  For example, if vendor Ohso
+        Soft, Inc. is assigned the subtree 1.3.6.1.4.1.4242, it may
+        assign the identifier 1.3.6.1.4.1.4242.1.1 to its Ursa DHCP
+        Server."
+    ::= { cDhcpv4SrvSystem 2 }
+
+-- cBootpCounterObjects Group
+
+cBootpCountRequests OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received that contain a Message Type of
+        1 (BOOTREQUEST) in the first octet and do not contain option
+        number 53 (DHCP Message Type) in the options."
+    REFERENCE       "RFC-2131."
+    ::= { cBootpCounters 1 }
+
+cBootpCountInvalids OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received that do not contain a Message
+        Type of 1 (BOOTREQUEST) in the first octet or are not valid
+        BOOTP packets (e.g., too short, invalid field in packet
+        header)."
+    ::= { cBootpCounters 2 }
+
+cBootpCountReplies OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets sent that contain a Message Type of 2
+        (BOOTREPLY) in the first octet and do not contain option number
+        53 (DHCP Message Type) in the options."
+    REFERENCE       "RFC-2131."
+    ::= { cBootpCounters 3 }
+
+cBootpCountDropUnknownClients OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BOOTP packets dropped due to the server not
+        recognizing or not providing service to the hardware address
+        received in the incoming packet."
+    ::= { cBootpCounters 4 }
+
+cBootpCountDropNotServingSubnet OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BOOTP packets dropped due to the server not
+        being configured or not otherwise able to serve addresses on
+        the subnet from which this message was received."
+    ::= { cBootpCounters 5 }
+
+-- DHCP Counters Group
+
+cDhcpv4CountDiscovers OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPDISCOVER (option 53 with value 1) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 1 }
+
+cDhcpv4CountOffers OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPOFFER (option 53 with value 2) packets
+        sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 2 }
+
+cDhcpv4CountRequests OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPREQUEST (option 53 with value 3) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 3 }
+
+cDhcpv4CountDeclines OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPDECLINE (option 53 with value 4) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 4 }
+
+cDhcpv4CountAcks OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPACK (option 53 with value 5) packets sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 5 }
+
+cDhcpv4CountNaks OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPNACK (option 53 with value 6) packets sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 6 }
+
+cDhcpv4CountReleases OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPRELEASE (option 53 with value 7) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 7 }
+
+cDhcpv4CountInforms OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPINFORM (option 53 with value 8) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4Counters 8 }
+
+cDhcpv4CountInvalids OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets received whose DHCP message type
+        (i.e., option number 53) is not understood or handled by the
+        server."
+    ::= { cDhcpv4Counters 10 }
+
+cDhcpv4CountDropUnknownClient OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets dropped due to the server not
+        recognizing or not providing service to the client-id and/or
+        hardware address received in the incoming packet."
+    ::= { cDhcpv4Counters 11 }
+
+cDhcpv4CountDropNotServingSubnet OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets dropped due to the server not being
+        configured or not otherwise able to serve addresses on the
+        subnet from which this message was received."
+    ::= { cDhcpv4Counters 12 }
+
+-- cBootpHCCounterObjects Group
+
+cBootpHCCountRequests OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received that contain a Message Type of
+        1 (BOOTREQUEST) in the first octet and do not contain option
+        number 53 (DHCP Message Type) in the options."
+    REFERENCE       "RFC-2131."
+    ::= { cBootpHCCounters 1 }
+
+cBootpHCCountInvalids OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received that do not contain a Message
+        Type of 1 (BOOTREQUEST) in the first octet or are not valid
+        BOOTP packets (e.g., too short, invalid field in packet
+        header)."
+    ::= { cBootpHCCounters 2 }
+
+cBootpHCCountReplies OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets sent that contain a Message Type of 2
+        (BOOTREPLY) in the first octet and do not contain option number
+        53 (DHCP Message Type) in the options."
+    REFERENCE       "RFC-2131."
+    ::= { cBootpHCCounters 3 }
+
+cBootpHCCountDropUnknownClients OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BOOTP packets dropped due to the server not
+        recognizing or not providing service to the hardware address
+        received in the incoming packet."
+    ::= { cBootpHCCounters 4 }
+
+cBootpHCCountDropNotServingSubnet OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BOOTP packets dropped due to the server not
+        being configured or not otherwise able to serve addresses on
+        the subnet from which this message was received."
+    ::= { cBootpHCCounters 5 }
+
+-- DHCP High Capacity Counters Group
+
+cDhcpv4HCCountDiscovers OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPDISCOVER (option 53 with value 1) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 1 }
+
+cDhcpv4HCCountOffers OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPOFFER (option 53 with value 2) packets
+        sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 2 }
+
+cDhcpv4HCCountRequests OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPREQUEST (option 53 with value 3) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 3 }
+
+cDhcpv4HCCountDeclines OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPDECLINE (option 53 with value 4) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 4 }
+
+cDhcpv4HCCountAcks OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPACK (option 53 with value 5) packets sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 5 }
+
+cDhcpv4HCCountNaks OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPNACK (option 53 with value 6) packets sent."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 6 }
+
+cDhcpv4HCCountReleases OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPRELEASE (option 53 with value 7) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 7 }
+
+cDhcpv4HCCountInforms OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPINFORM (option 53 with value 8) packets
+        received."
+    REFERENCE       "RFC2131; RFC2132, section 9.6."
+    ::= { cDhcpv4HCCounters 8 }
+
+cDhcpv4HCCountForcedRenews OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCPFORCERENEW (option 53 with value 9) packets
+        sent."
+    REFERENCE       "RFC 3203, DHCP reconfigure extension."
+    ::= { cDhcpv4HCCounters 9 }
+
+cDhcpv4HCCountInvalids OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets received whose DHCP message type
+        (i.e., option number 53) is not understood or handled by the
+        server."
+    ::= { cDhcpv4HCCounters 10 }
+
+cDhcpv4HCCountDropUnknownClient OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets dropped due to the server not
+        recognizing or not providing service to the client-id and/or
+        hardware address received in the incoming packet."
+    ::= { cDhcpv4HCCounters 11 }
+
+cDhcpv4HCCountDropNotServingSubnet OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of DHCP packets dropped due to the server not being
+        configured or not otherwise able to serve addresses on the
+        subnet from which this message was received."
+    ::= { cDhcpv4HCCounters 12 }
+-- DHCP Server Configuration
+-- cDhcpv4ServerSharedNetObjects Group
+
+cDhcpv4ServerSharedNetTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CDhcpv4ServerSharedNetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of shared networks that are configured in the server.
+        A shared network is the logical aggregation of one or more
+        subnets that share a common network segment (e.g., multi-
+        tapped coaxial cable, wiring hub, or switch).  This table is
+        present ONLY for those servers that organize the ranges of
+        addresses available for assignment where a higher-level
+        grouping (i.e., the 'shared' network) exists above ranges and
+        subnets."
+    ::= { cDhcpv4SrvConfiguration 1 }
+
+cDhcpv4ServerSharedNetEntry OBJECT-TYPE
+    SYNTAX          CDhcpv4ServerSharedNetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A logical row in the cDhcpv4ServerSharedNetTable."
+    INDEX           { cDhcpv4ServerSharedNetName }
+    ::= { cDhcpv4ServerSharedNetTable 1 }
+
+CDhcpv4ServerSharedNetEntry ::= SEQUENCE {
+        cDhcpv4ServerSharedNetName                  SnmpAdminString,
+        cDhcpv4ServerSharedNetFreeAddrLowThreshold  INTEGER,
+        cDhcpv4ServerSharedNetFreeAddrHighThreshold INTEGER,
+        cDhcpv4ServerSharedNetFreeAddresses         INTEGER,
+        cDhcpv4ServerSharedNetReservedAddresses     INTEGER,
+        cDhcpv4ServerSharedNetTotalAddresses        INTEGER
+}
+
+cDhcpv4ServerSharedNetName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..100))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The name of the shared network, which uniquely identifies an
+        entry in the cDhcpv4ServerSharedNetTable."
+    ::= { cDhcpv4ServerSharedNetEntry 1 }
+
+cDhcpv4ServerSharedNetFreeAddrLowThreshold OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The low threshold for available free addresses in this shared
+        network.  If the value for available free addresses in this
+        shared network becomes equal to or less than this value, a
+        cDhcpv4ServerFreeAddressLow event is generated for this shared
+        network.  No more cDhcpv4ServerFreeAddressLow events will be
+        generated for this subnet during this execution of the DHCP
+        server until the value for available free addresses has
+        exceeded the value of cDhcpv4ServerSharedNetFreeAddrHighThreshold."
+    ::= { cDhcpv4ServerSharedNetEntry 2 }
+
+cDhcpv4ServerSharedNetFreeAddrHighThreshold OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The high threshold for available free addresses in this
+        shared network.  If a cDhcpv4ServerFreeAddressLow event was
+        generated for this subnet, and the value for available free
+        addresses has exceeded the value of
+        cDhcpv4ServerSubnetFreeAddrHighThreshold, then a
+        cDhcpv4ServerFreeAddressHigh event will be generated.  No more
+        cDhcpv4ServerFreeAddressHigh events will be generated for this
+        subnet during this execution of the DHCP server until the
+        value for available free addresses becomes equal to or less
+        than the value of cDhcpv4ServerSubnetFreeAddrLowThreshold."
+    ::= { cDhcpv4ServerSharedNetEntry 3 }
+
+cDhcpv4ServerSharedNetFreeAddresses OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of IPv4 addresses which are available within this
+        shared network.  If the server does not count free addresses
+        by shared network segment, this value will be zero."
+    ::= { cDhcpv4ServerSharedNetEntry 4 }
+
+cDhcpv4ServerSharedNetReservedAddresses OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of IPv4 addresses which are reserved (not
+        available for assignment) within this shared network.  If the
+        server does not count reserved addresses by shared network
+        segment, this value will be zero."
+    ::= { cDhcpv4ServerSharedNetEntry 5 }
+
+cDhcpv4ServerSharedNetTotalAddresses OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of IPv4 addresses which are available within this
+        shared network.  If the server does not count total addresses
+        by shared network segment, this value will be zero."
+    ::= { cDhcpv4ServerSharedNetEntry 6 }
+
+
+-- cDhcpv4ServerSubnetObjects Group
+
+cDhcpv4ServerSubnetTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CDhcpv4ServerSubnetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of subnets that are configured in this server."
+    ::= { cDhcpv4SrvConfiguration 2 }
+
+cDhcpv4ServerSubnetEntry OBJECT-TYPE
+    SYNTAX          CDhcpv4ServerSubnetEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A logical row in the cDhcpv4ServerSubnetTable."
+    INDEX           { cDhcpv4ServerSubnetAddress }
+    ::= { cDhcpv4ServerSubnetTable 1 }
+
+CDhcpv4ServerSubnetEntry ::= SEQUENCE {
+        cDhcpv4ServerSubnetAddress               InetAddressIPv4,
+        cDhcpv4ServerSubnetMask                  InetAddressPrefixLength,
+        cDhcpv4ServerSubnetSharedNetworkName     SnmpAdminString,
+        cDhcpv4ServerSubnetFreeAddrLowThreshold  Unsigned32,
+        cDhcpv4ServerSubnetFreeAddrHighThreshold Unsigned32,
+        cDhcpv4ServerSubnetFreeAddresses         Unsigned32
+}
+
+cDhcpv4ServerSubnetAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 address of the subnet entry in the
+        cDhcpv4ServerSubnetTable."
+    ::= { cDhcpv4ServerSubnetEntry 1 }
+
+cDhcpv4ServerSubnetMask OBJECT-TYPE
+    SYNTAX          InetAddressPrefixLength
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The subnet mask of the subnet.  This MUST be the same as the
+        value of DHCP option 1 offered to clients on this subnet."
+    ::= { cDhcpv4ServerSubnetEntry 2 }
+
+cDhcpv4ServerSubnetSharedNetworkName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..100))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The shared subnet name (used as an index into the server
+        shared subnet table) to which this subnet belongs.  This value
+        will be null for servers that do not organize or describe
+        networks in this manner."
+    ::= { cDhcpv4ServerSubnetEntry 3 }
+
+cDhcpv4ServerSubnetFreeAddrLowThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The low threshold for available free addresses in this
+        subnet.  If the value for available free addresses in this
+        subnet becomes equal to or less than this value, a
+        cDhcpv4ServerSubnetFreeAddrLowThreshold event will be generated
+        for this shared network.  No more
+        cDhcpv4ServerSubnetFreeAddrLowThreshold events will be
+        generated for this subnet during this execution of the DHCP
+        server until the value for available free addresses has
+        exceeded the value of cDhcpv4ServerSubnetFreeAddrHighThreshold."
+    ::= { cDhcpv4ServerSubnetEntry 4 }
+
+cDhcpv4ServerSubnetFreeAddrHighThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The high threshold for available free addresses in this
+        subnet.  If a cDhcpv4ServerSubnetFreeAddrLowThreshold event has
+        been generated for this subnet, and the value for available
+        free addresses has exceeded the value of
+        cDhcpv4ServerSubnetFreeAddrHighThreshold, then a
+        cDhcpv4ServerFreeAddressHigh event will be generated.  No more
+        cDhcpv4ServerFreeAddressHigh events will be generated for this
+        subnet during this execution of the DHCP server until the
+        value for available free addresses becomes equal to or less
+        than the value of cDhcpv4ServerSubnetFreeAddrLowThreshold."
+    ::= { cDhcpv4ServerSubnetEntry 5 }
+
+cDhcpv4ServerSubnetFreeAddresses OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of free IPv4 addresses which are available in this
+        subnet."
+    ::= { cDhcpv4ServerSubnetEntry 6 }
+
+
+-- cDhcpv4ServerRangeObjects Group
+
+cDhcpv4ServerRangeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CDhcpv4ServerRangeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of ranges that are configured on this server."
+    ::= { cDhcpv4SrvConfiguration 3 }
+
+cDhcpv4ServerRangeEntry OBJECT-TYPE
+    SYNTAX          CDhcpv4ServerRangeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A logical row in the cDhcpv4ServerRangeTable."
+    INDEX           {
+                        cDhcpv4ServerRangeStartAddress,
+                        cDhcpv4ServerRangeEndAddress
+                    }
+    ::= { cDhcpv4ServerRangeTable 1 }
+
+CDhcpv4ServerRangeEntry ::= SEQUENCE {
+        cDhcpv4ServerRangeStartAddress      InetAddressIPv4,
+        cDhcpv4ServerRangeEndAddress        InetAddressIPv4,
+        cDhcpv4ServerRangeSubnetMask        InetAddressPrefixLength,
+        cDhcpv4ServerRangeInUse             Gauge32,
+        cDhcpv4ServerRangeOutstandingOffers Gauge32
+}
+
+cDhcpv4ServerRangeStartAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 address of the first address in the range.  The
+        value of cDhcpv4ServerRangeStartAddress MUST be less than or
+        equal to the value of cDhcpv4ServerRangeEndAddress."
+    ::= { cDhcpv4ServerRangeEntry 1 }
+
+cDhcpv4ServerRangeEndAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 address of the last address in the range.  The value
+        of cDhcpv4ServerRangeEndAddress MUST be greater than or equal
+        to the value of cDhcpv4ServerRangeStartAddress."
+    ::= { cDhcpv4ServerRangeEntry 2 }
+
+cDhcpv4ServerRangeSubnetMask OBJECT-TYPE
+    SYNTAX          InetAddressPrefixLength
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The subnet address mask for this range."
+    ::= { cDhcpv4ServerRangeEntry 3 }
+
+cDhcpv4ServerRangeInUse OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of addresses in this range that are currently in
+        use.  This number includes those addresses whose lease has not
+        expired and addresses which have been reserved (either by the
+        server or through configuration)."
+    ::= { cDhcpv4ServerRangeEntry 4 }
+
+cDhcpv4ServerRangeOutstandingOffers OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of outstanding DHCPOFFER messages for this range
+        is reported with this value.  An offer is outstanding if the
+        server has sent a DHCPOFFER message to a client, but has not
+        yet received a DHCPREQUEST message from the client nor has the
+        server-specific timeout (limiting the time in which a client
+        can respond to the offer message) for the offer message
+        expired."
+    ::= { cDhcpv4ServerRangeEntry 5 }
+
+
+-- cDhcpv4ServerClientObjects Group
+
+cDhcpv4ServerClientTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CDhcpv4ServerClientEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An optional list of addresses that are known by this server.
+        The list MUST contain addresses that have not expired.  The
+        list MUST NOT contain addresses that have never been assigned
+        by the server UNLESS the lease is pre-configured in the server
+        (e.g., a static lease for a host).  Expired leases MAY appear
+        during the time they are 'remembered' by the server for
+        subsequent assignment to the same host."
+    ::= { cDhcpv4SrvConfiguration 4 }
+
+cDhcpv4ServerClientEntry OBJECT-TYPE
+    SYNTAX          CDhcpv4ServerClientEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A logical row in the cDhcpv4ServerClientTable."
+    INDEX           { cDhcpv4ServerClient }
+    ::= { cDhcpv4ServerClientTable 1 }
+
+CDhcpv4ServerClientEntry ::= SEQUENCE {
+        cDhcpv4ServerClient                InetAddressIPv4,
+        cDhcpv4ServerClientSubnetMask      InetAddressPrefixLength,
+        cDhcpv4ServerClientRange           InetAddressIPv4,
+        cDhcpv4ServerClientLeaseType       INTEGER ,
+        cDhcpv4ServerClientTimeRemaining   Unsigned32,
+        cDhcpv4ServerClientAllowedProtocol INTEGER ,
+        cDhcpv4ServerClientServedProtocol  INTEGER ,
+        cDhcpv4ServerClientPhysicalAddress CDhcpv4PhysicalAddress,
+        cDhcpv4ServerClientClientId        OCTET STRING,
+        cDhcpv4ServerClientHostName        SnmpAdminString,
+        cDhcpv4ServerClientDomainName      SnmpAdminString
+}
+
+cDhcpv4ServerClient OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 address of this entry in the cDhcpv4ServerClientTable."
+    ::= { cDhcpv4ServerClientEntry 1 }
+
+cDhcpv4ServerClientSubnetMask OBJECT-TYPE
+    SYNTAX          InetAddressPrefixLength
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The subnet mask (DHCP option 1) provided to the client
+        offered this address.  The subnet, resulting from logically
+        ANDing the subnet mask with the entry's IPv4 address, MUST be
+        configured on this server and appear as a row in the
+        cDhcpSubnetTable."
+    ::= { cDhcpv4ServerClientEntry 2 }
+
+cDhcpv4ServerClientRange OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The starting IPv4 address (cDhcpv4ServerRangeStartAddress
+        object) of the range to which this address belongs.  If the
+        address does not fall into one of the configured ranges (e.g.,
+        a statically configured address on a subnet) the range MAY be
+        0.0.0.0."
+    ::= { cDhcpv4ServerClientEntry 3 }
+
+cDhcpv4ServerClientLeaseType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        static(1),
+                        dynamic(2),
+                        expired(3),
+                        configurationReserved(4),
+                        serverReserved(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of this address.  Types are:
+        (1) Static addresses defined by the server configuration.
+        (2) Dynamic addresses defined by the server configuration
+            AND actually assigned by the server.
+        (3) Expired dynamic addresses, previously assigned by the
+            server, and 'remembered' for subsequent assignment to
+            the same host.
+        (4) Addresses reserved (i.e., not assignable) by the server
+            configuration.
+        (5) Addresses previously assigned by the server, but
+            temporarily or permanently removed from assignable state
+            for some reason, e.g., the server received an ICMP
+            ECHOREPLY for the IPv4 address or a DHCPDECLINE message
+            has been received for the IPv4 address."
+    ::= { cDhcpv4ServerClientEntry 4 }
+
+cDhcpv4ServerClientTimeRemaining OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of seconds until the lease expires.  A value of
+        4294967295 (i.e., 0xFFFFFFFF) SHOULD be used for leases that
+        have a lease time which is 'infinite' and for BOOTP leases."
+    ::= { cDhcpv4ServerClientEntry 5 }
+
+cDhcpv4ServerClientAllowedProtocol OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        bootp(2),
+                        dhcp(3),
+                        bootpOrDhcp(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of protocol that is allowed to be used to serve this
+        address.  A type of none (1) indicates that the address is not
+        available to be served (e.g., a reserved address).  Type (2)
+        is reserved for BOOTP only devices, while type (3) is reserved
+        for DHCP only devices.  A type of bootp-or-dhcp (4) can be
+        offered to any type of client."
+    ::= { cDhcpv4ServerClientEntry 6 }
+
+cDhcpv4ServerClientServedProtocol OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        bootp(2),
+                        dhcp(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of protocol that was used when this address was
+        assigned.  This object will have the value of none (1) if the
+        address has not been served."
+    ::= { cDhcpv4ServerClientEntry 7 }
+
+cDhcpv4ServerClientPhysicalAddress OBJECT-TYPE
+    SYNTAX          CDhcpv4PhysicalAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The hardware type and hardware address of the client that has
+        been assigned this lease.  The first octet of this object
+        contains the hardware type from the 'htype' field of the BOOTP
+        packet and the remaining octets contain the hardware address
+        from the 'chaddr' field of the BOOTP packet.  This object MAY
+        be empty if the address has not been previously served."
+    ::= { cDhcpv4ServerClientEntry 8 }
+
+cDhcpv4ServerClientClientId OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The client-id of the client that has been assigned this
+        lease.  The client-id is the value specified in option 61
+        (client-id option) when the lease was assigned.  This object
+        MAY be empty if the lease has not been previously assigned or
+        if the client-id option was not specified when the address was
+        assigned."
+    ::= { cDhcpv4ServerClientEntry 9 }
+
+cDhcpv4ServerClientHostName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The host name (DHCP option 12) the client is configured to
+        use, or if no host name was configured then the host name that
+        the client supplied when requesting an address.  While this
+        object has a maximum size of 255 octets, a Fully-Qualified
+        Domain Name (FQDN) consisting of a Host Name part and a Domain
+        Name part is currently limited to 255 octets.  Therefore, the
+        sum of the string lengths for this object and the
+        cDhcpv4ServerClientDomainName MUST be, in practice, less than
+        256 octets."
+    ::= { cDhcpv4ServerClientEntry 10 }
+
+cDhcpv4ServerClientDomainName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The domain name (DHCP option 15) assigned to the client.
+        While this object has a maximum size of 255 octets, a Fully-
+        Qualified Domain Name (FQDN) consisting of a Host Name part
+        and a Domain Name part is currently limited to 255 octets,
+        less the separator ('.') character.  Therefore, the sum of the
+        string lengths for this object and the
+        cDhcpv4ServerClientHostName MUST be, in practice, less than 256
+        octets."
+    ::= { cDhcpv4ServerClientEntry 11 }
+
+
+
+-- cDhcpv4ServerNotifyObjects Group
+
+cDhcpv4ServerNotifyDuplicateIpAddr OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 address found to be a duplicate.  Duplicates are
+        detected by servers, which issue an ICMP ECHOREQUEST prior to
+        offering an IPv4 address lease, or by a client issuing a
+        gratuitous ARP message and reported through a DHCPDECLINE
+        message."
+    ::= { cDhcpv4ServerNotifyObjects 1 }
+
+cDhcpv4ServerNotifyDuplicateMac OBJECT-TYPE
+    SYNTAX          CDhcpv4PhysicalAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The offending MAC address which caused a duplicate IPv4
+        address to be detected, if captured by the server, else 00-00-
+        00-00-00-00."
+    ::= { cDhcpv4ServerNotifyObjects 2 }
+
+cDhcpv4ServerNotifyClientOrServerDetected OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        client(1),
+                        server(2)
+                    }
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Duplicate IPv4 addresses can be detected either by a server,
+        using an ICMP ECHO message, or by a client using ARP.  This
+        object is set by the server to (1) if the client used
+        DHCPDECLINE to mark the offered address as in-use, or to (2)
+        if the server discovered the address in use by some client
+        before offering it."
+    ::= { cDhcpv4ServerNotifyObjects 3 }
+
+cDhcpv4ServerNotifyServerStart OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The date and time when the server began operation."
+    ::= { cDhcpv4ServerNotifyObjects 4 }
+
+cDhcpv4ServerNotifyServerStop OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The date and time when the server ceased operation."
+    ::= { cDhcpv4ServerNotifyObjects 5 }
+-- Notifications
+
+cDhcpv4ServerNotificationPrefix  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpv4SrvMIBNotifs 2 }
+
+cDhcpv4ServerNotifications  OBJECT IDENTIFIER
+    ::= { cDhcpv4ServerNotificationPrefix 0 }
+
+
+cDhcpv4ServerFreeAddressLow NOTIFICATION-TYPE
+    OBJECTS         {
+                        cDhcpv4ServerSharedNetFreeAddrLowThreshold,
+                        cDhcpv4ServerSharedNetFreeAddresses
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of available IPv4
+        addresses for a particular shared network has fallen below the
+        value of cDhcpv4ServerSharedNetFreeAddrLowThreshold for that
+        shared network."
+   ::= { cDhcpv4ServerNotifications 1 }
+
+cDhcpv4ServerFreeAddressHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        cDhcpv4ServerSharedNetFreeAddrHighThreshold,
+                        cDhcpv4ServerSharedNetFreeAddresses
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of available IPv4
+        addresses for a particular shared network has risen above the
+        value of cDhcpv4ServerSharedNetFreeAddrHighThreshold for that
+        shared network."
+   ::= { cDhcpv4ServerNotifications 2 }
+
+cDhcpv4ServerStartTime NOTIFICATION-TYPE
+    OBJECTS         { cDhcpv4ServerNotifyServerStart }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the server of the specified
+        type has started on the host from which this notification has
+        been sent."
+   ::= { cDhcpv4ServerNotifications 3 }
+
+cDhcpv4ServerStopTime NOTIFICATION-TYPE
+    OBJECTS         { cDhcpv4ServerNotifyServerStop }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the server of the specified
+        type has stopped normally on the host from which this
+        notification has been sent."
+   ::= { cDhcpv4ServerNotifications 4 }
+
+cDhcpv4ServerDuplicateAddress NOTIFICATION-TYPE
+    OBJECTS         {
+                        cDhcpv4ServerNotifyDuplicateIpAddr,
+                        cDhcpv4ServerNotifyDuplicateMac,
+                        cDhcpv4ServerNotifyClientOrServerDetected
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that a duplicate IPv4 address has
+        been detected.  The DHCP server can detect this condition
+        through the ping-before-offer mechanism.  Alternatively, the
+        client may have sent a DHCPDECLINE back to the server; this is
+        assumed to be the result of the client detecting that the
+        address was in use.  In either case, the DHCP server marks the
+        IPv4 address as unavailable for leasing to clients.  The
+        cDhcpv4ServerNotifyClientOrServerDetected object indicates
+        whether the client or server detected this condition."
+   ::= { cDhcpv4ServerNotifications 5 }
+-- Conformance
+
+cDhcpv4SrvCompliances  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpv4SrvMIBConform 1 }
+
+cDhcpv4SrvGroups  OBJECT IDENTIFIER
+    ::= { ciscoIetfDhcpv4SrvMIBConform 2 }
+
+
+-- Compliance groups
+
+cDhcpv4SrvCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This group describes the requirements for conformance to the
+        DHCP Server MIB.  A DHCPv4 server implementation is only
+        required to support IPv4 addresses."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cDhcpv4SrvSystemObjects,
+                        cBootpCountersGroup,
+                        cDhcpv4CounterObjects,
+                        cBootpHCCountersGroup,
+                        cDhcpv4HCCounterObjects
+                    }
+    ::= { cDhcpv4SrvCompliances 1 }
+
+cDhcpv4SrvComplianceRev1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "This group describes the requirements for conformance to the
+        DHCP Server MIB.  A DHCPv4 server implementation is only
+        required to support IPv4 addresses."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cDhcpv4SrvSystemObjects,
+                        cBootpCountersGroup,
+                        cDhcpv4CounterObjects,
+                        cBootpHCCountersGroup,
+                        cDhcpv4HCCounterObjects,
+                        cDhcpv4ServerSharedNetObjects,
+                        cDhcpv4ServerSubnetObjects,
+                        cDhcpv4ServerRangeObjects,
+                        cDhcpv4ServerClientObjects,
+                        cDhcpv4ServerNotifyObjectsGroup,
+                        cDhcpv4ServerNotificationsGroup
+                    }
+
+    OBJECT          cDhcpv4ServerSharedNetFreeAddrLowThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cDhcpv4ServerSharedNetFreeAddrHighThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cDhcpv4ServerSubnetFreeAddrLowThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cDhcpv4ServerSubnetFreeAddrHighThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { cDhcpv4SrvCompliances 2 }
+
+-- Object groups
+
+cDhcpv4SrvSystemObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4SrvSystemDescr,
+                        cDhcpv4SrvSystemObjectID
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4SrvSystemObjects group."
+    ::= { cDhcpv4SrvGroups 1 }
+
+cBootpCountersGroup OBJECT-GROUP
+    OBJECTS         {
+                        cBootpCountRequests,
+                        cBootpCountInvalids,
+                        cBootpCountReplies,
+                        cBootpCountDropUnknownClients,
+                        cBootpCountDropNotServingSubnet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cBootpBountersGroup."
+    ::= { cDhcpv4SrvGroups 2 }
+
+cDhcpv4CounterObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4CountDiscovers,
+                        cDhcpv4CountOffers,
+                        cDhcpv4CountRequests,
+                        cDhcpv4CountDeclines,
+                        cDhcpv4CountAcks,
+                        cDhcpv4CountNaks,
+                        cDhcpv4CountReleases,
+                        cDhcpv4CountInforms,
+                        cDhcpv4CountInvalids,
+                        cDhcpv4CountDropUnknownClient,
+                        cDhcpv4CountDropNotServingSubnet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4CounterObjects group."
+    ::= { cDhcpv4SrvGroups 3 }
+
+cBootpHCCountersGroup OBJECT-GROUP
+    OBJECTS         {
+                        cBootpHCCountRequests,
+                        cBootpHCCountInvalids,
+                        cBootpHCCountReplies,
+                        cBootpHCCountDropUnknownClients,
+                        cBootpHCCountDropNotServingSubnet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cBootpHCCountersGroup."
+    ::= { cDhcpv4SrvGroups 4 }
+
+cDhcpv4HCCounterObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4HCCountDiscovers,
+                        cDhcpv4HCCountOffers,
+                        cDhcpv4HCCountRequests,
+                        cDhcpv4HCCountDeclines,
+                        cDhcpv4HCCountAcks,
+                        cDhcpv4HCCountNaks,
+                        cDhcpv4HCCountReleases,
+                        cDhcpv4HCCountInforms,
+                        cDhcpv4HCCountForcedRenews,
+                        cDhcpv4HCCountInvalids,
+                        cDhcpv4HCCountDropUnknownClient,
+                        cDhcpv4HCCountDropNotServingSubnet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4HCCounterObjects group."
+    ::= { cDhcpv4SrvGroups 5 }
+
+cDhcpv4ServerSharedNetObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4ServerSharedNetFreeAddrLowThreshold,
+                        cDhcpv4ServerSharedNetFreeAddrHighThreshold,
+                        cDhcpv4ServerSharedNetFreeAddresses,
+                        cDhcpv4ServerSharedNetReservedAddresses,
+                        cDhcpv4ServerSharedNetTotalAddresses
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4ServerSharedNetObjects group."
+    ::= { cDhcpv4SrvGroups 6 }
+
+cDhcpv4ServerSubnetObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4ServerSubnetMask,
+                        cDhcpv4ServerSubnetSharedNetworkName,
+                        cDhcpv4ServerSubnetFreeAddrLowThreshold,
+                        cDhcpv4ServerSubnetFreeAddrHighThreshold,
+                        cDhcpv4ServerSubnetFreeAddresses
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4ServerSubnetObjects group."
+    ::= { cDhcpv4SrvGroups 7 }
+
+cDhcpv4ServerRangeObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4ServerRangeSubnetMask,
+                        cDhcpv4ServerRangeInUse,
+                        cDhcpv4ServerRangeOutstandingOffers
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4ServerRangeObjects group."
+    ::= { cDhcpv4SrvGroups 8 }
+
+cDhcpv4ServerClientObjects OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4ServerClientSubnetMask,
+                        cDhcpv4ServerClientRange,
+                        cDhcpv4ServerClientLeaseType,
+                        cDhcpv4ServerClientTimeRemaining,
+                        cDhcpv4ServerClientAllowedProtocol,
+                        cDhcpv4ServerClientServedProtocol,
+                        cDhcpv4ServerClientPhysicalAddress,
+                        cDhcpv4ServerClientClientId,
+                        cDhcpv4ServerClientHostName,
+                        cDhcpv4ServerClientDomainName
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4ServerClientObjects group."
+    ::= { cDhcpv4SrvGroups 9 }
+
+cDhcpv4ServerNotifyObjectsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cDhcpv4ServerNotifyDuplicateIpAddr,
+                        cDhcpv4ServerNotifyDuplicateMac,
+                        cDhcpv4ServerNotifyClientOrServerDetected,
+                        cDhcpv4ServerNotifyServerStart,
+                        cDhcpv4ServerNotifyServerStop
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Objects belonging to the cDhcpv4ServerNotifyObjects group."
+    ::= { cDhcpv4SrvGroups 10 }
+
+cDhcpv4ServerNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cDhcpv4ServerFreeAddressLow,
+                        cDhcpv4ServerFreeAddressHigh,
+                        cDhcpv4ServerStartTime,
+                        cDhcpv4ServerStopTime,
+                        cDhcpv4ServerDuplicateAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notifications belonging to the cDhcpv4ServerNotifications
+        group."
+    ::= { cDhcpv4SrvGroups 11 }
+
+END
+

@@ -1,0 +1,227 @@
+-- **********************************************************
+-- Copyright 2021 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-HZECC-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+   TEXTUAL-CONVENTION
+       FROM SNMPv2-TC
+   SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+   vmwHzecc
+       FROM VMWARE-ROOT-MIB;
+
+    vmwHzeccMIB MODULE-IDENTITY
+    LAST-UPDATED "202105170000Z"
+    ORGANIZATION "VMware, Inc."
+    CONTACT-INFO
+        "VMware, Inc.
+        3401 Hillview Ave
+        Palo Alto, CA 94304
+        Tel: 1-877-486-9273 or 650-427-5000
+        Fax: 650-427-5001
+        Web: https://kb.vmware.com/s/article/1013445
+        "
+    DESCRIPTION
+        "This MIB file contains the definition of the SNMP
+        interface of VMware Horizon Cloud Connector.
+
+        Horizon Cloud Connector is an important product which
+        enables subscription license for Horizon on-prem VDI & APPs:
+        https://www.vmware.com/in/products/horizon.html
+        https://www.vmware.com/in/products/horizon-cloud-virtual-desktops.html
+
+        For more information about Horizon Cloud Connector (Hze CC), please see
+        the latest documentation of Horizon Cloud Connector:
+        https://docs.vmware.com/en/VMware-Horizon-Cloud-Service
+        "
+
+    REVISION     "202105170000Z"
+    DESCRIPTION
+        "Initial revision"
+
+    ::= { vmwHzecc 1 }
+
+vmwHzeccNotifications OBJECT IDENTIFIER ::= { vmwHzecc 0 }
+vmwHzeccLifecycleEvents OBJECT IDENTIFIER ::= { vmwHzecc 4 }
+vmwHzeccSubscriptionLicenseEvents OBJECT IDENTIFIER ::= { vmwHzecc 5 }
+
+VmwHzeccLifecycleEventType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "The lifecycle event type.
+           This trap is sent when a life cycle event occurs.
+           Except the failure events all other events are informational only
+           The value of the same is defined with codes.
+
+           paired - 1 - Indicates that Cloud Connector is being configured
+           or reconfigured by an admin by providing Horizon enterprise pod details.
+           This is an information only event.
+           For more information refer -
+           https://docs.vmware.com/en/VMware-Horizon-Cloud-Service/services/hzncloudmsazure.getstarted15/GUID-CFC5C50E-FBA2-4F9B-89EB-56A090D4C158.html
+           ----------------------------------------------------------------
+           unplug - 2 - Indicates that an admin is deleting
+           the Cloud Connector pod and related configuration. This is an
+           information only event.
+           ----------------------------------------------------------------
+           Upgrade Events - Cloud Connector Upgrade is based on Blue Green approach.
+           Blue appliance is the existing appliance.
+           Green appliance is the target upgraded version appliance
+           https://docs.vmware.com/en/VMware-Horizon-Cloud-Service/services/hzncloudmsazure.admin15/GUID-D3F6C0CB-5740-4CA4-9C20-D780F415E900.html
+           ----------------------------------------------------------------
+           bluepreupgrade - 10 -  Indicates that upgrade
+           is about to start. This indicates an admin is initiating
+           manual or scheduled upgrade of cloud connector appliance.
+           This is an information only event.
+           ----------------------------------------------------------------
+           bluepostupgradesuccess - 20 - Indicates that upgrade
+           has successfully completed. This is an information only event.
+           ----------------------------------------------------------------
+           bluepostupgradefailure - 21 - Indicates that upgrade
+           has failed. Upgrade can be restarted back. An Admin who
+           initiates upgrade would need to restart the upgrade.
+           This is an information only event.
+           ----------------------------------------------------------------
+           greenpostupgradesuccess - 30 - Indicates that upgrade
+           has successfully completed. This is an information only event.
+           ----------------------------------------------------------------
+           greenpostupgradefailure - 31 - Indicates that upgrade
+           has failed during configuration migration step.
+           Upgrade can be restarted back by an Admin.
+           This is an information only event.
+           ----------------------------------------------------------------
+           "
+    SYNTAX     INTEGER {
+        paired(1),
+        unplug(2),
+        bluepreupgrade(10),
+        bluepostupgradesuccess(20),
+        bluepostupgradefailure(21),
+        greenpostupgradesuccess(30),
+        greenpostupgradefailure(31)
+    }
+
+--
+-- Object Types
+--
+
+vmwHzeccLCEventName OBJECT-TYPE
+   SYNTAX VmwHzeccLifecycleEventType
+   MAX-ACCESS accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+   "The life cycle event generated."
+   ::= { vmwHzeccLifecycleEvents 1 }
+
+
+vmwHzeccSubscriptionLicenseFailStatus OBJECT-TYPE
+   SYNTAX SnmpAdminString
+   MAX-ACCESS accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+   "Subscription license sync status.
+   This trap is sent when a subscription license sync fails.
+   Subscription license is synced at minimum every 24 hours
+   from Horizon Cloud Control Plane to Horizon on-prem.
+
+   This trap indicates that the license sync failed due to the
+   mentioned error code. If you received this event for
+   more than one day in a row, please navigate to
+   Horizon Admin Console and check for connectivity.
+   You can then refer the KB http://kb.vmware.com/s/article/79509
+   for more information on error codes.
+
+   Possible values - LicenseFailed_400, LicenseFailed_401.
+   The number part is the API response code from horizon enterprise.
+
+   In case issue doesn't resolve after following troubleshooting
+   steps mentioned in KB article, please reach to VMware support.
+   "
+   ::= { vmwHzeccSubscriptionLicenseEvents 1 }
+
+--
+-- Notifications Objects
+--
+
+vmwHzeccLifecycleEventTrap NOTIFICATION-TYPE
+    OBJECTS {
+                vmwHzeccLCEventName
+            }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a life cycle event occurs.
+        This is an informational event only. There is no action to take upon receipt.
+        Frequency:
+        This event is sent once when (some part of your system) receives a configuration update.
+        The value of the same is defined with codes.
+        "
+    ::= { vmwHzeccNotifications 1 }
+
+vmwHzeccSubscriptionLicenseEventTrap NOTIFICATION-TYPE
+    OBJECTS {
+                vmwHzeccSubscriptionLicenseFailStatus
+            }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a subscription license sync fails.
+        Subscription license is synced at every 24 hours
+        from Horizon Cloud Control Plane to Horizon on-prem.
+
+        This trap indicates that the license sync failed due to the
+        mentioned error code. If you received this event for
+        more than one day in a row, please navigate to
+        Horizon Admin Console and check for connectivity.
+        You can then refer the KB http://kb.vmware.com/s/article/79509
+        for more information on error codes.
+
+        Frequency: This event is sent when the license sync fails. 
+                   After that once every 24 hrs until the issue is resolved
+
+        Possible values - LicenseFailed_400, LicenseFailed_401, LicenseFailed_500 etc.
+        The number part is the API response code from horizon enterprise.
+
+        In case issue doesn't resolve after following troubleshooting
+        steps mentioned in KB article, please reach to VMware support.
+        "
+    ::= { vmwHzeccNotifications 2 }
+
+-- conformance information
+
+vmwHzeccMIBConformance OBJECT IDENTIFIER ::= { vmwHzeccMIB 1 }
+vmwHzeccMIBCompliances OBJECT IDENTIFIER ::= { vmwHzeccMIBConformance 1 }
+vmwHzeccMIBGroups OBJECT IDENTIFIER ::= { vmwHzeccMIBConformance 2 }
+
+vmwHzeccMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+    "The compliance statement for entities which implement VMWARE-HZECC-EVENT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwHzeccNotificationGroup, vmwHzeccObjectGroup }
+    ::= { vmwHzeccMIBCompliances 1 }
+
+vmwHzeccObjectGroup OBJECT-GROUP
+    OBJECTS {
+        vmwHzeccLCEventName,
+        vmwHzeccSubscriptionLicenseFailStatus
+    }
+    STATUS current
+    DESCRIPTION
+    "These objects provide notification details."
+    ::= { vmwHzeccMIBGroups 1 }
+
+vmwHzeccNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vmwHzeccLifecycleEventTrap,
+        vmwHzeccSubscriptionLicenseEventTrap
+    }
+    STATUS current
+    DESCRIPTION
+    "Group of objects describing notifications."
+    ::= { vmwHzeccMIBGroups 2 }
+
+END

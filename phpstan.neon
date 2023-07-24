@@ -1,12 +1,10 @@
 includes:
     - phpstan-baseline.neon
+    - tests/phpstan/ignore-by-php-version.neon.php
     - vendor/nunomaduro/larastan/extension.neon
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
-
-    phpVersion: 70300
-
     paths:
         - app
         - config
@@ -15,16 +13,32 @@ parameters:
         - resources
         - tests
 
+    excludePaths:
+        - tests/phpstan/
+
     scanDirectories:
         - includes
 
-    level: 6
+    level: 5
 
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
+
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+
+    checkModelProperties: true
+
+    checkAlwaysTrueCheckTypeFunctionCall: true
+    checkAlwaysTrueInstanceof: true
+    checkAlwaysTrueStrictComparison: true
+
+    checkGenericClassInNonGenericObjectType: false
 
     ignoreErrors:
         - '#Unsafe usage of new static#'
 
     parallel:
         processTimeout: 300.0
+
+

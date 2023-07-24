@@ -96,6 +96,10 @@ $graphs['powerdns'] = [
     'queries',
     'queries_udp',
 ];
+$graphs['sneck'] = [
+    'results',
+    'time',
+];
 $graphs['ntp-client'] = [
     'stats',
     'freq',
@@ -270,8 +274,7 @@ $graphs['smart'] = [
     'id184',
     'id187',
     'id188',
-    'id190',
-    'id194',
+    'maxtemp',
     'id196',
     'id197',
     'id198',
@@ -399,6 +402,14 @@ $graphs['chronyd'] = [
     'frequency',
     'root',
 ];
+$graphs['cape'] = [
+    'status',
+    'pending',
+    'run_stats',
+    'lines',
+    'malscore_stats',
+    'pkg_tasks_all',
+];
 $graphs['sagan'] = [
     'after',
     'bytes_ignored',
@@ -416,6 +427,97 @@ $graphs['sagan'] = [
     'total',
     'uptime',
     'alert',
+];
+$graphs['hv-monitor'] = [
+    'status',
+    'memory',
+    'pmem',
+    'time',
+    'pcpu',
+    'flt',
+    'csw',
+    'cow',
+    'etimes',
+    'snaps',
+    'snaps_size',
+];
+$graphs['pwrstatd'] = [
+    'wattage',
+    'voltage',
+    'percentage',
+    'minutes',
+];
+$graphs['systemd'] = [
+    'sub',
+    'active',
+    'load',
+];
+$graphs['wireguard'] = [
+    'traffic',
+    'time',
+];
+$graphs['logsize'] = [
+    'size',
+    'set_sizes',
+    'max_size',
+    'mean_size',
+    'median_size',
+    'mode_size',
+    'min_size',
+];
+$graphs['linux_config_files'] = [
+    'number_of_confs',
+];
+$graphs['suricata_extract'] = [
+    'errors',
+    'ignored_host',
+    'ignored_ip',
+    'ignored_ip_dest',
+    'ignored_ip_src',
+    'sub',
+    'sub_2xx',
+    'sub_3xx',
+    'sub_4xx',
+    'sub_5xx',
+    'sub_codes',
+    'sub_fail',
+    'truncated',
+    'zero_sized',
+    'sub_size',
+];
+$graphs['mojo_cape_submit'] = [
+    'subs',
+    'subs_top12',
+    'hash_changed',
+    'app_protos',
+    'size_sum',
+    'size_stats',
+    'size_max',
+    'size_mean',
+    'size_median',
+    'size_mode',
+    'size_min',
+    'size_stddev',
+];
+$graphs['linux_softnet_stat'] = [
+    'packets',
+    'time_squeeze',
+    'backlog_length',
+    'packet_dropped',
+    'cpu_collision',
+    'flow_limit',
+    'received_rps',
+    'budget',
+];
+$graphs['privoxy'] = [
+    'client_requests',
+    'blocks',
+    'crunches',
+    'unique_bdomains',
+    'bytes_to_client',
+    'req',
+    'resp_xxx',
+    'ver',
 ];
 
 echo '<div class="panel panel-default">';

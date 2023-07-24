@@ -34,16 +34,13 @@ class MapquestApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'https://open.mapquestapi.com';
-    protected $geocoding_uri = '/geocoding/v1/address';
+    protected string $base_uri = 'https://open.mapquestapi.com';
+    protected string $geocoding_uri = '/geocoding/v1/address';
 
     /**
      * Get latitude and longitude from geocode response
-     *
-     * @param  array  $data
-     * @return array
      */
-    protected function parseLatLng($data)
+    protected function parseLatLng(array $data): array
     {
         return [
             'lat' => isset($data['results'][0]['locations'][0]['latLng']['lat']) ? $data['results'][0]['locations'][0]['latLng']['lat'] : 0,
@@ -52,14 +49,11 @@ class MapquestApi extends BaseApi implements Geocoder
     }
 
     /**
-     * Build Guzzle request option array
-     *
-     * @param  string  $address
-     * @return array
+     * Build request option array
      *
      * @throws \Exception you may throw an Exception if validation fails
      */
-    protected function buildGeocodingOptions($address)
+    protected function buildGeocodingOptions(string $address): array
     {
         $api_key = Config::get('geoloc.api_key');
         if (! $api_key) {

@@ -58,8 +58,8 @@ Connect to the server command line and follow the instructions below.
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:8.1
-        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        dnf module enable php:remi-8.1
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip gcc python3-devel
         ```
 
 === "Debian 11"
@@ -133,8 +133,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 
 === "Debian 11"
     ```bash
-    vi /etc/php/8.1/fpm/php.ini
-    vi /etc/php/8.1/cli/php.ini
+    vi /etc/php/8.2/fpm/php.ini
+    vi /etc/php/8.2/cli/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -173,10 +173,13 @@ innodb_file_per_table=1
 lower_case_table_names=0
 ```
 
+Then restart MariaDB
+
 ```
 systemctl enable mariadb
 systemctl restart mariadb
 ```
+Start MariaDB client
 
 ```
 mysql -u root
@@ -188,7 +191,6 @@ mysql -u root
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
-FLUSH PRIVILEGES;
 exit
 ```
 
@@ -214,8 +216,8 @@ exit
 
 === "Debian 11"
     ```bash
-    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
-    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
+    vi /etc/php/8.2/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -229,7 +231,7 @@ user = librenms
 group = librenms
 ```
 
-Change `listen` to a unique name:
+Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
 ```
 listen = /run/php-fpm-librenms.sock
 ```
@@ -470,7 +472,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php8.1-fpm
+        systemctl restart php8.2-fpm
         ```
 
 ## SELinux
@@ -590,7 +592,7 @@ systemctl restart snmpd
 ## Cron job
 
 ```
-cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
 > NOTE: Keep in mind  that cron, by default, only uses a very limited
@@ -600,6 +602,15 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
 > <@= config.site_url =@/Support/Configuration/#proxy-support>
+
+## Enable the scheduler
+
+```
+cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/
+
+systemctl enable librenms-scheduler.timer
+systemctl start librenms-scheduler.timer
+```
 
 ## Copy logrotate config
 
@@ -670,5 +681,5 @@ page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-helpa). You
+help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-help). You
 can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

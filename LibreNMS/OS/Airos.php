@@ -75,8 +75,8 @@ class Airos extends OS implements
 
         // fix having an extra - in the middle after the decimal point
         $regex = '/(-?\d+)\.-?(\d+)/';
-        $location->lng = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lng']);
-        $location->lat = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lat']);
+        $location->lng = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lng'] ?? '');
+        $location->lat = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lat'] ?? '');
 
         return $location;
     }
@@ -242,7 +242,7 @@ class Airos extends OS implements
                 'airos',
                 $index,
                 'RSSI: Chain ' . str_replace('1.', '', $index),
-                $entry['ubntRadioRssi.1']
+                $entry['ubntRadioRssi']
             );
         }
 

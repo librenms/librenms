@@ -46,7 +46,7 @@ if (($device['os'] == 'vmware-esxi') || ($device['os'] == 'linux')) {
             $vmid = dbInsert(['device_id' => $device['device_id'], 'vm_type' => 'vmware', 'vmwVmVMID' => $index, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus, 'vmwVmState' => $vmwVmState], 'vminfo');
             log_event($vmwVmDisplayName . " ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered", $device, 'system', 3, $vmid);
             echo '+';
-        // FIXME eventlog
+            // FIXME eventlog
         } else {
             echo '.';
         }

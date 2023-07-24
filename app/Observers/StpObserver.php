@@ -2,8 +2,9 @@
 
 namespace App\Observers;
 
+use App\Models\Eventlog;
 use App\Models\Stp;
-use Log;
+use LibreNMS\Util\Time;
 
 class StpObserver
 {
@@ -16,16 +17,16 @@ class StpObserver
     public function updating(Stp $stp)
     {
         if ($stp->isDirty('designatedRoot')) {
-            Log::event('STP designated root changed: ' . $stp->getOriginal('designatedRoot') . ' > ' . $stp->designatedRoot, $stp->device_id, 'stp', 4);
+            Eventlog::log('STP designated root changed: ' . $stp->getOriginal('designatedRoot') . ' > ' . $stp->designatedRoot, $stp->device_id, 'stp', 4);
         }
 
         if ($stp->isDirty('rootPort')) {
-            Log::event('STP root port changed: ' . $stp->getOriginal('rootPort') . ' > ' . $stp->rootPort, $stp->device_id, 'stp', 4);
+            Eventlog::log('STP root port changed: ' . $stp->getOriginal('rootPort') . ' > ' . $stp->rootPort, $stp->device_id, 'stp', 4);
         }
 
         if ($stp->isDirty('rootPort')) {
-            $time = \LibreNMS\Util\Time::formatInterval($stp->timeSinceTopologyChange);
-            Log::event('STP topology changed after: ' . $time, $stp->device_id, 'stp', 4);
+            $time = Time::formatInterval((int) $stp->timeSinceTopologyChange);
+            Eventlog::log('STP topology changed after: ' . $time, $stp->device_id, 'stp', 4);
         }
     }
 }

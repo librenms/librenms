@@ -9,6 +9,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
 $init_modules = [];
@@ -28,14 +29,14 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
     while ($i <= 24) {
         unset($class);
         unset($rate_data);
-        $day_data = getDates($bill['bill_day'], $i);
+        $day_data = Billing::getDates($bill['bill_day'], $i);
 
         $datefrom = $day_data['0'];
         $dateto = $day_data['1'];
 
         $check = dbFetchRow('SELECT * FROM `bill_history` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1', [$bill['bill_id'], $datefrom, $dateto]);
 
-        $period = getPeriod($bill['bill_id'], $datefrom, $dateto);
+        $period = Billing::getPeriod($bill['bill_id'], $datefrom, $dateto);
 
         $date_updated = str_replace('-', '', str_replace(':', '', str_replace(' ', '', $check['updated'])));
 
@@ -43,7 +44,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
         $dir_95th = $bill['dir_95th'];
 
         if ($period['period'] > 0 && $dateto > $date_updated) {
-            $rate_data = getRates($bill['bill_id'], $datefrom, $dateto, $dir_95th);
+            $rate_data = Billing::getRates($bill['bill_id'], $datefrom, $dateto, $dir_95th);
             $rate_95th = $rate_data['rate_95th'];
             $dir_95th = $rate_data['dir_95th'];
             $total_data = $rate_data['total_data'];
@@ -57,16 +58,16 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $used_text = Number::formatSi($used, 2, 3, 'bps');
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
-                $percent = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
+                $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } elseif ($bill['bill_type'] == 'quota') {
                 $type = 'Quota';
                 $allowed = $bill['bill_quota'];
                 $used = $rate_data['total_data'];
-                $allowed_text = format_bytes_billing($allowed);
-                $used_text = format_bytes_billing($used);
+                $allowed_text = Billing::formatBytes($allowed);
+                $used_text = Billing::formatBytes($used);
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
-                $percent = round((($rate_data['total_data'] / $bill['bill_quota']) * 100), 2);
+                $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             }
 
             echo strftime('%x @ %X', strtotime($datefrom)) . ' to ' . strftime('%x @ %X', strtotime($dateto)) . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';

@@ -29,67 +29,29 @@ use LibreNMS\Config;
 
 class Proxy
 {
-    /**
-     * Check if if the proxy should be used.
-     * (it should not be used for connections to localhost)
-     */
-    public static function shouldBeUsed(string $target_url): bool
+    public static function http(): string
     {
-        return preg_match('#(^|://)(localhost|127\.|::1)#', $target_url) == 0;
+        // use local_only to avoid CVE-2016-5385
+        $http_proxy = getenv('http_proxy', local_only: true) ?: getenv('HTTP_PROXY', local_only: true) ?: Config::get('http_proxy', '');
+
+        return $http_proxy;
     }
 
-    /**
-     * Return the proxy url
-     *
-     * @return array|bool|false|string
-     */
-    public static function get(?string $target_url = null)
+    public static function https(): string
     {
-        if ($target_url && ! self::shouldBeUsed($target_url)) {
-            return false;
-        } elseif (getenv('http_proxy')) {
-            return getenv('http_proxy');
-        } elseif (getenv('https_proxy')) {
-            return getenv('https_proxy');
-        } elseif ($callback_proxy = Config::get('callback_proxy')) {
-            return $callback_proxy;
-        } elseif ($http_proxy = Config::get('http_proxy')) {
-            return $http_proxy;
+        // use local_only to avoid CVE-2016-5385
+        return getenv('https_proxy', local_only: true) ?: getenv('HTTPS_PROXY', local_only: true) ?: Config::get('https_proxy', '');
+    }
+
+    public static function ignore(): array
+    {
+        // use local_only to avoid CVE-2016-5385
+        $no_proxy = getenv('no_proxy', local_only: true) ?: getenv('NO_PROXY', local_only: true) ?: Config::get('no_proxy', '');
+
+        if ($no_proxy == '') {
+            return [];
         }
 
-        return false;
-    }
-
-    /**
-     * Return the proxy url in guzzle format "http://127.0.0.1:8888"
-     */
-    public static function forGuzzle(?string $target_url = null): string
-    {
-        $proxy = self::forCurl($target_url);
-
-        return empty($proxy) ? '' : ('http://' . $proxy);
-    }
-
-    /**
-     * Get the ip and port of the proxy
-     *
-     * @return string
-     */
-    public static function forCurl(?string $target_url = null): string
-    {
-        return str_replace(['http://', 'https://'], '', rtrim(self::get($target_url), '/'));
-    }
-
-    /**
-     * Set the proxy on a curl handle
-     *
-     * @param  resource  $curl
-     */
-    public static function applyToCurl($curl): void
-    {
-        $proxy = self::forCurl();
-        if (! empty($proxy)) {
-            curl_setopt($curl, CURLOPT_PROXY, $proxy);
-        }
+        return explode(',', str_replace(' ', '', $no_proxy));
     }
 }

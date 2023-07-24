@@ -32,9 +32,9 @@ use Notification;
 
 class Browserpush extends Transport
 {
-    protected $name = 'Browser Push';
+    protected string $name = 'Browser Push';
 
-    public function deliverAlert($alert_data, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         $users = User::when($this->config['user'] ?? 0, function ($query, $user_id) {
             return $query->where('user_id', $user_id);
@@ -49,11 +49,11 @@ class Browserpush extends Transport
         return true;
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         $users = [__('All Users') => 0];
         foreach (User::get(['user_id', 'username', 'realname']) as $user) {
-            $users[$user->realname ?: $user->username] = $user->user_id;
+            $users[htmlentities($user->realname ?: $user->username)] = $user->user_id;
         }
 
         return [

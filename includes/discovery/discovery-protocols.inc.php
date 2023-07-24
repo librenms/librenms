@@ -82,7 +82,7 @@ foreach ($cdp_array as $key => $cdp_if_array) {
 }//end foreach
 echo PHP_EOL;
 
-if (($device['os'] == 'routeros')) {
+if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
@@ -128,7 +128,7 @@ if (($device['os'] == 'routeros')) {
         }//end foreach
     }
     echo PHP_EOL;
-} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom')) {
+} elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom') {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -161,7 +161,7 @@ if (($device['os'] == 'routeros')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'timos')) {
+} elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'tmnxLldpRemoteSystemsData', 'TIMETRA-LLDP-MIB');
     foreach ($lldp_array as $key => $lldp) {
@@ -195,7 +195,7 @@ if (($device['os'] == 'routeros')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'jetstream')) {
+} elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
     $lldp_array = snmpwalk_group($device, 'lldpNeighborInfoEntry', 'TPLINK-LLDPINFO-MIB');
@@ -259,7 +259,7 @@ if (($device['os'] == 'routeros')) {
                 }
             }
         }
-        if (($device['os'] == 'aos7')) {
+        if ($device['os'] == 'aos7') {
             $lldp_local = snmpwalk_cache_oid($device, 'lldpLocPortEntry', [], 'LLDP-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
         } else {
@@ -270,14 +270,14 @@ if (($device['os'] == 'routeros')) {
 
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
                 $ifIndex = $entry_key;
             }
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
@@ -314,7 +314,7 @@ if (($device['os'] == 'routeros')) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
 
                     if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
-                        $ptopo_array = snmpwalk_group($device, 'ptopoConnEntry', 'PTOPO-MIB');
+                        $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
                         d_echo($ptopo_array);
                         foreach ($ptopo_array as $ptopo) {
                             if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {

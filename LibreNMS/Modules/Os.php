@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\Location;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -32,6 +33,14 @@ use LibreNMS\Util\Url;
 
 class Os implements Module
 {
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
     public function discover(\LibreNMS\OS $os): void
     {
         $this->updateLocation($os);
@@ -83,16 +92,33 @@ class Os implements Module
 
             if (! empty($location)) { // legacy support, remove when no longer needed
                 $deviceModel->setLocation($location);
-                optional($deviceModel->location)->save();
+                $deviceModel->location?->save();
             }
         }
 
         $this->handleChanges($os);
     }
 
-    public function cleanup(\LibreNMS\OS $os): void
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Device $device): void
     {
-        // no cleanup needed?
+        // no cleanup needed
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        // get data fresh from the database
+        return [
+            'devices' => Device::where('device_id', $device->device_id)
+            ->leftJoin('locations', 'location_id', 'id')
+            ->select(['sysName', 'sysObjectID', 'sysDescr', 'sysContact', 'version', 'hardware', 'features', 'location', 'os', 'type', 'serial', 'icon'])
+            ->get(),
+        ];
     }
 
     private function handleChanges(\LibreNMS\OS $os): void
@@ -101,8 +127,11 @@ class Os implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
+        echo trans('device.attributes.location') . ': ' . $device->location?->display() . PHP_EOL;
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
+            if (isset($device->$attribute)) {
+                $device->$attribute = trim($device->$attribute);
+            }
             echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
 
@@ -114,7 +143,7 @@ class Os implements Module
         $device = $os->getDevice();
         $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
         $device->setLocation($new_location, true); // set location and lookup coordinates if needed
-        optional($device->location)->save();
+        $device->location?->save();
     }
 
     private function sysContact(\LibreNMS\OS $os): void

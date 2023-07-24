@@ -21,6 +21,7 @@
  *
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
+ *
  * @contributer f0o, sdef2
  * Thanks to F0o <f0o@devilcode.org> for creating the Slack transport which is the majority of this code.
  * Thanks to sdef2 for figuring out the differences needed to make Discord work.
@@ -29,7 +30,8 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Discord extends Transport
 {
@@ -41,85 +43,84 @@ class Discord extends Transport
         'rule' => 'Rule',
     ];
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $discord_opts = [
-            'url' => $this->config['url'],
-            'options' => $this->parseUserOptions($this->config['options']),
-        ];
+        $added_fields = $this->parseUserOptions($this->config['options']);
 
-        return $this->contactDiscord($obj, $discord_opts);
-    }
-
-    public function contactDiscord($obj, $discord_opts)
-    {
-        $host = $discord_opts['url'];
-        $curl = curl_init();
-        $discord_title = '#' . $obj['uid'] . ' ' . $obj['title'];
-        $discord_msg = strip_tags($obj['msg']);
-        $color = self::getColorForState($obj['state']);
+        $discord_title = '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
+        $discord_msg = $alert_data['msg'];
+        $color = hexdec(preg_replace('/[^\dA-Fa-f]/', '', self::getColorForState($alert_data['state'])));
 
         // Special handling for the elapsed text in the footer if the elapsed is not set.
-        $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
+        $footer_text = $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
 
         $data = [
             'embeds' => [
                 [
                     'title' => $discord_title,
-                    'color' => hexdec($color),
+                    'color' => $color,
                     'description' => $discord_msg,
-                    'fields' => $this->createDiscordFields($obj, $discord_opts),
+                    'fields' => $this->createDiscordFields($alert_data),
                     'footer' => [
                         'text' => $footer_text,
                     ],
                 ],
             ],
         ];
-        if (! empty($discord_opts['options'])) {
-            $data = array_merge($data, $discord_opts['options']);
+        if (! empty($added_fields)) {
+            $data = array_merge($data, $added_fields);
         }
 
-        $alert_message = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+        $data = $this->embedGraphs($data);
 
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 204) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
-            var_dump('Return: ' . $ret); //FIXME: propper debuging
+        // remove all remaining HTML tags
+        $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
 
-            return 'HTTP Status code ' . $code;
+        $res = Http::client()->post($this->config['url'], $data);
+
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $discord_msg, $data);
     }
 
-    public function createDiscordFields($obj, $discord_opts)
+    private function embedGraphs(array $data): array
+    {
+        $count = 1;
+        $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)" />#', function ($match) use (&$data, &$count) {
+            $data['embeds'][] = [
+                'image' => [
+                    'url' => $match[1],
+                ],
+            ];
+
+            return '[Image ' . ($count++) . ']';
+        }, $data['embeds'][0]['description']);
+
+        return $data;
+    }
+
+    public function createDiscordFields(array $alert_data): array
     {
         $result = [];
 
         foreach (self::ALERT_FIELDS_TO_DISCORD_FIELDS as $objKey => $discordKey) {
             // Skip over keys that do not exist so Discord does not give us a 400.
-            if (! $obj[$objKey]) {
+            if (! $alert_data[$objKey]) {
                 continue;
             }
 
-            array_push($result, [
+            $result[] = [
                 'name' => $discordKey,
-                'value' => $obj[$objKey],
-            ]);
+                'value' => $alert_data[$objKey],
+            ];
         }
 
         return $result;
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

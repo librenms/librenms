@@ -27,7 +27,6 @@
 namespace LibreNMS\Util;
 
 use Exception;
-use Illuminate\Support\Facades\Http;
 
 class GitHub
 {
@@ -63,6 +62,7 @@ class GitHub
         'translation' => [],
         'tests' => [],
         'misc' => [],
+        'internal features' => [],
         'mibs' => [],
         'dependencies' => [],
     ];
@@ -111,7 +111,7 @@ class GitHub
      */
     public function getRelease($tag)
     {
-        $release = Http::withHeaders($this->getHeaders())->get($this->github . "/releases/tags/$tag");
+        $release = Http::client()->withHeaders($this->getHeaders())->get($this->github . "/releases/tags/$tag");
 
         return $release->json();
     }
@@ -121,7 +121,7 @@ class GitHub
      */
     public function getPullRequest()
     {
-        $pull_request = Http::withHeaders($this->getHeaders())->get($this->github . "/pulls/{$this->pr}");
+        $pull_request = Http::client()->withHeaders($this->getHeaders())->get($this->github . "/pulls/{$this->pr}");
         $this->pr = $pull_request->json();
     }
 
@@ -179,7 +179,7 @@ class GitHub
 }
 GRAPHQL;
 
-        $prs = Http::withHeaders($this->getHeaders())->post($this->graphql, ['query' => $query]);
+        $prs = Http::client()->withHeaders($this->getHeaders())->post($this->graphql, ['query' => $query]);
         $prs = $prs->json();
         if (! isset($prs['data'])) {
             var_dump($prs);
@@ -365,7 +365,7 @@ GRAPHQL;
             $this->createChangelog(false);
         }
 
-        $release = Http::withHeaders($this->getHeaders())->post($this->github . '/releases', [
+        $release = Http::client()->withHeaders($this->getHeaders())->post($this->github . '/releases', [
             'tag_name' => $this->tag,
             'target_commitish' => $updated_sha,
             'body' => $this->markdown,
@@ -421,10 +421,10 @@ GRAPHQL;
      */
     private function pushFileContents($file, $contents, $message): string
     {
-        $existing = Http::withHeaders($this->getHeaders())->get($this->github . '/contents/' . $file);
+        $existing = Http::client()->withHeaders($this->getHeaders())->get($this->github . '/contents/' . $file);
         $existing_sha = $existing->json()['sha'];
 
-        $updated = Http::withHeaders($this->getHeaders())->put($this->github . '/contents/' . $file, [
+        $updated = Http::client()->withHeaders($this->getHeaders())->put($this->github . '/contents/' . $file, [
             'message' => $message,
             'content' => base64_encode($contents),
             'sha' => $existing_sha,

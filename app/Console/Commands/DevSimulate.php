@@ -51,6 +51,13 @@ class DevSimulate extends LnmsCommand
         $snmprec_dir = $this->snmpsim->getDir();
         $listen = $this->snmpsim->getIp() . ':' . $this->snmpsim->getPort();
 
+        $file = $this->argument('file');
+        if ($file && ! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
+            $this->error("$file does not exist");
+
+            return 1;
+        }
+
         $snmpsim = new Process([
             $this->snmpsim->findSnmpsimd(),
             "--data-dir=$snmprec_dir",
@@ -109,14 +116,14 @@ class DevSimulate extends LnmsCommand
     {
         if (function_exists('pcntl_signal')) {
             pcntl_signal(SIGINT, function () {
-                exit(); // exit normally on SIGINT
+                exit; // exit normally on SIGINT
             });
         }
 
         register_shutdown_function(function () use ($device_id) {
             Device::findOrNew($device_id)->delete();
             $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
-            exit();
+            exit;
         });
     }
 

@@ -13,7 +13,7 @@ class UpdateUserRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         if ($this->user()->isAdmin()) {
             return true;
@@ -35,13 +35,26 @@ class UpdateUserRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
+        if ($this->user()->isAdmin()) {
+            return [
+                'realname' => 'nullable|max:64|alpha_space',
+                'email' => 'nullable|email|max:64',
+                'descr' => 'nullable|max:30|alpha_space',
+                'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
+                'new_password_confirmation' => 'nullable|same:new_password',
+                'dashboard' => 'int',
+                'level' => 'int',
+                'enabled' => 'nullable',
+                'can_modify_passwd' => 'nullable',
+            ];
+        }
+
         return [
             'realname' => 'nullable|max:64|alpha_space',
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
-            'level' => 'int',
             'old_password' => 'nullable|string',
             'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
             'new_password_confirmation' => 'nullable|same:new_password',

@@ -25,7 +25,7 @@ function rewrite_entity_descr($descr)
     $descr = preg_replace('/^voltages /', '', $descr);
     $descr = str_replace('PowerSupply', 'PSU ', $descr);
 
-    return $descr;
+    return trim($descr);
 }
 
 /**
@@ -220,7 +220,7 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
 }
 
 /**
- * @param $descr
+ * @param  $descr
  * @return int
  */
 function get_nagios_state($descr)
@@ -247,7 +247,7 @@ function get_nagios_state($descr)
 }
 
 /**
- * @param $state
+ * @param  $state
  * @return int
  */
 function apc_relay_state($state)
@@ -262,20 +262,6 @@ function apc_relay_state($state)
             return 2;
             break;
     }
-}
-
-/**
- * @param $value
- * @return mixed
- */
-function return_number($value)
-{
-    preg_match('/[\d\.\-]+/', $value, $temp_response);
-    if (! empty($temp_response[0])) {
-        $value = $temp_response[0];
-    }
-
-    return $value;
 }
 
 function parse_entity_state($state, $value)

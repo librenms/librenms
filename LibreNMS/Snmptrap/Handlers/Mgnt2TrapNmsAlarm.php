@@ -30,7 +30,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Mgnt2TrapNmsAlarm implements SnmptrapHandler
 {
@@ -94,6 +93,6 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
                 break;
         }
 
-        Log::event($msg, $device->device_id, 'trap', $severity);
+        $trap->log($msg, $severity);
     }
 }

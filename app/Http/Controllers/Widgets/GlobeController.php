@@ -27,8 +27,10 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
 {
@@ -58,7 +60,7 @@ class GlobeController extends WidgetController
     public function getView(Request $request)
     {
         $data = $this->getSettings();
-        $locations = collect();
+        $locations = new Collection();
 
         $eager_load = $data['markers'] == 'ports' ? ['devices.ports'] : ['devices'];
         $query = Location::hasAccess($request->user())
@@ -71,7 +73,7 @@ class GlobeController extends WidgetController
         foreach ($query->get() as $location) {
             $count = 0;
             $up = 0;
-            $down_items = collect();
+            $down_items = new Collection();
 
             if ($data['markers'] == 'devices') {
                 $count = $location->devices->count();
@@ -103,7 +105,7 @@ class GlobeController extends WidgetController
                     $location->lat,
                     $location->lng,
                     $location->location,
-                    (1 - $up / $count) * 100, // percent down
+                    Number::calculatePercent($count - $up, $count), // percent down
                     $count,
                     $down_items->implode(',<br/> '),
                 ]);

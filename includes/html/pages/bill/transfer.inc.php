@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Billing;
+use LibreNMS\Util\Number;
+
 $pagetitle[] = 'Bandwidth Graphs';
 
 // $bill_data          = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
@@ -33,43 +36,46 @@ $rightnow = date('U');
 $cur_days = date('d', (strtotime('now') - strtotime($datefrom)));
 $total_days = round((strtotime($dateto) - strtotime($datefrom)) / (60 * 60 * 24));
 
-$total['data'] = format_bytes_billing($bill_data['total_data']);
+$total['data'] = Billing::formatBytes($bill_data['total_data']);
 if ($bill_data['bill_type'] == 'quota') {
-    $total['allow'] = format_bytes_billing($bill_data['bill_quota']);
+    $total['allow'] = Billing::formatBytes($bill_data['bill_quota']);
 } else {
     $total['allow'] = '-';
 }
 
-$total['ave'] = format_bytes_billing(($bill_data['total_data'] / $cur_days));
-$total['est'] = format_bytes_billing(($bill_data['total_data'] / $cur_days * $total_days));
+$total['ave'] = Billing::formatBytes(($bill_data['total_data'] / $cur_days));
+$total['est'] = Billing::formatBytes(($bill_data['total_data'] / $cur_days * $total_days));
 if ($bill_data['bill_type'] == 'quota') {
-    $total['per'] = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
+    $total['per'] = Number::calculatePercent($bill_data['total_data'], $bill_data['bill_quota']);
 } else {
-    $total['per'] = round(($bill_data['total_data'] / ($bill_data['total_data'] / $cur_days * $total_days) * 100), 2);
+    $total['per'] = Number::calculatePercent($bill_data['total_data'], $bill_data['total_data'] / $cur_days * $total_days);
 }
 $total['bg'] = \LibreNMS\Util\Color::percentage($total['per'], null);
 
-$in['data'] = format_bytes_billing($bill_data['total_data_in']);
+$in = [];
+$in['data'] = Billing::formatBytes($bill_data['total_data_in']);
 $in['allow'] = $total['allow'];
-$in['ave'] = format_bytes_billing(($bill_data['total_data_in'] / $cur_days));
-$in['est'] = format_bytes_billing(($bill_data['total_data_in'] / $cur_days * $total_days));
-$in['per'] = ! empty($bill_data['total_data']) ? round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2) : 0;
+$in['ave'] = Billing::formatBytes(($bill_data['total_data_in'] / $cur_days));
+$in['est'] = Billing::formatBytes(($bill_data['total_data_in'] / $cur_days * $total_days));
+$in['per'] = Number::calculatePercent($bill_data['total_data_in'], $bill_data['total_data']);
 $in['bg'] = \LibreNMS\Util\Color::percentage($in['per'], null);
 
-$out['data'] = format_bytes_billing($bill_data['total_data_out']);
+$out = [];
+$out['data'] = Billing::formatBytes($bill_data['total_data_out']);
 $out['allow'] = $total['allow'];
-$out['ave'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days));
-$out['est'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days * $total_days));
-$out['per'] = ! empty($bill_data['total_data']) ? round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2) : 0;
+$out['ave'] = Billing::formatBytes(($bill_data['total_data_out'] / $cur_days));
+$out['est'] = Billing::formatBytes(($bill_data['total_data_out'] / $cur_days * $total_days));
+$out['per'] = Number::calculatePercent($bill_data['total_data_out'], $bill_data['total_data']);
 $out['bg'] = \LibreNMS\Util\Color::percentage($out['per'], null);
 
+$ousage = [];
 $ousage['over'] = ($bill_data['total_data'] - ($bill_data['bill_quota']));
 $ousage['over'] = (($ousage['over'] < 0) ? '0' : $ousage['over']);
 $ousage['data'] = \LibreNMS\Util\Number::formatBase($ousage['over'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
 $ousage['allow'] = $total['allow'];
-$ousage['ave'] = format_bytes_billing(($ousage['over'] / $cur_days));
-$ousage['est'] = format_bytes_billing(($ousage['over'] / $cur_days * $total_days));
-$ousage['per'] = round((($bill_data['total_data'] / $bill_data['bill_quota'] * 100) - 100), 2);
+$ousage['ave'] = Billing::formatBytes(($ousage['over'] / $cur_days));
+$ousage['est'] = Billing::formatBytes(($ousage['over'] / $cur_days * $total_days));
+$ousage['per'] = Number::calculatePercent($bill_data['total_data'], $bill_data['bill_quota']) - 100;
 $ousage['per'] = (($ousage['per'] < 0) ? '0' : $ousage['per']);
 $ousage['bg'] = \LibreNMS\Util\Color::percentage($ousage['per'], null);
 

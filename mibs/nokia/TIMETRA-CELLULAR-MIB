@@ -1242,8 +1242,8 @@ tmnxCellPortRsrq                 OBJECT-TYPE
          quality, in decibel.
 
          A value of -20 indicates that the received signal quality is
-         -20 dBm or less, while a value of -3 indicates that the
-         received signal quality is -3 dBm or greater.
+         -20 dB or less, while a value of -3 indicates that the
+         received signal quality is -3 dB or greater.
 
          A value of 0 indicates that the reference signal received quality has
          not been measured."
@@ -1265,8 +1265,8 @@ tmnxCellPortSinr                 OBJECT-TYPE
          noise ratio, in tenths of decibel.
 
          A value of -200 indicates that the signal to noise and  interface
-         ratio is -20 dBm or less, while a value of 400 indicates that the
-         signal to noise and interface ratio is 40 dBm or greater."
+         ratio is -20 dB or less, while a value of 400 indicates that the
+         signal to noise and interface ratio is 40 dB or greater."
     ::= { tmnxCellularPortStatusEntry 12 }
 
 tmnxCellularSimCardStatusTable   OBJECT-TYPE

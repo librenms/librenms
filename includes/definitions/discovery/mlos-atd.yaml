@@ -1,0 +1,155 @@
+mib: MCAFEE-ATD-MIB
+modules:
+    mempools:
+        data:
+            -
+                percent_used: MCAFEE-ATD-MIB::atdMemoryUtilization
+    processors:
+        data:
+            -
+                oid: atdCPUUtilizationAvg
+                num_oid: .1.3.6.1.4.1.8962.4.1.1.1.0
+    sensors:
+        count:
+            data:
+                -
+                    oid: mcAfeeATDMIBObjects
+                    value: atdFileWaiting
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.6.{{ $index }}'
+                    descr: 'ATD Files Queued'
+                    group: 'File Processing'
+                    index: 'atdFileWaiting'
+                -
+                    oid: mcAfeeATDMIBObjects
+                    value: atdFileAnalyzing
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.7.{{ $index }}'
+                    descr: 'ATD Files Processing'
+                    group: 'File Processing'
+                    index: 'atdFileAnalyzing'
+        temperature:
+            data:
+                -
+                    oid: mcAfeeATDMIBObjects
+                    value: atdSystemTemperature
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.8.{{ $index }}'
+                    descr: 'System Temperature'
+        percent:
+            data:
+                -
+                    oid: mcAfeeATDMIBObjects
+                    value: atdHDDDataSpaceUtilization
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.4.0'
+                    descr: 'ATD Data Disk Space Utilization'
+                    index: 'atdDataDiskSpaceUsed'
+                -
+                    oid: atdHDDSystemSpaceUtilization
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.3.0'
+                    descr: 'ATD System Disk Space Utilization'
+                    index: 'atdSystemDiskSpaceUsed'
+
+                -
+                    oid: atdHDDVarSpaceUtilization
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.19.0'
+                    descr: 'ATD Var Disk Space Utilization'
+                    index: 'atdVarDiskSpaceUsed'
+        state:
+           data:
+                -
+                    oid: atdSystemHealth
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.9.0'
+                    descr: 'System Health'
+                    state_name: atdSystemHealth
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
+                -                    
+                    oid: atdBackupSchedulerStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.10.0'
+                    descr: 'Backup Scheduler Status'
+                    state_name: atdBackupSchedulerStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: 'Backup Scheduler Status Failed' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Backup Scheduler Status Ok' } 
+                -
+                    oid: atdLoadBalancerStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.11.0'
+                    descr: 'ATD Load Balancer Status'
+                    state_name: atdLoadBalancerStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Device In Standalone Mode' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'Load Balancer Down' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Load Balancer Up' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'SW VERSION MISMATCH' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'Primary Node LB Not Up' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'SCP Failed' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'VM Creation Failed' }
+                        - { value: 7, generic: 3, graph: 0, descr: 'Invalid Status' }
+                -
+                    oid: atdEmailConnectorStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.12.0'
+                    descr: 'ATD Email Connetor Status'
+                    state_name: atdEmailConnectorStatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: 'Email Connector Disabled' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Email Connector Ok' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'Email Connector Degraded' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'Email Connector Overloaded' }
+                -
+                    oid: atdEmailGatewayWaitTime
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.13.0'
+                    descr: 'Email Gateway Wait Time Threshold'
+                    state_name: atdEmailGatewayWaitTime
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Email Gateway Threshold Ok' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'Email Gateway Threshold Wait Time Reached' }
+                -
+                    oid: atdMalwareInterfaceStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.14.0'
+                    descr: 'ATD Malware Interface Status'
+                    state_name: atdMalwareInterfaceStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: Down }
+                        - { value: 1, generic: 0, graph: 0, descr: Up }
+                -
+                    oid: atdLicenseStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.15.0'
+                    descr: 'ATD License Status'
+                    state_name: atdLicenseStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: Valid }
+                        - { value: 2, generic: 2, graph: 0, descr: Invalid }
+                        - { value: 3, generic: 2, graph: 0, descr: Expired }
+                -
+                    oid: atdDXLChannelStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.16.0'
+                    descr: 'ATD DXL Status'
+                    state_name: atdDXLChannelStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: Down }
+                        - { value: 1, generic: 0, graph: 0, descr: Up } 
+                -
+                    oid: atdSensorStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.17.0'
+                    descr: 'ATD Sensor Status'
+                    state_name: atdSensorStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: Inactive }
+                        - { value: 1, generic: 0, graph: 0, descr: Active } 
+                        - { value: 2, generic: 3, graph: 0, descr: 'Not Conencted' }
+                -
+                    oid: atdTAXIIStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.0'
+                    descr: 'ATD TAXII Status'
+                    state_name: atdTAXIIStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: Down }
+                        - { value: 1, generic: 0, graph: 0, descr: Up } 
+                        - { value: 2, generic: 3, graph: 0, descr: Unknown }
+                -
+                    oid: atdMalwareDNSStatus
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.0'
+                    descr: 'ATD Malware DNS Status'
+                    state_name: atdMalwareDNSStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: Bad }
+                        - { value: 1, generic: 0, graph: 0, descr: Good } 

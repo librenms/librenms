@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Billing;
+use LibreNMS\Util\Number;
+
 $bill_id = $vars['bill_id'];
 
 if (Auth::user()->hasGlobalAdmin()) {
@@ -23,7 +26,7 @@ if (bill_permitted($bill_id)) {
     $bill_name = $bill_data['bill_name'];
     $dayofmonth = $bill_data['bill_day'];
 
-    $day_data = getDates($dayofmonth);
+    $day_data = Billing::getDates($dayofmonth, 0);
 
     $datefrom = $day_data['0'];
     $dateto = $day_data['1'];
@@ -85,7 +88,7 @@ if (bill_permitted($bill_id)) {
         echo '</div></div>';
     }//end print_port_list?>
 
-    <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
+    <h2>Bill: <?php echo htmlentities($bill_data['bill_name']); ?></h2>
 
     <?php
     print_optionbar_start();
@@ -158,21 +161,21 @@ if (bill_permitted($bill_id)) {
     <tr>
         <?php   if ($bill_data['bill_type'] == 'quota') {
             // The Customer is billed based on a pre-paid quota with overage in xB
-            $percent = round((($total_data) / $bill_data['bill_quota'] * 100), 2);
+            $percent = Number::calculatePercent($total_data, $bill_data['bill_quota']);
             $unit = 'MB';
             $total_data = round($total_data, 2);
             $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;ave=yes'; ?>
         <td>
-            <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
-            - Average rate <?php echo \LibreNMS\Util\Number::formatSi($rate_average, 2, 3, 'bps') ?>
+            <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
+            - Average rate <?php echo Number::formatSi($rate_average, 2, 3, 'bps') ?>
         </td>
         <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
         </tr>
         <tr>
             <td colspan="2">
             <?php
-            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
+            echo 'Predicted usage: ' . Billing::formatBytes(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
             </td>
             <?php
         } elseif ($bill_data['bill_type'] == 'cdr') {
@@ -180,11 +183,11 @@ if (bill_permitted($bill_id)) {
             $unit = 'kbps';
             $cdr = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
-            $percent = round((($rate_95th) / $cdr * 100), 2);
+            $percent = Number::calculatePercent($rate_95th, $cdr);
             $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;95th=yes'; ?>
         <td>
-            <?php echo \LibreNMS\Util\Number::formatSi($rate_95th, 2, 3, '') . 'bps' ?> of <?php echo \LibreNMS\Util\Number::formatSi($cdr, 2, 3, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
+            <?php echo Number::formatSi($rate_95th, 2, 3, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 3, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
             <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?>
@@ -193,7 +196,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
             <?php
-                echo 'Predicted usage: ' . \LibreNMS\Util\Number::formatSi(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
+                echo 'Predicted usage: ' . Number::formatSi(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
             </td>
 
         <?php

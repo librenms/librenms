@@ -70,10 +70,10 @@ class ObjectCache implements ArrayAccess
     /**
      * Check if data exists
      *
-     * @param  string  $obj  Name of Data-Object
+     * @param  mixed  $obj  Name of Data-Object
      * @return bool
      */
-    public function offsetExists($obj)
+    public function offsetExists($obj): bool
     {
         if (isset($this->data[$obj])) {
             return true;
@@ -87,24 +87,24 @@ class ObjectCache implements ArrayAccess
     /**
      * Get Data-Object
      *
-     * @param  string  $obj  Name of Data-Object
-     * @return mixed
+     * @param  mixed  $obj  Name of Data-Object
      */
-    public function offsetGet($obj)
+    public function offsetGet($obj): mixed
     {
-        if (isset($this->data[$obj])) {
-            if (isset($this->data[$obj]['value'])) {
-                return $this->data[$obj]['value'];
-            } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
-                return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
-            } else {
-                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], isset($this->data[$obj]['params']) ? $this->data[$obj]['params'] : []);
-                if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
-                    $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
-                }
-
-                return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
+        if (! isset($this->data[$obj])) {
+            return null;
+        }
+        if (isset($this->data[$obj]['value'])) {
+            return $this->data[$obj]['value'];
+        } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
+            return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
+        } else {
+            $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], isset($this->data[$obj]['params']) ? $this->data[$obj]['params'] : []);
+            if (count($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && count($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
+                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
             }
+
+            return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
         }
     }
 
@@ -113,19 +113,17 @@ class ObjectCache implements ArrayAccess
     /**
      * Overrides internal Cache-Object
      *
-     * @param  string  $obj  Name of Data-Object
+     * @param  mixed  $obj  Name of Data-Object
      * @param  mixed  $value  Value
-     * @return bool
+     * @return void
      */
-    public function offsetSet($obj, $value)
+    public function offsetSet($obj, $value): void
     {
         if (! isset($this->data[$obj])) {
             $this->data[$obj] = [];
         }
 
         $this->data[$obj]['value'] = $value;
-
-        return $this->data[$obj]['value'];
     }
 
     //end offsetSet()
@@ -133,14 +131,12 @@ class ObjectCache implements ArrayAccess
     /**
      * Reset Data-Object
      *
-     * @param  string  $obj  Name of Data-Object
-     * @return mixed
+     * @param  mixed  $obj  Name of Data-Object
+     * @return void
      */
-    public function offsetUnset($obj)
+    public function offsetUnset($obj): void
     {
         unset($this->data[$obj]['value']);
-
-        return true;
     }
 
     //end offsetUnset()

@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Ajax;
 use App\ApiClients\RipeApi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use LibreNMS\Exceptions\ApiException;
+use LibreNMS\Exceptions\ApiClientException;
 
 class RipeNccApiController extends Controller
 {
@@ -50,14 +50,16 @@ class RipeNccApiController extends Controller
                 'message' => 'Queried',
                 'output' => $output,
             ]);
-        } catch (ApiException $e) {
+        } catch (ApiClientException $e) {
             $response = $e->getOutput();
             $message = $e->getMessage();
 
             if (isset($response['messages'])) {
                 $message .= ': ' . collect($response['messages'])
                         ->flatten()
-                        ->reject('error')
+                        ->reject(function ($value, $key) {
+                            return $value != 'error';
+                        })
                         ->implode(', ');
             }
 

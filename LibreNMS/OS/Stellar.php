@@ -34,11 +34,15 @@ class Stellar extends OS implements
         if (empty($client_ws_data)) {
             $total_clients = 0;
         } else {
-            $total_clients = sizeof($client_ws_data);
+            $total_clients = count($client_ws_data);
         }
 
         $combined_oid = sprintf('%s::%s', $device['hardware'], 'apClientWlanService');
         $oid = snmp_translate($combined_oid, 'ALL', 'nokia/stellar', '-On');
+
+        if (empty($oid)) {
+            return $sensors;
+        }
 
         foreach ($client_ws_data as $client_entry) {
             $ssid[$client_entry['apClientWlanService']] += 1;
@@ -71,7 +75,7 @@ class Stellar extends OS implements
             if (empty($client_ws_data)) {
                 $total_clients = 0;
             } else {
-                $total_clients = sizeof($client_ws_data);
+                $total_clients = count($client_ws_data);
             }
 
             foreach ($sensors as $sensor) {

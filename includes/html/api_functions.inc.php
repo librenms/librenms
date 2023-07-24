@@ -27,19 +27,24 @@ use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Billing;
 use LibreNMS\Config;
-use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\InvalidTableColumnException;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
+function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
     if (isset($result) && ! isset($result_name)) {
         return api_error(500, 'Result name not specified');
@@ -66,12 +71,12 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     return response()->json($output, $code, [], JSON_PRETTY_PRINT);
 } // end api_success()
 
-function api_success_noresult($code, $message = null)
+function api_success_noresult($code, $message = null): JsonResponse
 {
     return api_success(null, null, $message, $code);
 } // end api_success_noresult
 
-function api_error($statusCode, $message)
+function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
         'status'  => 'error',
@@ -79,36 +84,47 @@ function api_error($statusCode, $message)
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
 
-function api_not_found()
+function api_not_found(): JsonResponse
 {
     return api_error(404, "This API route doesn't exist.");
 }
 
-function api_get_graph(array $vars)
+function api_get_graph(Request $request, array $additional = [])
 {
-    global $dur;        // Needed for callback within graph code
+    try {
+        $vars = $request->only([
+            'from',
+            'to',
+            'legend',
+            'title',
+            'absolute',
+            'font',
+            'bg',
+            'bbg',
+            'title',
+            'graph_title',
+            'nototal',
+            'nodetails',
+            'noagg',
+            'inverse',
+            'previous',
+        ]);
 
-    $auth = true;
+        $graph = Graph::get([
+            'width'  => $request->get('width', 1075),
+            'height' => $request->get('height', 300),
+            ...$additional,
+            ...$vars,
+        ]);
 
-    // prevent ugly error for undefined graphs from being passed to the user
-    [$type, $subtype] = extract_graph_type($vars['type']);
-    if (! is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
-        return api_error(400, 'Invalid graph type');
+        if ($request->get('output') === 'base64') {
+            return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
+        }
+
+        return response($graph->data, 200, ['Content-Type' => $graph->contentType()]);
+    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+        return api_error(500, $e->getMessage());
     }
-
-    ob_start();
-
-    include 'includes/html/graphs/graph.inc.php';
-    Datastore::terminate();
-
-    $image = ob_get_contents();
-    ob_end_clean();
-
-    if ($vars['output'] === 'base64') {
-        return api_success(['image' => $image, 'content-type' => get_image_type(Config::get('webui.graph_type'))], 'image');
-    }
-
-    return response($image, 200, ['Content-Type' => get_image_type(Config::get('webui.graph_type'))]);
 }
 
 function check_bill_permission($bill_id, $callback)
@@ -138,32 +154,25 @@ function check_port_permission($port_id, $device_id, $callback)
     return $callback($port_id);
 }
 
-function get_graph_by_port_hostname(Illuminate\Http\Request $request, $ifname = null, $type = 'port_bits')
+function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'port_bits')
 {
     // This will return a graph for a given port by the ifName
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
-        'port'   => $ifname ?: $request->route('ifname'),
-        'type'   => $request->route('type', $type),
-        'output' => $request->get('output', 'display'),
-        'width'  => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
+        'port' => $ifname ?: $request->route('ifname'),
+        'type' => $request->route('type', $type),
     ];
 
-    if ($request->has('from')) {
-        $vars['from'] = $request->get('from');
-    }
+    $port_field = $request->get('ifDescr') ? 'ifDescr' : 'ifName'; // don't accept user input
+    $vars['id'] = Port::where([
+        'device_id' => $device_id,
+        'deleted' => 0,
+        $port_field => $vars['port'],
+    ])->value('port_id');
 
-    if ($request->has('to')) {
-        $vars['to'] = $request->get('to');
-    }
-
-    $port = $request->get('ifDescr') ? 'ifDescr' : 'ifName';
-    $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
-
-    return check_port_permission($vars['id'], $device_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_port_permission($vars['id'], $device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -191,12 +200,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($out_rate, 2, 3, 'bps');
-        $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['in_pps'] = \LibreNMS\Util\Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = \LibreNMS\Util\Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
+        $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -212,14 +221,13 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     });
 }
 
-function get_graph_generic_by_hostname(Illuminate\Http\Request $request)
+function get_graph_generic_by_hostname(Request $request)
 {
     // This will return a graph type given a device id.
     $hostname = $request->route('hostname');
     $sensor_id = $request->route('sensor_id');
     $vars = [];
     $vars['type'] = $request->route('type', 'device_uptime');
-    $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id'] = $sensor_id;
         if (Str::contains($vars['type'], '_wireless')) {
@@ -236,18 +244,25 @@ function get_graph_generic_by_hostname(Illuminate\Http\Request $request)
     $vars['device'] = $device['device_id'];
 
     return check_device_permission($device_id, function () use ($request, $vars) {
-        if ($request->has('from')) {
-            $vars['from'] = $request->get('from');
-        }
+        return api_get_graph($request, $vars);
+    });
+}
 
-        if ($request->has('to')) {
-            $vars['to'] = $request->get('to');
-        }
+function get_graph_by_service(Request $request)
+{
+    $vars = [];
+    $vars['id'] = $request->route('id');
+    $vars['type'] = 'service_graph';
+    $vars['ds'] = $request->route('datasource');
 
-        $vars['width'] = $request->get('width', 1075);
-        $vars['height'] = $request->get('height', 300);
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+    $vars['device'] = $device['device_id'];
 
-        return api_get_graph($vars);
+    return check_device_permission($device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -272,7 +287,7 @@ function get_device(Illuminate\Http\Request $request)
 
     // find device matching the id
     $device = device_by_id_cache($device_id);
-    if (! $device || ! $device['device_id']) {
+    if (! $device || ! isset($device['device_id'])) {
         return api_error(404, "Device $hostname does not exist");
     }
 
@@ -345,6 +360,18 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = 'a.`ipv6_address`=? OR a.`ipv6_compressed`=?';
         $select .= ',p.* ';
         $param = [$query, $query];
+    } elseif ($type == 'sysName') {
+        $sql = '`d`.`sysName`=?';
+        $param[] = $query;
+    } elseif ($type == 'location_id') {
+        $sql = '`d`.`location_id`=?';
+        $param[] = $query;
+    } elseif ($type == 'type') {
+        $sql = '`d`.`type`=?';
+        $param[] = $query;
+    } elseif ($type == 'display') {
+        $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
@@ -744,33 +771,22 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
-function get_graph_by_portgroup(Illuminate\Http\Request $request)
+function get_graph_by_portgroup(Request $request)
 {
-    $group = $request->route('group');
     $id = $request->route('id');
-    $vars = [
-        'output' => $request->get('output', 'display'),
-        'width'  => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
-        'type'   => 'multiport_bits_separate',
-    ];
-    if ($request->has('from')) {
-        $vars['from'] = $request->get('from');
-    }
-
-    if ($request->has('to')) {
-        $vars['to'] = $request->get('to');
-    }
 
     if (empty($id)) {
+        $group = $request->route('group');
         $ports = get_ports_from_type(explode(',', $group));
         $if_list = implode(',', Arr::pluck($ports, 'port_id'));
     } else {
         $if_list = $id;
     }
-    $vars['id'] = $if_list;
 
-    return api_get_graph($vars);
+    return api_get_graph($request, [
+        'type'   => 'multiport_bits_separate',
+        'id' => $if_list,
+    ]);
 }
 
 function get_components(Illuminate\Http\Request $request)
@@ -987,25 +1003,16 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
     });
 }
 
-function get_port_graphs(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
 {
-    $hostname = $request->route('hostname');
-    $columns = $request->get('columns', 'ifName');
+    $device = DeviceCache::get($request->route('hostname'));
+    $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
 
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
-        return $validate;
-    }
-
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $sql = '';
-    $params = [$device_id];
-    if (! device_permitted($device_id)) {
-        $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, Auth::id());
-    }
-
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex`", $params);
+    $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
+        ->select($columns)->orderBy('ifIndex')->get();
 
     return api_success($ports, 'ports');
 }
@@ -1069,25 +1076,31 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
-function search_ports(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function search_ports(Illuminate\Http\Request $request): JsonResponse
 {
+    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName']);
     $field = $request->route('field');
     $search = $request->route('search');
 
-    $query = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
-
-    if (isset($search)) {
-        $query->where($field, 'like', "%$search%");
-    } else {
-        $value = "%$field%";
-        $query->where('ifAlias', 'like', $value)
-            ->orWhere('ifDescr', 'like', $value)
-            ->orWhere('ifName', 'like', $value);
+    // if only field is set, swap values
+    if (empty($search)) {
+        [$field, $search] = [$search, $field];
     }
+    $fields = validate_column_list($field, 'ports', ['ifAlias', 'ifDescr', 'ifName']);
 
-    $ports = $query->orderBy('ifName')
-                   ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->isNotDeleted()
+        ->where(function ($query) use ($fields, $search) {
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', "%$search%");
+            }
+        })
+        ->select($columns)
+        ->orderBy('ifName')
+        ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1096,21 +1109,17 @@ function search_ports(Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
-function get_all_ports(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function get_all_ports(Illuminate\Http\Request $request): JsonResponse
 {
-    $columns = $request->get('columns', 'port_id, ifName');
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
-        return $validate;
-    }
+    $columns = validate_column_list($request->get('columns'), 'ports', ['port_id', 'ifName']);
 
-    $params = [];
-    $sql = '';
-    if (! Auth::user()->hasGlobalRead()) {
-        $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, Auth::id());
-        array_push($params, Auth::id());
-    }
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
+    $ports = Port::hasAccess(Auth::user())
+        ->select($columns)
+        ->isNotDeleted()
+        ->get();
 
     return api_success($ports, 'ports');
 }
@@ -1132,7 +1141,7 @@ function get_port_stack(Illuminate\Http\Request $request)
     });
 }
 
-function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
 {
     $portid = $request->route('portid');
 
@@ -1157,19 +1166,19 @@ function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate
 function list_alert_rules(Illuminate\Http\Request $request)
 {
     $id = $request->route('id');
-    $sql = '';
-    $param = [];
-    if ($id > 0) {
-        $sql = 'WHERE id=?';
-        $param = [$id];
-    }
 
-    $rules = dbFetchRows("SELECT * FROM `alert_rules` $sql", $param);
+    $rules = \App\Http\Resources\AlertRule::collection(
+        \App\Models\AlertRule::when($id, fn ($query) => $query->where('id', $id))
+        ->with(['devices:device_id', 'groups:id', 'locations:id'])->get()
+    );
 
-    return api_success($rules, 'rules');
+    return api_success($rules->toArray($request), 'rules');
 }
 
-function list_alerts(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
@@ -1207,9 +1216,7 @@ function list_alerts(Illuminate\Http\Request $request)
 
     if ($request->has('order')) {
         [$sort_column, $sort_order] = explode(' ', $request->get('order'), 2);
-        if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
-            return $res;
-        }
+        validate_column_list($sort_column, 'alerts');
         if (in_array($sort_order, ['asc', 'desc'])) {
             $order = $request->get('order');
         }
@@ -1458,7 +1465,8 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
-    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . $hostname . '?format=json'), true);
+    $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
+    $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');
     } else {
@@ -1583,25 +1591,25 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = \LibreNMS\Util\Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = \LibreNMS\Util\Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
-                $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+                $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : \LibreNMS\Util\Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
-            $allowed = format_bytes_billing($bill['bill_quota']);
-            $used = format_bytes_billing($rate_data['total_data']);
+            $allowed = Billing::formatBytes($bill['bill_quota']);
+            $used = Billing::formatBytes($rate_data['total_data']);
             if ($bill['bill_quota'] > 0) {
-                $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+                $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
-            $overuse = (($overuse <= 0) ? '-' : format_bytes_billing($overuse));
+            $overuse = (($overuse <= 0) ? '-' : Billing::formatBytes($overuse));
         }
         $bill['allowed'] = $allowed;
         $bill['used'] = $used;
@@ -1627,12 +1635,10 @@ function get_bill_graph(Illuminate\Http\Request $request)
     $vars = [
         'type' => "bill_$graph_type",
         'id' => $bill_id,
-        'width' => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
     ];
 
-    return check_bill_permission($bill_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -1647,9 +1653,9 @@ function get_bill_graphdata(Illuminate\Http\Request $request)
             $to = $request->get('to', time());
             $reducefactor = $request->get('reducefactor');
 
-            $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+            $graph_data = Billing::getBitsGraphData($bill_id, $from, $to, $reducefactor);
         } elseif ($graph_type == 'monthly') {
-            $graph_data = getHistoricTransferGraphData($bill_id);
+            $graph_data = Billing::getHistoricTransferGraphData($bill_id);
         }
 
         if (! isset($graph_data)) {
@@ -1681,8 +1687,6 @@ function get_bill_history_graph(Illuminate\Http\Request $request)
         'type' => "bill_$graph_type",
         'id' => $bill_id,
         'bill_hist_id' => $bill_hist_id,
-        'width' => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
     ];
 
     switch ($graph_type) {
@@ -1701,8 +1705,8 @@ function get_bill_history_graph(Illuminate\Http\Request $request)
             return api_error(400, "Unknown Graph Type $graph_type");
     }
 
-    return check_bill_permission($bill_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -1718,11 +1722,11 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
             case 'bits':
                 $reducefactor = $request->get('reducefactor');
 
-                $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+                $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
                 break;
             case 'day':
             case 'hour':
-                $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+                $graph_data = Billing::getBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
                 break;
         }
 
@@ -1832,6 +1836,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid' => $bill['bill_custid'],
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes'],
+            'dir_95th' => $bill['dir_95th'],
         ];
         $update = dbUpdate($update_data, 'bills', 'bill_id=?', [$bill_id]);
         if ($update === false || $update < 0) {
@@ -1852,6 +1857,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid',
             'bill_ref',
             'bill_notes',
+            'dir_95th',
         ];
 
         if ($data['bill_type'] == 'quota') {
@@ -1890,6 +1896,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
                 'bill_custid' => $bill['bill_custid'],
                 'bill_ref' => $bill['bill_ref'],
                 'bill_notes' => $bill['bill_notes'],
+                'dir_95th' => $bill['dir_95th'],
             ],
             'bills'
         );
@@ -1916,7 +1923,12 @@ function update_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
+
+    if (is_null($device)) {
+        return api_error(404, "Device $hostname not found");
+    }
+
     $data = json_decode($request->getContent(), true);
     $bad_fields = ['device_id', 'hostname'];
     if (empty($data['field'])) {
@@ -1934,9 +1946,17 @@ function update_device(Illuminate\Http\Request $request)
         if (count($data['field']) == count($data['data'])) {
             $update = [];
             for ($x = 0; $x < count($data['field']); $x++) {
-                $update[$data['field'][$x]] = $data['data'][$x];
+                $field = $data['field'][$x];
+                $field_data = $data['data'][$x];
+
+                if ($field == 'location') {
+                    $field = 'location_id';
+                    $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
+                }
+
+                $update[$field] = $field_data;
             }
-            if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
+            if ($device->fill($update)->save()) {
                 return api_success_noresult(200, 'Device fields have been updated');
             } else {
                 return api_error(500, 'Device fields failed to be updated');
@@ -1944,7 +1964,7 @@ function update_device(Illuminate\Http\Request $request)
         } else {
             return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
         }
-    } elseif (dbUpdate([$data['field'] => $data['data']], 'devices', '`device_id`=?', [$device_id]) >= 0) {
+    } elseif ($device->fill([$data['field'] => $data['data']])->save()) {
         return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
     } else {
         return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
@@ -2422,10 +2442,49 @@ function list_fdb(Illuminate\Http\Request $request)
            ->get();
 
     if ($fdb->isEmpty()) {
-        return api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb entry does not exist');
     }
 
     return api_success($fdb, 'ports_fdb');
+}
+
+function list_fdb_detail(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('mac'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => Rewrite::readableOUI($macAddress)];
+
+    $fdb = PortsFdb::hasAccess(Auth::user())
+           ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
+               return $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
+                      ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
+                      ->where('mac_address', $macAddress)
+                      ->orderBy('ports_fdb.updated_at', 'desc')
+                      ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
+           })
+           ->limit(1000)->get();
+
+    if (count($fdb) == 0) {
+        return api_error(404, 'Fdb entry does not exist');
+    }
+
+    foreach ($fdb as $i => $fdb_entry) {
+        if ($fdb_entry['updated_at']) {
+            $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
+            $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
+        }
+    }
+
+    return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
 function list_sensors()
@@ -2606,9 +2665,11 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         $param[] = $to;
     }
 
+    $sort_order = $request->get('sortorder') === 'DESC' ? 'DESC' : 'ASC';
+
     $count_query = $count_query . $query;
     $count = dbFetchCell($count_query, $param);
-    $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
+    $full_query = $full_query . $query . " ORDER BY $timestamp $sort_order LIMIT $start,$limit";
     $logs = dbFetchRows($full_query, $param);
 
     if ($type === 'list_alertlog') {
@@ -2620,22 +2681,29 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     return api_success($logs, 'logs', null, 200, null, ['total' => $count]);
 }
 
-function validate_column_list($columns, $tableName)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function validate_column_list(?string $columns, string $table, array $default = []): array
 {
+    if ($columns == '') { // no user input, return default
+        return $default;
+    }
+
     static $schema;
     if (is_null($schema)) {
         $schema = new \LibreNMS\DB\Schema();
     }
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
-    $valid_columns = $schema->getColumns($tableName);
+    $valid_columns = $schema->getColumns($table);
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
-        return api_error(400, 'Invalid columns: ' . join(',', $invalid_columns));
+        throw new InvalidTableColumnException($invalid_columns);
     }
 
-    return true;
+    return $column_names;
 }
 
 function missing_fields($required_fields, $data)
@@ -2843,7 +2911,7 @@ function del_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = get_location_id_by_name($location);
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
     if (empty($location_id)) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }
@@ -2915,11 +2983,44 @@ function edit_service_for_host(Illuminate\Http\Request $request)
 }
 
 /**
+ * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
+ */
+function post_syslogsink(Illuminate\Http\Request $request)
+{
+    $json = $request->json()->all();
+
+    if (is_null($json)) {
+        return api_success_noresult(400, 'Not valid json');
+    }
+
+    $logs = array_is_list($json) ? $json : [$json];
+
+    foreach ($logs as $entry) {
+        process_syslog($entry, 1);
+    }
+
+    return api_success_noresult(200, 'Syslog received: ' . count($logs));
+}
+
+/**
  * Display Librenms Instance Info
  */
 function server_info()
 {
-    $versions = version_info();
+    $version = \LibreNMS\Util\Version::get();
+
+    $versions = [
+        'local_ver' => $version->name(),
+        'local_sha' => $version->git->commitHash(),
+        'local_date' => $version->date(),
+        'local_branch' => $version->git->branch(),
+        'db_schema' => $version->database(),
+        'php_ver' => phpversion(),
+        'python_ver' => $version->python(),
+        'database_ver' => $version->databaseServer(),
+        'rrdtool_ver' => $version->rrdtool(),
+        'netsnmp_ver' => $version->netSnmp(),
+    ];
 
     return api_success([
         $versions,

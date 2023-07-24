@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "dsm",
                     "type": "storage",
                     "serial": null,
-                    "icon": "synology.svg",
-                    "location": "<private>"
+                    "icon": "synology.svg"
                 }
             ]
         },
@@ -96,6 +96,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemStatusState"
                 }
             ],

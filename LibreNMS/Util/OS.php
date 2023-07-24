@@ -67,7 +67,7 @@ class OS
             $os_defs = unserialize(file_get_contents($cache_file));
             if ($existing) {
                 // remove unneeded os
-                $exists = Device::query()->distinct()->pluck('os')->flip()->all();
+                $exists = Device::query()->whereNotNull('os')->distinct()->pluck('os')->flip()->all();
                 $os_defs = array_intersect_key($os_defs, $exists);
             }
             \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
@@ -102,7 +102,9 @@ class OS
 
             // remove previously cached os settings and replace with user settings
             $config = ['os' => []]; // local $config variable, not global
-            @include "$install_dir/config.php"; // FIXME load db settings too or don't load config.php
+            if (is_file("$install_dir/config.php")) {
+                @include "$install_dir/config.php"; // FIXME load db settings too or don't load config.php
+            }
             Config::set('os', $config['os']);
 
             // load the os defs fresh from cache (merges with existing OS settings)

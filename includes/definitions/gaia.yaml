@@ -20,3 +20,7 @@ discovery:
             mib_dir: checkpoint
             op: contains
             value: Gaia
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

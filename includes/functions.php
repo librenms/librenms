@@ -9,7 +9,6 @@
  */
 
 use App\Models\Device;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
@@ -23,7 +22,6 @@ use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -123,7 +121,7 @@ function percent_colour($perc)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
  */
 function getIcon($device)
@@ -132,7 +130,7 @@ function getIcon($device)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return string an image tag with the icon for this device.  Close to square.
  */
 function getIconTag($device)
@@ -147,7 +145,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -245,7 +243,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
+        if (! (new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success()) {
             throw new HostUnreachablePingException($host);
         }
     }
@@ -499,28 +497,9 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
-    global $cache;
-
-    if (Config::has("astext.$asn")) {
-        return Config::get("astext.$asn");
-    }
-
-    if (isset($cache['astext'][$asn])) {
-        return $cache['astext'][$asn];
-    }
-
-    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
-    if (! empty($result[0]['txt'])) {
-        $txt = explode('|', $result[0]['txt']);
-        $result = trim($txt[4], ' "');
-        $cache['astext'][$asn] = $result;
-
-        return $result;
-    }
-
-    return '';
+    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
 
 /**
@@ -539,7 +518,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    Log::event($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -689,12 +668,22 @@ function is_port_valid($port, $device)
 /**
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
+ * Also trims the data
  *
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device)
 {
+    if (isset($port['ifDescr'])) {
+        $port['ifDescr'] = trim($port['ifDescr']);
+    }
+    if (isset($port['ifAlias'])) {
+        $port['ifAlias'] = trim($port['ifAlias']);
+    }
+    if (isset($port['ifName'])) {
+        $port['ifName'] = trim($port['ifName']);
+    }
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
@@ -766,14 +755,6 @@ function guidv4($data)
     $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
 
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-}
-
-/**
- * @param $curl
- */
-function set_curl_proxy($curl)
-{
-    \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
 function target_to_id($target)
@@ -979,7 +960,7 @@ function create_sensor_to_state_index($device, $state_name, $index)
 
 function delta_to_bits($delta, $period)
 {
-    return round(($delta * 8 / $period), 2);
+    return round($delta * 8 / $period, 2);
 }
 
 function report_this($message)
@@ -1185,13 +1166,12 @@ function q_bridge_bits2indices($hex_data)
 /**
  * Function to generate Mac OUI Cache
  */
-function cache_mac_oui()
+function mac_oui_to_database()
 {
-    // timers:
+    // Refresh timer
     $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
-    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
 
-    $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
+    $lock = Cache::lock('vendor_oui_db_refresh', $mac_oui_refresh_int_min); // We want to refresh after at least $mac_oui_refresh_int_min
 
     if (Config::get('mac_oui.enabled') !== true) {
         echo 'Mac OUI integration disabled' . PHP_EOL;
@@ -1200,21 +1180,24 @@ function cache_mac_oui()
     }
 
     if ($lock->get()) {
-        echo 'Caching Mac OUI' . PHP_EOL;
+        echo 'Storing Mac OUI in the database' . PHP_EOL;
         try {
             $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
 
             echo '  -> Downloading ...' . PHP_EOL;
-            $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($mac_oui_url);
+            $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
             $csv_data = $get->body();
+
+            // Process each line of the CSV data
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
 
                 $length = strlen($entry[0]);
                 $prefix = strtolower(str_replace(':', '', $entry[0]));
+                $vendor = $entry[2];
 
                 if (is_array($entry) && count($entry) >= 3 && $length == 8) {
                     // We have a standard OUI xx:xx:xx
@@ -1227,18 +1210,23 @@ function cache_mac_oui()
                         $oui = substr($prefix, 0, 9);
                     }
                 }
+
                 if (isset($oui)) {
-                    echo "Adding $oui, $entry[2]" . PHP_EOL;
-                    $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry[2], $mac_oui_cache_time);
+                    // Store the OUI for the vendor in the database
+                    DB::table('vendor_ouis')->insert([
+                        'vendor' => $vendor,
+                        'oui' => $oui,
+                    ]);
+
+                    echo "Adding $oui for $vendor" . PHP_EOL;
                 }
             }
         } catch (Exception $e) {
-            echo 'Error processing Mac OUI :' . PHP_EOL;
+            echo 'Error processing Mac OUI:' . PHP_EOL;
             echo 'Exception: ' . get_class($e) . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
 
-            $lock->release(); // we did not succeed so we'll try again next time
+            $lock->release(); // We did not succeed, so we'll try again next time
 
             return 1;
         }
@@ -1264,11 +1252,11 @@ function cache_peeringdb()
             $ix_keep = [];
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs as $ix) {
+                foreach ($ixs ?? [] as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
                     if ($tmp_ix) {
@@ -1285,11 +1273,11 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $ix_keep[] = $pdb_ix_id;
-                    $get_ix = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get("$peeringdb_url/netixlan?ix_id=$ixid");
+                    $get_ix = \LibreNMS\Util\Http::client()->get("$peeringdb_url/netixlan?ix_id=$ixid");
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers as $index => $peer) {
+                    foreach ($peers ?? [] as $index => $peer) {
                         $peer_name = get_astext($peer->{'asn'});
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {
@@ -1360,7 +1348,7 @@ function get_schema_list()
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return int|null
  */
 function get_device_oid_limit($device)

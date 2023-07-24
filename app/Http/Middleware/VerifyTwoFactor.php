@@ -4,8 +4,10 @@ namespace App\Http\Middleware;
 
 use App\Models\UserPref;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class VerifyTwoFactor
 {
@@ -14,14 +16,14 @@ class VerifyTwoFactor
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // check twofactor
         if (Config::get('twofactor') === true) {
             // don't apply on 2fa checking routes
-            if (Str::startsWith($request->route()->getName(), '2fa.')) {
+            $route_name = $request->route()->getName();
+            if ($route_name && Str::startsWith($route_name, '2fa.')) {
                 return $next($request);
             }
 

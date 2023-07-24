@@ -4,14 +4,15 @@ use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\BarPlot;
 use Amenadiel\JpGraph\Plot\GroupBarPlot;
 use Amenadiel\JpGraph\Plot\LinePlot;
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
 if (is_numeric($vars['bill_hist_id'])) {
-    $graph_data = getBillingBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
+    $graph_data = Billing::getBandwidthGraphData($vars['id'], $vars['bill_hist_id'], null, null, $vars['imgtype']);
 } elseif (is_numeric($vars['from'])) {
-    $graph_data = getBillingBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
+    $graph_data = Billing::getBandwidthGraphData($vars['id'], null, $vars['from'], $vars['to'], $vars['imgtype']);
 } else {
-    $graph_data = getHistoricTransferGraphData($vars['id']);
+    $graph_data = Billing::getHistoricTransferGraphData($vars['id']);
     $vars['imgtype'] = 'historical';
 }
 
@@ -21,7 +22,7 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
         $date = strtotime($graph_data['ticklabels'][$i]);
 
         if ($vars['imgtype'] === 'day') {
-            $graph_data['ticklabels'][$i] = strftime("%e\n%b", $date);
+            $graph_data['ticklabels'][$i] = date("j\nM", $date);
         }
     }
 }
@@ -75,7 +76,7 @@ $barplot_tot->SetLegend('Traffic total');
 $barplot_tot->SetColor('darkgray');
 $barplot_tot->SetFillColor('lightgray@0.4');
 $barplot_tot->value->Show();
-$barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
+$barplot_tot->value->SetFormatCallback('\LibreNMS\Billing::formatBytesShort');
 
 $barplot_in = new BarPlot($graph_data['in_data']);
 $barplot_in->SetLegend('Traffic In');

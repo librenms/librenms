@@ -1170,6 +1170,15 @@
   .glyphicon-menu-up:before {
     content: "\e260";
   }
+  .page-availability-report-select {
+    color: #000000;
+  }
+  .device-availability {
+    color: #ffffff;
+  }
+  .service-availability {
+    color: #ffffff;
+  }
   * {
     box-sizing: border-box;
   }
@@ -7218,6 +7227,9 @@
   }
   table tr:hover{
     background: #2d3237!important;
+  }
+  tr.list:nth-child(even) {
+    background: #353a41!important;
   }
   div[role=listbox]{
     background: #464c53;

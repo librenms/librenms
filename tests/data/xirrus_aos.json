@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "xirrus_aos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "xirrus.png",
-                    "location": "<private>"
+                    "icon": "xirrus.png"
                 }
             ]
         },
@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap4",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -246,7 +236,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -256,15 +245,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -351,7 +336,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -361,15 +345,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bridge",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -456,7 +436,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -466,15 +445,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap6",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -561,7 +536,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -571,15 +545,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -666,7 +636,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -676,15 +645,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap8",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -771,7 +736,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -781,15 +745,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -876,7 +836,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -886,15 +845,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -981,7 +936,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -991,15 +945,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "gig2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1086,7 +1036,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1096,15 +1045,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap3",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1191,7 +1136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1201,15 +1145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap5",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1296,7 +1236,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1306,15 +1245,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c4",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1401,7 +1336,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1411,15 +1345,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "gig1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1506,7 +1436,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1516,15 +1445,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h4",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1611,7 +1536,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1621,15 +1545,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bond2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1716,7 +1636,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1726,15 +1645,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap7",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1821,7 +1736,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1831,15 +1745,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c3",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -1926,7 +1836,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -1936,15 +1845,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap2",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2031,7 +1936,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -2041,15 +1945,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h3",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2136,7 +2036,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -2146,15 +2045,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bond1",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2245,7 +2140,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -2255,15 +2149,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap4",
                     "ifPhysAddress": "506028764a30",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2350,7 +2240,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -2360,15 +2249,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c2",
                     "ifPhysAddress": "3625f625d164",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2455,7 +2340,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -2465,15 +2349,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h2",
                     "ifPhysAddress": "a29cd7a5a40f",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2560,7 +2440,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -2570,15 +2449,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bridge",
                     "ifPhysAddress": "506028059704",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2665,7 +2540,6 @@
                     "ifSpeed": 1000000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -2675,15 +2549,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap6",
                     "ifPhysAddress": "506028764a50",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2770,7 +2640,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -2780,15 +2649,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c1",
                     "ifPhysAddress": "5acb90d0fe99",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2875,7 +2740,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -2885,15 +2749,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap8",
                     "ifPhysAddress": "506028764a70",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -2980,7 +2840,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -2990,15 +2849,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap1",
                     "ifPhysAddress": "506028764a00",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3085,7 +2940,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -3095,15 +2949,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h1",
                     "ifPhysAddress": "ce5c32664f4d",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3190,7 +3040,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
@@ -3200,15 +3049,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "gig2",
                     "ifPhysAddress": "506028059704",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3295,7 +3140,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -3305,15 +3149,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap3",
                     "ifPhysAddress": "506028764a00",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3400,7 +3240,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -3410,15 +3249,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap5",
                     "ifPhysAddress": "506028764a40",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3505,7 +3340,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -3515,15 +3349,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c4",
                     "ifPhysAddress": "5ea2a0c2a2d1",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3610,7 +3440,6 @@
                     "ifSpeed": 0,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -3620,15 +3449,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "gig1",
                     "ifPhysAddress": "506028059704",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3715,7 +3540,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -3725,15 +3549,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h4",
                     "ifPhysAddress": "82de5f85f684",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3820,7 +3640,6 @@
                     "ifSpeed": 0,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
@@ -3830,15 +3649,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bond2",
                     "ifPhysAddress": "7e8b1fe8495e",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -3925,7 +3740,6 @@
                     "ifSpeed": 0,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -3935,15 +3749,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap7",
                     "ifPhysAddress": "506028764a60",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -4030,7 +3840,6 @@
                     "ifSpeed": 10000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -4040,15 +3849,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-c3",
                     "ifPhysAddress": "ce8e99336a7f",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -4135,7 +3940,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -4145,15 +3949,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-iap2",
                     "ifPhysAddress": "506028764a10",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -4240,7 +4040,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -4250,15 +4049,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "wds-bond-h3",
                     "ifPhysAddress": "7ab2ea739557",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -4345,7 +4140,6 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -4355,15 +4149,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "bond1",
                     "ifPhysAddress": "506028059704",
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -4465,6 +4255,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
@@ -4493,7 +4284,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.12.1.2.22.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.12.1.2.22.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4514,7 +4306,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4535,7 +4328,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4556,7 +4350,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4577,7 +4372,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4598,7 +4394,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4619,7 +4416,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4640,7 +4438,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4661,7 +4460,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4682,7 +4482,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4703,7 +4504,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4724,7 +4526,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4745,7 +4548,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4766,7 +4570,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4787,7 +4592,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4808,7 +4614,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4829,7 +4636,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4850,7 +4658,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4871,7 +4680,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4892,7 +4702,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4913,7 +4724,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4934,7 +4746,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4955,7 +4768,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4976,7 +4790,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4997,7 +4812,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5018,7 +4834,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5039,7 +4856,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5060,7 +4878,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5081,7 +4900,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5102,7 +4922,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5123,7 +4944,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5144,7 +4966,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5165,7 +4988,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5186,7 +5010,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5207,7 +5032,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5228,7 +5054,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5249,7 +5076,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5270,7 +5098,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5291,7 +5120,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5312,7 +5142,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5333,7 +5164,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5354,7 +5186,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5375,7 +5208,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5396,7 +5230,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5417,7 +5252,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5438,7 +5274,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5459,7 +5296,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5480,7 +5318,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5501,7 +5340,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.8\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -5526,7 +5366,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.12.1.2.22.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.12.1.2.22.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5547,7 +5388,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5568,7 +5410,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5589,7 +5432,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5610,7 +5454,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5631,7 +5476,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5652,7 +5498,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5673,7 +5520,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5694,7 +5542,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.11.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5715,7 +5564,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5736,7 +5586,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5757,7 +5608,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5778,7 +5630,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5799,7 +5652,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5820,7 +5674,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5841,7 +5696,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5862,7 +5718,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.7.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5883,7 +5740,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5904,7 +5762,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5925,7 +5784,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5946,7 +5806,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5967,7 +5828,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5988,7 +5850,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6009,7 +5872,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6030,7 +5894,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.9.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6051,7 +5916,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6072,7 +5938,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6093,7 +5960,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6114,7 +5982,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6135,7 +6004,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6156,7 +6026,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6177,7 +6048,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6198,7 +6070,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.8.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6219,7 +6092,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6240,7 +6114,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6261,7 +6136,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6282,7 +6158,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6303,7 +6180,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6324,7 +6202,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6345,7 +6224,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6366,7 +6246,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.10.8\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6387,7 +6268,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6408,7 +6290,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6429,7 +6312,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6450,7 +6334,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6471,7 +6356,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.5\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.5\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6492,7 +6378,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.6\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.6\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6513,7 +6400,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.7\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.7\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6534,7 +6422,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.8\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.21013.1.2.24.7.1.3.8\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         }

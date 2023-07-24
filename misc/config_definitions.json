@@ -359,6 +359,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.sneck.polling_time_diff": {
+            "default": false,
+            "type": "boolean"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
@@ -727,7 +731,7 @@
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
             "default": [
-                "/-K9W8-/"
+                "/-K9W8/"
             ]
         },
         "bad_entity_sensor_regex": {
@@ -812,18 +816,6 @@
         "billing.base": {
             "default": 1000,
             "type": "integer"
-        },
-        "billing.bill_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.circuit_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.customer_autoadd": {
-            "default": false,
-            "type": "boolean"
         },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
@@ -972,51 +964,6 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "server.png",
-                    "text": "Servers",
-                    "type": "server"
-                },
-                {
-                    "icon": "network.png",
-                    "text": "Network",
-                    "type": "network"
-                },
-                {
-                    "icon": "wireless.png",
-                    "text": "Wireless",
-                    "type": "wireless"
-                },
-                {
-                    "icon": "firewall.png",
-                    "text": "Firewalls",
-                    "type": "firewall"
-                },
-                {
-                    "icon": "power.png",
-                    "text": "Power",
-                    "type": "power"
-                },
-                {
-                    "icon": "environment.png",
-                    "text": "Environment",
-                    "type": "environment"
-                },
-                {
-                    "icon": "loadbalancer.png",
-                    "text": "Load Balancers",
-                    "type": "loadbalancer"
-                },
-                {
-                    "icon": "storage.png",
-                    "text": "Storage",
-                    "type": "storage"
-                },
-                {
-                    "icon": "printer.png",
-                    "text": "Printers",
-                    "type": "printer"
-                },
-                {
                     "icon": "appliance.png",
                     "text": "Appliance",
                     "type": "appliance"
@@ -1025,6 +972,51 @@
                     "icon": "collaboration.png",
                     "text": "Collaboration",
                     "type": "collaboration"
+                },
+                {
+                    "icon": "environment.png",
+                    "text": "Environment",
+                    "type": "environment"
+                },
+                {
+                    "icon": "firewall.png",
+                    "text": "Firewalls",
+                    "type": "firewall"
+                },
+                {
+                    "icon": "loadbalancer.png",
+                    "text": "Load Balancers",
+                    "type": "loadbalancer"
+                },
+                {
+                    "icon": "network.png",
+                    "text": "Network",
+                    "type": "network"
+                },
+                {
+                    "icon": "printer.png",
+                    "text": "Printers",
+                    "type": "printer"
+                },
+                {
+                    "icon": "power.png",
+                    "text": "Power",
+                    "type": "power"
+                },
+                {
+                    "icon": "server.png",
+                    "text": "Servers",
+                    "type": "server"
+                },
+                {
+                    "icon": "storage.png",
+                    "text": "Storage",
+                    "type": "storage"
+                },
+                {
+                    "icon": "wireless.png",
+                    "text": "Wireless",
+                    "type": "wireless"
                 },
                 {
                     "icon": "workstation.png",
@@ -1076,6 +1068,13 @@
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.xdsl": {
+            "order": 255,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": false,
             "type": "boolean"
         },
         "discovery_modules.entity-physical": {
@@ -1427,6 +1426,13 @@
                 "value": "smtp"
             }
         },
+        "email_attach_graphs": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 4,
+            "type": "boolean"
+        },
         "email_backend": {
             "default": "mail",
             "group": "alerting",
@@ -1581,10 +1587,6 @@
             "section": "email",
             "order": 1,
             "type": "text"
-        },
-        "enable_bgp": {
-            "default": true,
-            "type": "boolean"
         },
         "enable_billing": {
             "default": false,
@@ -1774,6 +1776,13 @@
             "default": null,
             "type": "array"
         },
+        "graph_stat_percentile_disable": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 7,
+            "type": "boolean"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
@@ -1929,6 +1938,55 @@
                 "773177",
                 "5B185B",
                 "3F003F"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow": {
+            "default": [
+                "881177",
+                "AA3355",
+                "CC6666",
+                "EE9944",
+                "EEDD00",
+                "99DD55",
+                "44DD88",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_green": {
+            "default": [
+                "99DD55",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_purple": {
+            "default": [
+                "663399",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
             ],
             "type": "array"
         },
@@ -2726,6 +2784,166 @@
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active UDP Sessions"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkNumEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in DOS block table"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowMeterVsysThrottle": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - vsys Maximum Sessions"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowPolicyDeny": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - Policy"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowPolicyNat": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - NAT/IP allocation error"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowScanDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - Scan Detection"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosDropIpBlocked": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Source flagged for blocking"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIcmp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - ICMP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIcmp6": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - ICMPv6"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - Other IP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedTcp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - TCP-SYN"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedUdp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - UDP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosPbpDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Packet Buffer Protection RED"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRuleDeny": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "DOS Rule - Denied"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRuleDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "DOS Rule - Rate Limited or IP Blocked"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosZoneRedAct": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone RED - Activation Threshold Reached"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosZoneRedMax": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone RED - Maximum Threshold Reached"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosSyncookieNotTcpSyn": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Discarded - TCP SYN Cookies - Not SYN"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosSyncookieNotTcpSynAck": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Discarded - TCP SYN Cookies - Not SYN-ACK"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkSwEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in software DOS block table"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkHwEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in hardware DOS block table"
             },
             "type": "graph"
         },
@@ -3543,7 +3761,25 @@
             "group": "system",
             "section": "proxy",
             "order": 0,
-            "type": "text"
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
+        },
+        "https_proxy": {
+            "group": "system",
+            "section": "proxy",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
         },
         "icmp_check": {
             "default": true,
@@ -4138,6 +4374,13 @@
             "order": 5,
             "type": "executable"
         },
+        "no_proxy": {
+            "group": "system",
+            "default": "localhost,127.0.0.1,::1",
+            "section": "proxy",
+            "order": 2,
+            "type": "text"
+        },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
@@ -4293,6 +4536,7 @@
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
+                        {"match": "fortiswitch", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -4302,7 +4546,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
@@ -4508,6 +4752,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.xdsl": {
+            "order": 345,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.customoid": {
@@ -4772,9 +5023,8 @@
             "group": "system",
             "section": "cleanup",
             "order": 9,
-            "units": "days",
-            "default": "10",
-            "type": "integer"
+            "default": true,
+            "type": "boolean"
         },
         "project_home": {
             "default": "https://www.librenms.org/",
@@ -4853,6 +5103,24 @@
                 "git": "Git"
             }
         },
+        "reporting.error": {
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.dump_errors": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.usage": {
+            "group": "system",
+            "section": "reporting",
+            "order": 0,
+            "default": false,
+            "type": "boolean"
+        },
         "rewrite_if": {
             "type": "array"
         },
@@ -4919,11 +5187,11 @@
             "type": "text"
         },
         "rrdgraph_def_text": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_dark": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_color": {
@@ -5196,6 +5464,13 @@
             "default": 1200,
             "type": "integer",
             "units": "seconds"
+        },
+        "snmp.max_oid": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 10
         },
         "snmp.max_repeaters": {
             "group": "poller",

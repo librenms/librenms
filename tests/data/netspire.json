@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "CONAC01/4004:70FM",
                     "features": null,
+                    "location": "<private>",
                     "os": "netspire",
                     "type": "appliance",
                     "serial": "141100002",
-                    "icon": "openaccess.png",
-                    "location": "<private>"
+                    "icon": "openaccess.png"
                 }
             ]
         },
@@ -63,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

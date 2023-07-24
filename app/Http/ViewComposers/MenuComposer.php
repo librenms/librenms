@@ -39,6 +39,7 @@ use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use App\Plugins\Hooks\MenuEntryHook;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
@@ -82,7 +83,7 @@ class MenuComposer
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
-            collect();
+            new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         // Service menu
@@ -255,6 +256,7 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;

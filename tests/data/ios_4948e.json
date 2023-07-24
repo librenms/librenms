@@ -10,11 +10,11 @@
                     "version": "15.0(2)SG10",
                     "hardware": "WS-C4948E",
                     "features": "ENTSERVICESK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.6296.1.2.5.12",
                     "sysDescr": "V5812G NOS 6.07p1/00:d0:cb:f5:b9:8b",
                     "sysContact": null,
                     "version": "6.07p1",
                     "hardware": "V5812G",
                     "features": null,
+                    "location": null,
                     "os": "dasan-nos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dasan.png",
-                    "location": null
+                    "icon": "dasan.png"
                 }
             ]
         },

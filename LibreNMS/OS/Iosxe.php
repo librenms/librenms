@@ -107,7 +107,7 @@ class Iosxe extends Ciscowlc implements
                         'isisISAdjAreaAddress' => implode(',', array_map([$this, 'formatIsIsId'], $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddress'] ?? [])),
                         'isisISAdjIPAddrType' => implode(',', $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrType'] ?? []),
                         'isisISAdjIPAddrAddress' => implode(',', array_map(function ($ip) {
-                            return (string) IP::fromHexstring($ip, true);
+                            return (string) IP::fromHexString($ip, true);
                         }, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrAddress'] ?? [])),
                     ]));
                 }
@@ -130,7 +130,7 @@ class Iosxe extends Ciscowlc implements
 
         $uptime = SnmpQuery::walk('CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime')->values();
 
-        return $adjacencies->each(function (IsisAdjacency $adjacency) use ($states, $uptime) {
+        return $adjacencies->each(function ($adjacency) use ($states, $uptime) {
             $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });

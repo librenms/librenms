@@ -34,16 +34,13 @@ class GoogleMapsApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'https://maps.googleapis.com';
-    protected $geocoding_uri = '/maps/api/geocode/json';
+    protected string $base_uri = 'https://maps.googleapis.com';
+    protected string $geocoding_uri = '/maps/api/geocode/json';
 
     /**
      * Get latitude and longitude from geocode response
-     *
-     * @param  array  $data
-     * @return array
      */
-    protected function parseLatLng($data)
+    protected function parseLatLng(array $data): array
     {
         return [
             'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
@@ -53,11 +50,8 @@ class GoogleMapsApi extends BaseApi implements Geocoder
 
     /**
      * Get messages from response.
-     *
-     * @param  array  $data
-     * @return array
      */
-    protected function parseMessages($data)
+    protected function parseMessages(array $data): array
     {
         return [
             'error' => isset($data['error_message']) ? $data['error_message'] : '',
@@ -66,14 +60,11 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     }
 
     /**
-     * Build Guzzle request option array
-     *
-     * @param  string  $address
-     * @return array
+     * Build request option array
      *
      * @throws \Exception you may throw an Exception if validation fails
      */
-    protected function buildGeocodingOptions($address)
+    protected function buildGeocodingOptions(string $address): array
     {
         $api_key = Config::get('geoloc.api_key');
         if (! $api_key) {

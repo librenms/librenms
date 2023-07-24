@@ -132,7 +132,7 @@ class WirelessSensor extends Sensor
      */
     public static function getTypes($valid = false, $device_id = null)
     {
-        // Add new types here translations/descriptions/units in resources/lang/<lang>/wireless.php
+        // Add new types here translations/descriptions/units in lang/<lang>/wireless.php
         // FIXME I'm really bad with icons, someone please help!
         static $types = [
             'ap-count' => [
@@ -253,7 +253,7 @@ class WirelessSensor extends Sensor
      * @param  int  $channel
      * @return int
      */
-    public static function channelToFrequency($channel)
+    public static function channelToFrequency($channel): int
     {
         $channels = [
             1 => 2412,
@@ -300,6 +300,6 @@ class WirelessSensor extends Sensor
             165 => 5825,
         ];
 
-        return $channels[$channel];
+        return $channels[$channel] ?? 0;
     }
 }

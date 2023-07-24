@@ -58,6 +58,7 @@ class Sensor implements DiscoveryModule, PollerModule
     private $low_warn;
     private $entPhysicalIndex;
     private $entPhysicalMeasured;
+    private string $rrd_type = 'GAUGE';
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
@@ -78,6 +79,7 @@ class Sensor implements DiscoveryModule, PollerModule
      * @param  int|float  $low_warn  Alerting: Low warning value
      * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
      * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string  $rrd_type  the type of RRD file to use (GAUGE, COUNTER, DCOUNTER, DERIVE, DDERIVE, ABSOLUTE), default to GAUGE
      */
     public function __construct(
         $type,
@@ -95,7 +97,8 @@ class Sensor implements DiscoveryModule, PollerModule
         $high_warn = null,
         $low_warn = null,
         $entPhysicalIndex = null,
-        $entPhysicalMeasured = null
+        $entPhysicalMeasured = null,
+        $rrd_type = 'GAUGE'
     ) {
         $this->type = $type;
         $this->device_id = $device_id;
@@ -113,6 +116,7 @@ class Sensor implements DiscoveryModule, PollerModule
         $this->low_limit = $low_limit;
         $this->high_warn = $high_warn;
         $this->low_warn = $low_warn;
+        $this->rrd_type = $rrd_type;
 
         // ensure leading dots
         array_walk($this->oids, function (&$oid) {
@@ -236,6 +240,7 @@ class Sensor implements DiscoveryModule, PollerModule
             'sensor_current' => $this->current,
             'entPhysicalIndex' => $this->entPhysicalIndex,
             'entPhysicalIndex_measured' => $this->entPhysicalMeasured,
+            'rrd_type' => $this->rrd_type,
         ];
     }
 
@@ -630,7 +635,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : 'GAUGE';
+            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [

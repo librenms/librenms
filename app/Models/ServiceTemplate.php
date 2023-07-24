@@ -91,7 +91,7 @@ class ServiceTemplate extends BaseModel
     public function updateDevices()
     {
         if ($this->type == 'dynamic') {
-            $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
+            $this->devices()->sync(QueryBuilderFluentParser::fromJson($this->rules)->toQuery()
                 ->distinct()->pluck('devices.device_id'));
         }
     }
@@ -162,7 +162,7 @@ class ServiceTemplate extends BaseModel
         }
 
         $template_ids = static::query()
-            ->with(['device_groups' => function ($query) {
+            ->with(['groups' => function ($query) {
                 $query->select('device_groups.id');
             }])
             ->get()

@@ -564,6 +564,38 @@ Output:
 
 Output is an image.
 
+### `get_graph_by_service`
+
+Get the graph for a service
+
+Route: `/api/v0/devices/:hostname/services/:service_id/graphs/:datasource`
+
+- hostname can be either the device hostname or id
+- service id
+- datasource is the name of the service datasource
+
+Input:
+
+- from: This is the date you would like the graph to start - See
+  [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
+  for more information.
+- to: This is the date you would like the graph to end - See
+  [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
+  for more information.
+- width: The graph width, defaults to 1075.
+- height: The graph height, defaults to 300.
+
+  Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/localhost/35/graphs/loss
+```
+
+Output:
+
+Output is an image.
+
+
 ### `get_port_graphs`
 
 Get a list of ports for a particular device.
@@ -938,41 +970,6 @@ Output:
 
 Output is an image.
 
-### `list_locations`
-
-Return a list of locations.
-
-Route: `/api/v0/resources/locations`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "locations": [
-        {
-            "id": "1",
-            "location": "Example location, Example city, Example Country",
-            "lat": "-18.911436",
-            "lng": "47.517446",
-            "timestamp": "2017-04-01 02:40:05"
-        },
-        ...
-    ],
-    "count": 100
-}
-```
-
 ### `list_sensors`
 
 Get a list of all Sensors.
@@ -1049,8 +1046,12 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - location_id: serach by locaiton_id
   - hostname: search by hostname
+  - sysName: search by sysName
+  - display: search by display name
   - device_id: exact match by device-id
+  - type: search by device type
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1450,9 +1451,9 @@ Output:
 
 Returns a specific device's config from oxidized.
 
-Route: `api/v0/oxidized/config/:device_name`
+Route: `api/v0/oxidized/config/:hostname`
 
-  - device_name is the full dns name of the device used when adding the device to librenms.
+  - hostname is the Hostname or IP of the device used when adding the device to librenms.
 
 Input:
 

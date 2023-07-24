@@ -48,8 +48,11 @@ function makeTextBlock($text, $fontfile, $fontsize, $width)
  * No RRD files found that could match request
  *
  * @code HTTP error code
+ *
  * @code_msg Short text description of HTTP error code
+ *
  * @title Title for fake RRD graph
+ *
  * @msg Complete error message to display in place of graph content
  */
 function error($code, $code_msg, $title, $msg)
@@ -76,30 +79,30 @@ function error($code, $code_msg, $title, $msg)
     }
 
     imagefilledrectangle($png, 0, 0, $w, $h, $c_bkgnd);
-    imagefilledrectangle($png, 51, 33, ($w - 31), ($h - 47), $c_fgnd);
-    imageline($png, 51, 30, 51, ($h - 43), $c_grln);
-    imageline($png, 48, ($h - 46), ($w - 28), ($h - 46), $c_grln);
+    imagefilledrectangle($png, 51, 33, $w - 31, $h - 47, $c_fgnd);
+    imageline($png, 51, 30, 51, $h - 43, $c_grln);
+    imageline($png, 48, $h - 46, $w - 28, $h - 46, $c_grln);
     imagefilledpolygon($png, [49, 30, 51, 26, 53, 30], 3, $c_grarr);
     imagefilledpolygon($png, [$w - 28, $h - 48, $w - 24, $h - 46, $w - 28, $h - 44], 3, $c_grarr);
     imageline($png, 0, 0, $w, 0, $c_blt);
     imageline($png, 0, 1, $w, 1, $c_blt);
     imageline($png, 0, 0, 0, $h, $c_blt);
     imageline($png, 1, 0, 1, $h, $c_blt);
-    imageline($png, ($w - 1), 0, ($w - 1), $h, $c_brb);
-    imageline($png, ($w - 2), 1, ($w - 2), $h, $c_brb);
-    imageline($png, 1, ($h - 2), $w, ($h - 2), $c_brb);
-    imageline($png, 0, ($h - 1), $w, ($h - 1), $c_brb);
+    imageline($png, $w - 1, 0, $w - 1, $h, $c_brb);
+    imageline($png, $w - 2, 1, $w - 2, $h, $c_brb);
+    imageline($png, 1, $h - 2, $w, $h - 2, $c_brb);
+    imageline($png, 0, $h - 1, $w, $h - 1, $c_brb);
 
     imagestring($png, 4, ceil(($w - strlen($title) * imagefontwidth(4)) / 2), 10, $title, $c_txt);
     imagestring($png, 5, 60, 35, sprintf('%s [%d]', $code_msg, $code), $c_etxt);
     if (function_exists('imagettfbbox') && is_file(Config::get('error_font'))) {
         // Detailled error message
         $errorfont = Config::get('error_font');
-        $fmt_msg = makeTextBlock($msg, $errorfont, 10, ($w - 86));
+        $fmt_msg = makeTextBlock($msg, $errorfont, 10, $w - 86);
         $fmtbox = imagettfbbox(12, 0, $errorfont, $fmt_msg);
-        imagettftext($png, 10, 0, 55, (35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1]), $c_txt, $errorfont, $fmt_msg);
+        imagettftext($png, 10, 0, 55, 35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1], $c_txt, $errorfont, $fmt_msg);
     } else {
-        imagestring($png, 4, 53, (35 + 6 + imagefontwidth(5)), $msg, $c_txt);
+        imagestring($png, 4, 53, 35 + 6 + imagefontwidth(5), $msg, $c_txt);
     }
 
     imagepng($png);

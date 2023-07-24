@@ -25,15 +25,15 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Total       Used       Free       (Min       Max      Ave)'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free       (Min       Max      Ave)'";
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Total       Used       Free\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free\l'";
 }
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($components['name']), $descr_len);
 
-$perc = $components['memory_used'] * 100 / $components['memory_total'];
+$perc = \LibreNMS\Util\Number::calculatePercent((int) $components['memory_used'], (int) $tmp_component['memory_total']);
 
 $background = \LibreNMS\Util\Color::percentage($perc, 75);
 
@@ -57,7 +57,7 @@ if ($width > '500') {
     $rrd_options .= ' GPRINT:qfp_free:MIN:%5.2lf%sB';
     $rrd_options .= ' GPRINT:qfp_free:MAX:%5.2lf%sB';
     $rrd_options .= ' GPRINT:qfp_free:AVERAGE:%5.2lf%sB\\n';
-    $rrd_options .= " COMMENT:'" . substr(str_pad('', ($descr_len + 12)), 0, ($descr_len + 12)) . " '";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('', $descr_len + 12), 0, $descr_len + 12) . " '";
     $rrd_options .= " GPRINT:qfp_perc:LAST:'%6.2lf%%  '";
     $rrd_options .= " GPRINT:qfp_percx:LAST:'%6.2lf%% '";
     $rrd_options .= " GPRINT:qfp_perc:MIN:'%5.2lf%% '";
@@ -72,7 +72,7 @@ if ($width > '500') {
     $rrd_options .= ' GPRINT:qfp_used:LAST:%6.2lf%sB';
     $rrd_options .= ' GPRINT:qfp_free:LAST:%6.2lf%sB';
     $rrd_options .= " COMMENT:'\l'";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('', ($descr_len + 12)), 0, ($descr_len + 12)) . " '";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('', $descr_len + 12), 0, $descr_len + 12) . " '";
     $rrd_options .= " GPRINT:qfp_perc:LAST:'%5.2lf%%  '";
     $rrd_options .= " GPRINT:qfp_percx:LAST:'%5.2lf%% '";
     $rrd_options .= " COMMENT:'\l'";

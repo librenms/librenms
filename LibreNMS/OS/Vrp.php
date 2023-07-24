@@ -31,6 +31,7 @@ use App\Models\PortsNac;
 use App\Models\Sla;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
@@ -59,7 +60,7 @@ class Vrp extends OS implements
 {
     public function discoverMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSize', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityBomEnDesc', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
@@ -226,7 +227,7 @@ class Vrp extends OS implements
 
                     $foundid = 0;
 
-                    for ($z = 0; $z < sizeof($ap_db); $z++) {
+                    for ($z = 0; $z < count($ap_db); $z++) {
                         if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
                             $foundid = $ap_db[$z]['accesspoint_id'];
                             $ap_db[$z]['seen'] = 1;
@@ -276,7 +277,7 @@ class Vrp extends OS implements
                 }//end foreach 1
             }//end foreach 2
 
-            for ($z = 0; $z < sizeof($ap_db); $z++) {
+            for ($z = 0; $z < count($ap_db); $z++) {
                 if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
                     dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
                 }
@@ -336,7 +337,7 @@ class Vrp extends OS implements
      */
     public function pollNac()
     {
-        $nac = collect();
+        $nac = new Collection();
         // We collect the first table
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessInterface', [], 'HUAWEI-AAA-MIB');
 
@@ -466,7 +467,7 @@ class Vrp extends OS implements
             // We have at least 1 SSID, so we can count the total of STA
             $sensors[] = new WirelessSensor(
                 'clients',
-                    $this->getDeviceId(),
+                $this->getDeviceId(),
                 $ssid_total_oid_array,
                 'vrp-clients',
                 'total-all-ssids',
@@ -481,9 +482,9 @@ class Vrp extends OS implements
         return $sensors;
     }
 
-    public function discoverSlas()
+    public function discoverSlas(): Collection
     {
-        $slas = collect();
+        $slas = new Collection();
         // Get the index of the last finished test
         // NQA-MIB::nqaScheduleLastFinishIndex
 
@@ -512,7 +513,7 @@ class Vrp extends OS implements
         return $slas;
     }
 
-    public function pollSlas($slas)
+    public function pollSlas($slas): void
     {
         $device = $this->getDeviceArray();
 

@@ -7,6 +7,7 @@ icon: calix
 mib_dir: calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+snmp_max_oid: 8
 discovery:
     -
         sysObjectID:

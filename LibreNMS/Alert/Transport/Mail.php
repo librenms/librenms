@@ -28,28 +28,23 @@ use LibreNMS\Config;
 
 class Mail extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        return $this->contactMail($obj);
-    }
-
-    public function contactMail($obj)
-    {
-        $email = $this->config['email'] ?? $obj['contacts'];
+        $email = $this->config['email'] ?? $alert_data['contacts'];
         $html = Config::get('email_html');
 
-        if ($html && ! $this->isHtmlContent($obj['msg'])) {
+        if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
-            $msg = preg_replace("/\r?\n/", "<br />\n", $obj['msg']);
+            $msg = preg_replace("/\r?\n/", "<br />\n", $alert_data['msg']);
         } else {
             // fix line returns for windows mail clients
-            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
         }
 
-        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html);
+        return \LibreNMS\Util\Mail::send($email, $alert_data['title'], $msg, $html, $this->config['attach-graph'] ?? null);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -58,6 +53,13 @@ class Mail extends Transport
                     'name' => 'email',
                     'descr' => 'Email address of contact',
                     'type'  => 'text',
+                ],
+                [
+                    'title' => 'Include Graphs',
+                    'name' => 'attach-graph',
+                    'descr' => 'Include graph image data in the email.  Will be embedded if html5, otherwise attached. Template must use @signedGraphTag',
+                    'type' => 'checkbox',
+                    'default' => true,
                 ],
             ],
             'validation' => [

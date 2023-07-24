@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 use Permissions;
@@ -29,6 +29,7 @@ class Port extends DeviceRelatedModel
         static::deleting(function (Port $port) {
             // delete related data
             $port->adsl()->delete();
+            $port->vdsl()->delete();
             $port->fdbEntries()->delete();
             $port->ipv4()->delete();
             $port->ipv6()->delete();
@@ -48,7 +49,7 @@ class Port extends DeviceRelatedModel
             DB::table('links')->where('local_port_id', $port->port_id)->orWhere('remote_port_id', $port->port_id)->delete();
             DB::table('ports_stack')->where('port_id_low', $port->port_id)->orWhere('port_id_high', $port->port_id)->delete();
 
-            \Rrd::purge(optional($port->device)->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
+            \Rrd::purge($port->device?->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
         });
     }
 
@@ -61,7 +62,7 @@ class Port extends DeviceRelatedModel
      */
     public function getLabel()
     {
-        $os = optional($this->device)->os;
+        $os = $this->device?->os;
 
         if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
@@ -105,7 +106,7 @@ class Port extends DeviceRelatedModel
      */
     public function getDescription(): string
     {
-        return (string) ($this->ifAlias);
+        return (string) $this->ifAlias;
     }
 
     /**
@@ -277,6 +278,11 @@ class Port extends DeviceRelatedModel
     public function adsl(): HasMany
     {
         return $this->hasMany(PortAdsl::class, 'port_id');
+    }
+
+    public function vdsl(): HasMany
+    {
+        return $this->hasMany(PortVdsl::class, 'port_id');
     }
 
     public function events(): MorphMany

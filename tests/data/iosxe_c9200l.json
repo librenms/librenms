@@ -24,6 +24,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -33,7 +34,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1117",
                     "sensor_index": "1117",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Bias Current ",
+                    "sensor_descr": "Te1/1/4 Bias Current",
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
@@ -48,6 +49,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -57,7 +59,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1118",
                     "sensor_index": "1118",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Transmit Power ",
+                    "sensor_descr": "Te1/1/4 Transmit Power",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -72,6 +74,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -81,7 +84,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1119",
                     "sensor_index": "1119",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Receive Power ",
+                    "sensor_descr": "Te1/1/4 Receive Power",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -96,6 +99,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -120,6 +124,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -144,6 +149,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -168,6 +174,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -192,6 +199,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -216,6 +224,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -240,6 +249,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -264,6 +274,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -288,6 +299,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -312,6 +324,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -336,6 +349,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -360,6 +374,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -384,6 +399,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -408,6 +424,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -432,6 +449,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -456,6 +474,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -480,6 +499,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -504,6 +524,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -528,6 +549,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -552,6 +574,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -576,6 +599,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -600,6 +624,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -624,6 +649,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -648,6 +674,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -672,6 +699,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -696,6 +724,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -720,6 +749,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -744,6 +774,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -768,6 +799,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -792,6 +824,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -816,6 +849,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -840,6 +874,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFCfgRedundancyOperMode"
                 },
                 {
@@ -864,6 +899,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusPeerUnitState"
                 },
                 {
@@ -888,6 +924,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusUnitState"
                 },
                 {
@@ -912,6 +949,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswRingRedundant"
                 },
                 {
@@ -921,7 +959,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.117",
                     "sensor_index": "117",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -936,6 +974,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -945,7 +984,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.118",
                     "sensor_index": "118",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -960,6 +999,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -969,7 +1009,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.172",
                     "sensor_index": "172",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -984,6 +1024,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -993,7 +1034,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.173",
                     "sensor_index": "173",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1008,6 +1049,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1017,7 +1059,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.445",
                     "sensor_index": "445",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1032,6 +1074,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1041,7 +1084,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.446",
                     "sensor_index": "446",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1056,6 +1099,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1065,7 +1109,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.448",
                     "sensor_index": "448",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1080,6 +1124,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1089,7 +1134,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.449",
                     "sensor_index": "449",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1104,6 +1149,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1113,7 +1159,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.451",
                     "sensor_index": "451",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1128,6 +1174,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1137,7 +1184,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.452",
                     "sensor_index": "452",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1152,6 +1199,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1161,7 +1209,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.454",
                     "sensor_index": "454",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1176,6 +1224,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1185,7 +1234,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.455",
                     "sensor_index": "455",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1200,6 +1249,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1209,7 +1259,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.457",
                     "sensor_index": "457",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1224,6 +1274,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1233,7 +1284,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.458",
                     "sensor_index": "458",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1248,6 +1299,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1257,7 +1309,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.62",
                     "sensor_index": "62",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1272,6 +1324,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1281,7 +1334,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.63",
                     "sensor_index": "63",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1296,6 +1349,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -1320,6 +1374,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -1344,6 +1399,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -1368,6 +1424,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -1392,6 +1449,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -1416,6 +1474,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -1440,6 +1499,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -1464,6 +1524,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1488,6 +1549,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1512,6 +1574,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1536,6 +1599,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1560,6 +1624,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1584,6 +1649,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1608,6 +1674,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1632,6 +1699,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1656,6 +1724,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1665,7 +1734,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1010",
                     "sensor_index": "1010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - Inlet Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1680,6 +1749,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1689,7 +1759,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1011",
                     "sensor_index": "1011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - Outlet Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1704,6 +1774,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1713,7 +1784,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1012",
                     "sensor_index": "1012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - HotSpot Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1728,6 +1799,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1737,7 +1809,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1115",
                     "sensor_index": "1115",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Module ",
+                    "sensor_descr": "Te1/1/4 Module",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -1752,6 +1824,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1761,7 +1834,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2010",
                     "sensor_index": "2010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - Inlet Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1776,6 +1849,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1785,7 +1859,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2011",
                     "sensor_index": "2011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - Outlet Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1800,6 +1874,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1809,7 +1884,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2012",
                     "sensor_index": "2012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - HotSpot Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1824,6 +1899,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1833,7 +1909,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2115",
                     "sensor_index": "2115",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Module ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Module",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1848,6 +1924,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1857,7 +1934,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2116",
                     "sensor_index": "2116",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Supply Voltage ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Supply Voltage",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1872,6 +1949,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1881,7 +1959,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2117",
                     "sensor_index": "2117",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Bias Current ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Bias Current",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1896,6 +1974,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1905,7 +1984,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2118",
                     "sensor_index": "2118",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Transmit Power ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Transmit Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1920,6 +1999,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1929,7 +2009,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2119",
                     "sensor_index": "2119",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Receive Power ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Receive Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1944,6 +2024,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1953,7 +2034,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3010",
                     "sensor_index": "3010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - Inlet Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1968,6 +2049,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1977,7 +2059,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3011",
                     "sensor_index": "3011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - Outlet Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1992,6 +2074,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2001,7 +2084,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3012",
                     "sensor_index": "3012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - HotSpot Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2016,6 +2099,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2025,7 +2109,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1116",
                     "sensor_index": "1116",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Supply Voltage ",
+                    "sensor_descr": "Te1/1/4 Supply Voltage",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -2040,6 +2124,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -2721,6 +2806,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2730,7 +2816,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1117",
                     "sensor_index": "1117",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Bias Current ",
+                    "sensor_descr": "Te1/1/4 Bias Current",
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
@@ -2745,6 +2831,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2754,7 +2841,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1118",
                     "sensor_index": "1118",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Transmit Power ",
+                    "sensor_descr": "Te1/1/4 Transmit Power",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -2769,6 +2856,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2778,7 +2866,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1119",
                     "sensor_index": "1119",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Receive Power ",
+                    "sensor_descr": "Te1/1/4 Receive Power",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -2793,6 +2881,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2817,6 +2906,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2841,6 +2931,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2865,6 +2956,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2889,6 +2981,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2913,6 +3006,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2937,6 +3031,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2961,6 +3056,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2985,6 +3081,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3009,6 +3106,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3033,6 +3131,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -3057,6 +3156,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -3081,6 +3181,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -3105,6 +3206,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3129,6 +3231,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3153,6 +3256,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3177,6 +3281,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3201,6 +3306,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3225,6 +3331,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonFanState"
                 },
                 {
@@ -3249,6 +3356,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -3273,6 +3381,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -3297,6 +3406,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
                 },
                 {
@@ -3321,6 +3431,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3345,6 +3456,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3369,6 +3481,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3393,6 +3506,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3417,6 +3531,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3441,6 +3556,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3465,6 +3581,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3489,6 +3606,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3513,6 +3631,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
                 },
                 {
@@ -3537,6 +3656,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFCfgRedundancyOperMode"
                 },
                 {
@@ -3561,6 +3681,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusPeerUnitState"
                 },
                 {
@@ -3585,6 +3706,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusUnitState"
                 },
                 {
@@ -3609,6 +3731,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswRingRedundant"
                 },
                 {
@@ -3618,7 +3741,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.117",
                     "sensor_index": "117",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3633,6 +3756,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3642,7 +3766,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.118",
                     "sensor_index": "118",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3657,6 +3781,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3666,7 +3791,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.172",
                     "sensor_index": "172",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3681,6 +3806,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3690,7 +3816,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.173",
                     "sensor_index": "173",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3705,6 +3831,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3714,7 +3841,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.445",
                     "sensor_index": "445",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3729,6 +3856,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3738,7 +3866,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.446",
                     "sensor_index": "446",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3753,6 +3881,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3762,7 +3891,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.448",
                     "sensor_index": "448",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3777,6 +3906,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3786,7 +3916,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.449",
                     "sensor_index": "449",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3801,6 +3931,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3810,7 +3941,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.451",
                     "sensor_index": "451",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3825,6 +3956,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3834,7 +3966,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.452",
                     "sensor_index": "452",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3849,6 +3981,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3858,7 +3991,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.454",
                     "sensor_index": "454",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3873,6 +4006,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3882,7 +4016,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.455",
                     "sensor_index": "455",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3897,6 +4031,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3906,7 +4041,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.457",
                     "sensor_index": "457",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3921,6 +4056,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3930,7 +4066,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.458",
                     "sensor_index": "458",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3945,6 +4081,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3954,7 +4091,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.62",
                     "sensor_index": "62",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3969,6 +4106,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -3978,7 +4116,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.500.1.2.2.1.1.63",
                     "sensor_index": "63",
                     "sensor_type": "cswStackPortOperStatus",
-                    "sensor_descr": "Stack Port Status - ",
+                    "sensor_descr": "Stack Port Status -",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3993,6 +4131,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswStackPortOperStatus"
                 },
                 {
@@ -4017,6 +4156,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -4041,6 +4181,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -4065,6 +4206,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchRole"
                 },
                 {
@@ -4089,6 +4231,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -4113,6 +4256,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -4137,6 +4281,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cswSwitchState"
                 },
                 {
@@ -4161,6 +4306,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4185,6 +4331,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4209,6 +4356,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4233,6 +4381,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4257,6 +4406,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4281,6 +4431,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4305,6 +4456,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4329,6 +4481,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4353,6 +4506,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4362,7 +4516,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1010",
                     "sensor_index": "1010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - Inlet Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4377,6 +4531,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4386,7 +4541,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1011",
                     "sensor_index": "1011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - Outlet Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4401,6 +4556,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4410,7 +4566,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1012",
                     "sensor_index": "1012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 1 - Switch 1 - HotSpot Temp ",
+                    "sensor_descr": "Switch 1 - Switch 1 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4425,6 +4581,7 @@
                     "entPhysicalIndex_measured": "1000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4434,7 +4591,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1115",
                     "sensor_index": "1115",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Module ",
+                    "sensor_descr": "Te1/1/4 Module",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -4449,6 +4606,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4458,7 +4616,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2010",
                     "sensor_index": "2010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - Inlet Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4473,6 +4631,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4482,7 +4641,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2011",
                     "sensor_index": "2011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - Outlet Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4497,6 +4656,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4506,7 +4666,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2012",
                     "sensor_index": "2012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Switch 2 - HotSpot Temp ",
+                    "sensor_descr": "Switch 2 - Switch 2 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4521,6 +4681,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4530,7 +4691,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2115",
                     "sensor_index": "2115",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Module ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Module",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4545,6 +4706,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4554,7 +4716,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2116",
                     "sensor_index": "2116",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Supply Voltage ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Supply Voltage",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4569,6 +4731,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4578,7 +4741,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2117",
                     "sensor_index": "2117",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Bias Current ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Bias Current",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4593,6 +4756,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4602,7 +4766,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2118",
                     "sensor_index": "2118",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Transmit Power ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Transmit Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4617,6 +4781,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4626,7 +4791,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.2119",
                     "sensor_index": "2119",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 2 - Te2/1/4 Receive Power ",
+                    "sensor_descr": "Switch 2 - Te2/1/4 Receive Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4641,6 +4806,7 @@
                     "entPhysicalIndex_measured": "2000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4650,7 +4816,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3010",
                     "sensor_index": "3010",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - Inlet Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - Inlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4665,6 +4831,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4674,7 +4841,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3011",
                     "sensor_index": "3011",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - Outlet Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - Outlet Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4689,6 +4856,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4698,7 +4866,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.3012",
                     "sensor_index": "3012",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Switch 3 - Switch 3 - HotSpot Temp ",
+                    "sensor_descr": "Switch 3 - Switch 3 - HotSpot Temp",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4713,6 +4881,7 @@
                     "entPhysicalIndex_measured": "3000",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4722,7 +4891,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.1116",
                     "sensor_index": "1116",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Te1/1/4 Supply Voltage ",
+                    "sensor_descr": "Te1/1/4 Supply Voltage",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -4737,6 +4906,7 @@
                     "entPhysicalIndex_measured": "0",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -5406,11 +5576,11 @@
                     "version": "CAT9K_LITE_IOSXE 16.12.4",
                     "hardware": "c92xxL Stack",
                     "features": "Gibraltar",
+                    "location": null,
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

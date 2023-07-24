@@ -106,11 +106,11 @@
                     "version": "3.10.0-693.17.1.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
+                    "icon": "linux.svg"
                 }
             ]
         },

@@ -27,7 +27,7 @@ namespace LibreNMS\Exceptions;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
-use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 
 class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableException
 {
@@ -40,7 +40,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     public static function upgrade($exception)
     {
         // cannot write to storage directory
-        if ($exception instanceof FatalErrorException &&
+        if ($exception instanceof FatalError &&
             Str::startsWith($exception->getMessage(), 'Maximum execution time of')) {
             return new static($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -56,7 +56,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     public function render(\Illuminate\Http\Request $request)
     {
         $title = preg_match('/ (\d+) /', $this->message, $matches)
-            ? trans_choice('exceptions.maximum_execution_time_exceeded.title', $matches[1], ['seconds' => $matches[1]])
+            ? trans_choice('exceptions.maximum_execution_time_exceeded.title', (int) $matches[1], ['seconds' => (int) $matches[1]])
             : $this->getMessage();
 
         $message = trans('exceptions.maximum_execution_time_exceeded.message');

@@ -27,7 +27,7 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class AlertScheduleController extends TableController
 {
@@ -65,8 +65,8 @@ class AlertScheduleController extends TableController
     public function formatItem($schedule)
     {
         return [
-            'title' => $schedule->title,
-            'notes' => $schedule->notes,
+            'title' => htmlentities($schedule->title),
+            'notes' => htmlentities($schedule->notes),
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),
             'end' => $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes'),
@@ -75,7 +75,7 @@ class AlertScheduleController extends TableController
             'end_recurring_dt' => $schedule->recurring ? $schedule->end_recurring_dt : '',
             'end_recurring_hr' => $schedule->recurring ? $schedule->end_recurring_hr : '',
             'recurring' => $schedule->recurring ? __('Yes') : __('No'),
-            'recurring_day' => $schedule->recurring ? implode(',', $schedule->recurring_day) : '',
+            'recurring_day' => $schedule->recurring ? htmlentities(implode(',', $schedule->recurring_day)) : '',
             'status' => $schedule->status,
         ];
     }

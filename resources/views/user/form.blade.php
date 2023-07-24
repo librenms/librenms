@@ -6,15 +6,13 @@
     </div>
 </div>
 
-@if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
 <div class="form-group @if($errors->has('enabled')) has-error @endif">
     <label for="enabled" class="control-label col-sm-3">{{ __('Enabled') }}</label>
     <div class="col-sm-9">
-        <input type="hidden" value="@if(Auth::id() == $user->user_id) 1 else 0 @endif" name="enabled">
-        <input type="checkbox" id="enabled" name="enabled" data-size="small" @if(old('enabled', $user->enabled)) checked @endif @if(Auth::id() == $user->user_id) disabled @endif>
+        <input type="hidden" value="@if(Auth::id() == $user->user_id) 1 @else 0 @endif" name="enabled">
+        <input type="checkbox" id="enabled" name="enabled" data-size="small" @if(old('enabled', $user->enabled ?? true)) checked @endif @if(Auth::id() == $user->user_id) disabled @endif>
     </div>
 </div>
-@endif
 
 <div class="form-group @if($errors->has('email')) has-error @endif">
     <label for="email" class="control-label col-sm-3">{{ __('Email') }}</label>
@@ -87,6 +85,19 @@
     </div>
 </div>
 @endif
+
+<div class="form-group @if($errors->has('timezone')) has-error @endif">
+    <label for="timezone" class="control-label col-sm-3">{{ __('Timezone') }}</label>
+    <div class="col-sm-9">
+        <select id="timezone" name="timezone" class="form-control">
+            <option value="default">Browser Timezone</option>
+            @foreach(timezone_identifiers_list() as $tz)
+                <option value="{{ $tz }}" @if(old('timezone', $timezone) == $tz) selected @endif>{{ $tz }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ $errors->first('timezone') }}</span>
+    </div>
+</div>
 
 <script>
 $("[type='checkbox']").bootstrapSwitch();

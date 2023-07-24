@@ -87,7 +87,7 @@ modules:
                     group: 'Operating Time'
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.5.{{ $index }}'
                     descr: '{{ $lgpEnvOperationTimePoint }} - ID {{ $lgpEnvOperationTimeSubID }}'
-                    index: ' .1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
+                    index: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
         state:
             data:
                 -

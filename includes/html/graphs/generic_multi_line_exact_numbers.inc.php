@@ -16,13 +16,13 @@ if ($printtotal === 1) {
 $unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 10)), 0, ($descr_len + 10)) . "Now         Min         Max        Avg\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
     if ($printtotal === 1) {
         $rrd_options .= " COMMENT:'Total      '";
     }
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 10)), 0, ($descr_len + 10)) . "Now         Min         Max        Avg\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
 }
 
 foreach ($rrd_list as $rrd) {
@@ -53,7 +53,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' DEF:' . $rrd['ds'] . $i . 'max=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MAX ';
     }
 
-    if ($_GET['previous']) {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' DEF:' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $i . "X:$period";
         $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
@@ -100,7 +100,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {

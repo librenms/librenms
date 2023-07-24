@@ -2,14 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\AlertTransport;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Alert\Transport;
 
 class AlertTransportFactory extends Factory
 {
-    protected $model = AlertTransport::class;
-
     public function definition(): array
     {
         return [

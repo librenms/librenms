@@ -23,62 +23,44 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Support\Str;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Slack extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $slack_opts = $this->parseUserOptions($this->config['slack-options']);
-        $slack_opts['url'] = $this->config['slack-url'];
+        $slack_opts = $this->parseUserOptions($this->config['slack-options'] ?? '');
+        $icon = $this->config['slack-icon_emoji'] ?? $slack_opts['icon_emoji'] ?? null;
+        $slack_msg = html_entity_decode(strip_tags($alert_data['msg'] ?? ''), ENT_QUOTES);
 
-        return $this->contactSlack($obj, $slack_opts);
-    }
-
-    public static function contactSlack($obj, $api)
-    {
-        $host = $api['url'];
-        $curl = curl_init();
-        $slack_msg = html_entity_decode(strip_tags($obj['msg'] ?? ''), ENT_QUOTES);
-        $color = self::getColorForState($obj['state']);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $slack_msg,
-                    'color' => $color,
-                    'title' => $obj['title'] ?? null,
+                    'color' => self::getColorForState($alert_data['state']),
+                    'title' => $alert_data['title'] ?? null,
                     'text' => $slack_msg,
                     'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $api['author_name'] ?? null,
+                    'author_name' => $this->config['slack-author'] ?? $slack_opts['author'] ?? null,
                 ],
             ],
-            'channel' => $api['channel'] ?? null,
-            'username' => $api['username'] ?? null,
-            'icon_emoji' => isset($api['icon_emoji']) ? ':' . $api['icon_emoji'] . ':' : null,
+            'channel' => $this->config['slack-channel'] ?? $slack_opts['channel'] ?? null,
+            'icon_emoji' => $icon ? Str::finish(Str::start($icon, ':'), ':') : null,
         ];
-        $alert_message = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
 
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
-            var_dump('Return: ' . $ret); //FIXME: propper debuging
+        $res = Http::client()->post($this->config['slack-url'] ?? '', $data);
 
-            return 'HTTP Status code ' . $code;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $slack_msg, $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -89,14 +71,30 @@ class Slack extends Transport
                     'type' => 'text',
                 ],
                 [
-                    'title' => 'Slack Options',
-                    'name' => 'slack-options',
-                    'descr' => 'Slack Options',
-                    'type' => 'textarea',
+                    'title' => 'Channel',
+                    'name' => 'slack-channel',
+                    'descr' => 'Channel to post to',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Author Name',
+                    'name' => 'slack-author',
+                    'descr' => 'Name of author',
+                    'type' => 'text',
+                    'default' => 'LibreNMS',
+                ],
+                [
+                    'title' => 'Icon',
+                    'name' => 'slack-icon_emoji',
+                    'descr' => 'Name of emoji for icon',
+                    'type' => 'text',
                 ],
             ],
             'validation' => [
                 'slack-url' => 'required|url',
+                'slack-channel' => 'string',
+                'slack-author' => 'string',
+                'slack-icon_emoji' => 'string',
             ],
         ];
     }

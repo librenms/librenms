@@ -36,9 +36,10 @@ do this globally in `config.php` like:
 
 Disable OSPF polling
 
-```php
-$config['poller_modules']['ospf'] = false;
-```
+!!! setting "poller/poller_modules"
+    ```bash
+    lnms config:set poller_modules.ospf false
+    ```
 
 You can disable modules globally then re-enable the module per device
 or the opposite way. For a list of modules please see [Poller
@@ -83,22 +84,24 @@ You can also set this globally with the config option
 You can change some of the default fping options used globally or per
 device. The defaults are:
 
-```php
-$config['fping_options']['timeout'] = 500;
-$config['fping_options']['count']   = 3;
-$config['fping_options']['interval'] = 500;
-```
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set fping_options.timeout 500
+    lnms config:set fping_options.count 3
+    lnms config:set fping_options.interval 500
+    ```
 
 If your devices are slow to respond then you will need to increase the
 timeout value and potentially the interval value. However if your
 network is stable, you can increase poller performance by dropping the
 count value to 1 and/or the timeout+millsec value to 200 or 300:
 
-```php
-$config['fping_options']['timeout'] = 300;
-$config['fping_options']['count']   = 1;
-$config['fping_options']['interval'] = 300;
-```
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set fping_options.timeout 300
+    lnms config:set fping_options.count 1
+    lnms config:set fping_options.interval 300
+    ```
 
 This will mean that we no longer delay each icmp packet sent (we send
 3 in total by default) by 0.5 seconds. With only 1 icmp packet
@@ -182,7 +185,7 @@ Some distributions allow separate cli, mod_php and php-fpm configurations, we ca
 
 ### For web servers using mod_php and php-fpm
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/8.1/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache
@@ -197,7 +200,7 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your PHP opcache.ini.  Possible locations: `/etc/php/8.1/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache.so

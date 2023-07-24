@@ -1,0 +1,19 @@
+os: mlos-nsp
+group: trellix
+text: 'McAfee Linux OS - NSP'
+type: appliance
+icon: trellix
+mib_dir: trellix
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+        oid: .1.3.6.1.4.1.8962.2.1.2.1.1.6.0
+        op: contains
+        value: 
+            - 'NETWORK-SECURITY-PLATFORM'
+            - 'TRELLIX-INTRUSION-PREVENTION-SYSTEM'
