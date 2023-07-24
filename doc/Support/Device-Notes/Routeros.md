@@ -1,27 +1,30 @@
-This is attempt to get vlans information from Mikrotik RouterOS.
+This agent script will allow LibreNMS to run a script on a Mikrotik device to gather the vlan information from both /interface/vlan/ and /interface/bridge/vlan/
 
 # Installation
 
-Installation is very simple. On mikrotik we need:
-1. one script, named "LNMS_vlans"
-2. snmp community with write permission
 
-Copy the scripts from librenms-agent/snmp/Routeros and place in /system/scripts
-Set snmp community to have WRITE permission in /snmp/community
+Installation:
+1) Go to https://github.com/librenms/librenms-agent/tree/master/snmp/Routeros
+3) Copy and paste the contents of LNMS_vlans.scr file into a script within a RouterOS device.  Name this script LNMS_vlans. (This is NOT the same thing as creating a txt file and importing it into the Files section of the device)
+4) If you're unsure how to create the script.  Download the LNMS_vlans.scr file.  Rename to remove the .scr extension.  Copy this file onto all the Mikrotkk devices you want to monitor.
+5) Open a Terminal / CLI on each tik and run this.  ```{ :global txtContent [/file get LNMS_vlans contents]; /system/script/add name=LNMS_vlans owner=admin policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=$txtContent ;}```  This will import the contents of that txt file into a script named LNMS_vlans
+6) Enable an SNMP community that has both READ and WRITE capabilities. This is important, otherwise LibreNMS will not be able to run the above script. It is recommended to use SNMP v3 for this. 
 
-It is strongly recomended that snmp allowed address is narrowed down to /32 because write permission could allow attack on device
+It is strongly recommended that SNMP allowed address is narrowed down to the specific IP range your LibreNMS will be coming from. (usually /32 address) because the write permission could allow an attack on a device. (such as dropping all firewall filters or changing the admin credentials. 
+7) Discover / Force rediscover your Mikrotik devices. After discovery has been completed the vlans menu should appear within LibreNMS for the device. 
+
 
 Theory of operation:
 
-Mikrotik vlan discovery plugin using ability of ROS to "fire up" a script trough SNMP
-At first, LibreNMS check for existence of script, and if it present, it will be started
-Sript try to gather information from:
+Mikrotik vlan discovery plugin using the ability of ROS to "fire up" a script through SNMP
+At first, LibreNMS check for the existence of the script, and if it is present, it will start the LNMS_vlans script. 
+The script will gather information from:
 a. /interface/bridge/vlan for tagged ports inside bridge
 b. /interface/bridge/vlan for currently untagged ports inside bridge
 c. /interface/bridge/port for ports PVID (untagged) inside bridge
-d. /interface/vlan for plain (old style) vlans
+d. /interface/vlan for vlan interfaces
 
-after information is gathered, it is transmitted to LibreNMS over SNMP
+after the information is gathered, it is transmitted to LibreNMS over SNMP
 protocol is:
 type,vlanId,ifName <cr>
 
