@@ -877,8 +877,10 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
+            $count = 0;
 
             foreach ($raw_data as $index => $snmp_data) {
+                $count++;
                 $user_function = null;
                 if (isset($data['user_func'])) {
                     $user_function = $data['user_func'];
@@ -886,7 +888,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data['value'] = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
-                $snmp_value = $snmp_data[$data['value']];
+                $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values

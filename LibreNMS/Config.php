@@ -494,7 +494,7 @@ class Config
     {
         if (! self::has($key)) {
             if (is_string($value)) {
-                $format_values = array_map('self::get', $format_values);
+                $format_values = array_map('\LibreNMS\Config::get', $format_values);
                 self::set($key, vsprintf($value, $format_values));
             } else {
                 self::set($key, $value);
