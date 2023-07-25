@@ -5390,11 +5390,19 @@
                 "CRITICAL": "CRITICAL"
             }
         },
+        "service_master_timeout": {
+            "default": 20,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "integer",
+            "units": "seconds"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
             "section": "distributed",
-            "order": 25,
+            "order": 26,
             "type": "boolean"
         },
         "sfdp": {
