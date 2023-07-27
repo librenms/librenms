@@ -33,6 +33,13 @@ parser.add_argument(
     default=False,
     help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
 )
+parser.add_argument(
+    "-m",
+    "--modules",
+    dest="modules",
+    default="",
+    help="Enable passing of a module string, modules are separated by comma",
+)
 args = parser.parse_args()
 
 config = LibreNMS.get_config_data(os.path.dirname(os.path.realpath(__file__)))
@@ -59,5 +66,6 @@ wrapper.wrapper(
     amount_of_workers=amount_of_workers,
     config=config,
     log_dir=log_dir,
+    modules=args.modules or "",
     _debug=args.debug,
 )

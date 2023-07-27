@@ -31,7 +31,7 @@ Config is simple, here's an example based on Graylog 2.4:
     lnms config:set graylog.username admin
     lnms config:set graylog.password 'admin'
     lnms config:set graylog.version 2.4
-```
+    ```
 
 ## Timezone
 Graylog messages are stored using GMT timezone. You can display
@@ -81,7 +81,7 @@ the FQDN or IP address specified in
 !!! setting "external/graylog"
     ```bash
     lnms config:set graylog.server example.com
-```
+    ```
 
 ## Match Any Address
 If you want to match the source address of the log entries against any

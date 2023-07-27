@@ -1312,6 +1312,10 @@ return [
             'description' => 'Enable Polling',
             'help' => 'Enable poller workers. Sets the default value for all nodes.',
         ],
+        'service_master_timeout' => [
+            'description' => 'Master Dispatcher Timeout',
+            'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',

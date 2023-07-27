@@ -85,7 +85,7 @@ class Slack extends Transport
                 ],
                 [
                     'title' => 'Icon',
-                    'name' => 'slack-author',
+                    'name' => 'slack-icon_emoji',
                     'descr' => 'Name of emoji for icon',
                     'type' => 'text',
                 ],
@@ -93,7 +93,7 @@ class Slack extends Transport
             'validation' => [
                 'slack-url' => 'required|url',
                 'slack-channel' => 'string',
-                'slack-username' => 'string',
+                'slack-author' => 'string',
                 'slack-icon_emoji' => 'string',
             ],
         ];
