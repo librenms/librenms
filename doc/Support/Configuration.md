@@ -181,7 +181,7 @@ be linked to rather than having the config provided.
 >
 > Settings -> External Settings -> RRDTool Setup
 
-!!! setting "external/binaries"
+!!! fa-solid-fa-gear "external/binaries"
     ```bash
     lnms config:set rrdtool /usr/bin/rrdtool
     ```
@@ -191,13 +191,13 @@ configuring your install to record data more frequently.
 
 #### fping
 
-!!! setting "external/binaries"
+!!! fa-solid-fa-gear "external/binaries"
     ```bash
-lnms config:set fping /usr/bin/fping
-lnms config:set fping6 fping6
+    lnms config:set fping /usr/bin/fping
+    lnms config:set fping6 fping6
     ```
 
-!!! setting "poller/ping"
+!!! fa-solid-fa-gear "poller/ping"
     ```bash
     lnms config:set fping_options.timeout 500
     lnms config:set fping_options.count 3
@@ -252,7 +252,7 @@ LibreNMS uses traceroute to record debug information
 when a device is down due to icmp AND you have
 `lnms config:set debug.run_trace true` set.
 
-!!! setting "external/binaries"
+!!! fa-solid-fa-gear "external/binaries"
     ```bash
     lnms config:set traceroute /usr/bin/traceroute
     ```
@@ -261,7 +261,7 @@ when a device is down due to icmp AND you have
 
 SNMP program locations.
 
-!!! setting "external/binaries"
+!!! fa-solid-fa-gear "external/binaries"
     ```bash
     lnms config:set snmpwalk /usr/bin/snmpwalk
     lnms config:set snmpget /usr/bin/snmpget
@@ -271,7 +271,7 @@ SNMP program locations.
     ```
 
 #### Misc binaries
-!!! setting "external/binaries"
+!!! fa-solid-fa-gear "external/binaries"
 ```bash
 lnms config:set whois /usr/bin/whois
 lnms config:set ping /bin/ping
@@ -299,7 +299,7 @@ lnms config:set password.min_length 8
 For alerting and the callback functionality, we support the use of a
 http proxy setting. These can be any one of the following:
 
-!!! setting "system/proxy"
+!!! fa-solid-fa-gear "system/proxy"
     ```bash
     lnms config:set callback_proxy proxy.domain.com
     lnms config:set http_proxy proxy.domain.com
@@ -324,7 +324,7 @@ lnms config:set base_url http://demo.librenms.org
 
 LibreNMS will attempt to detect the URL you are using but you can override that here.
 
-!!! setting "webui/style"
+!!! fa-solid-fa-gear "webui/style"
     ```bash
     lnms config:set site_style light
     ```
@@ -342,7 +342,7 @@ into  `html/css/custom` so they will be ignored by auto updates. You
 can specify as many css files as you like, the order they are within
 your config will be the order they are loaded in the browser.
 
-!!! setting "webui/style"
+!!! fa-solid-fa-gear "webui/style"
     ```bash
     lnms config:set title_image images/custom/yourlogo.png
     ```
@@ -365,7 +365,7 @@ You can create your own front page by adding a blade file in `resources/views/ov
 and setting `front_page` to it's name.
 For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
-!!! setting "webui/dashboard"
+!!! fa-solid-fa-gear "webui/dashboard"
     ```bash
     lnms config:set webui.default_dashboard_id 0
     ```
@@ -467,7 +467,7 @@ lnms config:set overview_show_sysDescr true
 
 Enable or disable the sysDescr output for a device.
 
-!!! setting "webui/device"
+!!! fa-solid-fa-gear "webui/device"
     ```bash
     lnms config:set device_display_default '{{ $hostname }}'
     ```
@@ -519,7 +519,7 @@ lnms config:set percentile_value 90
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
-!!! setting "webui/graph"
+!!! fa-solid-fa-gear "webui/graph"
     ```bash
     lnms config:set shorthost_target_length 15
     ```
@@ -558,7 +558,7 @@ lnms config:set addhost_alwayscheckip false # true - check for duplicate ips eve
 By default we allow hosts to be added with duplicate sysName's, you
 can disable this with the following config:
 
-!!! setting "discovery/general"
+!!! fa-solid-fa-gear "discovery/general"
 ```bash
 lnms config:set allow_duplicate_sysName false
 ```
@@ -594,7 +594,7 @@ lnms config:set os.ios.poller_modules.entity-state true
 Default SNMP options including retry and timeout settings and also
 default version and port.
 
-!!! setting "poller/snmp"
+!!! fa-solid-fa-gear "poller/snmp"
     ```bash
     lnms config:set snmp.timeout 1                         # timeout in seconds
     lnms config:set snmp.retries 5                         # how many times to retry the query
@@ -610,7 +610,7 @@ default version and port.
 The default v1/v2c snmp community to use, you can expand this array
 with `[1]`, `[2]`, `[3]`, etc.
 
-!!! setting "poller/snmp"
+!!! fa-solid-fa-gear "poller/snmp"
     ```bash
     lnms config:set snmp.community.0 public
     ```
@@ -620,7 +620,7 @@ with `[1]`, `[2]`, `[3]`, etc.
 The default v3 snmp details to use, you can expand this array with
 `[1]`, `[2]`, `[3]`, etc.
 
-!!! setting "poller/snmp"
+!!! fa-solid-fa-gear "poller/snmp"
     ```bash
     lnms config:set snmp.v3.0 '{
         authlevel: "noAuthNoPriv",
@@ -650,7 +650,7 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 > You can configure these options within the WebUI now, please avoid
 > setting these options within config.php
 
-!!! setting "alerting/email"
+!!! fa-solid-fa-gear "alerting/email"
     ```bash
     lnms config:set email_backend mail
     lnms config:set email_from librenms@yourdomain.local
@@ -703,7 +703,7 @@ Enable / disable additional port statistics.
 Assign a new discovered Port automatically to Port Group with this Port Group ID
 (0 means no Port Group assignment)
 
-!!! setting "discovery/networks"
+!!! fa-solid-fa-gear "discovery/networks"
     ```bash
     lnms config:set default_port_group 0
     ```
@@ -964,7 +964,7 @@ lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 
 Mounted storage / mount points to ignore in discovery and polling.
 
-!!! setting "discovery/storage"
+!!! fa-solid-fa-gear "discovery/storage"
    ```bash
     lnms config:set ignore_mount_removable true
     lnms config:set ignore_mount_network true

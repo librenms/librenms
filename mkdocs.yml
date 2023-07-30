@@ -88,6 +88,7 @@ extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css
   - librenms.css
+  - stylesheets/extra.css
 extra_javascript:
   - js/docs-settings-links.js
 extra:
