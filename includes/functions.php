@@ -1233,6 +1233,7 @@ function mac_oui_to_database()
         }
     } else {
         echo 'Not able to acquire lock, skipping mac database update' . PHP_EOL;
+
         return 1;
     }
 
