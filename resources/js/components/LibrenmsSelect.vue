@@ -41,11 +41,17 @@
 <script>
 export default {
     name: "LibrenmsSelect",
+    props: {
+        route: {
+            type: String,
+            required: true
+        }
+    },
     data: () => ({
         options: [],
         searchString: '',
         observer: null,
-        limit: 10,
+        limit: 50,
         page: 1,
         hasNextPage: false
     }),
@@ -72,7 +78,6 @@ export default {
             if (isIntersecting) {
                 const ul = target.offsetParent
                 const scrollTop = target.offsetParent.scrollTop
-                console.log('intersected');
                 this.fetchMore()
                 await this.$nextTick()
                 ul.scrollTop = scrollTop
@@ -80,12 +85,10 @@ export default {
         },
         fetchMore() {
             if (this.hasNextPage) {
-                console.log('MORE');
                 this.fetch(function(){}, this.searchString, this);
             }
         },
         onSearch(search, loading) {
-            console.log('search:'+search);
             this.page = 1;
             this.hasNextPage = true;
             loading(true);
@@ -93,18 +96,15 @@ export default {
         },
         fetch: _.debounce((loading, search, vm) => {
             fetch(
-                route('ajax.select.role', {limit: vm.limit, page: vm.page, term: search})
+                route('ajax.select.' + vm.route, {limit: vm.limit, page: vm.page, term: search})
             ).then(res => {
                 res.json().then(json => {
-                    console.log(json);
-
                     // parse the data into the expected format from the select2 backend
                     let options = json.results.map((item) => ({label: item.text, code: item.id}));
                     vm.hasNextPage = json.pagination.more;
 
                     // append or set the data
                     vm.options = vm.page > 1 ? vm.options.concat(options) : options;
-                    console.log(vm.options);
 
                     vm.page++;
                     loading(false);

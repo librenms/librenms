@@ -33,11 +33,7 @@
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
             <span class="input-group-btn" style=" width:0;"></span>
-            <v-select class="form-control" @search="onSearch" @change="updateLevel(group, $event.target.value)">
-                <option value="1" :selected="data.level === 1">{{ $t('Normal') }}</option>
-                <option value="5" :selected="data.level === 5">{{ $t('Global Read') }}</option>
-                <option value="10" :selected="data.level === 10">{{ $t('Admin') }}</option>
-            </v-select>
+            <librenms-select class="form-control" @search="onSearch" @change="updateLevel(group, $event.target.value)" route="role"></librenms-select>
             <span class="input-group-btn">
                 <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
             </span>
@@ -46,11 +42,7 @@
             <div class="input-group">
                 <input type="text" class="form-control" v-model="newItem">
                 <span class="input-group-btn" style="width:0;"></span>
-                <v-select class="form-control" @search="fetchOptions" v-model="newItemLevel">
-                    <option value="1">{{ $t('Normal') }}</option>
-                    <option value="5">{{ $t('Global Read') }}</option>
-                    <option value="10">{{ $t('Admin') }}</option>
-                </v-select>
+                <librenms-select class="form-control" @search="onSearch" @change="updateLevel(group, $event.target.value)" route="role"></librenms-select>
                 <span class="input-group-btn">
                     <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
                </span>
@@ -61,9 +53,11 @@
 
 <script>
 import BaseSetting from "./BaseSetting";
+import LibrenmsSelect from "./LibrenmsSelect.vue";
 
 export default {
         name: "SettingGroupRoleMap",
+        components: {LibrenmsSelect},
         mixins: [BaseSetting],
         data() {
             return {
