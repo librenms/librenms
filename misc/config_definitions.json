@@ -28,7 +28,7 @@
             "type": "boolean"
         },
         "alert.macros.rule": {
-            "type": "array",
+            "type": "array"
         },	
         "alert_colour.ok": {
             "default": "#00ff00",
