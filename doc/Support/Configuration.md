@@ -193,8 +193,8 @@ configuring your install to record data more frequently.
 
 !!! setting "external/binaries"
     ```bash
-lnms config:set fping /usr/bin/fping
-lnms config:set fping6 fping6
+    lnms config:set fping /usr/bin/fping
+    lnms config:set fping6 fping6
     ```
 
 !!! setting "poller/ping"
