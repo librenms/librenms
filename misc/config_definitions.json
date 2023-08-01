@@ -27,6 +27,13 @@
             "order": 2,
             "type": "boolean"
         },
+        "alert.macros.rule": {
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
+        },	
         "alert_colour.ok": {
             "default": "#00ff00",
             "type": "color"
