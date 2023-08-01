@@ -1182,7 +1182,8 @@ function mac_oui_to_database()
     if ($lock->get()) {
         echo 'Storing Mac OUI in the database' . PHP_EOL;
         try {
-            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
+            $mac_oui_url = 'https://www.wireshark.org/download/automated/data/manuf';
+            //$mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
 
             echo '  -> Downloading ...' . PHP_EOL;
@@ -1197,12 +1198,12 @@ function mac_oui_to_database()
 
                 $length = strlen($entry[0]);
                 $prefix = strtolower(str_replace(':', '', $entry[0]));
-                $vendor = $entry[2];
+                $vendor = $entry[1];
 
-                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
+                if (is_array($entry) && count($entry) >= 2 && $length == 8) {
                     // We have a standard OUI xx:xx:xx
                     $oui = $prefix;
-                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
+                } elseif (is_array($entry) && count($entry) >= 2 && $length == 20) {
                     // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
                     if (substr($prefix, -2) == '28') {
                         $oui = substr($prefix, 0, 7);
@@ -1230,6 +1231,10 @@ function mac_oui_to_database()
 
             return 1;
         }
+    } else {
+        echo 'Not able to acquire lock, skipping mac database update' . PHP_EOL;
+
+        return 1;
     }
 
     return 0;
