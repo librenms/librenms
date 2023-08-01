@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 echo 'RFC1628 ';
 
 $battery_volts = snmp_get($device, 'upsBatteryVoltage.0', '-OqvU', 'UPS-MIB');
@@ -40,6 +42,7 @@ foreach ($output_volts as $index => $data) {
         $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
         $volt_oid .= '.0';
     }
+    $upsOutputVoltage_value = Number::cast($upsOutputVoltage_value);
 
     discover_sensor(
         $valid['sensor'],
@@ -74,6 +77,7 @@ foreach ($input_volts as $index => $data) {
         $upsInputVoltage_value = $data['upsInputVoltage'][0];
         $volt_oid .= '.0';
     }
+    $upsInputVoltage_value = Number::cast($upsInputVoltage_value);
 
     discover_sensor(
         $valid['sensor'],
@@ -105,6 +109,7 @@ foreach ($bypass_volts as $index => $data) {
         $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
         $volt_oid .= '.0';
     }
+    $data['upsBypassVoltage'] = Number::cast($data['upsBypassVoltage']);
 
     discover_sensor(
         $valid['sensor'],
