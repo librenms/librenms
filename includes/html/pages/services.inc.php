@@ -134,7 +134,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                 foreach (dbFetchRows($host_sql, $host_par) as $device) {
                     $device_id = $device['device_id'];
                     $device_hostname = $device['hostname'];
-                    $device_sysName = $device['sysName'];
+                    $device_sysName = htmlspecialchars($device['sysName']);
                     $devlink = generate_device_link($device, null, ['tab' => 'services']);
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_id);
