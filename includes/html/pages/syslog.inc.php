@@ -82,10 +82,10 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from'] ?? ''; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo htmlspecialchars($vars['from'] ?? ''); ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to'] ?? ''; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo htmlspecialchars($vars['to'] ?? ''); ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
