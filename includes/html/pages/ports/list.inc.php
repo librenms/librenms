@@ -113,20 +113,20 @@ var grid = $("#ports").bootgrid({
     post: function ()
     {
         return {
-            device_id: '<?php echo $vars['device_id'] ?? ''; ?>',
+            device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
             hostname: '<?php echo htmlspecialchars($vars['hostname'] ?? ''); ?>',
-            state: '<?php echo $vars['state'] ?? ''; ?>',
-            ifSpeed: '<?php echo $vars['ifSpeed'] ?? ''; ?>',
-            ifType: '<?php echo $vars['ifType'] ?? ''; ?>',
-            port_descr_type: '<?php echo $vars['port_descr_type'] ?? ''; ?>',
-            ifAlias: '<?php echo $vars['ifAlias'] ?? ''; ?>',
-            location: '<?php echo $vars['location'] ?? ''; ?>',
-            disabled: '<?php echo $vars['disabled'] ?? ''; ?>',
-            ignore: '<?php echo $vars['ignore'] ?? ''; ?>',
-            deleted: '<?php echo $vars['deleted'] ?? ''; ?>',
-            errors: '<?php echo $vars['errors'] ?? ''; ?>',
-            group: '<?php echo $vars['group'] ?? ''; ?>',
-            devicegroup: '<?php echo $vars['devicegroup'] ?? ''; ?>',
+            state: '<?php echo htmlspecialchars($vars['state'] ?? ''); ?>',
+            ifSpeed: '<?php echo htmlspecialchars($vars['ifSpeed'] ?? ''); ?>',
+            ifType: '<?php echo htmlspecialchars($vars['ifType'] ?? ''); ?>',
+            port_descr_type: '<?php echo htmlspecialchars($vars['port_descr_type'] ?? ''); ?>',
+            ifAlias: '<?php echo htmlspecialchars($vars['ifAlias'] ?? ''); ?>',
+            location: '<?php echo htmlspecialchars($vars['location'] ?? '') ?>',
+            disabled: '<?php echo htmlspecialchars($vars['disabled'] ?? ''); ?>',
+            ignore: '<?php echo htmlspecialchars($vars['ignore'] ?? ''); ?>',
+            deleted: '<?php echo htmlspecialchars($vars['deleted'] ?? ''); ?>',
+            errors: '<?php echo htmlspecialchars($vars['errors'] ?? ''); ?>',
+            group: '<?php echo htmlspecialchars($vars['group'] ?? ''); ?>',
+            devicegroup: '<?php echo htmlspecialchars($vars['devicegroup'] ?? ''); ?>',
         };
     },
     url: '<?php echo route('table.ports') ?>'
