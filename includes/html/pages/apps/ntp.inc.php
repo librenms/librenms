@@ -97,8 +97,8 @@ print_optionbar_end();
         {
             return {
                 id: "app_ntp",
-                view: '<?php echo $vars['view']; ?>',
-                graph: '<?php echo $vars['graph']; ?>',
+                view: '<?php echo htmlspecialchars($vars['view']); ?>',
+                graph: '<?php echo htmlspecialchars($vars['graph']); ?>',
             };
         },
         url: "ajax_table.php",
