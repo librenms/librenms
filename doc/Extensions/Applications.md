@@ -289,8 +289,8 @@ extend backupninja /etc/snmp/backupninja.py
 
 1. Create stats file with appropriate permissions:
 ```bash
-~$ touch /var/cache/bind/stats
-~$ chown bind:bind /var/cache/bind/stats
+touch /var/cache/bind/stats
+chown bind:bind /var/cache/bind/stats
 ```
 Change `user:group` to the user and group that's running bind/named.
 
