@@ -5,7 +5,7 @@ basic detection for a new OS.
 
 OS discovery is how LibreNMS detects which OS should be used for a device.
 Generally detection should use sysObjectID or sysDescr, but you can also
-snmpget an oid and check for a value.  This is discouraged because it slows
+snmpget an oid and check for a value.  snmpget is discouraged because it slows
 down all os detections, not just the added os.
 
 To begin, create the new OS file which should be called
