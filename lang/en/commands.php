@@ -173,7 +173,7 @@ return [
         'saving' => 'Saving results',
         'success' => 'Successfully updated OUI/Vendor mappings. :count modified OUI|Successfully updated. :count modified OUIs',
         'error' => 'Error processing Mac OUI:',
-        'vendor_update' => 'Adding :oui for :vendor',
+        'vendor_update' => 'Adding OUI :oui for :vendor',
     ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',

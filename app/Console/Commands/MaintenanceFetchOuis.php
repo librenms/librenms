@@ -52,6 +52,7 @@ class MaintenanceFetchOuis extends LnmsCommand
         $lock = Cache::lock('vendor_oui_db_refresh', 86400 * $this->min_refresh_days);
         if (! $lock->get() && ! $force) {
             $this->warn(trans('commands.maintenance:fetch-ouis.recently_fetched'));
+
             return 0;
         }
 
@@ -75,7 +76,7 @@ class MaintenanceFetchOuis extends LnmsCommand
 
             $this->line('  -> ' . trans('commands.maintenance:fetch-ouis.saving') . ' ...');
             $count = 0;
-            foreach(array_chunk($ouis, $this->upsert_chunk_size) as $oui_chunk) {
+            foreach (array_chunk($ouis, $this->upsert_chunk_size) as $oui_chunk) {
                 $count += DB::table('vendor_ouis')->upsert($oui_chunk, 'oui');
             }
 
@@ -105,10 +106,8 @@ class MaintenanceFetchOuis extends LnmsCommand
 
             [$oui, $vendor] = str_getcsv($csv_line, "\t");
 
-
             $oui = strtolower(str_replace(':', '', $oui)); // normalize oui
             $length = strlen($oui);
-
 
             // check for non-/24 oui
             if ($oui[$length - 3] == '/') {

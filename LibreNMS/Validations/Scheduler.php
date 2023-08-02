@@ -44,7 +44,7 @@ class Scheduler extends BaseValidation
     }
 
     /**
-     * @param Validator $validator
+     * @param  Validator  $validator
      * @return array
      */
     private function generateCommands(Validator $validator): array
@@ -72,11 +72,13 @@ class Scheduler extends BaseValidation
         // non-systemd use cron
         if ($base_dir === '/opt/librenms') {
             $commands[] = 'sudo cp /opt/librenms/dist/librenms-scheduler.cron /etc/cron.d/';
+
             return $commands;
         }
 
         // non-standard install dir
         $commands[] = "sudo sh -c 'sed \"s#/opt/librenms#$base_dir#\" $base_dir/dist/librenms-scheduler.cron > /etc/cron.d/librenms-scheduler.cron'";
+
         return $commands;
     }
 }
