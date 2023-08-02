@@ -153,10 +153,10 @@ class DeviceController extends TableController
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
-            'hardware' => Rewrite::ciscoHardware($device),
-            'os' => $this->getOsText($device),
+            'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
+            'os' => htmlspecialchars($this->getOsText($device)),
             'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), true),
-            'location' => $this->getLocation($device),
+            'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
         ];

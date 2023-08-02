@@ -3,10 +3,12 @@ basic detection for a new OS.
 
 ### Discovery
 
-Discovery is now all done by yaml files, you do not and should not
-create a php file for discovery.
+OS discovery is how LibreNMS detects which OS should be used for a device.
+Generally detection should use sysObjectID or sysDescr, but you can also
+snmpget an oid and check for a value.  snmpget is discouraged because it slows
+down all os detections, not just the added os.
 
-Create the new OS file which should be called
+To begin, create the new OS file which should be called
 `includes/definitions/pulse.yaml`. Here is a working example:
 
 ```yaml
