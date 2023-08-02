@@ -59,7 +59,7 @@ class MaintenanceFetchOuis extends LnmsCommand
         // wait for 0-15 minutes to prevent stampeding herd
         if ($this->option('wait')) {
             $seconds = rand(1, $this->max_wait_seconds);
-            $minutes = round($seconds / 60);
+            $minutes = (int) round($seconds / 60);
             $this->info(trans_choice('commands.maintenance:fetch-ouis.waiting', $minutes, ['minutes' => $minutes]));
             sleep($seconds);
         }
@@ -107,12 +107,12 @@ class MaintenanceFetchOuis extends LnmsCommand
             [$oui, $vendor] = str_getcsv($csv_line, "\t");
 
             $oui = strtolower(str_replace(':', '', $oui)); // normalize oui
-            $length = strlen($oui);
+            $prefix_index = strpos($oui, '/');
 
             // check for non-/24 oui
-            if ($oui[$length - 3] == '/') {
+            if ($prefix_index !== false) {
                 // find prefix length
-                $prefix_length = substr($oui, $length - 2, 2);
+                $prefix_length = (int) substr($oui, $prefix_index + 1);
 
                 // 4 bits per character: /28 = 7 /36 = 9
                 $substring_length = (int) floor($prefix_length / 4);
