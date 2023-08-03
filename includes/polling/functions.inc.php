@@ -137,6 +137,7 @@ function poll_sensor($device, $class)
 function record_sensor_data($device, $all_sensors)
 {
     $supported_sensors = [
+        'count'       => '',
         'current'     => 'A',
         'frequency'   => 'Hz',
         'runtime'     => 'Min',
