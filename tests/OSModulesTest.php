@@ -128,7 +128,7 @@ class OSModulesTest extends DBTestCase
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] !== 'matches discovery') {
+            if (isset($expected_data[$module]['poller']) && $expected_data[$module]['poller'] !== 'matches discovery') {
                 $expected = $expected_data[$module]['poller'] ?? [];
             }
             $actual = $results[$module]['poller'] ?? [];
