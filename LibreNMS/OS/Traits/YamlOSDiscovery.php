@@ -164,7 +164,9 @@ trait YamlOSDiscovery
                     $replacement = $replacements[1];
                 }
 
-                $device->$field = preg_replace($search, $replacement, $device->$field);
+                if (isset($device->$field)) {
+                    $device->$field = preg_replace($search, $replacement, $device->$field);
+                }
             }
         }
     }
