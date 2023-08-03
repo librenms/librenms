@@ -127,12 +127,9 @@ class Sensor implements DiscoveryModule, PollerModule
         // validity not checked yet
         if (is_null($this->current)) {
             $sensor['sensor_oids'] = $this->oids;
-            $sensors = [$sensor];
 
-            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), $sensors);
-            $data = static::processSensorValue($prefetch, $this->aggregator, $this->divisor, $this->multiplier);
-
-            $this->current = current($data);
+            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), [$sensor]);
+            $this->current = static::processSensorValue($prefetch, $this->aggregator, $this->divisor, $this->multiplier);
             $this->valid = is_numeric($this->current);
         }
 
