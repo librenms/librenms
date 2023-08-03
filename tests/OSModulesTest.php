@@ -123,12 +123,12 @@ class OSModulesTest extends DBTestCase
             $actual = $results[$module]['discovery'] ?? [];
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
-            if ($module === 'route') {
-                // no route poller module
+            // modules without polling
+            if (in_array($module, ['route', 'vlans'])) {
                 continue;
             }
 
-            if (isset($expected_data[$module]['poller']) && $expected_data[$module]['poller'] !== 'matches discovery') {
+            if ($expected_data[$module]['poller'] !== 'matches discovery') {
                 $expected = $expected_data[$module]['poller'] ?? [];
             }
             $actual = $results[$module]['poller'] ?? [];
