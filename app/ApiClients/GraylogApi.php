@@ -34,26 +34,21 @@ class GraylogApi
     private \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
-    public function __construct(array $config = [])
+    public function __construct()
     {
         if (version_compare(Config::get('graylog.version', '2.4'), '2.1', '>=')) {
             $this->api_prefix = '/api';
         }
 
-        if (empty($config)) {
-            $base_uri = Config::get('graylog.server');
-            if ($port = Config::get('graylog.port')) {
-                $base_uri .= ':' . $port;
-            }
-
-            $config = [
-                'base_uri' => $base_uri,
-                'auth' => [Config::get('graylog.username'), Config::get('graylog.password')],
-                'headers' => ['Accept' => 'application/json'],
-            ];
+        $base_uri = Config::get('graylog.server');
+        if ($port = Config::get('graylog.port')) {
+            $base_uri .= ':' . $port;
         }
 
-        $this->client = Http::client()->withOptions($config);
+        $this->client = Http::client()
+            ->baseUrl($base_uri)
+            ->withBasicAuth(Config::get('graylog.username'), Config::get('graylog.password'))
+            ->acceptJson();
     }
 
     public function getStreams(): array
@@ -92,7 +87,7 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-        $response = $this->client->get($uri, $data);
+        $response = $this->client->get($uri, $data)->throw();
 
         return $response->json() ?: [];
     }

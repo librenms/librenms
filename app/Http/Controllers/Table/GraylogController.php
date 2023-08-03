@@ -61,12 +61,12 @@ class GraylogController extends SimpleTableController
         ]);
 
         $search = $request->get('searchPhrase');
-        $device_id = $request->get('device');
+        $device_id = (int) $request->get('device');
         $device = $device_id ? Device::find($device_id) : null;
-        $range = $request->get('range', 0);
-        $limit = $request->get('rowCount', 10);
-        $page = $request->get('current', 1);
-        $offset = ($page - 1) * $limit;
+        $range = (int) $request->get('range', 0);
+        $limit = (int) $request->get('rowCount', 10);
+        $page = (int) $request->get('current', 1);
+        $offset = (int) (($page - 1) * $limit);
         $loglevel = $request->get('loglevel') ?? Config::get('graylog.loglevel');
 
         $query = $api->buildSimpleQuery($search, $device) .
