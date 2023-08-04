@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -2898,6 +2899,20 @@ function edit_location(Illuminate\Http\Request $request)
     }
 
     return api_error(500, 'Failed to update location');
+}
+
+function get_location(Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to get');
+    }
+    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    if (empty($data)) {
+        return api_error(404, 'Location does not exist');
+    }
+
+    return api_success($data, 'get_location');
 }
 
 function get_location_id_by_name($location)

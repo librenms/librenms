@@ -89,6 +89,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::post('devices/{id}/parents', 'LegacyApiController@add_parents_to_host')->name('add_parents_to_host');
         Route::delete('/devices/{id}/parents', 'LegacyApiController@del_parents_from_host')->name('del_parents_from_host');
         Route::post('locations', 'LegacyApiController@add_location')->name('add_location');
+        Route::get('location/{location_id_or_name}', 'LegacyApiController@get_location')->name('get_location');
         Route::patch('locations/{location_id_or_name}', 'LegacyApiController@edit_location')->name('edit_location');
         Route::delete('locations/{location}', 'LegacyApiController@del_location')->name('del_location');
         Route::delete('services/{id}', 'LegacyApiController@del_service_from_host')->name('del_service_from_host');
