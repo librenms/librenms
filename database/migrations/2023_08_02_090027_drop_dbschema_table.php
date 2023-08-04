@@ -14,8 +14,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('dbSchema')) {
-            if (DB::table('dbSchema')->first()->version != 1000) {
+        if (Schema::hasTable('dbSchema') && DB::table('dbSchema')->exists()) {
+            if (DB::table('dbSchema')->value('version') != 1000) {
                 $error = 'Unsupported upgrade path! You need to update to version 23.7.0 first!';
                 Log::error($error);
                 exit($error);
