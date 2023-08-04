@@ -157,6 +157,24 @@ return [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
+    'maintenance:fetch-ouis' => [
+        'description' => 'Fetch MAC OUIs and cache them to display vendor names for MAC addresses',
+        'options' => [
+            'force' => 'Ignore any settings or locks that prevent the command from being run',
+            'wait' => 'Wait a random amount of time, used by the scedueler to prevent server strain',
+        ],
+        'disabled' => 'Mac OUI integration disabled (:setting)',
+        'enable_question' => 'Enable Mac OUI integration and scheduled fetching?',
+        'recently_fetched' => 'MAC OUI Database fetched recently, skipping update.',
+        'waiting' => 'Waiting :minutes minute before attempting MAC OUI update|Waiting :minutes minutes before attempting MAC OUI update',
+        'starting' => 'Storing Mac OUI in the database',
+        'downloading' => 'Downloading',
+        'processing' => 'Processing CSV',
+        'saving' => 'Saving results',
+        'success' => 'Successfully updated OUI/Vendor mappings. :count modified OUI|Successfully updated. :count modified OUIs',
+        'error' => 'Error processing Mac OUI:',
+        'vendor_update' => 'Adding OUI :oui for :vendor',
+    ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
         'arguments' => [

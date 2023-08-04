@@ -46,6 +46,6 @@ class TimezoneController extends Controller
             return $request->timezone;
         }
 
-        return session('preferences.timezone');
+        return session('preferences.timezone', '');
     }
 }

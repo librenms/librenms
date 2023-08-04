@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
@@ -151,20 +152,29 @@ class Rewrite
      * Extract the OUI and match it against database values
      *
      * @param  string  $mac
-     * @return string|null
+     * @return string
      */
-    public static function readableOUI($mac)
+    public static function readableOUI($mac): string
     {
         $oui = substr($mac, 0, 6);
 
-        $result = DB::table('vendor_ouis')->where('oui', $oui)->value('vendor');
+        $results = DB::table('vendor_ouis')
+            ->where('oui', 'like', "$oui%") // possible matches
+            ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
+            ->pluck('vendor', 'oui');
 
-        if ($result === 'IEEE Registration Authority') {
-            // Then we may have a shorter prefix, so let's try them one after the other, ordered by probability
-            $result = DB::table('vendor_ouis')->whereIn('oui', [substr($mac, 0, 9), substr($mac, 0, 7)])->value('vendor');
+        if (count($results) == 1) {
+            return Arr::first($results);
         }
 
-        return $result ?: '';
+        // Then we may have a shorter prefix, so let's try them one after the other
+        foreach ($results as $oui => $vendor) {
+            if (str_starts_with($mac, $oui)) {
+                return $vendor;
+            }
+        }
+
+        return '';
     }
 
     /**

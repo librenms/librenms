@@ -1,1 +1,0 @@
-ALTER TABLE `ports` CHANGE `ifLastChange` `ifLastChange` BIGINT UNSIGNED NOT NULL DEFAULT '0';
