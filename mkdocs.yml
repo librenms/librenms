@@ -24,6 +24,7 @@ theme:
         name: Switch to light mode
 
   features:
+    - navigation.footer
     - navigation.instant
     - navigation.sections
     - navigation.tracking
@@ -98,6 +99,28 @@ extra:
   article_nav_bottom: true
   php:
     version_min: 8.1
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/librenms/
+      name: GitHub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/librenms/librenms
+      name: Docker
+    - icon: fontawesome/brands/discord
+      link: https://discord.com/invite/librenms
+      name: Discord
+    - icon: fontawesome/brands/reddit
+      link: https://www.reddit.com/r/LibreNMS/
+      name: Reddit
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/librenms
+      name: Twitter
+    - icon: fontawesome/brands/facebook
+      link: https://www.facebook.com/LibreNMS
+      name: Facebook
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/librenms/
+      name: LinkedIn
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
