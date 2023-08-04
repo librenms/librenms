@@ -51,13 +51,7 @@ class DBSetupTest extends DBTestCase
         $this->assertSame(0, $result, 'Errors loading DB Schema: ' . Artisan::output());
     }
 
-    public function testSchemaFiles(): void
-    {
-        $files = glob(base_path('/sql-schema/*.sql'));
-        $this->assertCount(282, $files, 'You should not create new legacy schema files.');
-    }
-
-    public function testSchema(): void
+    public function testSchema()
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
@@ -66,12 +60,6 @@ class DBSetupTest extends DBTestCase
         sort($files);
         sort($migrated);
         $this->assertEquals($files, $migrated, 'List of run migrations did not match existing migration files.');
-
-        // check legacy schema version is 1000
-        $schema = DB::connection($this->connection)->table('dbSchema')
-            ->orderBy('version', 'DESC')
-            ->value('version');
-        $this->assertEquals(1000, $schema, 'Seed not run, after seed legacy dbSchema should be 1000');
     }
 
     public function testCheckDBCollation(): void

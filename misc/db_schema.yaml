@@ -486,11 +486,6 @@ dashboards:
     - { Field: access, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [dashboard_id], Unique: true, Type: BTREE }
-dbSchema:
-  Columns:
-    - { Field: version, Type: int, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [version], Unique: true, Type: BTREE }
 devices:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
