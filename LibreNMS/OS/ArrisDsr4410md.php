@@ -26,7 +26,7 @@ class ArrisDsr4410md extends OS implements
                 0,
                 'Receive Signal Level',
                 null,
-                null,
+                1,
                 10
             ),
         ];
@@ -45,7 +45,7 @@ class ArrisDsr4410md extends OS implements
                 0,
                 'Receive SNR',
                 null,
-                null,
+                1,
                 10
             ),
         ];
