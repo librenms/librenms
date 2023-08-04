@@ -1330,29 +1330,6 @@ function cache_peeringdb()
 }
 
 /**
- * Get an array of the schema files.
- * schema_version => full_file_name
- *
- * @return mixed
- */
-function get_schema_list()
-{
-    // glob returns an array sorted by filename
-    $files = glob(Config::get('install_dir') . '/sql-schema/*.sql');
-
-    // set the keys to the db schema version
-    $files = array_reduce($files, function ($array, $file) {
-        $array[(int) basename($file, '.sql')] = $file;
-
-        return $array;
-    }, []);
-
-    ksort($files); // fix dbSchema 1000 order
-
-    return $files;
-}
-
-/**
  * @param  $device
  * @return int|null
  */
