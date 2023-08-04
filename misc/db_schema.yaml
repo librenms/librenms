@@ -2088,9 +2088,10 @@ vendor_ouis:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: vendor, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: oui, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: oui, Type: varchar(12), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    vendor_ouis_oui_unique: { Name: vendor_ouis_oui_unique, Columns: [oui], Unique: true, Type: BTREE }
 vlans:
   Columns:
     - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
