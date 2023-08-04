@@ -17,10 +17,7 @@ use LibreNMS\Util\Http;
 
 class LineMessagingAPI extends Transport
 {
-    /**
-     * @var string display name
-     */
-    protected $name = 'Line Messaging API';
+    protected string $name = 'Line Messaging API';
 
     /**
      * Deliver Alert
