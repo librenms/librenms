@@ -42,7 +42,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     $bill_id = $bill->bill_id;
 
     if ($config['distributed_poller'] && $config['distributed_billing']) {
-        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN (?)', [$bill_id, $config['distributed_poller_group']]);
+        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN ('.$config['distributed_poller_group'].')', [$bill_id]);
     } else {
         $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1', [$bill_id]);
     }
@@ -143,7 +143,15 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
     } else {
         // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-        dbInsert(['bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => (string) $delta, 'in_delta' => (string) $in_delta, 'out_delta' => (string) $out_delta], 'bill_data');
+        if ($config['distributed_poller'] && $config['distributed_billing']) {
+            $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id AND D.poller_group IN ('.$config['distributed_poller_group'].')', [$bill_id]);
+        } else {
+            $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', [$bill_id]);
+        }
+        if ($port_count > 0) {
+            // If no ports are part of this bill then don't insert a zero value entry
+            dbInsert(['bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => (string) $delta, 'in_delta' => (string) $in_delta, 'out_delta' => (string) $out_delta], 'bill_data');
+        }
     }
 }//end CollectData()
 
