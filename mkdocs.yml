@@ -1,5 +1,4 @@
 site_name: LibreNMS Docs
-copyright: Copyright © LibreNMS 2013 - 2023
 docs_dir: doc
 theme:
   name: material
