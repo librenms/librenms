@@ -96,11 +96,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 2
-			path: LibreNMS/OS/ArrisDsr4410md.php
-
-		-
 			message: "#^Variable \\$sensors in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: LibreNMS/OS/ArubaInstant.php
@@ -109,11 +104,6 @@ parameters:
 			message: "#^Variable \\$multi_get_array on left side of \\?\\? is never defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/Ceraos.php
-
-		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 3
-			path: LibreNMS/OS/HarmonyEnhanced.php
 
 		-
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
