@@ -106,11 +106,6 @@ parameters:
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 3
-			path: LibreNMS/OS/HarmonyEnhanced.php
-
-		-
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ios.php
