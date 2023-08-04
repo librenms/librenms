@@ -50,7 +50,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function __construct()
     {
-        $new->device = DeviceCache::getPrimary();
+        $this->device = DeviceCache::getPrimary();
     }
 
     public static function make(): SnmpQueryInterface
@@ -297,7 +297,6 @@ class SnmpQueryMock implements SnmpQueryInterface
      * The leading dot is ommited by default to be compatible with snmpsim
      *
      * @param  string  $oid  the oid to tranlslate
-     * @param  string  $mib  mib to use
      * @return string the oid in numeric format (1.3.4.5)
      *
      * @throws Exception Could not translate the oid

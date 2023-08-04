@@ -59,7 +59,7 @@ class SnmpTranslateTest extends TestCase
         $actual = \SnmpQuery::numeric()->mibs(['IP-MIB'])->translate('ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
 
-        $actual = \SnmpQuery::translate('ifTable', 'IP-MIB');
+        $actual = \SnmpQuery::mibs(['IP-MIB'])->translate('ifTable');
         $this->assertEquals('IF-MIB::ifTable', $actual);
 
         // with index
