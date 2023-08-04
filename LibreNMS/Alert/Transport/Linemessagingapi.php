@@ -11,7 +11,6 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
-use LibreNMS\Util\Proxy;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
