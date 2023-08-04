@@ -341,7 +341,6 @@ main () {
                 # and clean up the db.
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
                 status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
-                status_run 'Updating Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             post-pull)
                 # re-check dependencies after pull with the new code
@@ -371,7 +370,6 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
-                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             cleanup)
                 # Cleanups
@@ -405,10 +403,6 @@ main () {
             ;;
             peeringdb)
                 options=("peeringdb")
-                call_daily_php "${options[@]}"
-            ;;
-            mac_oui)
-                options=("mac_oui")
                 call_daily_php "${options[@]}"
         esac
     fi

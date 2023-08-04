@@ -358,15 +358,6 @@ if ($options['f'] === 'peeringdb') {
     }
 }
 
-if ($options['f'] === 'mac_oui') {
-    $lock = Cache::lock('vendor_oui_db', 86000);
-    if ($lock->get()) {
-        $res = mac_oui_to_database();
-        $lock->release();
-        exit($res);
-    }
-}
-
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
     if (is_file(Config::get('install_dir') . '/cache/os_defs.cache')) {
