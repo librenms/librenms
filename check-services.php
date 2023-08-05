@@ -14,6 +14,7 @@
  */
 
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
 
 $init_modules = [];
@@ -70,7 +71,7 @@ foreach (dbFetchRows($sql, $params) as $service) {
                 Skipping service check because device {$service['hostname']} is down due to icmp",
                 $service['device_id'],
                 'service',
-                4,
+                Severity::Warning,
                 $service['service_id']
             );
         } else {

@@ -27,6 +27,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf(): void
@@ -48,7 +50,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 "2f860f70-6b88-11e9-a3c5-000000937916"
 TRAP,
             'AP at location {{ location }} configuration updated with config-id 2f860f70-6b88-11e9-a3c5-000000937916',
             'Could not handle ruckusSZAPConfUpdatedTrap',
-            [2],
+            [Severity::Info],
         );
     }
 
@@ -71,7 +73,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP connected after rebooting"
 TRAP,
             'AP at location {{ location }} has connected to the SmartZone with reason AP connected after rebooting',
             'Could not handle ruckusSZAPConnectedTrap',
-            [2],
+            [Severity::Info],
         );
     }
 
@@ -94,7 +96,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 "Test AP event has occurred"
 TRAP,
             'AP event: Test AP event has occurred',
             'Could not handle ruckusSZAPMiscEventTrap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -117,7 +119,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP rebooted by controller user"
 TRAP,
             'AP at site {{ location }} rebooted with reason AP rebooted by controller user',
             'Could not handle ruckusSZAPRebootTrap',
-            [5],
+            [Severity::Error],
         );
     }
 }

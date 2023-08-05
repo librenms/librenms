@@ -32,7 +32,7 @@ use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
@@ -467,9 +467,9 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         if ($code) {
             if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             }
             Log::debug('Exitcode: ' . $code, [$error]);
         }

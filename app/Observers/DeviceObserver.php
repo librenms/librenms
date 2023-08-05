@@ -7,6 +7,7 @@ use App\ApiClients\Oxidized;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
+use LibreNMS\Enum\Severity;
 use Log;
 
 class DeviceObserver
@@ -19,7 +20,7 @@ class DeviceObserver
      */
     public function created(Device $device): void
     {
-        Eventlog::log("Device $device->hostname has been created", $device, 'system', 3);
+        Eventlog::log("Device $device->hostname has been created", $device, 'system', Severity::Notice);
         (new Oxidized)->reloadNodes();
     }
 
@@ -46,11 +47,11 @@ class DeviceObserver
         // key attribute changes
         foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type', 'ip'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                Eventlog::log(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
+                Eventlog::log(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', Severity::Notice);
             }
         }
         if ($device->isDirty('location_id')) {
-            Eventlog::log(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
+            Eventlog::log(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', Severity::Notice);
         }
     }
 
@@ -71,7 +72,7 @@ class DeviceObserver
             Log::error("Could not delete RRD files for: $device->hostname", [$e]);
         }
 
-        Eventlog::log("Device $device->hostname has been removed", 0, 'system', 3);
+        Eventlog::log("Device $device->hostname has been removed", 0, 'system', Severity::Notice);
 
         (new Oxidized)->reloadNodes();
     }

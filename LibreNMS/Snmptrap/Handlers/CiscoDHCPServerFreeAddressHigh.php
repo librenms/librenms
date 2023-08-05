@@ -29,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -48,6 +49,6 @@ class CiscoDHCPServerFreeAddressHigh implements SnmptrapHandler
         $oid = $trap->findOid($oid_prefix);
         $pool = str_replace($oid_prefix, '', $oid);
         $value = $trap->getOidData($oid);
-        $trap->log("SNMP Trap: DHCP pool $pool address space high. Free addresses: '$value' addresses.", 2);
+        $trap->log("SNMP Trap: DHCP pool $pool address space high. Free addresses: '$value' addresses.", Severity::Info);
     }
 }
