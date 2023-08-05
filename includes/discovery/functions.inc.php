@@ -18,7 +18,7 @@ use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
@@ -155,7 +155,7 @@ function discover_device(&$device, $force_module = false)
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
+                \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
                 report($e);
 
                 // Re-throw exception if we're in CI

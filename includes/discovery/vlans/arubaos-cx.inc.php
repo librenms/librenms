@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Vlan;
+use LibreNMS\Enum\Severity;
 
 echo "ArubaOS-CX VLANs:\n";
 
@@ -25,13 +26,13 @@ foreach ($vlans as $vlan_domain_id => $vlan_domains) {
 
         //vlan does not exist
         if (! $vlanDB->exists) {
-            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name", $device['device_id'], 'vlan', Severity::Warning);
             d_echo("Vlan added: $vlan_id with name $vlan_name");
         }
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
-            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', Severity::Warning);
             d_echo("Vlan changed: $vlan_id new name $vlan_name");
         }
 

@@ -23,6 +23,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -38,6 +39,6 @@ class EntityDatabaseConfigChanged implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Configuration of Entity Database on device ' . $device->displayName() . ' was changed', 3, 'system');
+        $trap->log('SNMP Trap: Configuration of Entity Database on device ' . $device->displayName() . ' was changed', Severity::Notice, 'system');
     }
 }

@@ -197,7 +197,7 @@ jobs:
           cat /tmp/artisan-serve.log || true
       -
         name: Dump snmp logs
-        if: always() && matrix.skip-unit-check != '1'
+        if: failure() && matrix.skip-unit-check != '1'
         run: |
           cat /tmp/snmpsimd.log || true
       -

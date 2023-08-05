@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -42,6 +43,6 @@ class JnxPowerSupplyOk implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $powerSupply = $trap->getOidData($trap->findOid('JUNIPER-MIB::jnxContentsDescr'));
-        $trap->log("Power Supply $powerSupply is OK", 1);
+        $trap->log("Power Supply $powerSupply is OK", Severity::Ok);
     }
 }

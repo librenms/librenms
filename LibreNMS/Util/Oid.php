@@ -70,7 +70,13 @@ class Oid
         $key = 'Oid:toNumeric:' . $oid . '/' . $mib;
 
         $numeric_oid = Cache::remember($key, $cache, function () use ($oid, $mib) {
-            return \SnmpQuery::numeric()->translate($oid, $mib);
+            $snmpQuery = \SnmpQuery::numeric();
+
+            if ($mib) {
+                $snmpQuery->mibs([$mib], append: $mib !== 'ALL'); // append to base mibs unless using ALL
+            }
+
+            return $snmpQuery->translate($oid);
         });
 
         if (empty($numeric_oid)) {

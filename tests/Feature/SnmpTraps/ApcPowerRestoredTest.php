@@ -24,6 +24,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class ApcPowerRestoredTest extends SnmpTrapTestCase
 {
     /**
@@ -43,7 +45,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
 TRAP,
             'INFORMATIONAL: Utility power has been restored.',
             'Could not handle testApcPowerRestored trap',
-            [1],
+            [Severity::Ok],
         );
     }
 }

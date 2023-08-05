@@ -29,7 +29,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\IP;
 
 class Trap
@@ -130,7 +130,7 @@ class Trap
     /**
      * Log this trap in the eventlog with the given message
      */
-    public function log(string $message, int $severity = Alert::INFO, string $type = 'trap', int|null|string $reference = null): void
+    public function log(string $message, Severity $severity = Severity::Info, string $type = 'trap', int|null|string $reference = null): void
     {
         Eventlog::log($message, $this->getDevice(), $type, $severity, $reference);
     }

@@ -3,7 +3,7 @@
 use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
@@ -340,7 +340,7 @@ function poll_device($device, $force_module = false)
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Severity::Error);
                     report($e);
 
                     // Re-throw exception if we're in CI
@@ -493,23 +493,23 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         switch ($app->app_state) {
             case 'OK':
-                $severity = Alert::OK;
+                $severity = Severity::Ok;
                 $event_msg = 'changed to OK';
                 break;
             case 'ERROR':
-                $severity = Alert::ERROR;
+                $severity = Severity::Error;
                 $event_msg = 'ends with ERROR';
                 break;
             case 'LEGACY':
-                $severity = Alert::WARNING;
+                $severity = Severity::Warning;
                 $event_msg = 'Client Agent is deprecated';
                 break;
             case 'UNSUPPORTED':
-                $severity = Alert::ERROR;
+                $severity = Severity::Error;
                 $event_msg = 'Client Agent Version is not supported';
                 break;
             default:
-                $severity = Alert::UNKNOWN;
+                $severity = Severity::Unknown;
                 $event_msg = 'has UNKNOWN state';
                 break;
         }

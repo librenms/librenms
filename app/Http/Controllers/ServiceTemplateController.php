@@ -310,6 +310,21 @@ class ServiceTemplateController extends Controller
     }
 
     /**
+     * Apply all Service Templates for a device
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function applyDeviceAll(int $device_id)
+    {
+        foreach (ServiceTemplate::all() as $template) {
+            $this->applyDevice($template, $device_id);
+        }
+        $msg = __('All Service Templates have been applied to device ' . $device_id);
+
+        return response($msg, 200);
+    }
+
+    /**
      * Apply specified Service Template.
      *
      * @param  \App\Models\ServiceTemplate  $template
@@ -327,6 +342,66 @@ class ServiceTemplateController extends Controller
         $msg = __('All Service Templates have been applied');
 
         return response($msg, 200);
+    }
+
+    /**
+     * Apply specified Service Template to a device.
+     *
+     * @param  \App\Models\ServiceTemplate  $template
+     * @param  int  $device_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function applyDevice(ServiceTemplate $template, int $device_id)
+    {
+        // Check if the device needs to be added
+        foreach (Device::inServiceTemplate($template->id)->where('device_id', $device_id)->get() as $device) {
+            $device->services()->updateOrCreate(
+                [
+                    'service_template_id' => $template->id,
+                ],
+                [
+                    'service_name' => $template->name,
+                    'service_type' => $template->check,
+                    'service_template_id' => $template->id,
+                    'service_param' => $template->param,
+                    'service_ip' => $template->ip,
+                    'service_desc' => $template->desc,
+                    'service_disabled' => $template->disabled,
+                    'service_ignore' => $template->ignore,
+                ]
+            );
+
+            return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
+        }
+
+        foreach (DeviceGroup::inServiceTemplate($template->id)->get() as $device_group) {
+            foreach (Device::inDeviceGroup($device_group->id)->where('device_id', $device_id)->get() as $device) {
+                $device->services()->updateOrCreate(
+                    [
+                        'service_template_id' => $template->id,
+                    ],
+                    [
+                        'service_name' => $template->name,
+                        'service_type' => $template->check,
+                        'service_template_id' => $template->id,
+                        'service_param' => $template->param,
+                        'service_ip' => $template->ip,
+                        'service_desc' => $template->desc,
+                        'service_disabled' => $template->disabled,
+                        'service_ignore' => $template->ignore,
+                    ]
+                );
+
+                return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
+            }
+        }
+
+        // remove if this template no longer applies
+        foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->where('device_id', $device_id)->pluck('device_id') as $device_id) {
+            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
+        }
+
+        return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
     }
 
     /**
