@@ -113,7 +113,7 @@ trait YamlMempoolsDiscovery
         }
 
         if (isset($this->mempoolsOids[$field])) {
-            return Oid::toNumeric("{$this->mempoolsOids[$field]}.$index", 'ALL');
+            return Oid::toNumeric("{$this->mempoolsOids[$field]}.$index");
         }
 
         return null;
