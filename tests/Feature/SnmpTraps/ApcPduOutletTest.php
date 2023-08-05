@@ -22,6 +22,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class ApcPduOutletTest extends SnmpTrapTestCase
 {
     public function testOutletOff(): void
@@ -37,7 +39,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
 TRAP,
             'APC PDU: Outlet has turned off: 2',
             'Could not handle outletOff trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -54,7 +56,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
 TRAP,
             'APC PDU: Outlet has been turned on: 2',
             'Could not handle outletOn trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -71,7 +73,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
 TRAP,
             'APC PDU: Outlet has rebooted: 2',
             'Could not handle outletReboot trap',
-            [4],
+            [Severity::Warning],
         );
     }
 }

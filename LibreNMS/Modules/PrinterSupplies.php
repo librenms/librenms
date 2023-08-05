@@ -27,7 +27,7 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -98,7 +98,7 @@ class PrinterSupplies implements Module
                     'Toner ' . $toner['supply_descr'] . ' is empty',
                     $os->getDevice(),
                     'toner',
-                    Alert::ERROR,
+                    Severity::Error,
                     $toner['supply_id']
                 );
             }
@@ -109,7 +109,7 @@ class PrinterSupplies implements Module
                     'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
                     $os->getDevice(),
                     'toner',
-                    Alert::NOTICE,
+                    Severity::Notice,
                     $toner['supply_id']
                 );
             }
