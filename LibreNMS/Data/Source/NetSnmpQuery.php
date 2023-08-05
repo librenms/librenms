@@ -73,26 +73,17 @@ class NetSnmpQuery implements SnmpQueryInterface
             '*',
         ],
     ];
-    /**
-     * @var string
-     */
-    private $context = '';
+
     /**
      * @var string[]
      */
     private array $mibDirs = [];
-    /**
-     * @var array|string
-     */
-    private $options = [self::DEFAULT_FLAGS];
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $abort = false;
+    private string $context = '';
+    private array|string $options = [self::DEFAULT_FLAGS];
+    private Device $device;
+    private bool $abort = false;
+    // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -161,6 +152,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDirs[] = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Set MIBs to use for this query. Base mibs are included by default.
+     * They will be appended to existing mibs unless $append is set to false.
+     */
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
+    {
+        $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
         return $this;
     }
@@ -281,7 +283,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Translate an OID.
      * call numeric() on the query to output numeric OID
      */
-    public function translate(string $oid, ?string $mib = null): string
+    public function translate(string $oid): string
     {
         $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
 
@@ -299,10 +301,6 @@ class NetSnmpQuery implements SnmpQueryInterface
             $this->options[] = '-IR'; // search for mib
         }
 
-        if ($mib) {
-            array_push($this->options, '-m', $mib);
-        }
-
         return $this->exec('snmptranslate', [$oid])->value();
     }
 
@@ -311,6 +309,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
+        array_push($cmd, '-m', implode(':', $this->mibs));
 
         if ($command === 'snmptranslate') {
             return array_merge($cmd, $this->options, $oids);
