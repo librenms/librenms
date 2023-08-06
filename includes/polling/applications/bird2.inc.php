@@ -119,7 +119,7 @@ foreach ($protocolSegments as $protocolSegment) {
 }
 
 // ---
-$deviceObj = Device::findOrFail($device['device_id']);
+$deviceObj = DeviceCache::getPrimary();
 
 if (empty($protocolsData)) {
     echo PHP_EOL . $name . ': No BGP Peers found' . PHP_EOL;
