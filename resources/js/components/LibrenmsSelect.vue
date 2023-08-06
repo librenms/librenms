@@ -69,7 +69,7 @@ export default {
             if (this.select2.find("option").filter((id, el) => values.includes(el.value)).length < values.length) {
                 axios.get(route(this.routeName), {params: {id: values.join(',')}}).then((response) => {
                     response.data.results.forEach((item) => {
-                        if (values.includes(item.id)) {
+                        if (values.find(x => x == item.id) !== undefined) {
                             this.select2.append(new Option(item.text, item.id, false, true));
                         }
                     })
