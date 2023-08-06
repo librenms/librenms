@@ -23,107 +23,107 @@
   -->
 
 <template>
-    <v-select
-        :options="options"
-        :filterable="false"
-        @open="onOpen"
-        @close="onClose"
-        @search="onSearch"
-    >
-        <template #list-footer>
-            <li v-show="hasNextPage" ref="load" class="loader">
-                Loading more options...
-            </li>
-        </template>
-    </v-select>
+    <select></select>
 </template>
 
 <script>
 export default {
     name: "LibrenmsSelect",
     props: {
-        route: {
+        routeName: {
             type: String,
             required: true
+        },
+        placeholder: {
+            type: String,
+            default: '',
+        },
+        allowClear: {
+            type: Boolean,
+            default: true
+        },
+        value: {
+            type: [String, Number],
+            default: ''
         }
     },
+    model: {
+        event: 'change',
+        prop: 'value'
+    },
     data: () => ({
-        options: [],
-        searchString: '',
-        observer: null,
-        limit: 50,
-        page: 1,
-        hasNextPage: false
+        select2: null
     }),
-    mounted() {
-        /**
-         * You could do this directly in data(), but since these docs
-         * are server side rendered, IntersectionObserver doesn't exist
-         * in that environment, so we need to do it in mounted() instead.
-         */
-        this.observer = new IntersectionObserver(this.infiniteScroll)
-        this.fetch(function(){}, this.searchString, this);
-    },
     methods: {
-        async onOpen() {
-            if (this.hasNextPage) {
-                await this.$nextTick()
-                this.observer.observe(this.$refs.load)
+        checkValue() {
+            if (this.value === '') {
+                return true;
             }
-        },
-        onClose() {
-            this.observer.disconnect()
-        },
-        async infiniteScroll([{ isIntersecting, target }]) {
-            if (isIntersecting) {
-                const ul = target.offsetParent
-                const scrollTop = target.offsetParent.scrollTop
-                this.fetchMore()
-                await this.$nextTick()
-                ul.scrollTop = scrollTop
-            }
-        },
-        fetchMore() {
-            if (this.hasNextPage) {
-                this.fetch(function(){}, this.searchString, this);
-            }
-        },
-        onSearch(search, loading) {
-            this.page = 1;
-            this.hasNextPage = true;
-            loading(true);
-            this.fetch(loading, search, this);
-        },
-        fetch: _.debounce((loading, search, vm) => {
-            fetch(
-                route('ajax.select.' + vm.route, {limit: vm.limit, page: vm.page, term: search})
-            ).then(res => {
-                res.json().then(json => {
-                    // parse the data into the expected format from the select2 backend
-                    let options = json.results.map((item) => ({label: item.text, code: item.id}));
-                    vm.hasNextPage = json.pagination.more;
 
-                    // append or set the data
-                    vm.options = vm.page > 1 ? vm.options.concat(options) : options;
-
-                    vm.page++;
-                    loading(false);
+            if (! this.select2.find("option[value='" + this.value + "']").length) {
+                axios.get(route(this.routeName), {params: {id: this.value}}).then((response) => {
+                    response.data.results.forEach((item) => {
+                        if (item.id == this.value) {
+                            this.select2.append(new Option(item.text, item.id, true, true))
+                                .trigger('change');
+                        }
+                    })
                 });
-            });
-        }, 350)
+
+                return false;
+            }
+
+            return true;
+        }
     },
+    watch: {
+        value(value) {
+            // check value and if the value doesn't exist, cancel this update to fetch it
+           if (! this.checkValue()) {
+               return;
+           }
+
+            if (value instanceof Array) {
+                this.select2.val([...value]);
+            } else {
+                this.select2.val([value]);
+            }
+            this.select2.trigger('change');
+        }
+    },
+    computed: {
+        settings() {
+            return {
+                theme: "bootstrap",
+                dropdownAutoWidth : true,
+                width: "auto",
+                allowClear: Boolean(this.allowClear),
+                placeholder: this.placeholder,
+                ajax: {
+                    url: route(this.routeName).toString(),
+                    delay: 250,
+                    cache: true
+                }
+            }
+        }
+    },
+    mounted() {
+        this.select2 = $(this.$el);
+
+        this.checkValue();
+
+        this.select2.select2(this.settings)
+        .on('select2:select select2:unselect', ev => {
+            this.$emit('change', this.select2.val());
+            this.$emit('select', ev['params']['data']);
+        });
+    },
+    beforeDestroy() {
+        this.select2.select2('destroy');
+    }
 }
 </script>
 
 <style scoped>
-.pagination {
-    display: flex;
-    margin: 0.25rem 0.25rem 0;
-}
-.pagination button {
-    flex-grow: 1;
-}
-.pagination button:hover {
-    cursor: pointer;
-}
+
 </style>

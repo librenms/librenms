@@ -434,10 +434,14 @@
             "group": "auth",
             "section": "ad",
             "order": 4,
-            "type": "ldap-groups",
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.role": "string|required"
             }
         },
         "auth_ad_user_filter": {
@@ -574,10 +578,14 @@
             "group": "auth",
             "section": "ldap",
             "order": 4,
-            "type": "ldap-groups",
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group DN"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.role": "string|required"
             }
         },
         "auth_ldap_port": {

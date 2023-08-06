@@ -173,6 +173,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('syslog', 'SyslogController')->name('ajax.select.syslog');
             Route::get('location', 'LocationController')->name('ajax.select.location');
             Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
+            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('service', 'ServiceController')->name('ajax.select.service');
             Route::get('template', 'ServiceTemplateController')->name('ajax.select.template');
             Route::get('poller-group', 'PollerGroupController')->name('ajax.select.poller-group');

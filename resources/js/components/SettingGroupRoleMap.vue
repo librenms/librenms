@@ -29,20 +29,23 @@
                    class="form-control"
                    :value="group"
                    :readonly="disabled"
+                   :placeholder="options.groupPlaceholder"
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <span class="input-group-btn" style=" width:0;"></span>
-            <librenms-select class="form-control" @search="onSearch" @change="updateLevel(group, $event.target.value)" route="role"></librenms-select>
+            <span class="input-group-btn">
+                <librenms-select class="form-control" @change="updateRole(group, $event)" route-name="ajax.select.role" :value="data.role"></librenms-select>
+            </span>
             <span class="input-group-btn">
                 <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
             </span>
         </div>
         <div v-if="!disabled">
             <div class="input-group">
-                <input type="text" class="form-control" v-model="newItem">
-                <span class="input-group-btn" style="width:0;"></span>
-                <librenms-select class="form-control" @search="onSearch" @change="updateLevel(group, $event.target.value)" route="role"></librenms-select>
+                <input type="text" class="form-control" v-model="newItem" :placeholder="options.groupPlaceholder">
+                <span class="input-group-btn">
+                    <librenms-select class="form-control" v-model="newItemRole" route-name="ajax.select.role" placeholder="Role"></librenms-select>
+                </span>
                 <span class="input-group-btn">
                     <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
                </span>
@@ -61,21 +64,20 @@ export default {
         mixins: [BaseSetting],
         data() {
             return {
-                localList: Array.isArray(this.value) ? {} : this.value,
                 newItem: "",
-                newItemLevel: 1,
-                roles: [],
-                lock: false
+                newItemRole: "",
+                localList: this.parseValue(this.value),
             }
         },
         methods: {
             addItem() {
-                this.$set(this.localList, this.newItem, {level: this.newItemLevel});
+                this.$set(this.localList, this.newItem, {role: this.newItemRole});
                 this.newItem = "";
-                this.newItemLevel = 1;
+                this.newItemRole = "";
             },
             removeItem(index) {
-                this.$delete(this.localList, index);
+                delete this.localList[index]
+                this.$emit('input', this.localList)
             },
             updateItem(oldValue, newValue) {
                 this.localList = Object.keys(this.localList).reduce((newList, current) => {
@@ -83,38 +85,38 @@ export default {
                     newList[key] = this.localList[current];
                     return newList;
                 }, {});
+                this.$emit('input', this.localList)
             },
-            updateLevel(group, level) {
-                this.$set(this.localList, group, {level: level})
+            updateRole(group, role) {
+                console.log(group, role, this.lock);
+                this.localList[group].role = role;
+                this.$emit('input', this.localList)
             },
-            onSearch(search, loading) {
-                if(search.length) {
-                    loading(true);
-                    this.search(loading, search, this);
+            parseValue(value) {
+                // empty lists parse to an array
+                if (Array.isArray(value)) {
+                    return {};
                 }
-            },
-            search: _.debounce((loading, search, vm) => {
-                fetch(
-                    route('ajax.select.role')
-                    `https://api.github.com/search/repositories?q=${escape(search)}`
-                ).then(res => {
-                    res.json().then(json => (vm.options = json.items));
-                    loading(false);
-                });
-            }, 350)
+
+                const levels =  {
+                    1:  "user",
+                    5:  "global-read",
+                    10:  "admin",
+                };
+
+                for (const group of Object.keys(value)) {
+                    if (! value[group].hasOwnProperty('role') && value[group].hasOwnProperty('level')) {
+                        value[group].role = levels[value[group].level] ? levels[value[group].level] : 1;
+                        delete value[group]["level"];
+                    }
+                }
+
+                return value;
+            }
         },
         watch: {
-            localList() {
-                if (! this.lock) {
-                    this.$emit('input', this.localList)
-                } else {
-                    // release the lock
-                    this.lock = false;
-                }
-            },
             value() {
-                this.lock = true // prevent loop
-                this.localList = Array.isArray(this.value) ? {} : this.value;
+                this.localList = this.parseValue(this.value);
             }
         }
     }
