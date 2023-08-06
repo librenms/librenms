@@ -122,9 +122,15 @@ abstract class SelectController extends PaginatedAjaxController
         return true;
     }
 
-    protected function filterById(EloquentBuilder|Builder $query, mixed $id): EloquentBuilder|Builder
+    protected function filterById(EloquentBuilder|Builder $query, ?string $id): EloquentBuilder|Builder
     {
         if ($id) {
+             // multiple
+            if (str_contains($id, ',')) {
+                $keys = explode(',', $id);
+                return $this->idField ? $query->whereIn($this->idField, $keys) : $query->whereKey($keys);
+            }
+
             // use id field if given
             return $this->idField ? $query->where($this->idField, $id) : $query->whereKey($id);
         }

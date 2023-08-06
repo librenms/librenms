@@ -23,7 +23,7 @@
   -->
 
 <template>
-    <select></select>
+    <select :multiple="multiple"></select>
 </template>
 
 <script>
@@ -42,8 +42,12 @@ export default {
             type: Boolean,
             default: true
         },
+        multiple: {
+            type: Boolean,
+            default: false
+        },
         value: {
-            type: [String, Number],
+            type: [String, Number, Array],
             default: ''
         }
     },
@@ -56,18 +60,21 @@ export default {
     }),
     methods: {
         checkValue() {
-            if (this.value === '') {
+            if (this.value === '' || this.value === []) {
                 return true;
             }
 
-            if (! this.select2.find("option[value='" + this.value + "']").length) {
-                axios.get(route(this.routeName), {params: {id: this.value}}).then((response) => {
+            // search for missing options and fetch them
+            let values = this.value instanceof Array ? this.value : [this.value];
+            if (this.select2.find("option").filter((id, el) => values.includes(el.value)).length < values.length) {
+                axios.get(route(this.routeName), {params: {id: values.join(',')}}).then((response) => {
                     response.data.results.forEach((item) => {
-                        if (item.id == this.value) {
-                            this.select2.append(new Option(item.text, item.id, true, true))
-                                .trigger('change');
+                        if (values.includes(item.id)) {
+                            this.select2.append(new Option(item.text, item.id, false, true));
                         }
                     })
+
+                    this.select2.trigger('change');
                 });
 
                 return false;
@@ -78,6 +85,13 @@ export default {
     },
     watch: {
         value(value) {
+            if (value instanceof Object && value.hasOwnProperty('id') && value.hasOwnProperty('text')) {
+                this.select2.append(new Option(value.text, value.id, true, true))
+                    .trigger('change');
+
+                return;
+            }
+
             // check value and if the value doesn't exist, cancel this update to fetch it
            if (! this.checkValue()) {
                return;
@@ -88,6 +102,7 @@ export default {
             } else {
                 this.select2.val([value]);
             }
+
             this.select2.trigger('change');
         }
     },
@@ -99,6 +114,7 @@ export default {
                 width: "auto",
                 allowClear: Boolean(this.allowClear),
                 placeholder: this.placeholder,
+                multiple: this.multiple,
                 ajax: {
                     url: route(this.routeName).toString(),
                     delay: 250,

@@ -441,7 +441,8 @@
             "validate": {
                 "value": "array",
                 "value.*": "array",
-                "value.*.role": "string|required"
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ad_user_filter": {
@@ -585,7 +586,8 @@
             "validate": {
                 "value": "array",
                 "value.*": "array",
-                "value.*.role": "string|required"
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ldap_port": {

@@ -33,23 +33,17 @@
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <span class="input-group-btn">
-                <librenms-select class="form-control" @change="updateRole(group, $event)" route-name="ajax.select.role" :value="data.role"></librenms-select>
-            </span>
+            <librenms-select class="form-control" @change="updateRoles(group, $event)" route-name="ajax.select.role" :value="data.roles" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
             <span class="input-group-btn">
                 <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
             </span>
         </div>
-        <div v-if="!disabled">
-            <div class="input-group">
-                <input type="text" class="form-control" v-model="newItem" :placeholder="options.groupPlaceholder">
-                <span class="input-group-btn">
-                    <librenms-select class="form-control" v-model="newItemRole" route-name="ajax.select.role" placeholder="Role"></librenms-select>
-                </span>
-                <span class="input-group-btn">
-                    <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
-               </span>
-            </div>
+        <div v-if="!disabled" class="input-group">
+            <input type="text" class="form-control" v-model="newItem" :placeholder="options.groupPlaceholder">
+            <librenms-select class="form-control" v-model="newItemRoles" route-name="ajax.select.role" placeholder="Role" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
+            <span class="input-group-btn">
+                <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
+           </span>
         </div>
     </div>
 </template>
@@ -65,15 +59,16 @@ export default {
         data() {
             return {
                 newItem: "",
-                newItemRole: "",
+                newItemRoles: [],
                 localList: this.parseValue(this.value),
             }
         },
         methods: {
             addItem() {
-                this.$set(this.localList, this.newItem, {role: this.newItemRole});
+                this.localList[this.newItem] = {roles: this.newItemRoles};
                 this.newItem = "";
-                this.newItemRole = "";
+                this.newItemRoles = [];
+                this.$emit('input', this.localList)
             },
             removeItem(index) {
                 delete this.localList[index]
@@ -87,9 +82,9 @@ export default {
                 }, {});
                 this.$emit('input', this.localList)
             },
-            updateRole(group, role) {
-                console.log(group, role, this.lock);
-                this.localList[group].role = role;
+            updateRoles(group, roles) {
+                console.log(group, roles, this.lock);
+                this.localList[group].roles = roles;
                 this.$emit('input', this.localList)
             },
             parseValue(value) {
@@ -105,8 +100,8 @@ export default {
                 };
 
                 for (const group of Object.keys(value)) {
-                    if (! value[group].hasOwnProperty('role') && value[group].hasOwnProperty('level')) {
-                        value[group].role = levels[value[group].level] ? levels[value[group].level] : 1;
+                    if (! value[group].hasOwnProperty('roles') && value[group].hasOwnProperty('level')) {
+                        value[group].roles = levels[value[group].level] ? [levels[value[group].level]] : [];
                         delete value[group]["level"];
                     }
                 }
