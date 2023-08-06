@@ -32,6 +32,9 @@ use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class RoleController extends SelectController
 {
+    protected ?string $idField = 'name';
+    protected ?string $textField = 'title';
+
     protected function searchFields(Request $request)
     {
         return ['name'];
@@ -40,18 +43,6 @@ class RoleController extends SelectController
     protected function baseQuery(Request $request)
     {
         return Bouncer::role()
-            ->where(DB::raw('1'), $request->user()->can('viewAny', Bouncer::role()))
-            ->select(['name', 'title']);
-    }
-
-    /**
-     * @param  \Silber\Bouncer\Database\Role  $port_group
-     */
-    public function formatItem($role)
-    {
-        return [
-            'id' => $role->name,
-            'text' => $role->title,
-        ];
+            ->where(DB::raw('1'), $request->user()->can('viewAny', Bouncer::role()));
     }
 }
