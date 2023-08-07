@@ -233,7 +233,7 @@ class LdapAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
         foreach ($entries as $entry) {
             $user = $this->ldapToUser($entry);
-            if ($user['user_id'] !== $user_id) {
+            if ($user['user_id'] != $user_id) {
                 continue;
             }
 
