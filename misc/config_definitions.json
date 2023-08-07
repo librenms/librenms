@@ -226,6 +226,13 @@
             "section": "rules",
             "order": 7
         },
+        "alert_rule.acknowledgement_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 7
+        },
         "alert_rule.invert_map": {
             "default": false,
             "type": "boolean",
