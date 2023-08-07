@@ -24,7 +24,6 @@ $divisor = 10;
 foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
     if (($entry['entityOpticalMuxAidString'] || $entry['entityFacilityAidString']) &&
         ($entry['pmSnapshotCurrentInputPower'] || $entry['pmSnapshotCurrentOutputPower'])) {
-
         if ($entry['entityOpticalMuxAidString']) {
             $oidRX = '.1.3.6.1.4.1.2544.1.11.7.7.2.3.1.2.' . $index;
             $descr = $entry['entityOpticalMuxAidString'] . ' RX';
