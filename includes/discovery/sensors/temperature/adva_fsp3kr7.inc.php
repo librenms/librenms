@@ -4,7 +4,7 @@
  *
  * @category   Network_Monitoring
  *
- * @author     Christoph Zilian <czilian@hotmail.com>
+ * @author     Christoph Zilian <czilian@hotmail.com> && Khairi Azmi <mkhairi47@hotmail.com>
  * @license    https://gnu.org/copyleft/gpl.html GNU GPL
  *
  * @link       https://github.com/librenms/librenms/
@@ -23,30 +23,62 @@
 $multiplier = 1;
 $divisor = 10;
 
-if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
-    foreach (array_keys($pre_cache['adva_fsp3kr7_Card']) as $index) {
-        if ($pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValueTemp']) {
-            $oid = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.5.' . $index;
-            $descr = $pre_cache['adva_fsp3kr7_Card'][$index]['entityEqptAidString'];
-            $high_limit = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysThresholdTempHigh'] / $divisor;
-            $current = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValueTemp'] / $divisor;
+// Module temperature
+foreach ($pre_cache['adva_fsp3kr7_Card'] as $index => $entry) {
+    $oid = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.5.' . $index;
+    $entityType = $entry['entityEqptType'];
+    $descrPrefix = $entry['entityEqptAidString'];
 
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                'eqptPhysInstValueTemp' . $index,
-                'adva_fsp3kr7',
-                $descr,
-                $divisor,
-                $multiplier,
-                null,
-                null,
-                null,
-                $high_limit,
-                $current
-            );
-        }
+    if ($entityType == 'eqpCem9hu') {
+        $entityDescr = 'CEM 9HU';
+    } elseif ($entityType == 'eqpPsu9hudc') {
+        $entityDescr = 'PSU 9HU';
+    } elseif ($entityType == 'eqpOscmPn') {
+        $entityDescr = 'OSCM';
+    } elseif ($entityType == 'eqpOsfm') {
+        $entityDescr = 'OSFM';
+    } elseif ($entityType == 'eqpEdfaDgcv') {
+        $entityDescr = 'EDFA';
+    } elseif ($entityType == 'eqp2Wcc10g') {
+        $entityDescr = '2WCC';
+    } elseif ($entityType == 'eqp4csmud') {
+        $entityDescr = '4CSM';
+    } elseif ($entityType == 'eqpNcuII') {
+        $entityDescr = 'NCU II';
+    } elseif ($entityType == 'eqpScuII') {
+        $entityDescr = 'SCU II';
+    } elseif ($entityType == 'eqpSh1upf') {
+        $entityDescr = 'SH1HU';
+    } elseif ($entityType == 'eqpScuS') {
+        $entityDescr = 'SCU S';
+    } elseif ($entityType == 'eqpPsu1hudc') {
+        $entityDescr = 'PSU 1HU DC';
+    } elseif ($entityType == 'eqpPsu1huac') {
+        $entityDescr = 'PSU 1HU AC';
+    } elseif ($entityType == 'eqpPsu7huac') {
+        $entityDescr = 'PSU 7HU AC';
+    } else {
+        continue; // Skip unknown types
     }
-}//  ************** End of Sensors for ADVA FSP3000 R7 **********
+
+    $descr = $descrPrefix . ' - [' . $entityDescr . '] Temp: ';
+    $value = $entry['eqptPhysInstValueTemp'] / $divisor;
+    $high_limit = $entry['eqptPhysThresholdTempHigh'] / $divisor;
+
+    discover_sensor(
+        $valid['sensor'],
+        'temperature',
+        $device,
+        $oid,
+        'eqptPhysInstValueTemp' . $index,
+        'adva_fsp3kr7',
+        $descr,
+        $divisor,
+        $multiplier,
+        null,
+        null,
+        null,
+        $high_limit,
+        $value
+    );
+}
