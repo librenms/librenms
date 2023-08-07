@@ -54,7 +54,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
         $descr = $entry['entityEqptAidString'] . ' - [PSU 7HU AC] Status: ';
     }
 
-    if (!empty($descr)) {
+    if (! empty($descr)) {
         discover_sensor($valid['sensor'], 'state', $device, $module_oid . $index, $index, $module_name, $descr, 1, 1, null, null, null, null, $entry['moduleOperState'], 'snmp', $index, null, null, 'Module State');
         create_sensor_to_state_index($device, $module_name, $index);
     }
@@ -85,7 +85,6 @@ foreach ($pre_cache['adva_fsp3kr7_Fan'] as $index => $entry) {
             : (($entry['fanType'] == 'eqpFan1hu')
                 ? 'SH1HU Fan Status'
             : 'Default Value')); // Add a default value if none of the conditions match
-
 
         discover_sensor($valid['sensor'], 'state', $device, $fanOid . $index, $index, $fan_name, $descr, 1, 1, null, null, null, null, $entry['fanAdmin'], 'snmp', null, null, null, 'Fan State');
         create_sensor_to_state_index($device, $fan_name, $index);
