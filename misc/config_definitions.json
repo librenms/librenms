@@ -4052,7 +4052,7 @@
         },
         "leaflet.default_zoom": {
             "default": 2,
-            "type": "integer"
+            "type": "float"
         },
         "leaflet.group_radius": {
             "default": 10,
