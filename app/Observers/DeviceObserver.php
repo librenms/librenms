@@ -42,7 +42,7 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            $actor = gethostname();
+            $actor = Config::get('distributed_poller_name', gethostname());
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, Config::get('distributed_poller') ? " by $actor" : ''), $device, $type);
         }
 
