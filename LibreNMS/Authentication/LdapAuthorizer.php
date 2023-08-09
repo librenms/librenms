@@ -233,7 +233,7 @@ class LdapAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
         foreach ($entries as $entry) {
             $user = $this->ldapToUser($entry);
-            if ((int) $user['user_id'] !== (int) $user_id) {
+            if ($user['user_id'] != $user_id) {
                 continue;
             }
 
@@ -360,7 +360,7 @@ class LdapAuthorizer extends AuthorizerBase
         return [
             'username' => $entry['uid'][0],
             'realname' => $entry['cn'][0],
-            'user_id' => (int) $entry[$uid_attr][0],
+            'user_id' => $entry[$uid_attr][0],
             'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
             'level' => $this->getUserlevel($entry['uid'][0]),
         ];
