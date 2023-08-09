@@ -7,6 +7,7 @@ use App\ApiClients\Oxidized;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use Log;
 
@@ -42,7 +43,7 @@ class DeviceObserver
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
             $actor = gethostname();
-            Eventlog::log('Device status changed to ' . ucfirst($type) . " from $reason check by $actor.", $device, $type);
+            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, Config::get('distributed_poller') ? " by $actor" : ''), $device, $type);
         }
 
         // key attribute changes
