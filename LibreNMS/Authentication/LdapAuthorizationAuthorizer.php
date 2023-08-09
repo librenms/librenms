@@ -156,7 +156,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
-            $user_id = (int) $entries[0]['uidnumber'][0];
+            $user_id = $entries[0]['uidnumber'][0];
         }
 
         if ($user_id === -1) {
@@ -216,7 +216,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         foreach ($this->getUserlist() as $user) {
-            if ((int) $user['user_id'] === (int) $user_id) {
+            if ($user['user_id'] == $user_id) {
                 $user['level'] = $this->getUserlevel($user['username']);
 
                 return $user;
