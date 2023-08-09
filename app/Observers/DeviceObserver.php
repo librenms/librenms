@@ -41,7 +41,8 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            Eventlog::log('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+            $actor = gethostname();
+            Eventlog::log('Device status changed to ' . ucfirst($type) . " from $reason check by $actor.", $device, $type);
         }
 
         // key attribute changes
