@@ -156,6 +156,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @param  string  $username
      * @return array
+     *
      * @throws AuthenticationException
      */
     public function getRoles(string $username): array
