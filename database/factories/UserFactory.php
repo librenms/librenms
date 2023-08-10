@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 
-/** @extends Factory<User> */
+/** @extends Factory<\App\Models\User> */
 class UserFactory extends Factory
 {
     /**

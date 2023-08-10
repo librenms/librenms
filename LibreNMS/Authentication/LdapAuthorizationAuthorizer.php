@@ -135,7 +135,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             if (isset($authLdapGroups[$groupname]['roles']) && is_array($authLdapGroups[$groupname]['roles'])) {
                 $roles = array_merge($roles, $authLdapGroups[$groupname]['roles']);
             } elseif (isset($authLdapGroups[$groupname]['level'])) {
-                $role = LegacyAuthLevel::from($authLdapGroups[$groupname]['level'])?->getName();
+                $role = LegacyAuthLevel::tryFrom($authLdapGroups[$groupname]['level'])?->getName();
                 if ($role) {
                     $roles[] = $role;
                 }

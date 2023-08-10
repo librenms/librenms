@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Select;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class RoleController extends SelectController
@@ -42,6 +41,6 @@ class RoleController extends SelectController
     protected function baseQuery(Request $request)
     {
         return Bouncer::role()
-            ->where(DB::raw('1'), $request->user()->can('viewAny', Bouncer::role()));
+            ->whereRaw('1 = ' . ((int) $request->user()->can('viewAny', Bouncer::role())));
     }
 }

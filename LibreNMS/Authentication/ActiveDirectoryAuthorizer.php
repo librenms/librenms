@@ -141,7 +141,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
                     if (isset($data['roles']) && is_array($data['roles'])) {
                         $roles = array_merge($roles, $data['roles']);
                     } elseif (isset($data['level'])) {
-                        $role = LegacyAuthLevel::from($data['level'])?->getName();
+                        $role = LegacyAuthLevel::tryFrom($data['level'])?->getName();
                         if ($role) {
                             $roles[] = $role;
                         }

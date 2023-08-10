@@ -18,6 +18,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        /** @var User|null $user */
         $user = $this->route('user');
         if ($user && $this->user()->can('update', $user)) {
             // normal users cannot update their roles or ability to modify a password

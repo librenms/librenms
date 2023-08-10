@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         User::all()->each(function (User $user) {
-            $role = match ($user->level) {
+            $role = match ($user->getAttribute('level')) {
                 1 => 'user',
                 5 => 'global-read',
                 10 => 'admin',
@@ -45,7 +45,7 @@ return new class extends Migration
         }
 
         User::whereIs('admin', 'global-read', 'user')->get()->each(function (User $user) {
-            $user->level = $this->getLevel($user);
+            $user->setAttribute('level', $this->getLevel($user));
             $user->save();
         });
 

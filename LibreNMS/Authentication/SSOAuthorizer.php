@@ -154,7 +154,9 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Returns an integer if the permission is found, or raises an AuthenticationException if the configuration is not valid.
      * Converts the legacy level into a role
      *
-     * @return string|array
+     * @param  string  $username
+     * @return array
+     * @throws AuthenticationException
      */
     public function getRoles(string $username): array
     {

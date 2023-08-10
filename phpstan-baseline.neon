@@ -1,16 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
-			message: "#^Parameter \\#2 \\$password of method LibreNMS\\\\Authentication\\\\MysqlAuthorizer\\:\\:addUser\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/SSOAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php

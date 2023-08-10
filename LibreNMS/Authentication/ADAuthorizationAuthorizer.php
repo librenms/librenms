@@ -118,7 +118,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             if (isset($auth_ad_groups[$group_cn]['roles']) && is_array($auth_ad_groups[$group_cn]['roles'])) {
                 $roles = array_merge($roles, $auth_ad_groups[$group_cn]['roles']);
             } elseif (isset($auth_ad_groups[$group_cn]['level'])) {
-                $role = LegacyAuthLevel::from($auth_ad_groups[$group_cn]['level'])?->getName();
+                $role = LegacyAuthLevel::tryFrom($auth_ad_groups[$group_cn]['level'])?->getName();
                 if ($role) {
                     $roles[] = $role;
                 }
