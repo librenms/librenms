@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Select;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Silber\Bouncer\BouncerFacade as Bouncer;

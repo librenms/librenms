@@ -176,7 +176,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             }
         } elseif (Config::get('sso.group_strategy') === 'static') {
             if (Config::get('sso.static_level')) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int)Config::get('sso.static_level'))?->getName());
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level'))?->getName());
             } else {
                 throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
             }

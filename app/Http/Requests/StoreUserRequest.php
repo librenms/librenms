@@ -18,7 +18,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if ( $this->user()->can('create', User::class)) {
+        if ($this->user()->can('create', User::class)) {
             if ($this->user()->cannot('manage', Bouncer::role())) {
                 unset($this['roles']);
             }

@@ -9,7 +9,6 @@ enum LegacyAuthLevel: int
     case admin = 10;
     case demo = 11;
 
-
     public function fromName(string $name): ?LegacyAuthLevel
     {
         return match ($name) {

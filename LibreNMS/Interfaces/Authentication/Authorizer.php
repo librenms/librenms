@@ -91,7 +91,7 @@ interface Authorizer
     public function getExternalUsername();
 
     /**
-     * @param string $username
+     * @param  string  $username
      * @return string[] get a list of roles for the user, they need not exist ahead of time
      */
     public function getRoles(string $username): array;

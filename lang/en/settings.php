@@ -1264,7 +1264,7 @@ return [
             'default_roles' => [
                 'description' => 'Default user roles',
                 'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
-            ]
+            ],
         ],
         'reporting' => [
             'error' => [

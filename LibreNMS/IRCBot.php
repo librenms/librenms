@@ -946,10 +946,10 @@ class IRCBot
             case 'prt':
                 $prtcount = Port::hasAccess($this->user['user'])->count();
                 $prtup = Port::hasAccess($this->user['user'])->isUp()->count();
-                $prtdown = Port::hasAccess($this->user['user'])->isDown()->whereHas('device', fn($q) => $q->where('ignore', 0))->count();
-                $prtsht = Port::hasAccess($this->user['user'])->isShutdown()->whereHas('device', fn($q) => $q->where('ignore', 0))->count();
+                $prtdown = Port::hasAccess($this->user['user'])->isDown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
+                $prtsht = Port::hasAccess($this->user['user'])->isShutdown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
                 $prtign = Port::hasAccess($this->user['user'])->where(function ($query) {
-                    $query->isIgnored()->orWhereHas('device', fn($q) => $q->where('ignore', 1));
+                    $query->isIgnored()->orWhereHas('device', fn ($q) => $q->where('ignore', 1));
                 })->count();
 //                $prterr   = dbFetchCell("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')".$p_a);
                 if ($prtup > 0) {

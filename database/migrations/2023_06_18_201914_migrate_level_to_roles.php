@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasColumn('users', 'level')) {
+        if (! Schema::hasColumn('users', 'level')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->tinyInteger('level')->default(0)->after('descr');
             });

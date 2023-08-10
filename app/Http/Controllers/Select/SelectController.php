@@ -125,9 +125,10 @@ abstract class SelectController extends PaginatedAjaxController
     protected function filterById(EloquentBuilder|Builder $query, ?string $id): EloquentBuilder|Builder
     {
         if ($id) {
-             // multiple
+            // multiple
             if (str_contains($id, ',')) {
                 $keys = explode(',', $id);
+
                 return $this->idField ? $query->whereIn($this->idField, $keys) : $query->whereKey($keys);
             }
 

@@ -128,7 +128,6 @@ if (! $auth) {
         }
     }
 
-
     include_once 'includes/html/print-date-selector.inc.php';
 
     echo '<div style="padding-top: 5px";></div>';
