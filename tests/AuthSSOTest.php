@@ -166,13 +166,13 @@ class AuthSSOTest extends DBTestCase
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
         $user = $this->makeUser();
-        $this->assertTrue($a->authenticate(['username' => $user]));
+        $this->assertTrue(auth()->attempt(['username' => $user]));
 
         // Change a few things and reauth
         $_SERVER['mail'] = 'test@example.net';
         $_SERVER['displayName'] = 'Testier User';
         Config::set('sso.static_level', 10);
-        $this->assertTrue($a->authenticate(['username' => $user]));
+        $this->assertTrue(auth()->attempt(['username' => $user]));
 
         // Retrieve it and validate the update persisted
         $dbuser = User::thisAuth()->where('username', $user)->firstOrNew();
@@ -356,41 +356,41 @@ class AuthSSOTest extends DBTestCase
         //Integer
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 5;
-        $this->assertSame(['global-read'], $a->authSSOCalculateRoles());
+        $this->assertSame(['global-read'], $a->getRoles(''));
 
         //String
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = '5';
-        $this->assertSame(['global-read'], $a->authSSOCalculateRoles());
+        $this->assertSame(['global-read'], $a->getRoles(''));
 
         // invalid level
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 9;
-        $this->assertSame([], $a->authSSOCalculateRoles());
+        $this->assertSame([], $a->getRoles(''));
 
         //Invalid String
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 'foobar';
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authSSOCalculateRoles();
+        $a->getRoles('');
 
         //null
         Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = null;
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authSSOCalculateRoles();
+        $a->getRoles('');
 
         //Unset pointer
         Config::forget('sso.level_attr');
         $_SERVER['level'] = '9';
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authSSOCalculateRoles();
+        $a->getRoles('');
 
         //Unset attr
         Config::set('sso.level_attr', 'level');
         unset($_SERVER['level']);
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authSSOCalculateRoles();
+        $a->getRoles('');
     }
 
     public function testGroupParsing(): void
