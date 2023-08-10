@@ -23,27 +23,23 @@
   -->
 
 <template>
-    <div class="form-inline" v-tooltip="disabled ? $t('settings.readonly') : false">
-        <div v-for="(data, group) in localList" class="input-group">
+    <div v-tooltip="disabled ? $t('settings.readonly') : false">
+        <div v-for="(data, group) in localList" class="tw-flex">
             <input type="text"
-                   class="form-control"
+                   class="form-control !tw-w-auto"
                    :value="group"
                    :readonly="disabled"
                    :placeholder="options.groupPlaceholder"
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <librenms-select class="form-control" @change="updateRoles(group, $event)" route-name="ajax.select.role" :value="data.roles" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
-            <span class="input-group-btn">
-                <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
-            </span>
+            <librenms-select class="form-control tw-flex-grow" @change="updateRoles(group, $event)" route-name="ajax.select.role" :value="data.roles" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
+            <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
         </div>
-        <div v-if="!disabled" class="input-group">
-            <input type="text" class="form-control" v-model="newItem" :placeholder="options.groupPlaceholder">
-            <librenms-select class="form-control" v-model="newItemRoles" route-name="ajax.select.role" placeholder="Role" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
-            <span class="input-group-btn">
-                <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
-           </span>
+        <div v-if="!disabled" class="tw-flex">
+            <input type="text" class="form-control !tw-w-auto" v-model="newItem" :placeholder="options.groupPlaceholder">
+            <librenms-select class="form-control tw-flex-grow" v-model="newItemRoles" route-name="ajax.select.role" placeholder="Role" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
+            <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
         </div>
     </div>
 </template>
@@ -118,7 +114,10 @@ export default {
 </script>
 
 <style scoped>
-    .input-group {
-        padding-bottom: 3px;
-    }
+   div >>> .select2-container {
+       flex-grow: 1;
+   }
+   div >>> .select2-selection--multiple .select2-search--inline .select2-search__field {
+       width: 0.75em !important;
+   }
 </style>
