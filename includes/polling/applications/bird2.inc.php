@@ -6,8 +6,9 @@ use Carbon\Carbon;
 
 $name = 'bird2';
 
-if (!\LibreNMS\Config::get('enable_bgp')) {
+if (! \LibreNMS\Config::get('enable_bgp')) {
     echo PHP_EOL . $name . ': BGP is not enabled in config' . PHP_EOL;
+
     return;
 }
 
@@ -16,6 +17,7 @@ $birdOutput = snmp_get($device, 'nsExtendOutputFull.' . string_to_oid($name), '-
 // make sure we actually get something back
 if (empty($birdOutput)) {
     echo PHP_EOL . $name . ': has empty output' . PHP_EOL;
+
     return;
 }
 
@@ -76,7 +78,6 @@ foreach ($protocolSegments as $protocolSegment) {
         }
 
         if (strpos($protocolBody, 'hannel ipv' . $IpVersion) === 0) {
-
             foreach (explode("\n", 'C' . $protocolBody) as $protocolBodyLine) {
                 if (strpos($protocolBodyLine, ':') !== false) {
                     $lineParts = explode(':', $protocolBodyLine, 2);
@@ -97,7 +98,7 @@ foreach ($protocolSegments as $protocolSegment) {
             // Set the route updates
             unset($protocolData['route_change_stats']);
             foreach (['import_updates', 'import_withdraws', 'export_updates', 'export_withdraws'] as $key) {
-                if (!isset($protocolData[$key])) {
+                if (! isset($protocolData[$key])) {
                     continue;
                 }
 
@@ -181,7 +182,7 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->bgpPeerInUpdateElapsedTime = Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now());
     $bgpPeer->save();
 
-    echo PHP_EOL . $name . ': Processed peer AS' . $bgpPeer->bgpPeerRemoteAs . ' (' . $bgpPeer->astext. ')';
+    echo PHP_EOL . $name . ': Processed peer AS' . $bgpPeer->bgpPeerRemoteAs . ' (' . $bgpPeer->astext . ')';
 
     $bgpPeerIds[] = $bgpPeer->bgpPeer_id;
 }
