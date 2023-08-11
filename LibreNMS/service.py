@@ -115,7 +115,7 @@ class ServiceConfig(DBConfig):
         )
 
         # backward compatible options
-        self.update_frequency = config.get(
+        self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
         self.poller.workers = config.get(
