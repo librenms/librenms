@@ -42,8 +42,12 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            $actor = \config('librenms.node_id', gethostname());
-            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, Config::get('distributed_poller') ? " by $actor" : ''), $device, $type);
+            $polled_by = '';
+            if (Config::get('distributed_poller')) {
+                $polled_by = ' by ' . (\config('librenms.node_id') ?: gethostname());
+            }
+
+            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by, $device, $type);
         }
 
         // key attribute changes
