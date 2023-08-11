@@ -241,7 +241,7 @@ modules:
                     oid: sPDUOutletControlTable
                     value: sPDUOutletCtl
                     num_oid: '.1.3.6.1.4.1.318.1.1.4.4.2.1.3.{{ $index }}'
-                    descr: 'Outlet {{ $subindex0 }} State'
+                    descr: '#{{ $subindex0 }} : {{ sPDUOutletCtlName }}'
                     index: 'sPDUOutletCtl.{{ $index }}'
                     state_name: sPDUOutletCtl
                     states:
@@ -575,6 +575,24 @@ modules:
                         - { descr: noCoolingFansPresent, graph: 0, value: 3, generic: 0 }
                         - { descr: unknown, graph: 0, value: 4, generic: 3 }
                     skip_values: 3
+                -
+                    oid: upsAdvInputLineFailCause
+                    value: upsAdvInputLineFailCause
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.3.2.5.{{ $index }}'
+                    descr: 'Last failure cause'
+                    index: 'upsAdvInputLineFailCause.{{ $index }}'
+                    state_name: upsAdvInputLineFailCause
+                    states:
+                        - { descr: noTransfer, graph: 0, value: 1, generic: 0 }
+                        - { descr: highLineVoltage, graph: 0, value: 2, generic: 0 }
+                        - { descr: brownout, graph: 0, value: 3, generic: 0 }
+                        - { descr: blackout, graph: 0, value: 4, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 5, generic: 0 }
+                        - { descr: deepMomentarySag, graph: 0, value: 6, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 7, generic: 0 }
+                        - { descr: largeMomentarySpike, graph: 0, value: 8, generic: 0 }
+                        - { descr: selfTest, graph: 0, value: 9, generic: 0 }
+                        - { descr: rateOfVoltageChange, graph: 0, value: 10, generic: 0 }
 
         temperature:
             data:
@@ -1120,7 +1138,7 @@ modules:
                     oid: rPDU2DeviceStatusTable
                     value: rPDU2DeviceStatusEnergy
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.9.{{ $index }}'
-                    divisor: 100
+                    divisor: 10
                     index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
                     descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
         pressure:
@@ -1281,3 +1299,15 @@ modules:
                     user_func: dateToDays
                     low_warn_limit: 30
                     low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.5.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBattPacks.{{ $index }}'
+                    descr: 'Installed batteries'
+                    low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBadBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.6.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBadBattPacks.{{ $index }}'
+                    descr: 'Bad batteries'
+                    high_limit: 1
