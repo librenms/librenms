@@ -126,6 +126,7 @@ if (empty($protocolsData)) {
     echo PHP_EOL . $name . ': No BGP Peers found' . PHP_EOL;
     $deviceObj->bgpLocalAs = 'NULL';
     $deviceObj->save();
+
     return;
 }
 
