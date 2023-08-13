@@ -606,7 +606,7 @@ function is_port_valid($port, $device)
     }
 
     $ifDescr = $port['ifDescr'];
-    $ifName = $port['ifName'];
+    $ifName = $port['ifName'] ?? '';
     $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
@@ -676,15 +676,10 @@ function is_port_valid($port, $device)
  */
 function port_fill_missing_and_trim(&$port, $device)
 {
-    if (isset($port['ifDescr'])) {
-        $port['ifDescr'] = trim($port['ifDescr']);
-    }
-    if (isset($port['ifAlias'])) {
-        $port['ifAlias'] = trim($port['ifAlias']);
-    }
-    if (isset($port['ifName'])) {
-        $port['ifName'] = trim($port['ifName']);
-    }
+    $port['ifDescr'] = isset($port['ifDescr']) ? trim($port['ifDescr']) : null;
+    $port['ifAlias'] = isset($port['ifAlias']) ? trim($port['ifAlias']) : null;
+    $port['ifName'] = isset($port['ifName']) ? trim($port['ifName']) : null;
+
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
