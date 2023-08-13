@@ -119,7 +119,6 @@ function discover_device(&$device, $force_module = false)
     // Reset $valid array
     $device['attribs'] = DeviceCache::getPrimary()->getAttribs();
 
-    $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
@@ -178,14 +177,6 @@ function discover_device(&$device, $force_module = false)
             echo "Module [ $module ] disabled globally.\n\n";
         }
     }
-
-    $device_time = round(microtime(true) - $device_start, 3);
-
-    dbUpdate(['last_discovered' => ['NOW()'], 'last_discovered_timetaken' => $device_time], 'devices', '`device_id` = ?', [$device['device_id']]);
-
-    echo "Discovered in $device_time seconds\n";
-
-    echo PHP_EOL;
 
     return true;
 }
