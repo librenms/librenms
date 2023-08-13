@@ -5,10 +5,10 @@ modules:
       - '/^AIX .* (?<version>\d+ \d+) (?<serial>\S+)$/'  # net-snmp daemon
     serial: IBM-AIX-MIB::aixSeSerialNumber.0
     serial_replace:
-      - 'IBM,'
+      - '/IBM,/'
     hardware: IBM-AIX-MIB::aixSeMachineType.0
     hardware_replace:
-      - 'IBM,'
+      - '/IBM,/'
     version_replace:
       - '/(?<=^|\.)0+(?=[^.])/' # standard snmp daemon
       - ['/(\d+) (\d+)/', '$2.$1'] # net-snmp daemon
