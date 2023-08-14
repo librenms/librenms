@@ -388,6 +388,30 @@ chmod +x /usr/lib/check_mk_agent/local/bind
 
 3. Set the variable 'agent' to '1' in the config.
 
+## BIRD2
+
+The BIRD Internet Routing Daemon (BGP) 
+
+Due to the lack of SNMP support in the BIRD daemon, this application extracts all configured BGP protocols and parses it into LibreNMS.
+This application supports both IPv4 and IPv6 Peer processing.
+
+### SNMP Extend
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend bird2 '/usr/bin/sudo /usr/sbin/birdc -r show protocols all'
+```
+
+2.  Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/sbin/birdc
+```
+_If your snmp daemon is running on a user that isnt `Debian-snmp` make sure that user has the correct permission to execute `birdc`_
+3. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+
 ## Certificate
 
 A small python3 script that checks age and remaining validity of certificates
