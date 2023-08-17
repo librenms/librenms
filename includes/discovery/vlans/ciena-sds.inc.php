@@ -47,7 +47,8 @@ foreach ($vlansPort as $portIndex => $vlantoport){
      $db_a['state'] = "unknown";
      $db_a['cost'] = "0";
      $db_a['untagged'] = "0";
-     $from_db_portid_ifIndex =  dbFetchRow('SELECT `port_id` from ports WHERE ports.device_id = ? AND ifIndex = ?', [$device['device_id'], $port_vlan_map['port']]);
+     //$from_db_portid_ifIndex =  dbFetchRow('SELECT `port_id` from ports WHERE ports.device_id = ? AND ifIndex = ?', [$device['device_id'], $port_vlan_map['port']]);
+     $from_db_portid_ifIndex =  Vlans::database()->query('SELECT `port_id` from ports WHERE ports.device_id = ? AND ifIndex = ?', [$device['device_id'], $port_vlan_map['port']]);
      $db_w = [
          'device_id' => $device['device_id'],
          'port_id'   => $from_db_portid_ifIndex['port_id'] ?? null,
