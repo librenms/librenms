@@ -34,7 +34,7 @@ class PortNacController extends TableController
     public function rules()
     {
         return [
-            'device_id' => 'required|int',
+            'device_id' => 'int',
         ];
     }
 
@@ -46,6 +46,7 @@ class PortNacController extends TableController
     protected function sortFields($request)
     {
         return [
+            'device_id',
             'port_id',
             'mac_address',
             'mac_oui',
@@ -72,10 +73,16 @@ class PortNacController extends TableController
      */
     public function baseQuery($request)
     {
-        return PortsNac::select('port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
-            ->where('device_id', $request->device_id)
-            ->hasAccess($request->user())
-            ->with('port');
+        if (is_numeric($request->device_id)) {
+            return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+                ->where('device_id', $request->device_id)
+                ->hasAccess($request->user())
+                ->with('port');
+        } else {
+            return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+                ->hasAccess($request->user())
+                ->with('port');
+        }
     }
 
     /**
@@ -88,7 +95,9 @@ class PortNacController extends TableController
         $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
         $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
         $item['port'] = null; //free some unused data to be sent to the browser
-
+        if (isset($item['device_id'])) {
+            $item['device_id'] = Url::deviceLink($nac->device);
+        }
         return $item;
     }
 }

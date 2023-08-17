@@ -295,6 +295,11 @@
                             </li>
                         @endif
 
+
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                          aria-hidden="true"></i> NAC</a></li>
+
                         @if(auth()->user()->hasGlobalRead())
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
