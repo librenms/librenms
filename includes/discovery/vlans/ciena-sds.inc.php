@@ -54,12 +54,15 @@ foreach ($vlansPort as $portIndex => $vlantoport){
          'port_id'   => $from_db_portid_ifIndex['port_id'] ?? null,
          'vlan'      => $port_vlan_map['vlan'],
      ];
-     $db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
+     //$db_id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
+     $db_id = Vlans::database()->insert(array_merge($db_w, $db_a), 'ports_vlans');
      echo([$db_id]);
-     $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port_vlan_map['port'] ?? null, $port_vlan_map['vlan']]);
+     //$from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port_vlan_map['port'] ?? null, $port_vlan_map['vlan']]);
+     $from_db = Vlans::database()->query('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port_vlan_map['port'] ?? null, $port_vlan_map['vlan']]);
      $db_id = $from_db['port_vlan_id'];
      d_echo([$from_db]);
-     $db_updater = dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', [$port_vlan_map['port'],0,"unknown",0,$port_vlan_map['vlan'],$db_id]);
+     //$db_updater = dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', [$port_vlan_map['port'],0,"unknown",0,$port_vlan_map['vlan'],$db_id]);
+     $db_updater = Vlans::database()->update($db_a, 'ports_vlans', '`port_vlan_id` = ?', [$port_vlan_map['port'],0,"unknown",0,$port_vlan_map['vlan'],$db_id]);
      d_echo([$db_updater]);
 
 }
