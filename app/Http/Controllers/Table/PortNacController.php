@@ -98,6 +98,7 @@ class PortNacController extends TableController
         if (isset($item['device_id'])) {
             $item['device_id'] = Url::deviceLink($nac->device);
         }
+
         return $item;
     }
 }
