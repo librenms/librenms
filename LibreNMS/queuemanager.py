@@ -412,7 +412,10 @@ class PingQueueManager(TimedQueueManager):
 
                 if self.config.log_output:
                     with open(
-                        "{}/dispatch_group_{}_ping.log".format(self.config.logdir, group), "a"
+                        "{}/dispatch_group_{}_ping.log".format(
+                            self.config.logdir, group
+                        ),
+                        "a",
                     ) as log_file:
                         log_file.write(output)
 
@@ -458,7 +461,10 @@ class ServicesQueueManager(TimedQueueManager):
 
             if self.config.log_output:
                 with open(
-                    "{}/dispatch_device_{}_services.log".format(self.config.logdir, device_id), "a"
+                    "{}/dispatch_device_{}_services.log".format(
+                        self.config.logdir, device_id
+                    ),
+                    "a",
                 ) as log_file:
                     log_file.write(output)
 
@@ -505,7 +511,10 @@ class AlertQueueManager(TimedQueueManager):
 
         if self.config.log_output:
             with open(
-                "{}/dispatch_alerts.log".format(self.config.logdir), "a"
+                "{}/dispatch_alerts.log".format(
+                    self.config.logdir
+                ),
+                "a",
             ) as log_file:
                 log_file.write(output)
 
@@ -537,7 +546,10 @@ class PollerQueueManager(QueueManager):
 
             if self.config.log_output:
                 with open(
-                    "{}/dispatch_device_{}_poller.log".format(self.config.logdir, device_id), "a"
+                    "{}/dispatch_device_{}_poller.log".format(
+                        self.config.logdir, device_id
+                    ),
+                    "a",
                 ) as log_file:
                     log_file.write(output)
 
