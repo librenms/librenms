@@ -375,9 +375,10 @@ class BillingQueueManager(TimedQueueManager):
             )
 
         if self.config.log_output:
-            with open("{}/dispatch_billing-{}.log".format(self.config.logdir, run_type), "a") as log_file:
+            with open(
+                "{}/dispatch_billing-{}.log".format(self.config.logdir, run_type), "a"
+            ) as logz_file:
                 log_file.write(output)
-
 
 
 class PingQueueManager(TimedQueueManager):
@@ -410,7 +411,9 @@ class PingQueueManager(TimedQueueManager):
                 exit_code, output = LibreNMS.call_script("ping.php", args)
 
                 if self.config.log_output:
-                    with open("{}/dispatch_group_{}_ping.log".format(self.config.logdir, group), "a") as log_file:
+                    with open(
+                        "{}/dispatch_group_{}_ping.log".format(self.config.logdir, group), "a"
+                    ) as log_file:
                         log_file.write(output)
 
                 if exit_code != 0:
@@ -454,7 +457,9 @@ class ServicesQueueManager(TimedQueueManager):
             exit_code, output = LibreNMS.call_script("check-services.php", args)
 
             if self.config.log_output:
-                with open("{}/dispatch_device_{}_services.log".format(self.config.logdir, device_id), "a") as log_file:
+                with open(
+                    "{}/dispatch_device_{}_services.log".format(self.config.logdir, device_id), "a"
+                ) as log_file:
                     log_file.write(output)
 
             if exit_code == 0:
@@ -499,7 +504,9 @@ class AlertQueueManager(TimedQueueManager):
         exit_code, output = LibreNMS.call_script("alerts.php", args)
 
         if self.config.log_output:
-            with open("{}/dispatch_alerts.log".format(self.config.logdir), "a") as log_file:
+            with open(
+                "{}/dispatch_alerts.log".format(self.config.logdir), "a"
+            ) as log_file:
                 log_file.write(output)
 
         if exit_code != 0:
@@ -529,7 +536,9 @@ class PollerQueueManager(QueueManager):
             exit_code, output = LibreNMS.call_script("poller.php", args)
 
             if self.config.log_output:
-                with open("{}/dispatch_device_{}_poller.log".format(self.config.logdir, device_id), "a") as log_file:
+                with open(
+                    "{}/dispatch_device_{}_poller.log".format(self.config.logdir, device_id), "a"
+                ) as log_file:
                     log_file.write(output)
 
             if exit_code == 0:
@@ -589,7 +598,9 @@ class DiscoveryQueueManager(TimedQueueManager):
             exit_code, output = LibreNMS.call_script("discovery.php", args)
 
             if self.config.log_output:
-                with open("{}/dispatch_device_{}_discovery.log".format(self.config.logdir, device_id), "a") as log_file:
+                with open(
+                    "{}/dispatch_device_{}_discovery.log".format(self.config.logdir, device_id), "a"
+                ) as log_file:
                     log_file.write(output)
 
             if exit_code == 0:
