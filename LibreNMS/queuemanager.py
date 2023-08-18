@@ -377,7 +377,7 @@ class BillingQueueManager(TimedQueueManager):
         if self.config.log_output:
             with open(
                 "{}/dispatch_billing-{}.log".format(self.config.logdir, run_type), "a"
-            ) as logz_file:
+            ) as log_file:
                 log_file.write(output)
 
 
