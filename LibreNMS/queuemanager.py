@@ -511,9 +511,7 @@ class AlertQueueManager(TimedQueueManager):
 
         if self.config.log_output:
             with open(
-                "{}/dispatch_alerts.log".format(
-                    self.config.logdir
-                ),
+                "{}/dispatch_alerts.log".format(self.config.logdir),
                 "a",
             ) as log_file:
                 log_file.write(output)
@@ -611,7 +609,10 @@ class DiscoveryQueueManager(TimedQueueManager):
 
             if self.config.log_output:
                 with open(
-                    "{}/dispatch_device_{}_discovery.log".format(self.config.logdir, device_id), "a"
+                    "{}/dispatch_device_{}_discovery.log".format(
+                        self.config.logdir, device_id
+                    ),
+                    "a",
                 ) as log_file:
                     log_file.write(output)
 
