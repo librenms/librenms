@@ -26,7 +26,7 @@ if __name__ == "__main__":
         "-o",
         "--log-output",
         action="store_true",
-        help="Log poller ouput to files. Warning: This could use significant disk space!"
+        help="Log poller ouput to files. Warning: This could use significant disk space!",
     )
     parser.add_argument(
         "-m",
