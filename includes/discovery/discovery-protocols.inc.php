@@ -85,7 +85,7 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo PHP_EOL;
 }//end if
 
-if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
+if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', '<')) {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
