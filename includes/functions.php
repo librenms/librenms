@@ -108,7 +108,15 @@ function parse_modules($type, $options)
 
 function logfile($string)
 {
-    $fd = fopen(Config::get('log_file'), 'a');
+    $file = Config::get('log_file');
+    $fd = fopen($file, 'a');
+
+    if ($fd === false) {
+        print_error("Error: Could not write to log file: $file");
+
+        return;
+    }
+
     fputs($fd, $string . "\n");
     fclose($fd);
 }
