@@ -93,9 +93,7 @@ class PortNacController extends TableController
         $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
         $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
         $item['port'] = null; //free some unused data to be sent to the browser
-        if (isset($item['device_id'])) {
-            $item['device_id'] = Url::deviceLink($nac->device);
-        }
+        $item['device_id'] = Url::deviceLink($nac->device);
 
         return $item;
     }
