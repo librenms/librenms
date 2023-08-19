@@ -34,6 +34,7 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\PortGroup;
+use App\Models\PortsNac;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
@@ -116,6 +117,8 @@ class MenuComposer
             $vars['custom_port_descr']->isNotEmpty();
 
         $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
+
+        $vars['port_nac'] = PortsNac::hasAccess($user)->exists();
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();
