@@ -7,13 +7,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.1005.24.5",
                     "sysDescr": "CBS250-24P-4X 24-Port Gigabit PoE Smart Switch with 10G Uplinks",
                     "sysContact": "<private>",
-                    "version": "Software 3.1.1.7, Bootldr 3.0.0.40, Firmware 3.0.0.40",
-                    "hardware": "CBS250-24P-4X V02",
+                    "version": "Software 3.3.0.16, Bootldr 3.2.1.22, Firmware 3.2.1.22",
+                    "hardware": "CBS250-24P-4X V03",
                     "features": "CBS250-24P-4X",
                     "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
-                    "serial": "FOC2503LKRC",
+                    "serial": "FOC2533L5YZ",
                     "icon": "cisco.svg"
                 }
             ]
