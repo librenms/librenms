@@ -188,7 +188,7 @@ class Device extends BaseModel
         ]);
 
         // in case the displayName is a string without any content
-        if ($return_value == '' or is_null($return_value)) {
+        if ($return_value == '') {
             $return_value = $this->hostname;
         }
 
