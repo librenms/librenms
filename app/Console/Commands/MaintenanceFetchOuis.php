@@ -104,7 +104,7 @@ class MaintenanceFetchOuis extends LnmsCommand
                 continue;
             }
 
-            [$oui, $vendor] = str_getcsv($csv_line, "\t");
+            [$oui, $vendor_short, $vendor] = str_getcsv($csv_line, "\t");
 
             $oui = strtolower(str_replace(':', '', $oui)); // normalize oui
             $prefix_index = strpos($oui, '/');
@@ -122,12 +122,13 @@ class MaintenanceFetchOuis extends LnmsCommand
 
             // Add to the list of vendor ids
             $ouis[] = [
-                'vendor' => $vendor,
+                'vendor' => trim($vendor),
+                'vendor_short' => trim($vendor_short),
                 'oui' => $oui,
             ];
 
             if ($this->verbosity == OutputInterface::VERBOSITY_DEBUG) {
-                $this->line(trans('commands.maintenance:fetch-ouis.vendor_update', ['vendor' => $vendor, 'oui' => $oui]));
+                $this->line(trans('commands.maintenance:fetch-ouis.vendor_update', ['vendor' => $vendor, 'vendor_short' => $vendor_short, 'oui' => $oui]));
             }
         }
 
