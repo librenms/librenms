@@ -66,6 +66,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
 
+    Route::any('nac', 'NacController@index');
+
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
