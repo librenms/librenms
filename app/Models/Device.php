@@ -187,12 +187,8 @@ class Device extends BaseModel
             'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
         ]);
 
-        // in case the displayName is a string without any content
-        if ($return_value == '') {
-            $return_value = $this->hostname;
-        }
-
-        return $return_value;
+        // in case the displayName is a string without any content, return hostname
+        return $return_value ?: $this->hostname;
     }
 
     /**
