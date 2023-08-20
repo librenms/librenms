@@ -64,7 +64,7 @@
                 },
                 "required": ["type"],
                 "additionalProperties": false,
-                "oneOf": [
+                "anyOf": [
                     {
                         "properties": {
                             "type": {"const": "select"},
