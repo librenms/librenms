@@ -673,9 +673,8 @@ foreach ($ports as $port) {
                 }
             }
             if ($oid == 'ifSpeed') {
-                if (! empty($device['attribs']['ifSpeed:' . $port['ifName']])) {
-                    $this_port['ifSpeed'] = $port['ifSpeed'];
-                }
+                $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
+                $current_oid = $ifSpeed_override ?? $current_oid;
             }
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
@@ -698,6 +697,7 @@ foreach ($ports as $port) {
 
                 // set the update data
                 $port['update'][$oid] = $current_oid;
+                $this_port[$oid] = $current_oid;
 
                 // store the previous values for alerting
                 if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed'])) {
