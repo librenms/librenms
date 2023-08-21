@@ -122,7 +122,7 @@ class MaintenanceFetchOuis extends LnmsCommand
             }
             $vendor = trim($vendor);
             $oui = trim($oui);
-            
+
             // Add to the list of vendor ids
             $ouis[] = [
                 'vendor' => $vendor,
