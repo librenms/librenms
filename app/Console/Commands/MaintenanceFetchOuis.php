@@ -104,7 +104,7 @@ class MaintenanceFetchOuis extends LnmsCommand
                 continue;
             }
 
-            [$oui, $vendor] = str_getcsv($csv_line, "\t");
+            [$oui, , $vendor] = str_getcsv($csv_line, "\t"); // index 1 = short vendor
 
             $oui = strtolower(str_replace(':', '', $oui)); // normalize oui
             $prefix_index = strpos($oui, '/');
@@ -119,6 +119,8 @@ class MaintenanceFetchOuis extends LnmsCommand
 
                 $oui = substr($oui, 0, $substring_length);
             }
+            $vendor = trim($vendor);
+            $oui = trim($oui);
 
             // Add to the list of vendor ids
             $ouis[] = [
