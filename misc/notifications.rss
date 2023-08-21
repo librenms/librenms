@@ -96,7 +96,7 @@
   <item>
     <title>Manually set port speeds reset</title>
     <description>Due to a bug, all manually set port speeds will need to be reconfigured. Likely they are set to 1 instead of the expected value.</description>
-    <pubDate>Mon, 21 Oct 2023 15:00:00 +0000</pubDate>
+    <pubDate>Mon, 21 Aug 2023 15:00:00 +0000</pubDate>
   </item>
 </channel>
 </rss>
