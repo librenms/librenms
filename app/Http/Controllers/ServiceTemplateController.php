@@ -332,6 +332,9 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
+        if ($template->type == 'dynamic') {
+            $template->updateDevices();
+        }
         ServiceTemplateController::applyDevices($template);
         ServiceTemplateController::applyDeviceGroups($template);
 
