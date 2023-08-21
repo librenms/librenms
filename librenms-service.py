@@ -5,10 +5,9 @@ import logging
 import os
 import sys
 import threading
+from logging import info
 
 import LibreNMS
-
-from logging import info
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -23,6 +22,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("-v", "--verbose", action="count", help="Show verbose output.")
     parser.add_argument("-d", "--debug", action="store_true", help="Show debug output.")
+    parser.add_argument(
+        "-o",
+        "--log-output",
+        action="store_true",
+        help="Log poller ouput to files. Warning: This could use significant disk space!",
+    )
     parser.add_argument(
         "-m",
         "--multiple",
@@ -61,6 +66,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     service.config.single_instance = args.multiple
+    service.config.log_output = args.log_output
 
     if args.group:
         if isinstance(args.group, list):
