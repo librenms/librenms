@@ -45,7 +45,7 @@
     </style>
 @endsection
 
-@section('javascript')
+@push('scripts')
     <script>
         $(document).ready(function () {
             locations_grid = $("#nac-grid").bootgrid({
