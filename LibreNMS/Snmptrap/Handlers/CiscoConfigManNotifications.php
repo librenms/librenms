@@ -5,7 +5,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class ciscoConfigManMIBNotifications implements SnmptrapHandler
+class CiscoConfigManNotifications implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
