@@ -21,7 +21,7 @@ class CiscoConfigManNotifications implements SnmptrapHandler
         $trap->log('SNMP TRAP: Configuration Changed');
         if (\LibreNMS\Config::get('oxidized.enabled')) {
             $oxidized_api = new \App\ApiClients\Oxidized();
-            $oxidized_api->updateNode($hostname, 'SNMP Trap');
+            $oxidized_api->updateNode($device['hostname'], 'SNMP Trap');
         }
     }
 }
