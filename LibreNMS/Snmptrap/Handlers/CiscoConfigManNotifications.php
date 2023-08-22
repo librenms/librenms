@@ -1,3 +1,5 @@
+<?php
+
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
