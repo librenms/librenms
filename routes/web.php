@@ -194,7 +194,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('location', 'LocationController');
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
-            Route::post('port-nac', 'PortNacController');
+            Route::post('port-nac', 'PortNacController')->name('table.port-nac');
             Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');

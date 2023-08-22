@@ -51,7 +51,7 @@
             locations_grid = $("#nac-grid").bootgrid({
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
-                url: "{{ url('/ajax/table/port-nac') }}",
+                url: "{{ route('table.port-nac') }}",
                 post: function () {
                     return {
                     };
@@ -129,4 +129,4 @@
 
         });
     </script>
-@endsection
+@endpush
