@@ -3,7 +3,6 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
