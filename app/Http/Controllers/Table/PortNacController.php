@@ -73,15 +73,11 @@ class PortNacController extends TableController
      */
     public function baseQuery($request)
     {
-        $query = PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
-                ->hasAccess($request->user())
-                ->with('device')
-                ->with('port');
-        $query->when(is_numeric($request->device_id), function ($q) use ($request) {
-            return $q->where('device_id', $request->device_id);
-        });
-
-        return $query;
+        return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+            ->when($request->device_id, fn($q, $id) => $q->where('device_id', $id))
+            ->hasAccess($request->user())
+            ->with('port')
+            ->with('device');
     }
 
     /**
