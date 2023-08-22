@@ -29,7 +29,7 @@ return [
         'BRIDGE-MIB::newRoot' => \LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
         'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
         'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => \LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
-        'CISCO-CONFIG-MAN-MIB::ciscoConfigManMIBNotifications' => \LibreNMS\Snmptrap\Handlers\ciscoConfigManMIBNotifications::class,
+        'CISCO-CONFIG-MAN-MIB::ciscoConfigManMIBNotifications' => \LibreNMS\Snmptrap\Handlers\CiscoConfigManMIBNotifications::class,
         'CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1' => \LibreNMS\Snmptrap\Handlers\CiscoErrDisableInterfaceEvent::class,
         'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStart::class,
         'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStopTime' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStop::class,
