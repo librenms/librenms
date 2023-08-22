@@ -100,6 +100,9 @@ class ServiceConfig(DBConfig):
     redis_sentinel_service = None
     redis_timeout = 60
 
+    log_output = False
+    logdir = "logs"
+
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
 
@@ -248,7 +251,8 @@ class ServiceConfig(DBConfig):
         self.watchdog_enabled = config.get(
             "service_watchdog_enabled", ServiceConfig.watchdog_enabled
         )
-        self.watchdog_logfile = config.get("log_file", ServiceConfig.watchdog_logfile)
+        self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
+        self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
