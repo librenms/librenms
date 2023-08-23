@@ -212,6 +212,15 @@ $(document).ready(function() {
     });
 });
 
+// Fix select2 search focus bug
+$(document).on('select2:open', (e) => {
+    const selectId = e.target.id
+
+    $(".select2-search__field[aria-controls='select2-" + selectId + "-results']").each(function (key, value){
+        value.focus();
+    })
+})
+
 function refresh_oxidized_node(device_hostname){
     $.ajax({
         type: 'POST',

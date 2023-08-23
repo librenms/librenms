@@ -153,10 +153,10 @@ class DeviceController extends TableController
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
-            'hardware' => Rewrite::ciscoHardware($device),
+            'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
             'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), true),
-            'location' => $this->getLocation($device),
+            'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
         ];
@@ -223,10 +223,10 @@ class DeviceController extends TableController
      */
     private function getOsText($device)
     {
-        $os_text = Config::getOsSetting($device->os, 'text');
+        $os_text = htmlspecialchars(Config::getOsSetting($device->os, 'text'));
 
         if ($this->isDetailed()) {
-            $os_text .= '<br />' . $device->version . ($device->features ? " ($device->features)" : '');
+            $os_text .= '<br />' . htmlspecialchars($device->version . ($device->features ? " ($device->features)" : ''));
         }
 
         return $os_text;

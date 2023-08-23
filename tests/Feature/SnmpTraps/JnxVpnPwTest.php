@@ -31,6 +31,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxVpnPwTest extends SnmpTrapTestCase
@@ -54,7 +55,7 @@ JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->if
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480",
             "l2Circuit on a pseudowire belonging to $port->ifDescr has gone down",
             'Could not handle JnxVpnPwDown trap',
-            [4],
+            [Severity::Warning],
             $device,
         );
     }
@@ -75,7 +76,7 @@ JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/02.0\".$port->ifIndex $port->ifI
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
             "l2Circuit on a pseudowire belonging to $port->ifDescr is now connected",
             'Could not handle JnxVpnPwUp trap',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

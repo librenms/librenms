@@ -66,7 +66,7 @@ if ($options['f'] === 'rrd_purge') {
         $rrd_dir = Config::get('rrd_dir');
 
         if (is_numeric($rrd_purge) && $rrd_purge > 0) {
-            $cmd = "find $rrd_dir -type f -mtime +$rrd_purge -print -exec rm -f {} +";
+            $cmd = "find $rrd_dir -name .gitignore -prune -o -type f -mtime +$rrd_purge -print -exec rm -f {} +";
             $purge = `$cmd`;
             if (! empty($purge)) {
                 echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
@@ -355,15 +355,6 @@ if ($options['f'] === 'peeringdb') {
     if ($lock->get()) {
         cache_peeringdb();
         $lock->release();
-    }
-}
-
-if ($options['f'] === 'mac_oui') {
-    $lock = Cache::lock('macouidb', 86000);
-    if ($lock->get()) {
-        $res = cache_mac_oui();
-        $lock->release();
-        exit($res);
     }
 }
 

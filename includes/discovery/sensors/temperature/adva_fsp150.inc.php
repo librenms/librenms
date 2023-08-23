@@ -88,7 +88,7 @@ $divisor = 1;
 foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
     foreach ($sensors_adva as $entry) {
         $sensor_name = $entry['sensor_name'];
-        if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
+        if (! empty($pre_cache['adva_fsp150'][$index][$sensor_name])) {
             $oid = $entry['sensor_oid'] . '.' . $index;
             $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . ' [#' . $pre_cache['adva_fsp150'][$index]['slotIndex'] . ']';
             $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
@@ -119,7 +119,7 @@ unset($sensors_adva, $entry);
 // Adva FSP150 SFP DOM Temperature
 
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
-    if ($entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetNetPortMediaType']) && $entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.40.' . $index . '.3';
         $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsTemp'];
 
@@ -149,9 +149,9 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         }
     }
 
-    if ($entry['cmEthernetAccPortMediaType'] && $entry['cmEthernetAccPortMediaType'] == 'fiber' && $entry['cmEthernetAccPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetAccPortMediaType']) && $entry['cmEthernetAccPortMediaType'] == 'fiber' && $entry['cmEthernetAccPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.39.' . $index . '.3';
-        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsTemp'];
+        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsTemp'] ?? null;
         if ($current != 0) {
             $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
@@ -178,9 +178,9 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         }
     }
 
-    if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber' && $entry['cmEthernetTrafficPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetTrafficPortMediaType']) && $entry['cmEthernetTrafficPortMediaType'] == 'fiber' && $entry['cmEthernetTrafficPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.41.' . $index . '.3';
-        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetTrafficPortStatsTemp'];
+        $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetTrafficPortStatsTemp'] ?? null;
         if ($current != 0) {
             $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';

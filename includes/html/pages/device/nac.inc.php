@@ -37,11 +37,7 @@ if ($device['os'] === 'vrp') {
                 <tr>
                     <th data-column-id="port_id" data-width="100px">Port</th>
                     <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
-<?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
-    echo '                    <th data-column-id="mac_oui" data-sortable="false" data-width="130px" data-visible="false" data-formatter="tooltip">Vendor</th>';
-}
-?>
+                    <th data-column-id="mac_oui" data-sortable="false" data-width="130px" data-visible="<?php echo \LibreNMS\Config::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
                     <th data-column-id="ip_address" data-width="140px" data-formatter="tooltip">IP Address</th>
                     <th data-column-id="vlan" data-width="60px" data-formatter="tooltip"<?php echo $vlan_visibility ?>>Vlan</th>
                     <th data-column-id="domain" data-formatter="nac_domain" data-formatter="tooltip">Domain</th>
@@ -89,7 +85,7 @@ if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
             "nac_authz": function (column, row) {
                 var value = row[column.id];
 
-                if (value === 'authorizationSuccess' || value === 'sussess') { 
+                if (value === 'authorizationSuccess' || value === 'sussess') {
                     //typo in huawei MIB so we must keep sussess
                     return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\"></i>";
                 } else if (value === 'authorizationFailed') {

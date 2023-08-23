@@ -93,5 +93,10 @@
     <description>Due to a security vulnerability, you must upgrade your memcached application scripts to the latest version. (1.1)</description>
     <pubDate>Fri, 10 Oct 2022 18:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Manually set port speeds reset</title>
+    <description>Due to a bug, all manually set port speeds will need to be reconfigured. Likely they are set to 1 instead of the expected value. See https://github.com/librenms/librenms/pull/15238 for more information.</description>
+    <pubDate>Mon, 21 Aug 2023 15:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

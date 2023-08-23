@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -248,6 +249,24 @@ function get_graph_generic_by_hostname(Request $request)
     });
 }
 
+function get_graph_by_service(Request $request)
+{
+    $vars = [];
+    $vars['id'] = $request->route('id');
+    $vars['type'] = 'service_graph';
+    $vars['ds'] = $request->route('datasource');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+    $vars['device'] = $device['device_id'];
+
+    return check_device_permission($device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
+    });
+}
+
 function list_locations()
 {
     $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');
@@ -352,8 +371,8 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = '`d`.`type`=?';
         $param[] = $query;
     } elseif ($type == 'display') {
-        $sql = '`d`.`display`=?';
-        $param[] = $query;
+        $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
@@ -2880,6 +2899,20 @@ function edit_location(Illuminate\Http\Request $request)
     }
 
     return api_error(500, 'Failed to update location');
+}
+
+function get_location(Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to get');
+    }
+    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    if (empty($data)) {
+        return api_error(404, 'Location does not exist');
+    }
+
+    return api_success($data, 'get_location');
 }
 
 function get_location_id_by_name($location)

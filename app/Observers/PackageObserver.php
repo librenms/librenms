@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Eventlog;
 use App\Models\Package;
+use LibreNMS\Enum\Severity;
 use Log;
 
 class PackageObserver
@@ -16,7 +17,7 @@ class PackageObserver
      */
     public function created(Package $package): void
     {
-        Eventlog::log('Package installed: ' . $package, $package->device_id, 'package', 3);
+        Eventlog::log('Package installed: ' . $package, $package->device_id, 'package', Severity::Notice);
         Log::info("+ $package");
     }
 
@@ -30,7 +31,7 @@ class PackageObserver
     {
         if ($package->getOriginal('version') !== $package->version || $package->getOriginal('build') !== $package->build) {
             $message = $package . ' from ' . $package->getOriginal('version') . ($package->getOriginal('build') ? '-' . $package->getOriginal('build') : '');
-            Eventlog::log('Package updated: ' . $message, $package->device_id, 'package', 3);
+            Eventlog::log('Package updated: ' . $message, $package->device_id, 'package', Severity::Notice);
             Log::info("u $message");
         }
     }
@@ -43,7 +44,7 @@ class PackageObserver
      */
     public function deleted(Package $package): void
     {
-        Eventlog::log('Package removed: ' . $package, $package->device_id, 'package', 3);
+        Eventlog::log('Package removed: ' . $package, $package->device_id, 'package', Severity::Notice);
         Log::info("- $package");
     }
 

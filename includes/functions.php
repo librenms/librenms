@@ -12,6 +12,7 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -107,7 +108,15 @@ function parse_modules($type, $options)
 
 function logfile($string)
 {
-    $fd = fopen(Config::get('log_file'), 'a');
+    $file = Config::get('log_file');
+    $fd = fopen($file, 'a');
+
+    if ($fd === false) {
+        print_error("Error: Could not write to log file: $file");
+
+        return;
+    }
+
     fputs($fd, $string . "\n");
     fclose($fd);
 }
@@ -518,7 +527,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -605,7 +614,7 @@ function is_port_valid($port, $device)
     }
 
     $ifDescr = $port['ifDescr'];
-    $ifName = $port['ifName'];
+    $ifName = $port['ifName'] ?? '';
     $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
@@ -675,15 +684,10 @@ function is_port_valid($port, $device)
  */
 function port_fill_missing_and_trim(&$port, $device)
 {
-    if (isset($port['ifDescr'])) {
-        $port['ifDescr'] = trim($port['ifDescr']);
-    }
-    if (isset($port['ifAlias'])) {
-        $port['ifAlias'] = trim($port['ifAlias']);
-    }
-    if (isset($port['ifName'])) {
-        $port['ifName'] = trim($port['ifName']);
-    }
+    $port['ifDescr'] = isset($port['ifDescr']) ? trim($port['ifDescr']) : null;
+    $port['ifAlias'] = isset($port['ifAlias']) ? trim($port['ifAlias']) : null;
+    $port['ifName'] = isset($port['ifName']) ? trim($port['ifName']) : null;
+
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
@@ -1164,71 +1168,6 @@ function q_bridge_bits2indices($hex_data)
 }
 
 /**
- * Function to generate Mac OUI Cache
- */
-function cache_mac_oui()
-{
-    // timers:
-    $mac_oui_refresh_int_min = 86400 * rand(7, 11); // 7 days + a random number between 0 and 4 days
-    $mac_oui_cache_time = 1296000; // we keep data during 15 days maximum
-
-    $lock = Cache::lock('macouidb-refresh', $mac_oui_refresh_int_min); //We want to refresh after at least $mac_oui_refresh_int_min
-
-    if (Config::get('mac_oui.enabled') !== true) {
-        echo 'Mac OUI integration disabled' . PHP_EOL;
-
-        return 0;
-    }
-
-    if ($lock->get()) {
-        echo 'Caching Mac OUI' . PHP_EOL;
-        try {
-            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
-            //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
-
-            echo '  -> Downloading ...' . PHP_EOL;
-            $get = \LibreNMS\Util\Http::client()->get($mac_oui_url);
-            echo '  -> Processing CSV ...' . PHP_EOL;
-            $csv_data = $get->body();
-            foreach (explode("\n", $csv_data) as $csv_line) {
-                unset($oui);
-                $entry = str_getcsv($csv_line, "\t");
-
-                $length = strlen($entry[0]);
-                $prefix = strtolower(str_replace(':', '', $entry[0]));
-
-                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
-                    // We have a standard OUI xx:xx:xx
-                    $oui = $prefix;
-                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
-                    // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
-                    if (substr($prefix, -2) == '28') {
-                        $oui = substr($prefix, 0, 7);
-                    } elseif (substr($prefix, -2) == '36') {
-                        $oui = substr($prefix, 0, 9);
-                    }
-                }
-                if (isset($oui)) {
-                    echo "Adding $oui, $entry[2]" . PHP_EOL;
-                    $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry[2], $mac_oui_cache_time);
-                }
-            }
-        } catch (Exception $e) {
-            echo 'Error processing Mac OUI :' . PHP_EOL;
-            echo 'Exception: ' . get_class($e) . PHP_EOL;
-            echo $e->getMessage() . PHP_EOL;
-
-            $lock->release(); // we did not succeed so we'll try again next time
-
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-/**
  * Function to generate PeeringDB Cache
  */
 function cache_peeringdb()
@@ -1315,29 +1254,6 @@ function cache_peeringdb()
     } else {
         echo 'Peering DB integration disabled' . PHP_EOL;
     }
-}
-
-/**
- * Get an array of the schema files.
- * schema_version => full_file_name
- *
- * @return mixed
- */
-function get_schema_list()
-{
-    // glob returns an array sorted by filename
-    $files = glob(Config::get('install_dir') . '/sql-schema/*.sql');
-
-    // set the keys to the db schema version
-    $files = array_reduce($files, function ($array, $file) {
-        $array[(int) basename($file, '.sql')] = $file;
-
-        return $array;
-    }, []);
-
-    ksort($files); // fix dbSchema 1000 order
-
-    return $files;
 }
 
 /**

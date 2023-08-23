@@ -27,6 +27,13 @@
             "order": 2,
             "type": "boolean"
         },
+        "alert.macros.rule": {
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
+        },	
         "alert_colour.ok": {
             "default": "#00ff00",
             "type": "color"
@@ -4045,7 +4052,7 @@
         },
         "leaflet.default_zoom": {
             "default": 2,
-            "type": "integer"
+            "type": "float"
         },
         "leaflet.group_radius": {
             "default": 10,
@@ -5390,11 +5397,19 @@
                 "CRITICAL": "CRITICAL"
             }
         },
+        "service_master_timeout": {
+            "default": 20,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "integer",
+            "units": "seconds"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
             "section": "distributed",
-            "order": 25,
+            "order": 26,
             "type": "boolean"
         },
         "sfdp": {

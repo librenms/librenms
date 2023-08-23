@@ -164,11 +164,8 @@ trait YamlOSDiscovery
                     $replacement = $replacements[1];
                 }
 
-                // check for regex
-                if (preg_match($search, $device->$field)) {
+                if (isset($device->$field)) {
                     $device->$field = preg_replace($search, $replacement, $device->$field);
-                } else {
-                    $device->$field = str_replace($search, $replacement, $device->$field);
                 }
             }
         }

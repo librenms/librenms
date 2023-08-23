@@ -64,6 +64,9 @@
                                             "integer",
                                             "string"
                                         ]
+                                    },
+                                    "snmp_no_Ih_flag": {
+                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false
@@ -170,6 +173,9 @@
                                             "string",
                                             "array"
                                         ]
+                                    },
+                                    "snmp_no_Ih_flag": {
+                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false,
@@ -284,6 +290,9 @@
                                             },
                                             "entPhysicalIndex_measured": {
                                                 "type": "string"
+                                            },
+                                            "snmp_no_Ih_flag": {
+                                                "type": "string"
                                             }
                                         },
                                         "additionalProperties": false,
@@ -318,6 +327,9 @@
                                                     "string",
                                                     "array"
                                                 ]
+                                            },
+                                            "snmp_no_Ih_flag": {
+                                                "type": "string"
                                             }
                                         },
                                         "additionalProperties": false,
@@ -378,6 +390,9 @@
                         "string",
                         "array"
                     ]
+                },
+                "snmp_no_Ih_flag": {
+                    "type": "string"
                 }
             },
             "additionalProperties": false,
@@ -457,6 +472,9 @@
                                 "type": "string"
                             },
                             "user_func": {
+                                "type": "string"
+                            },
+                            "snmp_no_Ih_flag": {
                                 "type": "string"
                             }
                         },

@@ -1176,6 +1176,9 @@
   .device-availability {
     color: #ffffff;
   }
+  .service-availability {
+    color: #ffffff;
+  }
   * {
     box-sizing: border-box;
   }
