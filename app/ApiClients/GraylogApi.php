@@ -59,7 +59,7 @@ class GraylogApi
 
         $uri = $this->api_prefix . '/streams';
 
-        $response = $this->client->get($uri);
+        $response = $this->client->get($uri, $data)->throw();
 
         return $response->json() ?: [];
     }
@@ -87,7 +87,7 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-        $response = $this->client->get($uri, $data)->throw();
+        $response = $this->client->get($uri, $data);
 
         return $response->json() ?: [];
     }
@@ -119,7 +119,8 @@ class GraylogApi
             gethostbyname($device->hostname),
             $device->hostname,
             $device->displayName(),
-            $device->ip,
+	    $device->ip,
+	    $device->sysName,
         ]);
 
         if (Config::get('graylog.match-any-address')) {
