@@ -78,7 +78,7 @@ class Gitlab extends Transport
                     'title' => 'Personal Access Token',
                     'name' => 'gitlab-key',
                     'descr' => 'Personal Access Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [
