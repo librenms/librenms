@@ -3,7 +3,6 @@ text: F5OS
 type: network
 icon: f5
 empty_ifdescr: true
-ifXEntry: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
