@@ -108,7 +108,7 @@ class Xmatters extends Transport
                     'name' => 'xmatters_api_secret',
                     'descr' => 'The Secret matching the API Key for authenticating the flow http trigger or legacy inbound integration.',
                     'type' => 'password',
-                ]
+                ],
             ],
             'validation' => [
                 'xmatters_url' => 'required|url',
