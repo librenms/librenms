@@ -40,7 +40,7 @@ class GraylogApi
             $this->api_prefix = '/api';
         }
 
-   	$base_uri = Config::get('graylog.server');
+   	    $base_uri = Config::get('graylog.server');
         if ($port = Config::get('graylog.port')) {
             $base_uri .= ':' . $port;
         }
@@ -59,9 +59,9 @@ class GraylogApi
 
         $uri = $this->api_prefix . '/streams';
 
-	$response = $this->client->get($uri, $data)->throw();
+	    $response = $this->client->get($uri, $data)->throw();
 	
-	return $response->json() ?: [];
+	    return $response->json() ?: [];
     }
 
     /**
@@ -73,7 +73,7 @@ class GraylogApi
 	    return [];
         }
 
-	$uri = Config::get('graylog.base_uri');
+	    $uri = Config::get('graylog.base_uri');
         if (! $uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
         }
@@ -87,8 +87,8 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-	$response = $this->client->get($uri, $data);
-	return $response->json() ?: [];
+	    $response = $this->client->get($uri, $data);
+	    return $response->json() ?: [];
     }
 
     /**
