@@ -109,6 +109,7 @@ function api_get_graph(Request $request, array $additional = [])
             'noagg',
             'inverse',
             'previous',
+            'duration',
         ]);
 
         $graph = Graph::get([
