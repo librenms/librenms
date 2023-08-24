@@ -118,5 +118,4 @@ class Xmatters extends Transport
             ],
         ];
     }
-
 }
