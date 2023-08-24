@@ -43,3 +43,43 @@ if (is_array($fan_trays)) {
         create_sensor_to_state_index($device, $state_name, $index);
     }
 }
+
+$error_disabled_oid = '.1.3.6.1.4.1.9.9.548.1.3.1.1.2';
+$error_disabled = snmpwalk_cache_oid($device, $error_disabled_oid, []);
+
+if (is_array($error_disabled)) {
+    foreach ($error_disabled as $oid => $array) {
+        $state = current($array);
+        $split_oid = explode('.', $oid);
+        $index = $split_oid[count($split_oid) - 2];
+        $current_oid = "$error_disabled_oid.$index.0";
+
+        $entity_oid = '.1.3.6.1.2.1.31.1.1.1.1';
+        $descr = trim(snmp_get($device, "$entity_oid.$index", '-Ovq'), '"') . ' Suspended Status';
+
+        $state_name = 'cErrDisableIfStatusCause';
+        $states = [
+            ['value' => 1, 'graph' => 1, 'generic' => 2, 'descr' => 'udld'],
+            ['value' => 2, 'graph' => 1, 'generic' => 2, 'descr' => 'bpduGuard'],
+            ['value' => 3, 'graph' => 1, 'generic' => 2, 'descr' => 'channelMisconfig'],
+            ['value' => 4, 'graph' => 1, 'generic' => 2, 'descr' => 'pagpFlap'],
+            ['value' => 5, 'graph' => 1, 'generic' => 2, 'descr' => 'dtpFlap'],
+            ['value' => 6, 'graph' => 1, 'generic' => 2, 'descr' => 'linkFlap'],
+            ['value' => 7, 'graph' => 1, 'generic' => 2, 'descr' => 'l2ptGuard'],
+            ['value' => 8, 'graph' => 1, 'generic' => 2, 'descr' => 'dot1xSecurityViolation'],
+            ['value' => 9, 'graph' => 1, 'generic' => 2, 'descr' => 'portSecurityViolation'],
+            ['value' => 10, 'graph' => 1, 'generic' => 2, 'descr' => 'gbicInvalid'],
+            ['value' => 11, 'graph' => 1, 'generic' => 2, 'descr' => 'dhcpRateLimit'],
+            ['value' => 12, 'graph' => 1, 'generic' => 2, 'descr' => 'unicastFlood'],
+            ['value' => 13, 'graph' => 1, 'generic' => 2, 'descr' => 'vmps'],
+            ['value' => 14, 'graph' => 1, 'generic' => 2, 'descr' => 'stormControl'],
+            ['value' => 15, 'graph' => 1, 'generic' => 2, 'descr' => 'inlinePower'],
+            ['value' => 16, 'graph' => 1, 'generic' => 2, 'descr' => 'arpInspection'],
+            ['value' => 17, 'graph' => 1, 'generic' => 2, 'descr' => 'portLoopback'],
+        ];
+        create_state_index($state_name, $states);
+
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $state_name, $descr, 1, 1);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+}
