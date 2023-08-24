@@ -64,11 +64,11 @@ class ColdBoot implements SnmptrapHandler
 where number on the end means color of the eventlog:
 
 ```
-1 green
-2 cyan
-3 blue
-4 yellow
-5 red
+Severity::Ok = green
+Severity::Info = cyan
+Severity::Notice = blue
+Severity::Warning = yellow
+Severity::Error = red
 ```
 
 Register the mapping in the `config/snmptraps.php` file. Make sure to
