@@ -954,7 +954,8 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
+Under Ubuntu/Debian just run `apt install dhcpd-pools` or under
+FreeBSD `pkg install dhcpd-pools`.
 
 ### SNMP Extend
 
