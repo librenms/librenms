@@ -17,7 +17,6 @@ class Xmatters extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
-
         $url = $this->config['xmatters_url'] . '/api/integration/1/functions/' . $this->config['xmatters_function'] . '/triggers';
 
         $device_url = \Config::get('base_url');
@@ -27,13 +26,13 @@ class Xmatters extends Transport
         $data = [
             'properties' => $alert_data,
             'recipients' => $alert_data['contacts'],
-            'priority' => $this->mapSeverityToPriority($alert_data['severity'])
+            'priority' => $this->mapSeverityToPriority($alert_data['severity']),
         ];
 
         $data['properties']['event_state'] = $this->mapStateToEventState($alert_data['state']);
         $data['properties']['instance_url'] = $device_url;
         $data['properties']['device_url'] = ($device_url . '/device/' . $alert_data['device_id']);
-        $data['properties']['alert_url'] = ($device_url . '/device/' . $alert_data['device_id'] . '/alerts/'  .$alert_data['alert_id']);
+        $data['properties']['alert_url'] = ($device_url . '/device/' . $alert_data['device_id'] . '/alerts/' . $alert_data['alert_id']);
         $data['properties']['hostname'] = $alert_data['sysName'];
         $data['properties']['ip'] = $alert_data['hostname'];
         $data['properties']['device_groups'] = $device_groups;
@@ -47,36 +46,37 @@ class Xmatters extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['message'] ?? '', $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
-
-    protected function mapSeverityToPriority(string $severity): string {
+    protected function mapSeverityToPriority(string $severity): string
+    {
         switch ($severity) {
             case 'critical':
                 return 'High';
-            case 'warning':  
+            case 'warning':
                 return 'Medium';
             case 'ok':
                 return 'Low';
             default:
-                return 'invalid severity'; 
+                return 'invalid severity';
         }
     }
 
-    protected function mapStateToEventState(int $state): string {
+    protected function mapStateToEventState(int $state): string
+    {
         switch ($state) {
-            case 0: 
+            case 0:
                 return 'ok';
             case 1:
                 return 'alert';
             case 2:
                 return 'ack';
-            case 3: 
+            case 3:
                 return 'better';
             case 4:
                 return 'worse';
-            default:  
+            default:
                 return 'invalid state';
         }
     }
@@ -89,33 +89,33 @@ class Xmatters extends Transport
                     'title' => 'xMatters URL',
                     'name' => 'xmatters_url',
                     'descr' => 'The hostname of the xMatters instance.',
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'xMatters Function',
                     'name' => 'xmatters_function',
                     'descr' => 'The ID of the xmatters flow http trigger or legacy inbound integration.',
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'xMatters API Key',
                     'name' => 'xmatters_api_key',
                     'descr' => 'The API Key key for authenticating the flow http trigger or legacy inbound integration.',
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'xMatters API Secret',
                     'name' => 'xmatters_api_secret',
                     'descr' => 'The Secret matching the API Key for authenticating the flow http trigger or legacy inbound integration.',
-                    'type' => 'password'
+                    'type' => 'password',
                 ]
             ],
             'validation' => [
                 'xmatters_url' => 'required|url',
                 'xmatters_function' => 'required|string',
                 'xmatters_api_key' => 'required|string',
-                'xmatters_api_secret' => 'required|string'
-            ]
+                'xmatters_api_secret' => 'required|string',
+            ],
         ];
     }
 }
