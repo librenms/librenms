@@ -40,12 +40,12 @@ class GraylogApi
             $this->api_prefix = '/api';
         }
 
-   	$base_uri = Config::get('graylog.server');
+        $base_uri = Config::get('graylog.server');
         if ($port = Config::get('graylog.port')) {
             $base_uri .= ':' . $port;
         }
 
-    	$this->client = Http::client()
+        $this->client = Http::client()
             ->baseUrl($base_uri)
             ->withBasicAuth(Config::get('graylog.username'), Config::get('graylog.password'))
             ->acceptJson();
@@ -59,9 +59,9 @@ class GraylogApi
 
         $uri = $this->api_prefix . '/streams';
 
-	$response = $this->client->get($uri, $data)->throw();
-	
-	return $response->json() ?: [];
+        $response = $this->client->get($uri);
+
+        return $response->json() ?: [];
     }
 
     /**
@@ -70,14 +70,14 @@ class GraylogApi
     public function query(string $query = '*', int $range = 0, int $limit = 0, int $offset = 0, ?string $sort = null, ?string $filter = null): array
     {
         if (! $this->isConfigured()) {
-	    return [];
+            return [];
         }
 
-	$uri = Config::get('graylog.base_uri');
+        $uri = Config::get('graylog.base_uri');
         if (! $uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
         }
-        
+
         $data = [
             'query' => $query,
             'range' => $range,
@@ -87,8 +87,9 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-	$response = $this->client->get($uri, $data);
-	return $response->json() ?: [];
+        $response = $this->client->get($uri, $data)->throw();
+
+        return $response->json() ?: [];
     }
 
     /**
