@@ -45,20 +45,23 @@ if (is_array($fan_trays)) {
 }
 
 $error_disabled_oid = '.1.3.6.1.4.1.9.9.548.1.3.1.1.2';
-$error_disabled = snmpwalk_cache_oid($device, $error_disabled_oid, []);
-
-if (is_array($error_disabled)) {
-    foreach ($error_disabled as $oid => $array) {
-        $state = current($array);
+$interface_oid = '.1.3.6.1.2.1.31.1.1.1.1';
+$interface_results = snmpwalk_cache_oid($device, $interface_oid, []);
+if (is_array($interface_results)) {
+    foreach ($interface_results as $oid => $array) {
         $split_oid = explode('.', $oid);
-        $index = $split_oid[count($split_oid) - 2];
-        $current_oid = "$error_disabled_oid.$index.0";
+        $index = $split_oid[count($split_oid) - 1];
+        $state = trim(snmp_get($device, "$error_disabled_oid.$index.0", '-Ovq'), '"');
+        if ($state == "No Such Instance currently exists at this OID") {
+            $state = 0;
+        }
 
-        $entity_oid = '.1.3.6.1.2.1.31.1.1.1.1';
-        $descr = trim(snmp_get($device, "$entity_oid.$index", '-Ovq'), '"') . ' Suspended Status';
+        $descr = "Suspended Status for " . current($array);
+        $current_oid = "$error_disabled_oid.$index.0";
 
         $state_name = 'cErrDisableIfStatusCause';
         $states = [
+            ['value' => 0, 'graph' => 1, 'generic' => 0, 'descr' => 'OK'],
             ['value' => 1, 'graph' => 1, 'generic' => 2, 'descr' => 'udld'],
             ['value' => 2, 'graph' => 1, 'generic' => 2, 'descr' => 'bpduGuard'],
             ['value' => 3, 'graph' => 1, 'generic' => 2, 'descr' => 'channelMisconfig'],
