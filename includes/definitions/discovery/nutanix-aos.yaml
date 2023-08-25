@@ -1,0 +1,44 @@
+mib: NUTANIX-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: diskStatusTable
+                    value: dstState
+                    index: 'DISKSTATE-{{ dstDiskId }}'
+                    descr: 'Disk {{ $dstDiskId }}'
+                    states:
+                        - { descr: ok , graph: 0, value: 1, generic: 0 }
+                        - { descr: error  , graph: 0, value: 2, generic: 1 }
+        count:
+            data:
+                -
+                    oid: hypervisorInformationTable
+                    value: hypervisorVmCount
+                    descr: '{{ $hypervisorName }} VM Count'
+                    index: 'VMS-{{ $hypervisorName }}'
+        percent:
+            data:
+                -
+                    oid: hypervisorInformationTable
+                    value: hypervisorMemoryUsagePercent
+                    descr: '{{ $hypervisorName }} RAM'
+                    index: 'RAM-{{ $hypervisorName }}'
+                    warn_limit: 90
+                    high_limit: 95
+                -
+                    oid: hypervisorInformationTable
+                    value: hypervisorCpuUsagePercent
+                    descr: '{{ $hypervisorName }} CPU'
+                    index: 'CPU-{{ $hypervisorName }}'
+                    warn_limit: 90
+                    high_limit: 95
+    processors:
+        data:
+            -
+                oid:
+                total: spitTotalCapacity
+                used: spitUsedCapacity
+                precision: 1024
+                descr: spitStoragePoolName
