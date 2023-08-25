@@ -52,11 +52,11 @@ if (is_array($interface_results)) {
         $split_oid = explode('.', $oid);
         $index = $split_oid[count($split_oid) - 1];
         $state = trim(snmp_get($device, "$error_disabled_oid.$index.0", '-Ovq'), '"');
-        if ($state == "No Such Instance currently exists at this OID") {
+        if ($state == 'No Such Instance currently exists at this OID') {
             $state = 0;
         }
 
-        $descr = "Suspended Status for " . current($array);
+        $descr = 'Suspended Status for ' . current($array);
         $current_oid = "$error_disabled_oid.$index.0";
 
         $state_name = 'cErrDisableIfStatusCause';
