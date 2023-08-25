@@ -6,6 +6,7 @@ modules:
                 -
                     oid: diskStatusTable
                     value: dstState
+                    num_oid: '{{ $dstState }}.{{ $index }}'
                     index: 'DISKSTATE-{{ dstDiskId }}'
                     descr: 'Disk {{ $dstDiskId }}'
                     states:
@@ -16,6 +17,7 @@ modules:
                 -
                     oid: hypervisorInformationTable
                     value: hypervisorVmCount
+                    num_oid: '{{ $hypervisorVmCount }}.{{ $index }}'
                     descr: '{{ $hypervisorName }} VM Count'
                     index: 'VMS-{{ $hypervisorName }}'
         percent:
@@ -23,6 +25,7 @@ modules:
                 -
                     oid: hypervisorInformationTable
                     value: hypervisorMemoryUsagePercent
+                    num_oid: '{{ $hypervisorMemoryUsagePercent }}.{{ $index }}'
                     descr: '{{ $hypervisorName }} RAM'
                     index: 'RAM-{{ $hypervisorName }}'
                     warn_limit: 90
@@ -30,15 +33,8 @@ modules:
                 -
                     oid: hypervisorInformationTable
                     value: hypervisorCpuUsagePercent
+                    num_oid: '{{ $hypervisorCpuUsagePercent }}.{{ $index }}'
                     descr: '{{ $hypervisorName }} CPU'
                     index: 'CPU-{{ $hypervisorName }}'
                     warn_limit: 90
                     high_limit: 95
-    processors:
-        data:
-            -
-                oid:
-                total: spitTotalCapacity
-                used: spitUsedCapacity
-                precision: 1024
-                descr: spitStoragePoolName
