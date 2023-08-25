@@ -19,7 +19,7 @@ foreach ($vlans_name as $vlans_key => $vlans_value) {
 }
 
 foreach ($vlans_port as $port_index => $vlantoport) {
-    $portindex_array = explode('.',$port_index);
+    $portindex_array = explode('.', $port_index);
     $vlanid_to_port["$port_index"] = "$portindex_array[2]";
     echo "\nportindex: {$portindex_array[2]}\n";
 }
