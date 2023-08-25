@@ -101,6 +101,15 @@ su - librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
+
+Important: For people who have installed Python using apt, the script can fail trying to use pip installing python requirements.
+This is default behavior for debian version 11 testing (and newer). In order to work around this, you can safely run this:
+```
+su - librenms
+pip3 install --user --break-system-packages -r /opt/librenms/requirements.txt
+```
+which will finalize the install script for those users.
+
 Sometime when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
 ```
 wget https://getcomposer.org/composer-stable.phar
@@ -191,7 +200,8 @@ mysql -u root
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
-exit
+FLUSH PRIVILEGES;
+quit
 ```
 
 ## Configure PHP-FPM
@@ -471,8 +481,8 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
         ```bash
         rm /etc/nginx/sites-enabled/default
-        systemctl reload nginx
-        systemctl restart php8.2-fpm
+        nginx -t
+        nginx -s reload
         ```
 
 ## SELinux
