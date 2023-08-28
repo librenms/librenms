@@ -16,6 +16,24 @@ echo '
         </div>
     </div>
     <div class="form-group">
+        <label for="unixagent" class="col-sm-4 control-label">Override default ssh port</label>
+        <div class="col-sm-8">
+            ' . dynamic_override_config('text', 'override_device_ssh_port', $device) . '
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="unixagent" class="col-sm-4 control-label">Override default telnet port</label>
+        <div class="col-sm-8">
+            ' . dynamic_override_config('text', 'override_device_telnet_port', $device) . '
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="unixagent" class="col-sm-4 control-label">Override default http port</label>
+        <div class="col-sm-8">
+            ' . dynamic_override_config('text', 'override_device_http_port', $device) . '
+        </div>
+    </div>
+    <div class="form-group">
         <label for="unixagent" class="col-sm-4 control-label">Unix agent port</label>
         <div class="col-sm-8">
             ' . dynamic_override_config('text', 'override_Unixagent_port', $device) . '
