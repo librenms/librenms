@@ -92,7 +92,7 @@ class AddUserCommand extends LnmsCommand
 
         $user->setPassword($password);
         $user->save();
-        $user->allow($this->option('role'));
+        $user->assign($this->option('role'));
 
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $user->save();
