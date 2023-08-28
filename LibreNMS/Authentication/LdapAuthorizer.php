@@ -128,14 +128,16 @@ class LdapAuthorizer extends AuthorizerBase
             $roles = [];
             // Collect all assigned roles
             foreach ($entries as $entry) {
-                $groupname = $entry['cn'][0];
+                if (isset($entry['cn'][0])) {
+                    $groupname = $entry['cn'][0];
 
-                if (isset($groups[$groupname]['roles']) && is_array($groups[$groupname]['roles'])) {
-                    $roles = array_merge($roles, $groups[$groupname]['roles']);
-                } elseif (isset($groups[$groupname]['level'])) {
-                    $role = LegacyAuthLevel::tryFrom($groups[$groupname]['level'])?->getName();
-                    if ($role) {
-                        $roles[] = $role;
+                    if (isset($groups[$groupname]['roles']) && is_array($groups[$groupname]['roles'])) {
+                        $roles = array_merge($roles, $groups[$groupname]['roles']);
+                    } elseif (isset($groups[$groupname]['level'])) {
+                        $role = LegacyAuthLevel::tryFrom($groups[$groupname]['level'])?->getName();
+                        if ($role) {
+                            $roles[] = $role;
+                        }
                     }
                 }
             }
