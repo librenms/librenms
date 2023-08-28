@@ -171,6 +171,11 @@ parameters:
 			path: LibreNMS/Util/Snmpsim.php
 
 		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 1
+			path: app/Console/Commands/AddUserCommand.php
+
+		-
 			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
