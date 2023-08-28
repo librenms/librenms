@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolesSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,6 +14,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        (new RolesSeeder)->run(); // make sure roles have been created.
+
         User::all()->each(function (User $user) {
             $role = match ($user->getAttribute('level')) {
                 1 => 'user',
