@@ -30,6 +30,7 @@ return [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
             'ldap' => ['name' => 'LDAP Settings'],
+            'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
@@ -1257,6 +1258,12 @@ return [
             'nets-exclude' => [
                 'description' => 'Networks/IPs to be ignored',
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
+        ],
+        'radius' => [
+            'default_roles' => [
+                'description' => 'Default user roles',
+                'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
             ],
         ],
         'reporting' => [

@@ -3,6 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
+use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
 
@@ -92,14 +93,13 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-    public function getUserlevel($username)
+    public function getRoles(string $username): array
     {
-        $userlevel = $this->authLdapSessionCacheGet('userlevel');
-        if ($userlevel) {
-            return $userlevel;
-        } else {
-            $userlevel = 0;
+        $roles = $this->authLdapSessionCacheGet('roles');
+        if ($roles !== null) {
+            return $roles;
         }
+        $roles = [];
 
         // Find all defined groups $username is in
         $search = ldap_search(
@@ -110,18 +110,25 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
-        // Loop the list and find the highest level
+        // collect all roles
+        $auth_ad_groups = Config::get('auth_ad_groups');
         foreach ($entries[0]['memberof'] as $entry) {
             $group_cn = $this->getCn($entry);
-            $auth_ad_groups = Config::get('auth_ad_groups');
-            if ($auth_ad_groups[$group_cn]['level'] > $userlevel) {
-                $userlevel = $auth_ad_groups[$group_cn]['level'];
+
+            if (isset($auth_ad_groups[$group_cn]['roles']) && is_array($auth_ad_groups[$group_cn]['roles'])) {
+                $roles = array_merge($roles, $auth_ad_groups[$group_cn]['roles']);
+            } elseif (isset($auth_ad_groups[$group_cn]['level'])) {
+                $role = LegacyAuthLevel::tryFrom($auth_ad_groups[$group_cn]['level'])?->getName();
+                if ($role) {
+                    $roles[] = $role;
+                }
             }
         }
 
-        $this->authLdapSessionCacheSet('userlevel', $userlevel);
+        $roles = array_unique($roles);
+        $this->authLdapSessionCacheSet('roles', $roles);
 
-        return $userlevel;
+        return $roles;
     }
 
     public function getUserid($username)
