@@ -192,7 +192,7 @@ class DeviceController extends Controller
         }
 
         // Web
-        $http_port = $device->attribs->firstWhere('attrib_type', 'override_device_http_port') ? ":" . $device->attribs->firstWhere('attrib_type', 'override_device_http_port')->attrib_value : "";
+        $http_port = $device->attribs->firstWhere('attrib_type', 'override_device_http_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_http_port')->attrib_value : '';
         $device_links['web'] = [
             'icon' => 'fa-globe',
             'url' => 'https://' . $device->hostname . $http_port,
@@ -213,7 +213,7 @@ class DeviceController extends Controller
         }
 
         // SSH
-        $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ":" . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : "";
+        $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
         $ssh_url = Config::has('gateone.server')
             ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
             : 'ssh://' . $device->hostname . $ssh_port;
@@ -225,7 +225,7 @@ class DeviceController extends Controller
         ];
 
         // Telnet
-        $telnet_port = $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port') ? ":" . $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port')->attrib_value : "";
+        $telnet_port = $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port')->attrib_value : '';
         $device_links['telnet'] = [
             'icon' => 'fa-terminal',
             'url' => 'telnet://' . $device->hostname . $telnet_port,
