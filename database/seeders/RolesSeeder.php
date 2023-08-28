@@ -1,6 +1,6 @@
 <?php
 /**
- * BasicApiTest.php
+ * RolesSeeder.php
  *
  * -Description-
  *
@@ -19,34 +19,23 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Tony Murray
+ * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace Database\Seeders;
 
-use App\Models\ApiToken;
-use App\Models\Device;
-use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Database\Seeder;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
-class BasicApiTest extends DBTestCase
+class RolesSeeder extends Seeder
 {
-    use DatabaseTransactions;
-
-    public function testListDevices(): void
+    public function run(): void
     {
-        /** @var User $user */
-        $user = User::factory()->admin()->create();
-        $token = ApiToken::generateToken($user);
-        $device = Device::factory()->create();
-
-        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash])
-            ->assertStatus(200)
-            ->assertJson([
-                'status' => 'ok',
-                'devices' => [$device->toArray()],
-                'count'=> 1,
-            ]);
+        // set abilities for default rules
+        Bouncer::allow('admin')->everything();
+        Bouncer::allow(Bouncer::role()->firstOrCreate(['name' => 'global-read'], ['title' => 'Global Read']))
+            ->to('viewAny', '*', []);
+        Bouncer::role()->firstOrCreate(['name' => 'user'], ['title' => 'User']);
     }
 }

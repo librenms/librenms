@@ -48,6 +48,7 @@
         "php-flasher/flasher-laravel": "^1.12",
         "phpmailer/phpmailer": "~6.0",
         "predis/predis": "^2.0",
+        "silber/bouncer": "^1.0",
         "socialiteproviders/manager": "^4.3",
         "spatie/laravel-ignition": "^2.0",
         "symfony/yaml": "^6.2",

@@ -164,6 +164,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
             Route::get('device-group', 'DeviceGroupController')->name('ajax.select.device-group');
             Route::get('port-group', 'PortGroupController')->name('ajax.select.port-group');
+            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('eventlog', 'EventlogController')->name('ajax.select.eventlog');
             Route::get('graph', 'GraphController')->name('ajax.select.graph');
             Route::get('graph-aggregate', 'GraphAggregateController')->name('ajax.select.graph-aggregate');
@@ -172,6 +173,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('syslog', 'SyslogController')->name('ajax.select.syslog');
             Route::get('location', 'LocationController')->name('ajax.select.location');
             Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
+            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('service', 'ServiceController')->name('ajax.select.service');
             Route::get('template', 'ServiceTemplateController')->name('ajax.select.template');
             Route::get('poller-group', 'PollerGroupController')->name('ajax.select.poller-group');

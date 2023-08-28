@@ -123,18 +123,18 @@ class AlertUtil
             }
         }
         foreach ($users as $user) {
-            if (empty($user['email'])) {
+            if (empty($user->email)) {
                 continue; // no email, skip this user
             }
-            if (empty($user['realname'])) {
-                $user['realname'] = $user['username'];
-            }
-            if (Config::get('alert.globals') && ($user['level'] >= 5 && $user['level'] < 10)) {
-                $contacts[$user['email']] = $user['realname'];
-            } elseif (Config::get('alert.admins') && $user['level'] == 10) {
-                $contacts[$user['email']] = $user['realname'];
-            } elseif (Config::get('alert.users') == true && in_array($user['user_id'], $uids)) {
-                $contacts[$user['email']] = $user['realname'];
+
+            $name = $user->realname ?: $user->username;
+
+            if (Config::get('alert.globals') && $user->hasGlobalRead()) {
+                $contacts[$user->email] = $name;
+            } elseif (Config::get('alert.admins') && $user->isAdmin()) {
+                $contacts[$user->email] = $name;
+            } elseif (Config::get('alert.users') && in_array($user['user_id'], $uids)) {
+                $contacts[$user->email] = $name;
             }
         }
 
