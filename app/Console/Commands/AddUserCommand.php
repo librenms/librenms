@@ -27,10 +27,10 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Models\User;
+use Bouncer;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use Silber\Bouncer\Database\Role;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -68,12 +68,12 @@ class AddUserCommand extends LnmsCommand
             $this->warn(__('commands.user:add.wrong-auth'));
         }
 
-        $roles = Role::pluck('name');
+        $roles = Bouncer::role()->pluck('name');
 
         $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
             'email' => 'nullable|email',
-            'role' => Rule::in($roles->keys()),
+            'role.*' => Rule::in($roles),
         ]);
 
         // set get password
