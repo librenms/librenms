@@ -186,6 +186,14 @@
     </x-panel>
     @endconfig
 
+    <x-panel title="{{ __('Roles') }}">
+        @forelse(auth()->user()->roles->pluck('title') as $role)
+            <span class="label label-info tw-mr-1">{{ $role }}</span>
+        @empty
+            <strong class="red">{{ __('No roles!') }}</strong>
+        @endforelse
+    </x-panel>
+
     <x-panel title="{{ __('Device Permissions') }}">
         @if(auth()->user()->hasGlobalAdmin())
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
