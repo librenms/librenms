@@ -102,7 +102,7 @@ class LdapAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
         try {
             $connection = $this->getLdapConnection();
@@ -147,7 +147,7 @@ class LdapAuthorizer extends AuthorizerBase
             echo $e->getMessage() . PHP_EOL;
         }
 
-        return [];
+        return false;
     }
 
     public function getUserid($username)

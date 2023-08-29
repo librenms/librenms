@@ -114,7 +114,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
         $roles = $this->authLdapSessionCacheGet('roles');
         if ($roles !== null) {

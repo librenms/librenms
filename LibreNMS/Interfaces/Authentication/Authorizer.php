@@ -92,7 +92,7 @@ interface Authorizer
 
     /**
      * @param  string  $username
-     * @return string[] get a list of roles for the user, they need not exist ahead of time
+     * @return string[]|false get a list of roles for the user, they need not exist ahead of time.  Return false to skip roles update.
      */
-    public function getRoles(string $username): array;
+    public function getRoles(string $username): array|false;
 }

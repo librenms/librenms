@@ -29,7 +29,11 @@ return new class extends Migration
             }
         });
 
-        Bouncer::refresh(); // clear cache
+        try {
+            Bouncer::refresh(); // clear cache
+        } catch (Exception $e) {
+            // if this fails, there was no cache anyway
+        }
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('level');
@@ -52,7 +56,11 @@ return new class extends Migration
             $user->save();
         });
 
-        Bouncer::refresh();
+        try {
+            Bouncer::refresh(); // clear cache
+        } catch (Exception $e) {
+            // if this fails, there was no cache anyway
+        }
     }
 
     private function getLevel(User $user): int

@@ -93,7 +93,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
         $roles = $this->authLdapSessionCacheGet('roles');
         if ($roles !== null) {

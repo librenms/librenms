@@ -44,13 +44,13 @@ class RadiusAuthorizer extends MysqlAuthorizer
             ]);
             $user->save();
 
-            $this->roles[$credentials['username']] = $this->getDefaultRoles();
-
             // cache a single role from the Filter-ID attribute now because attributes are cleared every accessRequest
             $filter_id_attribute = $this->radius->getAttribute(11);
             if ($filter_id_attribute && Str::startsWith($filter_id_attribute, 'librenms_role_')) {
                 $this->roles[$credentials['username']] = [substr($filter_id_attribute, 14)];
             }
+
+            $user->setRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles(), true);
 
             return true;
         }
@@ -58,9 +58,9 @@ class RadiusAuthorizer extends MysqlAuthorizer
         throw new AuthenticationException();
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
-        return $this->roles[$username] ?? $this->getDefaultRoles();
+        return $this->roles[$username] ?? false;
     }
 
     private function getDefaultRoles(): array
