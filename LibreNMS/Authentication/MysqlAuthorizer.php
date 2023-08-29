@@ -74,9 +74,4 @@ class MysqlAuthorizer extends AuthorizerBase
 
         return false;
     }
-
-    public function getRoles(string $username): array
-    {
-        return User::thisAuth()->firstWhere('username', $username)->roles()->pluck('name')->all();
-    }
 }
