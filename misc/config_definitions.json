@@ -370,6 +370,10 @@
             "default": false,
             "type": "boolean"
         },
+        "apps.no_app_id": {
+            "default": false,
+            "type": "boolean"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
