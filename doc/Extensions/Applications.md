@@ -155,6 +155,25 @@ LibreNMS during discovery and polling.
 
 ![Enable-applications](/img/Enable_applications.png)
 
+## Disabling using app ID with RRDs
+
+When a application is discovered it is assigned a ID. Then if
+discovery runs again and it has issues polling that app, that app
+will be removed from database table and it will loose association
+with that app ID, meaning next redicovery in which it is found
+it have a new app ID and have lost the previous RRDs.
+
+Using app ID in the naming of the app RRDs can be disabled as below.
+
+```
+lnms config:set apps.no_app_id true
+```
+
+This requires application specific support and ones that support this
+are listed below.
+
+- Logsize
+
 ## Agent
 
 The unix-agent does not have a discovery module, only a poller
