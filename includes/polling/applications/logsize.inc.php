@@ -88,9 +88,9 @@ foreach ($data['sets'] as $set_name => $set_data) {
 
     foreach ($set_data['files'] as $log_name => $log_size) {
         if ($no_app_id) {
-            $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
-        } else {
             $rrd_name = ['app', $name, $set_name . '_____-_____' . $log_name];
+        } else {
+            $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
         }
         $fields = [
             'size' => $log_size,
@@ -105,9 +105,9 @@ foreach ($data['sets'] as $set_name => $set_data) {
 
     foreach ($set_data['unseen'] as $log_name) {
         if ($no_app_id) {
-            $rrd_name = ['app', $name, $set_name . '_____-_____' . $log_name];
-        } else {
             $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        } else {
+            $rrd_name = ['app', $name, $set_name . '_____-_____' . $log_name];
         }
         $fields = [
             'size' => 0,
