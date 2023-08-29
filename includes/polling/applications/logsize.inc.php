@@ -1,8 +1,8 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Config;
 
 $name = 'logsize';
 
