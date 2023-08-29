@@ -1,5 +1,9 @@
 <?php
 
+use LibreNMS\Config;
+
+$no_app_id = Config::get('apps.no_app_id');
+
 $name = 'logsize';
 $app_id = $app['app_id'];
 $unit_text = 'Bytes';
@@ -16,7 +20,11 @@ $log_files = array_slice(array_keys($log_files_sizes), 0, 12);
 
 $rrd_list = [];
 foreach ($log_files as $index => $log_file) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]);
+    if ($no_app_id) {
+        $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $vars['log_set'] . '_____-_____' . $log_file]);
+    } else {
+        $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]);
+    }
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => $log_file,
