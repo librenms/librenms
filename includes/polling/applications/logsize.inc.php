@@ -2,6 +2,7 @@
 
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Config;
 
 $name = 'logsize';
 
@@ -14,6 +15,8 @@ try {
 
     return;
 }
+
+$no_app_id = Config::get('apps.no_app_id');
 
 $data = $returned['data'];
 
@@ -30,7 +33,11 @@ $set_rrd_def = RrdDefinition::make()
 
 $app_data = ['sets'=>[], 'no_minus_d'=>$data['no_minus_d']];
 
-$rrd_name = ['app', $name, $app->app_id];
+if ($no_app_id) {
+    $rrd_name = ['app', $name];
+} else {
+    $rrd_name = ['app', $name, $app->app_id];
+}
 $fields = [
     'max_size' => $data['max'],
     'mean_size' => $data['mean'],
@@ -63,7 +70,11 @@ foreach ($data['sets'] as $set_name => $set_data) {
     $metrics['set_' . $set_name . '_min_size'] = $set_data['min'];
     $metrics['set_' . $set_name . '_size'] = $set_data['size'];
 
-    $rrd_name = ['app', $name, $app->app_id, $set_name];
+    if ($no_app_id) {
+        $rrd_name = ['app', $name,  $set_name];
+    } else {
+        $rrd_name = ['app', $name, $app->app_id, $set_name];
+    }
     $fields = [
         'max_size' => $set_data['max'],
         'mean_size' => $set_data['mean'],
@@ -76,7 +87,11 @@ foreach ($data['sets'] as $set_name => $set_data) {
     data_update($device, 'app', $tags, $fields);
 
     foreach ($set_data['files'] as $log_name => $log_size) {
-        $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        if ($no_app_id) {
+            $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        } else {
+            $rrd_name = ['app', $name, $set_name . '_____-_____' . $log_name];
+        }
         $fields = [
             'size' => $log_size,
         ];
@@ -89,7 +104,11 @@ foreach ($data['sets'] as $set_name => $set_data) {
     }
 
     foreach ($set_data['unseen'] as $log_name) {
-        $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        if ($no_app_id) {
+            $rrd_name = ['app', $name, $set_name . '_____-_____' . $log_name];
+        } else {
+            $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
+        }
         $fields = [
             'size' => 0,
         ];
