@@ -154,12 +154,9 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Returns an integer if the permission is found, or raises an AuthenticationException if the configuration is not valid.
      * Converts the legacy level into a role
      *
-     * @param  string  $username
-     * @return array
-     *
      * @throws AuthenticationException
      */
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
         if (Config::get('sso.group_strategy') === 'attribute') {
             if (Config::get('sso.level_attr')) {

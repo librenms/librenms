@@ -125,7 +125,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
         $roles = [];
         if (! Config::get('auth_ad_require_groupmembership', true)) {

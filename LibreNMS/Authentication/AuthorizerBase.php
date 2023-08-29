@@ -60,8 +60,8 @@ abstract class AuthorizerBase implements Authorizer
         return $_SERVER[Config::get('http_auth_header')] ?? $_SERVER['PHP_AUTH_USER'] ?? null;
     }
 
-    public function getRoles(string $username): array
+    public function getRoles(string $username): array|false
     {
-        return []; // no roles by default
+        return false; // return false don't update roles by default
     }
 }
