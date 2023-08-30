@@ -130,6 +130,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $authLdapGroups = Config::get('auth_ldap_groups');
         // Collect all roles
         foreach ($entries as $entry) {
+          if (isset($entry['cn'][0])) {
             $groupname = $entry['cn'][0];
 
             if (isset($authLdapGroups[$groupname]['roles']) && is_array($authLdapGroups[$groupname]['roles'])) {
@@ -140,6 +141,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
                     $roles[] = $role;
                 }
             }
+          }
         }
 
         $roles = array_unique($roles);
