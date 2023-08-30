@@ -1,6 +1,11 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 1
+			path: LibreNMS/Alert/Transport/Mail.php
+
+		-
 			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php

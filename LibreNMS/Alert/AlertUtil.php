@@ -151,7 +151,7 @@ class AlertUtil
         return User::whereIs(...$roles)->whereNot('email', '')->dumpRawSql()->pluck('realname', 'email')->toArray();
     }
 
-    public static function findContactsSysContact(array $results): arraay
+    public static function findContactsSysContact(array $results): array
     {
         $contacts = [];
 
