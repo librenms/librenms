@@ -23,6 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Models\Application;
 use LibreNMS\Config;
 
 echo "\nApplications: ";
@@ -56,7 +57,7 @@ d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 
 // Generate a list of enabled apps and a list of all discovered apps from the db
 [$enabled_apps, $discovered_apps] = array_reduce(dbFetchRows(
-    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? ORDER BY `app_type`',
+    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? AND deleted_at IS NULL ORDER BY `app_type`',
     [$device['device_id']]
 ), function ($result, $app) {
     $result[0][] = $app['app_type'];
@@ -77,13 +78,24 @@ foreach ($results as $extend => $result) {
         if (in_array($app, $enabled_apps)) {
             echo '.';
         } else {
-            dbInsert([
-                'device_id' => $device['device_id'],
-                'app_type' => $app,
-                'discovered' => 1,
-                'app_status' => '',
-                'app_instance' => '',
-            ], 'applications');
+            Application::upsert(
+                [
+                    'device_id'=>$device['device_id'],
+                    'app_type'=>$app,
+                    'app_status' => '',
+                    'app_instance' => '',
+                    'deleted_at' => null,
+                ],
+                [
+                    'device_id',
+                    'app_type',
+                ],
+                [
+                    'app_status',
+                    'app_instance',
+                    'deleted_at',
+                ]
+            );
 
             echo '+';
             log_event("Application enabled by discovery: $app", $device, 'application', 1);
@@ -98,12 +110,11 @@ if ($num > 0) {
     echo str_repeat('-', $num);
     $vars = $apps_to_remove;
     array_unshift($vars, $device['device_id']);
-    dbDelete(
-        'applications',
-        '`device_id`=? AND `app_type` IN ' . dbGenPlaceholders($num),
-        $vars
-    );
     foreach ($apps_to_remove as $app) {
+        Application::where([
+                ['device_id', $device['device_id']],
+                ['app_type', $app],
+            ])->delete();
         log_event("Application disabled by discovery: $app", $device, 'application', 3);
     }
 }
