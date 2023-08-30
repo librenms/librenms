@@ -57,13 +57,12 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 $status = ['status' => 0, 'message' => 'Application enabled'];
             }
         } else {
-            if (Application::where([
+            Application::where([
                 ['device_id', $device_id],
                 ['app_type', $app],
-            ])->delete()) {
-                log_event("Application disablaed by user: $app", $device_id, 'application', 3);
-                $status = ['status' => 0, 'message' => 'Application disabled'];
-            }
+            ])->delete();
+            log_event("Application disablaed by user: $app", $device_id, 'application', 3);
+            $status = ['status' => 0, 'message' => 'Application disabled'];
         }
     }
 }
