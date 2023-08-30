@@ -112,9 +112,9 @@ if ($num > 0) {
     array_unshift($vars, $device['device_id']);
     foreach ($apps_to_remove as $app) {
         Application::where([
-                ['device_id', $device['device_id']],
-                ['app_type', $app],
-            ])->delete();
+            ['device_id', $device['device_id']],
+            ['app_type', $app],
+        ])->delete();
         log_event("Application disabled by discovery: $app", $device, 'application', 3);
     }
 }
