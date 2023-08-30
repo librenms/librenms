@@ -1277,7 +1277,7 @@ return [
             ],
             'dump_errors' => [
                 'description' => 'Dump debug errors (Will break your install)',
-                'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.'
+                'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
             ],
         ],
         'route_purge' => [
