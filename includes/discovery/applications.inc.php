@@ -85,6 +85,7 @@ foreach ($results as $extend => $result) {
                     'app_status' => '',
                     'app_instance' => '',
                     'deleted_at' => null,
+                    'discovered' => 1,
                 ],
                 [
                     'device_id',
@@ -94,6 +95,7 @@ foreach ($results as $extend => $result) {
                     'app_status',
                     'app_instance',
                     'deleted_at',
+                    'discovered',
                 ]
             );
 
