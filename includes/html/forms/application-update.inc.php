@@ -22,6 +22,8 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use App\Models\Application;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
@@ -33,19 +35,33 @@ if (! Auth::user()->hasGlobalAdmin()) {
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];
         if ($_POST['state'] == 'true') {
-            $update = [
-                'device_id' => $device_id,
-                'app_type' => $app,
-                'app_status' => '',
-                'app_instance' => '',
-            ];
-            if (dbInsert($update, 'applications')) {
+            if (Application::upsert(
+                [
+                    'device_id'=>$device_id,
+                    'app_type'=>$app,
+                    'app_status' => '',
+                    'app_instance' => '',
+                    'deleted_at' => null,
+                ],
+                [
+                    'device_id',
+                    'app_type',
+                ],
+                [
+                    'app_status',
+                    'app_instance',
+                    'deleted_at',
+                ]
+            )) {
                 log_event("Application enabled by user: $app", $device_id, 'application', 1);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
             }
         } else {
-            if (dbDelete('applications', '`device_id`=? AND `app_type`=?', [$device_id, $app])) {
-                log_event("Application disabled by user: $app", $device_id, 'application', 3);
+            if (Application::where([
+                ['device_id', $device_id],
+                ['app_type', $app],
+            ])->delete()) {
+                log_event("Application disablaed by user: $app", $device_id, 'application', 3);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
             }
         }
