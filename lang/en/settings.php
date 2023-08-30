@@ -1275,6 +1275,10 @@ return [
                 'description' => 'Send Usage Reports',
                 'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
             ],
+            'dump_errors' => [
+                'description' => 'Dump debug errors (Will break your install)',
+                'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
+            ],
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
