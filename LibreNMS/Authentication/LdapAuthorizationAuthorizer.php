@@ -130,14 +130,16 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $authLdapGroups = Config::get('auth_ldap_groups');
         // Collect all roles
         foreach ($entries as $entry) {
-            $groupname = $entry['cn'][0];
+            if (isset($entry['cn'][0])) {
+                $groupname = $entry['cn'][0];
 
-            if (isset($authLdapGroups[$groupname]['roles']) && is_array($authLdapGroups[$groupname]['roles'])) {
-                $roles = array_merge($roles, $authLdapGroups[$groupname]['roles']);
-            } elseif (isset($authLdapGroups[$groupname]['level'])) {
-                $role = LegacyAuthLevel::tryFrom($authLdapGroups[$groupname]['level'])?->getName();
-                if ($role) {
-                    $roles[] = $role;
+                if (isset($authLdapGroups[$groupname]['roles']) && is_array($authLdapGroups[$groupname]['roles'])) {
+                    $roles = array_merge($roles, $authLdapGroups[$groupname]['roles']);
+                } elseif (isset($authLdapGroups[$groupname]['level'])) {
+                    $role = LegacyAuthLevel::tryFrom($authLdapGroups[$groupname]['level'])?->getName();
+                    if ($role) {
+                        $roles[] = $role;
+                    }
                 }
             }
         }
