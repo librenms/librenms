@@ -144,7 +144,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     }
 
                     $header = true;
-                    $footer = false;
 
                     $service_iteration = 0;
                     $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
@@ -169,7 +168,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         if ($service_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
                             echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_sysName . '</div>';
-                            echo '<div class="panel-body">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
@@ -181,7 +179,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
                             echo '<th style="width:2%;max-width: 2%;">Alert</th>';
                             echo '<th style="width:4%;max-width: 4%;">Status</th>';
-                            echo '<th style="width:80px;max-width: 80px;"></th>';
+                            echo '<th style="width:100px;max-width: 100px;"></th>';
                             echo '</thead>';
                         }
 
@@ -236,12 +234,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '</tr>';
 
                         if ($service_iteration >= $services_count) {
-                            $footer = true;
-                        }
-
-                        if ($footer) {
                             echo '</table>';
-                            echo '</div>';
                             echo '</div>';
                         }
                     }

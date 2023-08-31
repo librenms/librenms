@@ -30,7 +30,7 @@ if ($port) {
             $port->device->forgetAttrib('ifSpeed:' . $port->ifName);
             \App\Models\Eventlog::log("{$port->ifName} Port speed cleared manually", $port->device, 'interface', Severity::Notice, $port_id);
         } else {
-            $port->device->setAttrib('ifSpeed:' . $port->ifName, 1);
+            $port->device->setAttrib('ifSpeed:' . $port->ifName, $speed);
             \App\Models\Eventlog::log("{$port->ifName} Port speed set manually: $speed", $port->device, 'interface', Severity::Notice, $port_id);
             $port_tune = $port->device->getAttrib('ifName_tune:' . $port->ifName);
             $device_tune = $port->device->getAttrib('override_rrdtool_tune');
