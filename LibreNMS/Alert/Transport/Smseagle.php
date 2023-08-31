@@ -74,7 +74,7 @@ class Smseagle extends Transport
                     'title' => 'Access Token',
                     'name' => 'smseagle-token',
                     'descr' => 'SMSEagle Access Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'User',
@@ -86,7 +86,7 @@ class Smseagle extends Transport
                     'title' => 'Password',
                     'name' => 'smseagle-pass',
                     'descr' => 'SMSEagle Password',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobiles',
