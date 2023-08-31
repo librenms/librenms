@@ -57,7 +57,7 @@ class Jira extends Transport
         ];
 
         // Add Custom fileds to the payload
-        if (!empty($custom)) {
+        if (! empty($custom)) {
             $data['fields'] = array_merge($data['fields'], $custom);
         }
 
