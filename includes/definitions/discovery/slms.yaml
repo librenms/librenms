@@ -1,0 +1,22 @@
+mib: ZHONE-CARD-RESOURCES-MIB
+modules:
+    processors:
+        data:
+              -
+                  oid: cardProcessorUsage
+                  num_oid: '.1.3.6.1.4.1.5504.3.3.3.1.5.{{ $index }}'
+                  descr: 'Processor {{ $index }}'
+                  type: slms
+    mempools:
+        pre-cache:
+            oids:
+                - ZHONE-CARD-RESOURCES-MIB::cardResourceTable
+
+        data:
+            -
+                oid: ZHONE-CARD-RESOURCES-MIB::cardRuntimeTable
+                total: ZHONE-CARD-RESOURCES-MIB::cardTotalMem
+                free: ZHONE-CARD-RESOURCES-MIB::cardAvailMem
+                descr: '{{ ZHONE-CARD-RESOURCES-MIB::cardIdentification }} ({{ $index }})'
+                precision: 1024
+
