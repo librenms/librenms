@@ -41,6 +41,7 @@ class Jira extends Transport
         $details = empty($alert_data['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
         $description = $alert_data['msg'];
         $url = $this->config['jira-url'] . '/rest/api/latest/issue';
+        $custom = json_decode('{' . $this->config['jira-custom'] . '}', true);
 
         $data = [
             'fields' => [
@@ -54,6 +55,11 @@ class Jira extends Transport
                 ],
             ],
         ];
+
+        // Add Custom fileds to the payload
+        if (!empty($custom)) {
+            $data['fields'] = array_merge($data['fields'], $custom);
+        }
 
         $res = Http::client()
             ->withBasicAuth($this->config['jira-username'], $this->config['jira-password'])
@@ -100,6 +106,12 @@ class Jira extends Transport
                     'name' => 'jira-password',
                     'descr' => 'Jira Password',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Custom Fileds',
+                    'name' => 'jira-custom',
+                    'type' => 'textarea',
+                    'descr' => '&quot;components&quot;: [{&quot;id&quot;: &quot;00001&quot;}],&#xA;&quot;customfield_10001&quot;: [{&quot;id&quot;: &quot;00002&quot;}]',
                 ],
             ],
             'validation' => [
