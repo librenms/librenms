@@ -120,6 +120,7 @@ class GraylogApi
             $device->hostname,
             $device->displayName(),
             $device->ip,
+            $device->sysName,
         ]);
 
         if (Config::get('graylog.match-any-address')) {

@@ -27,14 +27,6 @@ interface Authorizer
     public function userExists($username, $throw_exception = false);
 
     /**
-     * Get the userlevel of $username
-     *
-     * @param  string  $username  The username to check
-     * @return int
-     */
-    public function getUserlevel($username);
-
-    /**
      * Get the user_id of $username
      *
      * @param  string  $username
@@ -51,55 +43,12 @@ interface Authorizer
      * realname
      * email
      * descr
-     * level
      * can_modify_passwd
      *
      * @param  int  $user_id
      * @return array|false
      */
     public function getUser($user_id);
-
-    /**
-     * Add a new user.
-     *
-     * @param  string  $username
-     * @param  string  $password
-     * @param  int  $level
-     * @param  string  $email
-     * @param  string  $realname
-     * @param  int  $can_modify_passwd  If this user is allowed to edit their password
-     * @param  string  $description
-     * @return int|false Returns the added user_id or false if adding failed
-     */
-    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 0, $description = '');
-
-    /**
-     * Update the some of the fields of a user
-     *
-     * @param  int  $user_id  The user_id to update
-     * @param  string  $realname
-     * @param  int  $level
-     * @param  int  $can_modify_passwd
-     * @param  string  $email
-     * @return bool If the update was successful
-     */
-    public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email);
-
-    /**
-     * Delete a user.
-     *
-     * @param  int  $user_id
-     * @return bool If the deletion was successful
-     */
-    public function deleteUser($user_id);
-
-    /**
-     * Get a list of all users in this Authorizer
-     * !Warning! this could be very slow for some Authorizer types or configurations
-     *
-     * @return array
-     */
-    public function getUserlist();
 
     /**
      * Check if this Authorizer can add or remove users.
@@ -140,4 +89,10 @@ interface Authorizer
      * @return string|null
      */
     public function getExternalUsername();
+
+    /**
+     * @param  string  $username
+     * @return string[]|false get a list of roles for the user, they need not exist ahead of time.  Return false to skip roles update.
+     */
+    public function getRoles(string $username): array|false;
 }

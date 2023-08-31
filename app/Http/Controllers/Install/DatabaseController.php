@@ -103,7 +103,7 @@ class DatabaseController extends InstallationController implements InstallerStep
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
-                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true], $output);
+                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--no-ansi' => true, '--no-interaction' => true, '--schema-path' => database_path('schema/mysql-schema.dump')], $output);
                 if ($ret !== 0) {
                     throw new \RuntimeException('Migration failed');
                 }

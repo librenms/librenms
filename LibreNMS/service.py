@@ -100,6 +100,9 @@ class ServiceConfig(DBConfig):
     redis_sentinel_service = None
     redis_timeout = 60
 
+    log_output = False
+    logdir = "logs"
+
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
 
@@ -115,7 +118,7 @@ class ServiceConfig(DBConfig):
         )
 
         # backward compatible options
-        self.update_frequency = config.get(
+        self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
         self.poller.workers = config.get(
@@ -248,7 +251,8 @@ class ServiceConfig(DBConfig):
         self.watchdog_enabled = config.get(
             "service_watchdog_enabled", ServiceConfig.watchdog_enabled
         )
-        self.watchdog_logfile = config.get("log_file", ServiceConfig.watchdog_logfile)
+        self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
+        self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -589,7 +593,7 @@ class Service:
                 """SELECT `device_id`,
                   `poller_group`,
                   COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND), 1) AS `poll`,
-                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
+                  IF(status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR

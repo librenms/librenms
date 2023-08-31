@@ -30,17 +30,16 @@
     </div>
 </div>
 
-@can('admin')
-    <div class="form-group @if($errors->has('level')) has-error @endif">
-        <label for="level" class="control-label col-sm-3">{{ __('Level') }}</label>
+@can('viewAny', Bouncer::role())
+    <div class="form-group @if($errors->has('roles')) has-error @endif">
+        <label for="level" class="control-label col-sm-3">{{ __('Roles') }}</label>
         <div class="col-sm-9">
-            <select class="form-control" id="level" name="level">
-                <option value="1">{{ __('Normal') }}</option>
-                <option value="5" @if(old('level', $user->level) == 5) selected @endif>{{ __('Global Read') }}</option>
-                <option value="10" @if(old('level', $user->level) == 10) selected @endif>{{ __('Admin') }}</option>
-                @if(old('level', $user->level) == 11)<option value="11" selected>{{ __('Demo') }}</option>@endif
+            <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', Bouncer::role()) readonly @endcannot>
+                @foreach(Bouncer::role()->all() as $role)
+                    <option value="{{ $role->name }}" @if(collect(old('roles', $user->roles->pluck('name')))->contains($role->name)) selected @endif>{{ __($role->title) }}</option>
+                @endforeach
             </select>
-            <span class="help-block">{{ $errors->first('level') }}</span>
+            <span class="help-block">{{ $errors->first('roles') }}</span>
         </div>
     </div>
 @endcan
