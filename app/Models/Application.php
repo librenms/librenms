@@ -31,7 +31,7 @@ class Application extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'app_id';
-    protected $fillable = ['data'];
+    protected $fillable = ['device_id', 'app_type', 'app_instance', 'app_status', 'app_state', 'data', 'deleted_at'];
     protected $casts = [
         'data' => 'array',
     ];
