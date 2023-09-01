@@ -79,7 +79,7 @@ class Kayako extends Transport
                     'title' => 'Kayako API Secret',
                     'name' => 'kayako-secret',
                     'descr' => 'ServiceDesk API Secret Key',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Kayako Department',
