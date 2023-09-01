@@ -34,35 +34,25 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $status = ['status' => 1, 'message' => 'Error with data'];
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];
+        $app = Application::withTrashed()->firstOrNew(['device_id' => $device_id, 'app_type' => $app]);
         if ($_POST['state'] == 'true') {
-            if (Application::upsert(
-                [
-                    'device_id'=>$device_id,
-                    'app_type'=>$app,
-                    'app_status' => '',
-                    'app_instance' => '',
-                    'deleted_at' => null,
-                ],
-                [
-                    'device_id',
-                    'app_type',
-                ],
-                [
-                    'app_status',
-                    'app_instance',
-                    'deleted_at',
-                ]
-            )) {
+            if ($app->trashed()) {
+                $app->restore();
+            }
+            if ($app->save()) {
                 log_event("Application enabled by user: $app", $device_id, 'application', 1);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for enabling the application failed'];
             }
         } else {
-            Application::where([
-                ['device_id', $device_id],
-                ['app_type', $app],
-            ])->delete();
-            log_event("Application disablaed by user: $app", $device_id, 'application', 3);
-            $status = ['status' => 0, 'message' => 'Application disabled'];
+            $app->delete();
+            if ($app->save()) {
+                log_event("Application disablaed by user: $app", $device_id, 'application', 3);
+                $status = ['status' => 0, 'message' => 'Application disabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
+            }
         }
     }
 }
