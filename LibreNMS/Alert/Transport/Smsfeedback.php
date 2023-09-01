@@ -65,7 +65,7 @@ class Smsfeedback extends Transport
                     'title' => 'Password',
                     'name' => 'smsfeedback-pass',
                     'descr' => 'smsfeedback Password',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobiles',

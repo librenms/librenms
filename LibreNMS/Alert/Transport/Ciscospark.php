@@ -55,7 +55,7 @@ class Ciscospark extends Transport
                     'title' => 'API Token',
                     'name' => 'api-token',
                     'descr' => 'CiscoSpark API Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'RoomID',

@@ -56,7 +56,7 @@ class Twilio extends Transport
                     'title' => 'Token',
                     'name' => 'twilio-token',
                     'descr' => 'Twilio Account Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobile Number',
