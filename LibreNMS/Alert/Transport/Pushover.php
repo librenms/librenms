@@ -97,13 +97,13 @@ class Pushover extends Transport
                     'title' => 'Api Key',
                     'name'  => 'appkey',
                     'descr' => 'Api Key',
-                    'type'  => 'text',
+                    'type'  => 'password',
                 ],
                 [
                     'title' => 'User Key',
                     'name'  => 'userkey',
                     'descr' => 'User Key',
-                    'type'  => 'text',
+                    'type'  => 'password',
                 ],
                 [
                     'title' => 'Pushover Options',

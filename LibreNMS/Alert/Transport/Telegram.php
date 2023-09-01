@@ -81,7 +81,7 @@ class Telegram extends Transport
                     'title' => 'Token',
                     'name' => 'telegram-token',
                     'descr' => 'Telegram Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Format',
