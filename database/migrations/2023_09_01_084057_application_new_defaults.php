@@ -15,7 +15,7 @@ class ApplicationNewDefaults extends Migration
     {
         Schema::table('applications', function (Blueprint $table) {
             $table->string('app_instance')->default('')->change();
-            $table->string('app_status')->default('')->change();
+            $table->string('app_status', 1024)->default('')->change();
         });
     }
 
@@ -28,7 +28,7 @@ class ApplicationNewDefaults extends Migration
     {
         Schema::table('applications', function (Blueprint $table) {
             $table->string('app_instance')->default(null)->change();
-            $table->string('app_status')->default(null)->change();
+            $table->string('app_status', 1024)->default(null)->change();
         });
     }
 }
