@@ -183,9 +183,9 @@ applications:
     - { Field: app_state, Type: varchar(32), 'Null': false, Extra: '', Default: UNKNOWN }
     - { Field: discovered, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: app_state_prev, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: app_status, Type: varchar(1024), 'Null': false, Extra: '' }
+    - { Field: app_status, Type: varchar(1024), 'Null': false, Extra: '', Default: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
-    - { Field: app_instance, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: app_instance, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: data, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
