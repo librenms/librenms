@@ -78,7 +78,7 @@ class Matrix extends Transport
                     'title' => 'Auth_token',
                     'name' => 'matrix-authtoken',
                     'descr' => 'Enter the auth_token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Message',
