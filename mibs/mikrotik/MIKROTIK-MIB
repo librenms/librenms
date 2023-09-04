@@ -1467,6 +1467,20 @@ mtxrGaugeValue OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrGaugeTableEntry 3 }
 
+mtxrHlFanSpeed3 OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "rpm"
+    ::= { mtxrGaugeValue 7003 }
+
+mtxrHlFanSpeed4 OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "rpm"
+    ::= { mtxrGaugeValue 7004 }
+
 mtxrGaugeUnit OBJECT-TYPE
     SYNTAX INTEGER {
         celsius(1),
@@ -1490,6 +1504,7 @@ mtxrHealthGroup OBJECT-GROUP OBJECTS {
         mtxrHlProcessorFrequency,
         mtxrHlPowerSupplyState, mtxrHlBackupPowerSupplyState,
         mtxrHlFanSpeed1, mtxrHlFanSpeed2,
+        mtxrHlFanSpeed3, mtxrHlFanSpeed4,
         mtxrGaugeName, mtxrGaugeValue, mtxrGaugeUnit
     }
     STATUS current
