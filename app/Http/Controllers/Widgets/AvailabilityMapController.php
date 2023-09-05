@@ -95,7 +95,7 @@ class AvailabilityMapController extends WidgetController
         // process status
         $uptime_warn = (int) Config::get('uptime_warning', 86400);
         $check_maintenance = AlertSchedule::isActive()->exists(); // check if any maintenance schedule is active
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored-up' => 0, 'ignored-down' => 0, 'disabled' => 0];
         $data = [];
 
         foreach ($devices as $device) {
