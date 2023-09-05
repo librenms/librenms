@@ -248,7 +248,11 @@ class AvailabilityMapController extends WidgetController
         }
 
         if ($device->ignore) {
-            return ['ignored', 'label-default'];
+            if (($device->status == 1) && ($device->uptime != 0)) {
+                return ['ignored-up', 'label-success'];
+            }
+
+            return ['ignored-down', 'label-default'];
         }
 
         if ($device->status == 1) {
