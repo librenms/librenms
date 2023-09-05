@@ -164,6 +164,7 @@ class DeviceObserver
         $device->vrfLites()->delete();
         $device->vServers()->delete();
         $device->wirelessSensors()->delete();
+        \DB::table('applications')->where('device_id', $device->device_id)->delete();
 
         $device->ports()
             ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
