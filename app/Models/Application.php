@@ -25,8 +25,8 @@
 
 namespace App\Models;
 
-use LibreNMS\Util\StringHelpers;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
 {
