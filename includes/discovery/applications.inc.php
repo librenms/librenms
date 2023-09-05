@@ -78,27 +78,11 @@ foreach ($results as $extend => $result) {
         if (in_array($app, $enabled_apps)) {
             echo '.';
         } else {
-            Application::upsert(
-                [
-                    'device_id'=>$device['device_id'],
-                    'app_type'=>$app,
-                    'app_status' => '',
-                    'app_instance' => '',
-                    'deleted_at' => null,
-                    'discovered' => 1,
-                ],
-                [
-                    'device_id',
-                    'app_type',
-                ],
-                [
-                    'app_status',
-                    'app_instance',
-                    'deleted_at',
-                    'discovered',
-                ]
-            );
-
+            $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
+            if ($app_obj->trashed()) {
+                $app_obj->restore();
+            }
+            $app_obj->save();
             echo '+';
             log_event("Application enabled by discovery: $app", $device, 'application', 1);
         }
@@ -113,10 +97,9 @@ if ($num > 0) {
     $vars = $apps_to_remove;
     array_unshift($vars, $device['device_id']);
     foreach ($apps_to_remove as $app) {
-        Application::where([
-            ['device_id', $device['device_id']],
-            ['app_type', $app],
-        ])->delete();
+        $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
+        $app_obj->delete();
+        $app_obj->save();
         log_event("Application disabled by discovery: $app", $device, 'application', 3);
     }
 }
