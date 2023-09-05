@@ -29,6 +29,7 @@ use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
 {
+    use SoftDeletes;
     public $timestamps = false;
     protected $primaryKey = 'app_id';
     protected $fillable = ['device_id', 'app_type', 'app_instance', 'app_status', 'app_state', 'data', 'deleted_at'];
