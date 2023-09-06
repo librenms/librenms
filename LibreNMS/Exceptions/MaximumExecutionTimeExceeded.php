@@ -64,9 +64,9 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
             'message' => "$title: $message",
-        ]) : response()->view('errors.generic', [
+        ], 500) : response()->view('errors.generic', [
             'title' => $title,
             'content' => $message,
-        ]);
+        ], 500);
     }
 }
