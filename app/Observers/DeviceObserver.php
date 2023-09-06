@@ -96,7 +96,7 @@ class DeviceObserver
         $device->alerts()->delete();
         \DB::table('alert_device_map')->where('device_id', $device->device_id)->delete();
         $device->alertLogs()->delete();
-        $device->applications()->delete();
+        $device->applications()->delete()->forceDelete();
         $device->attribs()->delete();
         $device->availability()->delete();
         $device->bgppeers()->delete();
@@ -164,7 +164,6 @@ class DeviceObserver
         $device->vrfLites()->delete();
         $device->vServers()->delete();
         $device->wirelessSensors()->delete();
-        \DB::table('applications')->where('device_id', $device->device_id)->delete();
 
         $device->ports()
             ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
