@@ -93,19 +93,10 @@ foreach ($results as $extend => $result) {
 
 // remove non-existing apps
 $apps_to_remove = array_diff($discovered_apps, $current_apps);
-$num = count($apps_to_remove);
-if ($num > 0) {
-    echo str_repeat('-', $num);
-    $vars = $apps_to_remove;
-    array_unshift($vars, $device['device_id']);
-    foreach ($apps_to_remove as $app) {
-        $appToDelete = Application::firstWhere(['device_id' => $device['device_id'], 'app_type' => $app]);
-        if ($appToDelete) {
-            $appToDelete->delete();
-        }
-        log_event("Application disabled by discovery: $app", $device, 'application', 3);
-    }
-}
+DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (\App\Models\Application $app) {
+    $app->delete();
+    \App\Models\Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', \LibreNMS\Enum\Severity::Notice);
+});
 
 // clean application_metrics
 dbDeleteOrphans('application_metrics', ['applications.app_id']);
