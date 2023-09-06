@@ -79,7 +79,7 @@ foreach ($results as $extend => $result) {
         $app = $applications[$extend];
         $current_apps[] = $app;
 
-        if (!in_array($app, $enabled_apps)) {
+        if (! in_array($app, $enabled_apps)) {
             $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
             if ($app_obj->trashed()) {
                 $app_obj->restore();
