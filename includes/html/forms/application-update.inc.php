@@ -22,6 +22,8 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use App\Models\Application;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
@@ -32,21 +34,24 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $status = ['status' => 1, 'message' => 'Error with data'];
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];
+        $app = Application::withTrashed()->firstOrNew(['device_id' => $device_id, 'app_type' => $app]);
         if ($_POST['state'] == 'true') {
-            $update = [
-                'device_id' => $device_id,
-                'app_type' => $app,
-                'app_status' => '',
-                'app_instance' => '',
-            ];
-            if (dbInsert($update, 'applications')) {
+            if ($app->trashed()) {
+                $app->restore();
+            }
+            if ($app->save()) {
                 log_event("Application enabled by user: $app", $device_id, 'application', 1);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for enabling the application failed'];
             }
         } else {
-            if (dbDelete('applications', '`device_id`=? AND `app_type`=?', [$device_id, $app])) {
+            $app->delete();
+            if ($app->save()) {
                 log_event("Application disabled by user: $app", $device_id, 'application', 3);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
             }
         }
     }
