@@ -21,39 +21,15 @@ modules:
                     descr: mtxrOpticalName
                     index: 'mtxrOpticalTemperature.{{ $index }}'
                 -
-                    oid: mtxrHlSensorTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.5.{{ $index }}'
-                    divisor: 10
-                    descr: 'Sensor chip'
-                    index: 'mtxrHlSensorTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlCpuTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.6.{{ $index }}'
-                    divisor: 10
-                    descr: 'Processor'
-                    index: 'mtxrHlCpuTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlBoardTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.7.{{ $index }}'
-                    divisor: 10
-                    descr: 'System board'
-                    index: 'mtxrHlBoardTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.10.{{ $index }}'
-                    index: 0
-                    divisor: 10
-                    descr: 'Temperature {{ $index }}'
-                    low_limit: -40
-                    low_warn_limit: -35
-                    warn_limit: 65
-                    high_limit: 70
-                -
-                    oid: mtxrHlProcessorTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.11.{{ $index }}'
-                    index: 1
-                    divisor: 10
-                    descr: 'Processor Temperature {{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    index: 'mtxrGaugeTemperature.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 1
         voltage:
             data:
                 -
@@ -71,30 +47,16 @@ modules:
                     descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOEVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlCoreVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.1.{{ $index }}'
-                    descr: 'Core'
-                    index: 'mtxrHlCoreVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlThreeDotThreeVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.2.{{ $index }}'
-                    descr: '3.3V'
-                    index: 'mtxrHlThreeDotThreeVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlFiveVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.3.{{ $index }}'
-                    descr: '5V'
-                    index: 'mtxrHlFiveVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlTwelveVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.4.{{ $index }}'
-                    descr: '12V'
-                    index: 'mtxrHlTwelveVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.8.{{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
                     divisor: 10
-                    descr: 'Voltage {{ $index }}'
+                    index: 'mtxrGaugeVoltage.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 3
         current:
             data:
                 -
@@ -112,11 +74,17 @@ modules:
                     descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOECurrent.{{ $index }}'
                 -
-                    oid: mtxrHlCurrent
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.13.{{ $index }}'
-                    divisor: 1000
-                    descr: 'Current'
-                    index: '0'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    divisor: 10
+                    index: 'mtxrGaugeCurrent.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 4
+
         dbm:
             data:
                 -
@@ -170,23 +138,19 @@ modules:
                         - { descr: 'poweredOn', graph: 1, value: 3, generic: 0 }
                         - { descr: 'overload', graph: 1, value: 4, generic: 2 }
                 -
-                    oid: mtxrHlPowerSupplyState
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.15.{{ $index }}'
-                    descr: Primary PSU
-                    index: 'mtxrHlPowerSupplyState.{{ $index }}'
-                    state_name: mtxrHlPowerSupplyState
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    index: 'mtxrGaugeStatus.{{ $index }}'
+                    state_name: MIKROTIK-MIB::mtxrGaugeStatus
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 6
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
-                -
-                    oid: mtxrHlBackupPowerSupplyState
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.16.{{ $index }}'
-                    descr: Backup PSU
-                    index: 'mtxrHlBackupPowerSupplyState.{{ $index }}'
-                    state_name: mtxrHlBackupPowerSupplyState
-                    states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+                        - { value: 0, generic: 0, graph: 1, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'fail' }
                 -
                     oid: mtxrWl60GConnected
                     num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.4.{{ $index }}'
@@ -217,20 +181,26 @@ modules:
                     descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOEPower.{{ $index }}'
                 -
-                    oid: mtxrHlPower
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.12.{{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
                     divisor: 10
-                    descr: 'Power Usage'
-                    index: '1'
+                    index: 'mtxrGaugePower.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 5
         fanspeed:
             data:
                 -
-                    oid: mtxrHlFanSpeed1
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.17.{{ $index }}'
-                    descr: 'Fan #1'
-                    index: '0'
-                -
-                    oid: mtxrHlFanSpeed2
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.18.{{ $index }}'
-                    descr: 'Fan #2'
-                    index: '1'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    index: 'mtxrGuageFanspeed.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: !=
+                            value: 2
