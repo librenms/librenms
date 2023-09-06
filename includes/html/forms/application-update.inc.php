@@ -48,7 +48,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         } else {
             $app->delete();
             if ($app->save()) {
-                log_event("Application disablaed by user: $app", $device_id, 'application', 3);
+                log_event("Application disabled by user: $app", $device_id, 'application', 3);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
             } else {
                 $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
