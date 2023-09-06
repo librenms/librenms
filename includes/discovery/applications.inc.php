@@ -24,6 +24,7 @@
  */
 
 use App\Models\Application;
+use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
 
 echo "\nApplications: ";
@@ -68,6 +69,9 @@ d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
     return $result;
 }, [[], []]);
 
+// enable observer for printing changes
+ModuleModelObserver::observe(\App\Models\Application::class);
+
 // Enable applications
 $current_apps = [];
 foreach ($results as $extend => $result) {
@@ -75,16 +79,13 @@ foreach ($results as $extend => $result) {
         $app = $applications[$extend];
         $current_apps[] = $app;
 
-        if (in_array($app, $enabled_apps)) {
-            echo '.';
-        } else {
+        if (!in_array($app, $enabled_apps)) {
             $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
             if ($app_obj->trashed()) {
                 $app_obj->restore();
             }
             $app_obj->discovered = 1;
             $app_obj->save();
-            echo '+';
             log_event("Application enabled by discovery: $app", $device, 'application', 1);
         }
     }
@@ -98,10 +99,9 @@ if ($num > 0) {
     $vars = $apps_to_remove;
     array_unshift($vars, $device['device_id']);
     foreach ($apps_to_remove as $app) {
-        Application::where([
-            ['device_id', $device['device_id']],
-            ['app_type', $app],
-        ])->delete();
+        $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
+        $app_obj->delete();
+        $app_obj->save();
         log_event("Application disabled by discovery: $app", $device, 'application', 3);
     }
 }
