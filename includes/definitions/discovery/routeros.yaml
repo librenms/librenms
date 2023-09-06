@@ -28,7 +28,7 @@ modules:
                     index: 'mtxrGaugeTemperature.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                            op: '!='
                             value: 1
         voltage:
             data:
@@ -55,7 +55,7 @@ modules:
                     index: 'mtxrGaugeVoltage.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                            op: '!='
                             value: 3
         current:
             data:
@@ -82,7 +82,7 @@ modules:
                     index: 'mtxrGaugeCurrent.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                            op: '!='
                             value: 4
 
         dbm:
@@ -146,7 +146,7 @@ modules:
                     state_name: MIKROTIK-MIB::mtxrGaugeStatus
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                            op: '!='
                             value: 6
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'ok' }
@@ -189,7 +189,7 @@ modules:
                     index: 'mtxrGaugePower.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                            op: '!='
                             value: 5
         fanspeed:
             data:
@@ -200,7 +200,6 @@ modules:
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     index: 'mtxrGuageFanspeed.{{ $index }}'
                     skip_values:
-                        -
-                            oid: MIKROTIK-MIB::mtxrGaugeUnit
-                            op: !=
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
                             value: 2
