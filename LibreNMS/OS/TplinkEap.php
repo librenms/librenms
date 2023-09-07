@@ -5,14 +5,12 @@
  * TP linke EAP (Omada)
  *
  * @link       https://www.librenms.org
- *
- * @copyright  
- * @author     
+ * @copyright  2023 st4ro
+ * @author     st4ro <radek@starky.eu>
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
