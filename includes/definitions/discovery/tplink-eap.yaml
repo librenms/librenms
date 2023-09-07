@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<version>.*)/'
+        hardware: SNMPv2-MIB::sysName.0
