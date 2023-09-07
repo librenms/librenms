@@ -1265,6 +1265,10 @@ return [
                 'description' => 'Default user roles',
                 'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
             ],
+            'enforce_roles' => [
+                'description' => 'Enforce roles at login',
+                'help' => 'If enabled, roles will be set to the ones specified by the Filter-ID attribute or radius.default_roles at login.  Otherwise, they will be set when the user is created and never changed after that.',
+            ],
         ],
         'reporting' => [
             'error' => [
