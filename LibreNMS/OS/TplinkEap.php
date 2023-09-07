@@ -14,21 +14,11 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
-class TplinkEap extends OS implements OSDiscovery,WirelessClientsDiscovery
+class TplinkEap extends OS implements WirelessClientsDiscovery
 {
-   /**
-    * 
-    */ 
-    public function discoverOS(Device $device): void
-    {
-        $device->hardware = snmp_get($this->getDeviceArray(), '.1.3.6.1.2.1.1.5.0', '-Osqnv');
-        $device->version  = snmp_get($this->getDeviceArray(), '.1.3.6.1.2.1.1.1.0', '-Osqnv') ?: null;
-    }
-
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
