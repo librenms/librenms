@@ -8,6 +8,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.11863.1.
+            - .1.3.6.1.4.1.11863.5.
     -
         sysObjectID: .1.3.6.1.4.1.16972
         sysDescr_regex: '/Build \d+ Rel/'
