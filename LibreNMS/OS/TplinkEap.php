@@ -5,6 +5,7 @@
  * TP linke EAP (Omada)
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2023 st4ro
  * @author     st4ro <radek@starky.eu>
  */
@@ -31,5 +32,4 @@ class TplinkEap extends OS implements WirelessClientsDiscovery
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'tplink-eap', 1, 'Clients'),
         ];
     }
-
 }
