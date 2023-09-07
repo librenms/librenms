@@ -33,7 +33,7 @@
                  "value": "array",
                  "value.*": "string"
              }
-        },	
+        },
         "alert_colour.ok": {
             "default": "#00ff00",
             "type": "color"
@@ -5110,6 +5110,13 @@
             "section": "radius",
             "order": 3,
             "type": "array"
+        },
+        "radius.enforce_roles": {
+            "default": true,
+            "group": "auth",
+            "section": "radius",
+            "order": 4,
+            "type": "boolean"
         },
         "rancid_configs": {
             "default": [],
