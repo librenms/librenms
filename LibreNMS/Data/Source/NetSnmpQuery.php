@@ -83,7 +83,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private Device $device;
     private bool $abort = false;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
-    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'SNMP-VACM-MIB'];
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
