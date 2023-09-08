@@ -25,7 +25,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     index: 'mtxrGaugeTemperature.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
@@ -54,7 +54,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     divisor: 10
                     index: 'mtxrGaugeVoltage.{{ $index }}'
                     skip_values:
@@ -84,7 +84,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     divisor: 10
                     index: 'mtxrGaugeCurrent.{{ $index }}'
                     skip_values:
@@ -154,7 +154,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     state_name: mtxrGaugeStatus
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
@@ -200,7 +200,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     divisor: 10
                     index: 'mtxrGaugePower.{{ $index }}'
                     skip_values:
@@ -214,7 +214,7 @@ modules:
                     value: MIKROTIK-MIB::mtxrGaugeValue
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
-                    group: Health
+                    group: System
                     index: 'mtxrGuageFanspeed.{{ $index }}'
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit

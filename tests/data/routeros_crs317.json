@@ -4697,7 +4697,7 @@
                     "sensor_index": "mtxrGuageFanspeed.7001",
                     "sensor_type": "routeros",
                     "sensor_descr": "fan1-speed",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -4722,7 +4722,7 @@
                     "sensor_index": "mtxrGuageFanspeed.7002",
                     "sensor_type": "routeros",
                     "sensor_descr": "fan2-speed",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -4744,10 +4744,10 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.3.100.1.3.7401",
-                    "sensor_index": "mtxrGaugeStatus.7401",
-                    "sensor_type": "MIKROTIK-MIB::mtxrGaugeStatus",
+                    "sensor_index": "7401",
+                    "sensor_type": "mtxrGaugeStatus",
                     "sensor_descr": "psu1-state",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -4762,17 +4762,17 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrGaugeStatus"
+                    "state_name": "mtxrGaugeStatus"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.3.100.1.3.7402",
-                    "sensor_index": "mtxrGaugeStatus.7402",
-                    "sensor_type": "MIKROTIK-MIB::mtxrGaugeStatus",
+                    "sensor_index": "7402",
+                    "sensor_type": "mtxrGaugeStatus",
                     "sensor_descr": "psu2-state",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4787,7 +4787,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrGaugeStatus"
+                    "state_name": "mtxrGaugeStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4795,7 +4795,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.10",
                     "sensor_index": "mtxrOpticalRxLoss.10",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus10 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4812,7 +4812,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4820,7 +4820,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.11",
                     "sensor_index": "mtxrOpticalRxLoss.11",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus11 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4837,7 +4837,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4845,7 +4845,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.12",
                     "sensor_index": "mtxrOpticalRxLoss.12",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus12 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4862,7 +4862,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4870,7 +4870,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.13",
                     "sensor_index": "mtxrOpticalRxLoss.13",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus13 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4887,7 +4887,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4895,7 +4895,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.14",
                     "sensor_index": "mtxrOpticalRxLoss.14",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus14 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4912,7 +4912,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4920,7 +4920,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.15",
                     "sensor_index": "mtxrOpticalRxLoss.15",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus15 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4937,7 +4937,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4945,7 +4945,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.16",
                     "sensor_index": "mtxrOpticalRxLoss.16",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus16 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4962,7 +4962,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4970,7 +4970,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.3.9",
                     "sensor_index": "mtxrOpticalRxLoss.9",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "sensor_type": "mtxrOpticalRxLoss",
                     "sensor_descr": "sfp-sfpplus9 Rx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -4987,7 +4987,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss"
+                    "state_name": "mtxrOpticalRxLoss"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4995,7 +4995,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.10",
                     "sensor_index": "mtxrOpticalTxFault.10",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus10 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5012,7 +5012,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5020,7 +5020,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.11",
                     "sensor_index": "mtxrOpticalTxFault.11",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus11 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5037,7 +5037,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5045,7 +5045,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.12",
                     "sensor_index": "mtxrOpticalTxFault.12",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus12 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5062,7 +5062,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5070,7 +5070,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.13",
                     "sensor_index": "mtxrOpticalTxFault.13",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus13 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5087,7 +5087,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5095,7 +5095,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.14",
                     "sensor_index": "mtxrOpticalTxFault.14",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus14 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5112,7 +5112,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5120,7 +5120,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.15",
                     "sensor_index": "mtxrOpticalTxFault.15",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus15 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5137,7 +5137,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5145,7 +5145,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.16",
                     "sensor_index": "mtxrOpticalTxFault.16",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus16 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5162,7 +5162,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5170,7 +5170,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.14988.1.1.19.1.1.4.9",
                     "sensor_index": "mtxrOpticalTxFault.9",
-                    "sensor_type": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "sensor_type": "mtxrOpticalTxFault",
                     "sensor_descr": "sfp-sfpplus9 Tx",
                     "group": "Ports",
                     "sensor_divisor": 1,
@@ -5187,7 +5187,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault"
+                    "state_name": "mtxrOpticalTxFault"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5197,7 +5197,7 @@
                     "sensor_index": "mtxrGaugeTemperature.14",
                     "sensor_type": "routeros",
                     "sensor_descr": "temperature",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 45,
@@ -5222,7 +5222,7 @@
                     "sensor_index": "mtxrGaugeTemperature.17",
                     "sensor_type": "routeros",
                     "sensor_descr": "cpu-temperature",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 36,
@@ -5247,7 +5247,7 @@
                     "sensor_index": "mtxrGaugeTemperature.50",
                     "sensor_type": "routeros",
                     "sensor_descr": "sfp-temperature",
-                    "group": "Health",
+                    "group": "System",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 45,
@@ -5667,56 +5667,56 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrGaugeStatus",
+                    "state_name": "mtxrGaugeStatus",
                     "state_descr": "ok",
                     "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrGaugeStatus",
+                    "state_name": "mtxrGaugeStatus",
                     "state_descr": "fail",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "no",
                     "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "yes",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalRxLoss",
+                    "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "null",
                     "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "state_name": "mtxrOpticalTxFault",
                     "state_descr": "no",
                     "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "state_name": "mtxrOpticalTxFault",
                     "state_descr": "yes",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "MIKROTIK-MIB::mtxrOpticalTxFault",
+                    "state_name": "mtxrOpticalTxFault",
                     "state_descr": "null",
                     "state_draw_graph": 1,
                     "state_value": 2,
