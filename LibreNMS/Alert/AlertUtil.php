@@ -28,6 +28,8 @@ namespace LibreNMS\Alert;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -83,59 +85,28 @@ class AlertUtil
         if (empty($results)) {
             return [];
         }
+
         if (Config::get('alert.default_only') === true || Config::get('alerts.email.default_only') === true) {
             $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
 
             return $email ? [$email => ''] : [];
         }
-        $users = User::query()->thisAuth()->get();
+
         $contacts = [];
-        $uids = [];
-        foreach ($results as $result) {
-            $tmp = null;
-            if (isset($result['bill_id']) && is_numeric($result['bill_id'])) {
-                $tmpa = dbFetchRows('SELECT user_id FROM bill_perms WHERE bill_id = ?', [$result['bill_id']]);
-                foreach ($tmpa as $tmp) {
-                    $uids[$tmp['user_id']] = $tmp['user_id'];
-                }
-            }
-            if (isset($result['port_id']) && is_numeric($result['port_id'])) {
-                $tmpa = dbFetchRows('SELECT user_id FROM ports_perms WHERE port_id = ?', [$result['port_id']]);
-                foreach ($tmpa as $tmp) {
-                    $uids[$tmp['user_id']] = $tmp['user_id'];
-                }
-            }
-            if (isset($result['device_id']) && is_numeric($result['device_id'])) {
-                if (Config::get('alert.syscontact') == true) {
-                    if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result['device_id']])) {
-                        $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", [$result['device_id']]);
-                    } else {
-                        $tmpa = dbFetchCell('SELECT sysContact FROM devices WHERE device_id = ?', [$result['device_id']]);
-                    }
-                    if (! empty($tmpa)) {
-                        $contacts[$tmpa] = '';
-                    }
-                }
-                $tmpa = dbFetchRows('SELECT user_id FROM devices_perms WHERE device_id = ?', [$result['device_id']]);
-                foreach ($tmpa as $tmp) {
-                    $uids[$tmp['user_id']] = $tmp['user_id'];
-                }
-            }
+
+        if (Config::get('alert.syscontact')) {
+            $contacts = array_merge($contacts, self::findContactsSysContact($results));
         }
-        foreach ($users as $user) {
-            if (empty($user->email)) {
-                continue; // no email, skip this user
-            }
 
-            $name = $user->realname ?: $user->username;
+        if (Config::get('alert.users')) {
+            $contacts = array_merge($contacts, self::findContactsOwners($results));
+        }
 
-            if (Config::get('alert.globals') && $user->hasGlobalRead()) {
-                $contacts[$user->email] = $name;
-            } elseif (Config::get('alert.admins') && $user->isAdmin()) {
-                $contacts[$user->email] = $name;
-            } elseif (Config::get('alert.users') && in_array($user['user_id'], $uids)) {
-                $contacts[$user->email] = $name;
-            }
+        $roles = Config::get('alert.globals')
+            ? ['admin', 'global-read']
+            : (Config::get('alert.admins') ? ['admin'] : []);
+        if ($roles) {
+            $contacts = array_merge($contacts, self::findContactsRoles($roles));
         }
 
         $tmp_contacts = [];
@@ -173,6 +144,53 @@ class AlertUtil
         }
 
         return $tmp_contacts;
+    }
+
+    public static function findContactsRoles(array $roles): array
+    {
+        return User::whereIs(...$roles)->whereNot('email', '')->dumpRawSql()->pluck('realname', 'email')->toArray();
+    }
+
+    public static function findContactsSysContact(array $results): array
+    {
+        $contacts = [];
+
+        foreach ($results as $result) {
+            $device = DeviceCache::get($result);
+            $email = $device->getAttrib('override_sysContact_bool')
+                ? $device->getAttrib('override_sysContact_string')
+                : $device->sysContact;
+            $contacts[$email] = '';
+        }
+
+        return $contacts;
+    }
+
+    public static function findContactsOwners(array $results): array
+    {
+        return User::whereNot('email', '')->whereIn('user_id', function (\Illuminate\Database\Query\Builder $query) use ($results) {
+            $tables = [
+                'bill_id' => 'bill_perms',
+                'port_id' => 'ports_perms',
+                'device_id' => 'devices_perms',
+            ];
+
+            $first = true;
+            foreach ($tables as $column => $table) {
+                $ids = array_filter(Arr::pluck($results, $column)); // find IDs for this type
+
+                if (! empty($ids)) {
+                    if ($first) {
+                        $query->select('user_id')->from($table)->whereIn($column, $ids);
+                        $first = false;
+                    } else {
+                        $query->union(DB::table($table)->select('user_id')->whereIn($column, $ids));
+                    }
+                }
+            }
+
+            return $query;
+        })->pluck('realname', 'email')->all();
     }
 
     public static function getRules($device_id)
