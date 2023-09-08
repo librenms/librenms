@@ -177,7 +177,7 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
                     DISTRIBUTED_POLLING = False
                     nodes = nodeso
                 if nodes is not nodeso:
-                    logger.info("{} Node(s) Total".format(nodes))
+                    logger.info(f"{nodes} Node(s) Total")
                     nodeso = nodes
             else:
                 memc_touch(NODES_TAG, wrappers[wrapper_type]["memc_touch_time"])
@@ -209,17 +209,15 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
         DISCOVERED_DEVICES_COUNT += 1
         if elapsed_time < STEPPING and exit_code in VALID_EXIT_CODES:
             logger.info(
-                "worker {} finished device {} in {} seconds".format(
-                    worker_id, device_id, elapsed_time
-                )
+                f"worker {worker_id} finished device {device_id} "
+                f"in {elapsed_time} seconds"
             )
         else:
             logger.warning(
-                "worker {} finished device {} in {} seconds with exit code {}".format(
-                    worker_id, device_id, elapsed_time, exit_code
-                )
+                f"worker {worker_id} finished device {device_id} "
+                f"in {worker_id} seconds with exit code {exit_code}"
             )
-            logger.debug("Command was {}".format(command))
+            logger.debug(f"Command was {command}")
         print_queue.task_done()
 
 
@@ -244,28 +242,24 @@ def poll_worker(
         #  <<<EOC
         if (
             not DISTRIBUTED_POLLING
-            or MEMC.get("{}.device.{}{}".format(wrapper_type, device_id, TIME_TAG))
+            or MEMC.get(f"{wrapper_type}.device.{device_id}{TIME_TAG}")
             is None
         ):
             if DISTRIBUTED_POLLING:
                 result = MEMC.add(
-                    "{}.device.{}{}".format(wrapper_type, device_id, TIME_TAG),
+                    f"{wrapper_type}.device.{device_id}{TIME_TAG}",
                     config["distributed_poller_name"],
                     STEPPING,
                 )
                 if not result:
                     logger.info(
-                        "The device {} appears to be being checked by another node".format(
-                            device_id
-                        )
+                        f"The device {device_id} appears to be being checked by another node"
                     )
                     poll_queue.task_done()
                     continue
                 if not memc_alive(wrapper_type) and IS_NODE:
                     logger.warning(
-                        "Lost Memcached, Not checking Device {} as Node. Master will check it.".format(
-                            device_id
-                        )
+                        f"Lost Memcached, Not checking Device {device_id} as Node. Master will check it."
                     )
                     poll_queue.task_done()
                     continue
@@ -274,16 +268,16 @@ def poll_worker(
                 start_time = time.time()
 
                 device_log = os.path.join(
-                    log_dir, "{}_device_{}.log".format(wrapper_type, device_id)
+                    log_dir, f"{wrapper_type}_device_{device_id}.log"
                 )
                 executable = os.path.join(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} -h {}".format(executable, device_id)
+                command = f"/usr/bin/env php {executable} -h {device_id}"
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
-                    command = command + " -m {}".format(module_str)
+                    command = command + f" -m {module_str}"
                 if debug:
                     command = command + " -d"
                 exit_code, output = command_runner(
@@ -293,15 +287,14 @@ def poll_worker(
                     valid_exit_codes=VALID_EXIT_CODES,
                 )
                 if exit_code not in [0, 6]:
+                    thread_name = threading.current_thread().name
                     logger.error(
-                        "Thread {} exited with code {}".format(
-                            threading.current_thread().name, exit_code
-                        )
+                        f"Thread {thread_name} exited with code {exit_code}"
                     )
                     ERRORS += 1
                     logger.error(output)
                 elif exit_code == 5:
-                    logger.info("Unreachable device {}".format(device_id))
+                    logger.info(f"Unreachable device {device_id}")
                 else:
                     logger.debug(output)
                 if debug:
@@ -353,8 +346,8 @@ def wrapper(
             STEPPING = config["rrd"]["step"]
         TIME_TAG = "." + str(get_time_tag(STEPPING))
 
-    MASTER_TAG = "{}.master{}".format(wrapper_type, TIME_TAG)
-    NODES_TAG = "{}.nodes{}".format(wrapper_type, TIME_TAG)
+    MASTER_TAG = f"{wrapper_type}.master{TIME_TAG}"
+    NODES_TAG = f"{wrapper_type}.nodes{TIME_TAG}"
 
     #  <<<EOC
     if "distributed_poller_group" in config:
@@ -389,9 +382,7 @@ def wrapper(
                     IS_NODE = False
                 else:
                     logger.info(
-                        "Registered as Node joining Master {}".format(
-                            MEMC.get(MASTER_TAG)
-                        )
+                        f"Registered as Node joining Master {MEMC.get(MASTER_TAG)}"
                     )
                     IS_NODE = True
                     MEMC.incr(NODES_TAG)
@@ -462,9 +453,8 @@ def wrapper(
 
     #  <<<EOC
     if DISTRIBUTED_POLLING and not IS_NODE:
-        query = "SELECT max(device_id),min(device_id) FROM {}".format(
-            wrappers[wrapper_type]["table_name"]
-        )
+        table_name = wrappers[wrapper_type]["table_name"]
+        query = f"SELECT max(device_id),min(device_id) FROM {table_name}"
         cursor = db_connection.query(query)
         devices = cursor.fetchall()
         maxlocks = devices[0][0] or 0
@@ -479,14 +469,12 @@ def wrapper(
     if amount_of_workers > amount_of_devices:
         amount_of_workers = amount_of_devices
 
-    logger.info(
-        "starting the {} check at {} with {} threads for {} devices".format(
-            wrapper_type,
-            time.strftime("%Y-%m-%d %H:%M:%S"),
-            amount_of_workers,
-            amount_of_devices,
-        )
+    log_datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+    logger_str = (
+        f"starting the {wrapper_type} check at {log_datetime} "
+        f"with {amount_of_workers} threads for {amount_of_devices} devices"
     )
+    logger.info(logger_str)
 
     for device_id in devices_list:
         poll_queue.put(device_id)
@@ -522,8 +510,10 @@ def wrapper(
 
     total_time = int(time.time() - s_time)
 
-    end_msg = "{}-wrapper checked {} devices in {} seconds with {} workers with {} errors".format(
-        wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers, ERRORS
+    end_msg = (
+        f"{wrapper_type}-wrapper checked {DISCOVERED_DEVICES_COUNT} devices "
+        f"in {total_time} seconds with {amount_of_workers} workers "
+        f"with {ERRORS} errors"
     )
     if ERRORS == 0:
         logger.info(end_msg)
@@ -542,66 +532,68 @@ def wrapper(
                     nodes = MEMC.get(NODES_TAG)
                 except:
                     pass
-            logger.info("Clearing Locks for {}".format(NODES_TAG))
+            logger.info(f"Clearing Locks for {NODES_TAG}")
             x = minlocks
             while x <= maxlocks:
-                MEMC.delete("{}.device.{}".format(wrapper_type, x))
+                MEMC.delete(f"{wrapper_type}.device.{x}")
                 x = x + 1
-            logger.info("{} Locks Cleared".format(x))
+            logger.info(f"{x} Locks Cleared")
             logger.info("Clearing Nodes")
             MEMC.delete(MASTER_TAG)
             MEMC.delete(NODES_TAG)
         else:
             MEMC.decr(NODES_TAG)
-        logger.info("Finished {}.".format(time.strftime("%Y-%m-%d %H:%M:%S")))
+        logger.info(f"Finished {time.strftime('%Y-%m-%d %H:%M:%S')}")
     # EOC
 
     # Update poller statistics
     if wrapper_type == "poller":
-        query = "UPDATE pollers SET last_polled=NOW(), devices='{}', time_taken='{}' WHERE poller_name='{}'".format(
-            DISCOVERED_DEVICES_COUNT, total_time, config["distributed_poller_name"]
+        poller_name = config["distributed_poller_name"]
+        query = (
+            "UPDATE pollers SET last_polled=NOW(), "
+            f"devices='{DISCOVERED_DEVICES_COUNT}', time_taken='{total_time}' "
+            f"WHERE poller_name='{poller_name}'"
         )
         cursor = db_connection.query(query)
         if cursor.rowcount < 1:
-            query = "INSERT INTO pollers SET poller_name='{}', last_polled=NOW(), devices='{}', time_taken='{}'".format(
-                config["distributed_poller_name"], DISCOVERED_DEVICES_COUNT, total_time
+            query = (
+                f"INSERT INTO pollers SET poller_name='{poller_name}', "
+                f"last_polled=NOW(), devices='{DISCOVERED_DEVICES_COUNT}', "
+                f"time_taken='{total_time}'"
             )
             db_connection.query(query)
 
     db_connection.close()
 
-    if total_time > wrappers[wrapper_type]["total_exec_time"]:
+    w_total_exec_time = wrappers[wrapper_type]["total_exec_time"]
+    if total_time > w_total_exec_time:
         logger.warning(
-            "the process took more than {} seconds to finish, you need faster hardware or more threads".format(
-                wrappers[wrapper_type]["total_exec_time"]
-            )
+            f"the process took more than {w_total_exec_time} seconds to "
+            "finish, you need faster hardware or more threads"
         )
         logger.warning(
-            "in sequential style service checks the elapsed time would have been: {} seconds".format(
-                REAL_DURATION
-            )
+            "in sequential style service checks the elapsed time "
+            f"would have been: {REAL_DURATION} seconds"
         )
         show_stopper = False
         for device in PER_DEVICE_DURATION:
             if PER_DEVICE_DURATION[device] > wrappers[wrapper_type]["nodes_stepping"]:
                 logger.warning(
-                    "device {} is taking too long: {} seconds".format(
-                        device, PER_DEVICE_DURATION[device]
-                    )
+                    f"device {device} is taking too long: "
+                    f"{PER_DEVICE_DURATION[device]} seconds"
                 )
                 show_stopper = True
         if show_stopper:
+            nodes_stepping = wrappers[wrapper_type]["nodes_stepping"]
             logger.error(
-                "Some devices are taking more than {} seconds, the script cannot recommend you what to do.".format(
-                    wrappers[wrapper_type]["nodes_stepping"]
-                )
+                f"Some devices are taking more than {nodes_stepping} seconds, "
+                "the script cannot recommend you what to do."
             )
         else:
             recommend = int(total_time / STEPPING * amount_of_workers + 1)
             logger.warning(
-                "Consider setting a minimum of {} threads. (This does not constitute professional advice!)".format(
-                    recommend
-                )
+                f"Consider setting a minimum of {recommend} threads. "
+                f"(This does not constitute professional advice!)"
             )
         sys.exit(2)
 
@@ -646,7 +638,7 @@ if __name__ == "__main__":
     amount_of_workers = args.threads
 
     if wrapper_type not in ["service", "discovery", "poller"]:
-        parser.error("Invalid wrapper type '{}'".format(wrapper_type))
+        parser.error(f"Invalid wrapper type '{wrapper_type}'")
         sys.exit(4)
 
     config = LibreNMS.get_config_data(
@@ -663,9 +655,8 @@ if __name__ == "__main__":
             16 if wrapper_type == "poller" else 1
         )  # Defaults to 1 for service/discovery, 16 for poller
         logger.warning(
-            "Bogus number of workers given. Using default number ({}) of workers.".format(
-                amount_of_workers
-            )
+            f"Bogus number of workers given. "
+            f"Using default number ({amount_of_workers}) of workers."
         )
 
     if wrapper_type in ["discovery", "poller"]:
