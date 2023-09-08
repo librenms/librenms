@@ -119,7 +119,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
                     group: Ports
                     index: 'mtxrOpticalRxLoss.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrOpticalRxLoss
+                    state_name: mtxrOpticalRxLoss
                     states:
                         - { descr: no, graph: 1, value: 0, generic: 0 }
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
@@ -131,7 +131,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
                     group: Ports
                     index: 'mtxrOpticalTxFault.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrOpticalTxFault
+                    state_name: mtxrOpticalTxFault
                     states:
                         - { descr: no, graph: 1, value: 0, generic: 0 }
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
@@ -143,7 +143,7 @@ modules:
                     descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
                     group: Ports
                     index: 'mtxrPOEStatus.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrPOEStatus
+                    state_name: mtxrPOEStatus
                     states:
                         - { descr: 'disabled', graph: 1, value: 1, generic: 3 }
                         - { descr: 'waitingForLoad', graph: 1, value: 2, generic: 3 }
@@ -156,7 +156,7 @@ modules:
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     group: Health
                     index: 'mtxrGaugeStatus.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrGaugeStatus
+                    state_name: mtxrGaugeStatus
                     skip_values:
                         -   oid: MIKROTIK-MIB::mtxrGaugeUnit
                             op: '!='
@@ -170,7 +170,7 @@ modules:
                     descr: Station Connected
                     group: Wireless
                     index: 'mtxrWl60GConnected.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrWl60GConnected
+                    state_name: mtxrWl60GConnected
                     states:
                         - { value: 0, generic: 2, graph: 1, descr: 'disconnected' }
                         - { value: 1, generic: 0, graph: 1, descr: 'connected' }
@@ -180,7 +180,7 @@ modules:
                     descr: Mode
                     group: Wireless
                     index: 'mtxrWl60GMode.{{ $index }}'
-                    state_name: MIKROTIK-MIB::mtxrWl60GMode
+                    state_name: mtxrWl60GMode
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'AP Bridge' }
                         - { value: 1, generic: 0, graph: 1, descr: 'Station Bridge' }
