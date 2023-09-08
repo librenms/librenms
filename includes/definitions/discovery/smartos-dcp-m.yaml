@@ -28,8 +28,8 @@ modules:
                     value: dcpInterfaceStatus
                     group: Alarm
                     descr: '{{ $dcpInterfaceChannelId }}'
-                    index: 'dcpInterfaceStatus.{{ $index }}'
-                    state_name: InterfaceStatus
+                    index: 'dcpInterfaceAlarm.{{ $index }}'
+                    state_name: InterfaceAlarm
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: cleared }
                         - { value: 2, generic: 1, graph: 1, descr: indeterminate }
