@@ -1308,12 +1308,6 @@
         },
         "poller": "matches discovery"
     },
-    "sensors": {
-        "discovery": {
-            "sensors": []
-        },
-        "poller": "matches discovery"
-    },
     "storage": {
         "discovery": {
             "storage": [
