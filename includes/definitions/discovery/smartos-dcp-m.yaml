@@ -18,7 +18,7 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: up }
                     skip_values: 
                         -
-                            oid: '{{ $dcpInterfaceChannelId }}'
+                            oid: dcpInterfaceChannelId
                             op: '='
                             value: ''
           
@@ -35,7 +35,7 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: up }
                     skip_values: 
                         -
-                            oid: '{{ $dcpInterfaceChannelId }}'
+                            oid: dcpInterfaceChannelId
                             op: '='
                             value: ''
           
@@ -52,7 +52,7 @@ modules:
                         -
                             -990
                         -
-                            oid: '{{ $dcpInterfaceChannelId }}'
+                            oid: dcpInterfaceChannelId
                             op: '='
                             value: ''
                 -
@@ -66,7 +66,7 @@ modules:
                         -
                             -990
                         -
-                            oid: '{{ $dcpInterfaceChannelId }}'
+                            oid: dcpInterfaceChannelId
                             op: '='
                             value: ''
                 -
