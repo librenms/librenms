@@ -30,7 +30,8 @@
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": null,
+                    "deleted_at": null
                 }
             ]
         },
@@ -43,7 +44,8 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"mappings\":{\"wg0\":[\"client1.domain.com\",\"client2\",\"my_phone\",\"it_admin.domain.org\",\"computer\"]}}"
+                    "data": "{\"mappings\":{\"wg0\":[\"client1.domain.com\",\"client2\",\"my_phone\",\"it_admin.domain.org\",\"computer\"]}}",
+                    "deleted_at": null
                 }
             ],
             "application_metrics": [

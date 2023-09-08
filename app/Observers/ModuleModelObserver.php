@@ -66,6 +66,15 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
+    public function restored($model)
+    {
+        d_echo('Restored data:', 'R');
+        d_echo($model->getDirty());
+    }
+
+    /**
+     * @param  Eloquent  $model
+     */
     public function created($model): void
     {
         echo '+';

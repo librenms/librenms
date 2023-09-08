@@ -96,7 +96,7 @@ class DeviceObserver
         $device->alerts()->delete();
         \DB::table('alert_device_map')->where('device_id', $device->device_id)->delete();
         $device->alertLogs()->delete();
-        $device->applications()->delete();
+        $device->applications()->forceDelete();
         $device->attribs()->delete();
         $device->availability()->delete();
         $device->bgppeers()->delete();

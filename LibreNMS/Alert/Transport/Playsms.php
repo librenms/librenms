@@ -77,7 +77,7 @@ class Playsms extends Transport
                     'title' => 'Token',
                     'name' => 'playsms-token',
                     'descr' => 'PlaySMS Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'From',

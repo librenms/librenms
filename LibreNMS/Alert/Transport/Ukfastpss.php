@@ -71,7 +71,7 @@ class Ukfastpss extends Transport
                     'title' => 'API Key',
                     'name' => 'api-key',
                     'descr' => 'API key to use for authentication',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Author',
