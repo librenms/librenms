@@ -116,6 +116,11 @@ $pagp_extended_oids = [
     'pagpGroupIfIndex',
 ];
 
+$port_security_oids = [
+    'cpsIfStickyEnable',
+    'cpsIfMaxSecureMacAddr',
+];
+
 $ifmib_oids = [
     'ifDescr',
     'ifAdminStatus',
@@ -909,6 +914,21 @@ foreach ($ports as $port) {
             }
             // End Update PAgP
 
+<<<<<<< HEAD
+=======
+            // Update Port-Security
+            foreach ($port_security_oids as $oid) {
+                // Loop the OIDs
+                $current_oid = $this_port[$oid] ?? null;
+                if ($current_oid != $port[$oid]) {
+                    // If data has changed, build a query
+                    $port['update'][$oid] = $current_oid;
+                    echo 'Port-Security';
+                    log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
+                }
+            }
+            
+>>>>>>> c96ca1c520 (Feature add cpsIfStickyEnable, cpsIfMaxSecureMacAddr to polling. Created port_security_oids)
             // Do EtherLike-MIB
             if (LibrenmsConfig::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';
