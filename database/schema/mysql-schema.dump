@@ -1,5 +1,6 @@
 cat mysql-schema[K[K[K[K[K[K[K_schema.dump 
-[?2004l-- MariaDB dump 10.19  Distrib 10.5.16-MariaDB, for Linux (x86_64)
+[?2004l
+-- MariaDB dump 10.19  Distrib 10.5.16-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: librenms
 -- ------------------------------------------------------
@@ -2382,7 +2383,7 @@ CREATE TABLE `ports` (
   `ifOutOctets_delta` bigint(20) unsigned DEFAULT NULL,
   `ifOutOctets_rate` bigint(20) unsigned DEFAULT NULL,
   `cpsIfMaxSecureMacAddr` int(11) NOT NULL DEFAULT 1,
-  `cpsIfStickyEnable` char(1) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'f',
+  `cpsIfStickyEnable` char(1) NOT NULL DEFAULT 'f',
   `poll_time` int(10) unsigned DEFAULT NULL,
   `poll_prev` int(10) unsigned DEFAULT NULL,
   `poll_period` int(10) unsigned DEFAULT NULL,
