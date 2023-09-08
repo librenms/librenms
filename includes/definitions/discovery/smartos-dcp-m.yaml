@@ -33,11 +33,6 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: idle }
                         - { value: 2, generic: 2, graph: 1, descr: down }
                         - { value: 3, generic: 0, graph: 1, descr: up }
-                    skip_values: 
-                        -
-                            oid: dcpInterfaceChannelId
-                            op: '='
-                            value: ''
           
         dbm:
             data:
