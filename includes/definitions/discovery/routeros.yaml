@@ -23,7 +23,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     index: 'mtxrGaugeTemperature.{{ $index }}'
                     skip_values:
@@ -49,7 +49,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     divisor: 10
                     index: 'mtxrGaugeVoltage.{{ $index }}'
@@ -76,7 +76,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     divisor: 10
                     index: 'mtxrGaugeCurrent.{{ $index }}'
@@ -140,7 +140,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     index: 'mtxrGaugeStatus.{{ $index }}'
                     state_name: MIKROTIK-MIB::mtxrGaugeStatus
@@ -183,7 +183,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     divisor: 10
                     index: 'mtxrGaugePower.{{ $index }}'
@@ -196,7 +196,7 @@ modules:
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
                     descr: MIKROTIK-MIB::mtxrGaugeName
                     index: 'mtxrGuageFanspeed.{{ $index }}'
                     skip_values:
