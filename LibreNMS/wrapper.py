@@ -325,7 +325,7 @@ def wrapper(
     config,  # Type: dict
     log_dir,  # Type: str
     _debug=False,  # Type: bool
-    **kwargs,  # Type: dict, may contain modules
+    **kwargs,  # Type: dict, may contain: modules, groups [=device groups]
 ):  # -> None
     """
     Actual code that runs various php scripts, in single node mode or distributed poller mode
@@ -409,18 +409,52 @@ def wrapper(
 
     devices_list = []
 
+    query_args = []
+    dg_where_expansion = ''
+    # if device groups were passed, build an additional where condition here
+    d_groups = kwargs.get('groups')
+
+    if kwargs.get('groups'):
+        # remove trailing comma whitespace combinations
+        cleaned_groups = re.sub('(^,|,$)', '', str(d_groups).strip())
+        device_groups = re.split(',', cleaned_groups)
+        group_where_items = []
+        for group in device_groups:
+            group = group.strip()
+            if group.isnumeric():
+                query_args.append(int(group))
+                group_where_items.append('device_groups.id = %s')
+            else:
+                query_args.append(group.replace('*', '%'))
+                group_where_items.append('device_groups.name LIKE %s')
+        if group_where_items:
+            group_where = ' OR '.join(group_where_items)
+            dg_where_expansion = f'AND ({group_where})'
+
     if wrapper_type == "service":
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
-                "services.device_id = devices.device_id WHERE devices.poller_group IN({}) AND "
-                "devices.disabled = 0".format(poller_group)
+                "SELECT DISTINCT(services.device_id) FROM services "
+                "LEFT JOIN devices"
+                " ON services.device_id = devices.device_id "
+                "LEFT JOIN device_group_device"
+                " ON devices.device_id = device_group_device.device_id "
+                "LEFT JOIN device_groups"
+                " ON device_group_device.device_group_id = device_groups.id "
+                f"WHERE devices.poller_group IN(%s) {dg_where_expansion} "
+                "AND devices.disabled = 0"
             )
+            query_args.insert(0, poller_group)
         else:
             query = (
-                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
-                "services.device_id = devices.device_id WHERE devices.disabled = 0"
+                "SELECT DISTINCT(services.device_id) FROM services "
+                "LEFT JOIN devices ON services.device_id = devices.device_id "
+                "LEFT JOIN device_group_device"
+                " ON devices.device_id = device_group_device.device_id "
+                "LEFT JOIN device_groups"
+                " ON device_group_device.device_group_id = device_groups.id "
+                f"WHERE devices.disabled = 0 {dg_where_expansion}"
             )
         # EOC
     elif wrapper_type in ["discovery", "poller"]:
@@ -433,11 +467,21 @@ def wrapper(
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT device_id FROM devices WHERE poller_group IN ({}) AND "
-                "disabled = 0 ORDER BY last_polled_timetaken DESC".format(poller_group)
+                "SELECT device_id FROM devices "
+                "LEFT JOIN device_group_device"
+                " ON devices.device_id = device_group_device.device_id "
+                "LEFT JOIN device_groups"
+                " ON device_group_device.device_group_id = device_groups.id "
+                f"WHERE poller_group IN (%s) {dg_where_expansion} "
+                "AND disabled = 0 ORDER BY last_polled_timetaken DESC"
             )
+            query_args.insert(0, poller_group)
         else:
-            query = "SELECT device_id FROM devices WHERE disabled = 0 ORDER BY last_polled_timetaken DESC"
+            query = (
+                "SELECT device_id FROM devices "
+                f"WHERE disabled = 0 {dg_where_expansion} "
+                "ORDER BY last_polled_timetaken DESC"
+            )
         # EOC
     else:
         logger.critical("Bogus wrapper type called")
