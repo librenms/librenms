@@ -26,6 +26,7 @@
  */
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $data = '';
 $name = 'rrdcached';
@@ -62,7 +63,7 @@ if ($agent_data['app'][$name]) {
             $data .= fgets($sock, 128);
             if ($max == -1) {
                 $tmp_max = explode(' ', $data);
-                $max = $tmp_max[0] + 1;
+                $max = Number::cast($tmp_max[0]) + 1;
             }
             $count++;
         }
