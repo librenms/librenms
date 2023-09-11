@@ -1703,6 +1703,8 @@ ports:
     - { Field: ifVlan, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: cpsIfMaxSecureMacAddr, Type: 'int', 'Null': false, Extra: '' , Default: '1'}
+    - { Field: cpsIfStickyEnable, Type: 'varchar(1)', 'Null': false, Extra: '' , Default: 'f'}
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
