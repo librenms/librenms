@@ -923,6 +923,7 @@ foreach ($ports as $port) {
                     log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
                 }
             }
+            // End Update Port-Security
             
             // Do EtherLike-MIB
             if (Config::get('enable_ports_etherlike')) {
