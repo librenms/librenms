@@ -7,11 +7,3 @@ modules:
             - MOXA-SYSTEM-INFO-MIB::siStatProductInfoFirmwareVersion.0
         serial:
             - MOXA-SYSTEM-INFO-MIB::siStatProductInfoSerialNumber.0
-    sensors:
-        power:
-            data:
-                -
-                    oid: usStatPowerConsumption
-                    num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.4.0'
-                    descr: 'Power Consumption'
-                    index: 'usStatPowerConsumption.0'
