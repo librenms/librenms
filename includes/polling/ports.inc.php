@@ -927,6 +927,7 @@ foreach ($ports as $port) {
                     log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
                 }
             }
+            // End Update Port-Security
             
 >>>>>>> c96ca1c520 (Feature add cpsIfStickyEnable, cpsIfMaxSecureMacAddr to polling. Created port_security_oids)
             // Do EtherLike-MIB
