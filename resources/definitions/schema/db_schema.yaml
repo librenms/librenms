@@ -1740,8 +1740,6 @@ ports:
     - { Field: ifOutOctets_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutOctets_delta, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutOctets_rate, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: cpsIfMaxSecureMacAddr, Type: 'int', 'Null': false, Extra: '' , Default: '1'}
-    - { Field: cpsIfStickyEnable, Type: 'char(1)', 'Null': false, Extra: '' , Default: 'f'}
     - { Field: poll_time, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
