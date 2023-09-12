@@ -440,11 +440,13 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     foreach ($cisco_if_extension_oids as $oid) {
         $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-IF-EXTENSION-MIB');
     }
-
-    foreach ($port_security_oids as $oid) {
-        // echo 'CISCO-PORT-SECURITY-MIB';
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PORT-SECURITY-MIB');
-    }
+    /*
+    * Adding polling for $port_security_oids (Cisco only)
+    */
+    // foreach ($port_security_oids as $oid) {
+    //     // echo 'CISCO-PORT-SECURITY-MIB';
+    //     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PORT-SECURITY-MIB');
+    // }
 }//end if
 
 $polled = time();
