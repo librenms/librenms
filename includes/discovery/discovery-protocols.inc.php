@@ -7,7 +7,7 @@ global $link_exists;
 
 if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
-    $fdp_array = snmpwalk_group($device, 'snFdpCacheEntry', 'FOUNDRY-SN-SWITCH-GROUP-MIB', 2);
+    $fdp_array = SnmpQuery::allowUnordered()->hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
 
     foreach ($fdp_array as $key => $fdp_if_array) {
         $interface = get_port_by_ifIndex($device['device_id'], $key);
