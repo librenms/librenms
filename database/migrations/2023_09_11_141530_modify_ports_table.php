@@ -14,8 +14,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->string('cpsIfStickyEnable', 1)->default('f')->after('ifVrf');
-            $table->integer('cpsIfMaxSecureMacAddr')->default(1)->after('ifVrf');
+            $table->string('cpsIfStickyEnable', 1)->nullable()->after('ifVrf');
+            $table->integer('cpsIfMaxSecureMacAddr')->nullable()->after('ifVrf');
         });
     }
 
