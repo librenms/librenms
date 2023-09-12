@@ -22,7 +22,6 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
-<<<<<<< HEAD
 // Add ports from other snmp context
 if ($device['os'] == 'nokia-isam') {
     require base_path('includes/discovery/ports/nokia-isam.inc.php');
@@ -36,14 +35,8 @@ if ($device['os'] == 'bison') {
 // Get adva-fsp150cp
 if ($device['os'] == 'adva-fsp150cp') {
     require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
-=======
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
->>>>>>> a8e2864ee1 (Feature add cpsIfStickyEnable, cpsIfMaxSecureMacAddr to discovery)
-}
 
-// Get Trellix NSP ports
+    // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {
     require base_path('includes/discovery/ports/mlos-nsp.inc.php');
 }
