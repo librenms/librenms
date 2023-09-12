@@ -31,7 +31,7 @@ class Mail extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
-        $emails = match ($this->config['mail-contact']) {
+        $emails = match ($this->config['mail-contact'] ?? '') {
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
             'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
