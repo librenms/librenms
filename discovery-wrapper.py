@@ -40,6 +40,12 @@ parser.add_argument(
     default="",
     help="Enable passing of a module string, modules are separated by comma",
 )
+parser.add_argument(
+    "--device-groups",
+    dest="groups",
+    default="",
+    help="Enable passing one or more device groups (id, name, namepart), multiple groups are separated by comma",
+)
 args = parser.parse_args()
 
 config = LibreNMS.get_config_data(os.path.dirname(os.path.realpath(__file__)))
@@ -67,5 +73,6 @@ wrapper.wrapper(
     config=config,
     log_dir=log_dir,
     modules=args.modules or "",
+    groups=args.groups or "",
     _debug=args.debug,
 )
