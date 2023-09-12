@@ -913,18 +913,18 @@ foreach ($ports as $port) {
             // End Update PAgP
 
             // Update Port-Security
-            if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-                foreach ($port_security_oids as $oid) {
-                    // Loop the OIDs
-                    $current_oid = $this_port[$oid] ?? null;
-                    if ($current_oid != $port[$oid]) {
-                        // If data has changed, build a query
-                        $port['update'][$oid] = $current_oid;
-                        echo 'Port-Security';
-                        log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
-                    }
-                }
-            }
+            // if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+            //     foreach ($port_security_oids as $oid) {
+            //         // Loop the OIDs
+            //         $current_oid = $this_port[$oid] ?? null;
+            //         if ($current_oid != $port[$oid]) {
+            //             // If data has changed, build a query
+            //             $port['update'][$oid] = $current_oid;
+            //             echo 'Port-Security';
+            //             log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
+            //         }
+            //     }
+            // }
             // End Update Port-Security
             
             // Do EtherLike-MIB
