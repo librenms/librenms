@@ -7,7 +7,7 @@ global $link_exists;
 
 if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
-    $fdp_array = SnmpQuery::allowUnordered()->hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
+    $fdp_array = SnmpQuery::hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
 
     foreach ($fdp_array as $key => $fdp_if_array) {
         $interface = get_port_by_ifIndex($device['device_id'], $key);
@@ -43,7 +43,7 @@ if ($device['os'] == 'ironware') {
 
 if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo ' CISCO-CDP-MIB: ';
-    $cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
+    $cdp_array = SnmpQuery::hideMib()->walk('CISCO-CDP-MIB::cdpCache')->table(2);
 
     foreach ($cdp_array as $key => $cdp_if_array) {
         $interface = get_port_by_ifIndex($device['device_id'], $key);
