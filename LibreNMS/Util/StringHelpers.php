@@ -79,6 +79,7 @@ class StringHelpers
             'rrdcached' => 'RRDCached',
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
+            'ss' => 'Socket Statistics',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',
