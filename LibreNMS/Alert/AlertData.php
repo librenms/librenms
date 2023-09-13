@@ -80,7 +80,7 @@ class AlertData extends \Illuminate\Support\Collection
             'name' => 'Test-Rule',
             'string' => '#1: test => string;',
             'timestamp' => date('Y-m-d H:i:s'),
-            'contacts' => AlertUtil::getContacts($device->toArray()),
+            'contacts' => AlertUtil::getContacts([$device->toArray()]),
             'state' => AlertState::ACTIVE,
             'msg' => 'This is a test alert',
             'builder' => '{}',

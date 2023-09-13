@@ -42,6 +42,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 'auth_type' => LegacyAuth::getType(),
                 'can_modify_passwd' => 0,
             ]);
+            $new_user = ! $user->exists;
             $user->save();
 
             // cache a single role from the Filter-ID attribute now because attributes are cleared every accessRequest
@@ -50,7 +51,9 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 $this->roles[$credentials['username']] = [substr($filter_id_attribute, 14)];
             }
 
-            $user->setRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles(), true);
+            if (Config::get('radius.enforce_roles') || $new_user) {
+                $user->setRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles(), true);
+            }
 
             return true;
         }
