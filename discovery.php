@@ -125,9 +125,9 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
     $where .= ' AND devices.poller_group IN(' . \LibreNMS\Config::get('distributed_poller_group') . ')';
 }
 
-$sql = 'SELECT DISTINCT devices.* FROM `devices` '.
-       'LEFT JOIN device_group_device ON devices.device_id = device_group_device.device_id '.
-       'LEFT JOIN device_groups ON device_group_device.device_group_id = device_groups.id '.
+$sql = 'SELECT DISTINCT devices.* FROM `devices` ' .
+       'LEFT JOIN device_group_device ON devices.device_id = device_group_device.device_id ' .
+       'LEFT JOIN device_groups ON device_group_device.device_group_id = device_groups.id ' .
        "WHERE devices.disabled = 0 $where ORDER BY devices.device_id DESC";
 
 global $device;
