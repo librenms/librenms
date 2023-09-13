@@ -13,6 +13,8 @@ manually running to process data.
 -h new                                       Poll all devices that have not had a discovery run before
 --os <os_name>                               Poll devices only with specified operating system
 --type <type>                                Poll devices only with specified type
+--device-groups <group name/s>               Poll only devices having at least one of given device groups
+                                             Separate multiple groups by comma
 -i <instances> -n <number>                   Poll as instance <number> of <instances>
                                              Instances start at 0. 0-3 for -n 4
 
@@ -26,6 +28,18 @@ Debugging and testing options:
 wildcard using *). You can also specify odd and even. all will run
 discovery against all devices whilst new will poll only those devices
 that have recently been added or have been selected for rediscovery.
+
+`--os` Limit the amount of devices to ones having the given operating system.
+Please note: You must use the value that is stored in the database!
+Example: 'ios' for Cisco IOS
+
+`--type` Limit the amount of devices to ones having the given device type.
+
+`--device-groups` Limit the amount of devices to ones that are at least part of any
+of the given device groups. Separate multiple groups by comma, the whole
+list may (and should) be enclosed by quotation marks in case a group name
+contains whitespaces or similar. Please note that group names containing
+a comma cannot be used here.
 
 `-i` This can be used to stagger the discovery process.
 
@@ -51,6 +65,15 @@ in cron.
 You also may use `-m` to pass a list of comma-separated modules.
 Please refer to [Command options](#command-options) of discovery.php.
 Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
+
+If you need to filter by device groups, you may also pass one or more device
+group names separated by comma as option `--device-groups`
+Example: `/opt/librenms/discovery-wrapper.py 1 --device-groups 'Access Switches,Core Nodes'`
+
+It is also possible to use the ID of the group:
+`/opt/librenms/discovery-wrapper.py 1 --device-groups '26,4,Core Nodes'`
+
+Please note that group names containing a comma cannot be used here.
 
 If you want to switch back to discovery.php then you can replace:
 
