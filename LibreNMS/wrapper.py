@@ -242,8 +242,7 @@ def poll_worker(
         #  <<<EOC
         if (
             not DISTRIBUTED_POLLING
-            or MEMC.get(f"{wrapper_type}.device.{device_id}{TIME_TAG}")
-            is None
+            or MEMC.get(f"{wrapper_type}.device.{device_id}{TIME_TAG}") is None
         ):
             if DISTRIBUTED_POLLING:
                 result = MEMC.add(
@@ -410,26 +409,26 @@ def wrapper(
     devices_list = []
 
     query_args = []
-    dg_where_expansion = ''
+    dg_where_expansion = ""
     # if device groups were passed, build an additional where condition here
-    d_groups = kwargs.get('groups')
+    d_groups = kwargs.get("groups")
 
-    if kwargs.get('groups'):
+    if kwargs.get("groups"):
         # remove trailing comma whitespace combinations
-        cleaned_groups = re.sub('(^,|,$)', '', str(d_groups).strip())
-        device_groups = re.split(',', cleaned_groups)
+        cleaned_groups = re.sub("(^,|,$)", "", str(d_groups).strip())
+        device_groups = re.split(",", cleaned_groups)
         group_where_items = []
         for group in device_groups:
             group = group.strip()
             if group.isnumeric():
                 query_args.append(int(group))
-                group_where_items.append('device_groups.id = %s')
+                group_where_items.append("device_groups.id = %s")
             else:
-                query_args.append(group.replace('*', '%'))
-                group_where_items.append('device_groups.name LIKE %s')
+                query_args.append(group.replace("*", "%"))
+                group_where_items.append("device_groups.name LIKE %s")
         if group_where_items:
-            group_where = ' OR '.join(group_where_items)
-            dg_where_expansion = f'AND ({group_where})'
+            group_where = " OR ".join(group_where_items)
+            dg_where_expansion = f"AND ({group_where})"
 
     if wrapper_type == "service":
         #  <<<EOC
