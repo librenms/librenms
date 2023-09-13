@@ -287,9 +287,7 @@ def poll_worker(
                 )
                 if exit_code not in [0, 6]:
                     thread_name = threading.current_thread().name
-                    logger.error(
-                        f"Thread {thread_name} exited with code {exit_code}"
-                    )
+                    logger.error(f"Thread {thread_name} exited with code {exit_code}")
                     ERRORS += 1
                     logger.error(output)
                 elif exit_code == 5:
