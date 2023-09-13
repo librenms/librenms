@@ -101,7 +101,7 @@ if (! $where) {
     echo "--os <os_name>     Discover devices only with specified operating system\n";
     echo "--type <type>      Discover devices only with specified type\n";
     echo "-m                 Specify single module to be run. Comma separate modules, submodules may be added with /\n";
-    echo "--device-groups <group id/s or name/s or name part/s)>";
+    echo "--device-groups <group id/s or name/s or name part/s)>\n";
     echo "                   Discover only devices having at least one of the given device groups\n";
     echo "                   Multiple groups may be separated by comma\n";
     echo "-i <instances> -n <number>\n";
@@ -125,9 +125,9 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
     $where .= ' AND devices.poller_group IN(' . \LibreNMS\Config::get('distributed_poller_group') . ')';
 }
 
-$sql = "SELECT DISTINCT devices.* FROM `devices` ".
-       "LEFT JOIN device_group_device ON devices.device_id = device_group_device.device_id ".
-       "LEFT JOIN device_groups ON device_group_device.device_group_id = device_groups.id ".
+$sql = 'SELECT DISTINCT devices.* FROM `devices` '.
+       'LEFT JOIN device_group_device ON devices.device_id = device_group_device.device_id '.
+       'LEFT JOIN device_groups ON device_group_device.device_group_id = device_groups.id '.
        "WHERE devices.disabled = 0 $where ORDER BY devices.device_id DESC";
 
 global $device;
