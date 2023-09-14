@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+$vars['eventtype'] = 'test\"-alert(document.cookie)//';
+
 $common_output[] = '
 <div class="table-responsive">
     <table id="eventlog" class="table table-hover table-condensed table-striped">
@@ -36,7 +38,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
     {
         return {
             device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
-            eventtype: "' . addcslashes($vars['eventtype'] ?? '', '"') . '",
+            eventtype: "' . htmlspecialchars($vars['eventtype'] ?? '') . '",
         };
     },
     url: "' . url('/ajax/table/eventlog') . '"
