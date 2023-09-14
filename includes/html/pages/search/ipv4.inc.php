@@ -73,7 +73,7 @@ if ($_POST['interface'] == 'Vlan%') {
                   "</select>"+
                   "</div>&nbsp;"+
                   "<div class=\"form-group\">"+
-                  "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo $_POST['address']; ?>\" class=\"form-control input-sm\" placeholder=\"IPv4 Address\"/>"+
+                  "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo htmlspecialchars($_POST['address']); ?>\" class=\"form-control input-sm\" placeholder=\"IPv4 Address\"/>"+
                   "</div>&nbsp;"+
                   "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                   "</form></span></div>"+
