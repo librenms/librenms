@@ -156,7 +156,7 @@ class AlertUtil
         $contacts = [];
 
         foreach ($results as $result) {
-            $device = DeviceCache::get($result);
+            $device = DeviceCache::get($result['device_id']);
             $email = $device->getAttrib('override_sysContact_bool')
                 ? $device->getAttrib('override_sysContact_string')
                 : $device->sysContact;
