@@ -31,7 +31,7 @@ class Grafana extends Transport
         $device = DeviceCache::get($alert_data['device_id']);
 
         $graph_args = [
-            'type' => 'device_bits', #FIXME use graph url related to alert
+            'type' => 'device_bits', // FIXME use graph url related to alert
             'device' => $device['device_id'],
             'height' => 150,
             'width' => 300,
@@ -39,8 +39,8 @@ class Grafana extends Transport
             'title' => 'yes',
         ];
 
-        #$graph_url = url('graph.php') . '?' . http_build_query($graph_args);
-        # FIXME - workaround for https://github.com/grafana/oncall/issues/3031
+        //$graph_url = url('graph.php') . '?' . http_build_query($graph_args);
+        // FIXME - workaround for https://github.com/grafana/oncall/issues/3031
         $graph_url = url('graph.php') . '/' . str_replace('&', '/', http_build_query($graph_args));
 
         $data = [
