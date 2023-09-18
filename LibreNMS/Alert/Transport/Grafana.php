@@ -28,7 +28,6 @@ class Grafana extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        #$message_lines = explode("\n", $alert_data['msg'] ?? '');
         $device = DeviceCache::get($alert_data['device_id']);
 
         $graph_args = [
@@ -59,7 +58,7 @@ class Grafana extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $message_lines[0], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
     public static function configTemplate(): array
