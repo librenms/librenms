@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-$vars['eventtype'] = 'test\"-alert(document.cookie)//';
-
 $common_output[] = '
 <div class="table-responsive">
     <table id="eventlog" class="table table-hover table-condensed table-striped">
