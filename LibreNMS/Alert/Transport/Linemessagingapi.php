@@ -62,7 +62,7 @@ class LineMessagingAPI extends Transport
                     'title' => 'Access token',
                     'name' => 'line-messaging-token',
                     'descr' => 'LINE Channel access token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Recipient (groupID, userID or roomID)',

@@ -1492,12 +1492,20 @@ function list_oxidized(Illuminate\Http\Request $request)
 
     /** @var Device $device */
     foreach ($devices as $device) {
+        $device['device_id'] = DeviceCache::getByHostname($device->hostname)->device_id;
         $output = [
             'hostname' => $device->hostname,
             'os' => $device->os,
             'ip' => $device->ip,
         ];
-
+        $custom_ssh_port = get_dev_attrib($device, 'override_device_ssh_port');
+        if (! empty($custom_ssh_port)) {
+            $output['ssh_port'] = $custom_ssh_port;
+        }
+        $custom_telnet_port = get_dev_attrib($device, 'override_device_telnet_port');
+        if (! empty($custom_telnet_port)) {
+            $output['telnet_port'] = $custom_telnet_port;
+        }
         // Pre-populate the group with the default
         if (Config::get('oxidized.group_support') === true && ! empty(Config::get('oxidized.default_group'))) {
             $output['group'] = Config::get('oxidized.default_group');
