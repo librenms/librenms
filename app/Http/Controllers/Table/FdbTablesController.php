@@ -306,8 +306,7 @@ class FdbTablesController extends TableController
     {
         $query->where(function (Builder $query) use ($vendor_ouis) {
             foreach ($vendor_ouis as $oui) {
-                $clean_oui = str_replace(':', '', $oui);
-                $query->orWhere('ports_fdb.mac_address', 'LIKE', "$clean_oui%");
+                $query->orWhere('ports_fdb.mac_address', 'LIKE', "$oui%");
             }
         });
 
