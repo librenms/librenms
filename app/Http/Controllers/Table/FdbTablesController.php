@@ -291,7 +291,7 @@ class FdbTablesController extends TableController
      * @param  string  $vendor
      * @return array
      */
-    protected function ouisFromVendor(String $vendor): array
+    protected function ouisFromVendor(string $vendor): array
     {
         return DB::table('vendor_ouis')
             ->where('vendor', 'LIKE', '%' . $vendor . '%')
