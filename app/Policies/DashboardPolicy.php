@@ -24,9 +24,8 @@ class DashboardPolicy
      * Determine whether the user can view any dashboard.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return true;
     }
@@ -36,9 +35,8 @@ class DashboardPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dashboard  $dashboard
-     * @return mixed
      */
-    public function view(User $user, Dashboard $dashboard)
+    public function view(User $user, Dashboard $dashboard): bool
     {
         return $dashboard->user_id == $user->user_id || $dashboard->access > 0;
     }
@@ -47,9 +45,8 @@ class DashboardPolicy
      * Determine whether the user can create dashboards.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return true;
     }
@@ -59,9 +56,8 @@ class DashboardPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dashboard  $dashboard
-     * @return mixed
      */
-    public function update(User $user, Dashboard $dashboard)
+    public function update(User $user, Dashboard $dashboard): bool
     {
         return $dashboard->user_id == $user->user_id || $dashboard->access > 1;
     }
@@ -71,9 +67,8 @@ class DashboardPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dashboard  $dashboard
-     * @return mixed
      */
-    public function delete(User $user, Dashboard $dashboard)
+    public function delete(User $user, Dashboard $dashboard): bool
     {
         return $dashboard->user_id == $user->user_id || $user->isAdmin();
     }
@@ -84,7 +79,6 @@ class DashboardPolicy
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dashboard  $dashboard
      * @param  int  $target_user_id
-     * @return bool
      */
     public function copy(User $user, Dashboard $dashboard, int $target_user_id): bool
     {

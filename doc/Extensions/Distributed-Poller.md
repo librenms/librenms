@@ -41,23 +41,28 @@ These requirements are above the normal requirements for a full LibreNMS install
 By default, all hosts are shared and have the `poller_group = 0`. To
 pin a device to a poller, set it to a value greater than 0 and set the
 same value in the poller's config with
-`$config['distributed_poller_group']`. One can also specify a comma
+`distributed_poller_group`. One can also specify a comma
 separated string of poller groups in
-$config['distributed_poller_group'].  The poller will then poll
+`distributed_poller_group`.  The poller will then poll
 devices from any of the groups listed.  If new devices get added from
 the poller they will be assigned to the first poller group in the list
 unless the group is specified when adding the device.
 
 The following is a standard config, combined with a locking mechanism below:
 
-```php
-// Distributed Poller-Settings
-$config['distributed_poller']                            = true;
-// optional: defaults to hostname
-#$config['distributed_poller_name']                      = 'custom';
-$config['distributed_poller_group']                      = 0;
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set distributed_poller true
+    lnms config:set distributed_poller_group 0
+    ```
 
+If you want to customise the hostname for the poller then you will need
+to set this in `config.php`:
+
+```php
+$config['distributed_poller_name']           = php_uname('n');
 ```
+
 ## Locking mechanisms
 Pick one of the following setups, do not use all of them at the same
 time.
@@ -181,6 +186,15 @@ It's not necessary to run discovery services on all pollers. In fact, you should
 only run one discovery process per poller group.
 Designate a single poller to run discovery (or a separate server if required).
 
+If you run billing, you can do this in one of two ways:
+
+1. Run poll-billing.php and calculate-billing.php on a single poller which will 
+create billing information for all bills. Please note this poller must have 
+snmp access to all of your devices which have ports within a bill.
+1. The other option is to enable `$config['distributed_billing'] = true;` in 
+config.php. Then run poll-billing.php on a single poller per group. You can run 
+calculate-billing.php on any poller but only one poller overall.
+
 **Dispatcher service**
 When using the dispatcher service, discovery can run on all nodes.
 
@@ -199,12 +213,15 @@ Web Server:
 
 Running Apache and an install of LibreNMS in /opt/librenms
 
-- config.php
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set distributed_poller true
+    ```
 
-```php
-$config['distributed_poller'] = true;
-$config['rrdcached']    = "example.com:42217";
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "example.com:42217"
+    ```
 
 Database Server:
 Running Memcache and MariaDB
@@ -252,11 +269,20 @@ Running an install of LibreNMS in /opt/librenms
 ```php
 $config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '0';
-$config['distributed_poller_memcached_host'] = "example.com";
-$config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller']                = true;
-$config['rrdcached']                         = "example.com:42217";
+$config['distributed_billing']               = true;
 ```
+
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set distributed_poller_memcached_host "example.com"
+    lnms config:set distributed_poller_memcached_port 11211
+    lnms config:set distributed_poller true
+    ```
+
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "example.com:42217"
+    ```
 
 `/etc/cron.d/librenms`
 
@@ -279,11 +305,20 @@ Running an install of LibreNMS in /opt/librenms
 ```php
 $config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '0';
-$config['distributed_poller_memcached_host'] = "example.com";
-$config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller']                = true;
-$config['rrdcached']                         = "example.com:42217";
+$config['distributed_billing']               = true;
 ```
+
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set distributed_poller_memcached_host "example.com"
+    lnms config:set distributed_poller_memcached_port 11211
+    lnms config:set distributed_poller true
+    ```
+
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "example.com:42217"
+    ```
 
 `/etc/cron.d/librenms`
 
@@ -304,11 +339,20 @@ Running an install of LibreNMS in /opt/librenms
 ```php
 $config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = '2,3';
-$config['distributed_poller_memcached_host'] = "example.com";
-$config['distributed_poller_memcached_port'] = 11211;
-$config['distributed_poller']                = true;
-$config['rrdcached']                         = "example.com:42217";
+$config['distributed_billing']               = true;
 ```
+
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set distributed_poller_memcached_host "example.com"
+    lnms config:set distributed_poller_memcached_port 11211
+    lnms config:set distributed_poller true
+    ```
+
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdcached "example.com:42217"
+    ```
 
 `/etc/cron.d/librenms`
 Runs discovery and polling for groups 2 and 3.
@@ -316,6 +360,7 @@ Runs discovery and polling for groups 2 and 3.
 ```conf
 33  */6 * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
 */5 *   * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
+*/5 *   * * *   librenms    /opt/librenms/poll-billing.php >> /dev/null 2>&1
 */5 *   * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 15  0   * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
 ```

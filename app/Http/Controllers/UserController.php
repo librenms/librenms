@@ -74,12 +74,13 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = (int) LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+        $tmp_user->can_modify_passwd = LegacyAuth::getType() == 'mysql' ? 1 : 0; // default to true mysql
 
         return view('user.create', [
             'user' => $tmp_user,
             'dashboard' => null,
             'dashboards' => Dashboard::allAvailable($tmp_user)->get(),
+            'timezone' => 'default',
         ]);
     }
 
@@ -91,15 +92,17 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request, FlasherInterface $flasher)
     {
-        $user = $request->only(['username', 'realname', 'email', 'descr', 'level', 'can_modify_passwd']);
+        $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
         $user['auth_type'] = LegacyAuth::getType();
         $user['can_modify_passwd'] = $request->get('can_modify_passwd'); // checkboxes are missing when unchecked
 
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
+        $user->setRoles($request->get('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
+        $this->updateTimezone($user, $request->get('timezone'));
 
         if ($user->save()) {
             $flasher->addSuccess(__('User :username created', ['username' => $user->username]));
@@ -143,6 +146,7 @@ class UserController extends Controller
             'user' => $user,
             'dashboard' => UserPref::getPref($user, 'dashboard'),
             'dashboards' => Dashboard::allAvailable($user)->get(),
+            'timezone' => UserPref::getPref($user, 'timezone') ?: 'default',
         ];
 
         if (Config::get('twofactor')) {
@@ -181,9 +185,18 @@ class UserController extends Controller
         }
 
         $user->fill($request->validated());
+        $user->setRoles($request->get('roles', []));
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             $flasher->addSuccess(__('Updated dashboard for :username', ['username' => $user->username]));
+        }
+
+        if ($request->has('timezone') && $this->updateTimezone($user, $request->get('timezone'))) {
+            if ($request->get('timezone') != 'default') {
+                $flasher->addSuccess(__('Updated timezone for :username', ['username' => $user->username]));
+            } else {
+                $flasher->addSuccess(__('Cleared timezone for :username', ['username' => $user->username]));
+            }
         }
 
         if ($user->save()) {
@@ -225,6 +238,35 @@ class UserController extends Controller
             $existing = UserPref::getPref($user, 'dashboard');
             if ($dashboard != $existing) {
                 UserPref::setPref($user, 'dashboard', $dashboard);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  User  $user
+     * @param  string  $timezone
+     * @return bool
+     */
+    protected function updateTimezone(User $user, $timezone)
+    {
+        $existing = UserPref::getPref($user, 'timezone');
+        if ($timezone != 'default') {
+            if (! in_array($timezone, timezone_identifiers_list())) {
+                return false;
+            }
+
+            if ($timezone != $existing) {
+                UserPref::setPref($user, 'timezone', $timezone);
+
+                return true;
+            }
+        } else {
+            if ($existing != '') {
+                UserPref::forgetPref($user, 'timezone');
 
                 return true;
             }

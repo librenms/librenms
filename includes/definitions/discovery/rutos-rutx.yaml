@@ -4,6 +4,8 @@ modules:
         hardware: TELTONIKA-RUTX-MIB::routerName.0
         serial: TELTONIKA-RUTX-MIB::serial.0
         version: TELTONIKA-RUTX-MIB::fwVersion.0
+        lat: TELTONIKA-RUTX-MIB::latitude.0
+        long: TELTONIKA-RUTX-MIB::longtitude.0
     sensors:
         pre-cache:
             data:

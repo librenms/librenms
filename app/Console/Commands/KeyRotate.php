@@ -97,8 +97,8 @@ class KeyRotate extends LnmsCommand
         if ($this->option('generate-new-key')) {
             $old = $new; // use key in env as existing key
             $new = 'base64:' . base64_encode(
-                    Encrypter::generateKey($this->laravel['config']['app.cipher'])
-                );
+                Encrypter::generateKey($this->laravel['config']['app.cipher'])
+            );
         }
 
         $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));

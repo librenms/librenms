@@ -17,7 +17,7 @@
  */
 
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
@@ -72,9 +72,9 @@ function external_exec($command)
 
     if ($proc->getExitCode()) {
         if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
         } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Severity::Error);
         }
         d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());
@@ -820,7 +820,7 @@ function string_to_float($value)
  */
 function uw_to_dbm($value)
 {
-    return $value == 0 ? $value : 10 * log10($value / 1000);
+    return $value == 0 ? -60 : 10 * log10($value / 1000);
 }
 
 /**
@@ -829,11 +829,11 @@ function uw_to_dbm($value)
  */
 function mw_to_dbm($value)
 {
-    return $value == 0 ? $value : 10 * log10($value);
+    return $value == 0 ? -60 : 10 * log10($value);
 }
 
 /**
- * @param $value
+ * @param  $value
  * @param  null  $default
  * @param  int  $min
  * @return null

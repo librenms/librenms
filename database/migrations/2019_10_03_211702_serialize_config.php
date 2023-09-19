@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class SerializeConfig extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::table('config')->get()->each(function ($config) {
             $value = $config->config_value;
@@ -33,7 +33,7 @@ class SerializeConfig extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::table('config')->get()->each(function ($config) {
             $value = json_decode($config->config_value);
@@ -44,4 +44,4 @@ class SerializeConfig extends Migration
                 ->update(['config_value' => $value]);
         });
     }
-}
+};

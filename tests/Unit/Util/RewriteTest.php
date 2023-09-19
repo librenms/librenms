@@ -9,6 +9,7 @@ class RewriteTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider validMacProvider
      */
     public function testMacToHex(string $from, string $to): void

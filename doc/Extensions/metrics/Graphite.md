@@ -13,12 +13,13 @@ continue to function as normal.
 
 ## Configuration
 
-```php
-$config['graphite']['enable'] = true;
-$config['graphite']['host'] = 'your.graphite.server';
-$config['graphite']['port'] = 2003; // this defaults to 2003 and is usually not needed
-$config['graphite']['prefix'] = 'your.metric.prefix';
-```
+!!! setting "poller/graphite"
+    ```bash
+    lnms config:set graphite.enable true
+    lnms config:set graphite.host 'your.graphite.server'
+    lnms config:set graphite.port 2003
+    lnms config:set graphite.prefix 'your.metric.prefix'
+    ```
 
 Your metric path can be prefixed if required, otherwise the metric
 path for Graphite will be in the form of

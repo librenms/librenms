@@ -23,7 +23,6 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
-use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 

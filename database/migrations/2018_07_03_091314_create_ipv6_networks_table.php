@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateIpv6NetworksTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('ipv6_networks', function (Blueprint $table) {
             $table->increments('ipv6_network_id');
@@ -24,8 +24,8 @@ class CreateIpv6NetworksTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('ipv6_networks');
     }
-}
+};

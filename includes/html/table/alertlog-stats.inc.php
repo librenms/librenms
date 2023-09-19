@@ -55,7 +55,7 @@ if (empty($total)) {
 $sql .= ' GROUP BY D.device_id, R.name ORDER BY COUNT(*) DESC';
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 

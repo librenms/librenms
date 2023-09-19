@@ -127,12 +127,9 @@ class Sensor implements DiscoveryModule, PollerModule
         // validity not checked yet
         if (is_null($this->current)) {
             $sensor['sensor_oids'] = $this->oids;
-            $sensors = [$sensor];
 
-            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), $sensors);
-            $data = static::processSensorData($sensors, $prefetch);
-
-            $this->current = current($data);
+            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), [$sensor]);
+            $this->current = static::processSensorValue($prefetch, $this->aggregator, $this->divisor, $this->multiplier);
             $this->valid = is_numeric($this->current);
         }
 
@@ -398,36 +395,39 @@ class Sensor implements DiscoveryModule, PollerModule
             $requested_oids = array_flip($sensor['sensor_oids']);
             $data = array_intersect_key($prefetch, $requested_oids);
 
-            // if no data set null and continue to the next sensor
-            if (empty($data)) {
-                $data[$sensor['sensor_id']] = null;
-                continue;
-            }
-
-            if (count($data) > 1) {
-                // aggregate data
-                if ($sensor['sensor_aggregator'] == 'avg') {
-                    $sensor_value = array_sum($data) / count($data);
-                } else {
-                    // sum
-                    $sensor_value = array_sum($data);
-                }
-            } else {
-                $sensor_value = current($data);
-            }
-
-            if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-                $sensor_value = (cast_number($sensor_value) / $sensor['sensor_divisor']);
-            }
-
-            if ($sensor['sensor_multiplier']) {
-                $sensor_value = (cast_number($sensor_value) * $sensor['sensor_multiplier']);
-            }
-
-            $sensor_data[$sensor['sensor_id']] = $sensor_value;
+            $sensor_data[$sensor['sensor_id']] = self::processSensorValue($data, $sensor['sensor_aggregator'], $sensor['sensor_divisor'], $sensor['sensor_multiplier']);
         }
 
         return $sensor_data;
+    }
+
+    protected static function processSensorValue(array $data, string $aggregator, int $divisor, int $multiplier): mixed
+    {
+        if (empty($data)) {
+            return null;
+        }
+
+        if (count($data) > 1) {
+            // aggregate data
+            if ($aggregator == 'avg') {
+                $sensor_value = array_sum($data) / count($data);
+            } else {
+                // sum
+                $sensor_value = array_sum($data);
+            }
+        } else {
+            $sensor_value = current($data);
+        }
+
+        if ($divisor && $sensor_value !== 0) {
+            $sensor_value = (cast_number($sensor_value) / $divisor);
+        }
+
+        if ($multiplier) {
+            $sensor_value = (cast_number($sensor_value) * $multiplier);
+        }
+
+        return $sensor_value;
     }
 
     /**

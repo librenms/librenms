@@ -168,7 +168,7 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
 
     if ($_GET['debug'] == 1) {
         echo '<pre>$map</pre>';
-        exit();
+        exit;
     }
 
     switch ($_GET['format']) {
@@ -179,7 +179,7 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
             break;
         case 'dot':
             echo $map;
-            exit();
+            exit;
         default:
             $_GET['format'] = 'png:gd';
     }

@@ -189,8 +189,8 @@ if ($vars['subview'] == 'top10') {
           <td class=list-large width=200>' . \LibreNMS\Util\Rewrite::readableMac($acc['mac']) . '</td>
           <td class=list-large width=200>' . $addy['ipv4_address'] . '</td>
           <td class=list-large width=500>' . $name . ' ' . $arp_name . '</td>
-          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi(($acc['cipMacHCSwitchedBytes_input_rate'] / 8), 2, 3, 'bps') . '</td>
-          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi(($acc['cipMacHCSwitchedBytes_output_rate'] / 8), 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['cipMacHCSwitchedBytes_input_rate'] / 8, 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['cipMacHCSwitchedBytes_output_rate'] / 8, 2, 3, 'bps') . '</td>
         </tr>
       </table>
     ';

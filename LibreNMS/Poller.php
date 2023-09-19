@@ -31,10 +31,10 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
@@ -146,7 +146,7 @@ class Poller
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
                 \App\Models\Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
-                    ' minutes!  This will cause gaps in graphs.', $this->device, 'system', 5);
+                    ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
             }
         }
 
@@ -188,7 +188,7 @@ class Poller
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
                     report($e);
                 }
 
@@ -264,8 +264,10 @@ class Poller
         } elseif ($this->device_spec == 'all') {
             return $query;
         } elseif ($this->device_spec == 'even') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 0);
         } elseif ($this->device_spec == 'odd') {
+            /** @phpstan-ignore-next-line */
             return $query->where(DB::raw('device_id % 2'), 1);
         } elseif (is_numeric($this->device_spec)) {
             return $query->where('device_id', $this->device_spec);

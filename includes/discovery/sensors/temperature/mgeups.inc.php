@@ -49,5 +49,5 @@ foreach (array_keys($mge_env_data) as $index) {
 
     d_echo("low_limit : $low_limit\nlow_warn_limit : $low_warn_limit\nhigh_warn_limit : $high_warn_limit\nhigh_limit : $high_limit\n");
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '10', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, ($current / 10));
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '10', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current / 10);
 }

@@ -1,0 +1,152 @@
+CORERO-CMS-SYSTEM-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,  OBJECT-TYPE                       FROM SNMPv2-SMI
+    coreroCMSMIBObjects                                 FROM CORERO-CMS-MIB;
+
+systemStatus MODULE-IDENTITY
+    LAST-UPDATED "202001230000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+        "info@corero.com"
+    DESCRIPTION
+        "Represents current CMS status"
+    REVISION      "202001230000Z"
+    DESCRIPTION
+        "Initial revision"
+    ::= { coreroCMSMIBObjects 6 }
+
+protection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    warning(1),
+                    error(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current protection status"
+    ::= { systemStatus 1 }
+
+device OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    warning(1),
+                    error(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current device status"
+    ::= { systemStatus 2 }
+
+network OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    warning(1),
+                    error(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current network status"
+    ::= { systemStatus 3 }
+
+issueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IssueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of issues"
+    ::= { systemStatus 4 }
+
+analytics OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    warning(1),
+                    error(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current analytics status"
+    ::= { systemStatus 5 }
+
+issueEntry OBJECT-TYPE
+    SYNTAX      IssueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry within the issue table which represents a single issue"
+    INDEX { issueIndex }
+    ::= { issueTable 1 }
+
+
+IssueEntry ::= SEQUENCE {
+    issueIndex          INTEGER (1..2147483647),
+    issueType           INTEGER,
+    issueDevice         OCTET STRING,
+    issueSegment        OCTET STRING,
+    issueDescription    OCTET STRING,
+    issueSeverity       INTEGER
+}
+
+issueIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The issue index"
+    ::= { issueEntry 1 }
+
+
+issueType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    protection(0),
+                    devices(1),
+                    network(2),
+                    analytics(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The issue type"
+    ::= { issueEntry 2 }
+
+issueDevice OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device for which issue was created"
+    ::= { issueEntry 3 }
+
+issueSegment OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The segment for which issue was created"
+    ::= { issueEntry 4 }
+
+issueDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The issue description"
+    ::= { issueEntry 5 }
+
+issueSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    warning(1),
+                    error(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The issue severity"
+    ::= { issueEntry 6 }
+
+END

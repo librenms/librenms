@@ -51,7 +51,7 @@ $pagetitle[] = 'Oxidized';
                         <br/>
                         <div class="input-group">
                             <input type="text" class="form-control" id="input-parameter"
-                                   placeholder="service password-encryption etc.">
+                                   placeholder="service password-encryption etc. (Regex)">
                             <span class="input-group-btn">
                                 <button type="submit" name="btn-search" id="btn-search" class="btn btn-primary">Search</button>
                             </span>

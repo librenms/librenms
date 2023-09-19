@@ -11,7 +11,7 @@ foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc
 
 // Generate a list of enabled apps with a value of whether they are discovered or not
 $enabled_apps = array_reduce(dbFetchRows(
-    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? ORDER BY `app_type`',
+    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? AND deleted_at IS NULL ORDER BY `app_type`',
     [$device['device_id']]
 ), function ($result, $app) {
     $result[$app['app_type']] = $app['discovered'];

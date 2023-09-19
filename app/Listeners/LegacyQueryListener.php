@@ -22,7 +22,7 @@ class LegacyQueryListener
      * @param  \Illuminate\Database\Events\StatementPrepared  $event
      * @return void
      */
-    public function handle(StatementPrepared $event)
+    public function handle(StatementPrepared $event): void
     {
         global $PDO_FETCH_ASSOC;
 

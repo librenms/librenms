@@ -3,7 +3,7 @@
 use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
@@ -14,6 +14,8 @@ use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\UserFuncHelper;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -33,7 +35,7 @@ function bulk_sensor_snmpget($device, $sensors)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @param  string  $type  type/class of sensor
  * @return array
  */
@@ -83,13 +85,6 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if (! is_numeric($sensor_value)) {
-                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
-                if (! empty($temp_response[0])) {
-                    $sensor_value = $temp_response[0];
-                }
-            }
-
             if ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
@@ -136,35 +131,48 @@ function poll_sensor($device, $class)
 }//end poll_sensor()
 
 /**
- * @param $device
- * @param $all_sensors
+ * @param  $device
+ * @param  $all_sensors
  */
 function record_sensor_data($device, $all_sensors)
 {
     $supported_sensors = [
-        'current'     => 'A',
-        'frequency'   => 'Hz',
-        'runtime'     => 'Min',
-        'humidity'    => '%',
-        'fanspeed'    => 'rpm',
-        'power'       => 'W',
-        'voltage'     => 'V',
-        'temperature' => 'C',
-        'dbm'         => 'dBm',
-        'charge'      => '%',
-        'load'        => '%',
-        'state'       => '#',
-        'signal'      => 'dBm',
-        'airflow'     => 'cfm',
-        'snr'         => 'SNR',
-        'pressure'    => 'kPa',
-        'cooling'     => 'W',
+        'airflow'        => 'cfm',
+        'ber'            => '',
+        'bitrate'        => 'bps',
+        'charge'         => '%',
+        'chromatic_dispersion' => 'ps/nm',
+        'cooling'        => 'W',
+        'count'          => '',
+        'current'        => 'A',
+        'delay'          => 's',
+        'dbm'            => 'dBm',
+        'eer'            => 'eer',
+        'fanspeed'       => 'rpm',
+        'frequency'      => 'Hz',
+        'humidity'       => '%',
+        'load'           => '%',
+        'loss'           => '%',
+        'percent'        => '%',
+        'power'          => 'W',
+        'power_consumed' => 'kWh',
+        'power_factor'   => '',
+        'pressure'       => 'kPa',
+        'quality_factor' => 'dB',
+        'runtime'        => 'Min',
+        'signal'         => 'dBm',
+        'snr'            => 'SNR',
+        'state'          => '#',
+        'temperature'    => 'C',
+        'tv_signal'      => 'dBmV',
+        'voltage'        => 'V',
+        'waterflow'      => 'l/m',
     ];
 
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
         $unit = $supported_sensors[$sensor['sensor_class']];
-        $sensor_value = cast_number($sensor['new_value']);
+        $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
@@ -180,8 +188,12 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
-            $sensor_value = $sensor['user_func']($sensor_value);
+        if (isset($sensor['user_func'])) {
+            if (is_callable($sensor['user_func'])) {
+                $sensor_value = $sensor['user_func']($sensor_value);
+            } else {
+                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+            }
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
@@ -341,8 +353,13 @@ function poll_device($device, $force_module = false)
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Severity::Error);
                     report($e);
+
+                    // Re-throw exception if we're in CI
+                    if (getenv('CI') == true) {
+                        throw $e;
+                    }
                 }
 
                 $module_time = microtime(true) - $module_start;
@@ -489,23 +506,23 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         switch ($app->app_state) {
             case 'OK':
-                $severity = Alert::OK;
+                $severity = Severity::Ok;
                 $event_msg = 'changed to OK';
                 break;
             case 'ERROR':
-                $severity = Alert::ERROR;
+                $severity = Severity::Error;
                 $event_msg = 'ends with ERROR';
                 break;
             case 'LEGACY':
-                $severity = Alert::WARNING;
+                $severity = Severity::Warning;
                 $event_msg = 'Client Agent is deprecated';
                 break;
             case 'UNSUPPORTED':
-                $severity = Alert::ERROR;
+                $severity = Severity::Error;
                 $event_msg = 'Client Agent Version is not supported';
                 break;
             default:
-                $severity = Alert::UNKNOWN;
+                $severity = Severity::Unknown;
                 $event_msg = 'has UNKNOWN state';
                 break;
         }

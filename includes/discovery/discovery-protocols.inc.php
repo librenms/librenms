@@ -41,48 +41,51 @@ if ($device['os'] == 'ironware') {
     echo PHP_EOL;
 }//end if
 
-echo ' CISCO-CDP-MIB: ';
-$cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
+if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
+    echo ' CISCO-CDP-MIB: ';
+    $cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
 
-foreach ($cdp_array as $key => $cdp_if_array) {
-    $interface = get_port_by_ifIndex($device['device_id'], $key);
+    foreach ($cdp_array as $key => $cdp_if_array) {
+        $interface = get_port_by_ifIndex($device['device_id'], $key);
 
-    foreach ($cdp_if_array as $entry_key => $cdp) {
-        d_echo($cdp);
+        foreach ($cdp_if_array as $entry_key => $cdp) {
+            d_echo($cdp);
 
-        $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
-        $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
+            $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
+            $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
 
-        if (! $remote_device_id &&
-            ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
-            Config::get('autodiscovery.xdp') === true
-        ) {
-            $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
+            if (
+                ! $remote_device_id &&
+                ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
+                Config::get('autodiscovery.xdp') === true
+            ) {
+                $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
-            if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
-                $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
+                if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
+                    $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
+                }
             }
-        }
 
-        if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
-            $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
-            discover_link(
-                $interface['port_id'],
-                'cdp',
-                $remote_port_id,
-                $cdp['cdpCacheDeviceId'],
-                $cdp['cdpCacheDevicePort'],
-                $cdp['cdpCachePlatform'],
-                $cdp['cdpCacheVersion'],
-                $device['device_id'],
-                $remote_device_id
-            );
-        }
-    }//end foreach
-}//end foreach
-echo PHP_EOL;
+            if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
+                $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
+                discover_link(
+                    $interface['port_id'],
+                    'cdp',
+                    $remote_port_id,
+                    $cdp['cdpCacheDeviceId'],
+                    $cdp['cdpCacheDevicePort'],
+                    $cdp['cdpCachePlatform'],
+                    $cdp['cdpCacheVersion'],
+                    $device['device_id'],
+                    $remote_device_id
+                );
+            }
+        } //end foreach
+    } //end foreach
+    echo PHP_EOL;
+}//end if
 
-if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
+if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', '<')) {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (! empty($lldp_array)) {
@@ -128,7 +131,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }//end foreach
     }
     echo PHP_EOL;
-} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom')) {
+} elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom') {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -161,7 +164,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'timos')) {
+} elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'tmnxLldpRemoteSystemsData', 'TIMETRA-LLDP-MIB');
     foreach ($lldp_array as $key => $lldp) {
@@ -195,7 +198,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'jetstream')) {
+} elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
     $lldp_array = snmpwalk_group($device, 'lldpNeighborInfoEntry', 'TPLINK-LLDPINFO-MIB');
@@ -259,7 +262,7 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
                 }
             }
         }
-        if (($device['os'] == 'aos7')) {
+        if ($device['os'] == 'aos7') {
             $lldp_local = snmpwalk_cache_oid($device, 'lldpLocPortEntry', [], 'LLDP-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
         } else {
@@ -270,14 +273,14 @@ if (($device['os'] == 'routeros') && ($device['version'] <= '7.6')) {
 
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
                 $ifIndex = $entry_key;
             }
-            if (($device['os'] == 'aos7')) {
+            if ($device['os'] == 'aos7') {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);

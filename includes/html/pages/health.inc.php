@@ -66,10 +66,7 @@ $type_text = [
 
 $active_metric = basename($vars['metric'] ?? 'processor');
 
-if (! $vars['view']) {
-    $vars['view'] = 'detail';
-}
-
+$vars['view'] = $vars['view'] ?? 'detail';
 $link_array = ['page' => 'health'];
 
 $navbar = '<span style="font-weight: bold;">Health</span> &#187; ';
@@ -88,6 +85,7 @@ foreach ($datas as $texttype) {
 }
 unset($sep);
 
+$displayoptions = '';
 if ($vars['view'] == 'graphs') {
     $displayoptions = '<span class="pagemenu-selected">';
 }

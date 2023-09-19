@@ -25,18 +25,16 @@
 
 namespace App\Logging\Reporting\Middleware;
 
-use Facade\FlareClient\Report;
+use Spatie\FlareClient\Report;
 
-class CleanContext
+class CleanContext implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to remove sensitive data from the context.
      *
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    public function handle(Report $report, \Closure $next)
     {
         try {
             $report->setApplicationPath('');

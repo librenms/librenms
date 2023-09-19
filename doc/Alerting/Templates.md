@@ -68,7 +68,7 @@ been up for 30344 seconds`.
   - poller_name - name of poller (for distributed setups)
   - If `$config['debug']['run_trace] = true;` is set then this will contain:
    - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
-   - traceroute_output (if the traceroute fails this will contain why): `$alert->debug['output']`
+   - traceroute_output (if the traceroute fails this will contain why): `$alert->debug['traceroute_output']`
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`

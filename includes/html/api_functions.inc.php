@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
@@ -34,6 +35,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Billing;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -107,6 +109,7 @@ function api_get_graph(Request $request, array $additional = [])
             'noagg',
             'inverse',
             'previous',
+            'duration',
         ]);
 
         $graph = Graph::get([
@@ -247,6 +250,24 @@ function get_graph_generic_by_hostname(Request $request)
     });
 }
 
+function get_graph_by_service(Request $request)
+{
+    $vars = [];
+    $vars['id'] = $request->route('id');
+    $vars['type'] = 'service_graph';
+    $vars['ds'] = $request->route('datasource');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+    $vars['device'] = $device['device_id'];
+
+    return check_device_permission($device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
+    });
+}
+
 function list_locations()
 {
     $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');
@@ -350,6 +371,9 @@ function list_devices(Illuminate\Http\Request $request)
     } elseif ($type == 'type') {
         $sql = '`d`.`type`=?';
         $param[] = $query;
+    } elseif ($type == 'display') {
+        $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
@@ -1059,7 +1083,7 @@ function get_port_info(Illuminate\Http\Request $request)
  */
 function search_ports(Illuminate\Http\Request $request): JsonResponse
 {
-    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName']);
+    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName', 'ifAlias']);
     $field = $request->route('field');
     $search = $request->route('search');
 
@@ -1443,7 +1467,8 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
-    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . $hostname . '?format=json'), true);
+    $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
+    $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');
     } else {
@@ -1467,12 +1492,20 @@ function list_oxidized(Illuminate\Http\Request $request)
 
     /** @var Device $device */
     foreach ($devices as $device) {
+        $device['device_id'] = DeviceCache::getByHostname($device->hostname)->device_id;
         $output = [
             'hostname' => $device->hostname,
             'os' => $device->os,
             'ip' => $device->ip,
         ];
-
+        $custom_ssh_port = get_dev_attrib($device, 'override_device_ssh_port');
+        if (! empty($custom_ssh_port)) {
+            $output['ssh_port'] = $custom_ssh_port;
+        }
+        $custom_telnet_port = get_dev_attrib($device, 'override_device_telnet_port');
+        if (! empty($custom_telnet_port)) {
+            $output['telnet_port'] = $custom_telnet_port;
+        }
         // Pre-populate the group with the default
         if (Config::get('oxidized.group_support') === true && ! empty(Config::get('oxidized.default_group'))) {
             $output['group'] = Config::get('oxidized.default_group');
@@ -1578,15 +1611,15 @@ function list_bills(Illuminate\Http\Request $request)
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
-            $allowed = format_bytes_billing($bill['bill_quota']);
-            $used = format_bytes_billing($rate_data['total_data']);
+            $allowed = Billing::formatBytes($bill['bill_quota']);
+            $used = Billing::formatBytes($rate_data['total_data']);
             if ($bill['bill_quota'] > 0) {
                 $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
-            $overuse = (($overuse <= 0) ? '-' : format_bytes_billing($overuse));
+            $overuse = (($overuse <= 0) ? '-' : Billing::formatBytes($overuse));
         }
         $bill['allowed'] = $allowed;
         $bill['used'] = $used;
@@ -1630,9 +1663,9 @@ function get_bill_graphdata(Illuminate\Http\Request $request)
             $to = $request->get('to', time());
             $reducefactor = $request->get('reducefactor');
 
-            $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+            $graph_data = Billing::getBitsGraphData($bill_id, $from, $to, $reducefactor);
         } elseif ($graph_type == 'monthly') {
-            $graph_data = getHistoricTransferGraphData($bill_id);
+            $graph_data = Billing::getHistoricTransferGraphData($bill_id);
         }
 
         if (! isset($graph_data)) {
@@ -1699,11 +1732,11 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
             case 'bits':
                 $reducefactor = $request->get('reducefactor');
 
-                $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+                $graph_data = Billing::getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
                 break;
             case 'day':
             case 'hour':
-                $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+                $graph_data = Billing::getBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
                 break;
         }
 
@@ -2419,10 +2452,49 @@ function list_fdb(Illuminate\Http\Request $request)
            ->get();
 
     if ($fdb->isEmpty()) {
-        return api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb entry does not exist');
     }
 
     return api_success($fdb, 'ports_fdb');
+}
+
+function list_fdb_detail(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('mac'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => Rewrite::readableOUI($macAddress)];
+
+    $fdb = PortsFdb::hasAccess(Auth::user())
+           ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
+               return $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
+                      ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
+                      ->where('mac_address', $macAddress)
+                      ->orderBy('ports_fdb.updated_at', 'desc')
+                      ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
+           })
+           ->limit(1000)->get();
+
+    if (count($fdb) == 0) {
+        return api_error(404, 'Fdb entry does not exist');
+    }
+
+    foreach ($fdb as $i => $fdb_entry) {
+        if ($fdb_entry['updated_at']) {
+            $fdb[$i]['last_seen'] = $fdb_entry['updated_at']->diffForHumans();
+            $fdb[$i]['updated_at'] = $fdb_entry['updated_at']->toDateTimeString();
+        }
+    }
+
+    return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
 function list_sensors()
@@ -2838,6 +2910,20 @@ function edit_location(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to update location');
 }
 
+function get_location(Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to get');
+    }
+    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    if (empty($data)) {
+        return api_error(404, 'Location does not exist');
+    }
+
+    return api_success($data, 'get_location');
+}
+
 function get_location_id_by_name($location)
 {
     return dbFetchCell('SELECT id FROM locations WHERE location = ?', $location);
@@ -2918,6 +3004,26 @@ function edit_service_for_host(Illuminate\Http\Request $request)
     }
 
     return api_error(500, "Failed to update the service with id $service_id");
+}
+
+/**
+ * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
+ */
+function post_syslogsink(Illuminate\Http\Request $request)
+{
+    $json = $request->json()->all();
+
+    if (is_null($json)) {
+        return api_success_noresult(400, 'Not valid json');
+    }
+
+    $logs = array_is_list($json) ? $json : [$json];
+
+    foreach ($logs as $entry) {
+        process_syslog($entry, 1);
+    }
+
+    return api_success_noresult(200, 'Syslog received: ' . count($logs));
 }
 
 /**

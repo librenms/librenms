@@ -123,7 +123,7 @@ class SchemaTest extends TestCase
         return $schema;
     }
 
-    public function testTableRelationships()
+    public function testTableRelationships(): void
     {
         // mock getSchema
         $schema = $this->getSchemaMock();
@@ -143,7 +143,7 @@ class SchemaTest extends TestCase
         $this->assertEquals($expected, $schema->getTableRelationships());
     }
 
-    public function testFindRelationshipPath()
+    public function testFindRelationshipPath(): void
     {
         $schema = $this->getSchemaMock();
 

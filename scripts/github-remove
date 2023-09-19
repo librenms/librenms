@@ -33,7 +33,7 @@ args = parser.parse_args()
 if args.discard:
     if confirm("Are you sure you want to delete all modified and untracked files?"):
         dirs = ["app/", "bootstrap/", "contrib/", "database/", "doc/", "html/", "includes/", "LibreNMS/",
-                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
+                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "tests/"]
         gitignores = ['.gitignore',
                       'bootstrap/cache/.gitignore',
                       'logs/.gitignore',

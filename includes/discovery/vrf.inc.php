@@ -67,7 +67,7 @@ if (Config::get('enable_vrfs')) {
             $t = explode(' ', $port);
             $dotpos = strrpos($t[0], '.');
             $vrf_oid = substr($t[0], 0, $dotpos);
-            $port_id = substr($t[0], ($dotpos + 1));
+            $port_id = substr($t[0], $dotpos + 1);
 
             if (empty($port_table[$vrf_oid])) {
                 $port_table[$vrf_oid][0] = $port_id;

@@ -57,6 +57,7 @@ This means you can use:
 - `#` Can be used for main headings which translates to a `<h1>` tag,
   increasing the `#`'s will increase the hX tags.
 - `###` Can be used for sub-headings which will appear in the TOC to the left.
+- Settings should be prefixed with `!!! setting "<webui setting path>"`
 
 [Markdown CheatSheet Link](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 
@@ -68,7 +69,7 @@ This is achieved with `mkdocs`, a python package.
 1. Install the required packages.
 
 ```
-pip install mkdocs mkdocs-exclude mkdocs-material mkdocs-macros-plugin
+pip install mkdocs mkdocs-exclude mkdocs-material mkdocs-macros-plugin mkdocs-minify-plugin mkdocs-redirects
 ```
 If you encounter permissions issues, these might be reoslved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`

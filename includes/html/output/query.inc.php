@@ -29,7 +29,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     echo 'Insufficient Privileges';
-    exit();
+    exit;
 }
 
 $hostname = escapeshellcmd($_REQUEST['hostname']);
@@ -99,7 +99,7 @@ switch ($type) {
         break;
     default:
         echo 'You must specify a valid type';
-        exit();
+        exit;
 }
 
 // ---- Output ----

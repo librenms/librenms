@@ -24,7 +24,7 @@
  */
 if (! Auth::user()->hasGlobalAdmin()) {
     echo 'Insufficient Privileges';
-    exit();
+    exit;
 }
 
 $hostname = escapeshellcmd($_REQUEST['hostname']);

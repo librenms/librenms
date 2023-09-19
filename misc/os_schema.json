@@ -391,7 +391,8 @@
             "type": "boolean"
         },
         "snmp_max_oid": {
-            "type": "string"
+            "type": "integer",
+            "minimum": 1
         },
         "ifXmcbc": {
             "type": "boolean"

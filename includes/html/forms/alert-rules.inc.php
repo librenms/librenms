@@ -58,7 +58,7 @@ $mute = isset($_POST['mute']) ? $_POST['mute'] : null;
 $invert = isset($_POST['invert']) ? $_POST['invert'] : null;
 $name = strip_tags($_POST['name']);
 $proc = $_POST['proc'];
-$recovery = ($vars['recovery']);
+$recovery = $vars['recovery'];
 $invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
 $severity = $_POST['severity'];
 

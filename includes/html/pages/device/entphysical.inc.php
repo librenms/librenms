@@ -133,7 +133,7 @@ function printEntPhysical($device, $ent, $level, $class)
         $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
         if ($count) {
             echo '<ul>';
-            printEntPhysical($device, $ent['entPhysicalIndex'], ($level + 1), 'liClosed');
+            printEntPhysical($device, $ent['entPhysicalIndex'], $level + 1, 'liClosed');
             echo '</ul>';
         }
 

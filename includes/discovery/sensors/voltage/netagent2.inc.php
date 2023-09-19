@@ -30,38 +30,38 @@
 
 // Config
     // RRD graph color start value
-    $index = 0; // Text color number to start increasing +1
+$index = 0; // Text color number to start increasing +1
 
     // Voltage levels - EU and UK 230 volts +10% - 6% (ie. between 216.2 volts and 253 volts)
-    $limit = 270; // Maximum graph level
-    $warnlimit = 253; // Warning limit (High)
-    $lowlimit = 210;     // Minimum graph level
-    $lowwarnlimit = 216;     // Warning limit (Low)
-    $divisor1phase = 10;      // Divisor to set sensor input value (eg. value 2324/10=232,4 Volts)
-    $divisor3phase = 10;       // Divisor to set sensor input value (eg. value 22/1=22 Volts)
+$limit = 270; // Maximum graph level
+$warnlimit = 253; // Warning limit (High)
+$lowlimit = 210;     // Minimum graph level
+$lowwarnlimit = 216;     // Warning limit (Low)
+$divisor1phase = 10;      // Divisor to set sensor input value (eg. value 2324/10=232,4 Volts)
+$divisor3phase = 10;       // Divisor to set sensor input value (eg. value 22/1=22 Volts)
 
     // UPS single-phase battery system values
-    $bat_1phase_limit = 30; // Remember to check correct values
-    $bat_1phase_warnlimit = 28;
-    $bat_1phase_lowlimit = 10;
-    $bat_1phase_lowwarnlimit = 18;
-    $bat_1phase_divisor = 10;
+$bat_1phase_limit = 30; // Remember to check correct values
+$bat_1phase_warnlimit = 28;
+$bat_1phase_lowlimit = 10;
+$bat_1phase_lowwarnlimit = 18;
+$bat_1phase_divisor = 10;
 
     // UPS 3 phase battery system values
-    $bat_3phase_limit = 270; // Remember to check correct values
-    $bat_3phase_warnlimit = 270;
-    $bat_3phase_lowlimit = 210;
-    $bat_3phase_lowwarnlimit = 215;
-    $bat_3phase_divisor = 10;
+$bat_3phase_limit = 270; // Remember to check correct values
+$bat_3phase_warnlimit = 270;
+$bat_3phase_lowlimit = 210;
+$bat_3phase_lowwarnlimit = 215;
+$bat_3phase_divisor = 10;
 
 // Detect type of UPS (Signle-Phase/3 Phase)
 // Number of input lines
-    $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
-    $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
+$upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
+$in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
-    // Number of output lines
-    $upsOutputNumLines_oid = '.1.3.6.1.2.1.33.1.4.3.0';
-    $out_phaseNum = snmp_get($device, $upsOutputNumLines_oid, '-Oqv');
+// Number of output lines
+$upsOutputNumLines_oid = '.1.3.6.1.2.1.33.1.4.3.0';
+$out_phaseNum = snmp_get($device, $upsOutputNumLines_oid, '-Oqv');
 
 // INPUT single-phase system
 if ($in_phaseNum == '1') {

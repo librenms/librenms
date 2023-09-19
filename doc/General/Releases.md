@@ -19,8 +19,8 @@ secondary testers to the automation and manually testing that is done
 during the merge stages.
 
 You can configure your install (this is the default) to use this
-branch by setting `$config['update_channel'] = 'master';` in
-`config.php` and ensuring you switch to the master branch with:
+branch by setting `lnms config:set update_channel master` 
+and ensuring you switch to the master branch with:
 
 `cd /opt/librenms && git checkout master`
 
@@ -35,7 +35,7 @@ The changelog is also updated and will reference the release number
 and date so you can see what changes have been made since the last release.
 
 To switch to using stable branches you can set
-`$config['update_channel'] = 'release';` in config.php and then switch
+`lnms config:set update_channel release` and then switch
 to the latest release branch with:
 
 `cd /opt/librenms && git fetch --tags && git checkout $(git describe

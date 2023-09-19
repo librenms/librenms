@@ -114,7 +114,7 @@ if (isset($vars['process'])) {
     if (isset($vars['lastN']) &&
          is_numeric($vars['lastN']) &&
          ($vars['lastN'] <= \LibreNMS\Config::get('nfsen_last_max'))
-        ) {
+    ) {
         $lastN = $vars['lastN'];
     }
 
@@ -123,7 +123,7 @@ if (isset($vars['process'])) {
     if (isset($vars['topN']) &&
          is_numeric($vars['topN']) &&
          ($vars['topN'] <= \LibreNMS\Config::get('nfsen_top_max'))
-        ) {
+    ) {
         $topN = $vars['topN'];
     }
 

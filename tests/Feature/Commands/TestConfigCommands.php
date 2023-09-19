@@ -42,8 +42,8 @@ class TestConfigCommands extends InMemoryDbTestCase
 
         // set inside
         $this->assertCliGets('auth_ldap_groups.somegroup', null);
-        $this->artisan('config:set', ['setting' => 'auth_ldap_groups.somegroup', 'value' => '{"level": 3}'])->assertExitCode(0);
-        $this->assertCliGets('auth_ldap_groups.somegroup', ['level' => 3]);
+        $this->artisan('config:set', ['setting' => 'auth_ldap_groups.somegroup', 'value' => '{"roles": ["banana"]}'])->assertExitCode(0);
+        $this->assertCliGets('auth_ldap_groups.somegroup', ['roles' => ['banana']]);
         $this->artisan('config:set', ['setting' => 'auth_ldap_groups.somegroup'])
             ->expectsConfirmation(trans('commands.config:set.forget_from', ['path' => 'somegroup', 'parent' => 'auth_ldap_groups']), 'yes')
             ->assertExitCode(0);

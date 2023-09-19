@@ -381,7 +381,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
 }//end snmp_getnext_multi()
 
 /**
- * @param $device
+ * @param  $device
  * @return bool
  */
 function snmp_check($device)
@@ -535,7 +535,7 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value);
-        [$index,] = explode('.', strrev($oid), 2);
+        [$index] = explode('.', strrev($oid), 2);
         if (! strstr($value, 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }
@@ -909,8 +909,8 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
  * (eg. PolicyIndex/ObjectsIndex in CISCO-CLASS-BASED-QOS-MIB).
  * The resulting array allows us to easily access the top level index we want and iterate over the data from there.
  *
- * @param $device
- * @param $OID
+ * @param  $device
+ * @param  $OID
  * @param  int  $indexes
  *
  * @internal param $string
@@ -963,7 +963,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
 }
 
 /**
- * @param $device
+ * @param  $device
  * @return bool
  */
 function get_device_max_repeaters($device)

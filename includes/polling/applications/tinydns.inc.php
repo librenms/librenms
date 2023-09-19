@@ -56,7 +56,7 @@ if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {
     [
         $a, $ns, $cname, $soa, $ptr, $hinfo, $mx, $txt, $rp, $sig, $key, $aaaa, $axfr, $any,
         $total, $other, $notauth, $notimpl, $badclass, $noquery
-        ] = explode(':', $agent_data['app'][$name]);
+    ] = explode(':', $agent_data['app'][$name]);
 
     $fields = [
         'a'        => $a,

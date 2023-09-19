@@ -9,7 +9,7 @@ modules:
                     oid: dcpInterfaceTable
                     num_oid: '.1.3.6.1.4.1.30826.2.2.2.1.1.1.5.{{ $index }}'
                     value: dcpInterfaceStatus
-                    descr: '{{ $dcpInterfaceChannelId }}'
+                    descr: '{{ $dcpInterfaceName }}'
                     index: 'dcpInterfaceStatus.{{ $index }}'
                     state_name: InterfaceStatus
                     states:
@@ -31,18 +31,20 @@ modules:
             data:
                 -
                     oid: dcpInterfaceTable
-                    num_oid: '.1.3.6.1.4.1.30826.2.2.2.1.1.1.3.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.30826.2.2.1.1.1.1.3.{{ $index }}'
                     value: dcpInterfaceRxPower
                     divisor: 10
-                    descr: '{{ $dcpInterfaceChannelId }} - RX'
+                    descr: '{{ $dcpInterfaceName }} - RX'
                     index: 'dcpInterfaceRxPower.{{ $index }}'
+                    skip_values: -990
                 -
                     oid: dcpInterfaceTable
-                    num_oid: '.1.3.6.1.4.1.30826.2.2.2.1.1.1.4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.30826.2.2.1.1.1.1.4.{{ $index }}'
                     divisor: 10
                     value: dcpInterfaceTxPower
-                    descr: '{{ $dcpInterfaceChannelId }} - TX'
+                    descr: '{{ $dcpInterfaceName }} - TX'
                     index: 'dcpInterfaceTxPower.{{ $index }}'
+                    skip_values:  -990
                 -
                     oid: dcpLinkviewTable
                     num_oid: '.1.3.6.1.4.1.30826.2.2.3.1.1.1.14.{{ $index }}'

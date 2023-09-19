@@ -23,9 +23,10 @@ Collection](../Alerting/Rules.md#alert-rules-collection).
 
 2: Change the ping_rrd_step setting in config.php
 
-```
-$config['ping_rrd_step'] = 60;
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set ping_rrd_step 60
+    ```
 
 3: Update the rrd files to change the step (step is hardcoded at file
 creation in rrd files)
@@ -58,9 +59,10 @@ proceeding!
 
 1: Set ping_rrd_step
 
-```
-$config['ping_rrd_step'] = 30;
-```
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set ping_rrd_step 30
+    ```
 
 2: Update the rrd files
 
@@ -91,8 +93,9 @@ exception: retries is used instead of count.
 `ping.php` does not measure loss and avg response time, only up/down, so
 once a device responds it stops pinging it.
 
-```
-$config['fping_options']['retries'] = 2;
-$config['fping_options']['timeout'] = 500;
-$config['fping_options']['interval'] = 500;
-```
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set fping_options.retries 2
+    lnms config:set fping_options.timeout 500
+    lnms config:set fping_options.interval 500
+    ```

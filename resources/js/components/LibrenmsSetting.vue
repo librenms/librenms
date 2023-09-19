@@ -23,8 +23,8 @@
   -->
 
 <template>
-    <div :class="['form-group', 'has-feedback', setting.class, feedback]">
-        <label :for="setting.name" class="col-sm-5 control-label" v-tooltip="{ content: setting.name }">
+    <div :class="['form-group', 'row', 'has-feedback', setting.class, feedback]">
+        <label :for="setting.name" class="col-sm-5 col-md-3 col-form-label" v-tooltip="{ content: setting.name }">
             {{ getDescription() }}
             <span v-if="setting.units">({{ getUnits() }})</span>
         </label>
@@ -42,7 +42,7 @@
             ></component>
             <span class="form-control-feedback"></span>
         </div>
-        <div class="col-sm-2">
+        <div>
             <button :style="{'opacity': showResetToDefault()?1:0}" @click="resetToDefault" class="btn btn-default" :class="{'disable-events': ! showResetToDefault()}" type="button" v-tooltip="{ content: $t('Reset to default') }"><i class="fa fa-refresh"></i></button>
             <button :style="{'opacity': showUndo()?1:0}" @click="resetToInitial" class="btn btn-primary" :class="{'disable-events': ! showUndo()}" type="button" v-tooltip="{ content: $t('Undo') }"><i class="fa fa-undo"></i></button>
             <div v-if="hasHelp()" v-tooltip="{content: getHelp(), trigger: 'hover click'}" class="fa fa-fw fa-lg fa-question-circle"></div>

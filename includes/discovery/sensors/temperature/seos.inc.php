@@ -12,7 +12,7 @@ foreach (explode("\n", $oids) as $data) {
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 2)] . '.' . $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
         $oid = '.1.3.6.1.4.1.2352.2.4.1.4.1.3.' . $index;
         $temperature = snmp_get($device, $oid, '-Oqv');
         $descr = str_replace('"', '', $descr);
@@ -29,7 +29,7 @@ foreach (explode("\n", $oids) as $data) {
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 2)] . '.' . $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
         $oid = '.1.3.6.1.4.1.2352.2.4.1.6.1.3.' . $index;
         $temperature = snmp_get($device, $oid, '-Oqv');
         $descr = str_replace('"', '', $descr);

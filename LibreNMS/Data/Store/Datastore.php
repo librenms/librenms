@@ -155,7 +155,7 @@ class Datastore
     /**
      * Get the measurements for all datastores, keyed by datastore name
      *
-     * @return \Illuminate\Support\Collection<\App\Polling\Measure\MeasurementCollection>
+     * @return \Illuminate\Support\Collection
      */
     public function getStats(): Collection
     {

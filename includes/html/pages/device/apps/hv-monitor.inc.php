@@ -97,7 +97,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         '<b>MAC:</b> ' . $mac;
     if (isset($port) && isset($mac) && $mac != '') {
         echo ' (' .
-               generate_device_link([device_id=>$port->device_id]) .
+               generate_device_link(['device_id'=>$port->device_id]) .
                ', ' .
                generate_port_link([
                    'label' => $port->label,
@@ -169,7 +169,7 @@ if (! isset($vars['vmdisk']) and ! isset($vars['vmif'])) {
         if (isset($vars['vm']) && $app->data['hv'] == 'CBSD') {
             $graphs['hv-monitor_status-int'] = 'VM Status: 1=Running, 8=Shut Off, 9=Maintenace';
         }
-        $graphs['hv-monitor_memory'] = 'Memmory Usage';
+        $graphs['hv-monitor_memory'] = 'Memory Usage';
         $graphs['hv-monitor_pmem'] = 'Memory Percent';
         $graphs['hv-monitor_time'] = 'CPU Time';
         $graphs['hv-monitor_pcpu'] = 'CPU Percent';

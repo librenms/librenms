@@ -38,7 +38,7 @@ use RegexIterator;
  */
 class SVGTest extends TestCase
 {
-    public function testSVGContainsPNG()
+    public function testSVGContainsPNG(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);
@@ -50,7 +50,7 @@ class SVGTest extends TestCase
         }
     }
 
-    public function testSVGHasLengthWidth()
+    public function testSVGHasLengthWidth(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             if ($file == 'html/images/safari-pinned-tab.svg') {
@@ -67,7 +67,7 @@ class SVGTest extends TestCase
         }
     }
 
-    public function testSVGHasViewBox()
+    public function testSVGHasViewBox(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);

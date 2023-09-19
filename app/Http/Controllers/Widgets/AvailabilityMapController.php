@@ -95,7 +95,8 @@ class AvailabilityMapController extends WidgetController
         // process status
         $uptime_warn = (int) Config::get('uptime_warning', 86400);
         $check_maintenance = AlertSchedule::isActive()->exists(); // check if any maintenance schedule is active
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
+        // TODO: take a deeper look, why key ignored still has to exist
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'ignored-up' => 0, 'ignored-down' => 0, 'disabled' => 0];
         $data = [];
 
         foreach ($devices as $device) {
@@ -248,7 +249,11 @@ class AvailabilityMapController extends WidgetController
         }
 
         if ($device->ignore) {
-            return ['ignored', 'label-default'];
+            if (($device->status == 1) && ($device->uptime != 0)) {
+                return ['ignored-up', 'label-success'];
+            }
+
+            return ['ignored-down', 'label-default'];
         }
 
         if ($device->status == 1) {

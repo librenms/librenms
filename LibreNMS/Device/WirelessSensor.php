@@ -132,7 +132,7 @@ class WirelessSensor extends Sensor
      */
     public static function getTypes($valid = false, $device_id = null)
     {
-        // Add new types here translations/descriptions/units in resources/lang/<lang>/wireless.php
+        // Add new types here translations/descriptions/units in lang/<lang>/wireless.php
         // FIXME I'm really bad with icons, someone please help!
         static $types = [
             'ap-count' => [

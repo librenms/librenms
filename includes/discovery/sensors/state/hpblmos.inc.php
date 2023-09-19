@@ -13,7 +13,7 @@ foreach (explode("\n", $fans) as $fan) {
         [$oid, $presence] = explode(' ', $fan, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
-            $current_id = $split_oid[(count($split_oid) - 1)];
+            $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $fan_state_oid . $current_id;
             $descr = $fan_state_descr . $current_id;
             $state = snmp_get($device, $current_oid, '-Oqv');
@@ -45,7 +45,7 @@ foreach (explode("\n", $psus) as $psu) {
         [$oid, $presence] = explode(' ', $psu, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
-            $current_id = $split_oid[(count($split_oid) - 1)];
+            $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $psu_state_oid . $current_id;
             $descr = $psu_state_descr . $current_id;
             $state = snmp_get($device, $current_oid, '-Oqv');

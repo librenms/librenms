@@ -4,6 +4,7 @@ group: unix
 text: VMware ESXi
 icon: vmware
 mib_dir: vmware
+ifname: true
 ifXmcbc: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }

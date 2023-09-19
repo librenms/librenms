@@ -159,7 +159,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 
 // Monitor contact switches via the UIO ports.
 $apcContactData = snmpwalk_cache_oid($device, 'uioInputContact', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
-if ($apcContactData) {
+if ($apcContactData['uioInputContactStatusTableSize'] > 0) {
     // NMC2/NMC3/etc Universal Input Output
     foreach (array_keys($apcContactData) as $index) {
         // APC disabled (1), enabled (2)

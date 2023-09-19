@@ -130,7 +130,7 @@ class Iosxe extends Ciscowlc implements
 
         $uptime = SnmpQuery::walk('CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime')->values();
 
-        return $adjacencies->each(function (IsisAdjacency $adjacency) use ($states, $uptime) {
+        return $adjacencies->each(function ($adjacency) use ($states, $uptime) {
             $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });

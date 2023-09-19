@@ -32,7 +32,7 @@ use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
@@ -73,26 +73,17 @@ class NetSnmpQuery implements SnmpQueryInterface
             '*',
         ],
     ];
-    /**
-     * @var string
-     */
-    private $context = '';
+
     /**
      * @var string[]
      */
     private array $mibDirs = [];
-    /**
-     * @var array|string
-     */
-    private $options = [self::DEFAULT_FLAGS];
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $abort = false;
+    private string $context = '';
+    private array|string $options = [self::DEFAULT_FLAGS];
+    private Device $device;
+    private bool $abort = false;
+    // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -161,6 +152,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDirs[] = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Set MIBs to use for this query. Base mibs are included by default.
+     * They will be appended to existing mibs unless $append is set to false.
+     */
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
+    {
+        $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
         return $this;
     }
@@ -250,11 +252,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        if (empty($oid)) {
-            return new SnmpResponse('');
-        }
-
-        return $this->exec('snmpget', $this->parseOid($oid));
+        return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
@@ -278,14 +276,14 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        return $this->exec('snmpgetnext', $this->parseOid($oid));
+        return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
      * Translate an OID.
      * call numeric() on the query to output numeric OID
      */
-    public function translate(string $oid, ?string $mib = null): string
+    public function translate(string $oid): string
     {
         $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
 
@@ -303,10 +301,6 @@ class NetSnmpQuery implements SnmpQueryInterface
             $this->options[] = '-IR'; // search for mib
         }
 
-        if ($mib) {
-            array_push($this->options, '-m', $mib);
-        }
-
         return $this->exec('snmptranslate', [$oid])->value();
     }
 
@@ -315,6 +309,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
+        array_push($cmd, '-m', implode(':', $this->mibs));
 
         if ($command === 'snmptranslate') {
             return array_merge($cmd, $this->options, $oids);
@@ -351,11 +346,11 @@ class NetSnmpQuery implements SnmpQueryInterface
                 case 'authpriv':
                     array_push($cmd, '-x', $this->device->cryptoalgo);
                     array_push($cmd, '-X', $this->device->cryptopass);
-                // fallthrough
+                    // fallthrough
                 case 'authnopriv':
                     array_push($cmd, '-a', $this->device->authalgo);
                     array_push($cmd, '-A', $this->device->authpass);
-                // fallthrough
+                    // fallthrough
                 case 'noauthnopriv':
                     array_push($cmd, '-u', $this->device->authname ?: 'root');
                     break;
@@ -374,7 +369,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $response = new SnmpResponse('');
 
         foreach ($oids as $oid) {
-            $response = $response->append($this->exec($command, [$oid]));
+            $response = $response->append($this->exec($command, Arr::wrap($oid)));
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
@@ -472,9 +467,9 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         if ($code) {
             if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             }
             Log::debug('Exitcode: ' . $code, [$error]);
         }
@@ -500,10 +495,20 @@ class NetSnmpQuery implements SnmpQueryInterface
         Log::debug($error);
     }
 
-    /**
-     * @param  array|string  $oid
-     */
-    private function parseOid($oid): array
+    private function limitOids(array $oids): array
+    {
+        // get max oids per query device attrib > os setting > global setting
+        $configured_max = $this->device->getAttrib('snmp_max_oid') ?: Config::getOsSetting($this->device->os, 'snmp_max_oid', Config::get('snmp.max_oid', 10));
+        $max_oids = max($configured_max, 1); // 0 or less would break things.
+
+        if (count($oids) > $max_oids) {
+            return array_chunk($oids, $max_oids);
+        }
+
+        return [$oids]; // wrap in array for execMultiple so they are all done at once
+    }
+
+    private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
     }
