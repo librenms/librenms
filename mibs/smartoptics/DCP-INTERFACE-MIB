@@ -2,7 +2,7 @@
 -- DCP-INTERFACE-MIB.mib
 -- Smartoptics DCP Interface Enterprise Specific MIB.
 --
--- Copyright (c) 2018, Smartoptics
+-- Copyright (c) 2022, Smartoptics
 -- All rights reserved
 --
 
@@ -16,15 +16,18 @@ IMPORTS
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
-    OpticalPower1Decimal, ItuPerceivedSeverity, InterfaceStatus
+    OpticalPower1Decimal, ItuPerceivedSeverity, InterfaceStatus, InterfacePortMode
         FROM SO-TC-MIB;
 
 -- 1.3.6.1.4.1.30826.2.2.2
 dcpInterface MODULE-IDENTITY
-    LAST-UPDATED "202102251200Z"
+    LAST-UPDATED "202203181300Z"
     ORGANIZATION "Smartoptics."
     CONTACT-INFO "http://www.smartoptics.com"
     DESCRIPTION "This is the enterprise specific DCP INTERFACE MIB for Smartoptics"
+
+    REVISION "202203181300Z"  -- March 18.
+    DESCRIPTION "Addition of dcpInterfacePortType, dcpInterfacePortMode attributes."
 
     REVISION "202102251200Z"  -- February 25.
     DESCRIPTION "Update description for dcpInterfaceRxPower and dcpInterfaceTxPower."
@@ -85,7 +88,11 @@ DcpInterfaceEntry ::=
         dcpInterfaceChannelId
         DisplayString,
         dcpInterfaceDescription
-        DisplayString
+        DisplayString,
+        dcpInterfacePortType
+        DisplayString,
+        dcpInterfacePortMode
+        InterfacePortMode
  }
 
 -- 1.3.6.1.4.1.30826.2.2.2.1.1.1.1
@@ -207,6 +214,23 @@ dcpInterfaceDescription OBJECT-TYPE
 ::= { dcpInterfaceEntry 10 }
 
 
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.11
+dcpInterfacePortType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Port type of the interface."
+::= { dcpInterfaceEntry 11 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.12
+dcpInterfacePortMode OBJECT-TYPE
+    SYNTAX InterfacePortMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Interface portmode."
+::= { dcpInterfaceEntry 12 }
 
 -- 1.3.6.1.4.1.30826.2.2.2.2
 dcpInterfaceMIBCompliance OBJECT IDENTIFIER ::= { dcpInterface 2 }
@@ -232,6 +256,15 @@ dcpInterfaceTableGroupV2 OBJECT-GROUP
     "The interface table objects V2."
 ::= { dcpInterfaceMIBGroups 2 }
 
+-- 1.3.6.1.4.1.30826.2.2.2.2.1.3
+dcpInterfaceTableGroupV3 OBJECT-GROUP
+    OBJECTS { dcpInterfaceName, dcpInterfaceRxPower, dcpInterfaceTxPower, dcpInterfaceStatus,
+    dcpInterfaceAlarm, dcpInterfaceFormat, dcpInterfaceChannelId, dcpInterfaceWavelength, dcpInterfaceDescription, dcpInterfacePortType, dcpInterfacePortMode }
+    STATUS current
+    DESCRIPTION
+    "The interface table objects V3."
+::= { dcpInterfaceMIBGroups 3 }
+
 -- 1.3.6.1.4.1.30826.2.2.2.2.2
 dcpInterfaceMIBCompliances OBJECT IDENTIFIER ::= { dcpInterfaceMIBCompliance 2 }
 
@@ -255,6 +288,15 @@ dcpInterfaceBasicComplV2 MODULE-COMPLIANCE
             dcpInterfaceTableGroupV2 }
     ::= { dcpInterfaceMIBCompliances 2 }
 
+-- 1.3.6.1.4.1.30826.2.2.2.2.2.3
+dcpInterfaceBasicComplV3 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the DCP-INTERFACE-MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            dcpInterfaceTableGroupV3 }
+    ::= { dcpInterfaceMIBCompliances 3 }
 
 END
 

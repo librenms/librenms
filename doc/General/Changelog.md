@@ -1,3 +1,110 @@
+## 23.9.0
+*(2023-09-15)*
+
+A big thank you to the following 16 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (33)
+  - [SourceDoctor](https://github.com/SourceDoctor) (3)
+  - [VVelox](https://github.com/VVelox) (3)
+  - [eskyuu](https://github.com/eskyuu) (2)
+  - [PipoCanaja](https://github.com/PipoCanaja) (2)
+  - [MrMoCoDev](https://github.com/MrMoCoDev) (1)
+  - [electrocret](https://github.com/electrocret) (1)
+  - [Pelt10](https://github.com/Pelt10) (1)
+  - [LoveSkylark](https://github.com/LoveSkylark) (1)
+  - [slashdoom](https://github.com/slashdoom) (1)
+  - [jepke](https://github.com/jepke) (1)
+  - [hanserasmus](https://github.com/hanserasmus) (1)
+  - [adamsweet](https://github.com/adamsweet) (1)
+  - [fbourqui](https://github.com/fbourqui) (1)
+  - [fbouynot](https://github.com/fbouynot) (1)
+  - [Fehler12](https://github.com/Fehler12) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (10)
+  - [Jellyfrog](https://github.com/Jellyfrog) (9)
+  - [electrocret](https://github.com/electrocret) (8)
+  - [PipoCanaja](https://github.com/PipoCanaja) (3)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [cltnoc](https://github.com/cltnoc) (1)
+  - [ottorei](https://github.com/ottorei) (1)
+
+#### Feature
+* Additional contact options for email transports ([#15266](https://github.com/librenms/librenms/pull/15266)) - [murrant](https://github.com/murrant)
+* Implement RBAC (only built in roles) ([#15212](https://github.com/librenms/librenms/pull/15212)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Fix injection vulnerability in fdb search page ([#15315](https://github.com/librenms/librenms/pull/15315)) - [murrant](https://github.com/murrant)
+* Fix injection vulnerability in ports pages ([#15314](https://github.com/librenms/librenms/pull/15314)) - [murrant](https://github.com/murrant)
+* Fix another addcslashes incorrect escape in eventlog ([#15313](https://github.com/librenms/librenms/pull/15313)) - [murrant](https://github.com/murrant)
+* Fix another injection in ipv4 search page ([#15312](https://github.com/librenms/librenms/pull/15312)) - [murrant](https://github.com/murrant)
+* Fix injection in search pages ipv4, etc ([#15311](https://github.com/librenms/librenms/pull/15311)) - [murrant](https://github.com/murrant)
+* Fix improperly escaped output in outages page ([#15310](https://github.com/librenms/librenms/pull/15310)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Fix smartos-dcp-m.yaml ([#15295](https://github.com/librenms/librenms/pull/15295)) - [electrocret](https://github.com/electrocret)
+* Use mtxrGaugeTable instead of mtxrHealthGroup ([#15289](https://github.com/librenms/librenms/pull/15289)) - [murrant](https://github.com/murrant)
+* Added support for Nutanix VM count, disk state, CPU usage and RAM usage ([#15252](https://github.com/librenms/librenms/pull/15252)) - [eskyuu](https://github.com/eskyuu)
+* Initial support for f5os ([#15241](https://github.com/librenms/librenms/pull/15241)) - [fbouynot](https://github.com/fbouynot)
+
+#### Webui
+* Fix login page HTML ([#15321](https://github.com/librenms/librenms/pull/15321)) - [murrant](https://github.com/murrant)
+* Fix device display name in top interfaces widget ([#15319](https://github.com/librenms/librenms/pull/15319)) - [murrant](https://github.com/murrant)
+* Timezone, fix user set no timezone ([#15296](https://github.com/librenms/librenms/pull/15296)) - [murrant](https://github.com/murrant)
+* Availability Map: Show ignored device up when up ([#15283](https://github.com/librenms/librenms/pull/15283)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom ssh,telnet port with oxidized ([#15255](https://github.com/librenms/librenms/pull/15255)) - [jepke](https://github.com/jepke)
+* WebUI Services, generate more compact table ([#15243](https://github.com/librenms/librenms/pull/15243)) - [fbourqui](https://github.com/fbourqui)
+* Added empty string check ([#15235](https://github.com/librenms/librenms/pull/15235)) - [Fehler12](https://github.com/Fehler12)
+* Use full name for vendor_oui ([#15234](https://github.com/librenms/librenms/pull/15234)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add global NAC page ([#15228](https://github.com/librenms/librenms/pull/15228)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Alerting
+* Fix error when mail-contact is missing ([#15305](https://github.com/librenms/librenms/pull/15305)) - [murrant](https://github.com/murrant)
+* Hide token, keys and passwords in Transports ([#15274](https://github.com/librenms/librenms/pull/15274)) - [LoveSkylark](https://github.com/LoveSkylark)
+
+#### Applications
+* For the applications table set the defaults for app_instance and app_instance to '' ([#15278](https://github.com/librenms/librenms/pull/15278)) - [VVelox](https://github.com/VVelox)
+* Application Soft Delete ([#15270](https://github.com/librenms/librenms/pull/15270)) - [VVelox](https://github.com/VVelox)
+
+#### Api
+* Allow port search API to search ifAlias again ([#15320](https://github.com/librenms/librenms/pull/15320)) - [murrant](https://github.com/murrant)
+* Fix API availability graph duration ([#15250](https://github.com/librenms/librenms/pull/15250)) - [murrant](https://github.com/murrant)
+
+#### Settings
+* Add ui description for reporting dump_errors ([#15264](https://github.com/librenms/librenms/pull/15264)) - [murrant](https://github.com/murrant)
+
+#### Polling
+* Fix port ifAlias polling ([#15279](https://github.com/librenms/librenms/pull/15279)) - [murrant](https://github.com/murrant)
+* Fix ifSpeed override not being applied ([#15237](https://github.com/librenms/librenms/pull/15237)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* ADAuthorizer auth skip count entry ([#15322](https://github.com/librenms/librenms/pull/15322)) - [murrant](https://github.com/murrant)
+* Radius enforce roles ([#15294](https://github.com/librenms/librenms/pull/15294)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* FIX TP-Link JetStream 3.0.0 Build 20180511 Rel.36491(s) T1500-28PCT 3.0 ([#15318](https://github.com/librenms/librenms/pull/15318)) - [MrMoCoDev](https://github.com/MrMoCoDev)
+* Fix issue with rrdcached application and bad input ([#15301](https://github.com/librenms/librenms/pull/15301)) - [murrant](https://github.com/murrant)
+* Fix .env quoting issue ([#15298](https://github.com/librenms/librenms/pull/15298)) - [murrant](https://github.com/murrant)
+* Fix typo in default mibs for SnmpQuery ([#15297](https://github.com/librenms/librenms/pull/15297)) - [murrant](https://github.com/murrant)
+* Readd missing key ([#15291](https://github.com/librenms/librenms/pull/15291)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix missing keys for new status ([#15284](https://github.com/librenms/librenms/pull/15284)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Revert "Added empty string check" ([#15249](https://github.com/librenms/librenms/pull/15249)) - [murrant](https://github.com/murrant)
+* Fix manual port speed storage ([#15238](https://github.com/librenms/librenms/pull/15238)) - [murrant](https://github.com/murrant)
+* Make the service template controller re-evaluate dynamic membership when apply all button is pushed ([#15214](https://github.com/librenms/librenms/pull/15214)) - [eskyuu](https://github.com/eskyuu)
+
+#### Cleanup
+* Return an 5XX error when an exception is raise ([#15285](https://github.com/librenms/librenms/pull/15285)) - [Pelt10](https://github.com/Pelt10)
+
+#### Documentation
+* Note the package install command for dhcpd-pools for FreeBSD ([#15247](https://github.com/librenms/librenms/pull/15247)) - [VVelox](https://github.com/VVelox)
+* Update severity colours in SNMP-Traps.md ([#15244](https://github.com/librenms/librenms/pull/15244)) - [adamsweet](https://github.com/adamsweet)
+
+#### Misc
+* Another OR statement in GrayLog API ([#15246](https://github.com/librenms/librenms/pull/15246)) - [hanserasmus](https://github.com/hanserasmus)
+* Dispatcher option to log output ([#15230](https://github.com/librenms/librenms/pull/15230)) - [murrant](https://github.com/murrant)
+
+
 ## 23.8.0
 *(2023-08-19)*
 
