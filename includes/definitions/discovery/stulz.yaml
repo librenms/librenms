@@ -1,0 +1,184 @@
+mib: Stulz-WIB8000-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: busalarm
+                    value: busalarm
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.10.{{ $index }}'
+                    index: 'busalarm.{{ $index }}'
+                    descr: 'Unit {{ $index }} bus alarm'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: basadrconflict
+                    value: busadrconflict
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.12.{{ $index }}'
+                    index: 'busadrconflict.{{ $index }}'
+                    descr: 'Unit {{ $index }} bus conflict'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: unitOnOff
+                    value: unitOnOff
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.1013.{{ $index }}'
+                    index: 'unitOnOff.{{ $index }}'
+                    descr: 'Unit {{ $index }} running state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: generalError
+                    value: generalError
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.2.1.1.8.{{ $index }}'
+                    index: 'generalError.{{ $index }}'
+                    descr: 'Unit {{ $index }} error state'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: compr1Running
+                    value: compr1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.1.1.1.4403.{{ $index }}'
+                    index: 'compr1Running.{{ $index }}'
+                    descr: 'Unit {{ $index }} compressor state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: humidifier1Running
+                    value: humidifier1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6402.{{ $index }}'
+                    index: 'humidifier1Running.{{ $index }}'
+                    descr: 'Unit {{ $index }} humidifier state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: dehumidificationRunning
+                    value: dehumidificationRunning
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6802.{{ $index }}'
+                    index: 'dehumidificationRunning.{{ $index }}'
+                    descr: 'Unit {{ $index }} dehumidification'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: fan1Running
+                    value: fan1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6902.{{ $index }}'
+                    index: 'fan1Running.{{ $index }}'
+                    descr: 'Unit {{ $index }} fan state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: unitFreecoolingValve
+                    value: unitFreecoolingValve
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.2238.{{ $index }}'
+                    index: 'unitFreecoolingValve.{{ $index }}'
+                    descr: 'Unit {{ $index }} freecool valve'
+                    states:
+                        - { descr: Closed, graph: 1, value: 0, generic: 0 }
+                        - { descr: Open, graph: 1, value: 1, generic: 0 }
+        temperature:
+            data:
+                -
+                    oid: unitTemperature
+                    value: unitTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                    index: 'unitTemperature.{{ $index }}'
+                    descr: 'Unit {{ $index }} temp'
+                    divisor: 10
+                -
+                    oid: unitSupplyAirTemperature
+                    value: unitSupplyAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                    index: 'unitSupplyAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $index }} supply temp'
+                    divisor: 10
+                -
+                    oid: unitReturnAirTemperature
+                    value: unitReturnAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1192.{{ $index }}'
+                    index: 'unitReturnAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $index }} return temp'
+                    divisor: 10
+                -
+                    oid: unitWaterInTemperature1
+                    value: unitWaterInTemperature1
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1191.{{ $index }}'
+                    index: 'unitWaterInTemperature1.{{ $index }}'
+                    descr: 'Unit {{ $index }} water in temp'
+                    divisor: 10
+
+        humidity:
+            data:
+                -
+                    oid: unitHumidity
+                    value: unitHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1171.{{ $index }}'
+                    index: 'unitHumidity.{{ $index }}'
+                    descr: 'Unit {{ $index }} humidity'
+                    divisor: 10
+                -
+                    oid: unitSupplyAirHumidity
+                    value: unitSupplyAirHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1195.{{ $index }}'
+                    index: 'unitSupplyAirHumidity.{{ $index }}'
+                    descr: 'Unit {{ $index }} supply humidity'
+                    divisor: 10
+                -
+                    oid: unitReturnAirHumidity
+                    value: unitReturnAirHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1194.{{ $index }}'
+                    index: 'unitReturnAirHumidity.{{ $index }}'
+                    descr: 'Unit {{ $index }} return humidity'
+                    divisor: 10
+        pressure:
+            data:
+                -
+                    oid: unitCondensationPressure1
+                    value: unitCondensationPressure1
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.3.1.1.2235.{{ $index }}'
+                    index: 'unitCondensationPressure1.{{ $index }}'
+                    descr: 'Unit {{ $index }} condensation pressure'
+                    multiplier: 10
+                -
+                    oid: filter1PressureDrop
+                    value: filter1PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11009.{{ $index }}'
+                    index: 'filter1PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $index }} filter 1 pressure drop'
+                    divisor: 1000
+                -
+                    oid: filter2PressureDrop
+                    value: filter2PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11109.{{ $index }}'
+                    index: 'filter2PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $index }} filter 2 pressure drop'
+                    divisor: 1000
+                -
+                    oid: filter3PressureDrop
+                    value: filter3PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11209.{{ $index }}'
+                    index: 'filter3PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $index }} filter 3 pressure drop'
+                    divisor: 1000
+        percent:
+            data:
+                -
+                    oid: fan1Speed
+                    value: fan1Speed
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6932.{{ $index }}'
+                    index: 'fan1Speed.{{ $index }}'
+                    descr: 'Unit {{ $index }} fan speed'
+                -
+                    oid: gValveOpeningGrade
+                    value: gValveOpeningGrade
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.5312.{{ $index }}'
+                    index: 'gValveOpeningGrade.{{ $index }}'
+                    descr: 'Unit {{ $index }} gValve grade'
