@@ -198,6 +198,9 @@ if ($format == 'graph') {
         }
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
+
+        $device_group_name = dbFetchCell('SELECT `name` FROM device_groups where `id`=?', [$vars['group']]);
+        echo "<h4>" . $device_group_name . "</h4>";
     }
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
@@ -207,6 +210,7 @@ if ($format == 'graph') {
     }
 
     $query .= ' ORDER BY hostname';
+
 
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
@@ -268,6 +272,10 @@ if ($format == 'graph') {
     $type_selected = isset($vars['type']) ? json_encode(['id' => $vars['type'], 'text' => ucfirst($vars['type'])]) : '""';
     $version_selected = isset($vars['version']) ? json_encode(['id' => $vars['version'], 'text' => $vars['version']]) : '""';
 
+
+    $device_group_name = dbFetchCell('SELECT `name` FROM device_groups where `id`=?', [$vars['group']]);
+
+
     $os_selected = '""';
     if (isset($vars['os'])) {
         $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
@@ -289,6 +297,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
+        <h4><?php echo $device_group_name ?></h4>
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
