@@ -199,7 +199,7 @@ if ($format == 'graph') {
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
 
-        $device_group_name = dbFetchCell('SELECT `name` FROM device_groups where `id`=?', [$vars['group']]);
+        $device_group_name = DB::table('device_groups')->where('id', $vars['group'])->value('name');
         echo "<h4>" . $device_group_name . "</h4>";
     }
 
@@ -272,9 +272,7 @@ if ($format == 'graph') {
     $type_selected = isset($vars['type']) ? json_encode(['id' => $vars['type'], 'text' => ucfirst($vars['type'])]) : '""';
     $version_selected = isset($vars['version']) ? json_encode(['id' => $vars['version'], 'text' => $vars['version']]) : '""';
 
-
-    $device_group_name = dbFetchCell('SELECT `name` FROM device_groups where `id`=?', [$vars['group']]);
-
+    $device_group_name = DB::table('device_groups')->where('id', $vars['group'])->value('name');
 
     $os_selected = '""';
     if (isset($vars['os'])) {
