@@ -1265,6 +1265,7 @@ function render_table($table_info)
     }
     $to_return = $to_return . "</table>\n\n";
 
+    // copied and vaguely modified from https://www.w3schools.com/howto/howto_js_sort_table.asp
     $to_return=$to_return.'<script>
 function '.$function_id.'(n) {
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
