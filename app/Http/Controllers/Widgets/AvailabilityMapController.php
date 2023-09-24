@@ -221,7 +221,12 @@ class AvailabilityMapController extends WidgetController
     private function getDeviceTooltip(Device $device, string $state_name): string
     {
         $tooltip = $device->displayName();
-        $time = $device->formatDownUptime(true);
+
+        if (! $device->status && ! $device->last_polled) {
+            $time = __('Never polled');
+        } else {
+            $time = $device->formatDownUptime(true);
+        }
 
         if ($time) {
             $tooltip .= ' - ' . ($state_name == 'down' ? 'downtime ' : '') . $time;
