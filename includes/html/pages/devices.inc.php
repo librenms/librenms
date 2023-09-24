@@ -13,6 +13,24 @@
  * @author     LibreNMS Contributors
 */
 
+function show_device_group($device_group_id) {
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    ?>
+    <div class="panel-heading">
+        <span class="devices-font-bold">
+        <?php
+        if ($device_group_id == 'none') {
+            echo "ungrouped Devices";
+        } elseif ($device_group_id) {
+            echo "Device Group: ";
+        }
+        ?>
+        </span>
+        <?php echo $device_group_name ?>
+    </div>
+    <?php
+}
+
 $pagetitle[] = 'Devices';
 
 if (! isset($vars['format'])) {
@@ -198,10 +216,8 @@ if ($format == 'graph') {
         }
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
-
-        $device_group_name = DB::table('device_groups')->where('id', $vars['group'])->value('name');
-        echo "<h4>" . $device_group_name . "</h4>";
     }
+    show_device_group($vars['group']);
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
@@ -210,7 +226,6 @@ if ($format == 'graph') {
     }
 
     $query .= ' ORDER BY hostname';
-
 
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
@@ -272,8 +287,6 @@ if ($format == 'graph') {
     $type_selected = isset($vars['type']) ? json_encode(['id' => $vars['type'], 'text' => ucfirst($vars['type'])]) : '""';
     $version_selected = isset($vars['version']) ? json_encode(['id' => $vars['version'], 'text' => $vars['version']]) : '""';
 
-    $device_group_name = DB::table('device_groups')->where('id', $vars['group'])->value('name');
-
     $os_selected = '""';
     if (isset($vars['os'])) {
         $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
@@ -295,7 +308,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
-        <h4><?php echo $device_group_name ?></h4>
+        <?php show_device_group($vars['group']); ?>
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
