@@ -133,7 +133,7 @@ modules:
                     descr: Read IOPS
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskReadIops1
+                    index: diskReadIops
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadMerged
@@ -141,7 +141,7 @@ modules:
                     descr: Read Merged
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskReadMerged2
+                    index: diskReadMerged
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadBytes
@@ -149,7 +149,7 @@ modules:
                     descr: Read Bytes
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskReadBytes3
+                    index: diskReadBytes
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadLatencyMs
@@ -157,7 +157,7 @@ modules:
                     descr: Read Latency
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskReadLatencyMs4
+                    index: diskReadLatencyMs
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteIops
@@ -165,7 +165,7 @@ modules:
                     descr: Write IOPS
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskWriteIops5
+                    index: diskWriteIops
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteMerged
@@ -173,7 +173,7 @@ modules:
                     descr: Write Merged
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskWriteMerged6
+                    index: diskWriteMerged
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteBytes
@@ -181,7 +181,7 @@ modules:
                     descr: Write Bytes
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskWriteBytes7
+                    index: diskWriteBytes
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteLatencyMs
@@ -189,5 +189,5 @@ modules:
                     descr: Write Latency
                     group: Disk
                     rrd_type: COUNTER
-                    index: diskWriteLatencyMs8
+                    index: diskWriteLatencyMs
 
