@@ -105,7 +105,7 @@ class Jira extends Transport
                     'title' => 'Jira Password',
                     'name' => 'jira-password',
                     'descr' => 'Jira Password',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Custom Fileds',

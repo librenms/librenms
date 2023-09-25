@@ -402,7 +402,9 @@ if (Config::get('enable_ports_poe')) {
 
         foreach ($port_stats_poe as $p_index => $p_stats) {
             $if_id = $port_ent_to_if[$p_index];
-            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            if (is_array($port_stats[$if_id])) {
+                $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            }
         }
     }
 }
@@ -665,11 +667,14 @@ foreach ($ports as $port) {
         $tune_port = false;
         foreach ($data_oids as $oid) {
             $current_oid = $this_port[$oid] ?? null;
+
             if ($oid == 'ifAlias') {
-                if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
-                    $this_port['ifAlias'] = $port['ifAlias'];
+                $ifAlias_override = DeviceCache::getPrimary()->getAttrib('ifName:' . $port['ifName']);
+                if ($ifAlias_override !== null) {
+                    // handle legacy '1' setting, otherwise use value set by override
+                    $current_oid = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
                 } else {
-                    $this_port['ifAlias'] = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
+                    $current_oid = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
             }
             if ($oid == 'ifSpeed') {

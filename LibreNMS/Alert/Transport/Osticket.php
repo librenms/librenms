@@ -66,7 +66,7 @@ class Osticket extends Transport
                     'title' => 'API Token',
                     'name' => 'os-token',
                     'descr' => 'osTicket API Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

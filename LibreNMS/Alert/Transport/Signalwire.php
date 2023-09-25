@@ -66,7 +66,7 @@ class Signalwire extends Transport
                     'title' => 'Token',
                     'name' => 'signalwire-token',
                     'descr' => 'SignalWire Account Token ',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobile Number',

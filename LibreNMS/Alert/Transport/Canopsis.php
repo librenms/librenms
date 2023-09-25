@@ -97,7 +97,7 @@ class Canopsis extends Transport
                     'title' => 'Password',
                     'name' => 'canopsis-pass',
                     'descr' => 'Canopsis Password',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Vhost',

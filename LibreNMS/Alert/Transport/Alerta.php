@@ -83,7 +83,7 @@ class Alerta extends Transport
                     'title' => 'Api Key',
                     'name' => 'apikey',
                     'descr' => 'Your alerta api key with minimally write:alert permissions.',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Alert State',
