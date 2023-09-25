@@ -1725,6 +1725,9 @@ Extend` heading top of page.
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
 
+Then uncomment the line towards the top marked to be uncommented if
+using it as a agent.
+
 ## PHP-FPM
 
 ### SNMP Extend
