@@ -120,7 +120,7 @@ axosSystemChassisSerialNumber OBJECT-TYPE
    ::= {axosSystemModule 10}
 
 axosSystemChassisMacAddress OBJECT-TYPE
-   SYNTAX      MacAddress
+   SYNTAX      OCTET STRING
    MAX-ACCESS  read-only
    STATUS      current
    DESCRIPTION "Chassis MAC address"
