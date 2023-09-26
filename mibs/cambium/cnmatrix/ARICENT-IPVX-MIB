@@ -1,0 +1,571 @@
+-- Copyright (C) 2009-2012 Aricent Group . All Rights Reserved
+
+ARICENT-IPVX-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, 
+      Unsigned32, enterprises, Counter32 FROM SNMPv2-SMI
+      TruthValue, RowStatus, TEXTUAL-CONVENTION  FROM SNMPv2-TC
+      InetAddress, InetAddressType, 
+      InetAddressPrefixLength FROM INET-ADDRESS-MIB
+      InterfaceIndex FROM IF-MIB
+      ipv6InterfaceEntry FROM IP-MIB;
+      
+      fsipvxMIB MODULE-IDENTITY
+         LAST-UPDATED "201209050000Z" 
+         ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+         CONTACT-INFO "support@aricent.com"
+
+         DESCRIPTION
+            " The MIB module for IPvx "
+         REVISION "201209050000Z" 
+         DESCRIPTION
+            "The first version of the MIB for IPvx release 1.0.0.0. "
+      ::=  { enterprises  aricent-communication-holding-ltd(29601) iss(2) 16 } 
+      
+fsipvx      OBJECT IDENTIFIER ::= { fsipvxMIB 1 }
+fsipv6Icmpstats  OBJECT IDENTIFIER ::= { fsipvxMIB 2 }
+
+
+fsIpvxAddrPrefixTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FsIpvxAddrPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "This table is used as an alternate to populate the 
+     ipAddressPrefixTable present in stdipvx.mib.This table is
+     used to provide the rowstatus support to the standard 
+     ipAddressPrefixTable."
+    ::= { fsipvx 1 }
+
+  fsIpvxAddrPrefixEntry OBJECT-TYPE
+    SYNTAX FsIpvxAddrPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An address mapping for a particular interface."
+    INDEX {
+        fsIpvxAddrPrefixIfIndex, 
+        fsIpvxAddrPrefixAddrType, 
+        fsIpvxAddrPrefix, 
+        fsIpvxAddrPrefixLen
+        }
+    ::= { fsIpvxAddrPrefixTable 1 }
+
+FsIpvxAddrPrefixEntry ::= SEQUENCE {
+        fsIpvxAddrPrefixIfIndex      InterfaceIndex,
+        fsIpvxAddrPrefixAddrType     InetAddressType, 
+        fsIpvxAddrPrefix             InetAddress, 
+        fsIpvxAddrPrefixLen          InetAddressPrefixLength,
+        fsIpvxAddrPrefixProfileIndex Unsigned32,
+        fsIpvxAddrPrefixSecAddrFlag  TruthValue,
+        fsIpvxAddrPrefixRowStatus    RowStatus
+    }
+
+
+    fsIpvxAddrPrefixIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The index value that uniquely identifies the interface to
+    which this entry is applicable. The interface identified by
+    a particular value of this index is the same interface as
+    identified by the same value of the IF-MIB.s ifIndex."
+    ::= { fsIpvxAddrPrefixEntry 1 }
+
+    fsIpvxAddrPrefixAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The address type of fsIpvxAddrPrefixAddr."
+    ::= { fsIpvxAddrPrefixEntry 2 }
+
+    fsIpvxAddrPrefix OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The IP address to which this entry.s addressing information
+    pertains. The address type of this object is specified in
+    fsIpvxAddrPrefixAddrType.
+    Implementors need to be aware that if the size of
+    fsIpvxAddrPrefixAddr exceeds 116 octets, then OIDS of instances of
+    columns in this row will have more than 128 sub-identifiers
+    and cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3."
+    ::= { fsIpvxAddrPrefixEntry 3 }
+
+    fsIpvxAddrPrefixLen OBJECT-TYPE
+    SYNTAX InetAddressPrefixLength
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The prefix length associated with this prefix.
+    The value 0 has no special meaning for this object. It
+    simply refers to address .::/0.."
+    ::= { fsIpvxAddrPrefixEntry 4 }
+
+    fsIpvxAddrPrefixProfileIndex OBJECT-TYPE
+    SYNTAX Unsigned32 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION 
+    "Indicates the index into the IPv6 Address Profile Table.
+    This entry of the IPv6 Address Profile table defines the
+    parameters for this address. For a link-local address,
+    this object always takes the value zero and cannot be
+    modified from SNMP."
+    ::= { fsIpvxAddrPrefixEntry 5 }
+
+    fsIpvxAddrPrefixSecAddrFlag OBJECT-TYPE
+    SYNTAX TruthValue 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "This flag indicates whether the address is primary address 
+    or secondary address."
+    DEFVAL { true }
+    ::= { fsIpvxAddrPrefixEntry 6 }
+    
+    fsIpvxAddrPrefixRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "The status of this conceptual row.
+    The RowStatus TC requires that this DESCRIPTION clause
+    states under which circumstances other objects in this row
+    can be modified. The value of this object has no effect on
+    whether other objects in this conceptual row can be
+    modified.
+    A conceptual row can not be made active until the
+    fsIpvxAddrPrefixIfIndex has been set to a valid index."
+    ::= { fsIpvxAddrPrefixEntry 7 }
+
+-- ------------------------------------------------------------ 
+-- Per-interface ICMPv6 statistics table
+-- ------------------------------------------------------------ 
+
+    fsIpv6IfIcmpTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FsIpv6IfIcmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "IPv6 ICMP statistics. This table contains statistics
+    of ICMPv6 messages that are received and sourced by
+    the entity."
+    ::= { fsipv6Icmpstats 1 }
+
+    fsIpv6IfIcmpEntry OBJECT-TYPE
+    SYNTAX     FsIpv6IfIcmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "An ICMPv6 statistics entry containing
+    objects at a particular IPv6 interface.
+
+    Note that a receiving interface is
+    the interface to which a given ICMPv6 message
+    is addressed which may not be necessarily
+    the input interface for the message.
+
+    Similarly,  the sending interface is
+    the interface that sources a given
+    ICMP message which is usually but not
+    necessarily the output interface for the message."
+    AUGMENTS { ipv6InterfaceEntry }
+    ::= { fsIpv6IfIcmpTable 1 }
+
+    FsIpv6IfIcmpEntry ::= SEQUENCE {
+        fsIpv6IfIcmpInMsgs
+            Counter32      ,
+        fsIpv6IfIcmpInErrors
+            Counter32      ,
+        fsIpv6IfIcmpInDestUnreachs
+            Counter32      ,
+        fsIpv6IfIcmpInAdminProhibs
+            Counter32      ,
+        fsIpv6IfIcmpInTimeExcds
+            Counter32      ,
+        fsIpv6IfIcmpInParmProblems
+            Counter32      ,
+        fsIpv6IfIcmpInPktTooBigs
+            Counter32      ,
+        fsIpv6IfIcmpInEchos
+            Counter32      ,
+        fsIpv6IfIcmpInEchoReplies
+            Counter32      ,
+        fsIpv6IfIcmpInRouterSolicits
+            Counter32      ,
+        fsIpv6IfIcmpInRouterAdvertisements
+            Counter32      ,
+        fsIpv6IfIcmpInNeighborSolicits
+            Counter32      ,
+        fsIpv6IfIcmpInNeighborAdvertisements
+            Counter32      ,
+        fsIpv6IfIcmpInRedirects
+            Counter32      ,
+        fsIpv6IfIcmpInGroupMembQueries
+            Counter32      ,
+        fsIpv6IfIcmpInGroupMembResponses
+            Counter32      ,
+        fsIpv6IfIcmpInGroupMembReductions
+            Counter32      ,
+        fsIpv6IfIcmpOutMsgs
+            Counter32      ,
+        fsIpv6IfIcmpOutErrors
+            Counter32      ,
+        fsIpv6IfIcmpOutDestUnreachs
+            Counter32      ,
+        fsIpv6IfIcmpOutAdminProhibs
+            Counter32      ,
+        fsIpv6IfIcmpOutTimeExcds
+            Counter32      ,
+        fsIpv6IfIcmpOutParmProblems
+            Counter32      ,
+        fsIpv6IfIcmpOutPktTooBigs
+            Counter32      ,
+        fsIpv6IfIcmpOutEchos
+            Counter32      ,
+        fsIpv6IfIcmpOutEchoReplies
+            Counter32      ,
+        fsIpv6IfIcmpOutRouterSolicits
+            Counter32      ,
+        fsIpv6IfIcmpOutRouterAdvertisements
+            Counter32      ,
+        fsIpv6IfIcmpOutNeighborSolicits
+            Counter32      ,
+        fsIpv6IfIcmpOutNeighborAdvertisements
+            Counter32      ,
+        fsIpv6IfIcmpOutRedirects
+            Counter32      ,
+        fsIpv6IfIcmpOutGroupMembQueries
+            Counter32      ,
+        fsIpv6IfIcmpOutGroupMembResponses
+            Counter32      ,
+        fsIpv6IfIcmpOutGroupMembReductions
+            Counter32
+
+    }
+
+fsIpv6IfIcmpInMsgs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The total number of ICMP messages received
+by the interface which includes all those
+counted by fsIpv6IfIcmpInErrors. Note that this
+interface is the interface to which the
+ICMP messages were addressed which may not be
+necessarily the input interface for the messages."
+::= { fsIpv6IfIcmpEntry 1 }
+
+fsIpv6IfIcmpInErrors OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP messages which the interface
+received but determined as having ICMP-specific
+errors (bad ICMP checksums, bad length, etc.)."
+::= { fsIpv6IfIcmpEntry 2 }
+
+fsIpv6IfIcmpInDestUnreachs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Destination Unreachable
+messages received by the interface."
+::= { fsIpv6IfIcmpEntry 3 }
+
+fsIpv6IfIcmpInAdminProhibs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP destination
+unreachable/communication administratively
+prohibited messages received by the interface."
+::= { fsIpv6IfIcmpEntry 4 }
+
+fsIpv6IfIcmpInTimeExcds OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Time Exceeded messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 5 }
+
+fsIpv6IfIcmpInParmProblems OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Parameter Problem messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 6 }
+
+fsIpv6IfIcmpInPktTooBigs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Packet Too Big messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 7 }
+
+fsIpv6IfIcmpInEchos OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Echo (request) messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 8 }
+
+fsIpv6IfIcmpInEchoReplies OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Echo Reply messages received
+by the interface."
+::= { fsIpv6IfIcmpEntry 9 }
+
+fsIpv6IfIcmpInRouterSolicits OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Router Solicit messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 10 }
+
+fsIpv6IfIcmpInRouterAdvertisements OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Router Advertisement messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 11 }
+
+fsIpv6IfIcmpInNeighborSolicits OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Neighbor Solicit messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 12 }
+
+fsIpv6IfIcmpInNeighborAdvertisements OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Neighbor Advertisement
+messages received by the interface."
+::= { fsIpv6IfIcmpEntry 13 }
+
+fsIpv6IfIcmpInRedirects OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of Redirect messages received
+by the interface."
+::= { fsIpv6IfIcmpEntry 14 }
+
+fsIpv6IfIcmpInGroupMembQueries OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Query
+messages received by the interface."
+::= { fsIpv6IfIcmpEntry 15}
+
+fsIpv6IfIcmpInGroupMembResponses OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Response messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 16}
+
+fsIpv6IfIcmpInGroupMembReductions OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Reduction messages
+received by the interface."
+::= { fsIpv6IfIcmpEntry 17}
+
+fsIpv6IfIcmpOutMsgs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The total number of ICMP messages which this
+interface attempted to send.  Note that this counter
+includes all those counted by icmpOutErrors."
+::= { fsIpv6IfIcmpEntry 18 }
+
+fsIpv6IfIcmpOutErrors OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP messages which this interface did
+not send due to problems discovered within ICMP
+such as a lack of buffers.  This value should not
+include errors discovered outside the ICMP layer
+such as the inability of IPv6 to route the resultant
+datagram.  In some implementations there may be no
+types of error which contribute to this counter's
+value."
+::= { fsIpv6IfIcmpEntry 19 }
+
+fsIpv6IfIcmpOutDestUnreachs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Destination Unreachable
+
+messages sent by the interface."
+::= { fsIpv6IfIcmpEntry 20 }
+
+fsIpv6IfIcmpOutAdminProhibs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"Number of ICMP dest unreachable/communication
+administratively prohibited messages sent."
+::= { fsIpv6IfIcmpEntry 21 }
+
+fsIpv6IfIcmpOutTimeExcds OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Time Exceeded messages sent
+by the interface."
+::= { fsIpv6IfIcmpEntry 22 }
+
+fsIpv6IfIcmpOutParmProblems OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Parameter Problem messages
+sent by the interface."
+::= { fsIpv6IfIcmpEntry 23 }
+
+fsIpv6IfIcmpOutPktTooBigs OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Packet Too Big messages sent
+by the interface."
+::= { fsIpv6IfIcmpEntry 24 }
+
+fsIpv6IfIcmpOutEchos OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Echo (request) messages sent
+by the interface."
+::= { fsIpv6IfIcmpEntry 25 }
+
+fsIpv6IfIcmpOutEchoReplies OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Echo Reply messages sent
+by the interface."
+::= { fsIpv6IfIcmpEntry 26 }
+
+fsIpv6IfIcmpOutRouterSolicits OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Router Solicitation messages
+sent by the interface."
+::= { fsIpv6IfIcmpEntry 27 }
+
+fsIpv6IfIcmpOutRouterAdvertisements OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Router Advertisement messages
+sent by the interface."
+::= { fsIpv6IfIcmpEntry 28 }
+
+fsIpv6IfIcmpOutNeighborSolicits OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Neighbor Solicitation
+messages sent by the interface."
+::= { fsIpv6IfIcmpEntry 29 }
+
+fsIpv6IfIcmpOutNeighborAdvertisements OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMP Neighbor Advertisement
+messages sent by the interface."
+::= { fsIpv6IfIcmpEntry 30 }
+
+fsIpv6IfIcmpOutRedirects OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of Redirect messages sent. For
+a host, this object will always be zero,
+since hosts do not send redirects."
+::= { fsIpv6IfIcmpEntry 31 }
+
+fsIpv6IfIcmpOutGroupMembQueries OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Query
+messages sent."
+::= { fsIpv6IfIcmpEntry 32}
+
+fsIpv6IfIcmpOutGroupMembResponses OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Response
+messages sent."
+::= { fsIpv6IfIcmpEntry 33}
+
+fsIpv6IfIcmpOutGroupMembReductions OBJECT-TYPE
+SYNTAX     Counter32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+"The number of ICMPv6 Group Membership Reduction
+messages sent."
+::= { fsIpv6IfIcmpEntry 34}
+END

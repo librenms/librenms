@@ -1,0 +1,2055 @@
+-- Copyright (C) 2015 Aricent. All Rights Reserved.
+
+ARICENT-PVRST-MIB DEFINITIONS ::= BEGIN
+
+-- ---------------------------------------------------------
+-- Proprietary MIB for Per VLAN Rapid Spanning Tree Protocol
+-- ---------------------------------------------------------
+
+IMPORTS
+
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32,
+    enterprises,Counter32, TimeTicks,NOTIFICATION-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, MacAddress,
+    TruthValue, RowStatus        FROM SNMPv2-TC;
+
+futurePvrstMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION
+	"Draft 1"
+    REVISION "201209050000Z"
+    DESCRIPTION
+	"Draft 1"
+::= { enterprises futuresoftware(2076) 161}
+
+BridgeId ::= TEXTUAL-CONVENTION
+      STATUS  current
+      DESCRIPTION
+      "Identifier of Bridge in 8 byte format."
+        SYNTAX          OCTET STRING (SIZE (8))
+
+Timeout ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d4"
+    STATUS       current
+    DESCRIPTION
+              "Time out value in 4 byte."
+    SYNTAX       Integer32
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A simple status value for the object." 
+    SYNTAX      INTEGER { enabled(1), disabled(2) } 
+      
+      
+fsFuturePvrst     OBJECT IDENTIFIER   ::= { futurePvrstMIB 1 }
+fsPvrstTrapsControl OBJECT IDENTIFIER ::= { futurePvrstMIB 2 }
+fsFuturePvrstTraps OBJECT IDENTIFIER ::= { futurePvrstMIB 3 }
+
+-- fsFuturePvrst group
+
+fsPvrstSystemControl OBJECT-TYPE
+   SYNTAX      INTEGER { start(1), shutdown(2) } 
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The administrative shutdown status requested by management for the PVRST  
+      feature. The value start (1) indicates that PVRST should be active in 
+      the device on all ports. The value shutdown (2) indicates that PVRST 
+      should be shutdown in the device on all ports. All memory should 
+      be released on all ports."
+   ::= { fsFuturePvrst 1 } 
+
+fsPvrstModuleStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The administrative status requested by management for the Pvrst  
+      feature. The value enabled(1) indicates that Pvrst should be enabled  
+      in the device on all ports. The value disabled(2) indicates that 
+      Pvrst should be disabled in the device on all ports. The object can 
+      be set to enabled(1) if and only if, fsPvrstSystemControl is set to start."
+   ::= { fsFuturePvrst 2 } 
+
+fsPvrstNoOfActiveInstances OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Indicates number of instances active currently."
+   ::= { fsFuturePvrst 3 } 
+
+fsPvrstBrgAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The MAC address used by this bridge when it must
+          be referred to in a unique fashion. It is
+          recommended that this be the numerically smallest
+          MAC address of all ports that belong to this
+          bridge. However, it is only required to be unique.
+          When concatenated with fsPvrstInstBridgePriority or 
+          fsPvrstInstBridgePriority a unique BridgeIdentifier 
+          is formed which is used in the Spanning Tree Protocol."
+   ::= { fsFuturePvrst 4 } 
+
+fsPvrstUpCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times PVRST module has been enabled."
+   ::= { fsFuturePvrst 5 } 
+
+fsPvrstDownCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times PVRST Module has been disabled."
+   ::= { fsFuturePvrst 6 } 
+
+fsPvrstPathCostDefaultType OBJECT-TYPE
+SYNTAX      INTEGER {
+               stp8021d1998(1),
+               stp8021t2001(2)
+            }
+   MAX-ACCESS  read-write 
+   STATUS      obsolete
+   DESCRIPTION
+        "*******************Object is obsolete****************
+         The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge. A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+   ::= { fsFuturePvrst 7 } 
+
+fsPvrstDynamicPathCostCalculation OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+         "This object is used to determine whether dynamic pathcost
+          calculation is allowed or not. The value is determined by 
+          management. If set to true, pathcost is calculated dynamically 
+          from port speed(when the operational status of the port changes 
+          from down to up), otherwise the link speed at the time of port 
+          creation is used for calculating the path cost. In both cases,
+          if the user has configured a pathcost for the port that will be 
+          used. By default dynamic pathcost calculation is set to false."
+      DEFVAL { false }
+      ::= { fsFuturePvrst 8 }
+
+fsPvrstTrace OBJECT-TYPE
+   SYNTAX      Integer32 (0..255) 
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+      "This object is used to enable trace statements for the Pvrst
+      module in this context.
+
+      A four byte integer is used for enabling the level of tracing. 
+      Each bit in the four byte integer represents a particular 
+      level of trace. 
+
+      The mapping between the bit positions & the level of trace is 
+      as follows: 
+      0 - Init and Shutdown Traces
+      1 - Management Traces
+      2 - Data Path Traces
+      3 - Control Plane Traces
+      4 - Packet Dump Traces
+      5 - Traces related to All Resources except Buffers
+      6 - All Failure Traces
+      7 - Buffer Traces
+
+      The remaining bits are unused. Combination of trace levels are 
+      also allowed.
+
+      For example, if the bits 0 and 1 are set, then the trace
+      statements related to Init-Shutdown and management 
+      will be printed.
+
+      The user has to enter the corresponding integer value for the
+      bits set. For example, if bits 0 and 1 are to be set then user has
+      to give the value for this object as 3.
+      
+      Setting the trace option to any value will cause the debug option
+      to be set to 0 (i.e.) the trace option and debug option are mutually
+      exclusive."
+      
+      DEFVAL  { 0 }
+   ::= { fsFuturePvrst 9 } 
+
+fsPvrstDebug OBJECT-TYPE
+   SYNTAX      Integer32 (0..524287)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is used to enable debug statements in the PvrstP
+      module.
+
+      A four byte integer is used for enabling the level of debugging. 
+      Each bit in the four byte integer represents a particular 
+      level of debug.
+
+      The mapping between the bit positions & the level of debug is 
+      as follows: 
+      0 - Init and Shutdown Debug statements
+      1 - Management Debug statements
+      2 - Memory related Debug statements
+      3 - BPDU related Debug statements
+      4 - Event Handling Debug statements
+      5 - Timer Module Debug statements
+      6 - Port Information SEM Debug statements
+      7 - Port Receive SEM Debug statements (Invalid in the case of Pvrst) 
+      8 - Role Selection SEM Debug statements
+      9 - Role Transition SEM Debug statements
+     10 - State Transition SEM Debug statements
+     11 - Protocol Migration SEM Debug statements
+     12 - Topology Change SEM Debug statements
+     13 - Port Transmit SEM Debug statements
+     14 - Bridge Detection SEM Debug statements
+     15 - All Failure Debug statements
+     16 - Redundancy code flow Debug statements
+     17 - State Machine variable changes Debug statements
+     18 - Port Receive Pseudo Information SEM Debug statements
+
+      The remaining bits are unused. Combination of debug levels are 
+      also allowed.
+
+      For example, if the bits 0 and 1 are set, then the debug
+      statements related to Init-Shutdown and management 
+      will be printed.
+
+      The user has to enter the corresponding integer value for the
+      bits set. For example, if bits 0 and 1 are to be set then user has
+      to give the value for this object as 3.
+      
+      Setting the debug option to any value will cause the trace option
+      to be set to 0 (i.e.) the trace option and debug option are mutually
+      exclusive."
+      DEFVAL  { 0 }
+   ::= { fsFuturePvrst 10 } 
+
+fsPvrstBufferOverFlowCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times buffer overflows/failures have occurred.
+        A trap is generated on the occurrence of this event." 
+   ::= { fsFuturePvrst 11 } 
+
+fsPvrstMemAllocFailureCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times memory allocation failures have occurred.
+        A trap is generated on the occurrence of this event." 
+   ::= { fsFuturePvrst 12 } 
+
+-- -------------------------------------
+-- fsFuturePvrstPortTable - Start
+-- -------------------------------------
+
+fsFuturePvrstPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FsFuturePvrstPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+       "List of ports per virtual context."
+    ::= { fsFuturePvrst 13 }
+
+fsFuturePvrstPortEntry OBJECT-TYPE
+   SYNTAX       FsFuturePvrstPortEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+      "Virtual Context Pvrst Module Port Parameters."
+   INDEX { fsPvrstPort }
+   ::= { fsFuturePvrstPortTable 1 }
+
+FsFuturePvrstPortEntry ::=
+    SEQUENCE {
+	   fsPvrstPort
+	      Integer32,
+           fsPvrstPortAdminEdgeStatus
+              TruthValue,
+           fsPvrstPortOperEdgePortStatus
+              TruthValue,
+           fsPvrstBridgeDetectionSemState
+              INTEGER,
+           fsPvrstPortEnabledStatus
+              TruthValue,
+           fsPvrstRootGuard
+              TruthValue,
+           fsPvrstBpduGuard
+              Integer32,
+           fsPvrstEncapType
+              INTEGER,
+	   fsPvrstPortAdminPointToPoint
+              INTEGER,
+	   fsPvrstPortOperPointToPoint
+	      TruthValue,
+           fsPvrstPortInvalidBpdusRcvd
+              Counter32,
+           fsPvrstPortInvalidConfigBpduRxCount
+              Counter32,
+           fsPvrstPortInvalidTcnBpduRxCount
+              Counter32,
+		   fsPvrstPortRowStatus
+			   RowStatus,
+		   fsPvrstPortLoopGuard
+			   TruthValue,
+           fsPvrstPortLoopInconsistentState
+			   TruthValue,
+           fsPvrstPortEnableBPDURx
+		 TruthValue,
+           fsPvrstPortEnableBPDUTx
+		 TruthValue,
+	   fsPvrstBpduFilter
+		Integer32,
+           fsPvrstPortAutoEdge
+		TruthValue,
+          fsPvrstPortBpduInconsistentState
+                TruthValue,
+        fsPvrstPortTypeInconsistentState
+                TruthValue,
+        fsPvrstPortPVIDInconsistentState
+                TruthValue,
+        fsPvrstPortBpduGuardAction
+         Integer32,
+        fsPvrstPortRcvInfoWhileExpCount
+         Counter32,
+        fsPvrstPortRcvInfoWhileExpTimeStamp
+         TimeTicks,
+        fsPvrstPortImpStateOccurCount
+         Counter32,
+        fsPvrstPortImpStateOccurTimeStamp
+         TimeTicks,
+        fsPvrstPortErrorRecovery
+         Timeout
+    }
+
+fsPvrstPort OBJECT-TYPE
+   SYNTAX        Integer32 (1..65535)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "Port Number for the Context."
+   ::= { fsFuturePvrstPortEntry 1 }
+
+fsPvrstPortAdminEdgeStatus OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "The administrative value of the Edge Port parameter. A
+          value of TRUE(1) indicates that this port should be
+          assumed as an edge-port and a value of FALSE(2) indicates
+          that this port should be assumed as a non-edge-port."
+   ::= { fsFuturePvrstPortEntry 2 }
+
+fsPvrstPortOperEdgePortStatus OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "The operational value of the Edge Port parameter. The
+          object is initialized to the value of
+          fsPvrstPortAdminEdgeStatus and is set FALSE on reception 
+          of a BPDU."
+   ::= { fsFuturePvrstPortEntry 3 }
+
+fsPvrstBridgeDetectionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  edge (0),
+                  notedge (1)
+               }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Current state of the bridge detection state machine
+	  of this port for all Spanning Tree context."           
+   ::= { fsFuturePvrstPortEntry 4 } 
+
+fsPvrstPortEnabledStatus OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The administrative value for the port
+	  to configure PVRST enable/disable on this port 
+	  By default, PVRST is enabled on each port."           
+   ::= { fsFuturePvrstPortEntry 5 } 
+
+fsPvrstRootGuard OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The administrative value for the root guard
+	  is configurable on this Port. By default, it is
+	  False(2) & can be configured True(1)."           
+   ::= { fsFuturePvrstPortEntry 6 } 
+
+fsPvrstBpduGuard OBJECT-TYPE
+      SYNTAX      INTEGER    {
+                    none (0),
+                    enable (1),
+                    disable (2)
+                    }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This configures the BPDU guard feature on this port and has higher priority over Global BPDU guard.
+       Enable - prevents temporary loops and applicable to ports and 
+       moves the port to disabled discarding state when BPDU is received on this port.
+       Disable - Disables the BPDU guard feature and the port state will be maintained till it is manually made up.
+       None - removes the BPDU guard functionality on this port so that when Global BPDU guard
+              configuration will take effect if this port is edge port."           
+    DEFVAL { 0 }
+   ::= { fsFuturePvrstPortEntry 7 } 
+
+fsPvrstEncapType OBJECT-TYPE
+      SYNTAX      INTEGER {
+		  dot1Q (0),
+		  isl (1) }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The administrative value for the 
+	  encapsulation type on the port. 
+	  On Access Port, the encapsulation
+	  type will be DOT1q & is unchangeable. 
+	  Only on Trunk ports it is changeable."           
+      DEFVAL {0}
+   ::= { fsFuturePvrstPortEntry 8 } 
+
+fsPvrstPortAdminPointToPoint OBJECT-TYPE
+   SYNTAX        INTEGER {
+		    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+		}
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "The administrative point-to-point status of the LAN segment
+          attached to this port. A value of forceTrue(0) indicates that
+          this port should always be treated as if it is connected to
+          a point-to-point link. A value of forceFalse(1) indicates
+          that this port should be treated as having a shared media
+          connection. A value of auto(2) indicates that this port is
+          considered to have a point-to-point link if it is an aggregator
+          and all of its members are aggregatable, or if the MAC entity
+          is configured for full duplex operation, either through
+          auto-negotiation or by management means."
+   ::= { fsFuturePvrstPortEntry 9 }
+
+fsPvrstPortOperPointToPoint OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "The operational point-to-point status of the LAN segment
+          attached to this port. It indicates whether a port is
+          considered to have a point-to-point connection or not.
+          The value is determined by management or by auto-detection,
+          as described in the fsPvrstPortAdminPointToPoint object."
+   ::= { fsFuturePvrstPortEntry 10 }
+
+fsPvrstPortInvalidBpdusRcvd OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of invalid PVRST BPDUs received on this port."     
+      ::= { fsFuturePvrstPortEntry 11 }
+
+fsPvrstPortInvalidConfigBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of invalid configuration BPDUs received on this port."     
+      ::= { fsFuturePvrstPortEntry 12 }
+
+fsPvrstPortInvalidTcnBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of invalid TCN BPDUs received on this port."     
+      ::= { fsFuturePvrstPortEntry 13 }
+
+fsPvrstPortRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "This object is used to create or delete interfaces at PVRST module
+          level. Ports can be created at PVRST module level only for ports that
+          have been created in interface manager. This is applicable only when
+          Automatic Port Create Feature is disabled."
+      ::= { fsFuturePvrstPortEntry 14 }
+
+fsPvrstPortLoopGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If TRUE, then it will not age out
+        the information even if the peer does not send information. If the port
+        continues to receive information through BPDUs the operation 
+        on this port will be normal. This will be useful when the neighbor
+        bridge is faulty, i.e. it cannot send BPDUs but continues to send data 
+        traffic." 
+
+    DEFVAL { false }
+        ::= { fsFuturePvrstPortEntry 15 }
+
+fsPvrstPortLoopInconsistentState   OBJECT-TYPE 
+	SYNTAX      TruthValue 
+	MAX-ACCESS  read-only 
+	STATUS      current 
+	DESCRIPTION 
+		"A Boolean value set when the non-designated port on expiry of received information while timer 
+		transitions to Designated/Discarding state when the superior BPDU's are not received with the 
+		loop guard feature being enabled on that port. 
+		A value of TRUE indicates that the state of this port is moved into a loop-inconsistent 
+		state. A value of FALSE indicates that this port is not moved into a loop-inconsistent 
+		state." 
+	DEFVAL { false } 
+	::= { fsFuturePvrstPortEntry 16 } 
+
+fsPvrstPortEnableBPDURx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is Boolean value set by the management. The BPDUs received on the port 
+         are ignored when this object is set to False."
+    DEFVAL { true }
+    ::= { fsFuturePvrstPortEntry 17 }
+
+fsPvrstPortEnableBPDUTx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is a Boolean value set by the management. The BPDUs received on the port are 
+         not transmitted when this object is set to False."
+    DEFVAL { true }
+    ::= { fsFuturePvrstPortEntry 18 }
+
+fsPvrstBpduFilter OBJECT-TYPE
+    SYNTAX      INTEGER    {
+                    disable (1),
+                    enable (2)
+                    }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This object configures the BPDU filter in PVSTP mode.
+           Enable - Enables  BPDU Filter feature on the port.
+                    When enabled on a port, BPDU Tx/Rx is disabled on the specified  port.
+           Disable - Disables BPDU Filter feature on the port.
+                     When disabled on a port, BPDU Tx/Rx is enabled on the specified port."
+    DEFVAL { 1 }
+   ::= { fsFuturePvrstPortEntry 19 }
+
+fsPvrstPortAutoEdge OBJECT-TYPE
+        SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "TRUE(1) indicates that detection of a port
+               as Edge Port happens automatically and FALSE(2)
+               indicates that this feature is disabled."
+       DEFVAL { true }
+       ::= { fsFuturePvrstPortEntry 20 }
+
+fsPvrstPortBpduInconsistentState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object indicates that the port state changes to disabled / discarding
+            due to the BPDU guard feature enabled on the port and the port receives BPDU on this.
+            When set to TRUE, the state of this port is changed to a bpduguard-inconsistent 
+            state due to BPDU reception. When set to FALSE, this port does not receive the 
+            BPDU when BPDU guard is enabled on this port or BPDU guard feature is disabled on 
+            that port."
+         DEFVAL { false }
+    ::= { fsFuturePvrstPortEntry 21 }
+
+fsPvrstPortTypeInconsistentState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "This object indicates the port state changes to disabled / discarding
+            due to the PVRST tagged packet reception on an access port. When set to 
+            TRUE, the state of this port is moved into a port type inconsistent state 
+            due to tagged PVRST BPDU reception on access port.
+            When set to FALSE, this port has not received tagged PVRST BPDU."
+         DEFVAL { false }
+    ::= { fsFuturePvrstPortEntry 22 }
+
+fsPvrstPortPVIDInconsistentState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          " A Boolean value set indicates the port state goes to disabled / discarding
+            due to reception of tagged PVRST BPDU on its native VLAN(native VLAN PVRST packet
+            is always untagged). When set to TRUE, the state of this port is moved into an
+            PVID inconsistent state due to tagged BPDU reception on its native VLAN.
+            When set to FALSE, it indicates that this port has not received the tagged PVRST BPDU on its
+            native VLAN."
+         DEFVAL { false }
+    ::= { fsFuturePvrstPortEntry 23 }
+
+fsPvrstPortBpduGuardAction OBJECT-TYPE
+   SYNTAX     INTEGER    {
+            disableDiscarding (1),
+            adminDown (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object specifies the action to be taken when BPDU is received
+         on a BPDU guard enabled port.
+
+         When action is set as admin down error recovery time will be set as
+         zero. When action is set as disable-discarding, error recovery time
+         will be set as 3000 centi-seconds.
+
+         When action is set as admin down and BPDU is received on this
+         port, then the port will be made down. When port is made admin up again,
+         port moves to admin down if BPDU is received on this port.
+
+         When BPDU is received in case of disable-discarding state, spanning-tree
+         will be disabled on this port and port will move to discarding state.
+         On expiry of error recovery timer, spanning tree will be enabled on
+         the port. When BPDU is received again, spanning-tree will be disabled
+         on the port and port moves to discarding state
+
+         To recover from the admin down or disable discarding state, BPDU guard
+         should be disabled on this port."
+
+    DEFVAL { 1 }
+    ::= { fsFuturePvrstPortEntry 24 }
+
+
+fsPvrstPortRcvInfoWhileExpCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of times the info received while timer is expired on this port."
+   ::= { fsFuturePvrstPortEntry 25 }
+
+fsPvrstPortRcvInfoWhileExpTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) of the received info while timer is expired on this port last time."
+   ::= { fsFuturePvrstPortEntry 26 }
+
+fsPvrstPortImpStateOccurCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of times impossible state has occurred on this port."
+   ::= { fsFuturePvrstPortEntry 27 }
+
+fsPvrstPortImpStateOccurTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) of the impossible state that has occurred on this port last time."
+   ::= { fsFuturePvrstPortEntry 28 }
+
+fsPvrstPortErrorRecovery OBJECT-TYPE
+   SYNTAX      Timeout (3000..6553500)
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+   "This object specifies the amount of time to bring the interface out of the
+   error-disabled (err-disabled) state.
+   The range is from 30 to 65535 seconds."
+   DEFVAL {30000}
+      ::= { fsFuturePvrstPortEntry 29 }
+
+-- -------------------------------------
+-- fsFuturePvrstPortTable - End
+-- -------------------------------------
+
+-- -----------------------------------------------------------------
+-- Future Per Vlan Spanning Tree Instance Bridge Table
+-- -----------------------------------------------------------------
+
+fsPvrstInstBridgeTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsPvrstInstBridgeEntry      
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION
+      "Table containing Bridge Information specific to Spanning 
+       Tree Instance."
+   ::= { fsFuturePvrst 14 } 
+ 
+fsPvrstInstBridgeEntry OBJECT-TYPE
+   SYNTAX      FsPvrstInstBridgeEntry       
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Entry indicating the Bridge Information."
+   INDEX { fsPvrstInstVlanId }
+   ::= { fsPvrstInstBridgeTable 1 }
+
+FsPvrstInstBridgeEntry ::=
+   SEQUENCE {   
+      fsPvrstInstVlanId 
+            Integer32,
+      fsPvrstInstBridgePriority 
+            Integer32,
+      fsPvrstInstRootCost 
+            Integer32,
+      fsPvrstInstRootPort 
+            Integer32,
+      fsPvrstInstBridgeMaxAge 
+            Timeout,
+      fsPvrstInstBridgeHelloTime 
+            Timeout,
+      fsPvrstInstBridgeForwardDelay
+            Timeout,
+      fsPvrstInstHoldTime
+            Integer32,
+      fsPvrstInstTxHoldCount
+            Integer32,
+      fsPvrstInstTimeSinceTopologyChange
+            TimeTicks,
+      fsPvrstInstTopChanges
+            Counter32,
+      fsPvrstInstNewRootCount
+            Counter32,
+      fsPvrstInstInstanceUpCount
+            Counter32,
+      fsPvrstInstInstanceDownCount
+            Counter32,
+      fsPvrstInstPortRoleSelSemState
+            INTEGER,
+      fsPvrstInstDesignatedRoot
+            BridgeId,
+      fsPvrstInstRootMaxAge 
+            Timeout,
+      fsPvrstInstRootHelloTime 
+            Timeout,
+      fsPvrstInstRootForwardDelay
+            Timeout,
+      fsPvrstInstOldDesignatedRoot
+            BridgeId,
+      fsPvrstInstFlushIndicationThreshold
+         Integer32,
+      fsPvrstInstTotalFlushCount
+         Counter32
+
+   }
+
+fsPvrstInstVlanId OBJECT-TYPE
+   SYNTAX      Integer32 (1..4094)
+   MAX-ACCESS  not-accessible
+   STATUS      current 
+   DESCRIPTION 
+      "Spanning Tree Instance to which the information belongs."
+   ::= { fsPvrstInstBridgeEntry 1 }
+
+fsPvrstInstBridgePriority OBJECT-TYPE
+   SYNTAX      Integer32 (0..61440) 
+   MAX-ACCESS  read-write     
+   STATUS      current 
+   DESCRIPTION 
+      "The writable portion of the PVRST Bridge Identifier.
+       comprising of the first two octets.
+       The values that are set for Bridge priority must be 
+       in steps of 4096."
+   DEFVAL {32768}
+   ::= { fsPvrstInstBridgeEntry 2 }
+
+fsPvrstInstRootCost OBJECT-TYPE
+   SYNTAX      Integer32  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "The cost of the path to the PVRST root as seen 
+       by this bridge." 
+   ::= { fsPvrstInstBridgeEntry 3 }
+
+fsPvrstInstRootPort OBJECT-TYPE
+   SYNTAX      Integer32  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "The Port number of the port which offers the lowest    
+       path cost from this bridge to the PVRST root bridge."
+   ::= { fsPvrstInstBridgeEntry 4 }
+
+fsPvrstInstBridgeMaxAge OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-write      
+   STATUS      current 
+   DESCRIPTION 
+      "Max age of the bridge information."
+   ::= { fsPvrstInstBridgeEntry 5 }
+
+fsPvrstInstBridgeHelloTime OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-write      
+   STATUS      current 
+   DESCRIPTION 
+      "Hello time configured at Bridge Level."
+   ::= { fsPvrstInstBridgeEntry 6 }
+
+fsPvrstInstBridgeForwardDelay OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-write      
+   STATUS      current 
+   DESCRIPTION 
+      "Forward delay for STP bridge interoperability."
+   ::= { fsPvrstInstBridgeEntry 7 }
+
+fsPvrstInstHoldTime OBJECT-TYPE
+   SYNTAX      Integer32 
+   MAX-ACCESS  read-only     
+   STATUS      current 
+   DESCRIPTION 
+      "Hold time for each port."
+   ::= { fsPvrstInstBridgeEntry 8 }
+
+fsPvrstInstTxHoldCount OBJECT-TYPE
+   SYNTAX      Integer32 (1..10)
+   MAX-ACCESS  read-write      
+   STATUS      current 
+   DESCRIPTION 
+      "The value used by the port transmit state machine to limit
+         the maximum transmission rate."
+   REFERENCE
+        "IEEE 802.1w clause 17.16.6"
+    DEFVAL      { 6 }
+   ::= { fsPvrstInstBridgeEntry 9 }
+
+fsPvrstInstTimeSinceTopologyChange OBJECT-TYPE
+   SYNTAX      TimeTicks 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The time (in hundredths of a second) since the
+         TcWhile timer for any port in this bridge was 
+         non-zero for this spanning tree instance."
+   ::= { fsPvrstInstBridgeEntry 10 }
+
+fsPvrstInstTopChanges OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times that there have been at least
+         one non-zero TcWhile Timer on this bridge for this
+         spanning tree instance."
+   ::= { fsPvrstInstBridgeEntry 11 }
+
+fsPvrstInstNewRootCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times this bridge has detected a root
+          bridge change for this spanning tree instance.
+          A trap is generated on the occurrence of this event."
+   ::= { fsPvrstInstBridgeEntry 12 }
+
+fsPvrstInstInstanceUpCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times a new spanning tree instance has
+         been created. 
+         A trap is generated on the occurrence of this event."
+   ::= { fsPvrstInstBridgeEntry 13 }
+
+fsPvrstInstInstanceDownCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times a spanning tree instance has
+         been deleted.
+         A trap is generated on the occurrence of this event."
+   ::= { fsPvrstInstBridgeEntry 14 }
+
+fsPvrstInstPortRoleSelSemState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  initbridge (0),
+                  roleselection (1)
+               }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Selection State Machine          
+           for this spanning tree instance for this bridge."           
+   ::= { fsPvrstInstBridgeEntry 15 }
+
+fsPvrstInstDesignatedRoot OBJECT-TYPE
+       SYNTAX  BridgeId
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The bridge identifier of the old root of the spanning
+               tree instance as determined by the Spanning Tree Protocol
+               as executed by this node."
+       ::= { fsPvrstInstBridgeEntry 16 }
+
+fsPvrstInstRootMaxAge OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "Max age of the Root Bridge Information."
+   ::= { fsPvrstInstBridgeEntry 17 }
+
+fsPvrstInstRootHelloTime OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "Hello time of the Root Bridge."
+   ::= { fsPvrstInstBridgeEntry 18 }
+
+fsPvrstInstRootForwardDelay OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "Forward delay of the Root Bridge."
+   ::= { fsPvrstInstBridgeEntry 19 }
+
+fsPvrstInstOldDesignatedRoot OBJECT-TYPE
+       SYNTAX  BridgeId
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "This object specifies the bridge identifier of the old 
+		root of the spanning tree instance as determined by the
+		Spanning Tree Protocol as executed by this node."
+       ::= { fsPvrstInstBridgeEntry 20 }
+
+ fsPvrstInstFlushIndicationThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the number of flush indications to go
+	before timer method triggers. (i.e) The number of flush 
+	indications to trigger the FlushInterval Timer.
+
+        This value can be configurable only when fsPvrstFlushInterval
+        is other than default value.
+
+        When the value is retained as default value and flush interval
+        is being configured other than default value(0), then
+        vlan based flushing will happen.
+
+        When this value is non-default and the flush interval is being
+        configured other than default value(0), then the port and vlan
+        based flushing will happen until the actual flush indication
+        reaches the threshold. Once the threshold is reached, timer
+        will be started and during timer expiry instance based
+        flushing will happen. "
+
+    DEFVAL {0}
+    ::= { fsPvrstInstBridgeEntry 21 }
+
+fsPvrstInstTotalFlushCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the number of times flush is being 
+	 triggered from the STP stack in vlan level."
+
+ ::= { fsPvrstInstBridgeEntry 22 }
+
+
+
+
+-- -----------------------------------------------------------------
+-- Future Pvrst Common Spanning Tree Port Table     
+-- -----------------------------------------------------------------
+
+fsPvrstInstPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsPvrstInstPortEntry              
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "This table contains Common Spanning Tree Port
+           Information."
+     ::= { fsFuturePvrst 15 }
+
+fsPvrstInstPortEntry OBJECT-TYPE
+      SYNTAX      FsPvrstInstPortEntry               
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A list of information maintained by every port for 
+          each spanning tree."
+      INDEX  { fsPvrstInstVlanId,fsPvrstInstPortIndex }
+      ::= { fsPvrstInstPortTable 1 }
+
+FsPvrstInstPortEntry ::= 
+   SEQUENCE {
+       fsPvrstInstPortIndex  
+            Integer32,
+       fsPvrstInstPortEnableStatus  
+            INTEGER,
+       fsPvrstInstPortPathCost 
+            Integer32,
+       fsPvrstInstPortPriority 
+            Integer32,
+       fsPvrstInstPortDesignatedRoot 
+            BridgeId,
+       fsPvrstInstPortDesignatedBridge 
+            BridgeId,
+       fsPvrstInstPortDesignatedPort 
+            OCTET STRING,
+       fsPvrstInstPortOperVersion
+	    INTEGER,
+       fsPvrstInstPortProtocolMigration 
+            TruthValue,
+       fsPvrstInstPortState 
+            INTEGER,
+       fsPvrstInstPortForwardTransitions 
+            Counter32,
+       fsPvrstInstPortReceivedBpdus
+            Counter32,
+       fsPvrstInstPortRxConfigBpduCount
+            Counter32,
+       fsPvrstInstPortRxTcnBpduCount
+            Counter32,
+       fsPvrstInstPortTransmittedBpdus
+            Counter32,
+       fsPvrstInstPortTxConfigBpduCount
+            Counter32,
+       fsPvrstInstPortTxTcnBpduCount
+            Counter32,       
+       fsPvrstInstPortTxSemState 
+            INTEGER,        
+       fsPvrstInstPortProtMigrationSemState 
+            INTEGER,        
+       fsPvrstInstProtocolMigrationCount 
+            Counter32,
+       fsPvrstInstPortRole 
+            INTEGER,
+       fsPvrstInstCurrentPortRole  
+            INTEGER,
+       fsPvrstInstPortInfoSemState 
+            INTEGER,        
+       fsPvrstInstPortRoleTransitionSemState 
+            INTEGER,        
+       fsPvrstInstPortStateTransitionSemState 
+            INTEGER,         
+       fsPvrstInstPortTopologyChangeSemState 
+            INTEGER,
+       fsPvrstInstPortEffectivePortState
+            TruthValue,
+       fsPvrstInstPortHelloTime 
+            Timeout,
+       fsPvrstInstPortMaxAge
+	    Timeout,
+       fsPvrstInstPortForwardDelay
+	    Timeout,
+       fsPvrstInstPortHoldTime
+	    Timeout,
+       fsPvrstInstPortAdminPathCost
+         Integer32,
+       fsPvrstInstPortOldPortState 
+            INTEGER,
+       fsPvrstInstPortLoopInconsistentState
+            TruthValue,
+       fsPvrstInstPortRootInconsistentState
+	    TruthValue,
+       fsPvrstInstPortTCDetectedCount
+            Counter32,
+       fsPvrstInstPortTCReceivedCount
+            Counter32,
+       fsPvrstInstPortTCDetectedTimeStamp            
+           TimeTicks,
+       fsPvrstInstPortTCReceivedTimeStamp
+           TimeTicks,
+        fsPvrstInstPortProposalPktsSent
+         Counter32,
+        fsPvrstInstPortProposalPktsRcvd
+         Counter32,
+        fsPvrstInstPortProposalPktSentTimeStamp
+         TimeTicks,
+        fsPvrstInstPortProposalPktRcvdTimeStamp
+         TimeTicks,
+        fsPvrstInstPortAgreementPktSent
+         Counter32,
+        fsPvrstInstPortAgreementPktRcvd
+         Counter32,
+        fsPvrstInstPortAgreementPktSentTimeStamp
+         TimeTicks,
+        fsPvrstInstPortAgreementPktRcvdTimeStamp
+         TimeTicks
+       
+}
+
+fsPvrstInstPortIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The Port Id of the port for which this entry contains   
+           spanning tree information."                                      
+      ::= { fsPvrstInstPortEntry 1 }
+
+fsPvrstInstPortEnableStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+		  disable(2)
+		  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The administrative value for the port
+	  to configure PVRST enable/disable on this Port 
+	  for this instance."
+      ::= { fsPvrstInstPortEntry 2 }
+
+fsPvrstInstPortPathCost OBJECT-TYPE
+      SYNTAX      Integer32 (1..200000000)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+            "The contribution of this port to the path cost of
+             paths towards the Inst Root which include this port."
+      ::= { fsPvrstInstPortEntry 3 }
+
+fsPvrstInstPortPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..240)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The four most significant bits of the port identifier 
+          for a given Spanning Tree instance can be modified independently 
+	  for each Spanning Tree instance supported by the bridge. 
+	  The values that are set for port priority must be in steps of 16."
+     DEFVAL {128}
+      ::= { fsPvrstInstPortEntry 4 }
+
+fsPvrstInstPortDesignatedRoot OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique bridge identifier of the bridge recorded as the  
+           Inst Root in the configuration BPDUs transmitted."      
+      ::= { fsPvrstInstPortEntry 5 }
+
+fsPvrstInstPortDesignatedBridge OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique bridge identifier of the bridge which this port  
+           considers to be the Designated Bridge for the port's segment."   
+      ::= { fsPvrstInstPortEntry 6 }
+
+fsPvrstInstPortDesignatedPort OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The port identifier of the port on the designated bridge    
+           for this port's segment."                                           
+      ::= { fsPvrstInstPortEntry 7 }
+
+fsPvrstInstPortOperVersion OBJECT-TYPE
+   SYNTAX      INTEGER {
+               stpCompatible(0),
+               rstp(2)
+            }
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+   	  "This indicates whether the port is operationally in the 
+       PVRST/RSTP mode or the Stp-compatible mode i.e., whether the
+       port is transmitting PVRST/RST BPDUs or Config/TCN BPDUs."
+      ::= { fsPvrstInstPortEntry 8 }
+
+fsPvrstInstPortProtocolMigration OBJECT-TYPE
+      SYNTAX      TruthValue                
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "Indicates the protocol migration state of this port.         
+           When operating in RSTP/Pvrst (version = 2) mode, writing 
+          TRUE(1) to this object forces this port to transmit RSTP 
+          BPDUs without instance information.
+          Any other operation on this object has no effect and
+          it always returns FALSE(2) when read."
+      ::= { fsPvrstInstPortEntry 9 }
+
+fsPvrstInstPortState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabled (1),
+                  discarding (2),
+                  learning (4),
+                  forwarding (5)
+                  }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Current state of the port as defined by the common    
+           spanning tree protocol." 
+      ::= { fsPvrstInstPortEntry 10 }
+
+fsPvrstInstPortForwardTransitions OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of times this port has transitioned to the     
+           forwarding state."                                     
+      ::= { fsPvrstInstPortEntry 11 }
+
+fsPvrstInstPortReceivedBpdus OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of PVRST BPDUs received on this port."     
+      ::= { fsPvrstInstPortEntry 12 }
+
+fsPvrstInstPortRxConfigBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Configuration BPDUs received on this port."     
+      ::= { fsPvrstInstPortEntry 13 }
+
+fsPvrstInstPortRxTcnBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of TCN BPDUs received on this port."     
+      ::= { fsPvrstInstPortEntry 14 }
+
+fsPvrstInstPortTransmittedBpdus OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of PVRST BPDUs transmitted from this port."     
+      ::= { fsPvrstInstPortEntry 15 }
+
+fsPvrstInstPortTxConfigBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of configuration BPDUs transmitted from this port."     
+      ::= { fsPvrstInstPortEntry 16 }
+
+fsPvrstInstPortTxTcnBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of TCN BPDUs transmitted from this port."     
+      ::= { fsPvrstInstPortEntry 17 }
+
+fsPvrstInstPortTxSemState OBJECT-TYPE 
+      SYNTAX      INTEGER {                 
+                  transmitinit (0),
+                  transmitperiodic (1),
+                  transmitconfig (2),
+                  transmittcn (3),
+                  transmitrstp (4),
+                  idle (5)
+               }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Indicates current State of the port transmit state machine."
+      ::= { fsPvrstInstPortEntry 18 }
+
+fsPvrstInstPortProtMigrationSemState OBJECT-TYPE 
+      SYNTAX      INTEGER {                 
+                  init (0),
+                  sendrstp (1),
+                  sendingrstp (2),
+                  sendstp (3),
+                  sendingstp (4)
+               }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Indicates current state of the Port Protocol Migration
+           State machine."
+      ::= { fsPvrstInstPortEntry 19 }
+
+fsPvrstInstProtocolMigrationCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times this port has migrated from one STP protocol 
+        version to another. The relevant protocols are STP-COMPATIBLE and 
+        RSTP/PVRST.
+        A trap is generated on the occurrence of this event."
+      ::= { fsPvrstInstPortEntry 20 }
+
+fsPvrstInstPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Selected port role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsPvrstInstPortEntry 21 }
+
+fsPvrstInstCurrentPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {              
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current port role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsPvrstInstPortEntry 22 }
+
+-- current (6) state has been changed to present (6) state in 
+-- PortInfoSemState as current is the keyword
+fsPvrstInstPortInfoSemState OBJECT-TYPE
+	SYNTAX      INTEGER {
+               disabled (0),
+                  aged (1),
+	          update (2),
+	          superior (3),
+                  repeat (4),
+                  agreement(5),
+	          present (6),
+                  receive (7)
+            }                
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Information State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsPvrstInstPortEntry 23 }
+
+fsPvrstInstPortRoleTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  init (0),
+                  blockport (1),
+                  blockedport (2),
+                  rootport(3),
+		designatedport(4)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsPvrstInstPortEntry 24 }
+
+fsPvrstInstPortStateTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  discarding (0),
+                  learning (1),
+                  forwarding (2)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port State Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsPvrstInstPortEntry 25 }
+
+fsPvrstInstPortTopologyChangeSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  init (0),
+                  inactive (1),
+                  active (2),
+                  detected (3),
+                  notifiedtcn (4),
+                  notifiedtc (5),
+                  propagating (6),
+                  acknowledged (7)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Topology Change State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsPvrstInstPortEntry 26 }
+
+fsPvrstInstPortEffectivePortState OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The effective operational state of the port for Inst. This will be
+          TRUE only when the port is operationally up in the Interface level
+          and Protocol level for Inst. This is set to False for all 
+          other times."
+      ::= { fsPvrstInstPortEntry 27 }
+
+fsPvrstInstPortHelloTime OBJECT-TYPE
+   SYNTAX      Timeout   
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+   	  "The amount of time between the transmission of
+	   Configuration bridge PDUs by this node on this port
+	   in units of hundredths of a second."
+      ::= { fsPvrstInstPortEntry 28 }
+
+fsPvrstInstPortMaxAge OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "Max age of the Bridge Information."
+   ::= { fsPvrstInstPortEntry 29 }
+
+fsPvrstInstPortForwardDelay OBJECT-TYPE
+   SYNTAX      Timeout  
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "Forward delay for STP bridge interoperability."
+   ::= { fsPvrstInstPortEntry 30 }
+
+fsPvrstInstPortHoldTime OBJECT-TYPE
+   SYNTAX      Timeout 
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "Hold time for each port."
+   ::= { fsPvrstInstPortEntry 31 }
+
+fsPvrstInstPortAdminPathCost  OBJECT-TYPE
+    SYNTAX      Integer32 (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths toward the spanning
+         tree root.
+
+         Writing a value of '0' assigns the automatically calculated
+         default path cost value to the port. If the default path
+         cost is being used, this object returns '0' when read.
+
+         This complements the object dot1dStpPortPathCost or
+         dot1dStpPortPathCost32, which returns the operational value
+         of the path cost.
+         The value of this object must be retained across
+         reinitializations of the management system."
+     
+    ::= { fsPvrstInstPortEntry 32 }
+ 
+fsPvrstInstPortOldPortState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabled (1),
+                  discarding (2),
+                  learning (4),
+                  forwarding (5)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+	"This object specifies the previous state of the port."
+
+    ::= { fsPvrstInstPortEntry 33 }
+
+fsPvrstInstPortLoopInconsistentState  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+	"This object specifies a Boolean value set. When the non-designated port on which loop-guard
+	is enabled, it tries to transit to Designated/Forwarding due to the expiry of Receive info 
+	while timer when bpdu's are not received.
+	A value of TRUE indicates that the state of this port is moved into a loop-inconsistent
+	state. A value of FALSE indicates that this port is not moved into a loop-inconsistent
+	state."
+        DEFVAL { false }
+
+    ::= { fsPvrstInstPortEntry 34 } 
+
+fsPvrstInstPortRootInconsistentState  OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "This object specifies a Boolean value set when the designated
+        port receives a superior BPDU trying to transition itself
+        to the Root Port. A value of TRUE, indicates that the state
+        of this port is moved into an root-inconsistent state.
+        A value of FALSE, indicates that this port is not moved
+        into an root-inconsistent state."
+      DEFVAL { false }
+
+    ::= { fsPvrstInstPortEntry 35 }
+
+
+fsPvrstInstPortTCDetectedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of topology changes detected on this port."
+   ::= { fsPvrstInstPortEntry 36 }
+
+fsPvrstInstPortTCReceivedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of topology change messages received on this port."
+   ::= { fsPvrstInstPortEntry 37 }
+
+fsPvrstInstPortTCDetectedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which the 
+	 topology change is detected on this port last time."
+   ::= { fsPvrstInstPortEntry 38 }
+
+fsPvrstInstPortTCReceivedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which the
+	 topology change message was received on this port last time."
+   ::= { fsPvrstInstPortEntry 39 }
+
+fsPvrstInstPortProposalPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of proposal packets sent by this port."
+   ::= { fsPvrstInstPortEntry 40 }
+
+fsPvrstInstPortProposalPktsRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of proposal packets received on this port."	
+   ::= { fsPvrstInstPortEntry 41 }
+
+fsPvrstInstPortProposalPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which 
+	 proposal packet was sent by this port last time."	
+   ::= { fsPvrstInstPortEntry 42 }
+
+fsPvrstInstPortProposalPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which 
+	 proposal packet was received on this port last time."
+   ::= { fsPvrstInstPortEntry 43 }
+
+fsPvrstInstPortAgreementPktSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of agreement packets sent by this port."
+   ::= { fsPvrstInstPortEntry 44 }
+
+fsPvrstInstPortAgreementPktRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the number of agreement packets received on this port."
+   ::= { fsPvrstInstPortEntry 45 }
+
+fsPvrstInstPortAgreementPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which 
+	 agreement packet was sent by this port last time."
+   ::= { fsPvrstInstPortEntry 46 }
+
+fsPvrstInstPortAgreementPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This object specifies the time stamp(in hundredths of a second) at which 
+	 agreement packet was received on this port last time."
+   ::= { fsPvrstInstPortEntry 47 }
+
+-- NEW SCALAR ADDED
+fsPvrstCalcPortPathCostOnSpeedChg OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+         "This object is used to determine whether dynamic pathcost
+          calculation is done for a port for which port speed is changing
+          dynamically. This is mainly intended for Link Aggregated ports where
+          depending on active ports speed of Link aggregated port changes.
+          By default, dynamic path cost calculation on change in speed is set to
+          false."
+      DEFVAL { false }
+      ::= { fsFuturePvrst 16 }
+
+fsPvrstGlobalBpduGuard OBJECT-TYPE
+      SYNTAX      INTEGER    {
+                    enable (1),
+                    disable (2)
+                    }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This object configures BPDU guard globally in PVRST 
+           and this global BPDU is applicable if and only if no port specific 
+           BPDU guard is configured.
+           Enable - enables  BPDU guard feature on edge ports globally and
+           moves the port to disabled discarding state when BPDU is received 
+           on the edge ports.
+           Disable - disables BPDU guard feature on edge ports globally."           
+    DEFVAL { 2 }
+   ::= { fsFuturePvrst 17 } 
+
+fsPvrstForceProtocolVersion OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  stpCompatible(0),
+                  rstp(2)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+       "This object specifies the version of Spanning Tree Protocol 
+        the bridge is currently running. The value 'stpCompatible(0)'
+        indicates the Spanning Tree Protocol specified in
+        IEEE 802.1D(1998) and 'rstp(2)' indicates Rapid Spanning
+        Tree Protocol specified in IEEE 802.1w and 802.1D ,2004." 
+
+   DEFVAL { rstp }
+   ::= { fsFuturePvrst 18 } 
+
+fsPvrstFlushInterval OBJECT-TYPE
+    SYNTAX      Timeout (0..500)
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object specifies time value, measured in units of hundredths
+          of a second, controls the number of flush indications
+          invoked from STP module per instance basis.
+
+          If set to zero, then normal port and vlan based flushing
+          will take place in PVRST (for backward compatibility, which will
+                  be retained as default value).
+
+          If set to non-zero, then port based flushing will be done.
+
+          This scale would help to adjust the timer value,
+          based on the deployment scenario."
+
+    DEFVAL {0}
+    ::= { fsFuturePvrst 19 }
+
+fsPvrstPathCostType OBJECT-TYPE
+SYNTAX      INTEGER {
+               stp8021d1998(1),
+               stp8021t2001(2)
+            }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+         "The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge.  A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+
+   DEFVAL { stp8021t2001 }
+   ::= { fsFuturePvrst 20 }
+
+
+
+--SCALAR END
+
+-- TRAP MIB BEGIN
+
+fsPvrstSetTraps OBJECT-TYPE
+        SYNTAX   Integer32 (0..3)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This object is used to enable and  disable 
+           PVRST traps. Currently, the following are defined.
+           0 - Traps are not enabled.
+           1 - General Traps like protocol up or down 
+           2 - Exception Traps like port protocol migration or 
+	       invalid packet rcvd in port
+           3 - All the above Traps."
+    ::= { fsPvrstTrapsControl 1 }
+
+ fsPvrstGenTrapType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    up (1),
+                    down (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+          "Used within the Trap Notification PDU. 
+	   It denotes general events like 
+           none - none of the below values
+           up - protocol UP,
+           down - protocol DOWN." 
+    ::= { fsPvrstTrapsControl 2 }
+
+fsPvrstErrTrapType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    memfail (1),
+                    bufffail (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Used within the Trap Notification PDU. 
+	    It returns the following values
+            none - none of the below values
+            memfail - memory allocation failure
+            bufffail - buffer allocation failure."
+   ::= { fsPvrstTrapsControl 3 }
+
+fsPvrstPortTrapNotificationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsPvrstPortTrapNotificationEntry 
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table is used to store the notification information
+       occurred in each of the port for protocol migration and 
+       invalid packet received."
+   ::= { fsPvrstTrapsControl 4 }
+
+fsPvrstPortTrapNotificationEntry OBJECT-TYPE
+   SYNTAX      FsPvrstPortTrapNotificationEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This entry is used to store the notification information."
+   INDEX { fsPvrstPortTrapIndex}
+   ::= { fsPvrstPortTrapNotificationTable 1 }
+
+FsPvrstPortTrapNotificationEntry ::=
+        SEQUENCE {
+               fsPvrstPortTrapIndex
+               Integer32,
+               fsPvrstPortMigrationType
+               INTEGER,
+               fsPvrstPktErrType
+               INTEGER,
+               fsPvrstPktErrVal
+               Integer32
+        }
+
+ fsPvrstPortTrapIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..4096)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A unique value, greater than zero, indicating the port number."
+   ::= { fsPvrstPortTrapNotificationEntry 1 }
+
+ fsPvrstPortMigrationType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  sendstp (0),
+                  sendrstp (1)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Port protocol migration type occurred in the port."
+   ::= { fsPvrstPortTrapNotificationEntry 2 }
+
+ fsPvrstPktErrType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  protocolIdErr(0),
+                  invalidBpdu(1),
+                  configLengthErr(2),
+                  tcnLengthErr(3),
+                  rstpLengthErr(4),
+                  maxAgeErr(5),
+                  fwdDelayErr(6),
+                  helloTimeErr(7),
+                  pvrstLengthErr(8)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Type of invalid packet received in each of the port."
+   ::= { fsPvrstPortTrapNotificationEntry 3 }
+
+ fsPvrstPktErrVal OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Packet error value corresponding to the above type."
+   ::= { fsPvrstPortTrapNotificationEntry 4 }
+
+fsPvrstPortRoleTrapNotificationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsPvrstPortRoleTrapNotificationEntry 
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table is used to store the notification information
+       occurred in each of the port during role change."
+   ::= { fsPvrstTrapsControl 5 }
+
+fsPvrstPortRoleTrapNotificationEntry OBJECT-TYPE
+   SYNTAX      FsPvrstPortRoleTrapNotificationEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " This entry is used to store the notification information."
+   INDEX { fsPvrstPortTrapIndex, fsPvrstInstVlanId}
+   ::= { fsPvrstPortRoleTrapNotificationTable 1 }
+
+FsPvrstPortRoleTrapNotificationEntry ::=
+        SEQUENCE {
+		fsPvrstPortRoleType
+		INTEGER,
+		fsPvrstOldRoleType
+		INTEGER
+	}
+
+ fsPvrstPortRoleType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabledPort(0),
+                  alternatePort(1),
+                  backupPort(2),
+                  rootPort(3),
+                  designatedPort(4)	
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Particular role selected for the port."
+   ::= { fsPvrstPortRoleTrapNotificationEntry 1 }
+
+ fsPvrstOldRoleType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabledPort(0),
+                  alternatePort(1),
+                  backupPort(2),
+                  rootPort(3),
+                  designatedPort(4)	
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Particular role which is existing for the port."
+   ::= { fsPvrstPortRoleTrapNotificationEntry 2 }
+
+ fsPvrstTraps OBJECT IDENTIFIER ::= { fsFuturePvrstTraps 0 }
+
+ fsPvrstGenTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstGenTrapType,
+            fsPvrstInstInstanceUpCount,
+            fsPvrstInstInstanceDownCount
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when any of the general events like protocol up or 
+          protocol down occurs."
+   ::= { fsPvrstTraps 1 }
+
+ fsPvrstErrTrap NOTIFICATION-TYPE
+        OBJECTS {
+           fsPvrstBrgAddress,
+           fsPvrstErrTrapType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when any of the error events like memory failure or buffer failure
+          or protocol migration or new root or topology change occurs."
+   ::= { fsPvrstTraps 2 }
+
+ fsPvrstNewRootTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstInstDesignatedRoot,
+            fsPvrstInstOldDesignatedRoot
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever a new root bridge is selected in the topology."
+   ::= { fsPvrstTraps 3 }
+
+ fsPvrstTopologyChgTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstInstTopChanges
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when topology change is detected."
+   ::= { fsPvrstTraps 4 }
+
+ fsPvrstProtocolMigrationTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstPortMigrationType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when port protocol migration happens in the port."
+   ::= { fsPvrstTraps 5 }
+
+fsPvrstInvalidBpduRxdTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstPktErrType,
+            fsPvrstPktErrVal
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the invalid packet is received for 
+          bpdu/stp/rstp/maximum age/forward delay/hello time."
+   ::= { fsPvrstTraps 6 }
+
+fsPvrstNewPortRoleTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsPvrstBrgAddress,
+            fsPvrstPortRoleType,
+            fsPvrstOldRoleType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever a new role is selected for the port."
+   ::= { fsPvrstTraps 7 }
+
+fsPvrstHwFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+                  fsPvrstBrgAddress,
+                  fsPvrstInstPortState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever an NPAPI call that is invoked from the protocol
+          to program the hardware port state fails."
+   ::= { fsPvrstTraps 8 }
+
+fsPvrstLoopIncStateChange NOTIFICATION-TYPE
+         OBJECTS {
+                    fsPvrstBrgAddress,
+                    fsPvrstInstPortLoopInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+	"This object specifies the generation of trap when the port has been 
+	 moved to the loop inconsistent state."
+::= { fsPvrstTraps 9 }
+
+fsPvrstBpduIncStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsPvrstBrgAddress,
+		     fsPvrstPortBpduInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port state
+	  goes to BPDU inconsistent state."
+::= { fsPvrstTraps 10 }
+
+fsPvrstRootIncStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsPvrstBrgAddress,
+                    fsPvrstInstPortRootInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port state 
+	  goes to root inconsistent state. "
+::= { fsPvrstTraps 11 }
+
+fsPvrstPortStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsPvrstBrgAddress,
+                    fsPvrstInstPortState,
+                    fsPvrstInstPortOldPortState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the current 
+	  state of the port has been changed."
+::= { fsPvrstTraps 12 }
+
+-- TRAP MIB END
+
+END

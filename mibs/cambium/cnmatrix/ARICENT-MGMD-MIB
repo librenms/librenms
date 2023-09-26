@@ -1,0 +1,850 @@
+-- Copyright (C) 2010-2012 Aricent Group . All Rights Reserved
+
+ARICENT-MGMD-MIB DEFINITIONS ::= BEGIN
+   IMPORTS 
+    OBJECT-TYPE,  Counter32, Integer32, enterprises,
+    MODULE-IDENTITY, Unsigned32, IpAddress FROM SNMPv2-SMI
+    RowStatus FROM SNMPv2-TC
+    InetAddress, InetAddressType FROM INET-ADDRESS-MIB 
+    InterfaceIndex FROM IF-MIB; 
+
+fsmgmdMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z" 
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com" 
+
+    DESCRIPTION	 "The MIB module for management of MGMD (Multicast Group 
+                  Membership Discovery)modules IGMPv1, IGMPv2 IGMPv3, MLDv1 and 
+                  MLDv2"
+    REVISION	 "201209050000Z" -- August 25, 2003
+    DESCRIPTION	 "Initial Version"
+::= { enterprises  aricent-communication-holding-ltd(29601) iss(2) 62 }
+   
+fsmgmd		OBJECT IDENTIFIER ::= { fsmgmdMIB 1 }
+
+          fsMgmdIgmpGlobalStatus  OBJECT-TYPE
+              SYNTAX  INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                      "This variable controls the global status of
+                      the IGMP protocol in the router. It must be
+                      made up for protocol functioning.Making this
+                      object 'disabled' will remove all dynamic multicast 
+                      entries stop all the timers for route entries and 
+                      disables IGMP on all the IGMP enabled interfaces.  
+                      Default value of this entry will be 'disabled'."
+              DEFVAL  { disabled }
+              ::= { fsmgmd 1 }
+
+	  fsMgmdIgmpTraceLevel OBJECT-TYPE
+	      SYNTAX  Integer32(0..255)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	" This is used to enable Trace Statements in IGMP Module.
+		A four byte integer value is specified for enabling the level
+		of tracing.Each Bit in the four byte integer variable represents
+		a level of Trace. The bits represents the levels as
+		follows: 0 - Management, 1 - Data Path, 2 - Control Plane,
+                3 - Rx, 4 - Tx, 5 - All Failures. The remaining
+                bits are unused. The combination of levels are also allowed.
+                For example if the bits 1 and 2 are set, then the Trace
+                statements related to Data Path and Control Plane will be printed.
+                The administrator have to enter the corresponding integer value
+                for the bits set. For example if bits 1 and 2 are set then
+                admin has to give the value 6."
+	      DEFVAL  { 0 }
+	      ::= { fsmgmd 2 }
+
+         fsMgmdIgmpDebugLevel OBJECT-TYPE
+              SYNTAX  Integer32(0..255)
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                " This is used to enable Trace Statements in IGMP Module.
+                A four byte integer value is specified for enabling the level
+                of tracing.Each Bit in the four byte integer variable represents
+                a level of Trace. The bits represents the levels as
+                follows:0 - I/o, 1 - Group, 2 - Query,
+                3 - Timer, 4 - NP, 5 - Init Shut, 6 - OS resources, 7 - Buffer,
+                8 - Management,9 - Entry, 10 - Exit.  The remaining bits are unused. 
+		The combination of levels are also allowed.
+                For example if the bits 1 and 2 are set, then the Debug
+                statements related to Group and Query  will be printed.
+                The administrator have to enter the corresponding integer value
+                for the bits set. For example if bits 1 and 2 are set then
+                admin has to give the value 6." 
+              DEFVAL  { 0 }
+              ::= { fsmgmd 3 }   
+	
+	fsMgmdMldGlobalStatus  OBJECT-TYPE
+              SYNTAX  INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                      "This variable controls the global status of
+                      the MLD protocol in the router. It must be
+                      made up for protocol functioning.Making this
+                      object 'disabled' will remove all dynamic multicast 
+                      entries stop all the timers for route entries and 
+                      disables MLD on all the IGMP enabled interfaces.  
+                      Default value of this entry will be 'disabled'."
+              DEFVAL  { disabled }
+              ::= { fsmgmd 4 }
+
+	  fsMgmdMldTraceLevel OBJECT-TYPE
+	      SYNTAX  Integer32(0..255)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+	      " This is used to enable Trace Statements in IGMP Module.
+                A four byte integer value is specified for enabling the level
+                of tracing.Each Bit in the four byte integer variable represents
+                a level of Trace. The bits represents the levels as
+                follows: 0 - Data Path, 1 - Control Plane,
+                2 - Rx, 3 - Tx, 4 - All Failures. The remaining
+                bits are unused. The combination of levels are also allowed.
+                For example if the bits 0 and 1 are set, then the Trace
+                statements related to Data Path and Control Plane will be printed.
+                The administrator have to enter the corresponding integer value
+                for the bits set. For example if bits 1 and 2 are set then
+                admin has to give the value 6."      
+	DEFVAL  { 0 }
+	      ::= { fsmgmd 5 }
+
+          fsMgmdMldDebugLevel OBJECT-TYPE
+              SYNTAX  Integer32(0..255)
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+               "This is used to enable Debug Statements in IGMP Module.
+                A four byte integer value is specified for enabling the level
+                of tracing.Each Bit in the four byte integer variable represents
+                a level of Debug. The bits represents the levels as
+                follows:0 - I/o, 1 - Group, 2 - Query,
+                3 - Timer, 4 - NP, 5 - Init Shut, 6 - OS resources, 7 - Buffer,
+                8 - Entry, 9 - Exit.  The remaining bits are unused. The combination
+                of levels are also allowed.
+                For example if the bits 1 and 2 are set, then the Debug
+                statements related to Group and Query  will be printed.
+                The administrator have to enter the corresponding integer value
+                for the bits set. For example if bits 1 and 2 are set then
+                admin has to give the value 6." 
+           DEFVAL  { 0 }
+             ::= { fsmgmd 6 }	
+-- SCALAR_TABLE_END fsmgmd
+
+
+	  --	  ************************************************
+	  --		       MGMD INTERFACE TABLE
+	  --	  ************************************************
+
+	  fsMgmdInterfaceTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsMgmdInterfaceEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the MGMD Statistic information 
+                       for all the ports in the system."
+	      ::= { fsmgmd 7  }
+
+	  fsMgmdInterfaceEntry OBJECT-TYPE
+	      SYNTAX  FsMgmdInterfaceEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains the necessary information of MGMD
+		       statistics on a logical interface."
+	      INDEX   { fsMgmdInterfaceIfIndex, fsMgmdInterfaceAddrType }
+	      ::= { fsMgmdInterfaceTable 1 }
+
+	  FsMgmdInterfaceEntry ::=
+	      SEQUENCE {
+                  fsMgmdInterfaceIfIndex             InterfaceIndex,
+                  fsMgmdInterfaceAddrType            InetAddressType, 
+                  fsMgmdInterfaceAdminStatus         INTEGER,
+                  fsMgmdInterfaceFastLeaveStatus     INTEGER,
+                  fsMgmdInterfaceOperStatus          INTEGER,
+                  fsMgmdInterfaceIncomingPkts        Counter32,
+                  fsMgmdInterfaceIncomingJoins       Counter32,
+                  fsMgmdInterfaceIncomingLeaves      Counter32,
+                  fsMgmdInterfaceIncomingQueries     Counter32,
+                  fsMgmdInterfaceOutgoingQueries     Counter32,
+                  fsMgmdInterfaceRxGenQueries       Counter32, 
+                  fsMgmdInterfaceRxGrpQueries       Counter32, 
+                  fsMgmdInterfaceRxGrpAndSrcQueries Counter32, 
+                  fsMgmdInterfaceRxIgmpv1v2Reports  Counter32, 
+                  fsMgmdInterfaceRxIgmpv3Reports    Counter32, 
+                  fsMgmdInterfaceRxMldv1Reports     Counter32, 
+                  fsMgmdInterfaceRxMldv2Reports     Counter32, 
+                  fsMgmdInterfaceTxGenQueries       Counter32, 
+                  fsMgmdInterfaceTxGrpQueries       Counter32, 
+                  fsMgmdInterfaceTxGrpAndSrcQueries Counter32, 
+                  fsMgmdInterfaceTxIgmpv1v2Reports  Counter32, 
+                  fsMgmdInterfaceTxIgmpv3Reports    Counter32, 
+                  fsMgmdInterfaceTxMldv1Reports     Counter32, 
+                  fsMgmdInterfaceTxMldv2Reports     Counter32, 
+                  fsMgmdInterfaceTxLeaves           Counter32,
+                  fsMgmdInterfaceChannelTrackStatus INTEGER,
+                  fsMgmdInterfaceGroupListId        Unsigned32,
+                  fsMgmdInterfaceLimit              Unsigned32,
+                  fsMgmdInterfaceCurGrpCount        Unsigned32,
+		  fsMgmdInterfaceCKSumError 	    Counter32,
+		  fsMgmdInterfacePktLenError        Counter32,
+		  fsMgmdInterfacePktsWithLocalIP    Counter32,
+		  fsMgmdInterfaceSubnetCheckFailure Counter32,
+		  fsMgmdInterfaceQryFromNonQuerier  Counter32,
+		  fsMgmdInterfaceReportVersionMisMatch  Counter32,
+		  fsMgmdInterfaceQryVersionMisMatch	Counter32,
+		  fsMgmdInterfaceUnknownMsgType		Counter32,
+		  fsMgmdInterfaceInvalidV1Report        Counter32,
+		  fsMgmdInterfaceInvalidV2Report        Counter32,
+		  fsMgmdInterfaceInvalidV3Report        Counter32,
+		  fsMgmdInterfaceRouterAlertCheckFailure Counter32,
+		  fsMgmdInterfaceIncomingSSMPkts    Counter32,
+		  fsMgmdInterfaceInvalidSSMPkts     Counter32,
+                  fsMgmdInterfaceJoinPktRate	    Integer32,
+		  fsMgmdInterfaceMalformedPkts     Counter32,
+		  fsMgmdInterfaceSocketErrors     Counter32,
+		  fsMgmdInterfaceBadScopeErrors     Counter32
+	      }
+
+          fsMgmdInterfaceIfIndex OBJECT-TYPE 
+          SYNTAX     InterfaceIndex 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The ifIndex value of the interface for which IGMP or MLD
+                  is enabled.  The table is indexed by the ifIndex value and
+                  the InetAddressType to allow for interfaces that may be
+                  configured in both IPv4 and IPv6 modes."
+
+          ::= { fsMgmdInterfaceEntry 1 }
+ 
+          fsMgmdInterfaceAddrType OBJECT-TYPE
+          SYNTAX     InetAddressType
+          MAX-ACCESS not-accessible
+          STATUS     current
+          DESCRIPTION 
+                  "The address type of this interface.  This entry along with
+                   the ifIndex value acts as the index to the
+                   fsMgmdInterface table.  A physical interface may be
+                   configured in multiple modes concurrently, e.g., in IPv4
+                   and IPv6 modes connected to the same interface; however,
+                   the traffic is considered to be logically separate."
+          ::= { fsMgmdInterfaceEntry 2 }
+ 
+
+	  fsMgmdInterfaceAdminStatus OBJECT-TYPE
+             SYNTAX  INTEGER {
+		     up   (1),
+		     down  (2)
+		    }
+	      MAX-ACCESS  read-write
+	      STATUS  current
+	      DESCRIPTION
+                      " This gives the Administrative Status of the Interface."
+              DEFVAL { up }
+	      ::= { fsMgmdInterfaceEntry 3 }
+
+	  fsMgmdInterfaceFastLeaveStatus  OBJECT-TYPE
+	      SYNTAX  INTEGER {
+		     disable (0),
+		     enable  (1)
+		    }
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+    	          "This variable controls the fast leave feature of the 
+                  IGMPV3 or MLDv2  protocol. Making this object 'enable'
+                  supports immediate intimation to the Multicast Routing 
+                  Protocol on the last member leaving the Group. 
+                  Making this object 'disable' will not support fast leave
+		  support. Default value of this entry will 
+                  be 'disable'. This must be enabled only on those interfaces
+                  where there is single host. This can also be enabled on
+                  those interfaces having more than one hosts only if all are 
+                  IGMPv3/MLDv2 hosts in IGMPV3/MLDv2 Mode. "
+	      DEFVAL  { disable }
+	      ::= { fsMgmdInterfaceEntry 4 }
+
+
+	  fsMgmdInterfaceOperStatus OBJECT-TYPE
+              SYNTAX      INTEGER {
+                 up          (1),
+                 down        (2)
+              }
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+                      " This gives the Operational Status of the Interface."
+	      ::= { fsMgmdInterfaceEntry 5 }
+
+	  fsMgmdInterfaceIncomingPkts OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The total number of IGMP/MLD Packets received by the router"
+	      ::= { fsMgmdInterfaceEntry 6 }
+
+	  fsMgmdInterfaceIncomingJoins  OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming JoinGroupMessage  counter."
+	      ::= { fsMgmdInterfaceEntry 7 }
+
+	  fsMgmdInterfaceIncomingLeaves	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming LeaveGroupMessage counter."
+	      ::= { fsMgmdInterfaceEntry 8 }
+
+	  fsMgmdInterfaceIncomingQueries	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming Queries counter."
+	      ::= { fsMgmdInterfaceEntry 9 }
+
+	  fsMgmdInterfaceOutgoingQueries	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Outgoing Queries counter."
+	      ::= { fsMgmdInterfaceEntry 10 }
+
+    fsMgmdInterfaceRxGenQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of General Queries received on this
+                 interface."
+        ::= { fsMgmdInterfaceEntry 11 }
+    
+    fsMgmdInterfaceRxGrpQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group specific queries received 
+                 on this interface. This object is specific to MGMD Proxy
+                 implementation."
+        ::= { fsMgmdInterfaceEntry 12 }
+               
+    fsMgmdInterfaceRxGrpAndSrcQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group and source specific 
+                 queries received on this interface. This object is specific
+                 to MGMD Proxy implementation."
+        ::= { fsMgmdInterfaceEntry 13 }
+    
+    fsMgmdInterfaceRxIgmpv1v2Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv1 and IGMPv2 reports  
+                 reports received on this interface."
+        ::= { fsMgmdInterfaceEntry 14 }
+    
+    fsMgmdInterfaceRxIgmpv3Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv3 reports  
+                  received on this interface."
+        ::= { fsMgmdInterfaceEntry 15 }
+    
+    fsMgmdInterfaceRxMldv1Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of MLDv1  reports  
+                 reports received on this interface."
+        ::= { fsMgmdInterfaceEntry 16 }
+    
+    fsMgmdInterfaceRxMldv2Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of MLDv2 reports  
+                  received on this interface."
+        ::= { fsMgmdInterfaceEntry 17 }
+
+    fsMgmdInterfaceTxGenQueries  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of General queries sent on this 
+                 interface."
+        ::= { fsMgmdInterfaceEntry 18 }
+    
+    fsMgmdInterfaceTxGrpQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group specific queries sent 
+                 on this interface."
+        ::= { fsMgmdInterfaceEntry 19 }
+               
+    fsMgmdInterfaceTxGrpAndSrcQueries  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group and source specific 
+                 queries sent on this interface."
+        ::= { fsMgmdInterfaceEntry 20 }
+    
+    fsMgmdInterfaceTxIgmpv1v2Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMP v1/v2 reports 
+                 sent on this interface. This object is specific
+                 to MGMD Proxy implementation."
+        ::= { fsMgmdInterfaceEntry 21 }
+    
+    fsMgmdInterfaceTxIgmpv3Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv3 reports 
+                 sent on this interface. This object is specific to MGMD
+                 Proxy implementation."
+        ::= { fsMgmdInterfaceEntry 22 }
+    
+    fsMgmdInterfaceTxMldv1Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of MLD v1 reports 
+                 sent on this interface. This object is specific
+                 to MGMD Proxy implementation."
+        ::= { fsMgmdInterfaceEntry 23 }
+    
+    fsMgmdInterfaceTxMldv2Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of MLDv2 reports 
+                 sent on this interface. This object is specific to MGMD
+                 Proxy implementation."
+        ::= { fsMgmdInterfaceEntry 24 }
+
+    fsMgmdInterfaceTxLeaves  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv2 leaves or MLDv1 leaves sent on 
+                 this interface. This object is specific to MGMD Proxy
+                 implementation."
+        ::= { fsMgmdInterfaceEntry 25 }
+    
+    fsMgmdInterfaceChannelTrackStatus  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		   disable (0),
+		   enable  (1)
+		  }
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+    	        "This variable controls the explicit channel tracking 
+                feature of the IGPMV3 protocol. Configuring this object as
+                'enable' makes the router to keep track of each individual 
+                host that is joined to a particular multicast group or channel.
+                Making this object 'disable' will not support explicit channel
+                tracking feature support. Default value of this entry will 
+                be 'disable'. 
+                This must be enabled only on IGMPv3 interfaces."
+	    DEFVAL  { disable }
+	    ::= { fsMgmdInterfaceEntry 26 }
+	  fsMgmdInterfaceGroupListId OBJECT-TYPE
+	      SYNTAX  Unsigned32(1..4294967295)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicate multicast GroupList Id mapped to this interface.This grouplist will be exempted for limiting on this interface. Grouplist support is provided for IGMPv1, IGMPv2 IGMPv3 only."
+        ::= { fsMgmdInterfaceEntry 27 }
+    
+	  fsMgmdInterfaceLimit OBJECT-TYPE
+	      SYNTAX  Unsigned32 (0..255)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the total number of multicast groups can be allowed for this interface.If fsMgmdInterfaceCurGrpCount reaches this InterfaceLimit then no membership reports will be honored on this interface except the grouplist mapped to this interface.This feature supports for IGMPv1, IGMPv2 IGMPv3 only."
+        ::= { fsMgmdInterfaceEntry 28 }
+
+	  fsMgmdInterfaceCurGrpCount OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..255)
+	      MAX-ACCESS   read-only
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the current count of multicast groups that were added to 
+              the interface.This counter will be incremented for each valid membership 
+              report on this interface and decremented for leave report."
+        ::= { fsMgmdInterfaceEntry 29 }
+    
+
+	  fsMgmdInterfaceCKSumError  OBJECT-TYPE
+	  SYNTAX		Counter32
+	  MAX-ACCESS	read-only
+	  STATUS		current
+	  DESCRIPTION
+	  "This object displays the number of packets received with checksum error on an interface."
+	  ::= { fsMgmdInterfaceEntry 30 }
+
+	  fsMgmdInterfacePktLenError  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets received with 
+	  packet length error on an interface."
+	  ::= { fsMgmdInterfaceEntry 31 }
+
+
+	  fsMgmdInterfacePktsWithLocalIP  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets received on an interface with
+	  local IP address as source address."
+	  ::= { fsMgmdInterfaceEntry 32 }
+
+	  fsMgmdInterfaceSubnetCheckFailure  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets dropped due to subnet check failure."
+	  ::= { fsMgmdInterfaceEntry 33 }
+
+
+      fsMgmdInterfaceQryFromNonQuerier  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of queries received from a non-querier on an interface."
+      ::= { fsMgmdInterfaceEntry 34 }
+
+
+      fsMgmdInterfaceReportVersionMisMatch  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of reports received by with version mismatch on an interface."
+      ::= { fsMgmdInterfaceEntry 35 }
+
+
+      fsMgmdInterfaceQryVersionMisMatch  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of queries received with version mismatch on an interface."
+      ::= { fsMgmdInterfaceEntry 36 }
+
+      fsMgmdInterfaceUnknownMsgType  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of packets received with unknown message type on an interface."
+      ::= { fsMgmdInterfaceEntry 37 }
+
+      fsMgmdInterfaceInvalidV1Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V2 reports received on an interface."
+      ::= { fsMgmdInterfaceEntry 38 }
+
+
+      fsMgmdInterfaceInvalidV2Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V2 reports received on an interface."
+      ::= { fsMgmdInterfaceEntry 39 }
+
+
+      fsMgmdInterfaceInvalidV3Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V3 reports received on an interface."
+      ::= { fsMgmdInterfaceEntry 40 }
+
+      fsMgmdInterfaceRouterAlertCheckFailure  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of packets dropped due to router alert check failure."
+      ::= { fsMgmdInterfaceEntry 41 }
+
+
+      fsMgmdInterfaceIncomingSSMPkts  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of V3 reports received on an interface for SSM group range."
+      ::= { fsMgmdInterfaceEntry 42 }
+
+      fsMgmdInterfaceInvalidSSMPkts  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid SSM v3 reports received on an interface."
+      ::= { fsMgmdInterfaceEntry 43 }
+
+      fsMgmdInterfaceJoinPktRate  OBJECT-TYPE
+      SYNTAX            Integer32
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+      "This object specifies the rate at which the join packets can be received on an interface."
+      DEFVAL { 0 }
+      ::= { fsMgmdInterfaceEntry 44 }
+
+      fsMgmdInterfaceMalformedPkts  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of Malformed packets received. Packet is just not as expected in the protocol specifications."
+      ::= { fsMgmdInterfaceEntry 45 }
+
+      fsMgmdInterfaceSocketErrors  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of socket errors."
+      ::= { fsMgmdInterfaceEntry 46 }
+
+      fsMgmdInterfaceBadScopeErrors  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of MLD packets received on the link scope IPv6 multicast address. "
+      ::= { fsMgmdInterfaceEntry 47 }
+
+	  --	  ************************************************
+	  --		       MGMD CACHE TABLE
+	  --	  ************************************************
+
+	  fsMgmdCacheTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsMgmdCacheEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP/MLD group statistic 
+                       information"	
+	      ::= { fsmgmd 26  }
+
+	  fsMgmdCacheEntry OBJECT-TYPE
+	      SYNTAX  FsMgmdCacheEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains the necessary Statistics of Multicast
+		       Groups"
+	      INDEX   { fsMgmdCacheAddrType, fsMgmdCacheAddress, 
+                        fsMgmdCacheIfIndex }
+	      ::= { fsMgmdCacheTable 1 }
+
+	  FsMgmdCacheEntry ::=
+	      SEQUENCE {
+                  fsMgmdCacheAddrType
+                      InetAddressType,
+                  fsMgmdCacheAddress    
+                      InetAddress, 
+                  fsMgmdCacheIfIndex     
+                      InterfaceIndex, 
+		  fsMgmdCacheGroupCompMode
+		      Integer32
+	      }
+
+
+          fsMgmdCacheAddrType OBJECT-TYPE 
+          SYNTAX     InetAddressType 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The address type of this interface. It can be IPv4 or IPv6. 
+                   This entry along with
+                   the ifIndex and CacheAddress acts as the index to the
+                   fsMgmdCache table.  A physical interface may be
+                   configured in multiple modes concurrently, e.g., in IPv4
+                   and IPv6 modes connected to the same interface; however,
+                   the traffic is considered to be logically separate."
+          ::= { fsMgmdCacheEntry 1 }
+ 
+          fsMgmdCacheAddress OBJECT-TYPE 
+          SYNTAX     InetAddress (SIZE(4|16)) 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The IP multicast group address for which this entry 
+                  contains information." 
+          ::= { fsMgmdCacheEntry 2 } 
+       
+ 
+          fsMgmdCacheIfIndex OBJECT-TYPE 
+          SYNTAX     InterfaceIndex 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The interface for which this entry contains information for 
+                  an IP multicast group address." 
+          ::= { fsMgmdCacheEntry 3 }
+ 
+	  fsMgmdCacheGroupCompMode OBJECT-TYPE
+	      SYNTAX  Integer32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Group Compatibility Mode of the particular Group."
+	      ::= { fsMgmdCacheEntry 4 }
+
+fsMgmdScalarGroup OBJECT IDENTIFIER ::= {fsmgmd 8}
+	  fsMgmdGlobalLimit OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..255)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the total number of multicast groups can be allowed.This support is for IGMPv1, IGMPv2 IGMPv3 only"
+	      ::= { fsMgmdScalarGroup 1 }
+    
+	  fsMgmdGlobalCurGrpCount OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..255)
+	      MAX-ACCESS   read-only
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the current count of groups that were added. If this reaches to fsMgmdGlobalLimit no membership reports will be honored for any interface."
+	      ::= { fsMgmdScalarGroup 2 }
+
+
+      fsMgmdSSMMapStatus  OBJECT-TYPE
+              SYNTAX  INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                      "This variable controls the global status of
+                      the SSM Mapping functionality in the router. 
+                      When the SSM map status is enabled, if SSM mapping
+                      is configured for a set of groups, then on receving 
+                      ( * G) join from the IGMP hosts, the router translates
+                      the (* G) into (S G) entry with the configured 
+                      source address. Making this object 'disabled' will 
+                      remove all dynamic multicast entries learnt via SSM
+                      mapped group and source addresses.
+                      Default value of this variable will be 'disabled'."
+              DEFVAL  { disabled }
+              ::= { fsMgmdScalarGroup 3 }
+
+
+	  --	  ************************************************
+	  --		       IGMP SSM MAP GROUP TABLE
+	  --	  ************************************************
+
+	  fsMgmdSSMMapGroupTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsMgmdSSMMapGroupEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP SSM Mapped group and source information. 
+               Multiple range of groups will be mapped to a single source address."               
+	      ::= { fsmgmd 9  }
+
+	  fsMgmdSSMMapGroupEntry OBJECT-TYPE
+	      SYNTAX  FsMgmdSSMMapGroupEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains information about the range of group address 
+               mapped to source address."
+	      INDEX   { fsMgmdSSMMapStartGrpAddress,fsMgmdSSMMapEndGrpAddress,fsMgmdSSMMapSourceAddress }
+	      ::= { fsMgmdSSMMapGroupTable 1 }
+
+	  FsMgmdSSMMapGroupEntry ::=
+	      SEQUENCE {
+                  fsMgmdSSMMapStartGrpAddress    
+                     IpAddress, 
+                  fsMgmdSSMMapEndGrpAddress     
+                      IpAddress, 
+		          fsMgmdSSMMapSourceAddress
+                      IpAddress,
+                  fsMgmdSSMMapRowStatus
+	           	      RowStatus
+	      }
+
+	  fsMgmdSSMMapStartGrpAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Start Group IP address for which SSM mapping 
+              has to be applied."
+	      ::= { fsMgmdSSMMapGroupEntry 1 }
+
+	  fsMgmdSSMMapEndGrpAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the End Group IP address upto which SSM mapping 
+              has to be applied."
+	      ::= { fsMgmdSSMMapGroupEntry 2 }
+
+	  fsMgmdSSMMapSourceAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Source IP address that has to be mapped to
+              the given group IP address range."
+	      ::= { fsMgmdSSMMapGroupEntry 3 }
+
+	  fsMgmdSSMMapRowStatus OBJECT-TYPE
+	      SYNTAX  RowStatus
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "RowStatus of SSM Mapped Multicast Group record"
+	      ::= { fsMgmdSSMMapGroupEntry 4 }
+
+END

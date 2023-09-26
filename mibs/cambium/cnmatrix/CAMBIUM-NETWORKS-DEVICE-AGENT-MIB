@@ -1,0 +1,173 @@
+CAMBIUM-NETWORKS-DEVICE-AGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, enterprises, Integer32
+                FROM SNMPv2-SMI
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        DateAndTime, DisplayString, TruthValue
+                FROM SNMPv2-TC;
+
+deviceAgent MODULE-IDENTITY
+    LAST-UPDATED "202111300000Z" -- November 30, 2021
+    ORGANIZATION
+        "Cambium Networks Inc."
+    CONTACT-INFO
+        "Cambium Networks Support"
+    DESCRIPTION
+        "This module contains MIB definitions for cnMaestro device agent."
+
+    REVISION    "202111300000Z" -- November 30, 2020
+    DESCRIPTION
+        "Added cambiumDeviceAgentRemoteManager definition."
+
+    REVISION    "202006240000Z" -- June 24, 2020
+    DESCRIPTION
+        "Added support for enforcing certificate validation for
+        cnMaestro on-premise."
+
+    REVISION "201902191500Z" -- February 19, 2019
+    DESCRIPTION
+        "Initial Production Version."
+
+::= { cnMatrix 2 }
+
+cnMatrix OBJECT IDENTIFIER ::= { enterprises 17713 24 }
+
+cambiumDeviceAgentEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Remote Management:
+         Cambium provides cloud management of Cambium devices called cnMaestro.
+         This allows a user to manage all of their various Cambium devices via the web from any location in the world.
+         This field enables this cnMaestro Cloud Management."
+    DEFVAL      { true }
+    ::= { deviceAgent 1 }
+
+cambiumDeviceAgentStaticURL OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "cnMaestro URL:
+         This specifies the URL for accessing the cnMaestro Manager"
+    DEFVAL      { "" }
+    ::= { deviceAgent 2 }
+
+cambiumCNSDeviceAgentID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Cambium ID:
+        This is a user name for the cnMaestro Remote Management system.
+        This is used with the 'Onboarding Key' to on-board older Cambium devices,
+        which are not provisioned with an MSN in the Cambium factory."
+    DEFVAL      { "" }
+    ::= { deviceAgent 3 }
+
+cambiumCNSDeviceAgentPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Onboarding Key:
+        This is a password for the cnMaestro Remote Management system.
+        This is used with the 'Cambium ID' to on-board older Cambium devices,
+        which are not provisioned with an MSN in the Cambium factory."
+    DEFVAL      { "" }
+    ::= { deviceAgent 4 }
+
+cambiumDeviceAgentValidateCert OBJECT-TYPE
+    SYNTAX      INTEGER {
+                                cloud-only(1),
+                                disabled(2),
+                                full(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Certificate validation:
+         This verifies the identity of the cnMaestro Manager server.
+         Cloud-only validates only cnMaestro cloud certificate, cnMaestro on-premise is not validated
+         Disabled does not validate any certificates
+         Full validates all certificates, for both cloud and on-premise versions of cnMaestro"
+    DEFVAL      { 1 }
+    ::= { deviceAgent 5 }
+
+cambiumDeviceAgentStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                                notConnected(1),
+                                dnsFailed(2),
+                                noCambiumId(3),
+                                error(4),
+                                connecting(5),
+                                approvalPending(6),
+                                connected(7),
+                                ownershipError(8),
+                                messageFromCNS(9)
+                        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "cnMaestro connection status:
+         This shows the current status of the connection to cnMaestro Manager"
+    ::= { deviceAgent 6 }
+
+cambiumDeviceAgentStatusMessage OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "cnMaestro status message:
+         This shows a status message that came from cnMaestro Manager"
+    ::= { deviceAgent 7 }
+
+cambiumDeviceAgentCNSURL OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "cnMaestro URL:
+         This shows the URL of the cnMaestro Manager this device is currently connected to"
+    ::= { deviceAgent 8 }
+
+cambiumDeviceAgentAccountID OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "cnMaestro Account-ID:
+         This shows the account ID associated by the cnMaestro Manager"
+    ::= { deviceAgent 9 }
+
+cambiumDeviceAgentLastAction OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The last action performed by the cnMaestro Manager"
+    ::= { deviceAgent 10 }
+
+cambiumDeviceAgentLastSync OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Time of the last synchronization with cnMaestro"
+    ::= { deviceAgent 11 }
+
+cambiumDeviceAgentRemoteManager OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the device is under the control of
+        XMS Cloud Management ('true') or not ('false)."
+    DEFVAL      { false }
+    ::= { deviceAgent 12 }
+
+END
+

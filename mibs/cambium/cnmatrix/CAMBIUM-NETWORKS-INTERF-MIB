@@ -1,0 +1,236 @@
+CAMBIUM-NETWORKS-INTERF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, enterprises,
+                Integer32, Counter32, Gauge32, IpAddress
+                FROM SNMPv2-SMI
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        DateAndTime, TruthValue, DisplayString
+                FROM SNMPv2-TC;
+
+cnInterfaces MODULE-IDENTITY
+    LAST-UPDATED "202205260000Z" -- May 26, 2022
+    ORGANIZATION
+        "Cambium Networks Inc."
+    CONTACT-INFO
+        "Cambium Networks Support"
+    DESCRIPTION
+        "This module contains MIB definitions with statistics functions
+         for cnMatrix."
+
+    REVISION "202205260000Z" -- November 30, 2021
+    DESCRIPTION
+        "Added ifCnPortCpuStatisticsTable with the folowing prameters:
+            - ifCnCpuIndex
+            - ifCnCpuRxUcastPkts
+            - ifCnCpuRxMcastPkts
+            - ifCnCpuRxBcastPkts
+            - ifCnCpuRxArpPkts
+            - ifCnCpuRxIgmpPkts
+            - ifCnCpuRxIpMcastPkts
+            - ifCnCpuRxStpPkts
+            - ifCnCpuRxLldpPkts
+            - ifCnCpuRxDhcpPkts
+            - ifCnCpuRxOtherPkts"
+
+    REVISION "202111300000Z" -- November 30, 2021
+    DESCRIPTION
+        "Updated MIB registration node to fix
+        conflict with CAMBIUM-NETWORKS-EEE-MIB."
+
+    REVISION "202104081800Z" -- April 08, 2021
+    DESCRIPTION
+        "Added ifCnTablePortLinkTransitions with the folowing parameters:
+            - ifCnIndex
+            - ifCnPortLinkTransitions"
+
+    ::= { enterprises cambium(17713) cnMatrix(24) 11 }
+
+ifCnTablePortLinkTransitions OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfCnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of ifCnNumber."
+    ::= { cnInterfaces 1 }
+
+ifCnEntry OBJECT-TYPE
+    SYNTAX      IfCnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    INDEX   { ifCnIndex }
+    ::= { ifCnTablePortLinkTransitions 1 }
+
+IfCnEntry ::=
+    SEQUENCE {
+        ifCnIndex               Integer32,
+        ifCnPortLinkTransitions Gauge32
+    }
+
+ifCnIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { ifCnEntry 1 }
+
+ifCnPortLinkTransitions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of Link Up and Link Down transition events
+            counted for a port."
+    ::= { ifCnEntry 2 }
+
+ifCnPortCpuStatisticsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IfCnCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of CPU interface entries. The number of entries is
+            given by the value of ifCnCpuIndex."
+    ::= { cnInterfaces 2}
+
+ifCnCpuEntry OBJECT-TYPE
+    SYNTAX      IfCnCpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    INDEX       { ifCnCpuIndex }
+
+    ::=  { ifCnPortCpuStatisticsTable 1 }
+
+IfCnCpuEntry ::=
+    SEQUENCE  {
+        ifCnCpuIndex        Integer32,
+        ifCnCpuRxUcastPkts  Counter32,
+        ifCnCpuRxMcastPkts  Counter32,
+        ifCnCpuRxBcastPkts  Counter32,
+        ifCnCpuRxArpPkts    Counter32,
+        ifCnCpuRxIgmpPkts   Counter32,
+        ifCnCpuRxIpMcastPkts Counter32,
+        ifCnCpuRxStpPkts    Counter32,
+        ifCnCpuRxLldpPkts   Counter32,
+        ifCnCpuRxDhcpPkts   Counter32,
+        ifCnCpuRxOtherPkts  Counter32
+        }
+
+ifCnCpuIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { ifCnCpuEntry 1 }
+
+ifCnCpuRxUcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of unicast packets received by the CPU through the
+            associated device interface."
+    ::= { ifCnCpuEntry 2 }
+
+ifCnCpuRxMcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of multicast packets received by the CPU through
+            the associated device interface."
+    ::= { ifCnCpuEntry 3 }
+
+ifCnCpuRxBcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of broadcast packets received by the CPU through
+            the associated device interface."
+    ::= { ifCnCpuEntry 4 }
+
+ifCnCpuRxArpPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of ARP packets received by the CPU  through the
+            associated device interface."
+    ::= { ifCnCpuEntry 5 }
+
+ifCnCpuRxIgmpPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IGMP packets received by the CPU  through the
+            associated device interface."
+    ::= { ifCnCpuEntry 6 }
+
+ifCnCpuRxIpMcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IP multicast packets received by the CPU
+            through the associated device interface."
+    ::= { ifCnCpuEntry 7 }
+
+ifCnCpuRxStpPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of STP packets received by the CPU through the
+            associated device interface."
+    ::= { ifCnCpuEntry 8 }
+
+ifCnCpuRxLldpPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of LLDP packets received by the CPU through the
+            associated device interface."
+    ::= { ifCnCpuEntry 9 }
+
+ifCnCpuRxDhcpPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of DHCP packets received by the CPU through the
+            associated device interface."
+    ::= { ifCnCpuEntry 10 }
+
+ifCnCpuRxOtherPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of other packets received by the CPU that are not:
+              ARP,IGMP, IP Multicast, STP, LLDP, DHCP."
+    ::= { ifCnCpuEntry 11 }
+
+END
+

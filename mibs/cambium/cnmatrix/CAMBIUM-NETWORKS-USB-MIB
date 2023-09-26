@@ -1,0 +1,202 @@
+CAMBIUM-NETWORKS-USB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32, Integer32, Counter32
+            FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+            FROM IF-MIB
+    RowStatus, TruthValue
+            FROM SNMPv2-TC;
+
+cnUsbMib MODULE-IDENTITY
+    LAST-UPDATED "201903140000Z"     -- March 14, 2019
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cnnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the 
+        transceiver information support."
+
+    REVISION    "201903140000Z" -- March 14, 2019
+    DESCRIPTION "Ver 1:  Initial version."
+
+    ::= { 1 3 6 1 4 1 17713 24 3 }
+
+cnUsbMountDevice OBJECT IDENTIFIER ::= { cnUsbMib 0 }
+cnUsbDeviceTable OBJECT IDENTIFIER ::= { cnUsbMib 1 }
+cnUsbDeviceFiles  OBJECT IDENTIFIER ::= { cnUsbMib 2 }
+
+--
+-- USB MIB Mount
+--
+cnUsbMount OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      mount(1),
+                      unmount(2)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Mount or unmount the device."
+    ::= { cnUsbMountDevice 1 }
+
+--
+-- USB MIB Table
+--
+cnUsbTable	OBJECT-TYPE
+    SYNTAX SEQUENCE OF CnUsbEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table for retrieving the data for
+		   the USBs inserted on the chassis"
+    ::= { cnUsbDeviceTable 1 }
+
+cnUsbEntry OBJECT-TYPE
+    SYNTAX        CnUsbEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Contains information regarding the data for 
+		   USBs inserted on the chassis"
+    INDEX         { cnUsbSlotIndex }
+    ::= { cnUsbTable 1 }
+
+CnUsbEntry ::=
+    SEQUENCE {
+          cnUsbSlotIndex             Integer32,
+          cnUsbSlotDescription       OCTET STRING,
+          cnUsbVendorId              OCTET STRING,
+          cnUsbManufacturer          OCTET STRING,
+          cnUsbProductId             OCTET STRING,
+          cnUsbProductName           OCTET STRING,
+          cnUsbSerialNumber          OCTET STRING,
+          cnUsbVersion               OCTET STRING,
+          cnUsbMaxCurrent            Integer32
+    }
+
+cnUsbSlotIndex    OBJECT-TYPE
+    SYNTAX        Integer32 (1..2)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Slot number of CP in which USB is inserted."
+    ::= { cnUsbEntry 1 }
+
+cnUsbSlotDescription    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..20))
+    MAX-ACCESS	  read-only
+    STATUS        current
+    DESCRIPTION	  "Used to indicate the slot type information.
+                   Such as, 'Slot1'..'Slot2."
+    ::= { cnUsbEntry 2 }
+
+cnUsbVendorId    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS	  read-only
+    STATUS        current
+    DESCRIPTION	  "Indicates the Vendor Id for the inserted USB.
+                   Value is assigned by USB-IF."  
+    ::= { cnUsbEntry 3 }
+
+cnUsbManufacturer    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS	  read-only
+    STATUS        current
+    DESCRIPTION	  "Indicates the Manufacturer for the inserted USB."
+    ::= { cnUsbEntry 4 }
+
+cnUsbProductId    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS	  read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the Product Id for the inserted USB. Value is assigned by manufacturer."
+    ::= { cnUsbEntry 5 }
+
+cnUsbProductName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the Product Name for the inserted USB."
+    ::= { cnUsbEntry 6 }
+
+cnUsbSerialNumber    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the Serial Number for the inserted USB."
+    ::= { cnUsbEntry 7 }
+
+cnUsbVersion    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates the version the USB is using."
+    ::= { cnUsbEntry 8 }
+
+cnUsbMaxCurrent    OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "milliamps"            
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION	  "Returns the Max Power as defined by specification  
+                   for the inserted USB.  The units are milliamps."
+    ::= { cnUsbEntry 9 }
+
+--
+-- USB MIB File
+--
+cnUsbFile     OBJECT-TYPE
+    SYNTAX SEQUENCE OF CnUsbFileEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table for retrieving the data for
+                   the USBs inserted on the chassis"
+    ::= { cnUsbDeviceFiles 1 }
+
+cnUsbFileEntry    OBJECT-TYPE
+    SYNTAX       CnUsbFileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Contains information regarding the data for
+                  USBs inserted on the chassis"
+    INDEX        { cnUsbSlotIndex }
+    ::= { cnUsbFile 1 }
+
+CnUsbFileEntry ::=
+    SEQUENCE {
+          cnUsbFileSlot Integer32,
+          cnUsbFileName OCTET STRING,
+          cnUsbFileDate OCTET STRING,
+          cnUsbFileSize Unsigned32
+    }
+
+cnUsbFileSlot OBJECT-TYPE
+    SYNTAX        Integer32 (0..8)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "slot number"
+    ::= { cnUsbFileEntry 1 }
+
+cnUsbFileName OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..114))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "name of file"
+    ::= { cnUsbFileEntry 2 }
+
+cnUsbFileDate OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "date"
+    ::= { cnUsbFileEntry 3 }
+
+cnUsbFileSize OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "size in bytes"
+    ::= { cnUsbFileEntry 4 }
+
+END

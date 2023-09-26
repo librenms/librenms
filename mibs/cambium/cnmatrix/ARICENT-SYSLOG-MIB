@@ -1,0 +1,757 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+ARICENT-SYSLOG-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS 
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   enterprises, IpAddress,NOTIFICATION-TYPE, Integer32   
+   FROM SNMPv2-SMI 
+   TruthValue, DisplayString, RowStatus
+   FROM SNMPv2-TC
+
+    InetAddressType, InetAddress
+         FROM INET-ADDRESS-MIB;              -- [RFC4001]
+
+
+   fsSyslog MODULE-IDENTITY 
+      LAST-UPDATED "202108310000Z" 
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE" 
+      CONTACT-INFO "support@aricent.com" 
+      DESCRIPTION
+         "The MIB for Syslog."
+      REVISION "202108310000Z"
+      DESCRIPTION 
+         "The MIB for Syslog." 
+   ::= { enterprises futuresoftware (2076) 89 }
+
+
+-- ----------------------------------------------------------------- -- 
+-- groups in the MIB  
+-- ----------------------------------------------------------------- -- 
+ 
+      fsSyslogGeneralGroup          		OBJECT IDENTIFIER ::= { fsSyslog 1 }
+      fsSyslogLogs                  		OBJECT IDENTIFIER ::= { fsSyslog 2 }
+      fsSyslogSmtp                  		OBJECT IDENTIFIER ::= { fsSyslog 3 }
+      fsSyslogSrvrUnreachableNotifications	OBJECT IDENTIFIER ::= { fsSyslog 4 }
+ 
+-- ---------------------------------------------------------------- --
+
+-- General Group 
+
+-- Common objects for syslogLogs and SMTP 
+
+fsSyslogLogging OBJECT-TYPE
+   SYNTAX       INTEGER {
+                enable(1),
+                disable(2)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "This object is for enabling or disabling syslog and email alert
+   features in the system."
+
+   DEFVAL  { enable } 
+   ::= { fsSyslogGeneralGroup 1 }
+
+fsSyslogTimeStamp OBJECT-TYPE 
+   SYNTAX         INTEGER {
+                   enable(1),
+                   disable(2)
+                  }
+   MAX-ACCESS  read-write 
+   STATUS      deprecated 
+   DESCRIPTION 
+      "Currently this object is not used. Timestamp is a mandatory field
+       in Syslog Message format"
+
+   DEFVAL  { enable } 
+   ::= { fsSyslogGeneralGroup 2 }
+
+fsSyslogConsoleLog OBJECT-TYPE
+   SYNTAX         INTEGER {
+                   enable(1),
+                   disable(2)
+                  }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "This object is for enabling or disabling the console log option.
+
+       When enabled, the messages (log and email alert messages) sent to 
+       the server will be displayed in the console also.
+
+       When disabled,the messages will just be sent to the servers and not 
+       be displayed in the console." 
+
+   DEFVAL  { enable } 
+   ::= { fsSyslogGeneralGroup 3 }
+
+fsSyslogSysBuffers OBJECT-TYPE 
+   SYNTAX      Integer32 (1..200)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Number of log buffers to be allocated in the system"
+
+   DEFVAL  { 50 }
+   ::= { fsSyslogGeneralGroup 4 }
+
+fsSyslogClearLog OBJECT-TYPE 
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Clears the buffered logs.
+
+       This object is set to 'false' by default. 
+
+       When set to 'True', the buffered logs will be cleared and the value 
+       of this object will become 'false' again."
+
+   DEFVAL  { false }
+   ::= { fsSyslogGeneralGroup 5 }
+
+
+-- fsSyslogConfigTable
+-- This table is for configuring the log level options for the module.
+
+  fsSyslogConfigTable       OBJECT-TYPE
+         SYNTAX               SEQUENCE OF FsSyslogConfigEntry 
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A table for configuring module specific log levels." 
+
+         ::= { fsSyslogGeneralGroup 6 }
+
+  fsSyslogConfigEntry    OBJECT-TYPE
+         SYNTAX            FsSyslogConfigEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing logging level options for a particular module."
+         INDEX { fsSyslogConfigModule }
+         ::= { fsSyslogConfigTable 1 }
+         
+      FsSyslogConfigEntry ::=
+         SEQUENCE {
+            fsSyslogConfigModule    INTEGER, 
+            fsSyslogConfigLogLevel  INTEGER
+            }
+
+      fsSyslogConfigModule    OBJECT-TYPE
+         SYNTAX                 INTEGER{
+                                  web(1),  -- For WEB module
+                                  msr(2),  -- For MSR module
+                                  tftp(3), -- For TFTP module
+                                  cli(4)   -- For CLI module
+                                }
+         MAX-ACCESS             not-accessible 
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the module for which the log level option has to be 
+             configured."
+         ::= { fsSyslogConfigEntry 1 }
+
+      fsSyslogConfigLogLevel    OBJECT-TYPE
+         SYNTAX                 INTEGER{
+                                  emergency(0), -- For logging messages that 
+                                                -- are equivalent to panic 
+                                                -- condition. 
+                                  alert(1),     -- For logging messages that 
+                                                -- require immediate attention.
+                                  critical(2),  -- For logging critical errors.
+                                  error(3),     -- For logging error messages.
+                                  warning(4),   -- For logging warning messages.
+                                  notice(5),    -- For logging messages that 
+                                                -- require attention
+                                                -- and not errors.
+                                  info(6),      -- For logging informational 
+                                                -- messages.
+                                  debug(7)      -- For logging debug messages.
+                                }
+         MAX-ACCESS             read-write
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the log level option to be set for a specific module."
+         DEFVAL  { 2 } 
+         
+         ::= { fsSyslogConfigEntry 2 }
+
+--Table ends
+
+fsSyslogFacility OBJECT-TYPE 
+   SYNTAX         INTEGER {
+                   local0(128),     -- Reserved local use
+                   local1(136),     -- Reserved local use
+                   local2(144),     -- Reserved local use
+                   local3(152),     -- Reserved local use
+                   local4(160),     -- Reserved local use
+                   local5(168),     -- Reserved local use
+                   local6(176),     -- Reserved local use
+                   local7(184)      -- Reserved local use
+                  }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "The Syslog standard facilities.
+       The facility to be used when sending Syslog messages to this server."
+
+   DEFVAL  { local0 } 
+   ::= { fsSyslogGeneralGroup 7 }
+
+--fsSyslogRole
+--This scalar for configuring syslog role
+
+fsSyslogRole OBJECT-TYPE
+   SYNTAX       INTEGER {
+                device(1),
+                relay(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog supports two type of roles one is Device and other is Relay
+       Device can generate and forward the syslog message
+       Relay can receive , generate and forward the syslog messages
+       Relay check whether the received packet is as per BSD Syslog format
+       if not relay makes the message to BSD Syslog format and forward
+       Default role is device."
+
+   DEFVAL  { device }
+   ::= { fsSyslogGeneralGroup 8 }
+
+--fsSyslogLogFile
+--This scalar for enabling local storage
+
+fsSyslogLogFile OBJECT-TYPE
+   SYNTAX       INTEGER {
+                enable(1),
+                disable(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog supports storing of syslog messages in the file as configured by admin
+       This object is used to enable or disable the syslog local storage
+       By default the local storage option is disabled."
+
+   DEFVAL  {disable }
+   ::= { fsSyslogGeneralGroup 9 }
+
+--fsSyslogMail
+--This scalar for enabling mail option
+
+fsSyslogMail OBJECT-TYPE
+   SYNTAX       INTEGER {
+                enable(1),
+                disable(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog supports sending syslog message to any mail-id as configured by the admin
+       This object is used to enable or disable the syslog mail storage
+       By default the syslog mail option is disabled."
+
+   DEFVAL  {disable }
+   ::= { fsSyslogGeneralGroup 10 }
+
+--fsSyslogProfile
+--This scalar for setting the syslog profile.
+
+fsSyslogProfile OBJECT-TYPE
+   SYNTAX       INTEGER {
+                raw(1),
+                cooked(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Beep supports two types of profile. One is raw other is cooked profile.
+       This object is used to set the profile for beep
+       By default the beep profile is raw."
+
+   DEFVAL  {raw}
+   ::= { fsSyslogGeneralGroup 11 }
+
+--fsSyslogRelayPort
+--This scalar for setting the syslog port in relay for receiving 
+--syslog messages from other relay/device.
+
+fsSyslogRelayPort OBJECT-TYPE
+   SYNTAX       Integer32 (1..65535)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is used to configure port in which the relay listens
+       Irrespective of the transport type, the relay opens the socket
+       and listen on the port configured here.
+       By default the relay will listen on port 514."
+
+   DEFVAL  {514}
+   ::= { fsSyslogGeneralGroup 12}
+
+--fsSyslogRelayTransType
+--This scalar for setting the syslog relay transport type.
+
+fsSyslogRelayTransType OBJECT-TYPE
+   SYNTAX       INTEGER {
+                udp(1),
+                tcp(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Relay supports UDP and TCP transport type.When the transport type is configured
+       as UDP, relay receives syslog messages via UDP socket.When the transport type is
+       configured as TCP, relay receives syslog message via TCP socket."
+
+   DEFVAL  {udp}
+   ::= { fsSyslogGeneralGroup 13 }
+
+--fsSyslogFileNameOne
+-- This Scalar is to configure file name for syslog local storage
+
+fsSyslogFileNameOne OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(0..32)) 
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog can store the messages locally in three different files.This scalar is to
+       get the file name"
+   ::= { fsSyslogGeneralGroup 14 }
+
+--fsSyslogFileNameTwo
+-- This Scalar is to configure file name for syslog local storage
+
+fsSyslogFileNameTwo OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(0..32))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog can store the messages locally in three different files.This scalar is to
+       get the file name"
+   ::= { fsSyslogGeneralGroup 15 }
+
+--fsSyslogFileNameThree
+-- This Scalar is to configure file name for syslog local storage
+
+fsSyslogFileNameThree OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(0..32))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Syslog can store the messages locally in three different files.This scalar is to
+       get the file name"
+   ::= { fsSyslogGeneralGroup 16 }
+
+
+-- fsSyslogFileTable
+-- This table is for configuring the file table
+
+  fsSyslogFileTable       OBJECT-TYPE
+         SYNTAX               SEQUENCE OF FsSyslogFileEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A table containing entries of priority and filename.
+             Both priority and file name is considered as index "
+
+         ::= { fsSyslogGeneralGroup 17 }
+
+  fsSyslogFileEntry    OBJECT-TYPE
+         SYNTAX            FsSyslogFileEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "A table containing entries of priority,file name.
+             Both priority and file name is considered as index"
+         INDEX { fsSyslogFilePriority, fsSyslogFileName }
+         ::= { fsSyslogFileTable 1 }
+
+      FsSyslogFileEntry ::=
+         SEQUENCE {
+             fsSyslogFilePriority    Integer32,
+             fsSyslogFileName    DisplayString,
+             fsSyslogFileRowStatus   RowStatus
+
+            }
+      fsSyslogFilePriority    OBJECT-TYPE
+         SYNTAX                 Integer32(0..191)
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "This Object specifies the priority for which it should be written in file.
+             Priority value ranges from 0 to 191"
+         ::= { fsSyslogFileEntry 1 }
+
+        fsSyslogFileName    OBJECT-TYPE
+         SYNTAX                 DisplayString (SIZE(1..64))
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "This object specifies the file name to which syslog message is written."
+         ::= { fsSyslogFileEntry 2 }
+
+      fsSyslogFileRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION    "This object specifies the Status of the File Entry."
+         ::= {fsSyslogFileEntry 3}
+
+
+--Table ends
+
+fsSyslogServerUpDownTrap OBJECT-TYPE
+           SYNTAX             INTEGER { 
+				  enabled(1), 
+				  disabled(2) 
+			              }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+            "Indicates whether Syslog server up/down traps should be generated. 
+             When this object is set to Enabled, A Trap will be generated whenever connectivity to the external server collecting logs is lost."
+            
+
+         DEFVAL  {  enabled  }
+                       ::= { fsSyslogGeneralGroup 18 }
+
+-- Syslog Logs group
+
+-- Objects specific to Syslogs Logging.
+
+fsSyslogLogSrvAddr OBJECT-TYPE
+   SYNTAX       IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION 
+       "Currently this object is is not used. Instead fsSyslogFwdServerIP 
+       is used for configuring syslog server IP for remote logging. "
+
+   ::= { fsSyslogLogs 1 }
+
+fsSyslogLogNoLogServer OBJECT-TYPE
+   SYNTAX      TruthValue 
+   MAX-ACCESS  read-write 
+   STATUS      deprecated 
+   DESCRIPTION 
+      " Currently this object is not used. Instead fsSyslogFwdServerIP
+        is used for closing the communication with syslog server IP 
+        for remote logging. "
+
+   ::= { fsSyslogLogs 2 }
+
+-- fsSyslogFwdTable
+-- This table is for configuring the Logging server forward table
+
+  fsSyslogFwdTable       OBJECT-TYPE
+         SYNTAX               SEQUENCE OF FsSyslogFwdEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A table containing entries of priority,server address type, server address,
+             port through which it can send and tranport type."
+
+         ::= { fsSyslogLogs 3 }
+
+  fsSyslogFwdEntry    OBJECT-TYPE
+         SYNTAX            FsSyslogFwdEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "A table containing index as priority , server address type and server address."
+         INDEX { fsSyslogFwdPriority,fsSyslogFwdAddressType,fsSyslogFwdServerIP}
+         ::= { fsSyslogFwdTable 1 }
+
+      FsSyslogFwdEntry ::=
+         SEQUENCE {
+             fsSyslogFwdPriority    Integer32,
+             fsSyslogFwdAddressType InetAddressType,
+             fsSyslogFwdServerIP    InetAddress,
+             fsSyslogFwdPort        Integer32,
+             fsSyslogFwdTransType   INTEGER,
+             fsSyslogFwdRowStatus   RowStatus
+
+            }
+
+     fsSyslogFwdPriority    OBJECT-TYPE
+         SYNTAX                 Integer32(0..191)
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the priority which is to be forwarded to the desired server.
+             Priority can take the value from 0 to 191."
+         ::= { fsSyslogFwdEntry 1 }
+
+
+         fsSyslogFwdAddressType    OBJECT-TYPE
+         SYNTAX                 InetAddressType
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Address type of server.Address type shall be ipv4 or ipv6."
+         ::= { fsSyslogFwdEntry 2 }
+
+        fsSyslogFwdServerIP    OBJECT-TYPE
+         SYNTAX                 InetAddress
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the ServerIP to which the syslog shall be forwarded.
+              Host name is a string value with maximum size 63."
+         ::= { fsSyslogFwdEntry 3 }
+
+      fsSyslogFwdPort    OBJECT-TYPE
+         SYNTAX                 Integer32(1..65535)
+         MAX-ACCESS             read-write
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Port through which it can send the syslog message.
+             By default the the port  is 514"
+         DEFVAL { 514 }
+         ::= { fsSyslogFwdEntry 4 }
+
+     fsSyslogFwdTransType    OBJECT-TYPE
+         SYNTAX                 INTEGER {
+                                           udp (0),
+                                           tcp (1),
+                                           beep (2)
+                                        }
+         MAX-ACCESS             read-write
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Transport type using which it can send syslog message.
+             By default the tranport type is udp"
+         DEFVAL { udp }
+         ::= { fsSyslogFwdEntry 5 }
+
+      fsSyslogFwdRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION    "The Status of the Fwd  Entry."
+         ::= {fsSyslogFwdEntry 6}
+
+         
+fsSyslogGlobalLevel OBJECT-TYPE 
+   SYNTAX      Integer32 (0..7)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+	"Specifies the log level option to be set globally. Intended for cnMaestro use.
+	                          emergency(0), -- For logging messages that 
+                                                -- are equivalent to panic 
+                                                -- condition. 
+                                  alert(1),     -- For logging messages that 
+                                                -- require immediate attention.
+                                  critical(2),  -- For logging critical errors.
+                                  error(3),     -- For logging error messages.
+                                  warning(4),   -- For logging warning messages.
+                                  notice(5),    -- For logging messages that 
+                                                -- require attention
+                                                -- and not errors.
+                                  info(6),      -- For logging informational 
+                                                -- messages.
+                                  debug(7)      -- For logging debug messages."
+
+   DEFVAL  { 3 }
+   ::= { fsSyslogGeneralGroup 20 }         
+
+--Table ends
+
+-- Syslog SMTP group
+
+-- Objects specific to SMTP (Email alert).
+
+fsSyslogSmtpSrvAddr OBJECT-TYPE
+   SYNTAX       IpAddress
+   MAX-ACCESS   read-write
+   STATUS       deprecated
+   DESCRIPTION 
+      "Currently this object is not used. fsSyslogMailServAdd is used for 
+      specifing the mail server IP to be used for sending email alerts."
+
+   ::= { fsSyslogSmtp 1 }
+
+fsSyslogSmtpRcvrMailId OBJECT-TYPE 
+   SYNTAX       DisplayString (SIZE(1..100)) 
+   MAX-ACCESS   read-write
+   STATUS       deprecated
+   DESCRIPTION
+      "Currently this object is not used. fsSyslogRxMailId is used for
+      specifing the receiver mail ID for email alerts."
+      DEFVAL { "admin@email.com" }
+   ::= { fsSyslogSmtp 2 }
+
+fsSyslogSmtpSenderMailId OBJECT-TYPE
+   SYNTAX       DisplayString (SIZE(0..100))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION 
+      "Specifies the sender mail ID for email alerts."
+
+   ::= { fsSyslogSmtp 3 }
+
+-- fsSyslogMailTable
+
+-- This table is for configuring the Mail table
+
+  fsSyslogMailTable       OBJECT-TYPE
+         SYNTAX               SEQUENCE OF FsSyslogMailEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A table containing entries of priority,mail server address type,mail 
+             server address and receiver mail id"
+
+         ::= { fsSyslogSmtp 4 }
+
+  fsSyslogMailEntry    OBJECT-TYPE
+         SYNTAX            FsSyslogMailEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "Mail Table contains index as priority , mail server address type and 
+             mail server address."
+         INDEX { fsSyslogMailPriority, fsSyslogMailServAddType , fsSyslogMailServAdd }
+         ::= { fsSyslogMailTable 1 }
+
+      FsSyslogMailEntry ::=
+         SEQUENCE {
+             fsSyslogMailPriority    Integer32,
+             fsSyslogMailServAddType InetAddressType,
+             fsSyslogMailServAdd InetAddress,
+             fsSyslogRxMailId DisplayString,
+             fsSyslogMailRowStatus   RowStatus,
+             fsSyslogMailServUserName DisplayString,
+             fsSyslogMailServPassword DisplayString
+            }
+
+     fsSyslogMailPriority    OBJECT-TYPE
+         SYNTAX                 Integer32(0..191)
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the priority which is to be mailed.
+             Priority can be in the range 0 to 191"
+         ::= { fsSyslogMailEntry 1 }
+
+        fsSyslogMailServAddType    OBJECT-TYPE
+         SYNTAX                 InetAddressType
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Mail Server Address Type.
+             Address type can be ipv4 or ipv6"
+         ::= { fsSyslogMailEntry 2 }
+
+
+          fsSyslogMailServAdd    OBJECT-TYPE
+         SYNTAX                 InetAddress(SIZE(4..16))
+         MAX-ACCESS             not-accessible
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Mail Server ip.
+             Server Address can be ipv4 or ipv6"
+         ::= { fsSyslogMailEntry 3 }
+
+
+      fsSyslogRxMailId    OBJECT-TYPE
+         SYNTAX                 DisplayString (SIZE(1..100))
+         MAX-ACCESS             read-write
+         STATUS                 current
+         DESCRIPTION
+            "Specifies the Receiver mail id "
+
+         ::= { fsSyslogMailEntry 4 }
+
+      fsSyslogMailRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION    "Specifies RowStatus of the Mail  Entry."
+         ::= {fsSyslogMailEntry 5}
+
+      fsSyslogMailServUserName OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(1..64))
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+          "Specifies the distinguished username of the account in the
+           mail server to which the mails have to be sent.
+           The username will be used only when a valid authentication method
+           is configured for the system. When fsSyslogSmtpAuthMethod is set
+           as noAuthenticate, the userName will not be used for sending mails."
+         ::= {fsSyslogMailEntry 6}
+
+      fsSyslogMailServPassword OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(1..64))
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+          "Specifies the password that authenticates for the configured
+           username in the mail server.
+           The password will be used only when a valid authentication method
+           is configured for the system. When fsSyslogSmtpAuthMethod is set
+           as noAuthenticate, the password will not be used for sending mails."
+         ::= {fsSyslogMailEntry 7}
+
+--Mail Table ends
+    fsSyslogSmtpAuthMethod OBJECT-TYPE
+        SYNTAX             INTEGER {
+                             noAuthenticate(1),
+                             authLogin(2),
+                             authPlain(3),
+                             crammd5(4),
+                             digestmd5(5)
+                            }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION 
+            "Specifies the authentication mode to be used for 
+             sending email alerts to the mail servers configured."
+
+        DEFVAL  { noAuthenticate }
+   ::= { fsSyslogSmtp 5 }
+
+-- Syslog Traps Group.
+-- This group defines the different types of Traps used by the Syslog Module.
+sysLogTraps OBJECT IDENTIFIER ::= { fsSyslogSrvrUnreachableNotifications 0 }
+sysLogTrapObjects OBJECT IDENTIFIER ::= { fsSyslogSrvrUnreachableNotifications 1 }
+
+    sysLogSrvrUnreachEventTime OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE (24))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the date and time at which SysLogSrvrUnreachEvent
+         was performed."
+    ::= { sysLogTrapObjects 1 }
+
+    sysLogSrvrUnreachMessage OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This string is also used to display message that the
+         syslog server is unreachable"
+    ::= { sysLogTrapObjects 2 }
+
+
+   sysLogSrvrUnreachable   NOTIFICATION-TYPE
+        OBJECTS {
+                  sysLogSrvrUnreachEventTime,
+                  sysLogSrvrUnreachMessage 
+        }
+        STATUS             current
+        DESCRIPTION
+                "This Object specifies the Interface index in which the number of
+                 packets denied exceeds the threshold configured."
+        ::= { sysLogTraps 1 }
+
+-- Syslog Traps Group.
+END

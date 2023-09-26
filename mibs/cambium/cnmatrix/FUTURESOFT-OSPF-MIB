@@ -1,0 +1,3133 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+FUTURESOFT-OSPF-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+      Integer32, IpAddress, enterprises, Unsigned32,
+      NOTIFICATION-TYPE,TimeTicks
+                                                 FROM SNMPv2-SMI
+      TruthValue, RowStatus, DateAndTime, DisplayString  FROM SNMPv2-TC
+      ospfVirtNbrEntry, AreaID, RouterID, BigMetric,
+      Status, PositiveInteger, InterfaceIndex, TOSType,
+      ospfRouterId, ospfNbrRtrId, ospfVirtIfEntry,
+      ospfIfEntry
+
+                                                 FROM OSPF-MIB;
+
+--    org         OBJECT IDENTIFIER ::=  { iso(1) 3 }
+--    dod         OBJECT IDENTIFIER ::=  { org 6 }
+--    internet    OBJECT IDENTIFIER ::=  { dod 1 }
+--    mgmt        OBJECT IDENTIFIER ::=  { internet 2 }
+--    private     OBJECT IDENTIFIER ::= { internet 4 }
+--    enterprises OBJECT IDENTIFIER ::=  { iso(1) org(3) dod(6) internet(1)  private(4) 1 }
+--      mib-2      OBJECT IDENTIFIER ::= { mgmt 1 }
+
+
+futospf  MODULE-IDENTITY
+      LAST-UPDATED "201209050000Z"
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+      CONTACT-INFO "support@aricent.com"
+      DESCRIPTION
+          " Changed the Enterprises MIB from SNMPv1 syntax MIB to SNMPv2 
+            syntax MIB"
+      REVISION "201209050000Z" 
+      DESCRIPTION
+          " Changed the Enterprises MIB from SNMPv1 syntax MIB to SNMPv2 
+            syntax MIB"
+
+         ::= { enterprises futuresoftware (2076) 10 }
+
+--future              OBJECT IDENTIFIER ::= { enterprises 2076}
+--futOspf             OBJECT IDENTIFIER ::= { future 10 }
+--::=  { 1 3 6 1 4 1 2076 10 }
+
+futOspfTestGroup     OBJECT IDENTIFIER ::= { futospf 100 }
+futOspfNotification  OBJECT IDENTIFIER ::= { futospf 101 }
+futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
+
+--  OSPF General Variables
+--  These parameters apply globally to the Router's
+--  OSPF Process.
+
+    futospfGeneralGroup OBJECT IDENTIFIER ::=  { futospf 1 }
+
+--  SCALAR_TABLE_BEGIN futospfGeneralGroup 15
+
+   futOspfOverFlowState OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Indicates whether router is in overflow state or not."
+       DEFVAL { false }
+       ::=  { futospfGeneralGroup 1 }
+   
+   futOspfPktsRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Packets received."
+       ::=  { futospfGeneralGroup 2 }
+   
+   futOspfPktsTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Packets Transmitted."
+       ::=  { futospfGeneralGroup 3 }
+   
+   futOspfPktsDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Packets Discarded."
+       ::=  { futospfGeneralGroup 4 }
+   
+   futOspfRFC1583Compatibility OBJECT-TYPE
+       SYNTAX Status
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " Controls the preference rules, when choosing among multiple AS 
+             external LSAs advertising the same destination.
+             When set to enabled, the preference rules remain those specified
+             by RFC1583. 
+             When set to disabled the preference rules are those stated in 
+             RFC2178. Set to enabled by default."
+       REFERENCE
+           " OSPF Version 2, Appendix on Demand Routing"
+       DEFVAL { enabled } 
+       ::=  {futospfGeneralGroup 5}
+
+   futOspfMaxAreas OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This gives the maximum number of areas."
+       DEFVAL { 4 } 
+       ::=  { futospfGeneralGroup 6 }
+
+   futOspfMaxLSAperArea OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This gives the maximum number of LSAs in each area."
+       DEFVAL { 128 }
+       ::=  { futospfGeneralGroup 7 }
+
+   futOspfMaxExtLSAs OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This gives the maximum number of AS-EXT LSAs in 
+             the router's LSDB."
+       DEFVAL { 512 }
+       ::=  { futospfGeneralGroup 8}
+
+   futOspfMaxSelfOrgLSAs OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This gives the maximum number of Self Originated LSAs 
+             that can be geneated by the router."
+       DEFVAL { 128 }
+       ::=  { futospfGeneralGroup 9}
+
+   futOspfMaxRoutes OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This gives the maximum number of routing table entries."
+       DEFVAL { 256 }
+       ::=  { futospfGeneralGroup 10} 
+
+   futOspfMaxLsaSize OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      deprecated
+       DESCRIPTION
+           " This specifies the maximum size of the LSA."
+       DEFVAL { 128 }
+       ::=  { futospfGeneralGroup 11} 
+  
+   futOspfTraceLevel OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This object is used to define level of trace required for OSPF. 
+	     Levels are defined as follows.
+	     0x00000100 -- Packet High Level Dump Trace.
+	     0x00000200 -- Packet Low Level Dump Trace.
+	     0x00000400 -- Packet Hex Dump Trace.
+	     0x00000800 -- Critical Trace.
+	     0x00001000 -- Function Entry Trace.
+	     0x00002000 -- Function Exit Trace.
+	     0x00004000 -- Memory Allocation Success Trace.
+	     0x00008000 -- Memory Allocation Failure Trace.
+	     0x00010000 -- Hello packet Trace.
+             0x00020000 -- DDP packet Trace.
+	     0x00040000 -- Link State Request Packet Trace.
+	     0x00080000 -- Link State Update Packet Trace.
+	     0x00100000 -- Link State Acknowledge Packet Trace.
+             0x00200000 -- Interface State Machine Trace.
+	     0x00400000 -- Neighbor State Machine Trace.
+	     0x00800000 -- Routing Table Calculation Trace.
+	     0x01000000 -- RTM Module Trace.  
+	     0x02000000 -- Interface Trace.  
+	     0x04000000 -- NSSA Trace.
+	     0x08000000 -- Route Aggregation Trace.
+	     0x10000000 -- Configuration Trace.
+	     0x20000000 -- Adjacency formation Trace.
+	     0x40000000 -- Link State Database Trace.
+	     0x80000000 -- Protocol Packet Processing Trace."
+       DEFVAL { '00000800'H }
+         ::= { futospfGeneralGroup 12 }
+ 
+   futOspfMinLsaInterval OBJECT-TYPE
+       SYNTAX      Integer32 (1..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The minimum time between distinct originations of any particular LSA."
+       DEFVAL { 5 }
+         ::= { futospfGeneralGroup 13 }
+
+   futOspfABRType OBJECT-TYPE
+       SYNTAX   INTEGER    {
+                    standardABR (1),
+                    ciscoABR (2),
+                    ibmABR (3)
+                  }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Different Types of ABRs supported"
+       REFERENCE
+           "RFC-3509 -- Alternative Implementations of OSPF Area Border 
+	                Routers"
+       DEFVAL { standardABR }
+         ::= { futospfGeneralGroup 14 }
+
+   futOspfNssaAsbrDefRtTrans OBJECT-TYPE
+       SYNTAX      INTEGER {
+                             enabled (1) ,
+                             disabled (2)
+                           }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Specifies the P-Bit setting for the default Type-7
+            LSA generated by ASBR(which is not ABR).When set 
+            disabled, P-Bit is clear in the generated default Lsa.
+            When set to enabled, P-Bit is set in the generated
+            Type-7 default Lsa. "
+       DEFVAL { disabled }
+         ::= { futospfGeneralGroup 15 }
+
+   futOspfDefaultPassiveInterface OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "When set to true all OSPF interfaces created after this
+	    setting will be passive interfaces. 
+	    If set to false OSPF interfaces created after this setting 
+	    will not be passive."
+       DEFVAL { false }
+         ::= { futospfGeneralGroup 16 }
+         
+    futOspfSpfHoldtime OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Minimum time between two consecutive SPF calculations.
+           Time is configured in milli seconds"
+      DEFVAL {10}
+      ::= { futospfGeneralGroup 17}
+
+    futOspfSpfDelay OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The Delay at which routing calculation is carried after a topology change.
+           Time is configured in milli seconds"
+      DEFVAL {1}
+      ::= { futospfGeneralGroup 18}
+
+--  OSPF Graceful Restart related MIB objects
+
+    futOspfRestartSupport OBJECT-TYPE
+      SYNTAX      INTEGER {
+                            none (1),
+                            plannedOnly (2),
+                            plannedAndUnplanned (3)
+                          }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The router.s support for OSPF graceful restart.
+           Options include: no restart support, only planned
+           restarts, or both planned and unplanned restarts.
+           
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+      DEFVAL { none }
+      ::= { futospfGeneralGroup 19}
+
+    futOspfRestartInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1..1800)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Configured OSPF graceful restart timeout interval.
+           
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+      DEFVAL { 120 }
+      ::= { futospfGeneralGroup 20}
+
+    futOspfRestartStrictLsaChecking OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Indicates if strict LSA checking is enabled for
+           graceful restart.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+      DEFVAL { false }
+      ::= { futospfGeneralGroup 21}
+
+    futOspfRestartStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                            notRestarting (1),
+                            plannedRestart (2),
+                            unplannedRestart (3)
+                          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Current status of OSPF graceful restart."
+      ::= { futospfGeneralGroup 22}
+
+    futOspfRestartAge OBJECT-TYPE
+      SYNTAX      Unsigned32
+      UNITS       "seconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Remaining time in current OSPF graceful restart
+           interval."
+      ::= { futospfGeneralGroup 23}
+
+    futOspfRestartExitReason OBJECT-TYPE
+      SYNTAX      INTEGER {
+                            none (1),           -- none attempted
+                            inProgress (2),     -- restart in progress
+                            completed (3),      -- successfully completed
+                            timedOut (4),       -- timed out
+                            topologyChanged (5) -- aborted due to
+                                                -- topology change.
+                          }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+          "Describes the outcome of the last attempt at a
+           graceful restart. If the value is 'none', no restart
+           has yet been attempted. If the value is 'inProgress',
+           a restart attempt is currently underway."
+      ::= { futospfGeneralGroup 24}
+
+    futOspfHelperSupport OBJECT-TYPE
+       SYNTAX      BITS {
+                            unknown (0),
+                            softwareRestart (1),
+                            swReloadUpgrade (2),
+                            switchToRedundant(3)
+                          }
+
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The router.s helper support for OSPF graceful restart.
+            Options include: unknown,softwarerestart,swreloadupgrade,
+            switchtoredundant. 
+            futOspfHelperSupport is indicated by bitmap.
+
+            This object is persistent and when written
+            the entity SHOULD save the change to non-volatile
+            storage.
+            By default, all bits are set."
+
+      ::= { futospfGeneralGroup 25}
+
+
+    futOspfHelperGraceTimeLimit  OBJECT-TYPE
+       SYNTAX      Integer32 (0..1800)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Configured OSPF graceful restart interval limit in helper side.
+            Time is configured in seconds
+
+            This object is persistent and when written the entity 
+            SHOULD save the change to non-volatile storage."
+       DEFVAL {0}
+      ::= { futospfGeneralGroup 26}
+
+    futOspfRestartAckState OBJECT-TYPE
+       SYNTAX      INTEGER  {
+			    enabled(1),
+			    disabled(2)
+			   }		 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Indicates Reception required / not-required . whether GraceLSAs 
+            sent by this router are expected to be acknowledged by peers. 
+           
+            This object is persistent and when written
+            the entity SHOULD save the change to non-volatile
+            storage."
+       DEFVAL {enabled}
+      ::= { futospfGeneralGroup 27}
+
+    futOspfGraceLsaRetransmitCount OBJECT-TYPE
+       SYNTAX      Integer32 (0..180)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Number of retransmissions for unacknowledged GraceLSAs"
+       DEFVAL {2}
+      ::= { futospfGeneralGroup 28}
+
+    futOspfRestartReason  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                            unknown (0),
+                            softwareRestart (1),
+                            swReloadUpgrade (2),
+                            switchToRedundant(3)
+                          }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The router.s restarter reason code of OSPF graceful restart.
+            Options include: unknown,softwarerestart,swreloadupgrade,
+            switchtoredundant.
+            This object is persistent and when written
+            the entity SHOULD save the change to non-volatile
+            storage."
+
+       DEFVAL {unknown}
+      ::= { futospfGeneralGroup 29}
+
+    futOspfRTStaggeringInterval OBJECT-TYPE
+      SYNTAX     TimeTicks
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This object denotes the time interval in milliseconds after which the route 
+          calculation is suspended for doing all other OSPF operations.Default value of 
+          this object is equal to Hello Interval"
+      DEFVAL {10000}
+      ::= { futospfGeneralGroup 30}
+
+    futOspfRTStaggeringStatus OBJECT-TYPE
+     SYNTAX     INTEGER 
+                       {
+                         enabled (1),
+                         disabled (2)
+                        } 
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This object indicates the status of route table calculation
+          staggering option"
+      DEFVAL { enabled }
+      ::= { futospfGeneralGroup 31}
+
+-- Start of Scalar MIB objectts related to OSPF Hot-Standby
+
+    futOspfHotStandbyAdminStatus OBJECT-TYPE
+      SYNTAX    INTEGER { 
+                          enabled (1),
+                          disabled (2)
+                        }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+                 "High Availabilty feature enabled or disabled in OSPF"
+      ::= { futospfGeneralGroup 32}
+
+    futOspfHotStandbyState OBJECT-TYPE
+       SYNTAX      INTEGER { 
+                             init(1),
+                             activeStandbyUp(2),
+                             activeStandbyDown(3),
+                             standby(4)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                "Internal State of the OSPF instance.
+                 init(1) implies that the OSPF instance is up, but is unaware 
+                 of the status of its peer.
+                 activeStandbyUp(2) implies that the current OSPF instance is up
+                 and functioning as active node and its peer is functioning as 
+                 the standby.
+                 activeStandbyDown(3) implies that the current OSPF instance
+                 is up and functioning as active node but its peer is down/not
+                 functioning.
+                 standby(4) implies the status of the standby Instance."
+       ::= { futospfGeneralGroup 33}
+
+    futOspfDynamicBulkUpdStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+                             notStarted(1),
+                             inProgress(2),
+                             completed(3),
+                             aborted(4)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                   "Status of dynamic bulk update between active and dynamic
+                    OSPF instance."
+       ::= { futospfGeneralGroup 34}
+
+    futOspfStanbyHelloSyncCount OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                 "Total number of hello packets synced."
+       ::= { futospfGeneralGroup 35}
+
+    futOspfStanbyLsaSyncCount OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                 "Total number of LSAs synced."
+       ::= { futospfGeneralGroup 36}
+
+    futOspfExtTraceLevel OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "This object is used to define level of trace required for OSPF Extension. 
+	     Levels are defined as follows.
+	     0x00000100 -- Restart Module.
+	     0x00000200 -- Helper Module.
+	     0x00000400 -- HA Module."
+      ::= { futospfGeneralGroup 37 }
+
+    futospfRouterIdPermanence OBJECT-TYPE
+        SYNTAX   INTEGER    {
+                    dynamic (1),        -- derived from internal logic ( lowest IP Address)
+                    permanent (2)       -- user-configured
+                  }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This variable displays the status of  the  ospfRouterId.
+           'dynamic'  and  'permanent' refer to how the  ospfRouterId                                        is derived. This object is used to save and restore the
+            ospfRouterId value. This object is not configurable
+            by the user since this object is used for internal purpose."
+       DEFVAL { dynamic }
+       ::= { futospfGeneralGroup 38 }
+
+    futOspfBfdStatus OBJECT-TYPE
+        SYNTAX   INTEGER {
+                           enabled (1),
+                           disabled (2)
+                         }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This object is to enable/disable BFD feature in OSPF.By default is enabled.
+            If it is disabled OSPF will not register with BFD for neighbor IP path monitoring"
+        DEFVAL { disabled }
+	::= { futospfGeneralGroup 39 }
+
+    futOspfBfdAllIfState OBJECT-TYPE
+        SYNTAX   INTEGER {
+                           enabled (1),
+                           disabled (2)
+                         }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This object is to enable/disable BFD for all OSPF interfaces
+            By default it is disabled. If it is enabled, OSPF will register
+            with BFD for neighbor IP path monitoring, when the OSPF neighbor state
+            becomes FULL. Enabling this object will internally enable BFD for all the
+            interface entries.
+
+            When it is disabled, it will de-register from BFD for all the neighbors
+            associated with any of the OSPF interface and no longer allows any
+            registration with BFD for neighbor Path monitoring"
+        DEFVAL { disabled }
+       ::= { futospfGeneralGroup 40 }
+
+
+--  SCALAR_TABLE_END futospfGeneralGroup
+
+
+--  Future OSPF AreaTable.
+--  The  futospfAreaTable is an extension to the ospfAreaTable
+--  and has statistics associated with each area. 
+
+   futOspfAreaTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfAreaEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "Information describing the configured parameters 
+           and cumulative statistics of the router's
+              attached areas."
+       ::=  { futospf 2 }
+   
+   futOspfAreaEntry OBJECT-TYPE
+       SYNTAX FutOspfAreaEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "Information describing the configured  parameters  
+           and  cumulative  statistics of one of the
+              router's attached areas."
+       INDEX {futOspfAreaId}
+       ::=  { futOspfAreaTable 1 }
+   
+   FutOspfAreaEntry ::= SEQUENCE {
+       futOspfAreaId         AreaID,
+       futOspfAreaIfCount    Gauge32,
+       futOspfAreaNetCount   Gauge32,
+       futOspfAreaRtrCount   Gauge32,
+       futOspfAreaNSSATranslatorRole			INTEGER,
+       futOspfAreaNSSATranslatorState			INTEGER,
+       futOspfAreaNSSATranslatorStabilityInterval	PositiveInteger,
+       futOspfAreaNSSATranslatorEvents			Counter32,
+       futOspfAreaDfInfOriginate			INTEGER
+   }
+   
+   futOspfAreaId OBJECT-TYPE
+       SYNTAX      AreaID
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A 32-bit integer uniquely identifying an area.
+              Area ID 0.0.0.0 is used for the OSPF backbone."
+       REFERENCE
+           "OSPF Version 2, Appendix C.2 Area parameters"
+       ::=  { futOspfAreaEntry 1 }
+   
+   futOspfAreaIfCount OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Ifaces in the Area "
+       ::=  { futOspfAreaEntry 2 }
+   
+   futOspfAreaNetCount OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Networks in the Area. "
+       ::=  { futOspfAreaEntry 3 }
+      
+   futOspfAreaRtrCount OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total no. of Routers in the Area. "
+       ::=  { futOspfAreaEntry 4 }
+
+    futOspfAreaNSSATranslatorRole OBJECT-TYPE
+       SYNTAX      INTEGER { always (1),candidate (2) } 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           " Indicates an NSSA Border router's ability
+             to perform NSSA Translation of Type-7 LSAs
+             to Type-5 LSAs. "
+       DEFVAL { candidate }
+       ::=  { futOspfAreaEntry 5 }
+
+     futOspfAreaNSSATranslatorState OBJECT-TYPE
+       SYNTAX      INTEGER { enabled (1),elected (2),
+                             disabled (3)
+                           } 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Indicates if and how an NSSA Border router is
+             performing NSSA translation of Type-7 to into Type-5
+             LSAs.When this object is set to enabled, the NSSA border
+             router's futOspfAreaNssaTranslatorRole has been set to
+             always.When this object is set to elected,a candidate
+             NSSA border router is translating Type-7 to Type-5 LSAs.
+             When this object is set to disabled, a candidate NSSA
+             Border router is not performing translation. " 
+       DEFVAL { disabled }
+       ::=  { futOspfAreaEntry 6 }
+
+     futOspfAreaNSSATranslatorStabilityInterval OBJECT-TYPE
+       SYNTAX      PositiveInteger
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           " The number of seconds after an elected translator
+             determines its services are no longer required, that
+             it should continue to perform its translation duties."
+       DEFVAL { 40 }
+       ::=  { futOspfAreaEntry 7 }
+
+     futOspfAreaNSSATranslatorEvents OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Indicates the number of  translator state
+             changes that have occurred since the last boot-up. "
+       ::=  { futOspfAreaEntry 8 }
+
+    futOspfAreaDfInfOriginate OBJECT-TYPE
+       SYNTAX      INTEGER { enabled (1),disabled (2) } 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           " Indicates the generation default Type-7 LSA. "
+       DEFVAL { disabled }
+       ::=  { futOspfAreaEntry 9 }
+
+
+   
+--  Future OSPF Host Table
+--  The  futospfHostTable is an extension to the ospfHostTable
+--  and has interface information to reach the host.
+
+   futOspfHostTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfHostEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The list of Hosts, and their metrics, that the
+             router will advertise as host routes."
+       REFERENCE
+           "OSPF Version 2, Appendix C.6  Host route parameters"
+       ::=  { futospf 3 }
+   
+   futOspfHostEntry OBJECT-TYPE
+       SYNTAX FutOspfHostEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A metric to be advertised, for a given type of
+            service, when a given host is reachable."
+       INDEX { futOspfHostIpAddress, futOspfHostTOS}
+       ::=  { futOspfHostTable 1 }
+
+   FutOspfHostEntry ::= SEQUENCE {
+       futOspfHostIpAddress       IpAddress,
+       futOspfHostTOS             TOSType,
+       futOspfHostRouteIfIndex    Integer32
+   }
+   
+   futOspfHostIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The IP Address of the Host."
+       REFERENCE
+           "OSPF Version 2, Appendix C.6 Host route parameters"
+       ::=  { futOspfHostEntry 1 }
+   
+   futOspfHostTOS OBJECT-TYPE
+       SYNTAX TOSType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The Type of Service of the route being configured."
+       REFERENCE
+           "OSPF Version 2, Appendix C.6 Host route parameters"
+       ::=  { futOspfHostEntry 2 }
+   
+   futOspfHostRouteIfIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The Interface to reach the host"
+       ::=  { futOspfHostEntry 3 }
+   
+   
+--  Future OSPF Interface Table
+--  The  futospfIfTable is an extension to the ospfIfTable
+--  and has statistical information associated with each interface.
+
+   futOspfIfTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfIfEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Table describes the  inter-
+              faces from the viewpoint of OSPF."
+       REFERENCE
+           "OSPF Version 2, Appendix C.3  Router  interface
+             parameters"
+       ::=  { futospf 4 }
+   
+   futOspfIfEntry OBJECT-TYPE
+       SYNTAX FutOspfIfEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Entry describes one  inter-
+              face from the viewpoint of OSPF."
+       INDEX { futOspfIfIpAddress, futOspfAddressLessIf}
+       ::=  { futOspfIfTable 1 }
+   
+   FutOspfIfEntry ::= SEQUENCE {
+       futOspfIfIpAddress    IpAddress,
+       futOspfAddressLessIf  InterfaceIndex,
+       futOspfIfOperState    INTEGER,
+       futOspfIfPassive      TruthValue,
+       futOspfIfNbrCount     Gauge32,
+       futOspfIfAdjCount     Gauge32,
+       futOspfIfHelloRcvd    Counter32,
+       futOspfIfHelloTxed    Counter32,
+       futOspfIfHelloDisd    Counter32,
+       futOspfIfDdpRcvd      Counter32,
+       futOspfIfDdpTxed      Counter32,
+       futOspfIfDdpDisd      Counter32,
+       futOspfIfLrqRcvd      Counter32,
+       futOspfIfLrqTxed      Counter32,
+       futOspfIfLrqDisd      Counter32,
+       futOspfIfLsuRcvd      Counter32,
+       futOspfIfLsuTxed      Counter32,
+       futOspfIfLsuDisd      Counter32,
+       futOspfIfLakRcvd      Counter32,
+       futOspfIfLakTxed      Counter32,
+       futOspfIfLakDisd      Counter32,
+       futOspfIfBfdState     INTEGER
+   }
+   
+   futOspfIfIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The IP address of this OSPF interface."
+       ::=  { futOspfIfEntry 1 }
+   
+   futOspfAddressLessIf OBJECT-TYPE
+       SYNTAX      InterfaceIndex (0..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "For the purpose of easing  the  instancing  of
+              addressed   and  addressless  interfaces;  This
+              variable takes the value 0 on  interfaces  with
+              IP  Addresses,  and  the corresponding value of
+              ifIndex for interfaces having no IP Address."
+       ::=  { futOspfIfEntry 2 }
+   
+   futOspfIfOperState OBJECT-TYPE
+       SYNTAX      INTEGER {
+                 operup          (1),
+                 operdown        (2),
+                 loopback        (3),
+                 unloop          (4)
+              }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Operational Status of the Interface."
+       ::=  { futOspfIfEntry 3 }
+
+   futOspfIfPassive OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This object is used to make the interface as passive.
+	      If set to TRUE, then interface will be passive
+	      If set to FALSE then interface will be normal"
+       ::=  { futOspfIfEntry 4 }
+
+   futOspfIfNbrCount OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Neighbours through 
+                    that Interface."
+       ::=  { futOspfIfEntry 5 }
+   
+   futOspfIfAdjCount OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Adjacencies through 
+                    that Interface."
+       ::=  { futOspfIfEntry 6 }
+   
+   futOspfIfHelloRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Hello packets received
+                    through that Interface."
+       ::=  { futOspfIfEntry 7 }
+   
+   futOspfIfHelloTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Hello packets 
+                    transmitted through that Interface."
+       ::=  { futOspfIfEntry 8 }
+   
+   futOspfIfHelloDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Hello packets 
+                    discarded through that Interface."
+       ::=  { futOspfIfEntry 9 }
+   
+   futOspfIfDdpRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Ddp packets received
+                    through that Interface."
+       ::=  { futOspfIfEntry 10 }
+   
+   futOspfIfDdpTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Ddp packets 
+                    transmitted through that Interface."
+       ::=  { futOspfIfEntry 11 }
+   
+   futOspfIfDdpDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Ddp packets discarded
+                    through that Interface."
+       ::=  { futOspfIfEntry 12 }
+   
+   futOspfIfLrqRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lrq packets received
+                    through that Interface."
+       ::=  { futOspfIfEntry 13 }
+   
+   futOspfIfLrqTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lrq packets 
+                    transmitted through that Interface."
+       ::=  { futOspfIfEntry 14 }
+   
+   futOspfIfLrqDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lrq packets discarded
+                    through that Interface."
+       ::=  { futOspfIfEntry 15 }
+   
+   futOspfIfLsuRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lsu packets received
+                    through that Interface."
+       ::=  { futOspfIfEntry 16 }
+   
+   futOspfIfLsuTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lsu packets 
+                    transmitted through that Interface."
+       ::=  { futOspfIfEntry 17 }
+   
+   futOspfIfLsuDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lsu packets discarded
+                    through that Interface."
+       ::=  { futOspfIfEntry 18 }
+   
+   futOspfIfLakRcvd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lak packets received
+                    through that Interface."
+       ::=  { futOspfIfEntry 19 }
+   
+   futOspfIfLakTxed OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lak packets 
+                    transmitted through that Interface."
+       ::=  { futOspfIfEntry 20 }
+   
+   futOspfIfLakDisd OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Total number of Lak packets discarded
+                    on that Interface."
+       ::=  { futOspfIfEntry 21 }
+   
+
+   futOspfIfBfdState OBJECT-TYPE
+        SYNTAX   INTEGER {
+                           enabled (1),
+                           disabled (2)
+                         }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+          " This object is to enable/disable BFD in a specific OSPF interface.
+            By default it is disabled. But when futOspfBfdAllIfState is enabled,
+            internally this object will be enabled for all interface entries.
+
+            If futOspfBfdAllIfState is disabled and this (futOspfIfBfdState) object
+            is enabled, then OSPF will register with BFD for monitoring the neighbor
+            IP path, for the neighbors associated with this OSPF interface alone.
+
+            When it is disabled, it will de-register from BFD for the all the neighbors
+            associated with this interface and no longer allows registration with BFD
+            for the neighbors associated with this interface."
+        ::= { futOspfIfEntry 22 }
+
+--  Future OSPF Interface MD5 Authentication Table
+
+   futOspfIfMD5AuthTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfIfMD5AuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Table describes the parameters
+            required for MD5 cryptographic Authentication."
+       REFERENCE
+           "OSPF Version 2, Appendix D.3  Cryptographic Authentication"
+       ::=  { futospf 5 }
+   
+   futOspfIfMD5AuthEntry OBJECT-TYPE
+       SYNTAX      FutOspfIfMD5AuthEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface MD5 Authentication Entry describes one  
+            Authentication Key from the viewpoint of OSPF."
+       INDEX { futOspfIfMD5AuthIpAddress, futOspfIfMD5AuthAddressLessIf, 
+              futOspfIfMD5AuthKeyId}
+       ::=  { futOspfIfMD5AuthTable 1 }
+   
+   FutOspfIfMD5AuthEntry ::= SEQUENCE {
+       futOspfIfMD5AuthIpAddress         IpAddress,
+       futOspfIfMD5AuthAddressLessIf     InterfaceIndex,
+       futOspfIfMD5AuthKeyId             Integer32,
+       futOspfIfMD5AuthKey               OCTET STRING,
+       futOspfIfMD5AuthKeyStartAccept    Integer32,
+       futOspfIfMD5AuthKeyStartGenerate  Integer32,
+       futOspfIfMD5AuthKeyStopGenerate   Integer32,
+       futOspfIfMD5AuthKeyStopAccept     Integer32,
+       futOspfIfMD5AuthKeyStatus         INTEGER
+       }
+   
+   futOspfIfMD5AuthIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The IP address of this OSPF interface."
+       ::=  { futOspfIfMD5AuthEntry 1 }
+   
+   futOspfIfMD5AuthAddressLessIf OBJECT-TYPE
+       SYNTAX      InterfaceIndex (0..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "For the purpose of easing  the  instancing  of
+              addressed   and  addressless  interfaces;  This
+              variable takes the value 0 on  interfaces  with
+              IP  Addresses,  and  the corresponding value of
+              ifIndex for interfaces having no IP Address."
+       ::=  { futOspfIfMD5AuthEntry 2 }
+   
+   futOspfIfMD5AuthKeyId OBJECT-TYPE
+       SYNTAX      Integer32 (0..255)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " This object identifies the secret key used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfIfMD5AuthEntry 3 }
+   
+   futOspfIfMD5AuthKey OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..16))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This is the secret key which is used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfIfMD5AuthEntry 4 }
+   
+   futOspfIfMD5AuthKeyStartAccept OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will start accepting packets that have 
+             been created with this key. The value shown will be configured 
+	     time + system time at which the value is configured."
+       ::=  { futOspfIfMD5AuthEntry 5 }
+   
+   futOspfIfMD5AuthKeyStartGenerate OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will start using this key for  packets 
+             generation.The value shown will be configured
+             time + system time at which the value is configured. "
+       ::=  { futOspfIfMD5AuthEntry 6 }
+   
+   futOspfIfMD5AuthKeyStopGenerate OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will stop using this key for  packets 
+             generation.  The value -1 indicates infinite lifetime.The 
+	     value shown will be configured time + system time at which 
+	     the value is configured."
+       DEFVAL { -1 }
+       ::=  { futOspfIfMD5AuthEntry 7 }
+   
+   futOspfIfMD5AuthKeyStopAccept OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will stop accepting packets that have 
+             been created with this key. The value -1 indicates infinite 
+	     lifetime.The value shown will be configured
+             time + system time at which the value is configured. "
+       DEFVAL { -1 }
+       ::=  { futOspfIfMD5AuthEntry 8 }
+   
+   futOspfIfMD5AuthKeyStatus OBJECT-TYPE
+       SYNTAX      INTEGER { valid(1), delete(3) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " Identifies the status of the key. 
+	     NOTE:invalid (2) currently not supported"
+       ::=  { futOspfIfMD5AuthEntry 9 }
+
+--  Future OSPF Virtual Interface MD5 Authentication Table
+
+   futOspfVirtIfMD5AuthTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfVirtIfMD5AuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Table describes the parameters
+            required for MD5 cryptographic Authentication."
+       REFERENCE
+           "OSPF Version 2, Appendix D.3  Cryptographic Authentication"
+       ::=  { futospf 6 }
+   
+   futOspfVirtIfMD5AuthEntry OBJECT-TYPE
+       SYNTAX FutOspfVirtIfMD5AuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface MD5 Authentication Entry describes one  
+             Authentication Key from the viewpoint of OSPF."
+       INDEX {futOspfVirtIfMD5AuthAreaId,futOspfVirtIfMD5AuthNeighbor, 
+              futOspfVirtIfMD5AuthKeyId}
+       ::=  { futOspfVirtIfMD5AuthTable 1 }
+   
+   FutOspfVirtIfMD5AuthEntry ::= SEQUENCE {
+       futOspfVirtIfMD5AuthAreaId            AreaID,
+       futOspfVirtIfMD5AuthNeighbor          RouterID,
+       futOspfVirtIfMD5AuthKeyId             Integer32,
+       futOspfVirtIfMD5AuthKey               OCTET STRING,
+       futOspfVirtIfMD5AuthKeyStartAccept    Integer32,
+       futOspfVirtIfMD5AuthKeyStartGenerate  Integer32,
+       futOspfVirtIfMD5AuthKeyStopGenerate   Integer32,
+       futOspfVirtIfMD5AuthKeyStopAccept     Integer32,
+       futOspfVirtIfMD5AuthKeyStatus         INTEGER
+       }
+   
+   futOspfVirtIfMD5AuthAreaId OBJECT-TYPE
+       SYNTAX      AreaID
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " The  Transit  Area  that  the   Virtual   Link
+              traverses.  By definition, this should not be 0.0.0.0."
+       ::=  { futOspfVirtIfMD5AuthEntry 1 }
+   
+   futOspfVirtIfMD5AuthNeighbor OBJECT-TYPE
+       SYNTAX      RouterID
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            " The Router ID of the Virtual Neighbor."
+       ::=  { futOspfVirtIfMD5AuthEntry 2 }
+   
+   futOspfVirtIfMD5AuthKeyId OBJECT-TYPE
+       SYNTAX      Integer32 (0..255)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " This object identifies the secret key used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfVirtIfMD5AuthEntry 3 }
+   
+   futOspfVirtIfMD5AuthKey OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..16))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This is the secret key which is used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfVirtIfMD5AuthEntry 4 }
+   
+   futOspfVirtIfMD5AuthKeyStartAccept OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will start accepting packets that have 
+             been created with this key.The value shown will be configured
+             time + system time at which the value is configured."
+       ::=  { futOspfVirtIfMD5AuthEntry 5 }
+   
+   futOspfVirtIfMD5AuthKeyStartGenerate OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will start using this key for  packet 
+             generation.The value shown will be configured
+             time + system time at which the value is configured."
+       ::=  { futOspfVirtIfMD5AuthEntry 6 }
+   
+   futOspfVirtIfMD5AuthKeyStopGenerate OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will stop using this key for  packets 
+             generation. The value -1 indicates infinite lifetime.The value 
+	     shown will be configured time + system time at which the value 
+	     is configured."
+       DEFVAL { -1 }
+       ::=  { futOspfVirtIfMD5AuthEntry 7 }
+   
+   futOspfVirtIfMD5AuthKeyStopAccept OBJECT-TYPE
+       SYNTAX      Integer32 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " The time the router will stop accepting packets that have 
+             been created with this key. The value -1 indicates infinite 
+	     lifetime. The value shown will be configured
+             time + system time at which the value is configured."
+       DEFVAL { -1 }
+       ::=  { futOspfVirtIfMD5AuthEntry 8 }
+   
+   futOspfVirtIfMD5AuthKeyStatus OBJECT-TYPE
+       SYNTAX      INTEGER { valid(1), delete(3) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " Identifies the status of the key. 
+	     NOTE: invalid (2) is currently not supported"
+       ::=  { futOspfVirtIfMD5AuthEntry 9 }
+   
+--  Future OSPF Neighbor Table
+
+   futOspfNbrTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfNbrEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of non-virtual neighbor information."
+       REFERENCE
+           "OSPF Version 2, Section 10  The  Neighbor  Data
+             Structure"
+       ::=  { futospf 7 }
+   
+   futOspfNbrEntry OBJECT-TYPE
+       SYNTAX FutOspfNbrEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The information regarding a single neighbor."
+       REFERENCE
+           "OSPF Version 2, Section 10  The  Neighbor  Data
+             Structure"
+       INDEX {futOspfNbrIpAddr, futOspfNbrAddressLessIndex}
+       ::=  { futOspfNbrTable 1 }
+   
+   FutOspfNbrEntry ::= SEQUENCE {
+       futOspfNbrIpAddr            IpAddress,
+       futOspfNbrAddressLessIndex  InterfaceIndex,
+       futOspfNbrDBSummaryQLen     Gauge32,
+       futOspfNbrLSReqQLen         Gauge32,
+       futOspfNbrRestartHelperStatus
+                                   INTEGER,
+       futOspfNbrRestartHelperAge  Unsigned32,
+       futOspfNbrRestartHelperExitReason
+                                   INTEGER,
+       futOspfNbrBfdState INTEGER
+       }
+   
+   futOspfNbrIpAddr OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "  The IP address this neighbor is using  in  its
+              IP  Source  Address.  Note that, on addressless
+              links, this will not be 0.0.0.0,  but  the  ad-
+              dress of another of the neighbor's interfaces."
+       ::=  { futOspfNbrEntry 1 }
+   
+   futOspfNbrAddressLessIndex OBJECT-TYPE
+       SYNTAX      InterfaceIndex (0..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "  On an interface having an  IP  Address,  zero.
+              On  addressless  interfaces,  the corresponding
+              value of ifIndex in the Internet Standard  MIB.
+              On  row  creation, this can be derived from the
+              instance."
+       ::=  { futOspfNbrEntry 2 }
+   
+   futOspfNbrDBSummaryQLen OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the queue Length of the Database summary List ."
+       ::=  { futOspfNbrEntry 3 }
+   
+   futOspfNbrLSReqQLen OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " This gives the Length of Link State Request Queue ."
+       ::=  { futOspfNbrEntry 4 }
+   
+   futOspfNbrRestartHelperStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+                             notHelping (1),
+                             helping (2)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Indicates whether the router is acting
+             as a graceful restart helper for the neighbor."
+       ::= { futOspfNbrEntry 5 }
+
+   futOspfNbrRestartHelperAge OBJECT-TYPE
+       SYNTAX      Unsigned32
+       UNITS       "seconds"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Remaining time in current OSPF graceful restart
+             interval, if the router is acting as a restart
+             helper for the neighbor."
+       ::= { futOspfNbrEntry 6 }
+
+   futOspfNbrRestartHelperExitReason OBJECT-TYPE
+       SYNTAX      INTEGER { none (1),           -- not attempted
+                             inProgress (2),     -- restart in progress
+                             completed (3),      -- successfully completed
+                             timedOut (4),       -- timed out
+                             topologyChanged (5) -- aborted due to topology
+                                                 -- change.
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Describes the outcome of the last attempt at acting
+             as a graceful restart helper for the neighbor."
+       ::= { futOspfNbrEntry 7 }
+
+   futOspfNbrBfdState OBJECT-TYPE
+      SYNTAX   INTEGER {
+                         enabled (1),
+                         disabled (2)
+                       }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+          " This is a read-only object. This will be enabled internally only when BFD is
+            enabled for monitoring this neighbor IP path."
+      ::= { futOspfNbrEntry 8 }
+   
+-- Routing Table
+
+   futOspfRoutingTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF FutOspfRoutingEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of routing information."
+       ::=  { futospf 8 }
+   
+   futOspfRoutingEntry OBJECT-TYPE
+       SYNTAX      FutOspfRoutingEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The information regarding a single route."
+       INDEX {futOspfRouteIpAddr,futOspfRouteIpAddrMask,
+              futOspfRouteIpTos,futOspfRouteIpNextHop}
+       ::=  { futOspfRoutingTable 1 }
+   
+   FutOspfRoutingEntry ::= SEQUENCE {
+       futOspfRouteIpAddr          IpAddress,
+       futOspfRouteIpAddrMask      IpAddress,
+       futOspfRouteIpTos           TOSType,
+       futOspfRouteIpNextHop       IpAddress,
+       futOspfRouteType            INTEGER,
+       futOspfRouteAreaId          IpAddress,
+       futOspfRouteCost            BigMetric,
+       futOspfRouteType2Cost       BigMetric,
+       futOspfRouteInterfaceIndex  InterfaceIndex
+       }
+   
+   futOspfRouteIpAddr OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " IP Address of the route "
+       ::=  { futOspfRoutingEntry 1 }
+   
+   futOspfRouteIpAddrMask OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " IP Address Mask of the route "
+       ::=  { futOspfRoutingEntry 2 }
+   
+   futOspfRouteIpTos OBJECT-TYPE
+       SYNTAX      TOSType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " IP TOS of the route "
+       ::=  { futOspfRoutingEntry 3 }
+   
+   futOspfRouteIpNextHop OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " IP Next Hop of the route "
+       ::=  { futOspfRoutingEntry 4 }
+   
+   futOspfRouteType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                    intraArea (1), 
+                    interArea (2), 
+                    type1External (3), 
+                    type2External (4)
+                	}
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Type of the route"
+       ::=  { futOspfRoutingEntry 5 }
+   
+   futOspfRouteAreaId OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Area ID associated with the route "
+       ::=  { futOspfRoutingEntry 6 }
+   
+   futOspfRouteCost OBJECT-TYPE
+       SYNTAX BigMetric
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          " It is a Type 1 external metrics which is 
+	    expressed in the same units as OSPF interface
+	    cost ie. in terms of the OSPF link state metric. 
+	    If Type1 and Type2 cost are present, Type1 external
+	    metrics always take precedence."
+       ::=  { futOspfRoutingEntry 7 }
+   
+   futOspfRouteType2Cost OBJECT-TYPE
+       SYNTAX BigMetric
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Type 2 external metrics are configured with  
+	     the cost greater than any path internal to the AS. 
+	     Use of Type 2 external metrics assumes that routing 
+	     between AS is the major cost of routing a packet, and
+             eliminates the need for conversion of external costs to
+	     internal link state metrics."
+       ::=  { futOspfRoutingEntry 8 }
+   
+   futOspfRouteInterfaceIndex OBJECT-TYPE
+       SYNTAX InterfaceIndex
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Interface Index associated with the route"
+       ::=  { futOspfRoutingEntry 9 }
+   
+   
+-- Secondary IP Address Table
+   futOspfSecIfTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfSecIfEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of Secondary IP Address information."
+       ::=  { futospf 9 }
+   
+   futOspfSecIfEntry OBJECT-TYPE
+       SYNTAX FutOspfSecIfEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The information regarding a single route."
+       INDEX {futOspfPrimIpAddr,futOspfPrimAddresslessIf,futOspfSecIpAddr,futOspfSecIpAddrMask}
+       ::=  { futOspfSecIfTable 1 }
+   
+   FutOspfSecIfEntry ::= SEQUENCE {
+       futOspfPrimIpAddr           IpAddress,
+       futOspfPrimAddresslessIf    InterfaceIndex,
+       futOspfSecIpAddr            IpAddress,
+       futOspfSecIpAddrMask        IpAddress,
+       futOspfSecIfStatus          RowStatus
+       }
+   
+   futOspfPrimIpAddr OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " Primary Interface IP Address."
+       ::=  { futOspfSecIfEntry 1 }
+   
+   futOspfPrimAddresslessIf OBJECT-TYPE
+       SYNTAX InterfaceIndex (0..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " Primary Interface Addressless Index."
+       ::=  { futOspfSecIfEntry 2 }
+   
+   futOspfSecIpAddr OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " Secondary Interface IP Address."
+       ::=  { futOspfSecIfEntry 3 }
+   
+   futOspfSecIpAddrMask OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " Secondary Interface IP Address Mask."
+       ::=  { futOspfSecIfEntry 4 }
+      
+   futOspfSecIfStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This variable displays the status of  the  entry.  
+	     Setting it to 'invalid' has the effect of
+             rendering it inoperative.  The internal  effect
+             (row removal) is implementation dependent."
+       ::=  { futOspfSecIfEntry 5 }
+
+--fsospfn
+-- FutureSoft Area Aggregate Table
+-- The futOspfAreaAggregateTable is an extension to the 
+-- ospfAreaAggregateTable to support external Tag for address
+-- range configured.
+   futOspfAreaAggregateTable OBJECT-TYPE
+           SYNTAX   SEQUENCE OF FutOspfAreaAggregateEntry
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "Supports configuration of External Tag for
+               Type-7 Address ranges configured. "
+          ::= { futospf 10 }
+
+    futOspfAreaAggregateEntry OBJECT-TYPE
+        SYNTAX   FutOspfAreaAggregateEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Supports configuration of External Tag for
+            Type-7 Address ranges configured. "
+      INDEX { futOspfAreaAggregateAreaID, futOspfAreaAggregateLsdbType,
+              futOspfAreaAggregateNet, futOspfAreaAggregateMask }
+      ::= {futOspfAreaAggregateTable 1 }
+
+    FutOspfAreaAggregateEntry ::=
+       SEQUENCE {
+           futOspfAreaAggregateAreaID
+               AreaID,
+           futOspfAreaAggregateLsdbType
+               INTEGER,
+           futOspfAreaAggregateNet
+               IpAddress,
+           futOspfAreaAggregateMask
+               IpAddress,
+           futOspfAreaAggregateExternalTag
+               Integer32
+                }
+
+    futOspfAreaAggregateAreaID OBJECT-TYPE
+           SYNTAX   AreaID
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The Area the Address Aggregate is to be  found
+               within."
+           REFERENCE
+              "OSPF Version 2, Appendix C.2 Area parameters"
+           ::= { futOspfAreaAggregateEntry 1 }
+
+    futOspfAreaAggregateLsdbType OBJECT-TYPE
+           SYNTAX   INTEGER    {
+                       summaryLink (3),
+                       nssaExternalLink (7)
+                     }
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The type of the Address Aggregate.  This field
+               specifies  the  Lsdb type that this Address Ag-
+               gregate applies to."
+           REFERENCE
+              "OSPF Version 2, Appendix A.4.1 The  Link  State
+               Advertisement header"
+           ::= { futOspfAreaAggregateEntry 2 }
+
+    futOspfAreaAggregateNet OBJECT-TYPE
+           SYNTAX   IpAddress
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The IP Address of the Net or Subnet  indicated
+               by the range."
+           REFERENCE
+              "OSPF Version 2, Appendix C.2 Area parameters"
+           ::= { futOspfAreaAggregateEntry 3 }
+
+    futOspfAreaAggregateMask OBJECT-TYPE
+           SYNTAX   IpAddress
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The Subnet Mask that pertains to  the  Net  or
+               Subnet."
+           REFERENCE
+              "OSPF Version 2, Appendix C.2 Area parameters"
+           ::= { futOspfAreaAggregateEntry 4 }
+
+    futOspfAreaAggregateExternalTag OBJECT-TYPE
+           SYNTAX   Integer32
+           MAX-ACCESS   read-create
+           STATUS   current
+           DESCRIPTION
+              "A 32-bit field attached to each external route.
+               This is not used by OSPF protocol itself. It may
+               be used to communicate information between AS 
+               boundary routers. The precise nature of this information
+               is outside the scope of OSPF. " 
+           ::= { futOspfAreaAggregateEntry 5 }
+
+--fsospfn
+-- FutureSoft AsExternalAggregation  Table
+   futOspfAsExternalAggregationTable OBJECT-TYPE
+           SYNTAX   SEQUENCE OF FutOspfAsExternalAggregationEntry
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "Indicates whether for the specified address range
+               Type-7/Type-5 LSA will be aggregated or not generated. "   
+          ::= { futospf 11 }
+
+    futOspfAsExternalAggregationEntry OBJECT-TYPE
+        SYNTAX   FutOspfAsExternalAggregationEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION 
+            "Supports configuration of Type-5,Type-7 Address Range specifying
+             whether for the configured range, Type-5,Type-7 LSA will be 
+             generated or not, and if generated whether aggregation is performed. "
+      INDEX { futOspfAsExternalAggregationNet, futOspfAsExternalAggregationMask,
+              futOspfAsExternalAggregationAreaId }
+      ::= {futOspfAsExternalAggregationTable 1 }
+
+    FutOspfAsExternalAggregationEntry ::=
+       SEQUENCE {
+           futOspfAsExternalAggregationNet
+               IpAddress,
+           futOspfAsExternalAggregationMask
+               IpAddress,
+           futOspfAsExternalAggregationAreaId
+               AreaID,
+           futOspfAsExternalAggregationEffect
+               INTEGER,
+           futOspfAsExternalAggregationTranslation
+               INTEGER,
+           futOspfAsExternalAggregationStatus
+               RowStatus
+                }
+
+    futOspfAsExternalAggregationNet OBJECT-TYPE
+           SYNTAX   IpAddress
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The IP address of the Net indicated by 
+               the range. "
+           ::= { futOspfAsExternalAggregationEntry 1 }
+
+    futOspfAsExternalAggregationMask OBJECT-TYPE
+           SYNTAX   IpAddress
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+              "The subnet mask that pertains to the 
+               range. "
+           ::= { futOspfAsExternalAggregationEntry 2 }
+
+    futOspfAsExternalAggregationAreaId OBJECT-TYPE
+           SYNTAX  AreaID
+           MAX-ACCESS   not-accessible
+           STATUS   current
+           DESCRIPTION
+               "Refer to description in futOspfAsExternalAggregationEffect."
+           ::= { futOspfAsExternalAggregationEntry 3 }
+
+
+    futOspfAsExternalAggregationEffect OBJECT-TYPE
+           SYNTAX   INTEGER {
+                       advertise (1),
+                       doNotAdvertise (2),
+                       allowAll (3),
+                       denyAll (4)
+                       }
+           MAX-ACCESS   read-create
+           STATUS   current
+           DESCRIPTION
+              "Indicates whether Type-5/Type-7 will be aggregated or not
+               generated for the specified range. 
+               When set to allowAll (3) and associated areaId is 0.0.0.0
+               aggregated Type-5 are generated for the specified range. In
+               addition aggregated Type-7 are generated in all attached NSSA
+               areas, for the specified range.Value allowAll (3) is not valid
+               for areaId other than 0.0.0.0 
+               When set to denyAll (4) neither Type-5 nor Type-7 will be
+               generated for the specified range. Value denyAll (4) is not
+               valid for areaID other than 0.0.0.0
+               When set to advertise (1) and associated areaId is 0.0.0.0,
+               aggregated Type-5 are generated.Otherwise if associated areaId
+               is x.x.x.x(other than 0.0.0.0) aggregated Type-7 is generated
+               in NSSA area x.x.x.x
+               When set to doNotAdvertise (2) and associated areaId is 0.0.0.0,
+               Type-5 is not generated for the specified range, while aggregated
+               Type-7 are generated in all attached NSSA areas.While if associated
+               areaId is x.x.x.x(other than 0.0.0.0), Type-7 are not generated in
+               NSSA area x.x.x.x for the specified range. "
+           DEFVAL { advertise }
+           ::= { futOspfAsExternalAggregationEntry 4 }
+
+    futOspfAsExternalAggregationTranslation OBJECT-TYPE
+           SYNTAX   INTEGER {
+                       enabled (1),
+                       disabled (2)
+                       }
+           MAX-ACCESS   read-create
+           STATUS   current
+           DESCRIPTION
+              "This when set to enabled, P Bit is set in
+               the generated Type-7 LSA. When set disabled
+               P Bit is clear in the generated Type-7 LSA
+               for the range. "
+           DEFVAL { enabled }
+           ::= { futOspfAsExternalAggregationEntry 5 }
+
+    futOspfAsExternalAggregationStatus OBJECT-TYPE
+           SYNTAX   RowStatus
+           MAX-ACCESS   read-create
+           STATUS   current
+           DESCRIPTION
+           "This variable displays the status of  the  en-
+           try.  Setting it to 'invalid' has the effect of
+           rendering it inoperative."
+           ::= { futOspfAsExternalAggregationEntry 6 }
+
+
+-- Opaque LSA Support objects
+
+futOspfOpaqueLSAGroup OBJECT IDENTIFIER ::= { futospf 12 }
+
+
+    futOspfOpaqueLSAGeneralGroup OBJECT IDENTIFIER
+            ::=  { futOspfOpaqueLSAGroup 1 }
+
+--  OSPF Opaque LSA Support General Variables
+--  These parameters apply globally to the Router's
+--  OSPF Process.
+
+--  SCALAR_TABLE_BEGIN futOspfOpaqueLSAGeneralGroup 4
+
+    futOspfOpaqueOption OBJECT-TYPE
+        SYNTAX      INTEGER    {
+                        enabled (1) ,
+                        disabled (2) 
+			}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether router is Opaque-Capable or not"
+        REFERENCE
+               "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        DEFVAL { disabled }
+        ::=  { futOspfOpaqueLSAGeneralGroup 1 }
+
+
+    futOspfType11LsaCount OBJECT-TYPE
+        SYNTAX   Gauge32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of  LS type 11  link-state
+           advertisements in the link-state database."
+        REFERENCE
+          "The Opaque LSA Option, Section 5.0 Management Considerations"
+      ::= { futOspfOpaqueLSAGeneralGroup 2 }
+
+
+    futOspfType11LsaCksumSum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The 32-bit unsigned sum of the LS checksums of
+            the  Type 11  link-state  advertisements  con-
+            tained in the link-state  database.   This  sum
+            can  be  used  to determine if there has been a
+            change in a router's link state  database,  and
+            to  compare  the  link-state  database  of  two
+            routers."
+       ::= { futOspfOpaqueLSAGeneralGroup 3 }
+
+
+    futOspfAreaIDValid OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Indicates whether an application is expected to provide
+            the AreaId, while generating a type-10 opaque LSA. This value
+            will be true if an application can provide the AreaId otherwise
+            false. In case of false the Opaque module will determine the
+            associated area for a Type-10 LSA based on the interface to which
+            the LSA is associated."
+        DEFVAL { false }
+        ::= { futOspfOpaqueLSAGeneralGroup 4 }
+
+
+--  SCALAR_TABLE_END futOspfOpaqueLSAGeneralGroup
+--      The OSPF OPAQUE Interface Data Structure contains information
+--      regarding the count and checksum of Type 9 LSAs.
+
+
+    futOspfOpaqueInterfaceTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF FutOspfOpaqueInterfaceEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the count and checksum of the Type9 LSAs."
+       REFERENCE
+          "The Opaque LSA Option , Section 5.0 Management Considerations"
+      ::= { futOspfOpaqueLSAGroup 2 }
+
+
+    futOspfOpaqueInterfaceEntry OBJECT-TYPE
+        SYNTAX   FutOspfOpaqueInterfaceEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the Type 9 LSAs Count and Checksums."
+        AUGMENTS { futOspfIfEntry }
+        ::= { futOspfOpaqueInterfaceTable 1 }
+
+
+    FutOspfOpaqueInterfaceEntry ::= SEQUENCE {
+        futOspfOpaqueType9LsaCount     Gauge32,
+        futOspfOpaqueType9LsaCksumSum  Integer32
+    }
+
+    futOspfOpaqueType9LsaCount OBJECT-TYPE
+        SYNTAX   Gauge32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The total number of TYPE 9 Opaque link-state advertisements."
+        ::= { futOspfOpaqueInterfaceEntry 1 }
+
+    futOspfOpaqueType9LsaCksumSum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The 32-bit unsigned sum of the link-state ad-
+            vertisements' TYPE9 Opaque LS checksums.The sum
+            change in a router's link state data-base, and
+            to compare the link-state database of the two
+            routers."
+        DEFVAL   { 0 }
+        ::= { futOspfOpaqueInterfaceEntry 2 }
+
+
+-- Future OSPF Opaque LSA TYPE9 Link State Database
+
+--      The Link State Database contains Type 9 Opaque Link State
+--      Advertisements .
+
+-- kihsoreky   Removed Areaid as the index to this table.
+    futOspfType9LsdbTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF FutOspfType9LsdbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The OSPF Process's TYPE9 Link State Database."
+        REFERENCE
+           "The Opaque LSA Option, Section 5.0 Management Considerations"
+        ::= { futOspfOpaqueLSAGroup 3 }
+
+    futOspfType9LsdbEntry OBJECT-TYPE
+        SYNTAX   FutOspfType9LsdbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A single Type 9 Link State Advertisement."
+        INDEX { futOspfType9LsdbIfIpAddress,
+                futOspfType9LsdbOpaqueType,futOspfType9LsdbLsid,
+                futOspfType9LsdbRouterId }
+       ::= { futOspfType9LsdbTable 1 }
+
+    FutOspfType9LsdbEntry ::= SEQUENCE {
+        futOspfType9LsdbIfIpAddress    IpAddress,
+        futOspfType9LsdbOpaqueType     Integer32,
+        futOspfType9LsdbLsid           IpAddress,
+        futOspfType9LsdbRouterId       RouterID,
+        futOspfType9LsdbSequence       Integer32,
+        futOspfType9LsdbAge            Integer32,
+        futOspfType9LsdbChecksum       Integer32,
+        futOspfType9LsdbAdvertisement  OCTET STRING
+        }
+
+    futOspfType9LsdbIfIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IP address of this OSPF interface."
+        ::=  { futOspfType9LsdbEntry 1 }
+
+    futOspfType9LsdbOpaqueType OBJECT-TYPE
+        SYNTAX   Integer32 (1..11)
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The Opaque type  of  the  LSA."
+
+        REFERENCE
+          "The Opaque LSA Option ,Section A.3 The Opaque LSA"
+        ::= { futOspfType9LsdbEntry 2 }
+
+    futOspfType9LsdbLsid OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The Link State ID is an LS Type Specific field
+            containing the Opaque Type and Opaque ID."
+        REFERENCE
+           "The OpaqueLSA Option ,Appendix A.2 The Opaque LSA"
+        ::= { futOspfType9LsdbEntry 3 }
+
+    futOspfType9LsdbRouterId OBJECT-TYPE
+        SYNTAX   RouterID
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The 32 bit number that uniquely identifies the
+            originating router in the Autonomous System."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType9LsdbEntry 4 }
+
+--  Note that the OSPF Sequence Number is a 32 bit signed
+--  integer.  It starts with the value '80000001'h,
+--  or -'7FFFFFFF'h, and increments until '7FFFFFFF'h
+--  Thus, a typical sequence number will be very negative.
+
+    futOspfType9LsdbSequence OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The sequence number field is a  signed  32-bit
+            integer.   It  is used to detect old and dupli-
+            cate link state advertisements.  The  space  of
+            sequence  numbers  is  linearly  ordered.   The
+            larger the sequence number the more recent  the
+            advertisement."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType9LsdbEntry 5 }
+
+
+    futOspfType9LsdbAge OBJECT-TYPE
+        SYNTAX   Integer32    -- Should be 0..MaxAge
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "This field is the age of the link state adver-
+            tisement in seconds."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType9LsdbEntry 6 }
+
+    futOspfType9LsdbChecksum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "This field is the  checksum  of  the  complete
+            contents  of  the  advertisement, excepting the
+            age field.  The age field is excepted  so  that
+            an   advertisement's  age  can  be  incremented
+            without updating the  checksum.   The  checksum
+            used  is  the same that is used for ISO connec-
+            tionless datagrams; it is commonly referred  to
+            as the Fletcher checksum."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType9LsdbEntry 7 }
+
+    futOspfType9LsdbAdvertisement OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (1..65535))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The entire TYPE9 Opaque Link State Advertisement,
+            including its header."
+        REFERENCE
+           "The Opaque LSA Option,Appendix A.2 The Opaque LSA"
+        ::= { futOspfType9LsdbEntry 8 }
+
+
+--  OSPF TYPE 11 Opaque Link State Database
+
+--      The Link State Database contains the Type 11Link State
+--      Advertisements from throughout the areas that the
+--      device is attached to.
+
+--             This table is identical to the OSPF LSDB Table in
+--      format, but contains only Type11 Link State Advertisements.
+--      The purpose is to allow Type11 LSAs to be displayed
+--      once for the router rather than once in each non-stub area.
+
+
+    futOspfType11LsdbTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF FutOspfType11LsdbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The OSPF Process's TYPE11 Links State Database."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfOpaqueLSAGroup 4 }
+    futOspfType11LsdbEntry OBJECT-TYPE
+        SYNTAX   FutOspfType11LsdbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A single TYPE11 Opaque Link State Advertisement."
+        INDEX { futOspfType11LsdbOpaqueType, futOspfType11LsdbLsid, futOspfType11LsdbRouterId }
+        ::= { futOspfType11LsdbTable 1 }
+
+    FutOspfType11LsdbEntry ::= SEQUENCE {
+        futOspfType11LsdbOpaqueType      Integer32,
+        futOspfType11LsdbLsid            IpAddress,
+        futOspfType11LsdbRouterId        RouterID,
+        futOspfType11LsdbSequence        Integer32,
+        futOspfType11LsdbAge             Integer32,
+        futOspfType11LsdbChecksum        Integer32,
+        futOspfType11LsdbAdvertisement   OCTET STRING
+        }
+
+    futOspfType11LsdbOpaqueType OBJECT-TYPE
+        SYNTAX   Integer32 (1..11)
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The Opaquetype  of  the  link  state  advertisement."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 1 }
+
+    futOspfType11LsdbLsid OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The Link State ID identifies the opaque type and
+            the opaque ID of the received Opaque LSA for an application."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 2 }
+
+    futOspfType11LsdbRouterId OBJECT-TYPE
+        SYNTAX   RouterID
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The 32 bit number that uniquely identifies the
+           originating router in the Autonomous System."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 3 }
+
+--  Note that the OSPF Sequence Number is a 32 bit signed
+--  integer.  It starts with the value '80000001'h,
+--  or -'7FFFFFFF'h, and increments until '7FFFFFFF'h
+--  Thus, a typical sequence number will be very negative.
+
+    futOspfType11LsdbSequence OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The sequence number field is a  signed  32-bit
+            integer.   It  is used to detect old and dupli-
+            cate link state advertisements.  The  space  of
+            sequence  numbers  is  linearly  ordered.   The
+            larger the sequence number the more recent  the
+            advertisement."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 4 }
+
+    futOspfType11LsdbAge OBJECT-TYPE
+        SYNTAX   Integer32    -- Should be 0..MaxAge
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "This field is the age of the link state adver-
+            tisement in seconds."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 5 }
+
+    futOspfType11LsdbChecksum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "This field is the  checksum  of  the  complete
+            contents  of  the  advertisement, excepting the
+            age field.  The age field is excepted  so  that
+            an   advertisement's  age  can  be  incremented
+            without updating the  checksum.   The  checksum
+            used  is  the same that is used for ISO connec-
+            tionless datagrams; it is commonly referred  to
+            as the Fletcher checksum."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 6 }
+
+    futOspfType11LsdbAdvertisement OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(1..65535))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The entire Link State Advertisement, including
+            its header."
+        REFERENCE
+           "The Opaque LSA Option ,Section 5.0 Management Considerations"
+        ::= { futOspfType11LsdbEntry 7 }
+--  Application Information Database
+
+--      The Application Information Database contains
+--    statistical information regarding the LSAs,which it has
+--    generated and received.
+
+
+    futOspfAppInfoDbTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF FutOspfAppInfoDbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "This table maintains information related to application statistics."  
+           ::= { futOspfOpaqueLSAGroup 5 }
+
+    futOspfAppInfoDbEntry OBJECT-TYPE
+        SYNTAX   FutOspfAppInfoDbEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A single Application's  statistical Information."
+        INDEX { futOspfAppInfoDbAppid }
+        ::= { futOspfAppInfoDbTable 1 }
+
+     FutOspfAppInfoDbEntry ::= SEQUENCE {
+        futOspfAppInfoDbAppid               Integer32,
+        futOspfAppInfoDbOpaqueType          Integer32,
+        futOspfAppInfoDbLsaTypesSupported   Integer32,
+        futOspfAppInfoDbType9Gen            Counter32,
+        futOspfAppInfoDbType9Rcvd           Counter32,
+        futOspfAppInfoDbType10Gen           Counter32,
+        futOspfAppInfoDbType10Rcvd          Counter32,
+        futOspfAppInfoDbType11Gen           Counter32,
+        futOspfAppInfoDbType11Rcvd          Counter32
+        }
+
+    futOspfAppInfoDbAppid OBJECT-TYPE
+        SYNTAX   Integer32 (1..65535)
+        MAX-ACCESS   not-accessible 
+        STATUS   current
+        DESCRIPTION
+           "The Application's ID. Each Application has a
+            unique Appid associated with it."
+        ::= { futOspfAppInfoDbEntry 1 }
+
+    futOspfAppInfoDbOpaqueType OBJECT-TYPE
+        SYNTAX   Integer32 (0..255) 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The OpaqueType of the LSA the application can
+            generate or receive. Each Application can register
+            only for a single OpaqueType."
+        ::= { futOspfAppInfoDbEntry 2 }
+
+    futOspfAppInfoDbLsaTypesSupported OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+          "The LSA Types the application can generate is indicated
+           by a BITMASK.The BITMASK and the interpretation of the
+           types supported is given as below:-
+
+            BitMask    TypesSupported
+            0 0 0   ==>  No types
+            0 0 1   ==>  Only Type9
+            0 1 0   ==>  Only Type10
+            0 1 1   ==>  Types 9,10
+            1 0 0   ==>  Only Type11
+            1 0 1   ==>  Types 9,11
+            1 1 0   ==>  Types 10,11
+            1 1 1   ==>  Types 9,10,11
+           The remaining values are left for future definition."
+        ::= { futOspfAppInfoDbEntry 3 }
+
+    futOspfAppInfoDbType9Gen OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of Type 9 LSAs generated by the application.
+            This field is invalid if the application does not
+            support the generation of Type9 LSAs."
+        ::= { futOspfAppInfoDbEntry 4 }
+
+    futOspfAppInfoDbType9Rcvd OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of Type 9 LSAs received by the application."
+        ::= { futOspfAppInfoDbEntry 5 }
+
+    futOspfAppInfoDbType10Gen OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of Type 10 LSAs generated by the application.
+            This field is invalid if the application does not
+            support the generation of Type10 LSAs."
+        ::= { futOspfAppInfoDbEntry 6 }
+
+    futOspfAppInfoDbType10Rcvd OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of Type 10 LSAs received by the application."
+        ::= { futOspfAppInfoDbEntry 7 }
+
+    futOspfAppInfoDbType11Gen OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS      current
+        DESCRIPTION
+           "The number of Type 11 LSAs generated by the application.
+            This field is invalid if the application does not support
+            the generation of Type11 LSAs."
+        ::= { futOspfAppInfoDbEntry 8 }
+
+    futOspfAppInfoDbType11Rcvd OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The number of Type 11 LSAs received by the application."
+        ::= { futOspfAppInfoDbEntry 9 }
+
+
+-- RRD OBJECT DEFINITION BEGIN
+
+   futospfRRDGroup OBJECT IDENTIFIER ::=  { futospf 13 }
+
+   futospfRRDGeneralGroup OBJECT IDENTIFIER ::=  { futospfRRDGroup 1}
+
+--   SCALAR_TABLE_BEGIN futospfRRDGeneralGroup 3
+
+   futOspfRRDStatus OBJECT-TYPE
+       SYNTAX Status
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This MIB object enables/disables OSPF to participate in Route 
+            Redistribution. If set to enabled, OSPF will start advertising 
+            the routes learned by other protocols. If set to disabled, OSPF 
+            will stop redistribution of routes. However, OSPF will continue 
+            updating the Common Routing Table using the queue interface."
+       DEFVAL { disabled }
+       ::= { futospfRRDGeneralGroup 1 }
+
+   futOspfRRDSrcProtoMaskEnable OBJECT-TYPE
+       SYNTAX Integer32
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The bit mask of source protocols from which routes are 
+            imported to OSPF.
+
+            Bit 1, if set, indicates that local routes are
+            redistributed into OSPF. (value = 2)
+
+            Bit 2, if set, indicates that static routes are
+            redistributed into OSPF. (value = 4)
+
+            Bit 7, if set, indicates that routes from RIP are
+            redistributed into OSPF. (value = 128)
+
+            Bit 13, if set, indicates that routes from BGP are
+            redistributed into OSPF. (value = 8192)
+
+            Bit 14, if set, indicates that routes from ISIS Level1 are
+            redistributed into OSPF. (value = 16384)
+
+            Bit 15, if set, indicates that routes from ISIS Level2 are
+            redistributed into OSPF. (value = 32768)
+            Other bits are reserved for future use."
+       DEFVAL { 0 }
+       ::= { futospfRRDGeneralGroup 2 }
+
+   futOspfRRDSrcProtoMaskDisable OBJECT-TYPE
+       SYNTAX Integer32
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The bit mask of source protocols from which redistribution 
+            to OSPF is disabled.
+
+            Bit 1, if set, indicates that local routes are not
+            redistributed into OSPF. (value = 2)
+
+            Bit 2, if set, indicates that static routes are not
+            redistributed into OSPF. (value = 4)
+
+            Bit 7, if set, indicates that routes from RIP are not
+            redistributed into OSPF. (value = 128)
+
+            Bit 13, if set, indicates that routes from BGP are not
+            redistributed into OSPF. (value = 8192) 
+            
+            Bit 14, if set, indicates that routes from ISIS Level1 are not
+            redistributed into OSPF. (value = 16384)
+
+            Bit 15, if set, indicates that routes from ISIS Level2 are not
+            redistributed into OSPF. (value = 32768)
+
+            Other bits are reserved for future use."
+       DEFVAL { 587478 }
+       ::= { futospfRRDGeneralGroup 3 }
+
+   futOspfRRDRouteMapEnable OBJECT-TYPE
+       SYNTAX             DisplayString (SIZE(0..20))
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION        "Name  Identifies the  specified route-map
+                           in the list of route-maps. If this Object needs to be
+                           changed, first reset this object and then configure
+                           the new value."
+       ::={ futospfRRDGeneralGroup 4 }
+
+--   SCALAR_TABLE_END futospfRRDGeneralGroup 
+
+   futOspfRRDRouteConfigTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfRRDRouteConfigEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "A table describing the configuration of Metric Cost and Route
+            Type information to be applied to the routes learnt from the RTM."
+       ::= { futospfRRDGroup 2 }
+
+   futOspfRRDRouteConfigEntry OBJECT-TYPE
+       SYNTAX FutOspfRRDRouteConfigEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Information describing the configuration of single route entry."
+       INDEX {futOspfRRDRouteDest,futOspfRRDRouteMask}
+       ::=  { futOspfRRDRouteConfigTable 1 }
+
+   FutOspfRRDRouteConfigEntry ::= SEQUENCE {
+       futOspfRRDRouteDest       IpAddress,
+       futOspfRRDRouteMask       IpAddress,
+       futOspfRRDRouteMetric     BigMetric,
+       futOspfRRDRouteMetricType INTEGER,
+       futOspfRRDRouteTagType    INTEGER, 
+       futOspfRRDRouteTag        Unsigned32, 
+       futOspfRRDRouteStatus     RowStatus
+       }
+
+   futOspfRRDRouteDest OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Ip Address of the Destination route."
+       ::=  { futOspfRRDRouteConfigEntry 1 }
+
+   futOspfRRDRouteMask OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Mask of the Destination route."
+       ::=  { futOspfRRDRouteConfigEntry 2 }
+
+   futOspfRRDRouteMetric OBJECT-TYPE
+       SYNTAX BigMetric
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The Metric value applied to the route before it is adv. into the
+            OSPF Domain."
+       DEFVAL { 10 }
+       ::=  { futOspfRRDRouteConfigEntry 3 }
+
+   futOspfRRDRouteMetricType OBJECT-TYPE
+       SYNTAX INTEGER {
+              asexttype1 (1),
+              asexttype2 (2)
+              }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The Metric Type applied to the route before it is adv. into the
+            OSPF Domain"
+       DEFVAL { asexttype2 }
+       ::=  { futOspfRRDRouteConfigEntry 4 }
+    
+   futOspfRRDRouteTagType OBJECT-TYPE 
+          SYNTAX INTEGER { 
+              manual (1), 
+              automatic (2) 
+              } 
+          MAX-ACCESS read-write 
+          STATUS current 
+          DESCRIPTION 
+              "The Tag Type MIB object describes whether Tags will be 
+               automatically generated or will be manually configured. 
+               If tags are manually configured , the futospfRRDRouteTag 
+               MIB has to be set with the Tag value needed." 
+          DEFVAL { manual } 
+          ::= { futOspfRRDRouteConfigEntry 5 } 
+    
+   futOspfRRDRouteTag OBJECT-TYPE 
+          SYNTAX Unsigned32 
+          MAX-ACCESS read-write 
+          STATUS current 
+          DESCRIPTION 
+              "The Route Tag in case the user configures a Manual option for 
+               the tags." 
+          DEFVAL { 0 } 
+          ::= { futOspfRRDRouteConfigEntry 6 } 
+
+   futOspfRRDRouteStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The variable displays the status of the entry.Setting it to
+            'invalid' has the effect of rendering it inoperative."
+       ::=  { futOspfRRDRouteConfigEntry 7 }
+
+-- RRD OBJECT DEFINITION END
+
+
+-- Future OSPF Virtual Neighbor Table
+
+    futOspfVirtNbrTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF FutOspfVirtNbrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A table of virtual neighbor information."
+       REFERENCE
+          "OSPF Version 2, Section 15  Virtual Links"
+      ::= { futospf 14 }
+
+
+    futOspfVirtNbrEntry OBJECT-TYPE
+        SYNTAX   FutOspfVirtNbrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Virtual neighbor information."
+        AUGMENTS { ospfVirtNbrEntry }
+        ::= { futOspfVirtNbrTable 1 }
+
+
+FutOspfVirtNbrEntry ::=
+    SEQUENCE {
+        futOspfVirtNbrRestartHelperStatus
+            INTEGER,
+        futOspfVirtNbrRestartHelperAge
+            Unsigned32,
+        futOspfVirtNbrRestartHelperExitReason
+            INTEGER
+        }
+
+    futOspfVirtNbrRestartHelperStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             notHelping (1),
+                             helping (2)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+           "Indicates whether the router is acting
+            as a graceful restart helper for the neighbor."
+        ::= { futOspfVirtNbrEntry 1 }
+
+    futOspfVirtNbrRestartHelperAge OBJECT-TYPE
+       SYNTAX      Unsigned32
+       UNITS       "seconds"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Remaining time in current OSPF graceful restart
+            interval, if the router is acting as a restart
+            helper for the neighbor."
+       ::= { futOspfVirtNbrEntry 2 }
+
+   futOspfVirtNbrRestartHelperExitReason OBJECT-TYPE
+       SYNTAX      INTEGER { none (1),           -- not attempted
+                             inProgress (2),     -- restart in progress
+                             completed (3),      -- successfully completed
+                             timedOut (4),       -- timed out
+                             topologyChanged (5) -- aborted due to topology
+                                                 -- change.
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           " Describes the outcome of the last attempt at acting
+             as a graceful restart helper for the neighbor."
+       ::= { futOspfVirtNbrEntry 3 }
+
+-- Future OSPF virtual neighbor table ends
+
+-- FILTERING OBJECT DEFINITION BEGIN
+
+ futospfDistInOutRouteMap OBJECT IDENTIFIER ::= { futospf 15 }
+
+    futOspfDistInOutRouteMapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FutOspfDistInOutRouteMapEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "A table describing the configuration of filtering for route map."
+    ::= { futospfDistInOutRouteMap 1 }
+
+    futOspfDistInOutRouteMapEntry OBJECT-TYPE
+        SYNTAX FutOspfDistInOutRouteMapEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Information describing the filtering configuration of single entry."
+        INDEX {futOspfDistInOutRouteMapName, futOspfDistInOutRouteMapType}
+    ::=  { futOspfDistInOutRouteMapTable 1 }
+
+    FutOspfDistInOutRouteMapEntry ::= SEQUENCE {
+        futOspfDistInOutRouteMapName         DisplayString,
+        futOspfDistInOutRouteMapType         Integer32,
+        futOspfDistInOutRouteMapValue        Integer32,
+        futOspfDistInOutRouteMapRowStatus    RowStatus
+    }
+
+    futOspfDistInOutRouteMapName OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..20))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Route map name."
+    ::=  { futOspfDistInOutRouteMapEntry 1 }
+
+    futOspfDistInOutRouteMapType OBJECT-TYPE
+        SYNTAX              Integer32(1..3)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Type of route map to indicate the route map is for 
+            distribute in or for distribute out or for distance.
+            1 - distance
+            2 - distribute in
+            3 - distribute out"
+    ::=  { futOspfDistInOutRouteMapEntry 3 }
+
+    futOspfDistInOutRouteMapValue  OBJECT-TYPE
+        SYNTAX              Integer32(1..255)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION
+            "Distance value ( this will be unused for distribute list )"
+    ::=  { futOspfDistInOutRouteMapEntry 4 }
+
+    futOspfDistInOutRouteMapRowStatus OBJECT-TYPE
+        SYNTAX              RowStatus
+        MAX-ACCESS          read-write
+        STATUS              current 
+        DESCRIPTION     
+            "The status of this row, by which new entries may be
+            created, or old entries deleted from this table."
+    ::=  { futOspfDistInOutRouteMapEntry 5 }
+
+-- FILTERING OBJECT DEFINITION END
+
+-- PREFERENCE OBJECT DEFINITION BEGIN
+
+ futospfPreferenceGroup OBJECT IDENTIFIER ::=  { futospf 16 }
+
+
+   futOspfPreferenceValue OBJECT-TYPE
+       SYNTAX Integer32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Preference value for OSPF routes. Use '0' to set default value"
+       DEFVAL { 0 }
+       ::= { futospfPreferenceGroup 1 }
+
+-- PREFERENCE OBJECT DEFINITION END
+   
+--  Future OSPF Interface Authentication Table
+
+   futOspfIfAuthTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfIfAuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Table describes the parameters
+            required for  cryptographic Authentication."
+       REFERENCE
+           "OSPF Version 2, Appendix D.3  Cryptographic Authentication"
+       ::=  { futospf 17 }
+   
+   futOspfIfAuthEntry OBJECT-TYPE
+       SYNTAX      FutOspfIfAuthEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Entry describes one  
+            Authentication Key from the viewpoint of OSPF."
+       INDEX { futOspfIfAuthIpAddress, futOspfIfAuthAddressLessIf, 
+              futOspfIfAuthKeyId}
+       ::=  { futOspfIfAuthTable 1 }
+   
+   FutOspfIfAuthEntry ::= SEQUENCE {
+       futOspfIfAuthIpAddress         IpAddress,
+       futOspfIfAuthAddressLessIf     InterfaceIndex,
+       futOspfIfAuthKeyId             Integer32,
+       futOspfIfAuthKey               OCTET STRING,
+       futOspfIfAuthKeyStartAccept    DateAndTime,
+       futOspfIfAuthKeyStartGenerate  DateAndTime,
+       futOspfIfAuthKeyStopGenerate   DateAndTime,
+       futOspfIfAuthKeyStopAccept     DateAndTime,
+       futOspfIfAuthKeyStatus         INTEGER
+       }
+   
+   futOspfIfAuthIpAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The IP address of this OSPF interface."
+       ::=  { futOspfIfAuthEntry 1 }
+   
+   futOspfIfAuthAddressLessIf OBJECT-TYPE
+       SYNTAX      InterfaceIndex (0..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "For the purpose of easing  the  instancing  of
+              addressed   and  addressless  interfaces;  This
+              variable takes the value 0 on  interfaces  with
+              IP  Addresses,  and  the corresponding value of
+              ifIndex for interfaces having no IP Address."
+       ::=  { futOspfIfAuthEntry 2 }
+   
+   futOspfIfAuthKeyId OBJECT-TYPE
+       SYNTAX      Integer32 (0..255)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " This object identifies the secret key used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfIfAuthEntry 3 }
+   
+   futOspfIfAuthKey OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..16)) -- Already existing Max Key size is carried over for all the Algorithms.
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This is the secret key which is used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfIfAuthEntry 4 }
+   
+   futOspfIfAuthKeyStartAccept OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will start accepting packets that have 
+            been created with this key.If the value is not set, then it 
+            will be taken as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfIfAuthEntry 5 }
+   
+   futOspfIfAuthKeyStartGenerate OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will start using this key for packets 
+            generation.If the value is not set, then it will be taken 
+            as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfIfAuthEntry 6 }
+   
+   futOspfIfAuthKeyStopGenerate OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will stop using this key for packets 
+            generation.If the value is not set, then it will be taken 
+            as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfIfAuthEntry 7 }
+   
+   futOspfIfAuthKeyStopAccept OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will stop accepting packets that have 
+            been created with this key.If the value is not set, then it 
+            will be taken as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfIfAuthEntry 8 }
+   
+   futOspfIfAuthKeyStatus OBJECT-TYPE
+       SYNTAX      INTEGER { valid(1), delete(3) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " Identifies the status of the key. 
+	     NOTE:invalid (2) currently not supported"
+       ::=  { futOspfIfAuthEntry 9 }
+
+--  Future OSPF Virtual Interface Authentication Table
+
+   futOspfVirtIfAuthTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FutOspfVirtIfAuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Table describes the parameters
+            required for cryptographic Authentication."
+       REFERENCE
+           "OSPF Version 2, Appendix D.3  Cryptographic Authentication"
+       ::=  { futospf 18 }
+   
+   futOspfVirtIfAuthEntry OBJECT-TYPE
+       SYNTAX FutOspfVirtIfAuthEntry
+       MAX-ACCESS not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The OSPF Interface Authentication Entry describes one  
+             Authentication Key from the viewpoint of OSPF."
+       INDEX {futOspfVirtIfAuthAreaId,futOspfVirtIfAuthNeighbor, 
+              futOspfVirtIfAuthKeyId}
+       ::=  { futOspfVirtIfAuthTable 1 }
+   
+   FutOspfVirtIfAuthEntry ::= SEQUENCE {
+       futOspfVirtIfAuthAreaId            AreaID,
+       futOspfVirtIfAuthNeighbor          RouterID,
+       futOspfVirtIfAuthKeyId             Integer32,
+       futOspfVirtIfAuthKey               OCTET STRING,
+       futOspfVirtIfAuthKeyStartAccept    DateAndTime,
+       futOspfVirtIfAuthKeyStartGenerate  DateAndTime,
+       futOspfVirtIfAuthKeyStopGenerate   DateAndTime,
+       futOspfVirtIfAuthKeyStopAccept     DateAndTime,
+       futOspfVirtIfAuthKeyStatus         INTEGER
+       }
+   
+   futOspfVirtIfAuthAreaId OBJECT-TYPE
+       SYNTAX      AreaID
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " The  Transit  Area  that  the   Virtual   Link
+              traverses.  By definition, this should not be 0.0.0.0."
+       ::=  { futOspfVirtIfAuthEntry 1 }
+   
+   futOspfVirtIfAuthNeighbor OBJECT-TYPE
+       SYNTAX      RouterID
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            " The Router ID of the Virtual Neighbor."
+       ::=  { futOspfVirtIfAuthEntry 2 }
+   
+   futOspfVirtIfAuthKeyId OBJECT-TYPE
+       SYNTAX      Integer32 (0..255)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           " This object identifies the secret key used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfVirtIfAuthEntry 3 }
+   
+   futOspfVirtIfAuthKey OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..16)) -- Already existing Max Key size is carried over for all the Algorithms.
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " This is the secret key which is used to create the 
+             message digest appended to the OSPF packet."
+       ::=  { futOspfVirtIfAuthEntry 4 }
+   
+   futOspfVirtIfAuthKeyStartAccept OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will start accepting packets that have 
+            been created with this key.If the value is not set, then it 
+            will be taken as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfVirtIfAuthEntry 5 }
+   
+   futOspfVirtIfAuthKeyStartGenerate OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will start using this key for packets 
+            generation.If the value is not set, then it will be taken 
+            as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfVirtIfAuthEntry 6 }
+   
+   futOspfVirtIfAuthKeyStopGenerate OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will stop using this key for packets 
+            generation.If the value is not set, then it will be taken 
+            as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfVirtIfAuthEntry 7 }
+   
+   futOspfVirtIfAuthKeyStopAccept OBJECT-TYPE
+       SYNTAX      DateAndTime 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "The time the router will stop accepting packets that have 
+            been created with this key.If the value is not set, then it 
+            will be taken as infinite and displayed as 9999-12-31,23:59:59.0. 
+            For example, Tuesday May 26, 1992 at 1:30:15 PM should be 
+            configured as,  1992-5-26,13:30:15.0"  
+       ::=  { futOspfVirtIfAuthEntry 8 }
+   
+   futOspfVirtIfAuthKeyStatus OBJECT-TYPE
+       SYNTAX      INTEGER { valid(1), delete(3) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           " Identifies the status of the key. 
+	     NOTE: invalid (2) is currently not supported"
+       ::=  {futOspfVirtIfAuthEntry 9 }
+
+
+-- CRYPTO AUTH START
+    futOspfIfCryptoAuthTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FutOspfIfCryptoAuthEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table which holds the crypto authentication type.This must be configured
+            for SHA-1 / SHA-2 authentication to be enabled. "
+        ::= { futospf 19 }
+
+        futOspfIfCryptoAuthEntry OBJECT-TYPE
+        SYNTAX  FutOspfIfCryptoAuthEntry
+        MAX-ACCESS not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "Describes the cryptographic authentication."
+        AUGMENTS { ospfIfEntry }
+        ::= { futOspfIfCryptoAuthTable 1 }
+            
+    FutOspfIfCryptoAuthEntry ::=
+        SEQUENCE {
+            futOspfIfCryptoAuthType INTEGER
+        }
+
+        futOspfIfCryptoAuthType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                                md5(1),
+                                sha1(2),
+                                sha224(3),
+                                sha256(4),
+                                sha384(5),
+                                sha512(6)
+                            }
+             MAX-ACCESS read-write
+             STATUS     current
+             DESCRIPTION
+             "Crypto authentication type to be used on the interface. This object 
+              should be used to set SHA authentication along with  ospfIfAuthType 
+              in stdospf.mib"
+             ::= { futOspfIfCryptoAuthEntry 1 }
+
+-- CRYPTO AUTH END
+
+-- CRYPTO AUTH VIRTUAL INTERFACE START
+    futOspfVirtIfCryptoAuthTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FutOspfVirtIfCryptoAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which holds the crypto authentication type."
+    ::= { futospf 20 }
+    futOspfVirtIfCryptoAuthEntry OBJECT-TYPE
+    SYNTAX  FutOspfVirtIfCryptoAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the cryptographic authentication."
+         AUGMENTS { ospfVirtIfEntry }
+    ::= { futOspfVirtIfCryptoAuthTable 1 }    
+    FutOspfVirtIfCryptoAuthEntry ::=
+       SEQUENCE {
+                  futOspfVirtIfCryptoAuthType
+                          INTEGER
+                }                                                        
+    futOspfVirtIfCryptoAuthType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                           md5(1),
+                           sha1(2),
+                           sha224(3),
+                           sha256(4),
+                           sha384(5),
+                           sha512(6)
+                       }
+                                   
+
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+        "Crypto authentication type to be used on the interface This object
+        should be used to set SHA authentication along with  ospfVirtIfAuthType
+        in stdospf.mib"
+                                                                           
+    ::= { futOspfVirtIfCryptoAuthEntry 1 }                                                                                                         
+-- CRYPTO AUTH VIRTUAL INTERFACE END
+
+-- Trap Notification types for Graceful restart
+
+    futOspfTraps  OBJECT IDENTIFIER ::= { futOspfNotification 0 }
+ 
+    futOspfRestartStatusChange NOTIFICATION-TYPE
+        OBJECTS  {
+                   ospfRouterId, -- The originator of the trap
+                   futOspfRestartStatus,
+                   futOspfRestartInterval,
+                   futOspfRestartExitReason
+                 }
+        STATUS   current
+        DESCRIPTION
+            "An futOspfRestartStatusChange trap signifies that
+             there has been a change in the graceful restart
+             state for the router. This trap should be
+             generated when the router restart status
+             changes."
+        ::= { futOspfTraps 1 }
+
+    futOspfNbrRestartHelperStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                  ospfRouterId, -- The originator of the trap
+                  ospfNbrRtrId,
+                  futOspfNbrRestartHelperStatus,
+                  futOspfNbrRestartHelperAge,
+                  futOspfNbrRestartHelperExitReason
+                }
+        STATUS  current
+        DESCRIPTION
+            "An futOspfNbrRestartHelperStatusChange trap signifies that
+            there has been a change in the graceful restart
+            helper state for the neighbor. This trap should be
+            generated when the neighbor restart helper status
+            transitions for a neighbor."
+        ::= { futOspfTraps 2 }
+
+    futOspfVirtNbrRestartHelperStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                  ospfRouterId, -- The originator of the trap
+                  futOspfVirtNbrRestartHelperStatus,
+                  futOspfVirtNbrRestartHelperAge,
+                  futOspfVirtNbrRestartHelperExitReason
+                }
+        STATUS  current
+        DESCRIPTION
+            "An futOspfVirtNbrRestartHelperStatusChange trap signifies
+            that there has been a change in the graceful restart
+            helper state for the virtual neighbor. This trap should
+            be generated when the virtual neighbor restart helper
+            status transitions for a virtual neighbor."
+        ::= { futOspfTraps 3 }
+
+    futOspfHotStandbyEventTrap NOTIFICATION-TYPE
+         OBJECTS {
+                     ospfRouterId, -- The originator of the trap
+                     futOspfHotStandbyState,
+                     futOspfDynamicBulkUpdStatus
+                 }
+         STATUS   current
+         DESCRIPTION "
+                      A notification is sent to the management entity whenever
+                      there is a state change in the OSPF hotstandby Module."
+         ::= {futOspfTraps 4}
+
+-- End of Trap notifications
+END

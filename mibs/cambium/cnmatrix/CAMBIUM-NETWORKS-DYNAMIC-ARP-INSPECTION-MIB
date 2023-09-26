@@ -1,0 +1,268 @@
+-- Copyright (C) Cambium Networks. All Rights Reserved. --
+
+CAMBIUM-NETWORKS-DYNAMIC-ARP-INSPECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32, Unsigned32,
+    enterprises, NOTIFICATION-TYPE, Counter32, IpAddress
+         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress, TruthValue,
+    DisplayString
+         FROM SNMPv2-TC
+    dot1qTpFdbPort
+         FROM Q-BRIDGE-MIB
+    dot1qStaticUnicastEntry
+         FROM Q-BRIDGE-MIB
+    dot1qVlanStaticEntry
+         FROM Q-BRIDGE-MIB
+    VlanIdOrNone
+         FROM Q-BRIDGE-MIB
+    dot1qTpFdbEntry, PortList
+         FROM Q-BRIDGE-MIB;
+
+cnDaiMib MODULE-IDENTITY
+    LAST-UPDATED "202202170000Z"     -- February 17, 2022
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the
+        Dynamic ARP Inspection feature."
+
+    REVISION    "202202170000Z"     -- February 17, 2022
+    DESCRIPTION "Added support for port channel."
+
+    REVISION    "201903070000Z"     -- March 07, 2019
+    DESCRIPTION "Ver 1:  Initial version."
+
+    ::= {  enterprises futuresoftware(2076) 110 }
+
+    TrustState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Dynamic ARP Inspection trust state of the port."
+    SYNTAX      INTEGER { untrusted(0), trusted(1) }
+
+    VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      Integer32 (1..4094)
+
+    AdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Dynamic ARP Inspection admin status for VLAN entry. "
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+-- ***************************************************************************
+--                         Groups in the MIB
+-- ***************************************************************************
+    cnDaiGlobal     OBJECT IDENTIFIER ::= { cnDaiMib 1 }
+    cnDaiVlanCfg    OBJECT IDENTIFIER ::= { cnDaiMib 2 }
+    cnDaiIfCfg      OBJECT IDENTIFIER ::= { cnDaiMib 3 }
+-- ***************************************************************************
+--                               GROUPS
+-- ***************************************************************************
+
+-- **************************** VLAN Entry ******************************
+
+    cnDaiDebugFlag     OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to set a specific value for Dynamic ARP inspection
+             debug traces."
+        DEFVAL  { 0 }
+    ::= { cnDaiGlobal 1 }
+
+    cnDaiVlanCfgTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CnDaiVlanCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains the configuration & statistics collection
+            parameters of Dynamic ARP Inspection for a specified VLAN."
+    ::= { cnDaiVlanCfg 1 }
+                               
+    cnDaiVlanCfgEntry OBJECT-TYPE
+        SYNTAX CnDaiVlanCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each row instance gives the Dynamic ARP Inspection status on VLAN and the
+	         in that VLAN for the Dynamic ARP Inspection module"
+        INDEX { cnDaiVlanCfgVlanId }
+    ::= { cnDaiVlanCfgTable 1 }
+
+    CnDaiVlanCfgEntry ::= SEQUENCE {
+        cnDaiVlanCfgVlanId                  VlanId,
+        cnDaiVlanCfgDaiAdminStatus 	        AdminStatus,
+        cnDaiVlanForwarded                  Counter32,
+        cnDaiVlanDropped                    Counter32,
+        cnDaiVlanInvalidProtocolData        Counter32,
+        cnDaiVlanSrcMacValidationFailures   Counter32,
+        cnDaiVlanIpValidationFailures       Counter32,
+        cnDaiVlanDhcpBindingsPermitted      Counter32,
+        cnDaiVlanDhcpBindingsDenied         Counter32,
+        cnDaiVlanStaticBindingsPermitted    Counter32,
+        cnDaiVlanStaticBindingsDenied       Counter32,
+        cnDaiVlanCfgRowStatus    	        RowStatus
+    }
+
+   cnDaiVlanCfgVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Vlan ID of the VLAN to which this table-entry is associated."
+    ::= { cnDaiVlanCfgEntry 1 }
+
+   cnDaiVlanCfgDaiAdminStatus OBJECT-TYPE
+        SYNTAX      AdminStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This OID is used to enable or disable the Dynamic ARP inspection on a per-VLAN basis."
+        DEFVAL  { disabled }
+    ::= { cnDaiVlanCfgEntry 2 }
+
+    cnDaiVlanForwarded OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which successfully passed all
+             the validity checks specific to Dynamic ARP inspection being subject to
+             forwarding."
+    ::= { cnDaiVlanCfgEntry 3 }
+
+    cnDaiVlanDropped OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which did not passed
+             one of the validity checks specific to Dynamic ARP inspection,
+             meaning that it will be dropped."
+    ::= { cnDaiVlanCfgEntry 4 }
+
+    cnDaiVlanInvalidProtocolData OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which contain data
+             that is not valid for the ARP packet format."
+    ::= { cnDaiVlanCfgEntry 5 }
+
+    cnDaiVlanSrcMacValidationFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets for which the source
+             HW address from the ARP payload didn't match any MAC address
+             in the binding table."
+    ::= { cnDaiVlanCfgEntry 6 }
+
+    cnDaiVlanIpValidationFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets for which the source
+             protocol address from the ARP payload specific to source HW address
+             also from the ARP payload didn't match any IP address in the binding table."
+    ::= { cnDaiVlanCfgEntry 7 }
+
+    cnDaiVlanDhcpBindingsPermitted OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which were validated against an
+             entry in the binding table which was learned through DHCP Snooping."
+    ::= { cnDaiVlanCfgEntry 8 }
+
+    cnDaiVlanDhcpBindingsDenied OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which were invalidated against an
+             entry in the binding table which was learned through DHCP Snooping."
+    ::= { cnDaiVlanCfgEntry 9 }
+
+    cnDaiVlanStaticBindingsPermitted OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which were validated against a
+             static entry from the binding table."
+    ::= { cnDaiVlanCfgEntry 10 }
+
+    cnDaiVlanStaticBindingsDenied OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the total number of ARP packets which were invalidated against a
+             static entry from the binding table."
+    ::= { cnDaiVlanCfgEntry 11 }
+
+	cnDaiVlanCfgRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Row-Status of the VLAN interface entry."
+    ::= { cnDaiVlanCfgEntry 12 }
+
+    cnDaiIfCfgTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CnDaiIfCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains the configuration & statistics collection
+            parameters of Dynamic ARP Inspection for a specified VLAN. "
+    ::= { cnDaiIfCfg 1 }
+
+    cnDaiIfCfgEntry OBJECT-TYPE
+        SYNTAX CnDaiIfCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each row instance gives the Dynamic ARP Inspection status on VLAN and the
+	         in that VLAN for the Dynamic ARP Inspection module"
+        INDEX { cnDaiIfCfgIfIndex }
+    ::= { cnDaiIfCfgTable 1 }
+
+    CnDaiIfCfgEntry ::= SEQUENCE {
+        cnDaiIfCfgIfIndex                   Integer32,
+        cnDaiIfCfgTrustState 	            TrustState
+    }
+
+    cnDaiIfCfgIfIndex OBJECT-TYPE
+        SYNTAX         Integer32(1..60)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Port (ifIndex) identifier attribute"
+
+    ::= { cnDaiIfCfgEntry 1 }
+
+    cnDaiIfCfgTrustState OBJECT-TYPE
+        SYNTAX         TrustState
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "Set the Dynamic ARP Inspection trust state for the given interface.
+             If the interface is part of a port channel it cannot be set."
+        DEFVAL  { untrusted }
+
+    ::= { cnDaiIfCfgEntry 2 }
+
+END

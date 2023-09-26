@@ -1,0 +1,89 @@
+CAMBIUM-NETWORKS-EEE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32, Integer32, Counter32, enterprises
+            FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+            FROM IF-MIB
+    RowStatus, TruthValue
+            FROM SNMPv2-TC;
+
+cnEeeMib MODULE-IDENTITY
+    LAST-UPDATED "202104190000Z"     -- Apr 19, 2021
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the energy efficient ethernet support."
+
+    REVISION "202104190000Z"     -- Apr 19, 2021
+    DESCRIPTION
+        "Initial version."
+    ::= { enterprises 17713 24 8 }
+
+cnEeeObjects  OBJECT IDENTIFIER ::= { cnEeeMib 0 }
+
+cnEeePortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CnEeePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of por-port entries containing control and status information related to energy efficient ethernet"
+       ::= { cnEeeObjects 1 }
+
+cnEeePortEntry OBJECT-TYPE
+       SYNTAX      CnEeePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Per-port entry for control and status information related to energy efficient ethernet"
+       INDEX    { cnEeePortIndex  }
+       ::= { cnEeePortTable 1 }
+
+CnEeePortEntry ::= SEQUENCE {
+       cnEeePortIndex    Integer32,
+       cnEeeEnabled      INTEGER,
+       cnEeeCapabilities Integer32,
+       cnEeeLpAbilities   Integer32
+}
+
+cnEeePortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the ethernet port index"
+       ::= { cnEeePortEntry 1 }
+
+cnEeeEnabled OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the eee status for a port index"
+       ::= { cnEeePortEntry 2 }
+
+cnEeeCapabilities OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the eee auto-negotiation capabilities for a port index"
+       ::= { cnEeePortEntry 3 }
+
+cnEeeLpAbilities OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the eee link-partner auto-negotiation abilities"
+       ::= { cnEeePortEntry 4 }
+
+END

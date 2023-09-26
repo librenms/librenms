@@ -1,0 +1,434 @@
+-- Copyright (C) 2008-2012 Aricent Group . All Rights Reserved
+
+    ARICENT-TAC-MIB DEFINITIONS ::= BEGIN
+         IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             enterprises, Unsigned32                  FROM SNMPv2-SMI
+             RowStatus, DisplayString                 FROM SNMPv2-TC
+             InetAddressType, InetAddress             FROM INET-ADDRESS-MIB;
+
+    fstac   MODULE-IDENTITY
+            LAST-UPDATED "201209050000Z"
+            ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+            CONTACT-INFO "support@aricent.com"
+	    DESCRIPTION
+             "The proprietary MIB module for TAC. The MIB provides
+              objects for configuring admission as well as transmission
+              control mechanisms."
+	    REVISION "201209050000Z"    
+            DESCRIPTION
+             "The proprietary MIB module for TAC. The MIB provides 
+              objects for configuring admission as well as transmission 
+              control mechanisms."
+        ::=  { enterprises aricent-communication-holding-ltd(29601) iss(2) 8}
+
+-- ****************************************************************************
+--                Information useful for understanding this MIB
+-- ****************************************************************************
+
+-- A multicast channel is a multicast (S, G) entry. That is, a channel means 
+-- multicast data sent for a multicast group (G), by a source (S).
+
+-- For all the multicast related objects, this MIB works closely with the 
+-- fssnp.mib (snooping module MIB).
+
+-- ****************************************************************************
+--                           Groups in the MIB
+-- ****************************************************************************
+     fsTacScalars                       OBJECT IDENTIFIER ::= { fstac 1 }
+     fsTacProfile                       OBJECT IDENTIFIER ::= { fstac 2 }
+     fsTacChannels                      OBJECT IDENTIFIER ::= { fstac 3 }
+     fsTacStatistics                    OBJECT IDENTIFIER ::= { fstac 4 }
+
+-- ****************************************************************************
+--                               Scalars                                  
+-- ****************************************************************************
+
+    fsTacMcastChannelDefaultBandwidth OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This represents the default bandwidth in Kbps required by a 
+             multicast channel. For any channel, bandwidth can be configured 
+             in channel table (fsTacMcastChannelTable). If for any channel, 
+             there is no entry in the channel table, this default bandwidth 
+             value configured will be used for processing it."
+        DEFVAL { 2000 }
+    ::= { fsTacScalars 1 }
+
+    fsTacTraceOption OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+             "This object is used to enable trace statements in
+              TAC module.
+              A four byte integer is used for enabling the trace level.
+              Each bit in the four byte integer represents a particular
+              trace level.
+              Trace Levels
+                     BIT
+                      0  - Init and Shutdown traces
+                      1  - Management traces
+                      2  - Data Path traces
+                      3  - Control Plane traces
+                      4  - Packet Dump traces
+                      5  - Traces related to all resources except buffers
+                      6  - All Failure traces
+                      7  - Buffer allocation/release traces
+
+              The remaining bits are reserved to be used for module specific
+              trace options."
+
+    ::= { fsTacScalars 2 }
+
+	fsTacStatus OBJECT-TYPE
+		SYNTAX      INTEGER { enabled(1), disabled(2) }
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+				"Sets the Transmission and Admin Control Module administrative status as
+                enabled or disabled. The module can be enabled only when this
+                object is set to 'enabled'."
+		DEFVAL { enabled }
+	::= { fsTacScalars 3 }
+
+-- ****************************************************************************
+--                           Profiles Group
+-- ****************************************************************************
+
+-- The Multicast Profile table
+
+    fsTacMcastProfileTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FsTacMcastProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains multicast profiles, which is used to filter
+             incoming IGMP/MLDP reports from customers." 
+        ::= { fsTacProfile 1 }
+
+    fsTacMcastProfileEntry OBJECT-TYPE
+        SYNTAX      FsTacMcastProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each profile table entry will contain a table of multicast 
+             information and an access rule (permit or deny)."
+        INDEX       { fsTacMcastProfileId, fsTacMcastProfileAddrType }
+        ::= { fsTacMcastProfileTable 1 }
+
+    FsTacMcastProfileEntry ::= SEQUENCE {
+        fsTacMcastProfileId             Unsigned32,
+        fsTacMcastProfileAddrType       InetAddressType,
+        fsTacMcastProfileAction         INTEGER,
+        fsTacMcastProfileDescription    DisplayString,
+        fsTacMcastProfileStatus         RowStatus
+    }
+    
+    fsTacMcastProfileId OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Identifier for the multicast profile entry."
+        ::= { fsTacMcastProfileEntry 1 }
+
+    fsTacMcastProfileAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the configured rule is for
+             IPv4 or IPv6 address."
+        ::= { fsTacMcastProfileEntry 2 }
+
+    fsTacMcastProfileAction OBJECT-TYPE
+        SYNTAX      INTEGER { permit(1), deny (2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether to allow or deny the channels associated 
+            with this profile."
+        DEFVAL { deny }
+        ::= { fsTacMcastProfileEntry 3 }
+
+    fsTacMcastProfileDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..128))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Description for the profile entry."
+        ::= { fsTacMcastProfileEntry 4 }
+
+    fsTacMcastProfileStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The status of a row in the multicast profile table. Using this
+             object new entries can be created in the multicast profile table 
+             or the existing entries can be removed."
+        ::= { fsTacMcastProfileEntry 5 }
+
+
+-- Multicast filter rule table
+
+    fsTacMcastPrfFilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FsTacMcastPrfFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each multicast profile entry will contain a table of filters
+             for channels. The filter rule may contain a range of group
+             and source addresses or specific addresses. A filter rule 
+             with source address as wild card is used to filter based on 
+             groups."
+        ::= { fsTacProfile 2 }
+
+    fsTacMcastPrfFilterEntry OBJECT-TYPE
+        SYNTAX      FsTacMcastPrfFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each filter entry can contain entries of the form (Ss-Se, Gs-Ge) 
+             or (*, Gs-Ge) or (Ss-Se, *) or (*,*),
+             where 'S' refers to a multicast source address,
+             'G' refers to a multicast group address, 's' refers to start 
+             address and 'e' refers to end address.
+
+             Group and source addresses are maintained as a range
+             or wildcard or specific values.
+        
+             The filter mode specifies the packet for which this
+             configuration needs to be enforced. This can be 'include'
+             or 'exclude' or 'any'. 'Any' implies both 'include' and 
+             'exclude'. Hence for a specific group and source range, 
+             only one mode is possible."
+         INDEX {
+                  fsTacMcastProfileId,
+                  fsTacMcastProfileAddrType,
+                  fsTacMcastPrfFilterGrpStartAddr,
+                  fsTacMcastPrfFilterGrpEndAddr,
+                  fsTacMcastPrfFilterSrcStartAddr,
+                  fsTacMcastPrfFilterSrcEndAddr
+                }
+        ::= { fsTacMcastPrfFilterTable 1 }
+
+    FsTacMcastPrfFilterEntry ::= SEQUENCE {
+        fsTacMcastPrfFilterGrpStartAddr     InetAddress,
+        fsTacMcastPrfFilterGrpEndAddr       InetAddress,
+        fsTacMcastPrfFilterSrcStartAddr     InetAddress,
+        fsTacMcastPrfFilterSrcEndAddr       InetAddress,
+        fsTacMcastPrfFilterMode             INTEGER,
+        fsTacMcastPrfFilterStatus           RowStatus
+    }
+
+    fsTacMcastPrfFilterGrpStartAddr OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object will contain a multicast group address, which
+             will be the start of multicast group address range.
+             This can be a particular multicast address or 0.0.0.0
+             which indicates that it is a wild card. For configuring a
+             specific address, both the start and end group address
+             must be the same."
+        ::= { fsTacMcastPrfFilterEntry 1 }
+
+    fsTacMcastPrfFilterGrpEndAddr OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object will contain a multicast group address, which
+             will be the end of multicast group address range.
+             This can be a particular multicast address or 0.0.0.0
+             which indicates that it is a wild card. The end address
+             cannot be specific address if the start address
+             is a wildcard. For configuring a specific address, both
+             the start and end group address must be the same."
+        ::= { fsTacMcastPrfFilterEntry 2 }
+
+    fsTacMcastPrfFilterSrcStartAddr OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object will contain a multicast source address, which
+             will be the start of multicast source address range.
+             This can be a particular ip address or 0.0.0.0
+             which indicates that it is a wild card. For configuring a 
+             specific address, both the start and end source address must 
+             be the same."
+        ::= { fsTacMcastPrfFilterEntry 3 }
+
+    fsTacMcastPrfFilterSrcEndAddr OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object will contain a multicast source address, which
+             will be the end of multicast source address range.
+             This can be a particular ip address or 0.0.0.0
+             which indicates that it is a wild card. The end address
+             cannot be specific address if the start address
+             is a wildcard. For configuring a specific address, both the 
+             start and end source address must be the same."
+        ::= { fsTacMcastPrfFilterEntry 4 }
+
+     fsTacMcastPrfFilterMode OBJECT-TYPE
+        SYNTAX      INTEGER  { include (1), exclude (2), any (3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object decides the type of packets to be filtered.
+             'Include' or 'exclude' is used to apply the filter for include
+             and exclude IGMP/MLD reports respectively. The option 'any'  
+             is used to apply the filter for all the packets."
+        DEFVAL { any }
+        ::= { fsTacMcastPrfFilterEntry 5 }
+
+     fsTacMcastPrfFilterStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is the status of a row in the multicast filter
+             rule entry. Using this object new entries can be
+             created in the multicast filter rule table or the existing 
+             entries can be removed or updated."
+        ::= { fsTacMcastPrfFilterEntry 6 }
+
+-- ****************************************************************************
+--                          Channels Group
+-- ****************************************************************************
+
+-- The Multicast Channel table
+
+    fsTacMcastChannelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FsTacMcastChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains the attributes associated with different
+             multicast channels i.e. (S, G) entries. If there is a need to 
+             associate attributes per group, it can be done by giving source 
+             address as zero."
+        ::= { fsTacChannels 1 }
+
+    fsTacMcastChannelEntry OBJECT-TYPE
+        SYNTAX      FsTacMcastChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A particular entry contains the informations about a particular
+             multicast channel."
+        INDEX { fsTacMcastChannelAddressType,
+                fsTacMcastChannelGrpAddress,
+                fsTacMcastChannelSrcAddress }
+        ::= {fsTacMcastChannelTable 1 }
+
+    FsTacMcastChannelEntry ::= SEQUENCE {
+        fsTacMcastChannelAddressType    InetAddressType,
+        fsTacMcastChannelGrpAddress     InetAddress,
+        fsTacMcastChannelSrcAddress     InetAddress,
+        fsTacMcastChannelBandWidth      Unsigned32,
+        fsTacMcastChannelRowStatus      RowStatus
+    }
+
+    fsTacMcastChannelAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the channel entry is for IGMP/MLDP."
+    ::= { fsTacMcastChannelEntry 1 }
+
+    fsTacMcastChannelGrpAddress OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Multicast group address of this channel."
+    ::= { fsTacMcastChannelEntry 2 }
+
+    fsTacMcastChannelSrcAddress OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (4..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Multicast source address of this channel. This object can be zero.
+             If it is zero, it represent the bandwidth for the group, 
+             irrespective of the multicast source."
+    ::= { fsTacMcastChannelEntry 3 }
+
+    fsTacMcastChannelBandWidth OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The bandwidth that will be required for this channel in Kbps."
+        DEFVAL { 2000 }
+    ::= { fsTacMcastChannelEntry 4 }
+
+    fsTacMcastChannelRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "With this rowstatus object, we can add/delete entries to/from
+             channel table. If there is no row in this table for a channel,
+             that channel will be assumed to have default attributes."
+    ::= { fsTacMcastChannelEntry 5 }
+
+
+-- Statistics
+
+    fsTacMcastPrfStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FsTacMcastPrfStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            " This table contains the statistics related to profile table"
+        ::= { fsTacStatistics 1 }
+
+    fsTacMcastPrfStatsEntry OBJECT-TYPE
+        SYNTAX      FsTacMcastPrfStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A particular entry contains the statistics about a particular
+             profile."
+        INDEX { 
+                fsTacMcastProfileId, 
+                fsTacMcastProfileAddrType 
+              }
+        ::= {fsTacMcastPrfStatsTable 1 }
+
+    FsTacMcastPrfStatsEntry ::= SEQUENCE {
+        fsTacMcastPrfStatsPortRefCnt        Unsigned32,
+        fsTacMcastPrfStatsVlanRefCnt        Unsigned32
+    }
+
+    fsTacMcastPrfStatsPortRefCnt OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of profile-to-port mappings configured."
+    ::= { fsTacMcastPrfStatsEntry 1 }
+
+    fsTacMcastPrfStatsVlanRefCnt OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of profile-to-VLAN mappings configured in the
+            entire system."
+    ::= { fsTacMcastPrfStatsEntry 2 }
+
+
+END

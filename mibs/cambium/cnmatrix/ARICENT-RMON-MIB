@@ -1,0 +1,186 @@
+-- Copyright (C) 2018  Aricent Group . All Rights Reserved
+
+ARICENT-RMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    etherStatsEntry                FROM RMON-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    enterprises, Unsigned32, Counter32 FROM SNMPv2-SMI;
+
+
+futrmon MODULE-IDENTITY
+     LAST-UPDATED "201209050000Z"
+     ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+     CONTACT-INFO "support@aricent.com" 
+     DESCRIPTION
+           " This MIB module is for managing RMON implementations." 
+     REVISION "201209050000Z"
+     DESCRIPTION
+           " This MIB module is for managing RMON implementations. 
+        Ether Statistics group supports the monitoring of different statistics on
+        ethernet interfaces, which is enhanced to support statistics per VLAN
+        The etherStatsDatasource of etherStats table identifies the source of data 
+        that is configured to analyze. Now this source can be set to either
+        interface OID or VLAN OID. If configured for interface OID the statistics
+        collection is set to be on Interface and if the source is set to VLAN OID,
+        the statistics collection is set to be on any of the VLAN configured in the
+        device."
+
+                  ::= { enterprises futuresoftware (2076) 44 }
+    
+-- FutreRmon Trace enable/disable object
+ 
+         rmonDebugType OBJECT-TYPE
+              SYNTAX  Unsigned32 
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled debug flag for rmon."
+
+         ::=  { futrmon  1 }
+        
+-- FutreRmon enable/disable status object
+ 
+         rmonEnableStatus OBJECT-TYPE
+              SYNTAX  INTEGER { rmonenabled(1), rmondisabled(2) } 
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the rmonenable flag for rmon." 
+
+         ::=  { futrmon  2 }
+-- FutreRmon  stats supported object
+ 
+      rmonHwStatsSupp OBJECT-TYPE
+
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		          "This object specifies the flag for whether HW supports
+                   Etherstatistics or not."
+
+         ::=  { futrmon  3 }
+
+-- FutreRmon  HW history supported object
+
+ 
+         rmonHwHistorySupp OBJECT-TYPE
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		          "This object specifies the enabled HWhistorysupp flag for rmon."
+
+         ::=  { futrmon  4 }
+
+
+-- FutreRmon HWalarmsupported object
+ 
+         rmonHwAlarmSupp OBJECT-TYPE
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled HWAlarmsupp flag for rmon."
+
+         ::=  { futrmon  5 }
+
+-- FutreRmon  HWHostsupported object
+ 
+         rmonHwHostSupp OBJECT-TYPE
+
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled HWhostsupp flag for rmon."
+
+         ::=  { futrmon  6 }
+
+-- FutreRmon  HW hosttopN supported object
+ 
+         rmonHwHostTopNSupp OBJECT-TYPE
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled HWHostTopN flag for rmon."
+
+         ::=  { futrmon  7 }
+
+-- FutreRmon  HW matrix supported object
+ 
+         rmonHwMatrixSupp OBJECT-TYPE
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled HWMatrix flag for rmon."
+
+         ::=  { futrmon  8 }
+
+-- FutreRmon  HW Event supported object
+ 
+         rmonHwEventSupp OBJECT-TYPE
+              SYNTAX  INTEGER { notsupported(0), supported(1)}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+		         "This object specifies the enabled HWEvent flag for rmon."
+
+         ::=  { futrmon  9 }
+
+
+--Tabular Object
+
+    rmonStatsTable OBJECT-TYPE
+    	SYNTAX     SEQUENCE OF RmonStatsEntry
+       	MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION 
+		   "This object specifies the table which is a enhancement of etherStatsTable in stdrmon.mib."
+
+    ::= {futrmon 10}
+
+    rmonStatsEntry  OBJECT-TYPE
+        SYNTAX      RmonStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION 
+		   "This object specifies an Entry containing Statistics information (e.g., OutFCSError)."
+        AUGMENTS {etherStatsEntry}
+    ::= {rmonStatsTable 1}
+
+    RmonStatsEntry  ::= SEQUENCE {
+     rmonStatsOutFCSErrors              Counter32,
+     rmonStatsPkts1519to1522Octets      Counter32
+                                }
+    rmonStatsOutFCSErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object specifies the number of frames transmitted with an invalid FCS.
+        Whenever a frame is modified during transmission
+        (e.g., to add or remove a tag) the frame's original FCS
+        is inspected before a new FCS is added to a modified
+        frame. If the original FCS is invalid, the new FCS is
+        made invalid too and this counter is incremented."
+
+    ::={rmonStatsEntry 1}
+	
+    rmonStatsPkts1519to1522Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object specifies the total number of packets (including bad
+         packets) received that were between
+         1519 and 1522 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+
+    ::={rmonStatsEntry 2}
+
+END

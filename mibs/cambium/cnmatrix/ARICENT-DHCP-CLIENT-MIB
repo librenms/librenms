@@ -1,0 +1,564 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+	ARICENT-DHCP-CLIENT-MIB DEFINITIONS ::= BEGIN
+ 
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,
+		Integer32, Counter32, enterprises,
+		IpAddress		FROM SNMPv2-SMI
+        RowStatus  FROM SNMPv2-TC
+                InterfaceIndex          FROM IF-MIB;
+   
+	futureDhcpClientMIB MODULE-IDENTITY
+		LAST-UPDATED "201209050000Z"
+		ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+		CONTACT-INFO "support@aricent.com" 
+		DESCRIPTION " The DHCP Client MIB is placed under 
+			futuresoftware MIB branch."
+		REVISION "201209050000Z"
+		DESCRIPTION " The DHCP Client MIB is placed under 
+			futuresoftware MIB branch."
+			::= { enterprises futuresoftware (2076) 87 } 
+
+
+dhcpClientConfig	OBJECT IDENTIFIER ::= { futureDhcpClientMIB 1 }
+dhcpClientCounters	OBJECT IDENTIFIER ::= { futureDhcpClientMIB 2 }
+
+
+--- dhcpClientConfig
+dhcpClientConfigTable OBJECT-TYPE  
+	SYNTAX SEQUENCE OF DhcpClientConfigEntry  
+	MAX-ACCESS not-accessible  
+	STATUS current  
+	DESCRIPTION  
+		" This table contains the Configuration information for 
+		DHCP client on each interface. "
+	::=  { dhcpClientConfig 1 }  
+  
+dhcpClientConfigEntry OBJECT-TYPE  
+	SYNTAX DhcpClientConfigEntry  
+	MAX-ACCESS not-accessible  
+	STATUS current  
+	DESCRIPTION  
+		"This object specifies the entries of the dhcpClientConfigTable."
+	INDEX {dhcpClientConfigIfIndex}
+	::=  { dhcpClientConfigTable 1 } 
+
+DhcpClientConfigEntry ::= SEQUENCE {  
+	dhcpClientConfigIfIndex	Integer32,
+	dhcpClientRenew			INTEGER,
+	dhcpClientRebind		INTEGER,
+	dhcpClientInform		INTEGER,
+	dhcpClientRelease		INTEGER,
+	dhcpClientIdentifier		OCTET STRING
+	}
+
+dhcpClientConfigIfIndex OBJECT-TYPE  
+	SYNTAX Integer32 (0..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current  
+	DESCRIPTION  
+	"This object specifies the index of one entry in dhcpClientConfigTable."  
+	::=  { dhcpClientConfigEntry 1 }  
+ 
+dhcpClientRenew OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		set (1),
+		notset (2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This object is for renewing the lease time currently available.
+         When this object is set,Client will send DHCP Renew Request 
+         message provided client is in BOUND/RENEW/REBIND state.
+         The Object can be set to the value 'notset' only through 
+         Protocol operation."
+		DEFVAL    { 2 }
+	::= { dhcpClientConfigEntry 2 }
+
+dhcpClientRebind OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		set(1),
+		notset (2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This object is for renewing the lease time currently available.
+         When this object is set,Client will send DHCP Rebind Request 
+         message provided client is in BOUND/RENEW/REBIND state.
+         The Object can be set to the value 'notset' only through 
+         Protocol operation."
+	DEFVAL    { 2 }
+	::= { dhcpClientConfigEntry 3 }
+
+dhcpClientInform OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		set(1),
+		notset (2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This object is used to get configuration parameters from the 
+         DHCP server.When this object is set,Client will send DHCP 
+         Inform message provided client in BOUND state. The Object 
+         can be set to the value 'notset' only through  Protocol 
+         operation."
+	DEFVAL    { 2 }
+	::= { dhcpClientConfigEntry 4 }
+
+dhcpClientRelease OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		set(1),
+		notset (2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This object is used to release the acquired IP back to the 
+         DHCP server pool.When this object is set,Client will send 
+         DHCP RELEASE message provided client is in BOUND/RENEW/
+         REBIND state.The Object can be set to the value 'notset' 
+         only through Protocol operation."
+	DEFVAL    { 2 }
+	::= { dhcpClientConfigEntry 5 }
+
+dhcpClientIdentifier   OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION 
+                "This object is unique identifier of dhcp client per interface.
+                 It will be used in option 61 field in all dhcp client messages. 
+                 This identifier will be used in dhcp server to maintain client 
+                 informations.
+ 
+                 This identifier can be mac address or any string.
+                 Administrators are responsible for choosing client-identifier
+                 to maintain uniqueness."
+        ::= { dhcpClientConfigEntry 6 }
+
+--- dhcpClientConfig scalar
+
+dhcpClientDebugTrace OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+            "The mask which is used to enable selective debug levels in
+             DHCP client module.Each allowed BIT in the integer, represents
+             a particular level of Trace.The mapping between the bit
+             positions & the level of trace is as follows:
+                  0 - Event Trace
+                  3 - packet Trace
+                  4 - Bind Trace
+                  6 - All Failure Traces
+             The remaining bits are unused. Combination of levels are also
+             allowed. For example if the bits 0 and 3 are set, then the
+             Trace statements related to events and packets will
+             be printed. The user has to enter the corresponding INTEGER VALUE
+             for the bits set. For example if bits 0 and 3 are set then user
+             has to give the value 9."
+
+	DEFVAL    { 0 }
+	::=  { dhcpClientConfig 2 }  
+
+dhcpClientOptTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF DhcpClientOptEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                " The dhcp options which are to be requested to server
+                  will be added as entries in this table.   
+
+                  While sending out discover message, the options entries
+                  which are avilable in this table will be added with
+                  discover message.  
+ 
+                  The option values which are received via dhcp ack
+                  packet will be stored in this table."
+
+            ::= { dhcpClientConfig 3 }
+
+dhcpClientOptEntry  OBJECT-TYPE
+        SYNTAX      DhcpClientOptEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry containing requested dhcp options and its values
+                 at a particular interface."
+        INDEX { dhcpClientOptIfIndex, dhcpClientOptType }
+        ::= { dhcpClientOptTable 1 }
+
+DhcpClientOptEntry ::=
+        SEQUENCE {
+            dhcpClientOptIfIndex    InterfaceIndex, 
+            dhcpClientOptType       Integer32,
+            dhcpClientOptLen        Integer32,
+            dhcpClientOptVal        OCTET STRING,
+            dhcpClientOptRowStatus  RowStatus 
+            }
+
+dhcpClientOptIfIndex  OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+           "A unique identifier for each interface.
+            This object is identical to the ifIndex
+           of the standard MIB-2 ifTable." 
+        ::= { dhcpClientOptEntry 1 }
+
+dhcpClientOptType  OBJECT-TYPE
+        SYNTAX     Integer32 (1..254)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The object identifies the option, this is the
+                tag octet of the DHCP option. This option is 
+                one of the index in the dhcpClientOptTable.
+                  
+                Option 0 denotes padding. Option 255 denotes
+                end of option field. Other options can be
+                requested from client to server."
+        ::= { dhcpClientOptEntry 2 }
+
+dhcpClientOptLen   OBJECT-TYPE
+        SYNTAX     Integer32 (0..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the length of the DHCP Client Option.
+                 This length does not include the two octets
+                 specifiying the tag and length.
+
+                 This object has read-write support only for option 60."
+        ::= { dhcpClientOptEntry 3 }
+
+dhcpClientOptVal   OBJECT-TYPE
+        SYNTAX     OCTET STRING
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "This object specifies the octets of data, for the length
+                specified by dhcpClientOptLen.
+
+                This object has read-write support only for option 60.
+                
+                This value is taken from DHCP ACK message
+                sent from server to client."
+        ::= { dhcpClientOptEntry 4 }
+
+dhcpClientOptRowStatus  OBJECT-TYPE
+         SYNTAX         RowStatus
+         MAX-ACCESS     read-create
+         STATUS         current
+         DESCRIPTION
+            "The RowStatus variable is for addition and deletion
+             of dhcpClientOptEntry."
+        ::= { dhcpClientOptEntry 5 }
+
+
+--- dhcpClientCounters Group
+
+dhcpClientCounterTable OBJECT-TYPE  
+	SYNTAX SEQUENCE OF DhcpClientCounterEntry  
+	MAX-ACCESS not-accessible  
+	STATUS current  
+	DESCRIPTION  
+		" This table contains the statistics of DHCP Client on each 
+		interface. It will give the no of messages sent and received at
+		any time"
+	::=  { dhcpClientCounters 1 }  
+  
+dhcpClientCounterEntry OBJECT-TYPE  
+	SYNTAX DhcpClientCounterEntry  
+	MAX-ACCESS not-accessible  
+	STATUS current  
+	DESCRIPTION  
+		"This object specifies the entries of the dhcpClientCounterTable."
+	INDEX {dhcpClientIfIndex}
+	::=  { dhcpClientCounterTable 1 }  
+
+--
+DhcpClientCounterEntry ::= SEQUENCE {  
+	dhcpClientIfIndex		        Integer32,
+	dhcpClientCountDiscovers		Counter32,
+	dhcpClientCountRequests		   Counter32,
+	dhcpClientCountReleases		   Counter32,
+	dhcpClientCountDeclines		   Counter32,
+	dhcpClientCountInforms		   Counter32,
+	dhcpClientCountOffers			Counter32,
+	dhcpCountAcksInReqState		   Counter32,
+	dhcpCountNacksInReqState	   Counter32,
+	dhcpCountAcksInRenewState	   Counter32,
+	dhcpCountNacksInRenewState	   Counter32,
+	dhcpCountAcksInRebindState	   Counter32,
+	dhcpCountNacksInRebindState	Counter32,
+	dhcpCountAcksInRebootState	   Counter32,
+	dhcpCountNacksInRebootState	Counter32,
+	dhcpCountErrorInHeader		   Counter32,
+	dhcpCountErrorInXid		      Counter32,
+	dhcpCountErrorInOptions		   Counter32,
+	dhcpClientIpAddress		      IpAddress,
+	dhcpClientLeaseTime		      Integer32,
+	dhcpClientCounterReset		   INTEGER,
+	dhcpClientRemainLeaseTime	   Integer32
+}  
+
+
+dhcpClientIfIndex OBJECT-TYPE  
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS	not-accessible
+	STATUS		current  
+	DESCRIPTION  
+		"This object specifies the index of one entry in dhcpClientCounterTable."  
+		::=  { dhcpClientCounterEntry 1 }  
+ 
+dhcpClientCountDiscovers OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+	"The number of DHCPDISCOVER (option 53 with value 1) packets 
+	received." 
+	::= { dhcpClientCounterEntry 2 } 
+             
+dhcpClientCountRequests OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		 "The number of DHCPREQUEST (option 53 with value 3) packets 
+		 received." 
+	::= { dhcpClientCounterEntry 3 } 
+				 
+dhcpClientCountReleases OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"The number of DHCPRELEASE (option 53 with value 7) packets 
+		received." 
+	::= { dhcpClientCounterEntry 4 } 
+				 
+dhcpClientCountDeclines OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"The number of DHCPDECLINE (option 53 with value 4) packets 
+		received." 
+	::= { dhcpClientCounterEntry 5 } 
+			   
+dhcpClientCountInforms OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"The number of DHCPINFORM (option 53 with value 8) packets 
+		 received." 
+	::= { dhcpClientCounterEntry 6 } 
+				 
+dhcpClientCountOffers OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"The number of DHCPOFFER (option 53 with value 2) packets 
+		 sent." 
+	::= { dhcpClientCounterEntry 7 } 
+				 
+dhcpCountAcksInReqState OBJECT-TYPE 
+	 SYNTAX		Counter32 
+	 MAX-ACCESS	read-only 
+	 STATUS		current 
+	 DESCRIPTION 
+		 "This object specifies the number of DHCPACK (option 53 with value 5) packets 
+		 recieved in the S_REQUESTING state." 
+	 ::= { dhcpClientCounterEntry 8 } 
+					  
+dhcpCountNacksInReqState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPNACK (option 53 with value 6) packets 
+		recieved in the S_REQUESTING state." 
+	::= { dhcpClientCounterEntry 9 } 
+             
+dhcpCountAcksInRenewState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPACK (option 53 with value 5) packets 
+		recieved in the S_RENEWING state." 
+	::= { dhcpClientCounterEntry 10 } 
+             
+dhcpCountNacksInRenewState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPNACK (option 53 with value 6) packets 
+		recieved in the S_RENEWING state." 
+	::= { dhcpClientCounterEntry 11 } 
+
+dhcpCountAcksInRebindState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPACK (option 53 with value 5) packets 
+		recieved in the S_REBINDING state." 
+	::= { dhcpClientCounterEntry 12 } 
+             
+dhcpCountNacksInRebindState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPNACK (option 53 with value 6) packets 
+		recieved in the S_REBINDING state." 
+	::= { dhcpClientCounterEntry 13 } 
+
+dhcpCountAcksInRebootState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPACK (option 53 with value 5) packets 
+		recieved in the S_REBOOTING state." 
+	::= { dhcpClientCounterEntry 14 } 
+             
+dhcpCountNacksInRebootState OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of DHCPNACK (option 53 with value 6) packets 
+		recieved in the S_REBOOTING state." 
+	::= { dhcpClientCounterEntry 15 } 
+
+dhcpCountErrorInHeader OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of packet errors reiceved in the DHCP Client 
+		Header." 
+	::= { dhcpClientCounterEntry 16 } 
+             
+dhcpCountErrorInXid OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of packet recieved which mismatches in Xid." 
+		::= { dhcpClientCounterEntry 17 } 
+             
+dhcpCountErrorInOptions OBJECT-TYPE 
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the number of packet recieved which has error in options." 
+		::= { dhcpClientCounterEntry 18 } 
+
+dhcpClientIpAddress OBJECT-TYPE 
+	SYNTAX		IpAddress 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the negotiated IP Address of particular interface." 
+		::= { dhcpClientCounterEntry 19 } 
+            
+dhcpClientLeaseTime OBJECT-TYPE 
+	SYNTAX		Integer32 
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object specifies the negotiated Lease time of particular interface." 
+		::= { dhcpClientCounterEntry 20 } 
+           
+dhcpClientCounterReset OBJECT-TYPE 
+	SYNTAX		INTEGER
+	{
+		set (1),
+		notset (2)
+	}
+	MAX-ACCESS	read-write 
+	STATUS		current 
+	DESCRIPTION 
+	    "This object is used to reset the statistics counters.
+        When set to set(1), statistics counters will be cleared. When set to notset(2), no
+	action will take place."
+        
+	DEFVAL  { notset }
+
+	::= { dhcpClientCounterEntry 21 } 
+			 
+dhcpClientRemainLeaseTime OBJECT-TYPE 
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only 
+	STATUS		current 
+	DESCRIPTION 
+		"This object is used to get the remaining lease time of the particular interface." 
+		::= { dhcpClientCounterEntry 22 }
+
+dhcpClientFastAccess OBJECT-TYPE
+    SYNTAX      INTEGER 
+	{
+		enable (1),
+		disable (2)
+	}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enables or disables fast DHCP fast access Mode. If fast access mode is
+		enabled, time to wait between discovery messages ie. discovery timeout
+		and time to wait after four unsuccessful discovery messages ie. null state
+		timeout will be user configurable and the default value for discovery
+		timeout is 5 seconds and for the null state timeout is 1 second.
+		If the mode is disabled, default value for discovery timeout and null state
+		timeout will be 15 seconds and 180 seconds respectively. The timeout values
+		cannot be changed under disable mode."
+	DEFVAL       { disable }
+		::= { dhcpClientConfig 4 }
+
+dhcpClientFastAccessDiscoverTimeOut   OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This object specifies the time to wait between discovery messages which is sent by DHCP client in seconds."
+	DEFVAL      { 15 }
+		::= { dhcpClientConfig 5 }
+
+dhcpClientFastAccessNullStateTimeOut  OBJECT-TYPE
+	SYNTAX    Integer32 (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"This object specifies the time to wait to go idle/null state after four unsuccessful DHCP client 
+		discovery messages in seconds."
+	DEFVAL      { 180 }
+		::= {dhcpClientConfig 6 }
+
+dhcpClientFastAccessArpCheckTimeOut  OBJECT-TYPE
+        SYNTAX    Integer32 (1..20)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "This object specifies the retransmission time out between ARP messages which is sent by DHCP client in seconds."
+        DEFVAL      { 20 }
+                ::= {dhcpClientConfig 7 }
+
+END 

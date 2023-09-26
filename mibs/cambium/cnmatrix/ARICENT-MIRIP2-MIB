@@ -1,0 +1,1395 @@
+-- Copyright (C) 2007-2012 Aricent Group . All Rights Reserved
+
+ARICENT-MIRIP2-MIB DEFINITIONS ::= BEGIN 
+ 
+    IMPORTS 
+    OBJECT-TYPE,IpAddress,
+    Counter32, Integer32   FROM SNMPv2-SMI 
+    enterprises            FROM SNMPv2-SMI
+    MODULE-IDENTITY, NOTIFICATION-TYPE	   FROM SNMPv2-SMI
+    InterfaceIndex     FROM IF-MIB    
+    fsMIStdRip2PeerAddress FROM ARICENT-MISTDRIP2-MIB
+    TruthValue, RowStatus, DisplayString, DateAndTime  FROM SNMPv2-TC;
+    
+
+fsMIRip MODULE-IDENTITY
+     LAST-UPDATED "201209050000Z"
+     ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+     CONTACT-INFO "support@aricent.com" 
+    DESCRIPTION " The Proprietary RIP MI MIB"
+    REVISION "201209050000Z"
+    DESCRIPTION " The Proprietary RIP MI MIB"
+    ::= { enterprises futuresoftware(2076) 151}
+
+fsMIRip2GeneralGroup OBJECT IDENTIFIER     ::=  { fsMIRip 1 }
+fsMIRipRRDGeneralGroup OBJECT IDENTIFIER ::=  { fsMIRip 2 }
+fsMIRip2TrapsControl OBJECT IDENTIFIER ::=  { fsMIRip 5 }
+fsMIRip2Notification OBJECT IDENTIFIER ::=  { fsMIRip 6 }
+
+fsMIRip2GlobalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FsMIRip2GlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+    "This Table Contains the list of globals for a
+     Context."
+    ::= { fsMIRip2GeneralGroup  1 }
+
+fsMIRip2GlobalEntry OBJECT-TYPE
+    SYNTAX    FsMIRip2GlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "An entry of fsMIRip2GlobalTable."
+    INDEX	 { fsMIRipContextId }
+    ::= { fsMIRip2GlobalTable 1 }
+
+    FsMIRip2GlobalEntry ::=
+    SEQUENCE {
+               fsMIRipContextId   Integer32,
+               fsMIRip2Security INTEGER,
+  	           fsMIRip2Peers    Integer32,
+               fsMIRip2TrustNBRListEnable INTEGER,
+               fsMIRip2NumberOfDroppedPkts Counter32,
+               fsMIRip2SpacingEnable INTEGER,
+               fsMIRip2AutoSummaryStatus INTEGER,
+               fsMIRip2RetransTimeoutInt Integer32,
+               fsMIRip2MaxRetransmissions Integer32,
+               fsMIRip2OverSubscriptionTimeout Integer32,
+               fsMIRip2Propagate INTEGER,
+               fsMIRipTrcFlag Integer32,
+               fsMIRipRowStatus RowStatus,
+               fsMIRipAdminStatus INTEGER,
+               fsMIRip2LastAuthKeyLifetimeStatus TruthValue,
+               fsMIRipRtCount Integer32,
+               fsMIRipSendVersion INTEGER,
+               fsMIRipReceiveVersion INTEGER
+             }
+
+  
+fsMIRipContextId OBJECT-TYPE
+   SYNTAX      Integer32 (0..255)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Identifies the Rip Domain Context."
+   ::= { fsMIRip2GlobalEntry  1 }
+
+fsMIRip2Security OBJECT-TYPE
+    SYNTAX  INTEGER {
+        minimumSecurity(1),
+        maximumSecurity(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "A variable denotes the security level of RIP-2
+    in the system. The value `minimumSecurity` denotes
+    that the RIP1 packets will be accepted even when
+    authentication is in use. The value `maximumSecurity`
+    denotes that RIP1 packets will be ignored when
+    authentication is in use"
+    DEFVAL  { maximumSecurity }
+    ::= {fsMIRip2GlobalEntry    2 }
+
+fsMIRip2Peers OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The maximum number of peers that can be in conversation
+    with the RIP2 system simultaneously"
+    DEFVAL  { 5 }
+    ::= {fsMIRip2GlobalEntry  3 }
+
+fsMIRip2TrustNBRListEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled      (1),
+        disabled     (2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The status of neighbor list in the router.
+        The value 'enabled' denotes that a list of
+        router's IP address can be configured and 
+        RIP Packets from those router's will be processed 
+        by RIP and packets from other Routers will be dropped.
+        'Disabled' denotes that RIP Packet from all the
+        router's will be processed."
+    DEFVAL  { disabled }
+      ::= { fsMIRip2GlobalEntry   4 }
+
+fsMIRip2NumberOfDroppedPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of RIP Packets dropped because of
+        neighbor list check."
+    ::= { fsMIRip2GlobalEntry  5 }
+
+fsMIRip2SpacingEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled	      (1),
+        disabled	      (2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Whether spacing is enabled or not. If spacing 
+        is enabled, generation of periodic update packet 
+        will be split and send."
+    DEFVAL  { disabled }
+    ::= { fsMIRip2GlobalEntry 6 }
+
+fsMIRip2AutoSummaryStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled	      (1),
+        disabled	      (2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object specify the auto-summary status.If  
+        enabled, summary routes are sent in regular updates for 
+        both rip v1 and v2.If split hoizon is enabled, summary 
+        is sent only if atlest one subnet route is learned over 
+        an interface which is different from the interface over 
+        which the update is sent.If all the subnet routes 
+        are learned over the same interface over which updates
+        are sent, then summary is not send.
+        With poisson reverse enabled, summary is sent either 
+        with metric 16 or with proper metric according to the 
+        interfaces over which subnet routes were learnt.
+        If summary is disabled, either individual subnet route 
+        are sent or subnet routes are sent based on the 
+        specfic aggregation configured over the interface."
+    DEFVAL  { enabled }
+    ::= { fsMIRip2GlobalEntry 7 }
+
+-- MIB Objects for Triggered RIP
+    
+fsMIRip2RetransTimeoutInt    OBJECT-TYPE
+    SYNTAX   Integer32 (5..10)
+    MAX-ACCESS  read-write
+    STATUS   current
+    DESCRIPTION
+       "The timeout interval to be used to retransmit the Update 
+       request packet or an unacknowledged update response packet."
+    DEFVAL { 5 }
+    ::= { fsMIRip2GlobalEntry 8 } 
+
+fsMIRip2MaxRetransmissions    OBJECT-TYPE
+    SYNTAX   Integer32 (10..40)
+    MAX-ACCESS  read-write
+    STATUS   current
+    DESCRIPTION
+        "The maximum number of retransmissions of the update request and 
+        update response packets. If no response is received then the routes 
+        via the next hop router are marked unreachable." 
+    DEFVAL { 36 }
+    ::= {fsMIRip2GlobalEntry 9 }
+
+fsMIRip2OverSubscriptionTimeout  OBJECT-TYPE
+    SYNTAX   Integer32 (100..300)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+        "Over subscription timeout value as mentioned in RFC 2091.When a
+        Circuit DOWN message is received from the circuit manager, this 
+        timer will be started for the specified timeout value."
+    DEFVAL { 180 }
+    ::= { fsMIRip2GlobalEntry 10 }
+
+fsMIRip2Propagate  OBJECT-TYPE
+    SYNTAX	    INTEGER  {
+        enable (1),
+        disable (2)
+    }
+    MAX-ACCESS	    read-write
+    STATUS	    current
+    DESCRIPTION
+        "Is propagation of static route is enabled or not. If it
+        is enabled then routing protocols (like RIP) are allowed
+        to include static routes in the update messages."
+    DEFVAL { disable }
+    ::= { fsMIRip2GlobalEntry 11 }
+
+fsMIRipTrcFlag  OBJECT-TYPE
+    SYNTAX   Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+        "Enables the tracing in the RIP. A 32 bit integer
+        is used to store the Tracing level in the specified module.
+        Different Tracing Levels -
+        BIT 0 - Initialisation and Shutdown Trace.
+        BIT 1 - Management trace.
+        BIT 2 - Data path trace.
+        BIT 3 - Control Plane trace.
+        BIT 4 - Packet Dump.
+        BIT 5 - OS Resource trace.
+        BIT 6 - All Failure trace (All failures including Packet Validation)
+        BIT 7 - Buffer Trace."
+    DEFVAL { 0 }
+    ::= { fsMIRip2GlobalEntry 12 }
+
+fsMIRipRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS      read-write
+    STATUS	  current
+    DESCRIPTION
+    "The row status variable, used according to
+    row installation and removal conventions."
+    ::= { fsMIRip2GlobalEntry 13 }
+
+fsMIRipAdminStatus  OBJECT-TYPE
+    SYNTAX  INTEGER { enabled (1), disabled (2) }
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "The administrative status of RIP in a particular 
+        router context. The value 'enabled' denotes that 
+        the RIP Process is active; 'disabled' disables it 
+        on all inter-faces."
+    DEFVAL { disabled }
+    ::= { fsMIRip2GlobalEntry 14 }
+
+fsMIRip2LastAuthKeyLifetimeStatus OBJECT-TYPE
+    SYNTAX   TruthValue
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "A flag that decides whether the last authentication key on expiry,
+	 should take its lifetime to be infinite or not. If this object is set 
+	 to true the last key on expiry resets its lifetime to be infinite and 
+	 continues to be the Key until new Authentication key id is configured. 
+	 If this object is configured to be false, then it should not send RIP 
+	 updates once the last key is expired. The received RIP updates from 
+	 the peer will be dropped after the last available key has expired and 
+	 the object is set not TRUE. 
+
+	 TRUE 	- The last key will be treated as having infinite life time.
+	 FALSE	- After the last key expires, the received RIP updates will be 
+		  dropped and the routes may tear down. No updates will be sent 
+		  on that interface." 
+    DEFVAL { true }
+    ::= { fsMIRip2GlobalEntry 15 }
+
+fsMIRipRtCount  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+       "The number of routes in a particular context"
+    ::= { fsMIRip2GlobalEntry 16 }
+
+ fsMIRipSendVersion  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                doNotSend (1),
+                ripVersion1 (2),
+                rip1Compatible (3),
+                ripVersion2 (4)
+             }
+     MAX-ACCESS read-create
+     STATUS   current
+     DESCRIPTION
+        "This object indicates the rip send version that is set
+        for the router.ripVersion1 implies sending RIP updates compliant
+        with  RFC  1058.   rip1Compatible implies broadcasting RIP-2
+        updates using RFC 1058 route subsumption rules.ripVersion2 implies
+        multicasting RIP-2 updates."
+     DEFVAL { rip1Compatible }
+     ::= { fsMIRip2GlobalEntry 17 }
+
+ fsMIRipReceiveVersion OBJECT-TYPE
+         SYNTAX   INTEGER {
+                     rip1 (1),
+                     rip2 (2),
+                     rip1OrRip2 (3),
+                     doNotRecieve (4)
+                  }
+         MAX-ACCESS   read-create
+         STATUS   current
+         DESCRIPTION
+            "This indicates which version of RIP updates
+            are to be accepted.  Note that rip2 and
+            rip1OrRip2 implies reception of multicast
+            packets.This object is set for the Router."
+        DEFVAL { rip1OrRip2 }
+        ::= { fsMIRip2GlobalEntry 18 }
+
+
+
+
+
+
+--SCALAR_TABLE_END fsMIRip2GeneralGroup
+
+fsMIRipGlobalTrcFlag  OBJECT-TYPE
+    SYNTAX   Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+        "Enables Global tracing in the RIP. A 32 bit integer
+        is used to store the Tracing level in the specified module.
+        Different Tracing Levels -
+        BIT 0 - Initialisation and Shutdown Trace.
+        BIT 1 - Management trace.
+        BIT 2 - Data path trace.
+        BIT 3 - Control Plane trace.
+        BIT 4 - Packet Dump.
+        BIT 5 - OS Resource trace.
+        BIT 6 - All Failure trace (All failures including Packet Validation)
+        BIT 7 - Buffer Trace."
+    DEFVAL { 0 }
+    ::= {fsMIRip2GeneralGroup   2}
+-- fsMIRip2NBRsTrustListTable
+
+fsMIRip2NBRTrustListTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF FsMIRip2NBRTrustListEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contains a list of Router addresses 
+        from which you can receive RIP Packets"
+    ::= { fsMIRip2GeneralGroup  3 }
+
+fsMIRip2NBRTrustListEntry OBJECT-TYPE
+    SYNTAX    FsMIRip2NBRTrustListEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "An entry of fsMIRip2NBRTrustListTable."
+    INDEX	 { fsMIRipContextId,fsMIRip2TrustNBRIpAddr }
+    ::= { fsMIRip2NBRTrustListTable 1 }
+
+
+    FsMIRip2NBRTrustListEntry ::=
+    SEQUENCE {
+        fsMIRip2TrustNBRIpAddr
+            IpAddress,
+        fsMIRip2TrustNBRRowStatus
+            RowStatus
+    }
+
+fsMIRip2TrustNBRIpAddr OBJECT-TYPE
+    SYNTAX	 IpAddress
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Ipaddress of the Router from which this router 
+        can accept RIP Packets"
+    ::= { fsMIRip2NBRTrustListEntry 1 }
+
+fsMIRip2TrustNBRRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS      read-write
+    STATUS	  current
+    DESCRIPTION
+    "The row status variable, used according to
+    row installation and removal conventions."
+    ::= { fsMIRip2NBRTrustListEntry 2 }
+
+
+      
+
+--fsMIRip2IfConfTable 
+
+fsMIRip2IfConfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FsMIRip2IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of subnets which require separate
+        configuration in RIP."
+    ::= { fsMIRip2GeneralGroup 4 }
+
+fsMIRip2IfConfEntry OBJECT-TYPE
+    SYNTAX  FsMIRip2IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A Single Routing Domain in a single Subnet."
+    INDEX   { fsMIRipContextId , fsMIRip2IfConfAddress }
+    ::= { fsMIRip2IfConfTable  1 }
+
+    FsMIRip2IfConfEntry ::=
+    SEQUENCE {
+        fsMIRip2IfConfAddress
+            IpAddress,
+        fsMIRip2IfAdminStat
+            INTEGER,
+        fsMIRip2IfConfOperState
+            INTEGER,
+        fsMIRip2IfConfUpdateTmr
+            Integer32,
+        fsMIRip2IfConfGarbgCollectTmr
+            Integer32,
+        fsMIRip2IfConfRouteAgeTmr
+            Integer32,
+        fsMIRip2IfSplitHorizonStatus
+            INTEGER,
+        fsMIRip2IfConfDefRtInstall
+            INTEGER,
+        fsMIRip2IfConfSpacingTmr
+            Integer32,
+        fsMIRip2IfConfInUseKey
+            Integer32,
+	    fsMIRip2IfConfAuthLastKeyStatus
+	        TruthValue
+    }
+
+fsMIRip2IfConfAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IP Address of this system on the indicated
+        subnet.  For unnumbered interfaces, the value 0.0.0.N,
+        where the least significant 24 bits (N) is the ifIndex
+        for the IP Interface in network byte order."
+    ::= { fsMIRip2IfConfEntry  1 }
+  
+fsMIRip2IfAdminStat OBJECT-TYPE
+   SYNTAX  INTEGER {
+       enabled(1),
+       disabled(2),
+       passive(3)
+   }
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION
+       "The  administrative  status  of  RIP-2  in  the
+       router.   The  value 'enabled' denotes that the
+       RIP2 Process is active throughout the system.
+       'disabled'	 disables RIP2 Process in the system.
+       'passive'	denotes that the RIP2 Process runs as
+       a passive one"
+   ::= { fsMIRip2IfConfEntry 2 }
+
+fsMIRip2IfConfOperState OBJECT-TYPE
+    SYNTAX   INTEGER	  {
+        operup (1),
+        operdown (2)
+    }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        " This gives the Operational Status of the Interface "
+    DEFVAL { operdown }
+    ::= { fsMIRip2IfConfEntry 3 }
+
+fsMIRip2IfConfUpdateTmr OBJECT-TYPE
+    SYNTAX  Integer32 (10..3600)
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "Interval Time Between Updates"
+    DEFVAL  { 30 }
+    ::= { fsMIRip2IfConfEntry 4 }
+
+fsMIRip2IfConfGarbgCollectTmr OBJECT-TYPE
+    SYNTAX   Integer32(120..180)
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        " Interval before deleting an entry after not hearing
+        it. Also the advertisements of this entry is set to
+        INFINITY while sending to others "
+    DEFVAL { 120 }
+    ::= { fsMIRip2IfConfEntry 5 }
+
+fsMIRip2IfConfRouteAgeTmr OBJECT-TYPE
+    SYNTAX   Integer32 (30..500)
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        " Time after which the entry is put into garbage collect
+        interval "
+    DEFVAL { 180 }
+    ::= { fsMIRip2IfConfEntry 6 }
+
+fsMIRip2IfSplitHorizonStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        splitHorizon(1),
+        splitHorizonWithPoisRev(2),
+        disable(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A flag to denote the split horizon operational status
+         in the system. The value `splitHorizon` denotes that
+         splitHorizon should be applied in the response packets
+         that are going out"
+    DEFVAL  { splitHorizonWithPoisRev }
+    ::= { fsMIRip2IfConfEntry 7 }
+
+fsMIRip2IfConfDefRtInstall OBJECT-TYPE
+    SYNTAX INTEGER {
+        installDefRt(1),
+        doNotInstallDefRt(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A flag that decides whether the default route received over this 
+        interface should be installed to rip database or not."
+    DEFVAL  { doNotInstallDefRt }
+    ::= { fsMIRip2IfConfEntry 8 }
+
+fsMIRip2IfConfSpacingTmr OBJECT-TYPE
+    SYNTAX   Integer32(0..360)
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "Number of route entries are greater than 25 , regular updates 
+         (response packets are sent for every fsMIRip2IfConfUpdateTmr 
+         interval) are sent in multiple packets.
+         Spacing Provides the interval between the 
+         packets.For value zero spacing will be disabled.Maximum value is 10%
+         of the fsMIRip2IfConfUpdateTmr object maximum value."
+    DEFVAL { 0 }
+    ::= { fsMIRip2IfConfEntry 9 }
+
+fsMIRip2IfConfInUseKey OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  
+        "This represents the active authentication KeyID that is currently used 
+        in the particular interface for sending RIP updates."
+    ::= { fsMIRip2IfConfEntry 10 }
+
+fsMIRip2IfConfAuthLastKeyStatus OBJECT-TYPE
+    SYNTAX   TruthValue
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+	"A flag to indicate that the last key configured on a RIP interface
+    has expired or not.This object is updated during transmission and
+    reception of RIP updates.
+
+	 TRUE 	- The last key on this particular interface is expired.
+	 FALSE	- The last key on this particular interface is not yet expired." 
+    DEFVAL { false }
+    ::= { fsMIRip2IfConfEntry 11 }
+
+
+-- MD5 Authentiacation table for RIP.
+
+fsMIRipMd5AuthTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMIRipMd5AuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The MD5 Authentication table for RIP." 
+    ::= { fsMIRip2GeneralGroup 5 }
+
+fsMIRipMd5AuthEntry    OBJECT-TYPE
+    SYNTAX      FsMIRipMd5AuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in to the MD5 Authentiaction table. More than one
+        entry can be configured for an interface."
+    INDEX       { fsMIRipContextId ,fsMIRipMd5AuthAddress, fsMIRipMd5AuthKeyId }
+    ::= { fsMIRipMd5AuthTable 1 }
+
+FsMIRipMd5AuthEntry ::= 
+    SEQUENCE {
+        fsMIRipMd5AuthAddress IpAddress,
+        fsMIRipMd5AuthKeyId   Integer32,
+        fsMIRipMd5AuthKey OCTET STRING,
+        fsMIRipMd5KeyStartTime Integer32,
+        fsMIRipMd5KeyExpiryTime Integer32,
+        fsMIRipMd5KeyRowStatus  RowStatus
+    }
+
+fsMIRipMd5AuthAddress     OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The IP Address of this system on the indicated
+        subnet.  For unnumbered interfaces, the value 0.0.0.N,
+        where the least significant 24 bits (N) is the ifIndex
+        for the IP Interface in network byte order. RIP should
+        have been enabled for this IP address and the rip2IfConfAuthType 
+        should be MD5 for creating this entry."
+    ::= { fsMIRipMd5AuthEntry 1 }
+
+fsMIRipMd5AuthKeyId     OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "The key ID for this key. This should be unique for the same 
+        fsMIRipMd5AuthAddress. This enables the configuration of more than
+        one key for an interface."
+    ::= { fsMIRipMd5AuthEntry 2 }
+
+
+fsMIRipMd5AuthKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value to be used as the Authentication Key.
+        If a string shorter than 16 octets is supplied, it will be 
+        left- justified and padded to 16 octets, on the right,
+        with nulls (0x00).
+        Reading this object always results in an  OCTET
+        STRING of length zero; authentication may not
+        be bypassed by reading the MIB object."
+    ::= { fsMIRipMd5AuthEntry  3 }
+          
+fsMIRipMd5KeyStartTime   OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time the router will start accepting or generating the 
+        packets that have been created with this key. 
+        The start time of the key should be less than the expiry time of
+        the previous key.
+        During the overlap interval, the next key will be used in the 
+        generation of the authentication messages.The start time of the first
+        key should be zero."
+    ::= { fsMIRipMd5AuthEntry 4 }
+
+fsMIRipMd5KeyExpiryTime   OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time the router will stop accepting the packets that have
+        been created with this key. This time will be indicated (in the 
+        number of seconds) from the start time of the key. If the expiry time    
+        of a key is zero, it means that, the key should be used for the           
+        infinite amount of time. If this key is the last key then that key
+        will be used for the infinite amount of time or until the new key 
+        is configured." 
+    ::= { fsMIRipMd5AuthEntry 5 }
+
+fsMIRipMd5KeyRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this row by which a new entry can be created or
+        deleted by setting this object to the appropriate value as 
+        mentioned in SMI-v2.If this entry is made active, then no other 
+        entry in the table will be allowed to modify. The entry can be in     
+        deleted from the table."
+    ::= { fsMIRipMd5AuthEntry 6 }
+
+-- Crypto Authentication table for RIP.
+
+fsMIRipCryptoAuthTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMIRipCryptoAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Crypto Authentication table for RIP." 
+    ::= { fsMIRip2GeneralGroup 9 }
+
+fsMIRipCryptoAuthEntry    OBJECT-TYPE
+    SYNTAX      FsMIRipCryptoAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in to the Crypto Authentication table. More than one
+        entry can be configured for an interface."
+    INDEX       { fsMIRipContextId ,fsMIRipCryptoAuthIfIndex, fsMIRipCryptoAuthAddress, 
+                  fsMIRipCryptoAuthKeyId }
+    ::= { fsMIRipCryptoAuthTable 1 }
+
+FsMIRipCryptoAuthEntry ::= 
+    SEQUENCE {
+        fsMIRipCryptoAuthIfIndex        InterfaceIndex,
+        fsMIRipCryptoAuthAddress        IpAddress,
+        fsMIRipCryptoAuthKeyId          Integer32,
+        fsMIRipCryptoAuthKey            OCTET STRING,
+        fsMIRipCryptoKeyStartAccept     DateAndTime,
+        fsMIRipCryptoKeyStartGenerate   DateAndTime,
+        fsMIRipCryptoKeyStopGenerate    DateAndTime,
+        fsMIRipCryptoKeyStopAccept      DateAndTime,
+        fsMIRipCryptoKeyStatus          INTEGER
+    }
+
+fsMIRipCryptoAuthIfIndex    OBJECT-TYPE
+    SYNTAX       InterfaceIndex (0..65535)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The interface index value of the RIP interface."
+    ::= { fsMIRipCryptoAuthEntry 1 }   
+  
+fsMIRipCryptoAuthAddress     OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Indicates the IP Address on the interface. 
+        Currently this IP Address will be taken as dont-care
+        value since IP Address specific authentication key 
+        configuration is not supported. Only interface 
+        specific key configuration is supported."
+    ::= { fsMIRipCryptoAuthEntry 2 }
+
+fsMIRipCryptoAuthKeyId     OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  
+        "The key ID for this key. This configured KeyID will be 
+        sent in the RIP update packet. This object enables the 
+        configuration of more than one key for an interface."
+    ::= { fsMIRipCryptoAuthEntry 3 }
+
+fsMIRipCryptoAuthKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value to be used as the Authentication Key.
+        If a string shorter than 16 octets is supplied, it will be 
+        left- justified and padded to 16 octets, on the right,
+        with nulls (0x00).
+        Reading this object always results in an  OCTET
+        STRING of length zero; authentication may not
+        be bypassed by reading the MIB object."
+    ::= { fsMIRipCryptoAuthEntry  4 }
+
+fsMIRipCryptoKeyStartAccept   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	   "The time the router will start accepting packets that have
+        been created with this key.If the value is not set, then it
+        will be taken as infinite and displayed as 2136-02-06,06:28:15,
+        DateTime equivalent to max value of UINT4.
+        For example, Tuesday May 26, 1992 at 1:30:15 PM should be
+        configured as,  1992-5-26,13:30:15.0"  
+    ::= { fsMIRipCryptoAuthEntry 5 }
+
+fsMIRipCryptoKeyStartGenerate   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time the router will start using this key for packets
+        generation.If the value is not set, then it will be taken
+        as infinite and displayed as 2136-02-06,06:28:15,
+        DateTime equivalent to max value of UINT4.
+        For example, Tuesday May 26, 1992 at 1:30:15 PM should be
+        configured as,  1992-5-26,13:30:15.0"  
+    ::= { fsMIRipCryptoAuthEntry 6 }
+
+fsMIRipCryptoKeyStopGenerate   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time the router will stop using this key for packets
+        generation.If the value is not set, then it will be taken
+        as infinite and displayed as 2136-02-06,06:28:15,
+        DateTime equivalent to max value of UINT4.
+        For example, Tuesday May 26, 1992 at 1:30:15 PM should be
+        configured as,  1992-5-26,13:30:15.0"  
+    ::= { fsMIRipCryptoAuthEntry 7 }
+
+fsMIRipCryptoKeyStopAccept   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time the router will stop accepting packets that have
+        been created with this key.If the value is not set, then it
+        will be taken as infinite and displayed as 2136-02-06,06:28:15,
+        DateTime equivalent to max value of UINT4.
+        For example, Tuesday May 26, 1992 at 1:30:15 PM should be
+        configured as,  1992-5-26,13:30:15.0"  
+    ::= { fsMIRipCryptoAuthEntry 8 }
+          
+fsMIRipCryptoKeyStatus    OBJECT-TYPE
+    SYNTAX      INTEGER { valid (1), delete (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies the status of key configured on a RIP interface.
+        The value valid indicates that there is a valid keyID 
+        configured on the interface. Before the Key is made 
+        valid the Authentication Key must be configured.The 
+        time related configurations can be done even after the 
+        key status is made valid.
+        The value delete removes the key from the Key table for
+        the particular RIP interface." 
+    ::= { fsMIRipCryptoAuthEntry 9 }
+
+ -- fsMIRip2NBRsUnicastListTable
+
+fsMIRip2NBRUnicastListTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF FsMIRip2NBRUnicastListEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contains a list of Router addresses 
+        from which you can receive RIP Packets"
+    ::= { fsMIRip2GeneralGroup  6 }
+
+fsMIRip2NBRUnicastListEntry OBJECT-TYPE
+    SYNTAX    FsMIRip2NBRUnicastListEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "An entry of fsMIRip2NBRUnicastListTable."
+    INDEX	 { fsMIRipContextId , fsMIRip2NBRUnicastIpAddr }
+    ::= { fsMIRip2NBRUnicastListTable 1 }
+
+FsMIRip2NBRUnicastListEntry ::=
+    SEQUENCE {
+        fsMIRip2NBRUnicastIpAddr
+            IpAddress,
+        fsMIRip2NBRUnicastNBRRowStatus
+            RowStatus
+    }
+
+fsMIRip2NBRUnicastIpAddr OBJECT-TYPE
+    SYNTAX	 IpAddress
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Ipaddress of the neighbour Router to which unicast 
+        update has to be sent"
+    ::= { fsMIRip2NBRUnicastListEntry 1 }
+
+fsMIRip2NBRUnicastNBRRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS      read-write
+    STATUS	  current
+    DESCRIPTION
+        "The row status variable, used according to
+         row installation and removal conventions."
+    ::= { fsMIRip2NBRUnicastListEntry 2 }
+
+
+--fsMIRip2LocalRoutingTable
+
+fsMIRip2LocalRouteTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF FsMIRip2LocalRouteEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contain Local routing table entries "
+    ::= { fsMIRip2GeneralGroup  7 }
+
+fsMIRip2LocalRouteEntry OBJECT-TYPE
+    SYNTAX FsMIRip2LocalRouteEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "A list of routes in local routing table" 
+	INDEX     { fsMIRipContextId , 
+		fsMIRip2DestNet,
+		fsMIRip2DestMask,
+		fsMIRip2Tos,
+		fsMIRip2NextHop
+	}
+    ::= { fsMIRip2LocalRouteTable 1 }
+
+FsMIRip2LocalRouteEntry ::=
+    SEQUENCE {
+        fsMIRip2DestNet
+            IpAddress,
+        fsMIRip2DestMask
+            IpAddress,
+        fsMIRip2Tos
+            Integer32,
+        fsMIRip2NextHop
+            IpAddress,
+        fsMIRip2RtIfIndex
+            Integer32,
+        fsMIRip2RtType
+            Integer32,
+        fsMIRip2Proto
+            Integer32,
+        fsMIRip2ChgTime
+            Integer32,
+        fsMIRip2Metric
+            Integer32,
+        fsMIRip2RowStatus
+            Integer32,
+        fsMIRip2Gateway
+            IpAddress
+    }
+
+fsMIRip2DestNet	OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  not-accessible 
+    STATUS  current
+    DESCRIPTION
+        "The IP Address of the destination network" 
+    ::= { fsMIRip2LocalRouteEntry  1 }
+      
+fsMIRip2DestMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The Destination mask for the destination network" 
+    ::= { fsMIRip2LocalRouteEntry  2 }
+
+fsMIRip2Tos OBJECT-TYPE
+    SYNTAX  Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The  value for Rip is always zero" 
+    ::= { fsMIRip2LocalRouteEntry 3 }
+
+fsMIRip2NextHop OBJECT-TYPE
+    SYNTAX IpAddress 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The The nexthop address to which any datagrams 
+        destined to the destination,to be 
+        forwarded. (In some special cases)"
+ 
+    ::= { fsMIRip2LocalRouteEntry 4 }
+    
+fsMIRip2RtIfIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " The interface through which the route is learnt"
+    ::= { fsMIRip2LocalRouteEntry 5 }
+
+fsMIRip2RtType OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The  value for Rip is always zero" 
+    ::= { fsMIRip2LocalRouteEntry 6 }
+    
+fsMIRip2Proto OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The protocol id   == RIP (8 - 1)here" 
+    ::= { fsMIRip2LocalRouteEntry 7 }
+
+fsMIRip2ChgTime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time when the route is installed" 
+    ::= { fsMIRip2LocalRouteEntry 8 }
+      
+fsMIRip2Metric OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The reachability cost for the destination" 
+    ::= { fsMIRip2LocalRouteEntry 9 }
+    
+fsMIRip2RowStatus OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Row status for perticular route entry" 
+    ::= { fsMIRip2LocalRouteEntry 10}
+
+fsMIRip2Gateway OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The gateway address to which any datagrams
+        destined to the destination, to be forwarded" 
+    ::= { fsMIRip2LocalRouteEntry 11}
+
+--  The CIDR group
+
+fsMIRipAggTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FsMIRipAggEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table listing the router's
+        supernet routes.RIP advertises only supernet
+        routes on the speicified interface. And it
+        suppresses all routes which are subset of the supernet."
+    ::= { fsMIRip2GeneralGroup  8 }
+
+fsMIRipAggEntry OBJECT-TYPE
+    SYNTAX	FsMIRipAggEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+        "An entry (conceptual row) in the
+        fsMIRipAggTable representing supertnet route for
+        the domain."
+    INDEX  { fsMIRipContextId , fsMIRipIfIndex, fsMIRipAggAddress, fsMIRipAggAddressMask }
+    ::= { fsMIRipAggTable 1 }
+
+FsMIRipAggEntry ::=
+    SEQUENCE {
+        fsMIRipIfIndex           Integer32,       
+        fsMIRipAggAddress		IpAddress,
+        fsMIRipAggAddressMask	IpAddress,
+        fsMIRipAggStatus	     	RowStatus
+    }
+
+fsMIRipIfIndex OBJECT-TYPE
+    SYNTAX	 Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS	 current
+    DESCRIPTION
+        "The interface index over which the aggregation is configured."
+    ::= { fsMIRipAggEntry 1 }
+
+fsMIRipAggAddress OBJECT-TYPE
+    SYNTAX	 IpAddress
+    MAX-ACCESS not-accessible
+    STATUS	 current
+    DESCRIPTION
+        "The aggregated address which when combined with the
+        corresponding value of fsMIRipAggAddressMask
+        identifies the supernet route for this domain."
+    ::= { fsMIRipAggEntry 2 }
+
+fsMIRipAggAddressMask OBJECT-TYPE
+    SYNTAX	 IpAddress
+    MAX-ACCESS not-accessible
+    STATUS	 current
+    DESCRIPTION
+        "The aggregated address mask which when combined with
+        the corresponding value of fsMIRipAggAddress
+        identifies the supernet route for the domain."
+    ::= { fsMIRipAggEntry 3 }
+
+fsMIRipAggStatus OBJECT-TYPE
+    SYNTAX	 RowStatus
+    MAX-ACCESS read-write
+    STATUS	 current
+    DESCRIPTION
+        "The status of this row , by which new entries may be 
+        created or old entries deleted from this table"
+    ::= { fsMIRipAggEntry 4 }
+
+
+-- MIB Definitions for the RIP Protocol to Support Route Redistribution:
+
+-- NOTE : This will be appended to the FS IPRIP Propreitary MIB
+
+-- MIB Definition for RRD Support Starts here 
+
+
+
+fsMIRipRRDGlobalTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF FsMIRipRRDGlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+    "This Table Contains the list of globals for a
+     Context."
+    ::= { fsMIRipRRDGeneralGroup 1 }
+
+fsMIRipRRDGlobalEntry OBJECT-TYPE
+    SYNTAX    FsMIRipRRDGlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "An entry of fsMIRip2GlobalTable."
+    INDEX	 { fsMIRipContextId }
+    ::= { fsMIRipRRDGlobalTable 1 }
+
+    FsMIRipRRDGlobalEntry ::=
+    SEQUENCE {
+		fsMIRipRRDGlobalStatus INTEGER,
+		fsMIRipRRDSrcProtoMaskEnable Integer32,
+		fsMIRipRRDSrcProtoMaskDisable Integer32,
+		fsMIRipRRDRouteTagType INTEGER,
+		fsMIRipRRDRouteTag Integer32,
+        fsMIRipRRDRouteDefMetric Integer32,
+        fsMIRipRRDRouteMapEnable DisplayString
+             }
+
+fsMIRipRRDGlobalStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This MIB object enables / disables RIP to participate
+        in Route Redistribution. If set to enabled then RIP will start 
+        advertising the routes learned by other protocols. If set to
+        disabled then RIP will stop redistribution of routes
+        but will continue to send updates to the RTM."
+    DEFVAL { disabled }
+    ::= {fsMIRipRRDGlobalEntry  1 }
+
+fsMIRipRRDSrcProtoMaskEnable OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object determines the protocols from which the routes 
+        have to be imported to RIP
+        Bit 1, if set indicates the routes have to be imported from the 
+        local interface.
+        Bit 2, if set indicates the routes have to be imported from static route.
+        Bit 12, if set indicates the routes have to be imported from OSPF.
+        Bit 13, if set indicates the routes have to be imported from BGP."
+    DEFVAL { 0 }
+    ::= { fsMIRipRRDGlobalEntry 2 }
+
+fsMIRipRRDSrcProtoMaskDisable OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object determines the protocols from which the importing of 
+        routes should be stopped to RIP
+        Bit 1, if set indicates the routes have to be imported from the 
+        local interface.
+        Bit 2, if set indicates the routes have to be imported from static route.
+        Bit 12, if set indicates the routes have to be imported from OSPF.
+        Bit 13,if set indicates the routes have to be imported from BGP."
+    DEFVAL { 0 }
+    ::= { fsMIRipRRDGlobalEntry 3 }
+
+fsMIRipRRDRouteTagType OBJECT-TYPE
+    SYNTAX INTEGER {
+        manual (1),
+        automatic (2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Tag Type MIB object describes whether Tags
+        will be automatically generated or will be manually 
+        configured. If tags are manually configured , the 
+        fsMIRipMIRRDRouteTag MIB has to be set with the Tag
+        value needed."
+    DEFVAL { manual }
+    ::= { fsMIRipRRDGlobalEntry 4 }
+
+fsMIRipRRDRouteTag OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " The Route Tag in case the user configures a Manual option for
+        the tags ."
+    DEFVAL { 0 }
+    ::= { fsMIRipRRDGlobalEntry 5 }
+
+fsMIRipRRDRouteDefMetric OBJECT-TYPE
+    SYNTAX Integer32 (1..16)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The default metric to be used for the imported routes from RTM."
+    DEFVAL { 3 }
+    ::={ fsMIRipRRDGlobalEntry 6 }
+
+fsMIRipRRDRouteMapEnable OBJECT-TYPE
+    SYNTAX             DisplayString (SIZE(0..20))
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION        "Name  Identifies the  specified route-map
+                        in the list of route-maps. If this Object needs to be
+                        changed, first reset this object and then configure the
+                        new value."
+    ::={ fsMIRipRRDGlobalEntry 7 }
+
+-- FILTERING OBJECT DEFINITION BEGIN
+
+ fsMIripDistInOutRouteMap OBJECT IDENTIFIER ::= { fsMIRip 3 }
+
+    fsMIRipDistInOutRouteMapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FsMIRipDistInOutRouteMapEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "A table describing the configuration of filtering for route map."
+    ::= { fsMIripDistInOutRouteMap 1 }
+
+    fsMIRipDistInOutRouteMapEntry OBJECT-TYPE
+        SYNTAX FsMIRipDistInOutRouteMapEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Information describing the filtering configuration of single entry."
+        INDEX {fsMIRipContextId, fsMIRipDistInOutRouteMapName, fsMIRipDistInOutRouteMapType}
+    ::=  { fsMIRipDistInOutRouteMapTable 1 }
+
+    FsMIRipDistInOutRouteMapEntry ::= SEQUENCE {
+        fsMIRipDistInOutRouteMapName         DisplayString,
+        fsMIRipDistInOutRouteMapType         Integer32,
+        fsMIRipDistInOutRouteMapValue        Integer32,
+        fsMIRipDistInOutRouteMapRowStatus    RowStatus
+    }
+
+    fsMIRipDistInOutRouteMapName OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..20))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Route map name."
+    ::=  { fsMIRipDistInOutRouteMapEntry 1 }
+
+    fsMIRipDistInOutRouteMapType OBJECT-TYPE
+        SYNTAX              Integer32(1..3)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Type of route map to indicate the route map is for
+            distribute in or for distribute out or for distance.
+            1 - distance
+            2 - distribute in
+            3 - distribute out"
+    ::=  { fsMIRipDistInOutRouteMapEntry 2 }
+
+    fsMIRipDistInOutRouteMapValue  OBJECT-TYPE
+        SYNTAX              Integer32(1..255)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION
+            "Distance value ( this will be unused for distribute list )"
+    ::=  { fsMIRipDistInOutRouteMapEntry 3 }
+
+    fsMIRipDistInOutRouteMapRowStatus OBJECT-TYPE
+        SYNTAX              RowStatus
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION
+            "The status of this row, by which new entries may be
+            created, or old entries deleted from this table."
+    ::=  { fsMIRipDistInOutRouteMapEntry 4 }
+
+-- FILTERING OBJECT DEFINITION END
+
+-- PREFERENCE OBJECT DEFINITION BEGIN
+
+ fsMIripPreferenceGroup OBJECT IDENTIFIER ::=  { fsMIRip 4 }
+
+      fsMIRipPreferenceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FsMIRipPreferenceEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "A table describing preference value for RIP routes."
+        ::= { fsMIripPreferenceGroup 1 }
+
+    fsMIRipPreferenceEntry OBJECT-TYPE
+        SYNTAX FsMIRipPreferenceEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "Information describing preference value of single entry."
+        INDEX { fsMIRipContextId }
+        ::=  { fsMIRipPreferenceTable 1 }
+
+    FsMIRipPreferenceEntry ::= SEQUENCE {
+        fsMIRipPreferenceValue          Integer32
+    }
+
+    fsMIRipPreferenceValue OBJECT-TYPE
+       SYNTAX Integer32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION 
+           "Preference value for RIP routes. Use '0' to set default value"
+       DEFVAL { 0 }
+    ::= { fsMIRipPreferenceEntry 1 }
+
+
+-- PREFERENCE OBJECT DEFINITION END
+
+
+--- TRAP Notification for Crypto Authentication
+
+fsMIRip2ContextId OBJECT-TYPE
+   SYNTAX      Integer32 (0..255)
+   MAX-ACCESS   accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+      "Identifies the Rip Domain Context."
+   ::= { fsMIRip2TrapsControl  1 }
+
+fsMIRipAuthIfIndex    OBJECT-TYPE
+    SYNTAX       InterfaceIndex (0..65535)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The interface index value of the RIP interface in which crypto
+        Authentication is enabled."
+    ::= { fsMIRip2TrapsControl 2 }   
+  
+fsMIRipAuthKeyId     OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION  
+        "The key ID for this key. This configured KeyID will be 
+        sent in the RIP update packet."  
+    ::= { fsMIRip2TrapsControl 3 }
+
+fsMIRipPeerAddress     OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Indicates the IP Address on the interface.
+        Specifies the Peer IP Address which has sent the RIP update."
+    ::= { fsMIRip2TrapsControl 4 }
+
+fsMIRip2Traps OBJECT IDENTIFIER ::= { fsMIRip2Notification 0 }
+
+fsMIRip2AuthenticationFailure NOTIFICATION-TYPE
+       OBJECTS  {
+                  fsMIRip2ContextId,
+                  fsMIRipPeerAddress,
+                  fsMIRipAuthIfIndex,
+                  fsMIRipAuthKeyId
+                }
+       STATUS   current                              
+       DESCRIPTION
+             "The fsMIRip2AuthenticationFailure trap signifies that the RIP 
+             Authentication has failed due to invalid key ID, expired key ID
+             received in the RIP update.This trap should be generated when
+             the RIP update is received with invalid Key ID in the packet."
+       ::= { fsMIRip2Traps 1 }
+
+fsMIRip2AuthLastKey NOTIFICATION-TYPE
+       OBJECTS  {
+                  fsMIRip2ContextId,
+                  fsMIRipAuthIfIndex,
+                  fsMIRipAuthKeyId
+                }
+       STATUS   current                              
+       DESCRIPTION
+             "The fsMIRip2AuthLastKey trap signifies that the last key  
+             configured on a RIPv2 interface has expired.This trap should 
+             be generated when the stop generate time of the last key configured 
+             on a RIPv2 interface expires."
+       ::= { fsMIRip2Traps 2 }
+
+END
+

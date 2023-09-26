@@ -1,0 +1,2990 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+   ARICENT-SNOOP-MIB DEFINITIONS ::= BEGIN 
+ 
+   IMPORTS 
+      MODULE-IDENTITY, OBJECT-TYPE,  
+      enterprises, Counter32,
+      Integer32, IpAddress, Unsigned32, 
+      NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+      MacAddress, RowStatus,
+      TEXTUAL-CONVENTION                       FROM SNMPv2-TC 
+      VlanIndex, PortList                      FROM Q-BRIDGE-MIB 
+      InetAddressType, InetAddress             FROM INET-ADDRESS-MIB
+      InterfaceIndex                           FROM IF-MIB;
+
+fssnoop MODULE-IDENTITY 
+         LAST-UPDATED "202008250000Z" 
+         ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE" 
+         CONTACT-INFO "support@aricent.com" 
+
+         DESCRIPTION 
+         "Added multicast profiles and port related configurations and 
+          statistics. Added support for group based VLAN classification. Added
+          support for Provider Bridging (i.e double vlan) functionality. Added
+          explicit host tracking feature support."
+
+         REVISION "202008250000Z"
+         DESCRIPTION 
+            "Added support for enabling/disabling IGMP/MLD
+             enforcement of the Router Alert option presence." 
+
+         REVISION "201209050000Z"
+         DESCRIPTION 
+            " The proprietary MIB module for Snoop. " 
+
+      ::=  { enterprises futuresoftware (2076) 105 } 
+ 
+-- ------------------------------------------------------------  
+-- Textual Conventions
+-- ------------------------------------------------------------ 
+
+InnerVlanIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "A value used to represent the Inner VLAN that might be
+         carried in a packet. 
+         A value between 1 and 4094 inclusive, represents
+         a valid vlan and is used only in cases where the
+         switch understands and is capable of handling 
+         double tagged packets.
+         A value 0 is used in cases where the switch understands
+         and is capable of handling only single tagged packets."
+    SYNTAX      Unsigned32 (0..4094)
+ 
+-- ------------------------------------------------------------  
+-- groups in the MIB  
+-- ------------------------------------------------------------ 
+ 
+      fsSnoopSystem  OBJECT IDENTIFIER ::= { fssnoop 1 } 
+      fsSnoopInst    OBJECT IDENTIFIER ::= { fssnoop 2 } 
+      fsSnoopVlan    OBJECT IDENTIFIER ::= { fssnoop 3 } 
+      fsSnoopStats   OBJECT IDENTIFIER ::= { fssnoop 4 } 
+      fsSnoopPort    OBJECT IDENTIFIER ::= { fssnoop 5 } 
+      fsSnoopTrapObjects OBJECT IDENTIFIER ::= {fssnoop 6 }
+      fsSnoopNotifications OBJECT IDENTIFIER  ::= {fssnoop 7}
+
+-- ------------------------------------------------------------------ 
+-- The SNOOP Instance Group 
+-- ------------------------------------------------------------------ 
+ 
+-- Instance Based Global Configuration Table 
+ 
+      fsSnoopInstanceGlobalTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopInstanceGlobalEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains multicast forwarding mode configuration
+             for each instance running in the snooping switch" 
+          ::= { fsSnoopInst 1 } 
+ 
+      fsSnoopInstanceGlobalEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopInstanceGlobalEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains instance number and the multicast
+             forwarding mode configuration for the particular instance"
+             INDEX { fsSnoopInstanceGlobalInstId } 
+          ::= { fsSnoopInstanceGlobalTable 1 } 
+ 
+      FsSnoopInstanceGlobalEntry ::= SEQUENCE { 
+          fsSnoopInstanceGlobalInstId               Integer32,
+          fsSnoopInstanceGlobalMcastFwdMode         INTEGER,
+          fsSnoopInstanceGlobalSystemControl        INTEGER,
+          fsSnoopInstanceGlobalLeaveConfigLevel     INTEGER,
+          fsSnoopInstanceGlobalEnhancedMode	        INTEGER,
+          fsSnoopInstanceGlobalReportProcessConfigLevel    INTEGER,
+          fsSnoopInstanceGlobalSparseMode           INTEGER,
+          fsSnoopInstanceControlPlaneDriven           INTEGER
+        } 
+ 
+      fsSnoopInstanceGlobalInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Instance ID pertaining to the global configuration entry." 
+           ::= { fsSnoopInstanceGlobalEntry 1 } 
+      
+      fsSnoopInstanceGlobalMcastFwdMode OBJECT-TYPE 
+          SYNTAX      INTEGER  { ipbased(1), macbased(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "Indicates the mode to be used for building the forwarding 
+              table i.e, whether IP based or MAC address based.
+              The hardware should support programming of S,G and *,G 
+              entries for IGS/MLDS to operate in 'ipbased' mode. 
+              If the hardware supports only MAC based multicast tables 
+              then 'macbased' mode should be chosen."
+           DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceGlobalEntry 2 } 
+
+      fsSnoopInstanceGlobalSystemControl OBJECT-TYPE 
+          SYNTAX      INTEGER  { start(1), shutdown(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+              "Snooping module is shutdown or started through this object. 
+               When set to 'start', resources required by the 
+               SNOOP module is allocated and the module starts running.   
+               When set to 'shutdown', all the resources are released back 
+               to the system and the module stops running."
+          DEFVAL  { 1 } 
+          ::= { fsSnoopInstanceGlobalEntry 3 } 
+
+      fsSnoopInstanceGlobalLeaveConfigLevel OBJECT-TYPE 
+          SYNTAX      INTEGER  { vlanbased(1), portbased(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+              "A global configuration to specify if the leave processing
+               mechanism needs to be configured at the vlan level or at 
+               the port level. 
+               When this object is set to vlanbased, the mib object
+               fsSnoopVlanFastLeave must be used to configure the leave
+               mechanism. 
+               When this object is set to portbased, the mib object
+               fsSnoopPortLeaveMode must be used to configure the leave
+               mechanism." 
+          DEFVAL  { 1 } 
+          ::= { fsSnoopInstanceGlobalEntry 4 } 
+
+     fsSnoopInstanceGlobalEnhancedMode OBJECT-TYPE 
+	     SYNTAX      INTEGER { enable (1), disable (2) }
+	     MAX-ACCESS  read-create
+	     STATUS      current 
+	     DESCRIPTION 
+		      "This object is used to enable or disable the snooping module 
+               functioning in the enhanced mode.
+               
+               By default, the snooping module operates in the normal or 
+               default mode. In the default mode, the module multicasts from 
+               an Outer VLAN (SVLAN) to a set of ports. The Inner VLAN (CVLAN) 
+               will typically have a value of zero. In this mode, an S-tagged 
+               multicast data or query packet from one port can result in 
+               multiple packets on separate egress ports, but only one packet 
+               on any one egress port with an S-tag or with no tag.
+		       
+               Enabling this object causes the snooping module to operate in 
+               the enhanced mode. The module multicasts from an Outer VLAN 
+               (SVLAN) to a set of ports & Inner VLANs (CVLAN). In this mode, 
+               an S-tagged multicast data or query packet from one port can 
+               result in multiple copies of the packet on the same egress port, 
+               each with a different C-tag. The Inner VLAN (CVLAN) will 
+               typically have a valid value within the designated range. 
+               However under certain scenarios, the Inner VLAN may also have a 
+               value of zero.
+               
+               Disabling this object causes the snooping module to operate in 
+               the default mode."
+	DEFVAL { disable }
+	::= { fsSnoopInstanceGlobalEntry 5}
+
+     fsSnoopInstanceGlobalReportProcessConfigLevel OBJECT-TYPE 
+         SYNTAX      INTEGER  { nonrouterports(1), allports(2) } 
+         MAX-ACCESS  read-write 
+         STATUS      current 
+         DESCRIPTION 
+              "A global configuration to specify if the report processing
+               mechanism needs to be configured for the non-router ports or
+               at the all ports level.
+               When this object is set to non-router ports, the incoming
+               report messages are process only on the non-router ports.
+               When this object is set to all-ports, the incoming
+               report messages are processed in all ports which includes
+               router ports also.
+               By default report messages were not processed on the router
+               ports(i.e) report process config level is non-router-ports." 
+          DEFVAL  { 1 } 
+          ::= { fsSnoopInstanceGlobalEntry 6 } 
+ 
+     fsSnoopInstanceGlobalSparseMode OBJECT-TYPE 
+	     SYNTAX      INTEGER { enable (1), disable (2) }
+	     MAX-ACCESS  read-create
+	     STATUS      current 
+	     DESCRIPTION 
+		      "This object is used to enable or disable the snooping module 
+               functioning in the sparse mode.
+               
+               By default, the snooping module operates in sparse
+               mode. In the sparse mode (i.e Sparse mode is enabled), 
+               the module will be used to drop the unknown multicast traffic 
+               when IGS is enabled in the switch.
+               In the non-sparse mode, the module will be used to 
+               forward the unknown multicast traffic when IGS is enabled 
+               in the switch.
+               
+               Disabling this object causes the snooping module to operate in 
+               the default mode."
+	DEFVAL { enable }
+	::= { fsSnoopInstanceGlobalEntry 7 }
+ 
+     fsSnoopInstanceControlPlaneDriven OBJECT-TYPE
+             SYNTAX      INTEGER { enable (1), disable (2) }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                               "Control plane driven approach is used to update forwarding table
+              based on the report messages. This object is used to
+              enable or disable the control plane driven approach in snooping module.
+              By default, control plane driven approach is disabled in the snooping switch.
+              If this mib object is enabled, forwarding table will be updated based on
+              report messages. If this mib object is disabled, forwarding table will be
+              updated based on data traffic."
+
+        DEFVAL { disable }
+        ::= { fsSnoopInstanceGlobalEntry 8 }
+ 
+      fsSnoopInstanceConfigTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopInstanceConfigEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains global configuration of snooping for each 
+             instance running in switch" 
+          ::= { fsSnoopInst 2 } 
+ 
+      fsSnoopInstanceConfigEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopInstanceConfigEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains instance number, address type and the list of 
+             global configuration for the particular instance and address type"
+             INDEX { fsSnoopInstanceConfigInstId,
+                     fsSnoopInetAddressType } 
+          ::= { fsSnoopInstanceConfigTable 1 } 
+ 
+      FsSnoopInstanceConfigEntry ::= SEQUENCE { 
+          fsSnoopInstanceConfigInstId        Integer32,
+          fsSnoopInetAddressType             InetAddressType,
+          fsSnoopStatus                      INTEGER,
+          fsSnoopProxyReportingStatus        INTEGER,
+          fsSnoopRouterPortPurgeInterval     Integer32,
+          fsSnoopPortPurgeInterval           Integer32,
+          fsSnoopReportForwardInterval       Integer32,
+          fsSnoopRetryCount                  Integer32,
+          fsSnoopGrpQueryInterval            Integer32,
+          fsSnoopReportFwdOnAllPorts         INTEGER,
+          fsSnoopTraceOption                 Integer32,
+          fsSnoopOperStatus                  INTEGER,
+          fsSnoopSendQueryOnTopoChange       INTEGER,
+          fsSnoopSendLeaveOnTopoChange       INTEGER,
+          fsSnoopFilterStatus                INTEGER,
+          fsSnoopMulticastVlanStatus         INTEGER,
+          fsSnoopProxyStatus                 INTEGER,
+          fsSnoopQueryFwdOnAllPorts          INTEGER,
+          fsSnoopFwdGroupsCnt                INTEGER,
+	  fsSnoopDebugOption                 Integer32,
+          fsSnoopEnforceRouterAlert          INTEGER
+        } 
+ 
+      fsSnoopInstanceConfigInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Instance ID pertaining to the global configuration entry."
+           ::= { fsSnoopInstanceConfigEntry 1 } 
+ 
+      fsSnoopInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Inet Address Type corresponding to  the global configuration entry. 
+               This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopInstanceConfigEntry 2 } 
+ 
+      fsSnoopStatus OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "Enables or disables IGMP/MLD snooping in the system.
+              When set to 'enabled', the IGS/MLDS module starts 
+              protocol operations.
+              When set to 'disabled', the IGS/MLDS module stops performing 
+              protocol operations."
+          DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceConfigEntry 3 } 
+ 
+      fsSnoopProxyReportingStatus OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "Enables or disables proxy-reporting in the system.
+              When proxy-reporting is 'enabled' the switch generates 
+              reports and forwards them to the router based on the 
+              available host information.
+              When proxy-reporting is 'disabled' the switch forwards 
+              all SSM (IGMPv3/MLDv2) and a single ASM (IGMPv2/MLDv1) 
+              report to the router.
+              Proxy-reporting can be enabled only if Proxy is disabled. "      
+           DEFVAL  { 1 } 
+          ::= { fsSnoopInstanceConfigEntry 4 } 
+
+      fsSnoopRouterPortPurgeInterval OBJECT-TYPE 
+          SYNTAX      Integer32 (60..600) 
+          MAX-ACCESS  read-write 
+          STATUS      deprecated 
+          DESCRIPTION 
+             "This is the interval (in seconds) after which a learnt  
+              router port entry will be purged. For each router port learnt, 
+              this timer runs for 'RouterPortPurgeInterval' seconds.When the 
+              timer expires, the learnt router port entry is purged. However 
+              if control messages are received from the router before the 
+              timer expiry, then the timer is restarted.
+              This object is deprecated and corresponding functionality is met
+              using the object fsSnoopOlderQuerierInterval in FsSnoopRtrPortEntry.
+	      If configured, this value overrides the value used in 
+	      FsSnoopRtrPortTable."
+          DEFVAL  { 125 } 
+          ::= { fsSnoopInstanceConfigEntry 5 } 
+ 
+      fsSnoopPortPurgeInterval OBJECT-TYPE 
+          SYNTAX      Integer32 
+          MAX-ACCESS  read-only 
+          STATUS      deprecated 
+          DESCRIPTION 
+             "This is the interval (in seconds) after which a learnt  
+              port entry will be purged. For each port on which report
+              has been received, this timer runs for 'PortPurgeInterval'
+              seconds. This timer will be restarted whenever a report 
+              message is received from a host on the specific port. If 
+              the timer expires, then , the learnt port entry  will 
+              be purged from the multicast group.
+              This object is deprecated and corresponding functionality is met
+              using the read only object fsSnoopVlanPortPurgeInterval in 
+	      fsSnoopVlanFilterXEntry."
+          ::= { fsSnoopInstanceConfigEntry 6 } 
+ 
+      fsSnoopReportForwardInterval OBJECT-TYPE 
+          SYNTAX      Integer32 (1..25) 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "This timer is used when both proxy and proxy-reporting is 
+              disabled. The switch then has to suppress multiple 
+              IGMPv2/ MLDv1 report messages for the same group from being 
+              forwarded to the router.
+              This is the interval (in seconds) within which report  
+              messages for the same multicast group will not be forwarded. 
+              The 'ReportForwardTimer' is per multicast group. This timer is 
+              started as soon as a report message for that group is forwarded 
+              out. Within this 'ReportForwardInterval' if another report for 
+              the same group arrives, that report will not be forwarded." 
+          DEFVAL  { 5 } 
+          ::= { fsSnoopInstanceConfigEntry 7 } 
+           
+      fsSnoopRetryCount OBJECT-TYPE
+          SYNTAX      Integer32 (1..5)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION 
+             "In proxy/proxy-reporting mode, when the switch receives leave 
+              message on a port, it sends group specific query to check if 
+              there are any other interested v2 receivers for the group. 
+              This attribute defines the maximum number of queries sent by 
+              the switch before deleting the port from the group membership 
+              information in the forwarding database. If the maximum retry 
+              count exceeds 'fsSnoopRetryCount', then the port will be deleted
+              from the multicast group membership information in the 
+              forwarding database and received leave message
+              will be forwarded onto the router ports if there are no 
+              interested receivers for the group." 
+          DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceConfigEntry 8 } 
+
+      fsSnoopGrpQueryInterval OBJECT-TYPE 
+          SYNTAX      Integer32 (2..5) 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "The value of this attribute defines the time period with which 
+              the switch will send group specific queries on a port to check 
+              if there are any interested receivers. The switch will send 
+              'fsSnoopRetryCount' queries before removing the port from the 
+              group membership information in the forwarding database."
+          DEFVAL  { 2 }
+          ::= { fsSnoopInstanceConfigEntry 9 } 
+ 
+      fsSnoopReportFwdOnAllPorts OBJECT-TYPE 
+          SYNTAX      INTEGER  { allports(1), rtrports(2), nonedgeports(3) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+              "In snooping mode, Snooping module will forward reports only 
+               on router ports by default. This object provides administrative
+               control either to forward the reports on all the member ports of the 
+               VLAN or to forward the report on SpanningTree non edge ports.
+               This configuration will not be valid in proxy or proxy-reporting
+               mode"
+          DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceConfigEntry 10 } 
+
+      fsSnoopTraceOption OBJECT-TYPE 
+          SYNTAX      Integer32
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "This object is used to enable trace statements in  
+              snooping module. 
+              A four byte integer is used for enabling the trace level.  
+              Each bit in the four byte integer represents a particular  
+              trace level.  
+              The mapping between the bit positions & the trace level is  
+              as follows:  
+                      0 - Data Path traces
+                      1 - Control Plane traces 
+                      2 - Tx Traces 
+                      3 - Rx Traces 
+ 
+              The remaining bits are unused. Combination of levels are  
+              also allowed. 
+ 
+              For example if the bits 0 and 1 are set, then the trace 
+              statement related to  Data Path and Control Plane
+              will be printed. 
+ 
+              The user has to enter the corresponding integer value for the 
+              bits set. For example if bits 0 and 1 are to be set ,then user
+              has to give the value 3." 
+          ::= { fsSnoopInstanceConfigEntry 11 } 
+
+      fsSnoopOperStatus OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+             "The operational status of the IGS/MLDS protocol.
+              The value enabled(1) indicates the IGS/MLDS module is currently
+              enabled in the system.
+              The value disable(1) indicates the IGS/MLDS module is currently
+              disabled in the system."
+          ::= { fsSnoopInstanceConfigEntry 12 } 
+
+       fsSnoopSendQueryOnTopoChange OBJECT-TYPE
+          SYNTAX      INTEGER  { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+             "The Snooping Switch can be configured to send IGMP/MLD General
+              queries on all non router ports when spanning tree topology 
+              change occurs in a network. If the spanning tree mode is RSTP, 
+              IGMP/MLD general queries will be sent on all the non router ports 
+              present in the switch.If the spanning tree mode is MSTP, IGMP/MLD 
+              general queries will be sent on all the non router ports of the 
+              VLAN mapped for the MSTP instance.When this object is set to 
+              'enabled' ,the switch will generate general query messages. This 
+              object cannot be enabled if fsSnoopSendLeaveOnTopoChange is 
+              enabled. "
+          DEFVAL  { 2 }
+          ::= { fsSnoopInstanceConfigEntry 13 }
+
+      fsSnoopSendLeaveOnTopoChange OBJECT-TYPE
+          SYNTAX      INTEGER  { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "The Snooping Switch can be configured to issue an IGMP proxy 
+              query solicitation on network ports, i.e. an IGMP Group Leave 
+              with group address 0.0.0.0. This will indicate to the upstream 
+              router that it immediately needs to send Group Specific queries, 
+              which will result in populating the L2 multicast tables in the 
+              snooping switch in order to speed up network convergence. This 
+              object cannot be enabled if fsSnoopSendQueryOnTopoChange is 
+              enabled. 
+              This is not applicable for proxy-reporting and proxy."
+          DEFVAL  { 2 }
+          ::= { fsSnoopInstanceConfigEntry 14 }
+
+      fsSnoopFilterStatus OBJECT-TYPE
+          SYNTAX      INTEGER  { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+          "This object is used to enable/disable the IGS filtering feature. 
+           Interface mapping configurations will not be affected by this object 
+           status.
+           When this object is disabled, filters will not be applied in this
+           instance but the profile mapping and registration limits can be
+           configured."
+          DEFVAL  { disabled }
+          ::= { fsSnoopInstanceConfigEntry 15 }
+
+      fsSnoopMulticastVlanStatus OBJECT-TYPE
+          SYNTAX      INTEGER  { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+          "This object is used to enable/disable the Multicast VLAN feature. 
+           When Multicast VLAN feature is enabled, each incoming untagged report 
+           or leave message will be classified to an M-VLAN, depending on 
+           whether any M-VLAN configuration exists for the particular Group 
+           and/or Source address, configured using the 
+           fsSnoopVlanMulticastProfileId object. 
+           When Multicast VLAN feature is disabled, the usual VLAN 
+           classification rules apply."
+          DEFVAL  { disabled }
+          ::= { fsSnoopInstanceConfigEntry 16 }
+
+      fsSnoopProxyStatus OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "This object enables or disables Proxy in the system.
+              Proxy can be enabled only if Proxy-reporting is disabled.      
+              In proxy mode, the switch act as querier for all 
+              downstream interfaces, act as host for all 
+              upstream interfaces.
+              In proxy mode, switch sends out general query on all 
+              downstream interfaces on every query interval and updates 
+              membership database based on the reports received. 
+              For upstream interfaces, when queried, proxy transmits 
+              current state consolidated report. For any change in 
+              membership databases, state change report is formed and 
+              transmitted on upstream interfaces."
+           DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceConfigEntry 17 } 
+
+      fsSnoopQueryFwdOnAllPorts OBJECT-TYPE 
+          SYNTAX      INTEGER  { allports(1), nonrtrports(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+              "In proxy and proxy reporting mode, Snooping module will send
+               query messages only to the non-router ports by default.
+               This object provides administrative control to forward the 
+               query messages on all the member ports of the VLAN."
+          DEFVAL  { 2 } 
+          ::= { fsSnoopInstanceConfigEntry 18 } 
+
+      fsSnoopFwdGroupsCnt OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Provide  Forwarding DataBase Group Count for Particular instance and
+               Address Type."
+          ::= { fsSnoopInstanceConfigEntry 19 }
+
+    fsSnoopDebugOption OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+             "This object is used to enable debug statements in
+              snooping module.
+              A four byte integer is used for enabling the debug level.
+              Each bit in the four byte integer represents a particular
+              debug level.
+              The mapping between the bit positions & the trace level is
+              as follows:
+                      0 - Init and Shutdown Debug
+                      1 - Resource Debug messages
+                      2 - Timer Debug 
+                      3 - Source Debug
+                      4 - Group Debug
+                      5 - query debug
+                      6 - redundancy debug 
+                      7 - Pkt receive/send debug messages
+		      8 - Forward debug messages
+		      9 - Vlan debug messages
+		     10 - Function Entry Debug Messages
+		     11 - Function Exit Debug Messages
+		     12 - Management Debug Messages
+		     13 - NP Debug Messgaes.
+		     14 - Buffer Debug
+                     15 - ICCH debug 
+                     16 - All failure debug
+
+              The remaining bits are unused. Combination of levels are
+              also allowed.
+
+              For example if the bits 0 and 1 are set, then the trace
+              statement related to Init-Shutdown and Resource Debug messages
+              will be printed.
+
+              The user has to enter the corresponding integer value for the
+              bits set. For example if bits 0 and 1 are to be set ,then user
+              has to give the value 3."
+          ::= { fsSnoopInstanceConfigEntry 20 }
+
+      fsSnoopEnforceRouterAlert OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "Enables or disables IGMP/MLD enforcement of the
+              Router Alert option presence."
+
+          DEFVAL  { 1 } 
+          ::= { fsSnoopInstanceConfigEntry 21 } 
+ 
+-- ------------------------------------------------------------------ 
+-- The Snoop VLAN Group 
+-- ------------------------------------------------------------------ 
+ 
+-- VLAN Based MAC Multicast Forwarding Table 
+ 
+      fsSnoopVlanMcastMacFwdTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopVlanMcastMacFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains MAC based multicast forwarding 
+             information. This information is applicable only if
+             the 'fsSnoopMcastForwardingMode' is set to 'macbased' " 
+          ::= { fsSnoopVlan 1 } 
+ 
+      fsSnoopVlanMcastMacFwdEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopVlanMcastMacFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains VLAN ID, multicast group MAC address and the  
+             list of ports onto which the multicast data packets for group
+             should be forwarded."  
+
+          INDEX { fsSnoopVlanMcastMacFwdInstId, 
+                  fsSnoopVlanMcastMacFwdVlanId,
+                  fsSnoopVlanMcastMacFwdInetAddressType,  
+                  fsSnoopVlanMcastMacFwdGroupAddress } 
+          ::= { fsSnoopVlanMcastMacFwdTable 1 } 
+ 
+      FsSnoopVlanMcastMacFwdEntry ::= SEQUENCE { 
+          fsSnoopVlanMcastMacFwdInstId           Integer32, 
+          fsSnoopVlanMcastMacFwdVlanId           Integer32,
+          fsSnoopVlanMcastMacFwdInetAddressType  InetAddressType,  
+          fsSnoopVlanMcastMacFwdGroupAddress     MacAddress, 
+          fsSnoopVlanMcastMacFwdPortList         PortList,
+          fsSnoopVlanMcastMacFwdLocalPortList    PortList,
+          fsSnoopVlanMcastMacFwdEntryFlag        Integer32 
+
+        } 
+
+      fsSnoopVlanMcastMacFwdInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Instance ID pertaining to the Multicast forwarding entry."
+           ::= { fsSnoopVlanMcastMacFwdEntry 1 } 
+
+      fsSnoopVlanMcastMacFwdVlanId OBJECT-TYPE 
+           SYNTAX      Integer32 (1..4094) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "VLAN ID pertaining to the Multicast forwarding entry"  
+           ::= { fsSnoopVlanMcastMacFwdEntry 2 } 
+ 
+      fsSnoopVlanMcastMacFwdInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "InetAddressType pertaining to the Multicast forwarding entry"  
+           ::= { fsSnoopVlanMcastMacFwdEntry 3 } 
+ 
+      fsSnoopVlanMcastMacFwdGroupAddress OBJECT-TYPE 
+           SYNTAX      MacAddress 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+               "Multicast group MAC address." 
+           ::= { fsSnoopVlanMcastMacFwdEntry 4 } 
+ 
+ 
+      fsSnoopVlanMcastMacFwdPortList OBJECT-TYPE 
+           SYNTAX      PortList 
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "List of ports onto which the multicast data
+                packets destined for this group will be forwarded."  
+           ::= { fsSnoopVlanMcastMacFwdEntry 5 } 
+
+
+     fsSnoopVlanMcastMacFwdLocalPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "List of ports onto which the multicast data packets destined 
+	       for this group will be forwarded. Each bit in this object 
+	       represent interfaces denoted by the object fsVcHlPortId 
+	       associated to the instance identifier denoted by 
+	       fsSnoopVlanMcastMacFwdInstId. This object alone should be
+	       referred in environments where the number of interfaces in the
+	       system is scaled to a large value, as the object
+	       fsSnoopVlanMcastMacFwdPortList may not be sufficient to 
+	       represent the full set of interfaces in each switch instance."
+
+           ::= { fsSnoopVlanMcastMacFwdEntry 6 }
+
+
+     fsSnoopVlanMcastMacFwdEntryFlag OBJECT-TYPE 
+           SYNTAX      Integer32 
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+             "This flag tell about the entry type: either it is a 
+              Static group entry or it is a Dynamic group entry"  
+           ::= { fsSnoopVlanMcastMacFwdEntry 7 } 
+
+
+
+-- VLAN Based IP Multicast Forwarding Table 
+ 
+      fsSnoopVlanMcastIpFwdTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopVlanMcastIpFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      deprecated
+          DESCRIPTION 
+            "This table contains IP based multicast forwarding 
+             information. This information is applicable only if
+             the 'fsSnoopInstMcastForwardingMode' is set to 'ip-based'.
+             This table and all its objects are being deprecated. The
+             fsSnoopVlanIpFwdTable is to be used instead." 
+          ::= { fsSnoopVlan 2 } 
+ 
+      fsSnoopVlanMcastIpFwdEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopVlanMcastIpFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      deprecated
+          DESCRIPTION 
+            "This table contains VLAN ID, unicast source address , 
+             multicast group address and the list of ports onto which the 
+             multicast data packets for group should be forwarded."  
+
+          INDEX { fsSnoopVlanMcastIpFwdInstId, 
+                  fsSnoopVlanMcastIpFwdVlanId,
+                  fsSnoopVlanMcastIpFwdAddressType,     
+                  fsSnoopVlanMcastIpFwdSourceAddress,  
+                  fsSnoopVlanMcastIpFwdGroupAddress } 
+          ::= { fsSnoopVlanMcastIpFwdTable 1 } 
+ 
+      FsSnoopVlanMcastIpFwdEntry ::= SEQUENCE { 
+          fsSnoopVlanMcastIpFwdInstId        Integer32, 
+          fsSnoopVlanMcastIpFwdVlanId        Integer32,
+          fsSnoopVlanMcastIpFwdAddressType   InetAddressType, 
+          fsSnoopVlanMcastIpFwdSourceAddress InetAddress, 
+          fsSnoopVlanMcastIpFwdGroupAddress  InetAddress, 
+          fsSnoopVlanMcastIpFwdPortList      PortList,
+          fsSnoopVlanMcastIpFwdEntryFlag     Integer32 
+  
+        } 
+
+      fsSnoopVlanMcastIpFwdInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      deprecated
+           DESCRIPTION 
+              "Instance ID pertaining to the Multicast forwarding entry." 
+           ::= { fsSnoopVlanMcastIpFwdEntry 1 } 
+
+      fsSnoopVlanMcastIpFwdVlanId OBJECT-TYPE 
+           SYNTAX      Integer32 (1..4094) 
+           MAX-ACCESS  not-accessible 
+           STATUS      deprecated
+           DESCRIPTION 
+              "VLAN ID pertaining to the Multicast forwarding entry"  
+           ::= { fsSnoopVlanMcastIpFwdEntry 2 } 
+
+      fsSnoopVlanMcastIpFwdAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      deprecated
+           DESCRIPTION 
+              "InetAddressType pertaining to the Multicast forwarding entry"  
+           ::= { fsSnoopVlanMcastIpFwdEntry 3 } 
+
+       fsSnoopVlanMcastIpFwdSourceAddress OBJECT-TYPE 
+           SYNTAX      InetAddress (SIZE (16))
+           MAX-ACCESS  not-accessible 
+           STATUS      deprecated
+           DESCRIPTION 
+              "Unicast source address of the data source that sends
+               multicast data for this group"
+           ::= { fsSnoopVlanMcastIpFwdEntry 4 } 
+
+       fsSnoopVlanMcastIpFwdGroupAddress OBJECT-TYPE 
+           SYNTAX      InetAddress (SIZE (16))
+           MAX-ACCESS  not-accessible 
+           STATUS      deprecated
+           DESCRIPTION 
+              "IP/IPv6 multicast group address" 
+           ::= { fsSnoopVlanMcastIpFwdEntry 5 } 
+ 
+       fsSnoopVlanMcastIpFwdPortList OBJECT-TYPE 
+           SYNTAX      PortList 
+           MAX-ACCESS  read-only 
+           STATUS      deprecated
+           DESCRIPTION 
+               "List of ports onto which the multicast data
+                packets destined for this source and group will be forwarded."  
+           ::= { fsSnoopVlanMcastIpFwdEntry 6 }
+      
+       fsSnoopVlanMcastIpFwdEntryFlag OBJECT-TYPE 
+          SYNTAX      Integer32   
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+              "This flag tell about the entry type: either it is a 
+               Static group entry or it is a Dynamic group entry"  
+          ::= { fsSnoopVlanMcastIpFwdEntry 7 } 
+ 
+
+-- VLAN based router table.
+ 
+      fsSnoopVlanRouterTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopVlanRouterEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This table contains the list of ports through which 
+              a router, in a particular VLAN is reachable." 
+          ::= { fsSnoopVlan 3 } 
+ 
+      fsSnoopVlanRouterEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopVlanRouterEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "Contains the VLAN ID and list of ports on which 
+              routers are present in the VLAN." 
+          INDEX { fsSnoopVlanRouterInstId,
+                  fsSnoopVlanRouterVlanId,
+                  fsSnoopVlanRouterInetAddressType } 
+          ::= { fsSnoopVlanRouterTable 1 } 
+ 
+      FsSnoopVlanRouterEntry ::= SEQUENCE { 
+          fsSnoopVlanRouterInstId             Integer32,
+          fsSnoopVlanRouterVlanId             Integer32,
+          fsSnoopVlanRouterInetAddressType    InetAddressType,  
+          fsSnoopVlanRouterPortList           PortList,
+	  fsSnoopVlanRouterLocalPortList      PortList
+        }
+           
+      fsSnoopVlanRouterInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Instance ID pertaining to the router port entry."
+           ::= { fsSnoopVlanRouterEntry 1 } 
+
+      fsSnoopVlanRouterVlanId OBJECT-TYPE 
+           SYNTAX      Integer32 (1..4094) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "VLAN ID of the ports through which router is reachable." 
+           ::= { fsSnoopVlanRouterEntry 2 } 
+ 
+      fsSnoopVlanRouterInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "It indicates whether the row belongs to IGMP / MLD snooping." 
+           ::= { fsSnoopVlanRouterEntry 3 } 
+ 
+      fsSnoopVlanRouterPortList OBJECT-TYPE 
+           SYNTAX      PortList 
+           MAX-ACCESS  read-only
+           STATUS      current 
+           DESCRIPTION 
+               "List of ports on which routers are present. 
+                These router ports are learnt through control messages 
+                received from routers, and can also be configured 
+                statically. This object may not be sufficient to represent the
+		full set of interfaces in each switch instance in environments
+		where the number of interfaces in the system is scaled to a 
+		large value." 
+           ::= { fsSnoopVlanRouterEntry 4 } 
+ 
+
+      fsSnoopVlanRouterLocalPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "List of ports on which routers are present. These router ports 
+	       are learnt through control messages received from routers, and 
+	       can also be configured statically. Each bit in this object 
+	       represent interfaces denoted by the object fsVcHlPortId 
+	       associated to the instance identifier denoted by 
+	       fsSnoopVlanRouterInstId. This object alone should be 
+	       referred in environments where the number of interfaces in the
+	       system is scaled to a large value, as the object
+	       fsSnoopVlanRouterPortList may not be sufficient to represent the
+	       full set of interfaces in each switch instance."
+
+            ::= { fsSnoopVlanRouterEntry 5 }
+
+-- VLAN based filter table 
+ 
+      fsSnoopVlanFilterTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopVlanFilterEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This table contains configuration of snooping
+              on specific Vlans. This Table is valid only when VLAN is  
+              enabled in the system." 
+          ::= { fsSnoopVlan 4 } 
+ 
+      fsSnoopVlanFilterEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopVlanFilterEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "Contains snooping status , version and fast leave
+              configuration for a specific VLAN." 
+          INDEX { fsSnoopVlanFilterInstId,
+                  fsSnoopVlanFilterVlanId,
+                  fsSnoopVlanFilterInetAddressType } 
+          ::= { fsSnoopVlanFilterTable 1 } 
+ 
+      FsSnoopVlanFilterEntry ::= SEQUENCE { 
+          fsSnoopVlanFilterInstId           Integer32, 
+          fsSnoopVlanFilterVlanId           Integer32, 
+          fsSnoopVlanFilterInetAddressType  InetAddressType,
+          fsSnoopVlanSnoopStatus            INTEGER, 
+          fsSnoopVlanOperatingVersion       INTEGER, 
+          fsSnoopVlanCfgOperVersion         INTEGER, 
+          fsSnoopVlanFastLeave              INTEGER,
+          fsSnoopVlanQuerier                INTEGER, 
+          fsSnoopVlanCfgQuerier             INTEGER, 
+          fsSnoopVlanQueryInterval          Integer32, 
+          fsSnoopVlanRtrPortList            PortList, 
+          fsSnoopVlanRowStatus              RowStatus,
+          fsSnoopVlanStartupQueryCount      Integer32,
+          fsSnoopVlanStartupQueryInterval   Integer32,
+          fsSnoopVlanOtherQuerierPresentInterval Integer32,
+ 	  fsSnoopVlanQuerierIpAddress      IpAddress,
+	  fsSnoopVlanQuerierIpFlag         Integer32,
+	  fsSnoopVlanElectedQuerier        IpAddress,
+      fsSnoopVlanRobustnessValue       Unsigned32
+          } 
+
+      fsSnoopVlanFilterInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            "Instance ID pertaining to VLAN filter table entry."
+           ::= { fsSnoopVlanFilterEntry 1 } 
+
+      fsSnoopVlanFilterVlanId OBJECT-TYPE 
+           SYNTAX      Integer32 (1..4094) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            " VLAN ID for which snooping configuration is to be done." 
+           ::= { fsSnoopVlanFilterEntry 2 } 
+ 
+      fsSnoopVlanFilterInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            " Indicates whether the row belongs to IGS/MLD snooping" 
+           ::= { fsSnoopVlanFilterEntry 3 } 
+ 
+      fsSnoopVlanSnoopStatus OBJECT-TYPE 
+           SYNTAX      INTEGER { enabled(1), disabled(2) } 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+               "Enables or disables IGS/MLDS on that specific VLAN"  
+           DEFVAL  { 1 }
+           ::= { fsSnoopVlanFilterEntry 4 } 
+
+      fsSnoopVlanOperatingVersion OBJECT-TYPE 
+           SYNTAX      INTEGER { v1(1), v2(2), v3(3) } 
+           MAX-ACCESS  read-only 
+           STATUS      deprecated 
+           DESCRIPTION 
+               "Indicates the operating version of the IGS/MLDS switch for 
+                a specific VLAN. The default operating mode on a specific VLAN 
+                is IGMP version 3 i.e, V3(3) or MLD version 2 i.e, V2(2).
+                This object is deprecated. Its functionality is met by 
+                fsSnoopRtrPortOperVersion object."
+           ::= { fsSnoopVlanFilterEntry 5 } 
+
+      fsSnoopVlanCfgOperVersion OBJECT-TYPE 
+           SYNTAX      INTEGER { v1(1), v2(2), v3(3) } 
+           MAX-ACCESS  read-write 
+           STATUS      deprecated 
+           DESCRIPTION 
+               "Indicates the operating version of the IGS/MLDS switch for 
+                a specific VLAN. The default operating mode on a specific VLAN 
+                is IGMP version 3 i.e, V3(3) or MLD version 2 i.e., V2(2). 
+                The 'fsSnoopVlanCfgOperVersion' should be configured on the 
+                basis of the router version present in the VLAN.
+                This configuration should be used only when one router port 
+                is existing in the VLAN. 
+                This object is deprecated and corresponding functionality is met
+                using fsSnoopRtrPortCfgOperVersion object available in 
+                fsSnoopRtrPortTable. If configured, consolidated reports sent 
+                on upstream interfaces will use this version." 
+           DEFVAL  { 3 }
+           ::= { fsSnoopVlanFilterEntry 6 } 
+
+      fsSnoopVlanFastLeave OBJECT-TYPE 
+           SYNTAX      INTEGER { enabled(1), disabled(2) } 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+               "Enables or disables fast leave for the VLAN. When it is 
+                'disabled',on reception of a leave message the switch checks
+                if they are any interested receivers for the group by sending 
+                a group specific query before removing the port from the 
+                forwarding table. If set to 'enabled', the switch does not 
+                send a group specific query and immediately removes the port
+                from the forwarding table."
+           DEFVAL  { 2 }
+           ::= { fsSnoopVlanFilterEntry 7 }
+
+      fsSnoopVlanQuerier OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+             "Indicates whether the switch is configured as a querier in the VLAN"
+          DEFVAL  { 2 } 
+          ::= { fsSnoopVlanFilterEntry 8 } 
+
+      fsSnoopVlanCfgQuerier OBJECT-TYPE 
+          SYNTAX      INTEGER  { enabled(1), disabled(2) } 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "The snooping switch can be configured to send IGMP/MLD queries 
+              when IGMP/MLD routers are not present in the VLAN. When set to 
+              'enabled' the switch will generate general query messages. 
+              The query messages will be suppressed if the switch receives 
+              the query message from any other router in the VLAN. Switch 
+              should be configured as a querier for a VLAN only when there 
+              are no queriers in the network.
+              This configuration is valid only in proxy reporting mode."
+          DEFVAL  { 2 } 
+          ::= { fsSnoopVlanFilterEntry 9 } 
+
+      fsSnoopVlanQueryInterval OBJECT-TYPE 
+          SYNTAX      Integer32 (60..600) 
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "This is the interval (in seconds) for which the switch 
+              sends general queries in proxy and proxy-reporting mode.
+              In proxy-reporting mode, General queries will be sent
+              on all downstream interfaces with this interval only if
+              the switch is the Querier.   
+              In proxy mode, switch will be querier for all downstream 
+              interfaces. General queries will be sent on all downstream
+              interfaces with this interval."   
+          DEFVAL  { 125 } 
+          ::= { fsSnoopVlanFilterEntry 10 } 
+
+      fsSnoopVlanRtrPortList OBJECT-TYPE 
+           SYNTAX      PortList 
+           MAX-ACCESS  read-write
+           STATUS      current 
+           DESCRIPTION 
+               "List of ports which are configured statically as router ports.
+	       statically. This object may not be sufficient to represent the
+	       full set of interfaces in each switch instance in environments
+	       where the number of interfaces in the system is scaled to a
+	       large value."
+           ::= { fsSnoopVlanFilterEntry 11 } 
+
+      fsSnoopVlanRowStatus OBJECT-TYPE 
+           SYNTAX      RowStatus 
+           MAX-ACCESS  read-write
+           STATUS      current 
+           DESCRIPTION 
+               "The status of a row in the VLAN filter table. Using this 
+                object, new entries can be created in the VLAN filter table 
+                and the existing entries can be removed from the 
+                VLAN filter table"
+           ::= { fsSnoopVlanFilterEntry 12 } 
+
+      fsSnoopVlanStartupQueryCount OBJECT-TYPE 
+          SYNTAX      Integer32 (2..5)
+          MAX-ACCESS  read-write 
+          STATUS      current 
+          DESCRIPTION 
+             "The Startup Query Count is the number of Queries sent out on 
+             startup, separated by the Startup Query Interval." 
+          DEFVAL  { 2 } 
+          ::= { fsSnoopVlanFilterEntry 13 } 
+          
+      fsSnoopVlanStartupQueryInterval OBJECT-TYPE 
+          SYNTAX      Integer32
+          UNITS       "seconds"
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+             "Interval between the general query messages sent by the switch 
+              during startup of querier election process.
+              This value is (Query Interval/4)"
+          ::= { fsSnoopVlanFilterEntry 14 } 
+
+      fsSnoopVlanOtherQuerierPresentInterval OBJECT-TYPE 
+          SYNTAX      Integer32 
+          UNITS       "seconds"
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+             "The Other Querier Present Interval is the length of time that 
+             must pass before a multicast router decides that there is no 
+             longer another multicast router which should be the querier. 
+             This value is ((Robustness Variable * Query Interval) 
+              + (Query Response Interval/2)).
+             Maximum value for the object varies for IGS and MLDS. 
+             For IGS, the max value supported is 1215. 
+             For MLDS, the max value supported is 1235.
+             The default value for the object is same for both IGS and MLDS."
+          ::= { fsSnoopVlanFilterEntry 15 } 
+
+      fsSnoopVlanQuerierIpAddress OBJECT-TYPE
+          SYNTAX  IpAddress
+          MAX-ACCESS  read-write
+          STATUS  current
+          DESCRIPTION
+             "The IpAddress to be used in Query Message."
+          ::= { fsSnoopVlanFilterEntry 16 }
+
+      fsSnoopVlanQuerierIpFlag OBJECT-TYPE
+          SYNTAX      INTEGER  { enabled(1), disabled(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+             "If the vlan querier IP flag is enabled but querier ip is not configured,
+             either IP Address of interface vlan or default vlan interface ip address will
+             be used as source ip address in query message"
+          ::= { fsSnoopVlanFilterEntry 17 }
+
+      fsSnoopVlanElectedQuerier OBJECT-TYPE
+          SYNTAX  IpAddress
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+             "This object specifies the IpAddress of elected querier."
+          ::= { fsSnoopVlanFilterEntry 18 }
+
+      fsSnoopVlanRobustnessValue OBJECT-TYPE
+          SYNTAX  Unsigned32 (2..7)
+          MAX-ACCESS  read-write
+          STATUS  current
+          DESCRIPTION
+            "The Robustness Variable allows tuning for the expected packet loss on
+            a subnet.  If a subnet is expected to be lossy, the Robustness variable 
+            may be increased"
+          DEFVAL {2}
+
+          ::= { fsSnoopVlanFilterEntry 19 }
+ 
+
+-- ------------------------------------------------------------------ 
+-- Multicast Group Table
+-- ------------------------------------------------------------------ 
+      fsSnoopVlanMcastGroupTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF FsSnoopVlanMcastGroupEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "This table contains the information about dynamically learnt
+                multicast groups and the ports on which they are learnt.
+                When enhanced mode is enabled this table will be populated 
+                with both Outer and Inner VLAN. When operating in the default 
+                mode this table will be populated with the Outer VLAN alone and 
+                the Inner VLAN will be considered to have a value of zero. When
+                the Snoop module receives a packet classified to a single VLAN
+                (such as the CVLAN in Customer Bridges, or SVLAN in 802.1ad
+                Bridges), then this single VLAN is considered to be the Outer 
+                VLAN and the Inner VLAN will have a value of zero."
+           ::= { fsSnoopVlan 5 }
+
+      fsSnoopVlanMcastGroupEntry OBJECT-TYPE
+           SYNTAX      FsSnoopVlanMcastGroupEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Contains the information learnt about a multicast group."
+           INDEX { fsSnoopVlanMcastGroupInstanceId,
+                   fsSnoopVlanMcastGroupOuterVlanId,
+                   fsSnoopVlanMcastGroupInetAddressType,
+                   fsSnoopVlanMcastGroupAddress,
+                   fsSnoopVlanMcastGroupInnerVlanId }
+           ::= { fsSnoopVlanMcastGroupTable 1 }
+
+      FsSnoopVlanMcastGroupEntry ::= SEQUENCE {
+           fsSnoopVlanMcastGroupInstanceId      Integer32,
+           fsSnoopVlanMcastGroupOuterVlanId     VlanIndex,
+           fsSnoopVlanMcastGroupInetAddressType InetAddressType,
+           fsSnoopVlanMcastGroupAddress         InetAddress,
+           fsSnoopVlanMcastGroupInnerVlanId     InnerVlanIndex,
+           fsSnoopVlanMcastGroupPortList        PortList, 
+	   fsSnoopVlanMcastGroupLocalPortList   PortList
+	   }
+
+      fsSnoopVlanMcastGroupInstanceId OBJECT-TYPE
+           SYNTAX      Integer32 (0..65535)
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Instance Id pertaining to a particular virtual context."
+           ::= { fsSnoopVlanMcastGroupEntry 1 }
+
+      fsSnoopVlanMcastGroupOuterVlanId OBJECT-TYPE
+           SYNTAX      VlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The outer vlan id on which the multicast group is learnt."
+           ::= { fsSnoopVlanMcastGroupEntry 2 }
+
+      fsSnoopVlanMcastGroupInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Inet Address Type corresponding to this group entry. 
+               This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopVlanMcastGroupEntry 3 } 
+ 
+      fsSnoopVlanMcastGroupAddress OBJECT-TYPE
+           SYNTAX      InetAddress (SIZE (16))
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The Multicast group address learnt."
+           ::= { fsSnoopVlanMcastGroupEntry 4 }
+
+      fsSnoopVlanMcastGroupInnerVlanId OBJECT-TYPE
+           SYNTAX      InnerVlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The inner vlan id on which the multicast group is learnt."
+           ::= { fsSnoopVlanMcastGroupEntry 5 }
+
+      fsSnoopVlanMcastGroupPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The list of interfaces on which the group entry is learnt.
+	       statically. This object may not be sufficient to represent the
+	       full set of interfaces in each switch instance in environments
+	       where the number of interfaces in the system is scaled to a
+	       large value."
+           ::= { fsSnoopVlanMcastGroupEntry 6 }
+
+      fsSnoopVlanMcastGroupLocalPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "The list of interfaces on which the group entry is learnt. 
+	       Each bit in this object represent interfaces denoted by the 
+	       object fsVcHlPortId associated to the instance identifier 
+	       denoted by fsSnoopVlanMcastGroupInstanceId. This object alone 
+	       should be referred in environments where the number of 
+	       interfaces in the system is scaled to a large value, as the 
+	       object fsSnoopVlanMcastGroupPortList may not be sufficient to 
+	       report the full set of interfaces in each switch instance."
+           ::= { fsSnoopVlanMcastGroupEntry 7 } 
+
+
+-- ------------------------------------------------------------------ 
+-- Multicast Receiver/Host Table
+-- ------------------------------------------------------------------ 
+      fsSnoopVlanMcastReceiverTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF FsSnoopVlanMcastReceiverEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "This table contains the information about dynamically
+                learnt multicast groups, the source ip of the hosts 
+                sending the multicast reports and the registered sources
+                from which the multicast data is requested."
+           ::= { fsSnoopVlan 6 }
+
+      fsSnoopVlanMcastReceiverEntry OBJECT-TYPE
+           SYNTAX      FsSnoopVlanMcastReceiverEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Contains an entry for each multicast report sent by each host
+                for a multicast group and requesting data from a specific 
+                source."
+           INDEX { fsSnoopVlanMcastGroupInstanceId,
+                   fsSnoopVlanMcastGroupOuterVlanId,
+                   fsSnoopVlanMcastGroupInetAddressType,
+                   fsSnoopVlanMcastGroupAddress,
+                   fsSnoopVlanMcastGroupInnerVlanId, 
+                   fsSnoopVlanMcastReceiverPortIndex,
+                   fsSnoopVlanMcastReceiverHostAddress,
+                   fsSnoopVlanMcastReceiverSourceAddress }
+           ::= { fsSnoopVlanMcastReceiverTable 1 }
+
+      FsSnoopVlanMcastReceiverEntry ::= SEQUENCE {
+           fsSnoopVlanMcastReceiverPortIndex       InterfaceIndex,
+           fsSnoopVlanMcastReceiverHostAddress     InetAddress,
+           fsSnoopVlanMcastReceiverSourceAddress   InetAddress,
+           fsSnoopVlanMcastReceiverFilterMode      INTEGER
+      }
+
+      fsSnoopVlanMcastReceiverPortIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The interface on which the multicast group address is learnt."
+           ::= { fsSnoopVlanMcastReceiverEntry 1 }
+
+      fsSnoopVlanMcastReceiverHostAddress OBJECT-TYPE
+           SYNTAX      InetAddress (SIZE (16))
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The IP address of the multicast receiver that has sent
+                the multicast report to join this group."
+           ::= { fsSnoopVlanMcastReceiverEntry 2 }
+
+      fsSnoopVlanMcastReceiverSourceAddress OBJECT-TYPE
+           SYNTAX      InetAddress (SIZE (16))
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Unicast source address of the data source that sends
+                multicast data for this group"
+           ::= { fsSnoopVlanMcastReceiverEntry 3 }
+
+      fsSnoopVlanMcastReceiverFilterMode OBJECT-TYPE
+           SYNTAX      INTEGER { include(1), exclude(2) }
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION
+               "The include or the exclude mode that has been
+                registered by the multicast receiver for the
+                unicast source address specified."
+           ::= { fsSnoopVlanMcastReceiverEntry 4 }
+
+-- --------------------------------------------------------------
+-- Outer-VLAN, Inner-VLAN Based IP Multicast Forwarding Table 
+-- --------------------------------------------------------------
+ 
+      fsSnoopVlanIpFwdTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopVlanIpFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains IP multicast forwarding information 
+             based on both Outer VLAN and Inner VLAN.                 
+
+             When enhanced mode is enabled this table will be populated 
+             with both Outer and Inner VLAN. When operating in the default mode 
+             this table will be populated with the Outer VLAN alone and the 
+             Inner VLAN will be considered to have a value of zero. When
+             the Snoop module receives a packet classified to a single VLAN
+             (such as the CVLAN in Customer Bridges, or SVLAN in 802.1ad
+             Bridges), then this single VLAN is considered to be the Outer VLAN
+             and the Inner VLAN will have a value of zero. 
+             
+             The information present in this table is applicable only if the 
+             object 'fsSnoopInstMcastForwardingMode' is set to 'ip-based'." 
+          ::= { fsSnoopVlan 7 } 
+ 
+      fsSnoopVlanIpFwdEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopVlanIpFwdEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+            "This table contains Outer VLAN ID, unicast source address, 
+             multicast group address, Inner VLAN ID and the list of ports onto 
+             which the multicast data packets for the group should be 
+             forwarded."  
+          INDEX { fsSnoopVlanIpFwdInstanceId, 
+                  fsSnoopVlanIpFwdOuterVlanId,
+                  fsSnoopVlanIpFwdInetAddressType,     
+                  fsSnoopVlanIpFwdSourceAddress,  
+                  fsSnoopVlanIpFwdGroupAddress, 
+                  fsSnoopVlanIpFwdInnerVlanId } 
+          ::= { fsSnoopVlanIpFwdTable 1 } 
+ 
+      FsSnoopVlanIpFwdEntry ::= SEQUENCE { 
+           fsSnoopVlanIpFwdInstanceId      Integer32,
+           fsSnoopVlanIpFwdOuterVlanId     VlanIndex,
+           fsSnoopVlanIpFwdInetAddressType InetAddressType,
+           fsSnoopVlanIpFwdSourceAddress   InetAddress,
+           fsSnoopVlanIpFwdGroupAddress    InetAddress,
+           fsSnoopVlanIpFwdInnerVlanId     InnerVlanIndex,
+           fsSnoopVlanIpFwdPortList        PortList, 
+	   fsSnoopVlanIpFwdLocalPortList   PortList
+        } 
+
+      fsSnoopVlanIpFwdInstanceId OBJECT-TYPE
+           SYNTAX      Integer32 (0..65535)
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Instance Id pertaining to a particular virtual context."
+           ::= { fsSnoopVlanIpFwdEntry 1 }
+
+      fsSnoopVlanIpFwdOuterVlanId OBJECT-TYPE
+           SYNTAX      VlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The outer vlan id on which the multicast group is learnt."
+           ::= { fsSnoopVlanIpFwdEntry 2 }
+
+      fsSnoopVlanIpFwdInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "Inet Address Type corresponding to this forwarding table 
+               entry. This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopVlanIpFwdEntry 3 } 
+ 
+      fsSnoopVlanIpFwdSourceAddress OBJECT-TYPE
+           SYNTAX      InetAddress 
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "Unicast source address of the data source that sends
+                multicast data for this group"
+           ::= { fsSnoopVlanIpFwdEntry 4 }
+
+      fsSnoopVlanIpFwdGroupAddress OBJECT-TYPE
+           SYNTAX      InetAddress 
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The Multicast group address learnt."
+           ::= { fsSnoopVlanIpFwdEntry 5 }
+
+      fsSnoopVlanIpFwdInnerVlanId OBJECT-TYPE
+           SYNTAX      InnerVlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The inner vlan id on which the multicast group is learnt."
+           ::= { fsSnoopVlanIpFwdEntry 6 }
+
+       fsSnoopVlanIpFwdPortList OBJECT-TYPE 
+           SYNTAX      PortList 
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "List of ports onto which the multicast data
+                packets from this source, destined for this group, 
+                will be forwarded statically. This object may not be sufficient 
+		to represent the full set of interfaces in each switch instance 
+		in environments where the number of interfaces in the system is 
+		scaled to a large value."
+           ::= { fsSnoopVlanIpFwdEntry 7 } 
+
+       fsSnoopVlanIpFwdLocalPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "List of ports onto which the multicast data packets from this 
+	       source destined for this group, will be forwarded. 
+	       Each bit in this object represent interfaces denoted by the 
+	       object fsVcHlPortId associated to the instance identifier 
+	       denoted by fsSnoopVlanIpFwdInstanceId. This object alone 
+	       should be referred in environments where the number of 
+	       interfaces in the system is scaled to a large value, as the 
+	       object fsSnoopVlanIpFwdPortList may not be sufficient to 
+	       report the full set of interfaces in each switch instance."
+           ::= { fsSnoopVlanIpFwdEntry 8 } 
+
+-- -----------------------------------------------------------------------------
+-- The Snoop VLAN Group (Extention)                        --                 
+-- -----------------------------------------------------------------------------
+
+-- The Extention table for VLAN based FilterEntry
+
+      fsSnoopVlanFilterXTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF FsSnoopVlanFilterXEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+             "This table is an extention table of fsSnoopVlanFilterTable"
+          ::= { fsSnoopVlan 8 }
+
+      fsSnoopVlanFilterXEntry OBJECT-TYPE
+          SYNTAX      FsSnoopVlanFilterXEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+             "Each entry contains configurations for specific VLANs"
+          AUGMENTS    { fsSnoopVlanFilterEntry }
+          ::= { fsSnoopVlanFilterXTable 1 }
+
+      FsSnoopVlanFilterXEntry ::= SEQUENCE {
+          fsSnoopVlanBlkRtrPortList             PortList,
+          fsSnoopVlanFilterMaxLimitType         INTEGER,
+          fsSnoopVlanFilterMaxLimit             Unsigned32,
+          fsSnoopVlanFilter8021pPriority        Integer32,
+          fsSnoopVlanFilterDropReports          INTEGER,
+          fsSnoopVlanMulticastProfileId         Unsigned32,
+          fsSnoopVlanPortPurgeInterval          Integer32,
+          fsSnoopVlanMaxResponseTime            Integer32,
+	  fsSnoopVlanRtrLocalPortList           PortList,
+	  fsSnoopVlanBlkRtrLocalPortList        PortList
+      }
+
+      fsSnoopVlanBlkRtrPortList OBJECT-TYPE
+          SYNTAX      PortList
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "List of ports which are configured statically as blocked router
+               ports statically. This object may not be sufficient to represent 
+	       full set of interfaces in each switch instance in environments
+	       where the number of interfaces in the system is scaled to a
+	       large value."
+          ::= { fsSnoopVlanFilterXEntry 1 }       
+
+      fsSnoopVlanFilterMaxLimitType OBJECT-TYPE
+          SYNTAX      INTEGER { none(0), groups(1), channels(2) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Indicates the type of limit to be applied on this VLAN. 
+               Setting as 'channels' indicates that the limit is set for 
+               channel (group, source) registrations whereas setting as 
+               'groups' indicates that the limit is set for groups. The
+               channel limit will be applied only for IGMPv3 Include &
+               Allow reports whereas the group limit will be applied for 
+               all IGMP reports. 
+               By default, this object has a value of 0 ('none') and no 
+               limiting is done i.e. the value of fsSnoopVlanFilterMaxLimit
+               is ignored when this object is set to 'none'."
+          DEFVAL { none }
+          ::= { fsSnoopVlanFilterXEntry 2 }
+
+      fsSnoopVlanFilterMaxLimit OBJECT-TYPE
+          SYNTAX      Unsigned32
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Sets the maximum number of unique entries (channel or group) 
+              that can be learned simultaneously on this VLAN. The 
+              fsSnoopVlanFilterMaxLimitType must be set before configuring 
+              this object. If fsSnoopVlanFilterMaxLimitType is 'channels', 
+              this limit applies to number of channels that can be joined 
+              on this VLAN. If fsSnoopVlanFilterMaxLimitType is 'groups', 
+              this limit applies to number of groups that can be joined on 
+              this VLAN.
+              By default, this object will hold a value of zero and will 
+              not limit any IGMP packets as long as the value of 
+              fsSnoopVlanFilterMaxLimitType is set to 'none'. However, when
+              fsSnoopVlanFilterMaxLimitType is set to 'groups' or 'channels',
+              if this object has the value of zero, then no IGMP reports will
+              be processed on this interface.
+              The maximum value supported by this object is dependent on the 
+              maximum groups or channels registrations that the system can 
+              support."
+         DEFVAL { 0 }
+          ::= { fsSnoopVlanFilterXEntry 3 }
+
+      fsSnoopVlanFilter8021pPriority OBJECT-TYPE
+          SYNTAX      Integer32 (0..7)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Configures the priority with which the reports assigned to this
+              VLAN should be processed by the hardware as well as by the
+              upstream router. Priority 0 means lowest priority while priority
+              7 means highest priority. This value will be used to update the
+              priority bits in the ethernet header."
+          DEFVAL  { 7 }
+          ::= { fsSnoopVlanFilterXEntry 4 }
+
+      fsSnoopVlanFilterDropReports OBJECT-TYPE
+          SYNTAX      INTEGER  { none(0), igmpv1(1), igmpv2(2), all(3) }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Some implementations might require that IGMPv1 should not be
+              supported, as IGMPv1 does not have any group leaving mechanism.
+              Some other implementations might require that both IGMPv1 and
+              IGMPv2 reports should be dropped, as they do not support SSM.
+              So in such cases, this object can be used. If set to 'igmpv1', 
+              incoming IGMPv1 Reports will be dropped. If set to 'igmpv2', 
+              both IGMPv1 reports and IGMPv2 reports will be dropped. 
+              In case there is no need to process any reports (for 
+              diagnostic purposes or so), this object can be set to 'all'."
+          DEFVAL { 0 }
+          ::= { fsSnoopVlanFilterXEntry 5 }
+
+      fsSnoopVlanMulticastProfileId OBJECT-TYPE
+          SYNTAX      Unsigned32
+          MAX-ACCESS  read-write
+          STATUS      current 
+          DESCRIPTION 
+               "This object contains the multicast profile id configured for a 
+               particular VLAN and is used for multicast vlan classification.
+               When any untagged report or leave message is received (i.e. packet 
+               with no tag in a Customer Bridge or packet with no S-tag in a 
+               Provider or 802.1ad Bridge), and if the Group & Source address in
+               the received packet matches any rule in this profile, then the
+               received packet is classified to be associated to the VLAN (that is,
+               Multicast VLAN) to which this profile is mapped.
+               By default, no profile is associated to any VLAN."
+          DEFVAL { 0 }
+          ::= { fsSnoopVlanFilterXEntry 6 }
+
+       fsSnoopVlanPortPurgeInterval OBJECT-TYPE 
+          SYNTAX      Integer32 
+          MAX-ACCESS  read-only 
+          STATUS      current 
+          DESCRIPTION 
+             "This is the interval (in seconds) after which a learnt  
+              port entry will be purged. For each port on which report
+              has been received,this timer runs for 'PortPurgeInterval'
+              seconds. This timer will be restarted whenever a report 
+              message is received from a host on the specific port. If 
+              the timer expires, then , the learnt port entry  will 
+              be purged from the multicast group. 
+	      This interval is calculated based on the value of
+	      (QueryInterval * Retry Count) + Maximum Response Time"
+          ::= { fsSnoopVlanFilterXEntry 7 } 
+
+      fsSnoopVlanMaxResponseTime OBJECT-TYPE
+         SYNTAX     Integer32 (1..65025)
+         MAX-ACCESS read-create
+         STATUS     current
+         DESCRIPTION
+             "The maximum response code advertised in queries send over this
+             vlan.This object is used to configure max response code for
+             both IGS and MLDS.Minimum value for the object is zero for both
+             IGS and MLDS. Max value and default value for the object varies
+             for IGS and MLDS. 
+             For IGS, the max value supported is 255. The default value is 
+             100.Its unit is in tenths of a  second.
+             For MLDS, the max value supported is 65025. The default value 
+             is 10000. Its unit is in milliseconds."
+         ::= { fsSnoopVlanFilterXEntry 8 }
+
+      fsSnoopVlanRtrLocalPortList OBJECT-TYPE
+           SYNTAX      PortList
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "List of ports which are configured statically as router ports. 
+	       Each bit in this object represent interfaces denoted by the 
+	       object fsVcHlPortId associated to the instance identifier 
+	       denoted by fsSnoopVlanFilterInstId. This object alone 
+	       should be referred in environments where the number of 
+	       interfaces in the system is scaled to a large value , as the 
+	       object fsSnoopVlanRtrPortList may not be sufficient to represent 
+	       the full set of interfaces in each switch instance."
+           ::= { fsSnoopVlanFilterXEntry 9 }
+
+      fsSnoopVlanBlkRtrLocalPortList OBJECT-TYPE
+          SYNTAX      PortList
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "List of ports which are configured statically as blocked router 
+	      ports. Each bit in this object represent interfaces denoted by 
+	      the object fsVcHlPortId associated to the instance identifier 
+	      denoted by fsSnoopVlanFilterInstId. This object alone should be 
+	      referred in environments where the number of interfaces in the 
+	      system is scaled to a large value, as the object 
+	      fsSnoopVlanBlkRtrPortList may not be sufficient to represent the 
+	      full set of interfaces in each switch instance."
+           ::= { fsSnoopVlanFilterXEntry 10 }
+
+---------------------------------------------------
+-- VLAN Based Static  Multicast Forwarding Table 
+---------------------------------------------------
+
+      fsSnoopVlanStaticMcastGrpTable OBJECT-TYPE 
+           SYNTAX      SEQUENCE OF FsSnoopVlanStaticMcastGrpEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "This table contains IP based multicast forwarding 
+              information." 
+           ::= { fsSnoopVlan 9 } 
+
+      fsSnoopVlanStaticMcastGrpEntry OBJECT-TYPE 
+               SYNTAX      FsSnoopVlanStaticMcastGrpEntry 
+               MAX-ACCESS  not-accessible 
+               STATUS      current 
+               DESCRIPTION 
+                  "This table contains VLAN ID, unicast source address , 
+                  multicast group address and the list of ports onto which the 
+                  multicast data packets for group should be forwarded."  
+
+      INDEX { fsSnoopVlanStaticMcastGrpInstId,
+         fsSnoopVlanStaticMcastGrpVlanId,
+         fsSnoopVlanStaticMcastGrpAddressType,     
+         fsSnoopVlanStaticMcastGrpSourceAddress,  
+         fsSnoopVlanStaticMcastGrpGroupAddress } 
+         ::= { fsSnoopVlanStaticMcastGrpTable 1 } 
+
+      FsSnoopVlanStaticMcastGrpEntry ::= SEQUENCE { 
+         fsSnoopVlanStaticMcastGrpInstId        Integer32,
+         fsSnoopVlanStaticMcastGrpVlanId        Integer32,
+         fsSnoopVlanStaticMcastGrpAddressType   InetAddressType, 
+         fsSnoopVlanStaticMcastGrpSourceAddress InetAddress, 
+         fsSnoopVlanStaticMcastGrpGroupAddress  InetAddress, 
+         fsSnoopVlanStaticMcastGrpPortList      PortList,
+         fsSnoopVlanStaticMcastGrpRowStatus     RowStatus 
+         } 
+
+      fsSnoopVlanStaticMcastGrpInstId OBJECT-TYPE 
+         SYNTAX     Integer32 (1..255) 
+         MAX-ACCESS  not-accessible 
+         STATUS      current 
+         DESCRIPTION 
+         "Instance ID pertaining to the Multicast forwarding entry.
+         Currently only one instance is supported so it is always 1" 
+         ::= { fsSnoopVlanStaticMcastGrpEntry 1 } 
+
+      fsSnoopVlanStaticMcastGrpVlanId OBJECT-TYPE 
+         SYNTAX      Integer32 (1..4094) 
+         MAX-ACCESS  not-accessible 
+         STATUS      current 
+         DESCRIPTION 
+         "VLAN ID pertaining to the Multicast forwarding entry"  
+         ::= { fsSnoopVlanStaticMcastGrpEntry 2 } 
+
+      fsSnoopVlanStaticMcastGrpAddressType OBJECT-TYPE 
+         SYNTAX      InetAddressType 
+         MAX-ACCESS  not-accessible 
+         STATUS      current 
+         DESCRIPTION 
+         "InetAddressType pertaining to the Multicast forwarding entry"  
+         ::= { fsSnoopVlanStaticMcastGrpEntry 3 } 
+
+      fsSnoopVlanStaticMcastGrpSourceAddress OBJECT-TYPE 
+         SYNTAX      InetAddress 
+         MAX-ACCESS  not-accessible 
+         STATUS      current 
+         DESCRIPTION 
+         "Unicast source address of the data source that sends
+         multicast data for this group"
+         ::= { fsSnoopVlanStaticMcastGrpEntry 4 } 
+
+      fsSnoopVlanStaticMcastGrpGroupAddress OBJECT-TYPE 
+         SYNTAX      InetAddress 
+         MAX-ACCESS  not-accessible 
+         STATUS      current 
+         DESCRIPTION 
+         "IP/IPv6 multicast group address" 
+         ::= { fsSnoopVlanStaticMcastGrpEntry 5 } 
+
+      fsSnoopVlanStaticMcastGrpPortList OBJECT-TYPE 
+         SYNTAX       PortList 
+         MAX-ACCESS  read-write 
+         STATUS      current 
+         DESCRIPTION 
+         "List of ports onto which the multicast data
+         packets destined for this source and group will be forwarded."  
+         ::= { fsSnoopVlanStaticMcastGrpEntry 6 } 
+
+      fsSnoopVlanStaticMcastGrpRowStatus OBJECT-TYPE
+         SYNTAX       RowStatus
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+          "The row status variable, used according to
+         row installation and removal conventions."
+         ::= { fsSnoopVlanStaticMcastGrpEntry 7 }
+
+
+ -- Snooping Statistics 
+ 
+      fsSnoopStatsTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopStatsEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This table contains snooping statistics  
+              maintained by the switch. The statistics are
+              maintained on a per VLAN basis."
+          ::= { fsSnoopStats 1 } 
+ 
+      fsSnoopStatsEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopStatsEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "Contains snooping statistics for a particular VLAN." 
+          INDEX { fsSnoopStatsInstId,
+                  fsSnoopStatsVlanId,
+                  fsSnoopStatsInetAddressType } 
+          ::= { fsSnoopStatsTable 1 } 
+ 
+      FsSnoopStatsEntry ::= SEQUENCE { 
+          fsSnoopStatsInstId                Integer32, 
+          fsSnoopStatsVlanId                Integer32, 
+          fsSnoopStatsInetAddressType       InetAddressType,
+          fsSnoopStatsRxGenQueries          Counter32,
+          fsSnoopStatsRxGrpQueries          Counter32,
+          fsSnoopStatsRxGrpAndSrcQueries    Counter32,
+          fsSnoopStatsRxAsmReports          Counter32,
+          fsSnoopStatsRxSsmReports          Counter32,
+          fsSnoopStatsRxSsmIsInMsgs         Counter32,
+          fsSnoopStatsRxSsmIsExMsgs         Counter32,
+          fsSnoopStatsRxSsmToInMsgs         Counter32,
+          fsSnoopStatsRxSsmToExMsgs         Counter32,
+          fsSnoopStatsRxSsmAllowMsgs        Counter32,
+          fsSnoopStatsRxSsmBlockMsgs        Counter32,
+          fsSnoopStatsRxAsmLeaves           Counter32,
+          fsSnoopStatsTxGenQueries          Counter32,
+          fsSnoopStatsTxGrpQueries          Counter32,
+          fsSnoopStatsTxGrpAndSrcQueries    Counter32,
+          fsSnoopStatsTxAsmReports          Counter32,
+          fsSnoopStatsTxSsmReports          Counter32,
+          fsSnoopStatsTxAsmLeaves           Counter32,
+          fsSnoopStatsDroppedPkts           Counter32,
+          fsSnoopStatsUnsuccessfulJoins     Counter32,
+          fsSnoopStatsActiveJoins           Counter32,
+          fsSnoopStatsActiveGroups          Counter32,
+          fsSnoopStatsRxV1Report            Counter32,
+          fsSnoopStatsRxV2Report            Counter32,
+          fsSnoopStatsTxV1Report            Counter32,
+          fsSnoopStatsTxV2Report            Counter32,
+          fsSnoopStatsDropV1GenQueries      Counter32,
+          fsSnoopStatsDropV2GenQueries      Counter32,
+          fsSnoopStatsDropV3GenQueries      Counter32,
+          fsSnoopStatsDropV2GrpQueries      Counter32,
+          fsSnoopStatsDropV3GrpQueries      Counter32,
+          fsSnoopStatsDropGrpAndSrcQueries  Counter32,
+          fsSnoopStatsDropV1Reports         Counter32,
+          fsSnoopStatsDropV2Reports         Counter32,
+          fsSnoopStatsDropSsmIsInMsgs       Counter32,
+          fsSnoopStatsDropSsmIsExMsgs         Counter32,
+          fsSnoopStatsDropSsmToInMsgs         Counter32,
+          fsSnoopStatsDropSsmToExMsgs         Counter32,
+          fsSnoopStatsDropSsmAllowMsgs        Counter32,
+          fsSnoopStatsDropSsmBlockMsgs        Counter32,
+          fsSnoopStatsDropAsmLeaves           Counter32,
+        fsSnoopStatsFwdGenQueries 	      Counter32,
+          fsSnoopStatsFwdGrpQueries           Counter32
+        } 
+
+      fsSnoopStatsInstId OBJECT-TYPE 
+           SYNTAX      Integer32 (0..255) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            "Instance ID pertaining for the statistics entry."
+           ::= { fsSnoopStatsEntry 1 } 
+
+      fsSnoopStatsVlanId OBJECT-TYPE 
+           SYNTAX      Integer32 (1..4094) 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            " VLAN ID for which snooping statistics are displayed"
+           ::= { fsSnoopStatsEntry 2 } 
+
+      fsSnoopStatsInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+            " Indicates whether the statistics are for IGS/MLDS"
+           ::= { fsSnoopStatsEntry 3 } 
+
+      fsSnoopStatsRxGenQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of General Queries received by the
+                snooping switch." 
+           ::= { fsSnoopStatsEntry 4 } 
+
+      fsSnoopStatsRxGrpQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of Group Specific Queries received
+                by the snooping switch." 
+           ::= { fsSnoopStatsEntry 5 } 
+
+      fsSnoopStatsRxGrpAndSrcQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of Group and Source Specific Queries
+                received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 6 } 
+
+      fsSnoopStatsRxAsmReports OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv1/IGMPv2 Membership reports
+                received by the snooping switch. In case of MLDS, it provides
+                the statistics of MLDv1 membership reports." 
+           ::= { fsSnoopStatsEntry 7 } 
+
+      fsSnoopStatsRxSsmReports OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                received by the snooping switch."
+           ::= { fsSnoopStatsEntry 8 } 
+
+      fsSnoopStatsRxSsmIsInMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type IS_IN received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 9 } 
+
+      fsSnoopStatsRxSsmIsExMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type IS_EX received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 10 } 
+
+      fsSnoopStatsRxSsmToInMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type TO_IN received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 11 } 
+
+      fsSnoopStatsRxSsmToExMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type TO_EX received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 12 } 
+
+      fsSnoopStatsRxSsmAllowMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type ALLOW received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 13 } 
+
+      fsSnoopStatsRxSsmBlockMsgs OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                of type BLOCK received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 14 } 
+
+      fsSnoopStatsRxAsmLeaves OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv2/MLDv1 Leave messages    
+                received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 15 } 
+
+      fsSnoopStatsTxGenQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of General Queries transmitted by the
+                snooping switch." 
+           ::= { fsSnoopStatsEntry 16 } 
+
+      fsSnoopStatsTxGrpQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of Group Specific Queries transmitted
+                by the snooping switch." 
+           ::= { fsSnoopStatsEntry 17 } 
+
+      fsSnoopStatsTxGrpAndSrcQueries OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of Group and Source Specific Queries
+                transmitted by the snooping switch." 
+           ::= { fsSnoopStatsEntry 18 } 
+
+      fsSnoopStatsTxAsmReports OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv1/IGMPv2 Membership reports
+                transmitted by the snooping switch." 
+           ::= { fsSnoopStatsEntry 19 } 
+
+      fsSnoopStatsTxSsmReports OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv3/MLDv2 Membership reports
+                transmitted by the snooping switch." 
+           ::= { fsSnoopStatsEntry 20 } 
+
+      fsSnoopStatsTxAsmLeaves OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the statistics of IGMPv2/MLDv1 Leave messages    
+                transmitted by the snooping switch." 
+           ::= { fsSnoopStatsEntry 21 } 
+
+      fsSnoopStatsDroppedPkts OBJECT-TYPE 
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+               "Provides the number of erroneous IGMP/MLD packets dropped
+                by the snooping switch due to failure in checksum 
+                calculation."
+           ::= { fsSnoopStatsEntry 22 }
+ 
+       fsSnoopStatsUnsuccessfulJoins OBJECT-TYPE
+          SYNTAX       Counter32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+              "Provides the total number of IGMP groups or channels dropped, 
+              because the maximum limit of groups or channels allowed for the 
+              VLAN has been reached. By default, this object is for groups, 
+              but if fsSnoopVlanFilterMaxLimitType is 'channels' this object 
+              is for channels (S,G) entries."
+          ::= { fsSnoopStatsEntry 23 }
+
+      fsSnoopStatsActiveJoins OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+              "Provides the total number of IGMP groups or channels active 
+              on this VLAN at the given time. By default, this object is for 
+              groups, but if fsSnoopVlanFilterMaxLimitType is 'channels' this 
+              object is for channels (S,G) entries."
+           ::= { fsSnoopStatsEntry 24 }
+
+      fsSnoopStatsActiveGroups OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+              "Provides the total number of IGMP groups or channels active 
+              on this VLAN at the given time."
+           ::= { fsSnoopStatsEntry 25 }
+
+      fsSnoopStatsRxV1Report  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv1 Membership reports
+                received by the snooping switch." 
+           ::= { fsSnoopStatsEntry 26 }
+
+      fsSnoopStatsRxV2Report  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv2 Membership reports
+                received by the snooping switch."
+           ::= { fsSnoopStatsEntry 27 }
+
+      fsSnoopStatsTxV1Report  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv1 Membership reports
+                transmitted by the snooping switch."
+           ::= { fsSnoopStatsEntry 28 }
+
+      fsSnoopStatsTxV2Report  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv2 Membership reports
+                transmitted by the snooping switch."
+           ::= { fsSnoopStatsEntry 29 }
+
+
+      fsSnoopStatsDropV1GenQueries    OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv1 General Queries that are dropped 
+                by the snooping switch."
+           ::= { fsSnoopStatsEntry 30 }
+
+      fsSnoopStatsDropV2GenQueries    OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv2 General Queries that are dropped
+                by the snooping switch."
+           ::= { fsSnoopStatsEntry 31 }
+
+      fsSnoopStatsDropV3GenQueries    OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv3 General Queries that are dropped
+                by the snooping switch."
+           ::= { fsSnoopStatsEntry 32 }
+
+
+      fsSnoopStatsDropV2GrpQueries  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of Group specific Queries that are dropped
+                by the snooping switch."
+           ::= { fsSnoopStatsEntry 33 }
+
+      fsSnoopStatsDropV3GrpQueries  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of Group specific Queries that are dropped
+                by the snooping switch."
+           ::= { fsSnoopStatsEntry 34 }
+
+
+     fsSnoopStatsDropGrpAndSrcQueries  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of Group and source specific 
+                Queries that are dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 35 }
+
+     fsSnoopStatsDropV1Reports  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv1 reports that 
+                are dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 36 }
+
+    fsSnoopStatsDropV2Reports  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+               "Provides the statistics of IGMPv2 reports that
+                are dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 37 }
+
+    fsSnoopStatsDropSsmIsInMsgs  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type IS_INCLUDE dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 38 }
+
+     fsSnoopStatsDropSsmIsExMsgs  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type IS_EXCLUDE dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 39 }
+
+     fsSnoopStatsDropSsmToInMsgs   OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type TO_INCLUDE dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 40 }
+
+     fsSnoopStatsDropSsmToExMsgs  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type TO_EXCLUDE dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 41 }
+
+     fsSnoopStatsDropSsmAllowMsgs  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type ALLOW dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 42 }
+    
+     fsSnoopStatsDropSsmBlockMsgs   OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+                "Provides the statistics of IGMPv3 Membership reports
+                of type BLOCK dropped by the snooping switch."
+           ::= { fsSnoopStatsEntry 43 }
+    
+     fsSnoopStatsDropAsmLeaves  OBJECT-TYPE
+           SYNTAX      Counter32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+	   "Provides the statistics of IGMPv2 Leave messages
+	   dropped by the snooping switch."
+	   ::= { fsSnoopStatsEntry 44 }
+
+	   fsSnoopStatsFwdGenQueries  OBJECT-TYPE
+	   SYNTAX      Counter32
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	   "Provides the statistics of IGMPv2 General Queries forwarded 
+	   by the snooping switch."
+	   ::= { fsSnoopStatsEntry 45 }
+
+	   fsSnoopStatsFwdGrpQueries  OBJECT-TYPE
+	   SYNTAX      Counter32
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	   "Provides the statistics of IGMPv2 Group Specific General 
+	   Queries forwarded by the snooping switch."
+	   ::= { fsSnoopStatsEntry 46 }
+
+-- ------------------------------------------------
+-- Port related Configuration
+-- ------------------------------------------------
+-- ---------------------------- 
+-- Snoop Port Config Table 
+-- ----------------------------
+
+       fsSnoopPortTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsSnoopPortEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This table contains Port-related configurable information.
+                This table is applicable only when the snooping module is 
+                operating in the default Mode. This table MUST NOT be 
+                configured when the snooping module is operating in the 
+                enhanced mode."
+         ::= { fsSnoopPort 1 } 
+
+       fsSnoopPortEntry OBJECT-TYPE 
+        SYNTAX      FsSnoopPortEntry 
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION 
+       "This table contains the list of parameters/attributes objects 
+             that can be configured on a port."
+        INDEX { fsSnoopPortIndex, 
+                  fsSnoopPortInetAddressType }
+        ::= { fsSnoopPortTable 1 }
+
+       FsSnoopPortEntry ::= SEQUENCE {
+           fsSnoopPortIndex                 InterfaceIndex,
+           fsSnoopPortInetAddressType       InetAddressType,
+           fsSnoopPortLeaveMode             INTEGER,
+           fsSnoopPortRateLimit             Unsigned32,
+           fsSnoopPortMaxLimitType          INTEGER,
+           fsSnoopPortMaxLimit              Unsigned32,
+           fsSnoopPortProfileId             Unsigned32,
+           fsSnoopPortMemberCnt             Unsigned32,
+           fsSnoopPortMaxBandwidthLimit     Unsigned32,
+           fsSnoopPortDropReports           INTEGER,
+           fsSnoopPortRowStatus             RowStatus
+         }
+
+      fsSnoopPortIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The interface index of the port."
+           ::= { fsSnoopPortEntry 1 }
+
+      fsSnoopPortInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current
+           DESCRIPTION 
+              "Inet Address Type corresponding to this interface configuration  
+               entry. This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopPortEntry 2 } 
+
+      fsSnoopPortLeaveMode OBJECT-TYPE 
+           SYNTAX      INTEGER { 
+                                   explicithosttrack (1),
+                                   fastleave (2),
+                                   normalleave (3) 
+                                 }
+           MAX-ACCESS    read-write
+           STATUS        current
+           DESCRIPTION
+              "Sets the mechanism to be used for processing the leave messages
+              in the down stream interface. 
+              
+              When this object is set to 'explicitHostTrack', then the leave 
+              messages are processed using the explicit host tracking 
+              mechanism.
+              When this object is set to 'fastLeave', the leave messages
+              are processed by the fast leave mechanism.
+              When this object is set to 'normalLeave', for every
+              leave message received, a group or group specific query is sent
+              on the interface.  
+              
+              This object can be configured only when
+              fsSnoopInstanceGlobalLeaveConfigLevel is set to portbased.
+              This object is applicable only for processing the igmp v2 leave 
+              messages. For igmpv3 reports, the explicit host tracking 
+              functionality is always performed for tracking the source 
+              registrations and it cannot be disabled (i.e.) configuration 
+              using this object has no effect."
+           DEFVAL { normalleave }
+           ::= { fsSnoopPortEntry 3 }
+
+       fsSnoopPortRateLimit OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+               "Configures the rate-limit for a downstream interface in 
+               units of the number of IGMP packets per second. By default, 
+               this object will hold the maximum value supported by an 
+               unsigned integer and will not rate limit any IGMP packets. 
+               The actual rate supported, however, will depend on what the 
+               system can support. If this object is configured as zero, then 
+               no IGMP packets will be processed on this interface."
+           DEFVAL { 4294967295 }
+              ::= { fsSnoopPortEntry 4 }
+
+      fsSnoopPortMaxLimitType OBJECT-TYPE 
+           SYNTAX      INTEGER { none(0), groups(1), channels(2) } 
+           MAX-ACCESS  read-write
+           STATUS      current 
+           DESCRIPTION 
+              "Indicates the type of limit to be applied on this interface. 
+               Setting as 'channels' indicates that the limit is set for 
+               channel (group, source) registrations whereas setting as 
+               'groups' indicates that the limit is set for groups.
+               The channel limit will be applied only for IGMPv3 Include &
+               Allow reports whereas the group limit will be applied for
+               all IGMP reports.
+               By default, this object has a value of 0 ('none') and no 
+               limiting is done i.e. the value of fsSnoopPortMaxLimit
+               is ignored when this object is set to 'none'."
+           DEFVAL { none }
+               ::= { fsSnoopPortEntry 5 } 
+
+      fsSnoopPortMaxLimit OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+              "Configures the maximum number of unique entries (channel or 
+               group) that can be learned simultaneously on this interface. 
+               The fsSnoopPortMaxLimitType must be set before configuring 
+               this object. However the Max-limit is configurable even if the 
+               limit type is 'none', but the limit won't be in effect unless 
+               the limit type is set as 'channels' or 'groups'. 
+
+               If fsSnoopPortMaxLimitType is 'channels', 
+               this limit applies to number of channels that can be joined 
+               on this interface. If fsSnoopPortMaxLimitType is 'groups', 
+               this limit applies to number of groups that can be joined on 
+               this interface.
+               
+               By default, this object will hold a value of zero and will 
+               not limit any IGMP packets as long as the value of 
+               fsSnoopPortMaxLimitType is set to 'none'. However, when
+               fsSnoopPortMaxLimitType is set to 'groups' or 'channels',
+               if this object has the value of zero, then no IGMP reports will
+               be processed on this interface.
+               The maximum value supported by this object is dependent on the 
+               maximum groups or channels registrations that the system can 
+               support."
+          DEFVAL { 0 }
+           ::= { fsSnoopPortEntry 6 }
+
+       fsSnoopPortProfileId	OBJECT-TYPE
+            SYNTAX      	Unsigned32
+                 MAX-ACCESS  	read-write	
+                 STATUS      	current 
+                 DESCRIPTION 
+                  "The multicast profile index configured for the downstream 
+                  interface. This profile contains a set of allowed or denied 
+                  rules which are to be applied for the IGMP packets received 
+                  through this downstream interface. By default, no profiles 
+                  are applied on the interface."
+                 DEFVAL { 0 }
+                   ::= { fsSnoopPortEntry 7 }
+
+       fsSnoopPortMemberCnt OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+              "Provides the total number of groups or channels active on the
+               interface at the given time."
+           ::= { fsSnoopPortEntry 8 }
+
+       fsSnoopPortMaxBandwidthLimit OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+              "Sets the Maximum bandwidth allowed on this port for Multicast.
+               The fsSnoopPortMaxLimitType must be set before configuring 
+               this object. If the fsSnoopPortMaxLimitType is 'channels', 
+               this limit applies to the bandwidth of channels going through 
+               the port. It means that both Source as well as Group will be 
+               considered for getting the configured bandwidth of multicast 
+               data. If the fsSnoopPortMaxLimitType is 'groups', only 
+               Group address will be considered for getting the configured 
+               bandwidth of multicast data. Whenever a join comes, the 
+               bandwidth corresponding to the joined channel or group, will be 
+               reserved on the port. No new joins will be accepted, if the 
+               reserved bandwidth gets greater that the configured 
+               MaxBandwidth."
+           ::= { fsSnoopPortEntry 9 }
+
+       fsSnoopPortDropReports OBJECT-TYPE
+           SYNTAX      INTEGER { allow(1), drop(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+              "This object decides whether to process or drop the
+              IGMP reports coming on this port."
+           DEFVAL { 1 }
+           ::= { fsSnoopPortEntry 10 }
+
+       fsSnoopPortRowStatus   OBJECT-TYPE 
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create 
+           STATUS     current 
+           DESCRIPTION 
+              "The status of a row in the Port Config table. Using this object, 
+              new entries can be created or existing entries can be removed 
+                 from the Port Config Table. "  
+           ::= { fsSnoopPortEntry 11 }
+
+
+-- ------------------------------------------------------------------ 
+-- Snoop Enhanced Port Config Table 
+-- ------------------------------------------------------------------ 
+
+       fsSnoopEnhPortTable OBJECT-TYPE 
+           SYNTAX      SEQUENCE OF FsSnoopEnhPortEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+               "This table contains Port-related configurable information.
+                This table is applicable only when the snooping module is 
+                operating in the enhanced Mode. This table MUST NOT be 
+                configured when the snooping module is operating in the 
+                default mode."
+             ::= { fsSnoopPort 2 } 
+
+      fsSnoopEnhPortEntry OBJECT-TYPE 
+          SYNTAX      FsSnoopEnhPortEntry 
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+               "This table contains the list of parameters/attributes objects that 
+               can be configured on an interface."
+          INDEX {
+                    fsSnoopEnhPortIndex,
+                    fsSnoopEnhPortInnerVlanId,
+                    fsSnoopEnhPortInetAddressType
+                   }
+          ::= { fsSnoopEnhPortTable 1 }
+
+      FsSnoopEnhPortEntry ::= SEQUENCE {
+            fsSnoopEnhPortIndex              InterfaceIndex,
+            fsSnoopEnhPortInnerVlanId        InnerVlanIndex,
+            fsSnoopEnhPortInetAddressType    InetAddressType,
+            fsSnoopEnhPortLeaveMode          INTEGER,
+            fsSnoopEnhPortRateLimit          Unsigned32,
+            fsSnoopEnhPortMaxLimitType       INTEGER,
+            fsSnoopEnhPortMaxLimit           Unsigned32,
+            fsSnoopEnhPortProfileId          Unsigned32,
+            fsSnoopEnhPortMemberCnt          Unsigned32,
+            fsSnoopEnhPortMaxBandwidthLimit  Unsigned32,
+            fsSnoopEnhPortDropReports        INTEGER,
+            fsSnoopEnhPortRowStatus          RowStatus
+      }
+
+      fsSnoopEnhPortIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The interface index of the port."
+           ::= { fsSnoopEnhPortEntry 1 }
+
+      fsSnoopEnhPortInnerVlanId OBJECT-TYPE
+           SYNTAX      InnerVlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The Inner VLAN Identifier."
+           ::= { fsSnoopEnhPortEntry 2 }
+
+      fsSnoopEnhPortInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current
+           DESCRIPTION 
+              "Inet Address Type corresponding to this interface configuration 
+               entry. This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopEnhPortEntry 3 } 
+
+      fsSnoopEnhPortLeaveMode OBJECT-TYPE 
+           SYNTAX      INTEGER { 
+                                   explicithosttrack (1),
+                                   fastleave (2),
+                                   normalleave (3) 
+                                 }
+           MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+              "Sets the mechanism to be used for processing the leave messages
+              in the down stream interface. 
+              
+              When this object is set to 'explicitHostTrack', then the leave 
+              messages are processed using the explicit host tracking 
+              mechanism.
+              When this object is set to 'fastLeave', the leave messages
+              are processed by the fast leave mechanism.
+              When this object is set to 'normalLeave', for every
+              leave message received, a group or group specific query is sent
+              on the interface.  
+              
+              This object can be configured only when
+              fsSnoopInstanceGlobalLeaveConfigLevel is set to portbased.
+              This object is applicable only for processing the igmp v2 leave 
+              messages. For igmpv3 reports, the explicit host tracking 
+              functionality is always performed for tracking the source 
+              registrations and it cannot be disabled.
+              For the v3 INCLUDE NONE reports the leave handling behavior is
+              similar to the v2 leave messages for the leave modes
+              'explicitHostTrack' and 'fastLeave'. For the leave mode
+              'normalLeave' query message is not sent on the interface
+              and only the host registered for the multicast group is removed"            DEFVAL { normalleave }
+            ::= { fsSnoopEnhPortEntry 4 }
+
+       fsSnoopEnhPortRateLimit OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+               "Configures the rate-limit for a downstream interface in 
+               units of the number of IGMP packets per second. By default, 
+               this object will hold the maximum value supported by an 
+               unsigned integer and will not rate limit any IGMP packets. 
+               The actual rate supported, however, will depend on what the 
+               system can support. If this object is configured as zero, then 
+               no IGMP packets will be processed on this interface."
+            DEFVAL { 4294967295 }
+               ::= { fsSnoopEnhPortEntry 5 }
+
+       fsSnoopEnhPortMaxLimitType OBJECT-TYPE 
+            SYNTAX      INTEGER { none(0), groups(1), channels(2) } 
+            MAX-ACCESS  read-write
+            STATUS      current 
+            DESCRIPTION 
+              "Indicates the type of limit to be applied on this interface. 
+               Setting as 'channels' indicates that the limit is set for 
+               channel (group, source) registrations whereas setting as 
+               'groups' indicates that the limit is set for groups. 
+               The channel limit will be applied only for IGMPv3 Include &
+               Allow reports whereas the group limit will be applied for
+               all IGMP reports.
+               By default, this object has a value of 0 ('none') and no 
+               limiting is done i.e. the value of fsSnoopEnhPortMaxLimit
+               is ignored when this object is set to 'none'."
+            DEFVAL { none }
+               ::= { fsSnoopEnhPortEntry 6 } 
+
+       fsSnoopEnhPortMaxLimit OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+              "Configures the maximum number of unique entries (channel or 
+               group) that can be learned simultaneously on this interface. 
+               The fsSnoopEnhPortMaxLimitType must be set before configuring 
+               this object. However the Max-limit is configurable even if the 
+               limit type is 'none', but the limit won't be in effect unless 
+               the limit type is set as 'channels' or 'groups'. 
+
+               If fsSnoopEnhPortMaxLimitType is 'channels', 
+               this limit applies to number of channels that can be joined 
+               on this interface. If fsSnoopEnhPortMaxLimitType is 'groups', 
+               this limit applies to number of groups that can be joined on 
+               this interface.
+               
+               By default, this object will hold a value of zero and will 
+               not limit any IGMP packets as long as the value of 
+               fsSnoopEnhPortMaxLimitType is set to 'none'. However, when
+               fsSnoopEnhPortMaxLimitType is set to 'groups' or 'channels',
+               if this object has the value of zero, then no IGMP reports will
+               be processed on this interface.
+               The maximum value supported by this object is dependent on the 
+               maximum groups or channels registrations that the system can 
+               support."
+          DEFVAL { 0 }
+               ::= { fsSnoopEnhPortEntry 7 }
+
+       fsSnoopEnhPortProfileId	OBJECT-TYPE
+           SYNTAX       Unsigned32
+           MAX-ACCESS   read-write
+           STATUS       current 
+           DESCRIPTION 
+             "The multicast profile index configured for the downstream 
+                interface. This profile contains a set of allowed or denied 
+                rules which are to be applied for the IGMP packets received 
+                through this downstream interface. By default, no profiles 
+                are applied on the interface."
+           DEFVAL { 0 }
+             ::= { fsSnoopEnhPortEntry 8 }
+
+        fsSnoopEnhPortMemberCnt OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+               "Provides the total number of groups or channels active on the
+                interface at the given time."
+            ::= { fsSnoopEnhPortEntry 9 }
+
+        fsSnoopEnhPortMaxBandwidthLimit OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+              "Sets the Maximum bandwidth allowed on this port for Multicast.
+               The fsSnoopEnhPortMaxLimitType must be set before configuring 
+               this object. If the fsSnoopEnhPortMaxLimitType is 'channels', 
+               this limit applies to the bandwidth of channels going through 
+               the port. It means that both Source as well as Group will be 
+               considered for getting the configured bandwidth of multicast 
+               data. If the fsSnoopEnhPortMaxLimitType is 'groups', only 
+               Group address will be considered for getting the configured 
+               bandwidth of multicast data. Whenever a join comes, the 
+               bandwidth corresponding to the joined channel or group, will be 
+               reserved on the port. No new joins will be accepted, if the 
+               reserved bandwidth gets greater that the configured 
+               MaxBandwidth."
+            ::= { fsSnoopEnhPortEntry 10 }
+
+        fsSnoopEnhPortDropReports OBJECT-TYPE
+            SYNTAX      INTEGER { allow(1), drop(2) }
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+               "This object decides whether to process or drop the
+               IGMP reports coming on this port."
+            DEFVAL { 1 }
+            ::= { fsSnoopEnhPortEntry 11 }
+
+       fsSnoopEnhPortRowStatus   OBJECT-TYPE 
+            SYNTAX      RowStatus
+            MAX-ACCESS  read-create 
+            STATUS      current 
+            DESCRIPTION 
+              "The status of a row in the Port Config table. Using this object, 
+              new entries can be created or existing entries can be removed 
+                from the Port Config Table. "  
+            ::= { fsSnoopEnhPortEntry 12 }
+
+-- ------------------------------------------------------------------ 
+-- Snoop Proxy Upstream Router Port Table
+-- ------------------------------------------------------------------ 
+
+       fsSnoopRtrPortTable OBJECT-TYPE 
+            SYNTAX      SEQUENCE OF FsSnoopRtrPortEntry 
+            MAX-ACCESS  not-accessible 
+            STATUS      current 
+            DESCRIPTION 
+               "This table contains upstream Router Port-related
+               configurable information. Router port entry in this table 
+               will be created when the router port is either learnt 
+               dynamically or when the router port is statically 
+               configured through 'fsSnoopVlanRtrPortList'.Only static
+               router ports will be restored during save restore."
+            ::= { fsSnoopPort 3 } 
+
+       fsSnoopRtrPortEntry OBJECT-TYPE 
+            SYNTAX          FsSnoopRtrPortEntry 
+            MAX-ACCESS      not-accessible 
+            STATUS          current 
+            DESCRIPTION 
+               "This table contains the upstream router port operating
+                and configured version of IGMP."
+
+            INDEX {
+                    fsSnoopRtrPortIndex,
+                    fsSnoopRtrPortVlanId,
+                    fsSnoopRtrPortInetAddressType
+                   }
+             ::= { fsSnoopRtrPortTable 1 }
+
+       FsSnoopRtrPortEntry ::= SEQUENCE {
+            fsSnoopRtrPortIndex              InterfaceIndex,
+            fsSnoopRtrPortVlanId             VlanIndex,
+            fsSnoopRtrPortInetAddressType    InetAddressType,
+            fsSnoopRtrPortOperVersion        INTEGER,
+            fsSnoopRtrPortCfgOperVersion     INTEGER,
+            fsSnoopOlderQuerierInterval      Integer32,
+            fsSnoopV3QuerierInterval         Integer32
+       }
+
+      fsSnoopRtrPortIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The interface index of the port which is defined
+                as an upstream router port."
+           ::= { fsSnoopRtrPortEntry 1 }
+
+      fsSnoopRtrPortVlanId OBJECT-TYPE
+           SYNTAX      VlanIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "The VLAN Identifier for the upstream router port"
+           ::= { fsSnoopRtrPortEntry 2 }
+
+      fsSnoopRtrPortInetAddressType OBJECT-TYPE 
+           SYNTAX      InetAddressType 
+           MAX-ACCESS  not-accessible 
+           STATUS      current
+           DESCRIPTION 
+              "Inet Address Type corresponding to  the global configuration 
+               entry. This indicates whether the row is for IGMP/MLD Snooping"
+           ::= { fsSnoopRtrPortEntry 3 } 
+
+       fsSnoopRtrPortOperVersion OBJECT-TYPE 
+            SYNTAX      INTEGER { v1(1), v2(2), v3(3) }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "Indicates the operating version of the IGMP Proxy 
+               on the upstream router port. Operating version is used by the
+               Proxy to send consolidated reports on the router ports.
+               Operating version of the router port will change based on the 
+               the version of query messages received on that port.
+               Otherwise it will be set to the configured version of IGMP on the
+               router port. 
+               The default operating mode is IGMP version 3
+               i.e, V3(3) or MLD version 2 i.e, V2(2)."
+            DEFVAL { 3 }
+            ::= { fsSnoopRtrPortEntry 4 }
+
+       fsSnoopRtrPortCfgOperVersion OBJECT-TYPE 
+            SYNTAX      INTEGER { v1(1), v2(2), v3(3) }
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+            "Indicates the configured version of the IGMP Proxy 
+            on the upstream router port.The default operating mode is
+            IGMP version 3 i.e, V3(3) or MLD version 2 i.e, V2(2). The
+            'fsSnoopRtrPortCfgOperVersion' should be configured on the
+            basis of the router version present in the router port.The 
+            value configured for static router alone will be stored 
+            and restored."
+            DEFVAL { 3 }
+            ::= { fsSnoopRtrPortEntry 5 }
+
+      fsSnoopOlderQuerierInterval OBJECT-TYPE 
+            SYNTAX     Integer32 (60..600) 
+            MAX-ACCESS read-only 
+            STATUS     current 
+            DESCRIPTION 
+            "The time interval after which proxy assumes that there are no 
+            v1/v2 routers present on the upstream port.While OlderQuerierTimer is 
+            running, proxy will reply to all queries with consolidated
+            v1/v2 (oper version) reports.   
+            On time-out, if v2/v3 queriers are not present and if the port 
+            is a dynamically learnt port, then it will be purged. 
+            Else, proxy will reply to all the queries with consolidated
+            reports with the new oper version (v2/v3)."
+            DEFVAL { 125 }
+            ::= { fsSnoopRtrPortEntry 6 } 
+
+     fsSnoopV3QuerierInterval OBJECT-TYPE 
+            SYNTAX     Integer32
+            MAX-ACCESS read-only 
+            STATUS     current 
+            DESCRIPTION 
+            "The time interval after which proxy assumes that there are no 
+            IGMPv3 routers present on the upstream port.While V3QuerierTimer is 
+            running, proxy will reply to all queries with consolidated 
+            v1/v2/v3 (oper version) reports.
+            On time-out, if v1/v2 queriers are not present and if the port
+            is a dynamically learnt upstream port, then the port will be purged.
+            Else, proxy will reply to all the queries with consolidated 
+            reports with the new oper version (v1/v2). " 
+            ::= { fsSnoopRtrPortEntry 7 }
+-------------------------------------------------------- 
+--  Snoop Router Port Table  objects Extension Table  
+-- --------------------------------------------------------
+ 
+      fsXSnoopRtrPortTable OBJECT-TYPE 
+          SYNTAX      SEQUENCE OF FsXSnoopRtrPortEntry
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This augment table contains additional objects
+              for fsSnoopRtrPortTable."
+          ::= { fsSnoopPort 4 } 
+ 
+      fsXSnoopRtrPortEntry OBJECT-TYPE 
+          SYNTAX      FsXSnoopRtrPortEntry
+          MAX-ACCESS  not-accessible 
+          STATUS      current 
+          DESCRIPTION 
+             "This table contains management information applicable to 
+	      an interface." 
+          AUGMENTS { fsSnoopRtrPortEntry }
+          ::= { fsXSnoopRtrPortTable 1 } 
+ 
+      FsXSnoopRtrPortEntry ::= 
+          SEQUENCE { 
+             fsXSnoopRtrPortRowStatus 
+                 RowStatus
+	  } 
+  
+      fsXSnoopRtrPortRowStatus OBJECT-TYPE 
+           SYNTAX      RowStatus
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+               "The Row status of this entry which 
+		is used only in two scenarios.
+		1. CREATE_AND_WAIT
+		2. DESTROY.
+		Where '1' will be used during port creation 
+		and '2' will be used during port deletion." 
+           ::= { fsXSnoopRtrPortEntry 1 } 
+ 
+ 
+-- END OF Snoop Router Port Extension TABLE--------------------- 
+
+
+-- The Trap objects Group 
+-- -------------------------------------------------------------
+
+       fsSnoopTrapObjectsTable OBJECT-TYPE
+           SYNTAX SEQUENCE OF FsSnoopTrapObjectsEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+               "This table is used to notify the error occurred, when an NPAPI call  
+                invoked from the Snooping module fails, in the form of a trap"
+           ::= { fsSnoopTrapObjects 5 }
+       
+       fsSnoopTrapObjectsEntry OBJECT-TYPE
+           SYNTAX      FsSnoopTrapObjectsEntry 
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               " This entry is used to store the notification information"
+           AUGMENTS    { fsSnoopVlanIpFwdEntry }
+           ::= { fsSnoopTrapObjectsTable 1 }
+       
+       FsSnoopTrapObjectsEntry ::=
+            SEQUENCE {
+                fsSnoopTrapHwErrType INTEGER
+            }
+
+       fsSnoopTrapHwErrType OBJECT-TYPE
+           SYNTAX      INTEGER {
+                          hardwareCreate(0),
+                          hardwareDelete(1),
+                          hardwarePortAdd(2),
+                          hardwarePortDelete(3)
+                          }
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+              "Indicates the type of hardware call that failed."
+           ::= { fsSnoopTrapObjectsEntry 1 }
+       
+-- -------------------------------------------------------------
+-- The Trap Notifications 
+-- -------------------------------------------------------------
+
+      fsSnoopTraps OBJECT IDENTIFIER ::= { fsSnoopNotifications 0 }
+      
+      fsSnoopHwFailureTrap NOTIFICATION-TYPE
+             OBJECTS {
+                fsSnoopTrapHwErrType
+                     }
+             STATUS             current
+             DESCRIPTION
+              "Generated when an NPAPI call invoked from the snooping module fails"
+        ::= { fsSnoopTraps 1 }
+      
+---------------------------------------------------- 
+END 

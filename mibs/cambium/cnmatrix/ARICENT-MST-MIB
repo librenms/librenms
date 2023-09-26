@@ -1,0 +1,3104 @@
+-- Copyright (C) 2016 Aricent. All Rights Reserved.
+
+ARICENT-MST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32,
+    enterprises, Counter32, TimeTicks, NOTIFICATION-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, MacAddress,
+    TruthValue, RowStatus        FROM SNMPv2-TC;
+
+
+futureMstMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION "||||||" 
+    REVISION "201209050000Z"
+    DESCRIPTION "||||||" 
+::= { enterprises futuresoftware(2076) 80}
+
+VlanId ::= TEXTUAL-CONVENTION 
+    DISPLAY-HINT  "d"    
+    STATUS      current 
+    DESCRIPTION 
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      Integer32 (1..4094)
+
+BridgeId ::= TEXTUAL-CONVENTION
+      STATUS  current
+      DESCRIPTION
+      " Identifier of Bridge in 8 byte format."
+        SYNTAX          OCTET STRING (SIZE (8))
+
+Timeout ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d4"
+    STATUS       current
+    DESCRIPTION
+                " Time out value in 4 byte."
+    SYNTAX       Integer32
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A simple status value for the object." 
+    SYNTAX      INTEGER { enabled(1), disabled(2) } 
+      
+      
+dot1sFutureMst     OBJECT IDENTIFIER   ::= { futureMstMIB 1 }
+dot1sFsMstTrapsControl OBJECT IDENTIFIER ::= { futureMstMIB 2 }
+dot1sFutureMstTraps OBJECT IDENTIFIER ::= { futureMstMIB 3 }
+
+-- dot1qFutureMst group 
+
+-- SCALAR BEGIN 
+
+fsMstSystemControl OBJECT-TYPE
+   SYNTAX      INTEGER { start(1), shutdown(2) } 
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The administrative shutdown status requested by management for the MST  
+      feature. The value start (1) indicates that MST should be active in 
+      the device on all ports. The value shutdown (2) indicates that MST 
+      should be shutdown in the device on all ports. All memory should 
+      be released on all ports."
+   ::= { dot1sFutureMst 1 }  
+
+fsMstModuleStatus OBJECT-TYPE
+   SYNTAX      EnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The administrative status requested by management for the MST  
+      feature. The value enabled(1) indicates that Mst should be enabled  
+      in the device on all ports. The value disabled(2) indicates that 
+      Mst should be disabled in the device on all ports. The object can 
+      be set to enabled(1) if and only if, fsMstSystemControl set to start."
+   ::= { dot1sFutureMst 2 }  
+
+fsMstMaxMstInstanceNumber OBJECT-TYPE
+   SYNTAX      Integer32 (1..64)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Maximum number of spanning trees to be allowed. An user may limit 
+      the number of Spanning Tree instances to be allowed in the Bridge. 
+      The value reflects the max number of active MSTIs that can be created.
+      It does not include the special MSTID, the PTETID, used to identify
+      VIDs used by Ethernet Switched Paths (ESPs)."
+   ::= { dot1sFutureMst 3 }  
+
+fsMstNoOfMstiSupported OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Indicates Maximum number of spanning tree Instances supported."
+   ::= { dot1sFutureMst 4 } 
+
+fsMstMaxHopCount OBJECT-TYPE
+   SYNTAX      Integer32 (600..4000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicates the Maximum Hop Count value. One-hundredth of the
+      configured value will be set as Max Hop Count.
+      An agent may return a badValue error if a set is attempted
+      to a value which is not a multiples of hundred."
+   DEFVAL { 2000 }
+   ::= { dot1sFutureMst 5 }  
+
+fsMstBrgAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The MAC address used by this bridge when it must
+          be referred to in a unique fashion.   It is
+          recommended that this be the numerically smallest
+          MAC address of all ports that belong to this
+          bridge.  However it is only required to be unique.
+          When concatenated with fsMstCistBridgePriority or 
+          fsMstMstiBridgePriority a unique BridgeIdentifier 
+          is formed which is used in the Spanning Tree Protocol."
+   ::= { dot1sFutureMst 6 } 
+
+fsMstCistRoot OBJECT-TYPE
+   SYNTAX      BridgeId  
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The bridge identifier of the Root of the common spanning
+         tree as determined by the Spanning Tree Protocol
+         as executed by this node.  This value is used as
+         the CIST Root Identifier parameter in all Configuration
+         Bridge PDUs originated by this node."
+   ::= { dot1sFutureMst 7 } 
+
+fsMstCistRegionalRoot OBJECT-TYPE
+   SYNTAX      BridgeId  
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The bridge identifier of the Root of the Multiple
+         spanning tree region as determined by the Spanning Tree
+         Protocol as executed by this node.  This value is used as
+         the CIST Regional Root Identifier parameter in all Configuration
+         Bridge PDUs originated by this node."
+   ::= { dot1sFutureMst 8 } 
+
+fsMstCistRootCost OBJECT-TYPE
+   SYNTAX      Integer32 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The Cost of the path to the CIST Root as seen 
+        from this bridge."
+   ::= { dot1sFutureMst 9 } 
+
+fsMstCistRegionalRootCost OBJECT-TYPE
+   SYNTAX      Integer32 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The Cost of the path to the CIST Regional Root 
+        as seen from this bridge."
+   ::= { dot1sFutureMst 10 } 
+
+fsMstCistRootPort OBJECT-TYPE
+   SYNTAX      Integer32  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "The Port Number of the Port which offers the lowest    
+       path cost from this bridge to the CIST Root Bridge."
+   ::= { dot1sFutureMst 11 } 
+
+fsMstCistBridgePriority OBJECT-TYPE
+   SYNTAX      Integer32 (0..61440) 
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The Value of the writable portion of the Bridge
+        Identifier comprising of the first two octets.
+        The values that are set for Bridge Priority must be 
+        in steps of 4096."
+   DEFVAL {32768}
+   ::= { dot1sFutureMst 12 } 
+
+fsMstCistBridgeMaxAge OBJECT-TYPE
+   SYNTAX      Timeout (600..4000)  
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The value that all bridges use for MaxAge when
+         this bridge is acting as the root. The granularity 
+         of this timer is specified to be 1 second.
+         An agent may return a badValue error if a set is
+         attempted to a value which is not a whole number
+         of seconds."
+   DEFVAL {2000}
+   ::= { dot1sFutureMst 13 } 
+
+fsMstCistBridgeForwardDelay OBJECT-TYPE
+   SYNTAX      Timeout (400..3000)  
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "The value that all bridges use for ForwardDelay
+         when this bridge is acting as the root.  Note that
+         802.1D specifies that the range for this
+         parameter is related to the value of
+         BridgeMaxAge.  The granularity of this
+         timer is specified to be 1 second.
+         An agent may return a badValue error if a set is
+         attempted to a value which is not a whole number
+         of seconds."
+   DEFVAL {1500}
+   ::= { dot1sFutureMst 14 } 
+
+fsMstCistHoldTime OBJECT-TYPE
+   SYNTAX      Integer32 
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+	 "This time value determines the interval length
+	 during which no more than two Configuration bridge
+	 PDUs shall be transmitted by this node, in units
+	 of hundredths of a second."
+   ::= { dot1sFutureMst 15 } 
+
+fsMstCistMaxAge OBJECT-TYPE
+   SYNTAX      Timeout
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+         "The maximum age of Spanning Tree Protocol
+          information learned from the network on any port
+          before it is discarded, in units of hundredths of
+          a second.  This is the actual value that this
+          bridge is currently using."
+   ::= { dot1sFutureMst 16 } 
+
+fsMstCistForwardDelay OBJECT-TYPE
+   SYNTAX      Timeout
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+   	  "This time value, measured in units of hundredths
+	   of a second, controls how fast a port changes its
+	   spanning state when moving towards the Forwarding
+	   state.  The value determines how long the port
+	   stays in a particular state before moving to the
+	   next state."
+   ::= { dot1sFutureMst 17 } 
+
+fsMstMstpUpCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times MSTP Module has been enabled."
+   ::= { dot1sFutureMst 18 } 
+
+fsMstMstpDownCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times MSTP Module has been disabled."
+   ::= { dot1sFutureMst 19 } 
+
+fsMstPathCostDefaultType OBJECT-TYPE
+SYNTAX      INTEGER {
+               stp8021d1998(1),
+               stp8021t2001(2)
+            }
+   MAX-ACCESS  read-write 
+   STATUS      obsolete
+   DESCRIPTION
+        "********* THIS OBJECT IS OBSOLETE **********
+        The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge.  A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+   ::= { dot1sFutureMst 20 } 
+
+fsMstTrace OBJECT-TYPE
+   SYNTAX      Integer32 (0..255) 
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+      "This object is used to enable Trace Statements in the MSTP
+      Module.
+
+      A FOUR BYTE integer is used for enabling the level of tracing. 
+      Each BIT in the four byte integer, represents a particular 
+      level of Trace. 
+
+      The mapping between the bit positions & the level of trace is 
+      as follows: 
+      0 - Init and Shutdown Traces
+      1 - Management Traces
+      2 - Data Path Traces
+      3 - Control Plane Traces
+      4 - Packet Dump Traces
+      5 - Traces related to All Resources except Buffers
+      6 - All Failure Traces
+      7 - Buffer Traces
+
+      The remaining bits are unused. Combination of trace levels are 
+      also allowed.
+
+      For example if the bits 0 and 1 are set, then the Trace
+      statements related to Init-Shutdown and management 
+      will be printed.
+
+      The user has to enter the corresponding INTEGER VALUE for the
+      bits set. For example if bits 0 and 1 are to be set then user has
+      to give the value for this object as 3.
+      
+      Setting the Trace Option to any value will cause the Debug Option
+      to be set to 0 (i.e.) the Trace Option and Debug Option are mutually
+      exclusive."
+      
+      DEFVAL  { 0 }
+   ::= { dot1sFutureMst 21 } 
+
+fsMstDebug OBJECT-TYPE
+   SYNTAX      Integer32 (0..524287)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is used to enable Debug Statements in the MSTP
+      Module.
+
+      A FOUR BYTE integer is used for enabling the level of debugging. 
+      Each BIT in the four byte integer, represents a particular 
+      level of Debug. 
+
+      The mapping between the bit positions & the level of debug is 
+      as follows: 
+      0 - Init and Shutdown Debug statements
+      1 - Management Debug statements
+      2 - Memory related Debug statements
+      3 - BPDU related Debug statements
+      4 - Event Handling Debug statements
+      5 - Timer Module Debug statements
+      6 - Port Information SEM Debug statements
+      7 - Port Receive SEM Debug statements (valid in the case of MSTP alone)
+      8 - Role Selection SEM Debug statements
+      9 - Role Transition SEM Debug statements
+     10 - State Transition SEM Debug statements
+     11 - Protocol Migration SEM Debug statements
+     12 - Topology Change SEM Debug statements
+     13 - Port Transmit SEM Debug statements
+     14 - Bridge Detection SEM Debug statements
+     15 - All Failure Debug statements
+     16 - Redundancy code flow Debug statements
+     17 - State Machine variable changes Debug statements
+     18 - Port Receive Pseudo Information SEM Debug statements
+
+      The remaining bits are unused. Combinations of debug levels are 
+      also allowed.
+
+      For example, if the bits 0 and 1 are set, then the Debug
+      statements related to Init-Shutdown and management 
+      will be printed.
+
+      The user has to enter the corresponding INTEGER VALUE for the
+      bits set. For example, if bits 0 and 1 are to be set then user has
+      to give the value for this object as 3.
+      
+      Setting the Debug Option to any value will cause the Trace Option
+      to be set to 0 (i.e.) the Trace Option and Debug Option are mutually
+      exclusive."
+      DEFVAL  { 0 }
+   ::= { dot1sFutureMst 22 } 
+
+fsMstForceProtocolVersion OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  stpCompatible(0),
+                  rstp(2),
+                  mstp(3)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+	"The version of Spanning Tree Protocol the bridge is
+	currently running.  The value 'stpCompatible(0)'
+	indicates the Spanning Tree Protocol specified in
+	IEEE 802.1D and 'rstp(2)' indicates the Rapid Spanning
+	Tree Protocol specified in IEEE 802.1w and 'mstp(3)'
+	indicates the Multiple Spanning Tree Protocol Specified
+	in IEEE 802.1s." 
+
+   DEFVAL { mstp }
+   ::= { dot1sFutureMst 23 } 
+
+fsMstTxHoldCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used by the Port Transmit state machine to limit
+         the maximum transmission rate."
+    DEFVAL  { 6 }
+   ::= { dot1sFutureMst 24 } 
+
+fsMstMstiConfigIdSel OBJECT-TYPE
+   SYNTAX      Integer32 (0..255) 
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+      "The Configuration Identifier Format Selector used 
+       by the Bridge. This has a fixed value of 0 to indicate
+       RegionName, RegionVersion are specified as in Standard."
+   ::= { dot1sFutureMst 25 } 
+
+fsMstMstiRegionName OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE (0..32))
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+      "The Name for the Region's configuration. By Default 
+       Region Name will be equal to the Bridge Mac Address."
+   ::= { dot1sFutureMst 26 } 
+
+fsMstMstiRegionVersion OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write 
+   STATUS      current
+   DESCRIPTION
+      "Version of the MST Region."
+   ::= { dot1sFutureMst 27 } 
+
+fsMstMstiConfigDigest OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE (0..32))
+   MAX-ACCESS  read-only 
+   STATUS      current
+   DESCRIPTION
+      "The Configuration Digest value for this Region."
+   ::= { dot1sFutureMst 28 } 
+
+fsMstBufferOverFlowCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times Buffer overflows/failures have occurred.
+        A Trap is generated on the occurence of this event." 
+   ::= { dot1sFutureMst 29 } 
+
+fsMstMemAllocFailureCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times memory allocation failures have occurred.
+        A Trap is generated on the occurrence of this event." 
+   ::= { dot1sFutureMst 30 } 
+
+fsMstRegionConfigChangeCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times a Region Configuration Identifier Change 
+	      was detected. 
+         A Trap is generated on the occurence of this event." 
+   ::= { dot1sFutureMst 31 } 
+
+fsMstCistBridgeRoleSelectionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  initbridge (0),
+                  roleselection (1)
+               }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Selection State Machine          
+           of this bridge in Common Spanning Tree context."           
+   ::= { dot1sFutureMst 32 } 
+
+fsMstCistTimeSinceTopologyChange OBJECT-TYPE
+   SYNTAX      TimeTicks 
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The time (in hundredths of a second) since the
+         TcWhile Timer for any port in this Bridge was 
+         non-zero for Common Spanning Tree context."
+   ::= { dot1sFutureMst 33 } 
+
+fsMstCistTopChanges OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times that there have been at least
+         one non-zero TcWhile Timer on this Bridge for Common
+         Spanning Tree context."
+   ::= { dot1sFutureMst 34 } 
+
+fsMstCistNewRootBridgeCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times this Bridge has detected a Root
+          Bridge change for Common Spanning Tree context.
+          A Trap is generated on the occurrence of this event."
+   ::= { dot1sFutureMst 35 } 
+
+fsMstCistHelloTime OBJECT-TYPE
+   SYNTAX      Timeout
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+           "This time value, measured in units of hundredths
+           of a second, specifies the amount of time between
+           the transmission of configuration BPDUs by this node
+           on any port when it is the root of the spanning tree 
+           or trying to become so."
+   ::= { dot1sFutureMst 36 } 
+
+fsMstCistBridgeHelloTime OBJECT-TYPE
+   SYNTAX      Timeout (100|200)  
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write  
+   STATUS      current
+   DESCRIPTION
+           "The amount of time between the transmission of
+           Configuration bridge PDUs by this node in units 
+           of hundredths of a second."
+      ::= { dot1sFutureMst 37 }
+
+-- SCALAR END 
+
+-- -----------------------------------------------------------------
+-- Future Mst Multiple Spanning Tree Instance Bridge Table
+-- -----------------------------------------------------------------
+
+fsMstMstiBridgeTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF FsMstMstiBridgeEntry      
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION
+      "Table containing Bridge Information specific to Spanning 
+       Tree Instance."
+   ::= { dot1sFutureMst 38 } 
+ 
+fsMstMstiBridgeEntry OBJECT-TYPE
+   SYNTAX      FsMstMstiBridgeEntry       
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Entry indicating the Bridge Information."
+   INDEX { fsMstMstiInstanceIndex }
+   ::= { fsMstMstiBridgeTable 1 }
+
+FsMstMstiBridgeEntry ::=
+   SEQUENCE {
+      fsMstMstiInstanceIndex 
+            Integer32,
+      fsMstMstiBridgeRegionalRoot 
+            BridgeId,
+      fsMstMstiBridgePriority 
+            Integer32,
+      fsMstMstiRootCost 
+            Integer32,
+      fsMstMstiRootPort 
+            Integer32,
+      fsMstMstiTimeSinceTopologyChange 
+            TimeTicks,
+      fsMstMstiTopChanges 
+            Counter32,
+      fsMstMstiNewRootBridgeCount 
+            Counter32,
+      fsMstMstiBridgeRoleSelectionSemState 
+            INTEGER,
+      fsMstInstanceUpCount 
+            Counter32,
+      fsMstInstanceDownCount 
+            Counter32,
+      fsMstOldDesignatedRoot 
+            BridgeId
+   }
+
+fsMstMstiInstanceIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..64|4094)
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "Spanning Tree Instance to which the information belongs.
+      The special MSTID of 4094, known as the PTETID, identifies VIDs 
+      that are used by Ethernet Switched Paths (ESPs)."
+   ::= { fsMstMstiBridgeEntry 1 }
+
+fsMstMstiBridgeRegionalRoot OBJECT-TYPE
+   SYNTAX      BridgeId  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "MSTI Regional Root Identifier value for the Instance. This value 
+       is used as the MSTI Regional Root Identifier parameter in all
+       Configuration Bridge PDUs originated by this node."
+   ::= { fsMstMstiBridgeEntry 2 }
+
+fsMstMstiBridgePriority OBJECT-TYPE
+   SYNTAX      Integer32 (0..61440) 
+   MAX-ACCESS  read-write     
+   STATUS      current 
+   DESCRIPTION 
+      "The writable portion of the MSTI Bridge Identifier.
+       comprising of the first two octets.
+       The values that are set for Bridge Priority must be 
+       in steps of 4096."
+   DEFVAL {32768}
+   ::= { fsMstMstiBridgeEntry 3 }
+
+fsMstMstiRootCost OBJECT-TYPE
+   SYNTAX      Integer32  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "The Cost of the path to the MSTI Regional Root as seen 
+       by this bridge." 
+   ::= { fsMstMstiBridgeEntry 4 }
+
+fsMstMstiRootPort OBJECT-TYPE
+   SYNTAX      Integer32  
+   MAX-ACCESS  read-only      
+   STATUS      current 
+   DESCRIPTION 
+      "The Port Number of the Port which offers the lowest    
+       path cost from this bridge to the MSTI Region Root Bridge."
+   ::= { fsMstMstiBridgeEntry 5 }
+
+fsMstMstiTimeSinceTopologyChange OBJECT-TYPE
+   SYNTAX      TimeTicks 
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The time (in hundredths of a second) since the
+         TcWhile Timer for any port in this Bridge was 
+         non-zero for this spanning tree instance."
+   ::= { fsMstMstiBridgeEntry 6 }
+
+fsMstMstiTopChanges OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times that there have been atleast
+         one non-zero TcWhile Timer on this Bridge for this
+         spanning tree instance."
+   ::= { fsMstMstiBridgeEntry 7 }
+
+fsMstMstiNewRootBridgeCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+         "The number of times this Bridge has detected a Root
+          Bridge change for this spanning tree instance.
+          A Trap is generated on the occurrence of this event."
+   ::= { fsMstMstiBridgeEntry 8 }
+
+fsMstMstiBridgeRoleSelectionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  initbridge (0),
+                  roleselection (1)
+               }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Selection State Machine          
+           for this spanning tree instance for this bridge."           
+   ::= { fsMstMstiBridgeEntry 9 }
+
+fsMstInstanceUpCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times a new spanning tree instance has
+         been created. 
+         A Trap is generated on the occurrence of this event."
+   ::= { fsMstMstiBridgeEntry 10 }
+
+fsMstInstanceDownCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times a spanning tree instance has
+         been deleted.
+         A Trap is generated on the occurrence of this event."
+   ::= { fsMstMstiBridgeEntry 11 }
+
+fsMstOldDesignatedRoot OBJECT-TYPE
+       SYNTAX  BridgeId
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The bridge identifier of the old root of the spanning
+               tree instance as determined by the Spanning Tree Protocol
+               as executed by this node. "
+       ::= { fsMstMstiBridgeEntry 12 }
+
+-- -----------------------------------------------------------------
+-- Future Mst VlanId to Instance Mapping Table               
+-- -----------------------------------------------------------------
+
+fsMstVlanInstanceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMstVlanInstanceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "This table contains one entry for each instance of MSTP." 
+     ::= { dot1sFutureMst 39 }
+
+fsMstVlanInstanceMappingEntry OBJECT-TYPE
+      SYNTAX      FsMstVlanInstanceMappingEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A conceptual row containing the status of the MSTP instance."
+      INDEX  { fsMstInstanceIndex }
+      ::= { fsMstVlanInstanceMappingTable 1 }
+
+FsMstVlanInstanceMappingEntry ::= 
+   SEQUENCE {
+       fsMstInstanceIndex  
+            Integer32,
+       fsMstMapVlanIndex 
+            VlanId,
+       fsMstUnMapVlanIndex 
+            VlanId,
+       fsMstSetVlanList 
+            OCTET STRING,
+       fsMstResetVlanList 
+            OCTET STRING,
+       fsMstInstanceVlanMapped 
+            OCTET STRING,
+       fsMstInstanceVlanMapped2k 
+            OCTET STRING,
+       fsMstInstanceVlanMapped3k 
+            OCTET STRING,
+       fsMstInstanceVlanMapped4k 
+            OCTET STRING
+   }
+
+fsMstInstanceIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..64|4094)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An arbitrary integer within the range from 1 to the value of
+           Max Instance Number that uniquely identifies an instance. In
+           a Bridge that supports PBB-TE, the special MSTID of 4094, the
+           PTETID, identifies VIDs that can be used by Ethernet Switched
+           Paths (ESPs). ESPs are provisioned separately by any external agent
+           and do not use spanning tree."
+      ::= { fsMstVlanInstanceMappingEntry 1 }
+
+fsMstMapVlanIndex OBJECT-TYPE
+      SYNTAX        VlanId
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION 
+          "The VlanId will get mapped to the spanning tree instance 
+           specified. All the Instance Specific information for the 
+           Member ports of the Vlan will be created.This object is 
+           used only for SET operation.GET Operation returns null values.
+           If the VlanId to Instance Mapping has to be known then any 
+           one of the VlanMapped object should be used."
+      ::= { fsMstVlanInstanceMappingEntry 2 }
+
+fsMstUnMapVlanIndex OBJECT-TYPE
+      SYNTAX        VlanId
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION 
+          "The VlanId will get unmapped from spanning tree instance
+          to which it is mapped. All the Instance Specific information
+          for the Member ports of the Vlan will get released.This object 
+          is used only for SET operation.GET Operation returns null values."
+      ::= { fsMstVlanInstanceMappingEntry 3 }
+
+fsMstSetVlanList OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..512))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+   	 "A string of octets containing one bit per VLAN. The
+	  first octet corresponds to VLANs with VlanIndex values
+	  1 through 8; the second octet to VLANs 9 through
+	  16 etc.  The most significant bit of each octet
+	  corresponds to the lowest VlanIndex value in that octet.
+	  The set of vlans configured by management to map for this 
+	  Instance.  If the VlanId to Instance Mapping has to be known
+      then any one of the VlanMapped object should be used.If a 
+      vlan is already mapped to this Instance, it may not be mapped 
+      again. This object is used only for SET operation.
+      GET Operation returns null values."
+    ::= { fsMstVlanInstanceMappingEntry 4 }
+
+fsMstResetVlanList OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..512))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+   	 "A string of octets containing one bit per VLAN. The
+	  first octet corresponds to VLANs with VlanIndex values
+	  1 through 8; the second octet to VLANs 9 through
+	  16 etc.  The most significant bit of each octet
+	  corresponds to the lowest VlanIndex value in that octet.
+	  The set of vlans configured by management to unmap from this 
+	  Instance. A vlan may not be unmapped from this instance if 
+	  it is not already mapped to this Instance. This object is
+      used only for SET operation.GET Operation returns null values."
+    ::= { fsMstVlanInstanceMappingEntry 5 }
+
+fsMstInstanceVlanMapped OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN. The
+            first octet corresponds to VLANs with VlanIndex values
+            1 through 8; the second octet to VLANs 9 through
+            16 etc.  The most significant bit of each octet
+            corresponds to the lowest VlanIndex value in that octet.
+
+            For each VLAN that is mapped to this MSTP instance,
+            the bit corresponding to that VLAN is set to '1'."
+    ::= { fsMstVlanInstanceMappingEntry 6 }
+
+fsMstInstanceVlanMapped2k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+            VLANS with VlanIndex values 1025 through 2048. The
+            first octet corresponds to VLANs with VlanIndex values
+            1025 through 1032; the second octet to VLANs 1033
+            through 1040 etc.  The most significant bit of each
+            octet corresponds to the lowest VlanIndex value in that
+            octet.
+
+            For each VLAN that is mapped to this MSTP instance,
+            the bit corresponding to that VLAN is set to '1'.
+            
+            This object is only instantiated on devices with 
+            support for VlanIndex values up to 4095."
+    ::= { fsMstVlanInstanceMappingEntry 7 }
+
+fsMstInstanceVlanMapped3k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+            VLANS with VlanIndex values 2049 through 3072. The
+            first octet corresponds to VLANs with VlanIndex values
+            of 2049 through 2056; the second octet to VLANs 2057
+            through 2064 etc.  The most significant bit of each
+            octet corresponds to the lowest VlanIndex value in that
+            octet.
+
+            For each VLAN that is mapped to this MSTP instance,
+            the bit corresponding to that VLAN is set to '1'.
+
+            This object is only instantiated on devices with 
+            support for VlanIndex values up to 4095."
+    ::= { fsMstVlanInstanceMappingEntry 8 }
+
+fsMstInstanceVlanMapped4k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+            VLANS with VlanIndex values 3073 through 4095. The
+            first octet corresponds to VLANs with VlanIndex values
+            3073 through 3080; the second octet to VLANs 3081
+            through 3088 etc.  The most significant bit of each
+            octet corresponds to the lowest VlanIndex value in that
+            octet.
+
+            For each VLAN that is mapped to this MSTP instance,
+            the bit corresponding to that VLAN is set to '1'.
+
+            This object is only instantiated on devices with 
+            support for VlanIndex values up to 4095."
+    ::= { fsMstVlanInstanceMappingEntry 9 }
+
+-- -----------------------------------------------------------------
+-- Future Mst Common Spanning Tree Port Table     
+-- -----------------------------------------------------------------
+
+fsMstCistPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMstCistPortEntry              
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "This table contains Common Spanning Tree Port
+           Information."
+     ::= { dot1sFutureMst 40 }
+
+fsMstCistPortEntry OBJECT-TYPE
+      SYNTAX      FsMstCistPortEntry               
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A list of information maintained by every port for 
+          Common Spanning tree."
+      INDEX  { fsMstCistPort }
+      ::= { fsMstCistPortTable 1 }
+
+FsMstCistPortEntry ::= 
+   SEQUENCE {
+       fsMstCistPort  
+            Integer32,
+       fsMstCistPortPathCost 
+            Integer32,
+       fsMstCistPortPriority 
+            Integer32,
+       fsMstCistPortDesignatedRoot 
+            BridgeId,
+       fsMstCistPortDesignatedBridge 
+            BridgeId,
+       fsMstCistPortDesignatedPort 
+            OCTET STRING,
+       fsMstCistPortAdminP2P 
+            INTEGER,
+       fsMstCistPortOperP2P 
+            TruthValue,
+       fsMstCistPortAdminEdgeStatus 
+            TruthValue,
+       fsMstCistPortOperEdgeStatus 
+            TruthValue,
+       fsMstCistPortProtocolMigration 
+            TruthValue,
+       fsMstCistPortState 
+            INTEGER,
+       fsMstCistForcePortState 
+            INTEGER,
+       fsMstCistPortForwardTransitions 
+            Counter32,
+       fsMstCistPortRxMstBpduCount
+            Counter32,
+       fsMstCistPortRxRstBpduCount
+            Counter32,
+       fsMstCistPortRxConfigBpduCount
+            Counter32,
+       fsMstCistPortRxTcnBpduCount
+            Counter32,
+       fsMstCistPortTxMstBpduCount
+            Counter32,
+       fsMstCistPortTxRstBpduCount
+            Counter32,
+       fsMstCistPortTxConfigBpduCount
+            Counter32,
+       fsMstCistPortTxTcnBpduCount
+            Counter32,
+       fsMstCistPortInvalidMstBpduRxCount
+            Counter32,
+       fsMstCistPortInvalidRstBpduRxCount
+            Counter32,
+       fsMstCistPortInvalidConfigBpduRxCount
+            Counter32,
+       fsMstCistPortInvalidTcnBpduRxCount
+            Counter32,
+       fsMstCistPortTransmitSemState 
+            INTEGER,        
+       fsMstCistPortReceiveSemState 
+            INTEGER,        
+       fsMstCistPortProtMigrationSemState 
+            INTEGER,        
+       fsMstCistProtocolMigrationCount 
+            Counter32,
+       fsMstCistPortDesignatedCost 
+            Integer32,
+       fsMstCistPortRegionalRoot 
+            BridgeId,
+       fsMstCistPortRegionalPathCost 
+            Integer32,
+       fsMstCistSelectedPortRole 
+            INTEGER,
+       fsMstCistCurrentPortRole  
+            INTEGER,
+       fsMstCistPortInfoSemState 
+            INTEGER,        
+       fsMstCistPortRoleTransitionSemState 
+            INTEGER,        
+       fsMstCistPortStateTransitionSemState 
+            INTEGER,         
+       fsMstCistPortTopologyChangeSemState 
+            INTEGER,
+       fsMstCistPortHelloTime 
+            Timeout,
+       fsMstCistPortOperVersion
+            INTEGER,
+       fsMstCistPortEffectivePortState
+            TruthValue,
+       fsMstCistPortAutoEdgeStatus 
+           TruthValue,
+       fsMstCistPortRestrictedRole 
+           TruthValue, 
+       fsMstCistPortRestrictedTCN 
+           TruthValue,
+       fsMstCistPortAdminPathCost
+           Integer32,
+       fsMstCistPortEnableBPDURx
+           TruthValue,
+       fsMstCistPortEnableBPDUTx
+           TruthValue,
+       fsMstCistPortPseudoRootId
+            BridgeId,
+       fsMstCistPortIsL2Gp
+           TruthValue,
+       fsMstCistPortLoopGuard
+           TruthValue,
+       fsMstCistPortRcvdEvent
+           INTEGER,
+       fsMstCistPortRcvdEventSubType
+           Integer32,
+       fsMstCistPortRcvdEventTimeStamp
+           Unsigned32,
+       fsMstCistPortBpduGuard
+           Integer32,
+       fsMstCistPortRootGuard
+	   TruthValue,
+       fsMstCistPortRootInconsistentState
+	   TruthValue,
+       fsMstCistPortErrorRecovery
+	   Timeout,
+       fsMstPortBpduInconsistentState
+       TruthValue,
+       fsMstPortBpduGuardAction
+       Integer32,
+        fsMstCistPortTCDetectedCount
+         Counter32,
+        fsMstCistPortTCReceivedCount
+         Counter32,
+        fsMstCistPortTCDetectedTimeStamp
+         TimeTicks,
+        fsMstCistPortTCReceivedTimeStamp
+         TimeTicks,
+        fsMstCistPortRcvInfoWhileExpCount
+         Counter32,
+        fsMstCistPortRcvInfoWhileExpTimeStamp
+         TimeTicks,
+        fsMstCistPortProposalPktsSent
+         Counter32,
+        fsMstCistPortProposalPktsRcvd
+         Counter32,
+        fsMstCistPortProposalPktSentTimeStamp
+         TimeTicks,
+        fsMstCistPortProposalPktRcvdTimeStamp
+         TimeTicks,
+        fsMstCistPortAgreementPktSent
+         Counter32,
+        fsMstCistPortAgreementPktRcvd
+         Counter32,
+        fsMstCistPortAgreementPktSentTimeStamp
+         TimeTicks,
+        fsMstCistPortAgreementPktRcvdTimeStamp
+         TimeTicks,
+        fsMstCistPortImpStateOccurCount
+         Counter32,
+        fsMstCistPortImpStateOccurTimeStamp
+         TimeTicks,
+        fsMstCistPortOldPortState
+          INTEGER,
+        fsMstCistPortLoopInconsistentState
+          TruthValue
+
+}
+
+fsMstCistPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The Port number of the port for which this entry contains   
+           spanning tree information."                                      
+      ::= { fsMstCistPortEntry 1 }
+
+fsMstCistPortPathCost OBJECT-TYPE
+      SYNTAX      Integer32 (1..200000000)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+            "The contribution of this port to the path cost of
+             paths towards the CIST Root which include this port."
+      ::= { fsMstCistPortEntry 2 }
+
+fsMstCistPortPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..240)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The four most significant bits of the Port Identifier 
+          of the Spanning Tree instance can be modified by setting 
+          the CistPortPriority value. The values that are set for Port 
+          Priority must be in steps of 16."
+     DEFVAL {128}
+      ::= { fsMstCistPortEntry 3 }
+
+fsMstCistPortDesignatedRoot OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique Bridge Identifier of the bridge recorded as the  
+           CIST Root in the configuration BPDUs transmitted."      
+      ::= { fsMstCistPortEntry 4 }
+
+fsMstCistPortDesignatedBridge OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique Bridge Identifier of the bridge which this port  
+           considers to be the Designated Bridge for the port's segment."   
+      ::= { fsMstCistPortEntry 5 }
+
+fsMstCistPortDesignatedPort OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The Port identifier of the port on the Designated Bridge    
+           for this port's segment."                                           
+      ::= { fsMstCistPortEntry 6 }
+
+fsMstCistPortAdminP2P OBJECT-TYPE
+      SYNTAX      INTEGER {               
+                    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+                  }
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The administrative point-to-point status of the LAN segment
+          attached to this port.  A value of forceTrue(0) indicates that
+          this port should always be treated as if it is connected to
+          a point-to-point link.  A value of forceFalse(1) indicates
+          that this port should be treated as having a shared media
+          connection.  A value of auto(2) indicates that this port is
+          considered to have a point-to-point link if it is an Aggregator
+          and all of its members are aggregatable, or if the MAC entity
+          is configured for full duplex operation, either through
+          auto-negotiation or by management means."
+      ::= { fsMstCistPortEntry 7 }
+
+fsMstCistPortOperP2P OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The operational point-to-point status of the LAN segment
+          attached to this port.  It indicates whether a port is
+          considered to have a point-to-point connection or not.
+          The value is determined by management or by auto-detection,
+          as described in the fsMstCistPortAdminP2P object."
+      ::= { fsMstCistPortEntry 8 }
+
+fsMstCistPortAdminEdgeStatus OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The administrative value of the Edge Port parameter.  A
+          value of TRUE(1) indicates that this port should be
+          assumed as an edge-port and a value of FALSE(2) indicates
+          that this port should be assumed as a non-edge-port."
+      ::= { fsMstCistPortEntry 9 }
+
+fsMstCistPortOperEdgeStatus OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The operational value of the Edge Port parameter.  The
+          object is initialized to the value of
+          fsMstCistPortAdminEdgeStatus and is set FALSE on reception 
+          of a BPDU."
+      ::= { fsMstCistPortEntry 10 }
+
+fsMstCistPortProtocolMigration OBJECT-TYPE
+      SYNTAX      TruthValue                
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "This object represents the protocol migration state event
+          machine variable 'mcheck' for this port.
+          When operating in RSTP/MSTP (version >= 2) mode, writing
+          TRUE(1) to this object forces this port to transmit MSTP
+          BPDUs.
+
+          Any other operation on this object has no effect and
+          it always returns FALSE(2) when read."
+      ::= { fsMstCistPortEntry 11 }
+
+fsMstCistPortState OBJECT-TYPE
+      SYNTAX      INTEGER {              
+                  disabled (1),
+                  discarding (2),
+                  learning (4),
+                  forwarding (5)
+                  }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port as defined by the Common    
+           spanning tree protocol." 
+      ::= { fsMstCistPortEntry 12 }
+
+fsMstCistForcePortState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   disabled(0),
+                   enabled(1)
+                  }
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port which can be changed to either 
+           Disabled or Enabled for ALL spanning tree   
+           instances. Setting this object will override the port's
+           status in any of the MSTI contexts."                                        
+      ::= { fsMstCistPortEntry 13 }
+
+fsMstCistPortForwardTransitions OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of times this port has transitioned to the     
+           Forwarding State."                                     
+      ::= { fsMstCistPortEntry 14 }
+
+fsMstCistPortRxMstBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of MST BPDUs received on this port."     
+      ::= { fsMstCistPortEntry 15 }
+
+fsMstCistPortRxRstBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of RST BPDUs received on this port."     
+      ::= { fsMstCistPortEntry 16 }
+
+fsMstCistPortRxConfigBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Configuration BPDUs received on this port."     
+      ::= { fsMstCistPortEntry 17 }
+
+fsMstCistPortRxTcnBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of TCN BPDUs received on this port."     
+      ::= { fsMstCistPortEntry 18 }
+
+fsMstCistPortTxMstBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of MST BPDUs Transmitted from this port."     
+      ::= { fsMstCistPortEntry 19 }
+
+fsMstCistPortTxRstBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of RST BPDUs Transmitted from this port."     
+      ::= { fsMstCistPortEntry 20 }
+
+fsMstCistPortTxConfigBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Configuration BPDUs Transmitted from this port."     
+      ::= { fsMstCistPortEntry 21 }
+
+fsMstCistPortTxTcnBpduCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of TCN BPDUs Transmitted from this port."     
+      ::= { fsMstCistPortEntry 22 }
+
+fsMstCistPortInvalidMstBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Invalid MST BPDUs Received on this port."     
+      ::= { fsMstCistPortEntry 23 }
+
+fsMstCistPortInvalidRstBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Invalid RST BPDUs Received on this port."     
+      ::= { fsMstCistPortEntry 24 }
+
+fsMstCistPortInvalidConfigBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Invalid Configuration BPDUs Received on this port."     
+      ::= { fsMstCistPortEntry 25 }
+
+fsMstCistPortInvalidTcnBpduRxCount OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Invalid TCN BPDUs Received on this port."     
+      ::= { fsMstCistPortEntry 26 }
+
+fsMstCistPortTransmitSemState OBJECT-TYPE 
+      SYNTAX      INTEGER {                 
+                  transmitinit (0),
+                  transmitperiodic (1),
+                  transmitconfig (2),
+                  transmittcn (3),
+                  transmitrstp (4),
+                  idle (5)
+               }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Indicates current State of the Port Transmit state machine."
+      ::= { fsMstCistPortEntry 27 }
+
+fsMstCistPortReceiveSemState OBJECT-TYPE 
+      SYNTAX      INTEGER {                 
+                  discard (0),
+                  receive (1)
+               }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Indicates current State of the Port Receive state machine."
+      ::= { fsMstCistPortEntry 28 }
+
+fsMstCistPortProtMigrationSemState OBJECT-TYPE 
+      SYNTAX      INTEGER {                 
+                  init (0),
+                  sendrstp (1),
+                  sendingrstp (2),
+                  sendstp (3),
+                  sendingstp (4)
+               }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Indicates current State of the Port Protocol Migration
+           State machine."
+      ::= { fsMstCistPortEntry 29 }
+
+fsMstCistProtocolMigrationCount OBJECT-TYPE
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+        "The number of times this Port has migrated from one STP protocol 
+        version to another. The relevant protocols are STP-COMPATIBLE and 
+        RSTP/MSTP.
+        A Trap is generated on the occurence of this event."
+      ::= { fsMstCistPortEntry 30 }
+
+fsMstCistPortDesignatedCost OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only           
+      STATUS      current
+      DESCRIPTION
+           "The path cost of the Designated Port of the
+            segment connected to this port."
+      ::= { fsMstCistPortEntry 31 }
+
+fsMstCistPortRegionalRoot OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique Bridge Identifier of the bridge recorded as the  
+           CIST Regional Root Identifier in the configuration BPDUs 
+           transmitted."      
+      ::= { fsMstCistPortEntry 32 }
+
+fsMstCistPortRegionalPathCost OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only           
+      STATUS      current
+      DESCRIPTION
+          "The contribution of this port to the path cost of paths     
+           towards the CIST Regional Root which includes this port."         
+      ::= { fsMstCistPortEntry 33 }
+
+fsMstCistSelectedPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Selected Port Role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsMstCistPortEntry 34 }
+
+fsMstCistCurrentPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {              
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current Port Role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsMstCistPortEntry 35 }
+
+fsMstCistPortInfoSemState OBJECT-TYPE
+	SYNTAX      INTEGER {
+               disabled (0),
+               aged (1),
+               update (2),
+               superiordesg (3),
+               repeatdesg (4),
+               inferiordesg (5),
+               notdesg (6),
+               present (7),
+               receive (8),
+               other (9)
+            }                
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Information State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstCistPortEntry 36 }
+
+fsMstCistPortRoleTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  init (0),
+                  disableport (1),
+                  disabledport (2),
+                  rootport (3),
+                  designatedport (4),
+                  alternateport (5),
+                  masterport (6)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstCistPortEntry 37 }
+
+fsMstCistPortStateTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  discarding (0),
+                  learning (1),
+                  forwarding (2)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port State Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstCistPortEntry 38 }
+
+fsMstCistPortTopologyChangeSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  inactive (0),
+                  learning (1),
+                  detected (2),
+                  active (3),
+                  notifiedtcn (4),
+                  notifiedtc (5),
+                  propagating (6),
+                  acknowledged (7)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Topology Change State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstCistPortEntry 39 }
+
+fsMstCistPortHelloTime OBJECT-TYPE
+   SYNTAX      Timeout (100|200)  
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write  
+   STATUS      current
+   DESCRIPTION
+   	  "The amount of time between the transmission of
+	   Configuration bridge PDUs by this node on this port
+	   in units of hundredths of a second."
+      ::= { fsMstCistPortEntry 40 }
+
+fsMstCistPortOperVersion OBJECT-TYPE
+   SYNTAX      INTEGER {
+               stpCompatible(0),
+               rstp(2),
+               mstp(3)
+            }
+   MAX-ACCESS  read-only  
+   STATUS      current
+   DESCRIPTION
+   	  "This indicates whether the Port is operationally in the Mstp
+       mode, Rstp mode or the Stp-compatible mode i.e., whether the
+       Port is transmitting MST BPDUs, RST BPDUs or Config/TCN BPDUs."
+      ::= { fsMstCistPortEntry 41 }
+      
+fsMstCistPortEffectivePortState OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The effective operational state of the port for CIST. This will
+          TRUE only when the port is operationally up in the Interface level
+          and Protocol level for CIST. This is will be set to False for all 
+          other times."
+
+      ::= { fsMstCistPortEntry 42 }
+
+fsMstCistPortAutoEdgeStatus OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "This parameter when TRUE(1) indicates that detection 
+          of a port as Edge Port happens automatically
+          and FALSE(2) indicates that this feature is disabled."
+      ::= { fsMstCistPortEntry 43 }
+
+fsMstCistPortRestrictedRole OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        "A Boolean value set by management. If TRUE causes the Port not 
+        to be selected as Root Port for the CIST or any MSTI, even it has 
+        the best spanning tree priority vector. Such a Port will be selected 
+        as an Alternate Port after the Root Port has been selected. This 
+        parameter should be FALSE by default. If set it can cause lack of 
+        spanning tree connectivity. It is set by a network administrator to 
+        prevent bridges external to a core region of the network influencing 
+        the spanning tree active topology, possibly because those bridges are 
+        not under the full control of the administrator. 
+
+        This administrator configuration is also known as 'Root Guard'." 
+
+        ::= {fsMstCistPortEntry 44}
+
+fsMstCistPortRestrictedTCN OBJECT-TYPE 
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        "A Boolean value set by management. If TRUE causes the Port not 
+        to propagate received topology change notifications and topology 
+        changes to other Ports. This parameter should be FALSE by default. 
+        If set it can cause temporary loss of connectivity after changes in 
+        a spanning trees active topology as a result of persistent 
+        incorrectly learnt station location information. It is set by a 
+        network administrator to prevent bridges external to a core region of 
+        the network causing address flushing in that region, possibly because 
+        those bridges are not under the full control of the administrator or 
+        MAC_Operational for the attached LANs transitions frequently." 
+
+        ::= {fsMstCistPortEntry 45}
+
+fsMstCistPortAdminPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths toward the spanning
+         tree root.
+         Writing a value of '0' assigns the automatically calculated
+         default Path Cost value to the port.  If the default Path
+         Cost is being used, this object returns '0' when read.
+         This complements the object dot1dStpPortPathCost or
+         dot1dStpPortPathCost32, which returns the operational value
+         of the path cost."
+ 
+        ::= { fsMstCistPortEntry 46} 
+
+fsMstCistPortEnableBPDURx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If FALSE, the BPDUs received on
+        the port are ignored."
+    REFERENCE   "IEEE802.1ah - 13.25.18"
+    DEFVAL { true }
+        ::= { fsMstCistPortEntry 47 }
+
+fsMstCistPortEnableBPDUTx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If FALSE, no BPDUs are transmitted
+        by this port. This variable should be FALSE before configuring port
+        as a Layer Two Gateway Port."
+    REFERENCE   "IEEE802.1ah - 13.25.19"
+    DEFVAL { true }
+        ::= { fsMstCistPortEntry 48 }
+
+fsMstCistPortPseudoRootId OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "In MSTP Bridge, the fsMstCistPortPseudoRootId parameter value
+        by default, it is set to the BridgeIdentifier. The pseudoRootId
+        is used by Layer Two Gateway Port as the RootId in generated BPDUs."
+    REFERENCE   "IEEE802.1ah - 13.25.20"
+        ::= { fsMstCistPortEntry 49 }
+
+fsMstCistPortIsL2Gp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If TRUE, then port is functioning
+        as a Layer Two Gateway Port. The fsMstCistPortEnableBPDUTx should be
+        FALSE to set fsMstCistPortIsL2Gp to TRUE."
+    REFERENCE   "IEEE802.1ah - 13.25.21"
+    DEFVAL { false }
+        ::= { fsMstCistPortEntry 50 }
+
+fsMstCistPortLoopGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If TRUE, then it will not age out
+        the information even if the peer does not send information. If the port
+        continues to receive information through BPDUs the operation 
+        on this port will be normal. This will be useful when the neighbor
+        bridge is faulty, i.e. it cannot send BPDUs but continues to send data 
+        traffic." 
+
+    DEFVAL { false }
+        ::= { fsMstCistPortEntry 51 }
+
+fsMstCistPortRcvdEvent OBJECT-TYPE
+    SYNTAX      INTEGER{
+        configurationEvent (1),
+        bpduEvent (2),
+        timerExpiryEvent (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives information about the recently received event in the
+         system.Currently we support only ConfigurationEvent."
+    ::= { fsMstCistPortEntry 52 }
+
+
+fsMstCistPortRcvdEventSubType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives information about sub-type of the event received in
+         the system recently. The value of this object depends on the value of
+         the object fsRstPortRcvdEvent.For ConfigurationEvent, the sub-types
+         supported are PortUp and PortDown."
+    ::= { fsMstCistPortEntry 53 }
+
+fsMstCistPortRcvdEventTimeStamp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the time stamp (in milli seconds) at which the event
+         specified by the object fsMstCistPortRcvdEvent was received in the
+         system. This object was introduced to measure the convergence time in
+         MSTP module."
+    ::= { fsMstCistPortEntry 54 }
+
+fsMstCistPortBpduGuard OBJECT-TYPE
+      SYNTAX      INTEGER    {
+                    none (0),
+                    enable (1),
+                    disable (2)
+                    }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This configures the BPDU guard feature on this port and has higher
+           priority over Global BPDU Guard.
+           Enable - prevents temporary loops and applicable to ports and 
+           moves the port to disabled discarding state when BPDU is received
+           on this port.
+           Disable - Disables the Bpdu Guard feature and the port state will
+           be maintained till it is manually made up.
+           None - removes the BPDU Guard functionality on this port so that
+           when Global BPDU guard configuration will take effect if this port is
+           edge port."           
+    DEFVAL { 0 }
+   ::= { fsMstCistPortEntry 55 }
+
+fsMstCistPortRootGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management. If TRUE causes the Port not
+        to be selected as Root Port for the CIST or any MSTI, even it has
+        the best spanning tree priority vector. Such a Port will be selected
+        as an Alternate Port after the Root Port has been selected. This
+        parameter should be FALSE by default. If set it can cause lack of
+        spanning tree connectivity. It is set by a network administrator to
+        prevent bridges external to a core region of the network influencing
+        the spanning tree active topology, possibly because those bridges are
+        not under the full control of the administrator.
+
+        This administrator configuration is also known as 'Root Guard'."
+
+        ::= {fsMstCistPortEntry 56}
+
+fsMstCistPortRootInconsistentState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          " A Boolean value set when the designated port receives a superior
+            BPDU trying to transition itself to the Root Port.A value of TRUE
+            indicates that the state of this port is moved into an
+            root-inconsistent state. A value of  FALSE indicates that this
+            port is not moved into an root-inconsistent state."
+         DEFVAL { false }
+    ::= { fsMstCistPortEntry 57 }
+
+fsMstCistPortErrorRecovery OBJECT-TYPE
+   SYNTAX      Timeout (3000..6553500)
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+           "The amount of time to bring the interface out of the
+           error-disabled (err-disabled) state.
+           The range is from 30 to 65535 seconds."
+   DEFVAL {30000 }
+      ::= { fsMstCistPortEntry 58 }
+fsMstPortBpduInconsistentState OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+   "A Boolean value set indicates the port state goes to disabled / discarding
+   due to the BPDU guard feature enabled on the port and the port receives BPDU
+   on this. A value of TRUE indicates that the state of this port is moved into
+   an bpduguard-inconsistent state due to BPDU reception.A value of FALSE
+   indicates that this port is not received the BPDU when BPDU guard is enabled
+   on this port or BPDU guard feature is disabled on that port."
+   DEFVAL { false }
+   ::= { fsMstCistPortEntry 59 }
+
+fsMstPortBpduGuardAction OBJECT-TYPE
+   SYNTAX     INTEGER    {
+            disableDiscarding (1),
+            adminDown (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object specifies the action to be taken when BPDU is received
+         on a BPDU guard enabled port.
+
+         When action is set as admin down error recovery time will be set as
+         zero. When action is set as disable-discarding, error recovery time
+         will be set as 3000 centi-seconds.
+
+         When action is set as admin down and BPDU is received on this
+         port, then the port will be made down. When port is made admin up again,
+         port moves to admin down if BPDU is received on this port.
+
+         When BPDU is received in case of disable-discarding state, spanning-tree
+         will be disabled on this port and port will move to discarding state.
+         On expiry of error recovery timer, spanning tree will be enabled on
+         the port. When BPDU is received again, spanning-tree will be disabled
+         on the port and port moves to discarding state
+
+         To recover from the admin down or disable discarding state, BPDU guard
+         should be disabled on this port."
+
+    DEFVAL { 1 }
+   ::= { fsMstCistPortEntry 60 }
+
+fsMstCistPortTCDetectedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object specifies the number of topology changes detected on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 61 }
+
+fsMstCistPortTCReceivedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of topology change messages received on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 62 }
+
+fsMstCistPortTCDetectedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the time stamp(in hundredths of a second) at which the topology 
+	 change is detected on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 63 }
+
+fsMstCistPortTCReceivedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which the topology change 
+	message received on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 64 }
+
+fsMstCistPortRcvInfoWhileExpCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object specifies the number of times the received info while timer is expired on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 65 }
+
+fsMstCistPortRcvInfoWhileExpTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which the received info while timer is expired on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 66 }
+
+fsMstCistPortProposalPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of proposal packets sent by this port for the CIST instance."
+   ::= { fsMstCistPortEntry 67 }
+
+fsMstCistPortProposalPktsRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of proposal packets received on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 68 }
+
+fsMstCistPortProposalPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which proposal packet sent by this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 69 }
+
+fsMstCistPortProposalPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which  proposal packet received on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 70 }
+
+fsMstCistPortAgreementPktSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of agreement packets sent by this port for the CIST instance."
+   ::= { fsMstCistPortEntry 71 }
+
+fsMstCistPortAgreementPktRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of agreement packets received on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 72 }
+
+fsMstCistPortAgreementPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which agreement packet sent by this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 73 }
+
+fsMstCistPortAgreementPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which agreement packet received on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 74 }
+
+fsMstCistPortImpStateOccurCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Indicates the number of times impossible state that has occurred on this port for the CIST instance."
+   ::= { fsMstCistPortEntry 75 }
+
+fsMstCistPortImpStateOccurTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which impossible state has occurred 
+	 on this port last time for the CIST instance."
+   ::= { fsMstCistPortEntry 76 }
+
+fsMstCistPortOldPortState OBJECT-TYPE
+   SYNTAX      INTEGER {
+               disabled (1),
+               discarding (2),
+               learning (4),
+               forwarding (5)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+	"This MIB object indicates the previous state of the port for the CIST instance."
+   ::= { fsMstCistPortEntry 77 }
+
+fsMstCistPortLoopInconsistentState    OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+               "This object specifies a Boolean value set when the non-designated port on which loop-guard is enabled,
+		 tries to transition to Designated/Forwarding due to the expiry of Receive info while timer when bpdu's are not received.
+             A value of TRUE, indicates that the state of this port is moved into an loop-inconsistent
+             state.A value of  FALSE, indicates that this port is not moved into an loop-inconsistent
+             state "
+     DEFVAL { false }
+   ::= { fsMstCistPortEntry 78 }
+
+-- -----------------------------------------------------------------
+-- Future Mst Multiple Spanning Tree Instance Port Table     
+-- -----------------------------------------------------------------
+fsMstMstiPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMstMstiPortEntry              
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "This table contains Spanning Tree Instance Specific Port
+           Information."
+     ::= { dot1sFutureMst 41 }
+
+fsMstMstiPortEntry OBJECT-TYPE
+      SYNTAX      FsMstMstiPortEntry               
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A list of information maintained by every port for each 
+           and every spanning tree instance."
+      INDEX  { fsMstMstiPort, fsMstInstanceIndex }
+      ::= { fsMstMstiPortTable 1 }
+
+FsMstMstiPortEntry ::= 
+   SEQUENCE {
+       fsMstMstiPort  
+            Integer32,
+       fsMstMstiPortPathCost 
+            Integer32,
+       fsMstMstiPortPriority 
+            Integer32,
+       fsMstMstiPortDesignatedRoot 
+            BridgeId,
+       fsMstMstiPortDesignatedBridge 
+            BridgeId,
+       fsMstMstiPortDesignatedPort 
+            OCTET STRING,
+       fsMstMstiPortState 
+            INTEGER,
+       fsMstMstiForcePortState 
+            INTEGER,
+       fsMstMstiPortForwardTransitions 
+            Counter32,
+       fsMstMstiPortReceivedBPDUs 
+            Counter32,
+       fsMstMstiPortTransmittedBPDUs 
+            Counter32,
+       fsMstMstiPortInvalidBPDUsRcvd 
+            Counter32,
+       fsMstMstiPortDesignatedCost 
+            Integer32,
+       fsMstMstiSelectedPortRole 
+            INTEGER,
+       fsMstMstiCurrentPortRole  
+            INTEGER,
+       fsMstMstiPortInfoSemState 
+            INTEGER,        
+       fsMstMstiPortRoleTransitionSemState 
+            INTEGER,        
+       fsMstMstiPortStateTransitionSemState 
+            INTEGER,         
+       fsMstMstiPortTopologyChangeSemState 
+            INTEGER,        
+       fsMstMstiPortEffectivePortState
+            TruthValue,
+       fsMstMstiPortAdminPathCost
+            Integer32,
+       fsMstMstiPortPseudoRootId
+            BridgeId,
+       fsMstMstiPortStateChangeTimeStamp
+            Unsigned32,
+       fsMstMstiPortRootInconsistentState
+	    TruthValue,
+        fsMstMstiPortOldPortState
+          INTEGER,
+       fsMstMstiPortLoopInconsistentState
+           TruthValue,
+        fsMstMstiPortTCDetectedCount
+         Counter32,
+        fsMstMstiPortTCReceivedCount
+         Counter32,
+        fsMstMstiPortTCDetectedTimeStamp
+         TimeTicks,
+        fsMstMstiPortTCReceivedTimeStamp
+         TimeTicks,
+        fsMstMstiPortProposalPktsSent
+         Counter32,
+        fsMstMstiPortProposalPktsRcvd
+         Counter32,
+        fsMstMstiPortProposalPktSentTimeStamp
+         TimeTicks,
+        fsMstMstiPortProposalPktRcvdTimeStamp
+         TimeTicks,
+        fsMstMstiPortAgreementPktSent
+         Counter32,
+        fsMstMstiPortAgreementPktRcvd
+         Counter32,
+        fsMstMstiPortAgreementPktSentTimeStamp
+         TimeTicks,
+        fsMstMstiPortAgreementPktRcvdTimeStamp
+         TimeTicks
+}
+
+fsMstMstiPort OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The Port number of the port for which this entry contains   
+           spanning tree information."                                      
+      ::= { fsMstMstiPortEntry 1 }
+
+fsMstMstiPortPathCost OBJECT-TYPE
+      SYNTAX      Integer32 (1..200000000)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The contribution of this port to the path cost of
+           paths towards the MSTI Root which include this port."
+      ::= { fsMstMstiPortEntry 2 }
+
+fsMstMstiPortPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..240)
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "The four most significant bits of the Port Identifier 
+          for a given Spanning Tree instance can be modified 
+          independently for each Spanning Tree instance 
+          supported by the Bridge. The values that are set for Port 
+          Priority must be in steps of 16."
+    DEFVAL {128}
+      ::= { fsMstMstiPortEntry 3 }
+
+fsMstMstiPortDesignatedRoot OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique Bridge Identifier of the bridge recorded as the  
+           MSTI Regional Root in the configuration BPDUs transmitted."      
+      ::= { fsMstMstiPortEntry 4 }
+
+fsMstMstiPortDesignatedBridge OBJECT-TYPE
+      SYNTAX      BridgeId                 
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The unique Bridge Identifier of the bridge which this port  
+           considers to be the Designated Bridge for the port's segment."   
+      ::= { fsMstMstiPortEntry 5 }
+
+fsMstMstiPortDesignatedPort OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The Port identifier of the port on the Designated Bridge    
+           for this port's segment."                                           
+      ::= { fsMstMstiPortEntry 6 }
+
+fsMstMstiPortState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabled (1),
+                  discarding (2),
+                  learning (4),
+                  forwarding (5)
+                  }
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port as defined by the Multiple  
+           spanning tree protocol. Port which is Forwarding state
+           in one instance can be in Discarding (Blocking) state 
+           in another instance."
+      ::= { fsMstMstiPortEntry 7 }
+
+fsMstMstiForcePortState OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   disabled(0),
+                   enabled(1)
+                  }
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port which can be changed to either 
+           Disabled or Enabled for the specific spanning tree   
+           instance. This object can be set to enabled only if the 
+           'fsMstCistForcePortState' is set to 'enabled' for this port."                                            
+      ::= { fsMstMstiPortEntry 8 }
+
+fsMstMstiPortForwardTransitions OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of times this port has transitioned to the     
+           Forwarding State for specific instance."                                     
+      ::= { fsMstMstiPortEntry 9 }
+
+fsMstMstiPortReceivedBPDUs OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of BPDUs received by this port for this 
+          spanning tree instance."                            
+      ::= { fsMstMstiPortEntry 10 }
+
+fsMstMstiPortTransmittedBPDUs OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of BPDUs transmitted on this port for 
+          this spanning tree instance."                            
+      ::= { fsMstMstiPortEntry 11 }
+
+fsMstMstiPortInvalidBPDUsRcvd OBJECT-TYPE 
+      SYNTAX      Counter32                
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "Number of Invalid BPDUs received on this Port
+           for this spanning tree instance."                            
+      ::= { fsMstMstiPortEntry 12 }
+
+fsMstMstiPortDesignatedCost OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only           
+      STATUS      current
+      DESCRIPTION
+            "The path cost of the Designated Port of the
+             segment connected to this port."
+      ::= { fsMstMstiPortEntry 13 }
+
+fsMstMstiSelectedPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4),
+                   master(5)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Selected Port Role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsMstMstiPortEntry 14 }
+
+fsMstMstiCurrentPortRole OBJECT-TYPE
+      SYNTAX      INTEGER {              
+                   disabled(0),
+                   alternate(1),
+                   backup(2),
+                   root(3),
+                   designated(4),
+                   master(5)
+                  }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current Port Role of the port for this spanning 
+          tree instance."                                      
+      ::= { fsMstMstiPortEntry 15 }
+
+fsMstMstiPortInfoSemState OBJECT-TYPE
+	SYNTAX      INTEGER {
+               disabled (0),
+               aged (1),
+               update (2),
+               superiordesg (3),
+               repeatdesg (4),
+               inferiordesg (5),
+               notdesg (6),
+               present (7),
+               receive (8),
+               other (9)
+            }                
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Information State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstMstiPortEntry 16 }
+
+fsMstMstiPortRoleTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  init (0),
+                  disableport (1),
+                  disabledport (2),
+                  rootport (3),
+                  designatedport (4),
+                  alternateport (5),
+                  masterport (6)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port Role Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstMstiPortEntry 17 }
+
+fsMstMstiPortStateTransitionSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  discarding (0),
+                  learning (1),
+                  forwarding (2)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Port State Transition State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstMstiPortEntry 18 }
+
+fsMstMstiPortTopologyChangeSemState OBJECT-TYPE
+      SYNTAX      INTEGER {                
+                  inactive (0),
+                  learning (1),
+                  detected (2),
+                  active (3),
+                  notifiedtcn (4),
+                  notifiedtc (5),
+                  propagating (6),
+                  acknowledged (7)
+               }
+      MAX-ACCESS  read-only        
+      STATUS      current
+      DESCRIPTION
+          "Current state of the Topology Change State Machine          
+           for this port in this spanning tree context."                                      
+      ::= { fsMstMstiPortEntry 19 }
+
+fsMstMstiPortEffectivePortState OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The effective operational state of the port for specific instance.
+          This is will be TRUE only when the port is operationally up in the
+          interface level and Protocol level for the specific instance.
+          This will be set to false at all other times."
+
+      ::= { fsMstMstiPortEntry 20 }
+
+
+fsMstMstiPortAdminPathCost OBJECT-TYPE
+      SYNTAX      Integer32 (0..200000000)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "The administratively assigned value for the contribution
+           of this port to the path cost of paths toward the spanning
+           tree root.
+           Writing a value of '0' assigns the automatically calculated
+           default Path Cost value to the port.  If the default Path
+           Cost is being used, this object returns '0' when read.
+           This complements the object dot1dStpPortPathCost or
+           dot1dStpPortPathCost32, which returns the operational value
+           of the path cost."
+      ::= { fsMstMstiPortEntry 21 }
+                                                                                                              
+fsMstMstiPortPseudoRootId OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "In MSTP Bridge, the fsMstMstiPortPseudoRootId parameter value
+        by default, it is set to the BridgeIdentifier. The pseudoRootId
+        is used by Layer Two Gateway Port as the RootId in generated BPDUs."
+    REFERENCE   "IEEE802.1ah - 13.25.20"
+      ::= { fsMstMstiPortEntry 22 }
+
+
+fsMstMstiPortStateChangeTimeStamp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time Stamp (in milli seconds) at which port state has changed for a
+         particular instance on this port.This object was introduced to measure
+         the convergence time in MSTP module."
+    ::= { fsMstMstiPortEntry 23 }
+
+
+fsMstMstiPortRootInconsistentState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          " A Boolean value set when the designated port receives a superior
+            BPDU trying to transition itself to the Root Port.
+            A value of TRUE indicates that the state of this port is moved
+            into an root-inconsistent state. A value of FALSE indicates that 
+            this port is not moved into an root-inconsistent state."
+         DEFVAL { false }
+    ::= { fsMstMstiPortEntry 24 }
+
+fsMstMstiPortOldPortState OBJECT-TYPE
+   SYNTAX      INTEGER {
+               disabled (1),
+               discarding (2),
+               learning (4),
+               forwarding (5)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This MIB object indicates the previous state of the port for MST instance."
+   ::= { fsMstMstiPortEntry 25 }
+
+fsMstMstiPortLoopInconsistentState   OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "A Boolean value set when the non-designated port on which loop-guard is enabled, tries to transition                                                         to Designated/Forwarding due to the expiry of Receive info while timer when bpdu's are not received.
+                A value of TRUE, indicates that the state of this port is moved into an loop-inconsistent
+                state.A value of  FALSE, indicates that this port is not moved into an loop-inconsistent
+                state "
+        DEFVAL { false }
+        ::= { fsMstMstiPortEntry 26 }
+
+fsMstMstiPortTCDetectedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object specifies the number of topology changes detected on this port for MST instance."
+   ::= { fsMstMstiPortEntry 27 }
+
+fsMstMstiPortTCReceivedCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of topology change messages received on this port for MST instance."
+   ::= { fsMstMstiPortEntry 28 }
+
+fsMstMstiPortTCDetectedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies  the Time stamp(in hundredths of a second) at which the topology change is detected on this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 29 }
+
+fsMstMstiPortTCReceivedTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies  the Time stamp(in hundredths of a second) at which the topology change message
+	  received on this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 30 }
+
+fsMstMstiPortProposalPktsSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of proposal packets sent by this port for MST instance."
+   ::= { fsMstMstiPortEntry 31 }
+
+fsMstMstiPortProposalPktsRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of proposal packets received on this port for MST instance."
+   ::= { fsMstMstiPortEntry 32 }
+
+fsMstMstiPortProposalPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which proposal packet sent by this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 33 }
+
+fsMstMstiPortProposalPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the time stamp(in hundredths of a second) at which  proposal packet received on this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 34 }
+
+fsMstMstiPortAgreementPktSent OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of agreement packets sent by this port for MST instance."
+   ::= { fsMstMstiPortEntry 35 }
+
+fsMstMstiPortAgreementPktRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the number of agreement packets received on this port for MST instance."
+   ::= { fsMstMstiPortEntry 36 }
+
+fsMstMstiPortAgreementPktSentTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the  Time stamp(in hundredths of a second) at which agreement packet sent by this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 37 }
+
+fsMstMstiPortAgreementPktRcvdTimeStamp OBJECT-TYPE
+   SYNTAX      TimeTicks
+   UNITS       "centi-seconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "This object specifies the Time stamp(in hundredths of a second) at which agreement packet received on this port last time for MST instance."
+   ::= { fsMstMstiPortEntry 38 }
+
+-- SCALAR ADDED
+fsMstCistDynamicPathcostCalculation OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+         "This object is used to determine whether dynamic pathcost
+          calculation is allowed or not.The value is determined by 
+          management. If set to true, pathcost is calculated dynamically 
+          from port speed(when the operational status of the port changes 
+          from down to up), otherwise the link speed at the time of port 
+          creation is used for calculating the path cost. In both cases
+          if the user has configured a pathcost for the port that will be 
+          used. By default, dynamic pathcost calculation is set to false."
+      DEFVAL { false }
+      ::= { dot1sFutureMst  42 }
+
+fsMstCalcPortPathCostOnSpeedChg OBJECT-TYPE
+      SYNTAX      TruthValue               
+      MAX-ACCESS  read-write           
+      STATUS      current
+      DESCRIPTION
+         "This object is used to determine whether dynamic pathcost
+          calculation is done for a port for which Port Speed is changing
+          dynamically. This is mainly intended for Link Aggregated ports where
+          depending on Active ports speed of Link aggregated port changes.
+          By default dynamic pathcost calculation on change in speed is set to
+          false."
+      DEFVAL { false }
+      ::= { dot1sFutureMst 43 }
+
+
+fsMstRcvdEvent OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        configurationEvent (1),
+        bpduEvent (2),
+        timerExpiryEvent (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives information about the recently received event in the
+        system. Currently, we support only ConfigurationEvent."
+    ::= { dot1sFutureMst 44 }
+
+fsMstRcvdEventSubType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives information about sub-type of the event received in
+        the system recently. The value of this object depends on the value of
+        the object fsMstRcvdEvent. For ConfigurationEvent, the sub-types
+        supported are PortUp and PortDown."
+    ::= { dot1sFutureMst 45 }
+
+fsMstRcvdEventTimeStamp OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The time stamp (in milli seconds) at which event specified by the
+       object fsMstRcvdEvent was received in the system at MSTP module recently.
+       This object is introduced to measure the convergence time in MSTP 
+       module."
+   ::= { dot1sFutureMst 46 }
+
+
+fsMstPortStateChangeTimeStamp OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The time stamp (in milli seconds) at which port state has been changed in  
+       the system. This object is introduced to measure the convergence time in
+       MSTP module."
+   ::= { dot1sFutureMst 47 }
+
+
+fsMstPortExtTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF FsMstPortExtEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "This is a table that is an extension to the dot1dStpExtPortTable.
+      This contains object(s) that are Port-based."
+   ::= { dot1sFutureMst 48 }
+
+fsMstPortExtEntry OBJECT-TYPE
+   SYNTAX      FsMstPortExtEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Each entry in this table is for creating/deleting port at MSTP
+       module level. This table is indexed by the fsRstPort."
+   INDEX { fsMstPort }
+   ::= { fsMstPortExtTable 1 }
+
+FsMstPortExtEntry ::=
+   SEQUENCE {
+      fsMstPort
+         Integer32,
+      fsMstPortRowStatus
+         RowStatus
+   }
+
+fsMstPort OBJECT-TYPE
+   SYNTAX      Integer32 (1..4096)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A unique value, greater than zero, indicating the Port number."
+   ::= { fsMstPortExtEntry 1 }
+
+fsMstPortRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "This object is used to create or delete interfaces at MSTP module
+       level.Ports can be created at MSTP module level only for ports that
+       have been created in Interface manager.This is applicable only when
+       Automatic Port Create Feature is Disabled."
+   ::= { fsMstPortExtEntry 2 }
+
+
+
+fsMstBpduGuard OBJECT-TYPE
+      SYNTAX      INTEGER    {
+                    enable (1),
+                    disable (2)
+                    }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "This object configures BPDU guard globally in MSTP 
+           and this global BPDU is applicable if and only if no Port specific 
+           BpduGuard is configured.
+           Enable - enables  BPDU Guard feature on edge ports globally and
+           moves the port to disabled discarding state when BPDU is received 
+           on the edge ports.
+           Disable - disables  BPDU Guard feature on edge ports globally."           
+    DEFVAL { 2 }
+   ::= { dot1sFutureMst 49 } 
+
+fsMstStpPerfStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  enable (1),
+                  disable (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "This object enables or disables the collection of performance data for 
+        the MSTP protocol. 'enable' (1) indicates that the collection of mstp
+        performance data is enabled on all ports in the device. 'disable'(2)
+        indicates the collection of mstp performance data is disabled on all
+        ports."
+    DEFVAL { 2 }
+   ::= { dot1sFutureMst 50}
+
+fsMstInstPortsMap OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object defines the spanning tree participating ports for an instance based on
+          the GVRP enabled status. When the object is enabled and GVRP is enabled in the node,
+          the member ports of the vlan which are mapped to the instance alone will be
+          participating in the spanning tree topology of the instance. When the object is
+          enabled and GVRP is disabled in the node, all the ports in the system will be
+          participating in the spanning-tree of the instance. When this object is disabled,
+          all the ports in the system will be participating in the spanning-tree of the instance.
+          By default this is set to false."
+     DEFVAL { false }
+      ::= { dot1sFutureMst 51 }
+
+fsMstCistPathCostType OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  stp8021d1998(1),
+                  stp8021t2001(2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+         "The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge.  A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+
+    DEFVAL { stp8021t2001 }
+   ::= { dot1sFutureMst 52 }
+
+  
+--SCALAR END
+
+-- TRAP MIB BEGIN
+fsMstSetTraps OBJECT-TYPE
+        SYNTAX   Integer32 (0..255)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This object is used to enable and  disable  specific
+           MSTP traps. Currently, the following are defined
+           0 - Traps are not enabled.
+           1 - General Traps like protocol up or down 
+           2 - Exception Traps like memory failure or buffer failure 
+                    or port protocol migration or invalid packet rcvd in port
+           3 - All the above Traps."
+    ::= { dot1sFsMstTrapsControl 1 }
+
+
+ fsMstGenTrapType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    up (1),
+                    down (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "The general events like 
+           none - none of the below values
+           up - protocol UP,
+           down - protocol DOWN." 
+   ::= { dot1sFsMstTrapsControl 2 }
+
+
+ fsMstErrTrapType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    memfail (1),
+                    bufffail (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "The error event like
+            none - none of the below values
+            memfail - memory allocation failure
+            bufffail - buffer allocation failure."
+   ::= { dot1sFsMstTrapsControl 3 }
+
+fsMstPortTrapNotificationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsMstPortTrapNotificationEntry 
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table is used to store the notification information
+       occurred in each of the port for protocol migration and 
+       invalid packet received."
+   ::= { dot1sFsMstTrapsControl 4 }
+
+fsMstPortTrapNotificationEntry OBJECT-TYPE
+   SYNTAX      FsMstPortTrapNotificationEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " This entry is used to store the notification information."
+   INDEX { fsMstPortTrapIndex}
+   ::= { fsMstPortTrapNotificationTable 1 }
+
+FsMstPortTrapNotificationEntry ::=
+        SEQUENCE {
+               fsMstPortTrapIndex
+               Integer32,
+               fsMstPortMigrationType 
+               INTEGER,
+               fsMstPktErrType
+               INTEGER,
+               fsMstPktErrVal
+               Integer32
+        }
+
+ fsMstPortTrapIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..4096)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A unique value, greater than zero, indicating the Port number."
+   ::= { fsMstPortTrapNotificationEntry 1 }
+
+ fsMstPortMigrationType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  sendstp (0),
+                  sendrstp (1)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Port Protocol migration type occured in the port."
+   ::= { fsMstPortTrapNotificationEntry 2 }
+
+ fsMstPktErrType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  protocolIdErr(0),
+                  invalidBpdu(1),
+                  configLengthErr(2),
+                  tcnLengthErr(3),
+                  rstpLengthErr(4),
+                  maxAgeErr(5),
+                  fwdDelayErr(6),
+                  helloTimeErr(7),
+                  mstpLengthErr(8)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Type of invalid packet received in each of the port."
+   ::= { fsMstPortTrapNotificationEntry 3 }
+
+ fsMstPktErrVal OBJECT-TYPE
+       SYNTAX   Integer32 
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Packet error value corresponding to the above type."
+   ::= { fsMstPortTrapNotificationEntry 4 }
+
+fsMstPortRoleTrapNotificationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF FsMstPortRoleTrapNotificationEntry 
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "This table is used to store the notification information
+       occurred in each of the port during role change."
+   ::= { dot1sFsMstTrapsControl 5 }
+
+fsMstPortRoleTrapNotificationEntry OBJECT-TYPE
+   SYNTAX      FsMstPortRoleTrapNotificationEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " This entry is used to store the notification information."
+   INDEX { fsMstPortTrapIndex, fsMstMstiInstanceIndex}
+   ::= { fsMstPortRoleTrapNotificationTable 1 }
+
+FsMstPortRoleTrapNotificationEntry ::=
+        SEQUENCE {
+            fsMstPortRoleType
+                INTEGER,
+            fsMstOldRoleType
+                INTEGER
+        }
+
+ fsMstPortRoleType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabledPort(0),
+                  alternatePort(1),
+                  backupPort(2),
+                  rootPort(3),
+                  designatedPort(4),
+		  masterport(5)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Particular Role Selected for the Port."
+   ::= { fsMstPortRoleTrapNotificationEntry 1 }
+
+ fsMstOldRoleType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  disabledPort(0),
+                  alternatePort(1),
+                  backupPort(2),
+                  rootPort(3),
+                  designatedPort(4),
+                  masterport(5)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Particular Role which is existing for the Port."
+   ::= { fsMstPortRoleTrapNotificationEntry 2 }
+
+ fsMstTraps OBJECT IDENTIFIER ::= { dot1sFutureMstTraps 0 }
+
+ fsMstGenTrap NOTIFICATION-TYPE
+        OBJECTS {
+           fsMstBrgAddress,
+           fsMstGenTrapType,
+           fsMstInstanceUpCount,
+           fsMstInstanceDownCount
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when any of the general events like protocol up or 
+          protocol down occurs."
+   ::= { fsMstTraps 1 }
+
+ fsMstErrTrap NOTIFICATION-TYPE
+        OBJECTS {
+           fsMstBrgAddress,
+           fsMstErrTrapType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when any of the error events like memory failure or buffer
+          failure or protocol migration or new root or topology change occurs."
+   ::= { fsMstTraps 2 }
+
+ fsMstNewRootTrap NOTIFICATION-TYPE
+        OBJECTS {
+                  fsMstBrgAddress,
+                  fsMstOldDesignatedRoot,
+                  fsMstMstiBridgeRegionalRoot
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever a new root bridge is selected in the topology."
+   ::= { fsMstTraps 3 }
+
+ fsMstTopologyChgTrap NOTIFICATION-TYPE
+        OBJECTS {
+                 fsMstBrgAddress,
+                 fsMstMstiTopChanges
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when topology change is detected."
+   ::= { fsMstTraps 4 }
+
+ fsMstProtocolMigrationTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsMstBrgAddress,
+            fsMstForceProtocolVersion,
+            fsMstPortMigrationType 
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when port protocol migration happens in the port."
+   ::= { fsMstTraps 5 }
+
+fsMstInvalidBpduRxdTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsMstBrgAddress,
+            fsMstPktErrType,
+            fsMstPktErrVal
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the invalid packet is received for 
+          bpdu/stp/rstp/maximum age/forward delay/hello time."
+   ::= { fsMstTraps 6 }
+
+fsMstRegionConfigChangeTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsMstBrgAddress, 
+            fsMstMstiConfigIdSel, 
+            fsMstMstiRegionName, 
+            fsMstMstiRegionVersion,
+            fsMstMstiConfigDigest
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the MST region's configuration     
+          identifier changes."
+   ::= { fsMstTraps 7 }
+
+fsMstNewPortRoleTrap NOTIFICATION-TYPE
+        OBJECTS {
+		  fsMstBrgAddress,
+		  fsMstPortRoleType,
+		  fsMstOldRoleType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever a new role is selected for the port."
+   ::= { fsMstTraps 8 }
+
+fsMstCistHwFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+          fsMstBrgAddress,
+          fsMstCistPortState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever an NPAPI call that is invoked from the protocol
+          to program the CIST port state in hardware fails."
+   ::= { fsMstTraps 9 }
+
+fsMstMstiHwFailureTrap NOTIFICATION-TYPE
+       OBJECTS {
+         fsMstBrgAddress,
+         fsMstMstiPortState
+               }
+       STATUS             current
+       DESCRIPTION
+        "Generated whenever an NPAPI call that is invoked from the protocol
+         to program the MSTI port state in hardware fails."
+   ::= { fsMstTraps 10 }
+
+fsMstCistLoopIncStateChange NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstCistPortLoopInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "Generated when the port has been moved to the loop inconsistent state for the CIST instance."
+    ::= { fsMstTraps 11 }
+
+fsMstMstiLoopIncStateChange NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstMstiPortLoopInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port has been moved to the loop inconsistent state for the MST instance."
+    ::= { fsMstTraps 12 }
+
+fsMstCistBpduIncStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstPortBpduInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port state goes to BPDU inconsistent state for the CIST instance."
+     ::= { fsMstTraps 13 }
+
+
+fsMstCistRootIncStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstCistPortRootInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port state goes to root inconsistent state for the CIST instance. "
+     ::= { fsMstTraps 14 }
+
+fsMstMstiRootIncStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstMstiPortRootInconsistentState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the port state goes to root inconsistent state for the MST instance. "
+     ::= { fsMstTraps 15 }
+
+fsMstCistPortStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstCistPortOldPortState,
+                    fsMstCistPortState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the current state of the port has been changed for the CIST instance."
+      ::= { fsMstTraps 16 }
+
+fsMstMstiPortStateChange  NOTIFICATION-TYPE
+         OBJECTS {
+                    fsMstBrgAddress,
+                    fsMstMstiPortOldPortState,
+                    fsMstMstiPortState
+                 }
+         STATUS             current
+         DESCRIPTION
+         "This object specifies the generation of trap when the current state of the port has been changed for the MST instance."
+      ::= { fsMstTraps 17 }
+
+   
+-- TRAP MIB END
+
+END

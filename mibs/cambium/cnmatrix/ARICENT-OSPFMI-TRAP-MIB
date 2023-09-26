@@ -1,0 +1,389 @@
+-- Copyright (C) 2007-2012 Aricent Group . All Rights Reserved
+
+ARICENT-OSPFMI-TRAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress, enterprises
+                FROM SNMPv2-SMI
+            fsMIStdOspfRouterId, fsMIStdOspfIfState,
+            fsMIStdOspfVirtIfState, fsMIStdOspfNbrRtrId,
+            fsMIStdOspfNbrState, fsMIStdOspfVirtNbrState,
+            fsMIStdOspfExtLsdbLimit, fsMIStdOspfEntry
+                FROM ARICENT-MISTDOSPF-MIB;
+
+    fsMIStdOspfTrap MODULE-IDENTITY
+      LAST-UPDATED "201209050000Z"
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+      CONTACT-INFO "support@aricent.com"
+      DESCRIPTION
+      "The Proprietary OSPFMI TRAP MIB modified from standard ospf trap MIB"
+      REVISION "201209050000Z"
+      DESCRIPTION
+      "The Proprietary OSPFMI TRAP MIB modified from standard ospf trap MIB"
+      
+        ::=  { enterprises futuresoftware (2076) 148 }
+
+-- Trap Support Objects
+
+--         The following are support objects for the OSPF traps.
+
+fsMIStdOspfTraps OBJECT IDENTIFIER ::= { fsMIStdOspfTrap 0 }
+fsMIStdOspfTrapControl OBJECT IDENTIFIER ::= { fsMIStdOspfTrap 1 }
+
+    fsMIStdOspfTrapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FsMIStdOspfTrapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+          "Ospf Trap Table for multiple context"
+        ::= { fsMIStdOspfTrapControl 1 }
+
+
+    fsMIStdOspfTrapEntry OBJECT-TYPE
+        SYNTAX FsMIStdOspfTrapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+          "Trap information for one of the instance"
+        AUGMENTS { fsMIStdOspfEntry }
+            
+        ::= { fsMIStdOspfTrapTable 1 }
+
+
+    FsMIStdOspfTrapEntry ::=
+        SEQUENCE {
+            fsMIStdOspfSetTrap
+               OCTET STRING,
+            fsMIStdOspfConfigErrorType
+               INTEGER,
+            fsMIStdOspfPacketType
+               INTEGER,
+            fsMIStdOspfPacketSrc
+               IpAddress
+                 }
+                   
+    fsMIStdOspfSetTrap OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(4))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "A four-octet string serving as a bit  map  for
+           the trap events defined by the OSPF traps. This
+           object is used to enable and  disable  specific
+           OSPF   traps   where  a  1  in  the  bit  field
+           represents enabled.  The right-most bit  (least
+           significant) represents trap 0. If MAX OSPF 
+           CONTEXT ID is passed as fsMIStdOspfContextId
+           then set the same trap for all the valid 
+           ospf context"
+       ::= { fsMIStdOspfTrapEntry 1 }
+
+
+    fsMIStdOspfConfigErrorType OBJECT-TYPE
+        SYNTAX   INTEGER   {
+                    badVersion (1),
+                    areaMismatch (2),
+                    unknownNbmaNbr (3), -- Router is Dr eligible
+                    unknownVirtualNbr (4),
+                    authTypeMismatch(5),
+                    authFailure (6),
+                    netMaskMismatch (7),
+                    helloIntervalMismatch (8),
+                    deadIntervalMismatch (9),
+                    optionMismatch (10) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Potential types  of  configuration  conflicts.
+           Used  by the ospfConfigError and ospfConfigVir-
+           tError traps."
+   ::= { fsMIStdOspfTrapEntry 2 }
+
+
+    fsMIStdOspfPacketType OBJECT-TYPE
+        SYNTAX   INTEGER   {
+                    hello (1),
+                    dbDescript (2),
+                    lsReq (3),
+                    lsUpdate (4),
+                    lsAck (5) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "OSPF packet types."
+   ::= { fsMIStdOspfTrapEntry 3 }
+
+
+    fsMIStdOspfPacketSrc OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP address of an inbound packet that  can-
+           not be identified by a neighbor instance."
+       ::= { fsMIStdOspfTrapEntry 4 }
+
+
+-- Traps
+
+
+    ospfIfStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfIfState   -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfStateChange trap signifies that there
+           has been a change in the state of a non-virtual
+           OSPF interface. This trap should  be  generated
+           when  the interface state regresses (e.g., goes
+           from Dr to Down) or progresses  to  a  terminal
+           state  (i.e.,  Point-to-Point, DR Other, Dr, or
+           Backup)."
+   ::= { fsMIStdOspfTraps 16 }
+
+
+    ospfVirtIfStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfVirtIfState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual interface.
+           This trap should be generated when  the  inter-
+           face  state  regresses  (e.g., goes from Point-
+           to-Point to Down) or progresses to  a  terminal
+           state (i.e., Point-to-Point)."
+   ::= { fsMIStdOspfTraps 1 }
+
+
+    ospfNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfNbrRtrId,
+                    fsMIStdOspfNbrState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An  ospfNbrStateChange  trap  signifies   that
+           there  has been a change in the state of a non-
+           virtual OSPF neighbor.   This  trap  should  be
+           generated  when  the  neighbor  state regresses
+           (e.g., goes from Attempt or Full  to  1-Way  or
+           Down)  or progresses to a terminal state (e.g.,
+           2-Way or Full).  When an  neighbor  transitions
+           from  or  to Full on non-broadcast multi-access
+           and broadcast networks, the trap should be gen-
+           erated  by the designated router.  A designated
+           router transitioning to Down will be  noted  by
+           ospfIfStateChange."
+   ::= { fsMIStdOspfTraps 2 }
+
+
+    ospfVirtNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfVirtNbrState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual neighbor.  This trap should  be  generated
+           when  the  neighbor state regresses (e.g., goes
+           from Attempt or  Full  to  1-Way  or  Down)  or
+           progresses to a terminal state (e.g., Full)."
+   ::= { fsMIStdOspfTraps 3 }
+    ospfIfConfigError NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfPacketSrc,  -- The source IP address
+                    fsMIStdOspfConfigErrorType, -- Type of error
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfConfigError  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface  from  a  router  whose   configuration
+           parameters  conflict  with this router's confi-
+           guration parameters.  Note that the  event  op-
+           tionMismatch  should  cause  a  trap only if it
+           prevents an adjacency from forming."
+                  ::= { fsMIStdOspfTraps 4 }
+
+
+    ospfVirtIfConfigError NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfConfigErrorType, -- Type of error
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfConfigError trap signifies that a pack-
+           et  has  been  received  on a virtual interface
+           from a router  whose  configuration  parameters
+           conflict   with   this  router's  configuration
+           parameters.  Note that the event optionMismatch
+           should  cause a trap only if it prevents an ad-
+           jacency from forming."
+   ::= { fsMIStdOspfTraps 5 }
+
+
+    ospfIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfPacketSrc,  -- The source IP address
+                    fsMIStdOspfConfigErrorType, -- authTypeMismatch or
+                                         -- authFailure
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfAuthFailure  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface from a router whose authentication  key
+           or  authentication  type  conflicts  with  this
+           router's authentication key  or  authentication
+           type."
+   ::= { fsMIStdOspfTraps 6 }
+
+
+    ospfVirtIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfConfigErrorType, -- authTypeMismatch or
+                                         -- authFailure
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfVirtIfAuthFailure trap signifies that a
+           packet has been received on a virtual interface
+           from a router whose authentication key  or  au-
+           thentication  type conflicts with this router's
+           authentication key or authentication type."
+   ::= { fsMIStdOspfTraps 7 }
+
+
+    ospfIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfPacketSrc,  -- The source IP address
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfIfRxBadPacket trap  signifies  that  an
+           OSPF  packet has been received on a non-virtual
+           interface that cannot be parsed."
+   ::= { fsMIStdOspfTraps 8 }
+
+    ospfVirtIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfRxBadPacket trap signifies that an OSPF
+           packet has been received on a virtual interface
+           that cannot be parsed."
+   ::= { fsMIStdOspfTraps 9 }
+
+
+    ospfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfNbrRtrId, -- Destination
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfTxRetransmit  trap  signifies  than  an
+           OSPF  packet  has  been retransmitted on a non-
+           virtual interface.  All packets that may be re-
+           transmitted  are associated with an LSDB entry.
+           The LS type, LS ID, and Router ID are  used  to
+           identify the LSDB entry."
+   ::= { fsMIStdOspfTraps 10 }
+
+
+    ospfVirtIfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfTxRetransmit  trap  signifies  than  an
+           OSPF packet has been retransmitted on a virtual
+           interface.  All packets that may be retransmit-
+           ted  are  associated with an LSDB entry. The LS
+           type, LS ID, and Router ID are used to identify
+           the LSDB entry."
+   ::= { fsMIStdOspfTraps 11 }
+
+
+    ospfOriginateLsa NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId -- The originator of the trap
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfOriginateLsa trap signifies that a  new
+           LSA  has  been originated by this router.  This
+           trap should not be invoked for simple refreshes
+           of  LSAs  (which happesn every 30 minutes), but
+           instead will only be invoked  when  an  LSA  is
+           (re)originated due to a topology change.  Addi-
+           tionally, this trap does not include LSAs  that
+           are  being  flushed  because  they have reached
+           MaxAge."
+   ::= { fsMIStdOspfTraps 12 }
+
+
+    ospfMaxAgeLsa NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId -- The originator of the trap
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfMaxAgeLsa trap signifies  that  one  of
+           the LSA in the router's link-state database has
+           aged to MaxAge."
+   ::= { fsMIStdOspfTraps 13 }
+
+
+    ospfLsdbOverflow NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfExtLsdbLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfLsdbOverflow trap  signifies  that  the
+           number of LSAs in the router's link-state data-
+           base has exceeded fsMIStdOspfExtLsdbLimit."
+   ::= { fsMIStdOspfTraps 14 }
+
+
+    ospfLsdbApproachingOverflow NOTIFICATION-TYPE
+        OBJECTS {
+                    fsMIStdOspfRouterId, -- The originator of the trap
+                    fsMIStdOspfExtLsdbLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfLsdbApproachingOverflow trap  signifies
+           that  the  number of LSAs in the router's link-
+           state database has exceeded ninety  percent  of
+           fsMIStdOspfExtLsdbLimit."
+   ::= { fsMIStdOspfTraps 15 }
+
+END

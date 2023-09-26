@@ -1,0 +1,249 @@
+ARICENT-ISS-MET-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS 
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   Integer32 FROM SNMPv2-SMI   
+    enterprises FROM SNMPv2-SMI 
+   issL2FilterEntry, issL3FilterEntry FROM ARICENT-ISS-MIB;
+     
+    
+
+
+   issMet MODULE-IDENTITY 
+      LAST-UPDATED "200702150000Z" 
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE" 
+      CONTACT-INFO 
+
+        "ARICENT COMMUNICATIONS SOFTWARE
+         3460 Hillview Avenue,
+         Palo Alto, CA 94304-1388, USA,
+         Phone : +1-650-391-1088
+         E-mail:support@aricent.com"
+
+         DESCRIPTION 
+       "The enterprise ID 2076 was originally assigned to Future Software Pvt Limited.
+        Future Software is a part of Aricent."
+         REVISION "200702150000Z"
+
+      DESCRIPTION 
+         "The MIB for AricentISSMetro." 
+   ::= { enterprises futuresoftware (2076) iss (81) issExt (8) 4}  
+
+-- ----------------------------------------------------------------- -- 
+-- groups in the MIB  
+-- ----------------------------------------------------------------- -- 
+
+      issMetroL2Filter              OBJECT IDENTIFIER ::= { issMet 1 }
+      issMetroL3Filter              OBJECT IDENTIFIER ::= { issMet 2 }
+
+-- ------------------------------------------------------------------ 
+-- L2 Filter Group --------------------------------------------------
+
+issMetroL2FilterTable OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF IssMetroL2FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       "A table to configure L2 filter rules defined for the metro
+       ethernet features of the switch."
+   ::= { issMetroL2Filter 1 }
+
+issMetroL2FilterEntry OBJECT-TYPE 
+   SYNTAX      IssMetroL2FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       "Each entry in this table is a L2 filter rule.
+       Index to the table is the L2 filter number. An entry in this
+       table will be created when the L2 Filter entry (issL2FilterStatus)
+       in the fsissext.mib is created."
+   AUGMENTS { issL2FilterEntry}
+   ::= { issMetroL2FilterTable 1 }
+   
+IssMetroL2FilterEntry ::= 
+   SEQUENCE { 
+      issMetroL2FilterOuterEtherType 
+         Integer32, 
+      issMetroL2FilterSVlanId 
+         Integer32,
+      issMetroL2FilterSVlanPriority
+         Integer32,
+      issMetroL2FilterCVlanPriority
+         Integer32,
+      issMetroL2FilterPacketTagType
+         INTEGER
+  }
+
+issMetroL2FilterOuterEtherType OBJECT-TYPE 
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+     " Specifies the Ether type of the Outer VLAN tag of a packet.
+       By Default, the value of the Outer Ether type will be zero,
+       which means dont care condition ie) Packet with any ether type."
+   DEFVAL  { 0 }
+   ::= { issMetroL2FilterEntry 1 }
+
+
+issMetroL2FilterSVlanId OBJECT-TYPE 
+   SYNTAX      Integer32 (0..4094)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Service Vlan Id / Outer Vlan Id / Vlan Id present in Outer tag to be
+      filtered. A value of '0' means, the service Vlan Id becomes dont care"
+   DEFVAL  { 0 }
+   ::= { issMetroL2FilterEntry 2 }
+
+issMetroL2FilterSVlanPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (-1..7)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Service Vlan Priority / Outer Vlan Priority / Vlan Priority present in 
+       Outer tag to be filtered. A value of '-1' means, the Service Vlan
+       priority becomes dont care"
+   DEFVAL  { -1 }
+   ::= { issMetroL2FilterEntry 3 }
+
+issMetroL2FilterCVlanPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (-1..7)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Customer Vlan Priority / Inner Vlan Priority / Vlan Priority present in 
+       Inner tag to be filtered. A value of '-1' means, the Customer Vlan
+       priority becomes dont care"
+   DEFVAL  { -1 }
+   ::= { issMetroL2FilterEntry 4 }
+
+issMetroL2FilterPacketTagType OBJECT-TYPE 
+   SYNTAX      INTEGER {
+                  singleTag (1),
+                  doubleTag (2)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies whether the configured filter parameters are applied on
+      single VLAN tagged packets or double VLAN tagged packets.
+     
+      The default value for this field is 'singleTag' when any of
+      issMetroL2FilterSVlanId, issMetroL2FilterSVlanPriority,
+      issMetroL2FilterOuterEtherType are configured other than the default
+      value.
+
+      When any of these parameters is configured, the value of this field
+      can be only 'doubleTag' and cannot be modified. However, this field can
+      be configured as 'doubleTag' when none of these parameters are
+      specified and only customer vlan id is configured"
+      
+
+   DEFVAL  { singleTag } 
+   ::= { issMetroL2FilterEntry 5 }
+
+-- ------------------------------------------------------------------ 
+-- L3 Filter Group --------------------------------------------------
+
+issMetroL3FilterTable OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF IssMetroL3FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       " A table to configure L3 filter rules defined for the metro
+       ethernet features of the switch."
+   ::= { issMetroL3Filter 1 }
+
+issMetroL3FilterEntry OBJECT-TYPE 
+   SYNTAX      IssMetroL3FilterEntry
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+       " Each entry in this table is a L3 filter rule.
+         Index to the table is L3 filter number. An entry in this 
+         table is created when issL3FilterStatus is created in fsissext.mib"
+   AUGMENTS { issL3FilterEntry}
+   ::= { issMetroL3FilterTable 1 }
+   
+IssMetroL3FilterEntry ::= 
+   SEQUENCE { 
+      issMetroL3FilterSVlanId
+         Integer32, 
+      issMetroL3FilterSVlanPriority
+         Integer32, 
+      issMetroL3FilterCVlanId
+         Integer32, 
+      issMetroL3FilterCVlanPriority
+         Integer32,
+      issMetroL3FilterPacketTagType
+         INTEGER
+  }
+
+issMetroL3FilterSVlanId OBJECT-TYPE 
+   SYNTAX      Integer32 (0..4094)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Service Vlan Id / Outer Vlan Id / Vlan Id present in Outer tag to be
+      filtered. A value of '0' means, the Service Vlan Id becomes dont care"
+   DEFVAL  { 0 }
+   ::= { issMetroL3FilterEntry 1 }
+
+issMetroL3FilterSVlanPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (-1..7)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Service Vlan Priority / Outer Vlan Priority / Vlan Priority present in 
+       Outer tag to be filtered. A value of '-1' means, the service vlan 
+       priority becomes dont care"
+   DEFVAL  { -1 }
+   ::= { issMetroL3FilterEntry 2 }
+
+issMetroL3FilterCVlanId OBJECT-TYPE 
+   SYNTAX      Integer32 (0..4094)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Customer Vlan Id / Inner Vlan Id / Vlan Id present in Inner tag to be
+      filtered. A value of '0' means, the Customer Vlan Id becomes dont care"
+   DEFVAL  { 0 }
+   ::= { issMetroL3FilterEntry 3 }
+
+issMetroL3FilterCVlanPriority OBJECT-TYPE 
+   SYNTAX      Integer32 (-1..7)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Customer Vlan Priority / Inner Vlan Priority / Vlan Priority present in 
+       Inner tag to be filtered. A value of '-1' means, the customer vlan
+       priority becomes dont care"
+   DEFVAL  { -1 }
+   ::= { issMetroL3FilterEntry 4 }
+
+issMetroL3FilterPacketTagType OBJECT-TYPE 
+   SYNTAX      INTEGER {
+                  singleTag (1),
+                  doubleTag (2)
+               }
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Specifies whether the configured filter parameters are applied on
+      single VLAN tagged packets or double VLAN tagged packets.
+     
+      The default value for this field is 'singleTag' when any of
+      issMetroL3FilterSVlanId, issMetroL3FilterSVlanPriority or
+      issMetroL3FilterCVlanPriority are not configured.
+
+      When any of these parameters is configured, the value of this field
+      can be only 'doubleTag' and cannot be modified. However, this field can
+      be configured as 'doubleTag' when none of these parameters are
+      specified and only customer vlan id is configured"
+      
+
+   DEFVAL  { singleTag } 
+   ::= { issMetroL3FilterEntry 5 }
+
+END

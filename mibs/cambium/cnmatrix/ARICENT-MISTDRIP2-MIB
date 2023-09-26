@@ -1,0 +1,501 @@
+-- Copyright (C) 2007-2012 Aricent Group . All Rights Reserved
+
+ARICENT-MISTDRIP2-MIB  DEFINITIONS ::= BEGIN 
+ 
+   IMPORTS 
+   OBJECT-TYPE, IpAddress, 
+   Counter32, TimeTicks,Integer32          FROM SNMPv2-SMI 
+   enterprises                             FROM SNMPv2-SMI
+   MODULE-IDENTITY	                   FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, RowStatus           FROM SNMPv2-TC
+   fsMIRipContextId, fsMIRip2GlobalEntry   FROM ARICENT-MIRIP2-MIB;
+
+fsMIStdRip  MODULE-IDENTITY
+     LAST-UPDATED "201209050000Z"
+     ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+     CONTACT-INFO "support@aricent.com" 
+     DESCRIPTION
+          " Changed the standard MIB for MI support"
+     REVISION "201209050000Z"
+     DESCRIPTION
+          " Changed the standard MIB for MI support"
+     ::= { enterprises futuresoftware(2076) 152}
+
+RouteTag ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+        "the RouteTag type represents the contents of the Route Domain 
+        field in the packet header or route entry" 
+    SYNTAX      OCTET STRING (SIZE (2)) 
+ 
+
+ 
+--Global Counters 
+ 
+--      The RIP-2 Globals Group. 
+--      Implementation of this group is mandatory for systems 
+--      which implement RIP-2. 
+ 
+-- These counters are intended to facilitate debugging quickly 
+-- changing routes or failing neighbors 
+
+fsMIStdRip2Globals OBJECT IDENTIFIER ::= { fsMIStdRip  1 }
+
+fsMIStdRip2GlobalTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF FsMIStdRip2GlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS	current
+    DESCRIPTION
+    "This Table Contains the list of globals for a
+     Context."
+::={ fsMIStdRip2Globals 1 }
+
+fsMIStdRip2GlobalEntry OBJECT-TYPE
+    SYNTAX    FsMIStdRip2GlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "An entry of fsMIStdRip2GlobalTable."
+    AUGMENTS { fsMIRip2GlobalEntry }
+    ::= { fsMIStdRip2GlobalTable 1 }
+
+   FsMIStdRip2GlobalEntry  ::=
+    SEQUENCE {
+  		fsMIStdRip2GlobalRouteChanges Counter32,
+  		fsMIStdRip2GlobalQueries Counter32
+             }
+
+  fsMIStdRip2GlobalRouteChanges OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of route changes made to the IP Route 
+           Database by RIP.  This does not include the refresh 
+           of a route's age." 
+       ::= { fsMIStdRip2GlobalEntry  1 } 
+ 
+  fsMIStdRip2GlobalQueries OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of responses sent to RIP queries 
+           from other systems." 
+       ::= { fsMIStdRip2GlobalEntry 2 } 
+          
+-- RIP Interface Tables 
+ 
+--  RIP Interfaces Groups 
+--  Implementation of these Groups is mandatory for systems 
+--  which implement RIP-2. 
+ 
+-- The RIP Interface Status Table. 
+
+ fsMIStdRip2IfStatTable OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF FsMIStdRip2IfStatEntry 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "A list of subnets which require separate 
+           status monitoring in RIP." 
+       ::= { fsMIStdRip 2 } 
+ 
+fsMIStdRip2IfStatEntry OBJECT-TYPE 
+       SYNTAX   FsMIStdRip2IfStatEntry 
+       MAX-ACCESS   not-accessible 
+       STATUS   current 
+       DESCRIPTION 
+          "A Single Routing Domain in a single Subnet." 
+      INDEX { fsMIRipContextId , fsMIStdRip2IfStatAddress } 
+      ::= { fsMIStdRip2IfStatTable 1 } 
+ 
+    FsMIStdRip2IfStatEntry ::= 
+    SEQUENCE { 
+	    fsMIStdRip2IfStatAddress 
+		    IpAddress, 
+	    fsMIStdRip2IfStatRcvBadPackets 
+		    Counter32, 
+	    fsMIStdRip2IfStatRcvBadRoutes 
+		    Counter32, 
+	    fsMIStdRip2IfStatSentUpdates 
+		    Counter32,
+	    fsMIStdRip2IfStatStatus 
+		    RowStatus, 
+        fsMIStdRip2IfStatPeriodicUpdates
+            Counter32,
+	    fsMIStdRip2IfStatRcvBadAuthPackets 
+		    Counter32 
+    } 
+ 
+ fsMIStdRip2IfStatAddress OBJECT-TYPE 
+        SYNTAX   IpAddress 
+        MAX-ACCESS    not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "The IP Address of this system on the indicated 
+           subnet. For unnumbered interfaces, the value 0.0.0.N, 
+           where the least significant 24 bits (N) is the ifIndex 
+           for the IP Interface in network byte order." 
+       ::= { fsMIStdRip2IfStatEntry 1 } 
+ 
+ fsMIStdRip2IfStatRcvBadPackets OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of RIP response packets received by 
+           the RIP process which were subsequently discarded 
+           for any reason (e.g. a version 0 packet, or an 
+           unknown command type)." 
+       ::= { fsMIStdRip2IfStatEntry 2 } 
+ 
+ fsMIStdRip2IfStatRcvBadRoutes OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of routes, in valid RIP packets, 
+           which were ignored for any reason (e.g. unknown 
+           address family, or invalid metric)." 
+       ::= { fsMIStdRip2IfStatEntry 3 } 
+ 
+ fsMIStdRip2IfStatSentUpdates OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of triggered RIP updates actually 
+           sent on this interface.  This explicitly does 
+           NOT include full updates sent containing new 
+           information." 
+       ::= { fsMIStdRip2IfStatEntry 4 } 
+ 
+ fsMIStdRip2IfStatStatus OBJECT-TYPE 
+        SYNTAX   RowStatus 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "Writing invalid has the effect of deleting 
+           this interface." 
+       ::= { fsMIStdRip2IfStatEntry 5 } 
+
+ fsMIStdRip2IfStatPeriodicUpdates OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of Periodic RIP updates  
+            sent on this interface." 
+       ::= { fsMIStdRip2IfStatEntry 6 } 
+ 
+ fsMIStdRip2IfStatRcvBadAuthPackets OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of RIP response packets received by 
+           the RIP process which were subsequently discarded 
+           due to authentication failure." 
+       ::= { fsMIStdRip2IfStatEntry 7 } 
+ 
+ 
+-- The RIP Interface Configuration Table. 
+ 
+ fsMIStdRip2IfConfTable OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF FsMIStdRip2IfConfEntry 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "A list of subnets which require separate 
+           configuration in RIP." 
+       ::= { fsMIStdRip 3 } 
+ 
+ fsMIStdRip2IfConfEntry OBJECT-TYPE 
+       SYNTAX   FsMIStdRip2IfConfEntry 
+       MAX-ACCESS   not-accessible 
+       STATUS   current 
+       DESCRIPTION 
+          "A Single Routing Domain in a single Subnet." 
+      INDEX { fsMIRipContextId , fsMIStdRip2IfConfAddress } 
+      ::= { fsMIStdRip2IfConfTable 1 } 
+ 
+ FsMIStdRip2IfConfEntry ::= 
+ SEQUENCE { 
+	 fsMIStdRip2IfConfAddress 
+		 IpAddress, 
+	 fsMIStdRip2IfConfDomain 
+		 RouteTag, 
+	 fsMIStdRip2IfConfAuthType 
+		 INTEGER, 
+	 fsMIStdRip2IfConfAuthKey 
+		 OCTET STRING,
+	 fsMIStdRip2IfConfSend 
+		 INTEGER, 
+	 fsMIStdRip2IfConfReceive 
+		 INTEGER, 
+	 fsMIStdRip2IfConfDefaultMetric 
+		 Integer32, 
+	 fsMIStdRip2IfConfStatus 
+		 RowStatus, 
+	 fsMIStdRip2IfConfSrcAddress 
+		 IpAddress 
+ } 
+ 
+    fsMIStdRip2IfConfAddress OBJECT-TYPE 
+        SYNTAX   IpAddress 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "The IP Address of this system on the indicated 
+            subnet. The IP Address is a Primary IP Address
+            or a Secondary IP address.For unnumbered interfaces, 
+            the value 0.0.0.N, where the least significant 
+            24 bits (N) is the ifIndex for the IP Interface 
+            in network byte order." 
+       ::= { fsMIStdRip2IfConfEntry 1 } 
+ 
+    fsMIStdRip2IfConfDomain OBJECT-TYPE 
+        SYNTAX   RouteTag 
+        MAX-ACCESS   read-create 
+        STATUS   obsolete 
+        DESCRIPTION 
+           "Value inserted into the Routing Domain field 
+           of all RIP packets sent on this interface." 
+       DEFVAL { '0000'h }
+       ::= { fsMIStdRip2IfConfEntry 2 } 
+ 
+    fsMIStdRip2IfConfAuthType OBJECT-TYPE 
+        SYNTAX   INTEGER { 
+                    noAuthentication (1), 
+                    simplePassword (2), 
+                    md5 (3),
+                    sha1 (4),
+                    sha256 (5),
+                    sha384 (6),
+                    sha512 (7) 
+                 } 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "The type of Authentication used on this 
+           interface." 
+       DEFVAL { noAuthentication } 
+       ::= { fsMIStdRip2IfConfEntry 3 } 
+ 
+    fsMIStdRip2IfConfAuthKey OBJECT-TYPE 
+        SYNTAX   OCTET STRING (SIZE(0..16)) 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "The value to be used as the Authentication Key 
+           whenever the corresponding instance of 
+           fsMIStdRip2IfConfAuthType has a value other than 
+           noAuthentication.  A modification of the corresponding 
+           instance of fsMIStdRip2IfConfAuthType does not modify 
+           the fsMIStdRip2IfConfAuthKey value.  If a string shorter 
+           than 16 octets is supplied, it will be left- 
+           justified and padded to 16 octets, on the right, 
+           with nulls (0x00). 
+ 
+           Reading this object always results in an  OCTET 
+           STRING of length zero; authentication may not 
+           be bypassed by reading the MIB object." 
+       DEFVAL { ''h } 
+       ::= { fsMIStdRip2IfConfEntry 4 } 
+ 
+    fsMIStdRip2IfConfSend OBJECT-TYPE 
+        SYNTAX   INTEGER { 
+                    doNotSend (1), 
+                    ripVersion1 (2), 
+                    rip1Compatible (3), 
+                    ripVersion2 (4), 
+                    ripV1Demand (5), 
+                    ripV2Demand (6) 
+                 } 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "What the router sends on this interface. 
+           ripVersion1 implies sending RIP updates compliant 
+           with  RFC  1058.   rip1Compatible implies 
+           broadcasting RIP-2 updates using RFC 1058 route 
+           subsumption rules.  ripVersion2 implies 
+           multicasting RIP-2 updates.  ripV1Demand indicates 
+           the use of Demand RIP on a WAN interface under RIP 
+           Version 1 rules.  ripV2Demand indicates the use of 
+           Demand RIP on a WAN interface under Version 2 rules." 
+       DEFVAL { rip1Compatible } 
+       ::= { fsMIStdRip2IfConfEntry 5 } 
+ 
+    fsMIStdRip2IfConfReceive OBJECT-TYPE 
+        SYNTAX   INTEGER { 
+                    rip1 (1), 
+                    rip2 (2), 
+                    rip1OrRip2 (3), 
+                    doNotRecieve (4) 
+                 } 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "This indicates which version of RIP updates 
+           are to be accepted.  Note that fsMIStdRip2 and 
+           rip1OrRip2 implies reception of multicast 
+           packets." 
+       DEFVAL { rip1OrRip2 } 
+       ::= { fsMIStdRip2IfConfEntry 6 } 
+ 
+    fsMIStdRip2IfConfDefaultMetric OBJECT-TYPE 
+        SYNTAX   Integer32 ( 0..15 ) 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "This variable indicates the metric that is to 
+           be used for the default route entry in RIP updates 
+           originated on this interface.  A value of zero 
+           indicates that no default route should be 
+           originated; in this case, a default route via 
+           another router may be propagated." 
+       ::= { fsMIStdRip2IfConfEntry 7 } 
+ 
+    fsMIStdRip2IfConfStatus OBJECT-TYPE 
+        SYNTAX   RowStatus 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "Writing invalid has  the  effect  of  deleting 
+           this interface." 
+       ::= { fsMIStdRip2IfConfEntry 8 } 
+ 
+    fsMIStdRip2IfConfSrcAddress OBJECT-TYPE 
+        SYNTAX   IpAddress 
+        MAX-ACCESS   read-create 
+        STATUS   current 
+        DESCRIPTION 
+           "The IP Address this system will use as a source 
+            address on this interface.  If it is a numbered 
+            interface, this MUST be the same value as 
+            fsMIStdRip2IfConfAddress.  On unnumbered interfaces, 
+            it must be the value of fsMIStdRip2IfConfAddress for 
+            some interface on the system." 
+       ::= { fsMIStdRip2IfConfEntry 9 } 
+ 
+--4.3 Peer Table 
+ 
+--  Peer Table 
+ 
+--      The RIP Peer Group 
+--      Implementation of this Group is Optional 
+ 
+--      This group provides information about active peer 
+--      relationships intended to assist in debugging.  An 
+--      active peer is a router from which a valid RIP 
+--      updated has been heard in the last 180 seconds. 
+ 
+    fsMIStdRip2PeerTable OBJECT-TYPE 
+        SYNTAX   SEQUENCE OF FsMIStdRip2PeerEntry 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "A list of RIP Peers." 
+       ::= { fsMIStdRip 4 } 
+ 
+   fsMIStdRip2PeerEntry OBJECT-TYPE 
+       SYNTAX   FsMIStdRip2PeerEntry 
+       MAX-ACCESS   not-accessible 
+       STATUS   current 
+       DESCRIPTION 
+          "Information regarding a single routing peer." 
+      INDEX { fsMIRipContextId, fsMIStdRip2PeerAddress, fsMIStdRip2PeerDomain } 
+      ::= { fsMIStdRip2PeerTable 1 } 
+ 
+    FsMIStdRip2PeerEntry ::= 
+        SEQUENCE { 
+            fsMIStdRip2PeerAddress 
+                IpAddress, 
+            fsMIStdRip2PeerDomain 
+                RouteTag, 
+            fsMIStdRip2PeerLastUpdate 
+                TimeTicks, 
+            fsMIStdRip2PeerVersion 
+                Integer32, 
+            fsMIStdRip2PeerRcvBadPackets 
+                Counter32, 
+            fsMIStdRip2PeerRcvBadRoutes 
+                Counter32,
+            fsMIStdRip2PeerInUseKey 
+                Integer32
+            } 
+ 
+    fsMIStdRip2PeerAddress OBJECT-TYPE 
+        SYNTAX   IpAddress 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "The IP Address that the peer is using as its source 
+            address.  Note that on an unnumbered link, this may 
+            not be a member of any subnet on the system." 
+       ::= { fsMIStdRip2PeerEntry 1 } 
+ 
+    fsMIStdRip2PeerDomain OBJECT-TYPE 
+        SYNTAX   RouteTag 
+        MAX-ACCESS   not-accessible 
+        STATUS   current 
+        DESCRIPTION 
+           "The value in the Routing Domain field  in  RIP 
+           packets received from the peer.  As domain suuport 
+           is deprecated, this must be zero." 
+       ::= { fsMIStdRip2PeerEntry 2 } 
+ 
+    fsMIStdRip2PeerLastUpdate OBJECT-TYPE 
+        SYNTAX   TimeTicks 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The value of sysUpTime when the most recent 
+           RIP update was received from this system." 
+       ::= { fsMIStdRip2PeerEntry 3 } 
+ 
+    fsMIStdRip2PeerVersion OBJECT-TYPE 
+        SYNTAX   Integer32 ( 0..255 ) 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The RIP version number in the header of the 
+           last RIP packet received." 
+       ::= { fsMIStdRip2PeerEntry 4 } 
+ 
+    fsMIStdRip2PeerRcvBadPackets OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of RIP response packets from this 
+           peer discarded as invalid." 
+       ::= { fsMIStdRip2PeerEntry 5 } 
+ 
+ 
+    fsMIStdRip2PeerRcvBadRoutes OBJECT-TYPE 
+        SYNTAX   Counter32 
+        MAX-ACCESS   read-only 
+        STATUS   current 
+        DESCRIPTION 
+           "The number of routes from this peer that were 
+           ignored because the entry format was invalid." 
+       ::= { fsMIStdRip2PeerEntry 6 } 
+
+    fsMIStdRip2PeerInUseKey OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION  
+          "This represents the active authentication KeyID that is currently used 
+          by the peer for sending RIP updates."
+       ::= { fsMIStdRip2PeerEntry 7 }
+
+END 
+
+          
+         
+
+

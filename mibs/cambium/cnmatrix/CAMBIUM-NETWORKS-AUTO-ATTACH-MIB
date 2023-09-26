@@ -1,0 +1,1801 @@
+CAMBIUM-NETWORKS-AUTO-ATTACH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32, Integer32, Counter32, enterprises
+            FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+            FROM IF-MIB
+    InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB
+    RowStatus, StorageType, TruthValue
+            FROM SNMPv2-TC;
+
+cnAutoAttachMib MODULE-IDENTITY
+    LAST-UPDATED "202209210000Z"     -- September 21, 2022
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the 
+        Auto-Attach support."
+
+    REVISION    "202209210000Z" -- September 21, 2022
+    DESCRIPTION "Ver 12: Added localization support. Defined
+                 device localization attribute and extended
+                 component naming where localization can
+                 be applied. Added MAC list support. Support
+                 creation and deletion of MAC list files.
+                 Add data file field to Rule entry. Defined
+                 PBA data file download attributes."
+
+    REVISION    "202112100000Z" -- December 10, 2021
+    DESCRIPTION "Ver 11: Added policy port list support."
+
+    REVISION    "202109290000Z" -- September 29, 2021
+    DESCRIPTION "Ver 10: Updated supported rule type enums
+                for automated voice VLAN functionalty. Added
+                Auto-VoIP action support. Introduced the
+                Neighbor Classification Table."
+
+    REVISION    "202102110000Z" -- February 11, 2021
+    DESCRIPTION "Ver 9: New action supporting port automatic
+                device recovery (ADR) status update defined."
+
+    REVISION    "202101190000Z" -- January 19, 2021
+    DESCRIPTION "Ver 8: Added rule list support. New port
+                speed action defined. Updated table name 
+                attribute size limits. Created Auto-VLAN
+                global status object."
+
+    REVISION    "202010120000Z" -- October 12, 2020
+    DESCRIPTION "Ver 7: Added action support for WISP 
+                switch Cambium Sync functionality."
+
+    REVISION    "202006050000Z" -- June 5, 2020
+    DESCRIPTION "Ver 6: Added new rule type enumerations
+                supporting Auto-VLAN and default policy 
+                functionality. Added action modifier that
+                indicates if a port bounce is required
+                when the PVID is updated when a policy
+                is applied. Defined new read-only table
+                cnAutoAttachCondensedNbrTable. Protected
+                port action added. Global uplink support
+                added."
+
+    REVISION    "201910100000Z" -- October 10, 2019
+    DESCRIPTION "Ver 5: Added new PBA global settings
+                supporting precedence-based active policy 
+                reordering and MAC-based policy ageout 
+                control."
+
+    REVISION    "201909100000Z" -- September 10, 2019
+    DESCRIPTION "Ver 4: Added global MAC matching   
+                mode attribute."
+
+    REVISION    "201906260000Z" -- June 26, 2019
+    DESCRIPTION "Ver 3: Added new rule type options.
+                Added new action support. Defined
+                objects supporting PBA TLVs. Updated
+                cnAutoAttachPolicyStatus description.
+                Support automatic port description
+                updates. Cleaned up MIB registration
+                number. Support port policy history."
+
+    REVISION    "201901230000Z" -- January 23, 2019
+    DESCRIPTION "Ver 2: Added new action support."
+
+    REVISION    "201810230000Z" -- October 23, 2018
+    DESCRIPTION "Ver 1: Initial version."
+
+    ::= { cnMatrix 1 }
+
+cambium                   OBJECT IDENTIFIER ::= { enterprises 17713 }
+cnMatrix                  OBJECT IDENTIFIER ::= { cambium 24 }
+cnAutoAttachNotifications OBJECT IDENTIFIER ::= { cnAutoAttachMib 0 }
+cnAutoAttachObjects       OBJECT IDENTIFIER ::= { cnAutoAttachMib 1 }
+cnAutoAttachNotifyObjects OBJECT IDENTIFIER ::= { cnAutoAttachMib 2 }
+
+--
+-- Auto-Attach scalar attributes
+--
+
+cnAutoAttachService OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Exports the status of the Auto-Attach service."
+
+    ::= { cnAutoAttachObjects 1 }
+
+cnAutoAttachDataDiffAllowed  OBJECT-TYPE
+    SYNTAX        Integer32 (0..8)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   
+        "The number of data discrepancies allowed 
+        before applied policy settings are deleted.
+        A data discrepancy occurs when current 
+        device identification data differs from the
+        previously received device data used for
+        policy application."
+
+    DEFVAL        { 0 }
+    ::= { cnAutoAttachObjects 2 }
+
+cnAutoAttachDeviceDataCompare OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       caseSensitive(1),
+                       caseInsensitive(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies the string comparison mode used
+        for device identification. A setting of
+        'caseSensitive(1)' indicates the character
+        case is taken into account when determining
+        a match. A setting of 'caseInsensitive(2)'
+        indicates that the character case is ignored
+        during string comparison operations."
+
+    DEFVAL	   { caseSensitive }
+    ::= { cnAutoAttachObjects 3 }
+
+cnAutoAttachClearPolicyStats OBJECT-TYPE
+    SYNTAX	   TruthValue
+    MAX-ACCESS	   read-write
+    STATUS	   current
+    DESCRIPTION
+        "Clears Auto-Attach statistics for all  
+        policies. Setting this attribute to 'true(1)' 
+        clears all counters. The value 'false(2)' is 
+        returned when the attribute is queried."
+
+    DEFVAL	   { false }
+    ::= { cnAutoAttachObjects 4 }
+
+cnAutoAttachClearInterfaceStats OBJECT-TYPE
+    SYNTAX	   TruthValue
+    MAX-ACCESS	   read-write
+    STATUS	   current
+    DESCRIPTION
+        "Clears Auto-Attach statistics on all device 
+        interfaces. Setting this attribute to 'true(1)' 
+        clears all counters. The value 'false(2)' is 
+        returned when the attribute is queried."
+
+    DEFVAL	   { false }
+    ::= { cnAutoAttachObjects 5 }
+
+cnAutoAttachUpdatePortDesc OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       disabled(1),
+                       pbaPolicyName(2),
+                       lldpSystemName(3),
+                       lldpSystemDescription(4)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "When enabled, the port description is
+        potentially updated when a PBA policy is
+        applied to the port. Updates occur only
+        if the current port description is empty.
+        The data used for the port description
+        update is determined by the attribute 
+        value at the time the policy is applied."
+
+    ::= { cnAutoAttachObjects 6 }
+
+cnAutoAttachRestrictedMacMatch OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "When enabled, additional checks are performed
+        during evaluation of MAC address-based policies
+        to ensure that they are only applied to ports
+        on which only a single MAC address has been
+        learned or where the MAC that is matched by
+        the policy represents the directly connected
+        device.
+
+        When disabled, MAC address-based policies are
+        more freely applied to any port on which there
+        exists MAC address data matching policy criteria."
+
+    DEFVAL	   { enabled }
+    ::= { cnAutoAttachObjects 7 }
+
+cnAutoAttachActivePolicyReorder OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "When enabled, definition of a new policy and
+        existing policy precedence updates cause active 
+        policy re-evaluation to occur. Currently applied 
+        policies, even if they are still applicable, may 
+        be replaced by a new policy if it is also applicable 
+        to an interface and has a higher precedence.
+
+        When disabled, policy precedence is only considered
+        when a policy is first evaluated for interface
+        applicability. Once a policy is applied, it will 
+        not be replaced by another policy until it is no
+        longer applicable to the interface."
+
+    DEFVAL	   { enabled }
+    ::= { cnAutoAttachObjects 8 }
+
+cnAutoAttachMacPolicyAging OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "When enabled, applied MAC-based policies are
+        cleared on an interface when the associated
+        MAC address is aged-out and removed from the
+        FDB.
+
+        When disabled, applied MAC-based policies are
+        not cleared on an interface when the associated
+        MAC address is aged-out and removed from the
+        FDB. The policy is only cleared based on other
+        PBA-impacting events, such as link-down, PBA
+        disable, PBA interface disable and policy 
+        deletion/disable. 
+
+        This MAC-based policy lockdown is useful when 
+        connecting devices that may generate minimal
+        traffic for extended periods causing installed
+        PBA policies to be cleared when they are
+        still necessary."
+
+    DEFVAL	   { disabled }
+    ::= { cnAutoAttachObjects 9 }
+
+--
+-- Auto-Attach Port Table support
+--
+
+cnAutoAttachPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains port-specific data
+        for the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 10 }
+
+cnAutoAttachPortEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-specific data related to the
+        Auto-Attach application."
+
+    INDEX { cnAutoAttachPortIfIndex }
+    ::= { cnAutoAttachPortTable 1 }
+
+CnAutoAttachPortEntry ::= SEQUENCE {
+    cnAutoAttachPortIfIndex                  Integer32,
+    cnAutoAttachPortState                    INTEGER,
+    cnAutoAttachPortMsgAuthStatus            INTEGER,
+    cnAutoAttachPortMsgAuthKey               OCTET STRING,
+    cnAutoAttachPortActivePolicyName         SnmpAdminString,
+    cnAutoAttachPortPolicyApplied            Counter32,
+    cnAutoAttachPortPolicyExpired            Counter32,
+    cnAutoAttachPortPolicyErrors             Counter32,
+    cnAutoAttachPortRowStatus                RowStatus,
+    cnAutoAttachPortTlvTxEnable              BITS,
+    cnAutoAttachPortDevSettingsTlvReceived   Counter32,
+    cnAutoAttachPortDevSettingsTlvProcessed  Counter32,
+    cnAutoAttachPortDevSettingsTlvAuthFails  Counter32,
+    cnAutoAttachPortPrevPolicyName           SnmpAdminString
+}
+
+cnAutoAttachPortIfIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Port (ifIndex) identifier attribute."
+
+    ::= { cnAutoAttachPortEntry 1 }
+
+cnAutoAttachPortState OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The current port state from an Auto-Attach
+        perspective. Indicates whether remote device 
+        data associated with the port will be examined 
+        for Auto-Attach processing purposes."
+
+    ::= { cnAutoAttachPortEntry 2 }
+
+cnAutoAttachPortMsgAuthStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Controls the current Auto-Attach message 
+        authentication status for the associated 
+        interface."
+
+    ::= { cnAutoAttachPortEntry 3 }
+
+cnAutoAttachPortMsgAuthKey OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0..32))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Provides access to the Auto-Attach message 
+        authentication key for the associated interface. 
+        Can be used to establish a new key of length 
+        1..32 octets. Always returns a zero-length 
+        string when queried."
+
+    ::= { cnAutoAttachPortEntry 4 }
+
+cnAutoAttachPortActivePolicyName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..20))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Name of the policy specification that is 
+        currently applied to the port."
+
+    ::= { cnAutoAttachPortEntry 5 }
+
+cnAutoAttachPortPolicyApplied OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times a policy has been applied
+        to the port."
+
+    ::= { cnAutoAttachPortEntry 6 }
+
+cnAutoAttachPortPolicyExpired OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times a policy has expired on
+        the port."
+
+    ::= { cnAutoAttachPortEntry 7 }
+
+cnAutoAttachPortPolicyErrors OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times an error has been detected
+        during policy application/expiration on the port."
+
+    ::= { cnAutoAttachPortEntry 8 }
+
+cnAutoAttachPortRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created, deleted
+        and modified in the cnAutoAttachPortTable, if the
+        operation is supported by the agent."
+
+    ::= { cnAutoAttachPortEntry 9 }
+
+cnAutoAttachPortTlvTxEnable OBJECT-TYPE
+    SYNTAX         BITS {
+                       pbaAuthenticationTlv(0),
+                       pbaDeviceSettingsTlv(1)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object supports enabling/disabling PBA/AA TLV 
+        transmission with LLDP. TLV transmission is enabled
+        on the port when the associated bit is 1 and disabled
+        when the bit is 0. Support for specific PBA TLVs is
+        platform-dependent."
+
+    ::= { cnAutoAttachPortEntry 10 }
+
+cnAutoAttachPortDevSettingsTlvReceived OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times a PBA Device Settings TLV
+        has been received by LLDP on the port."
+
+    ::= { cnAutoAttachPortEntry 11 }
+
+cnAutoAttachPortDevSettingsTlvProcessed OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times a PBA Device Settings TLV
+        has been processed by the PBA agent on the port."
+
+    ::= { cnAutoAttachPortEntry 12 }
+
+cnAutoAttachPortDevSettingsTlvAuthFails OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times a PBA Device Settings TLV
+        has been dropped because of an authentication
+        failure on the port."
+
+    ::= { cnAutoAttachPortEntry 13 }
+
+cnAutoAttachPortPrevPolicyName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..20))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Name of the policy specification that was 
+        previously applied to the port."
+
+    ::= { cnAutoAttachPortEntry 14 }
+
+--
+-- Auto-Attach Rule Table support        
+--
+
+cnAutoAttachRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the rule specifications 
+        for the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 11 }
+
+cnAutoAttachRuleEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the rule specifications 
+        for the Auto-Attach application."
+
+    INDEX { cnAutoAttachRuleName }
+    ::= { cnAutoAttachRuleTable 1 }
+
+CnAutoAttachRuleEntry ::= SEQUENCE {
+    cnAutoAttachRuleName          SnmpAdminString,
+    cnAutoAttachRuleType          INTEGER,
+    cnAutoAttachRuleDeviceData    SnmpAdminString,
+    cnAutoAttachRuleRowStatus     RowStatus,
+    cnAutoAttachRuleListName      SnmpAdminString,
+    cnAutoAttachRuleDataFileName  SnmpAdminString
+}
+
+cnAutoAttachRuleName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Name for the rule specification."
+
+    ::= { cnAutoAttachRuleEntry 1 }
+
+cnAutoAttachRuleType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       lldpAny(2),
+                       lldpCapabilities(3),
+                       lldpSystemName(4),
+                       lldpSystemDescription(5),
+                       lldpChassisId(6),
+                       lldpPortId(7),
+                       lldpPortDescription(8),
+                       macOui(9),
+                       macFullAddress(10),
+                       macAddressRange(11),
+                       lldpIpv4MgmtAddress(12),
+                       autoVlan(13),
+                       defaultAnyMac(14),
+                       ifc8021x(15),
+                       autoVoip(16),
+                       macList(17)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Rule type identifier. The rule type determines
+        how a device is identified using data associated
+        with the device (e.g., using exported LLDP TLV 
+        data, device MAC address data, etc.)."
+
+    ::= { cnAutoAttachRuleEntry 2 }
+
+cnAutoAttachRuleDeviceData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..60))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies the data that is used to identify a
+        device. Data application depends on the associated 
+        detection method (cnAutoAttachRuleType)."
+
+    ::= { cnAutoAttachRuleEntry 3 }
+
+cnAutoAttachRuleRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the cnAutoAttachRuleTable."
+
+    ::= { cnAutoAttachRuleEntry 4 }
+
+cnAutoAttachRuleListName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The Rule List Name is used to link rules.
+        Rules belonging to the same list (based on
+        the rule list name attribute) are treated
+        as a single rule during evaluation when
+        referenced by a policy."
+
+    ::= { cnAutoAttachRuleEntry 5 }
+
+cnAutoAttachRuleDataFileName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..128))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "File name that identifies downloaded data
+        that can be used to specify rule criteria,
+        if needed, as determined by the rule type."
+
+    ::= { cnAutoAttachRuleEntry 6 }
+
+--
+-- Auto-Attach Action Table support        
+--
+
+cnAutoAttachActionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the action specifications 
+        for the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 12 }
+
+cnAutoAttachActionEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the action specifications 
+        for the Auto-Attach application."
+
+    INDEX { cnAutoAttachActionName }
+    ::= { cnAutoAttachActionTable 1 }
+
+CnAutoAttachActionEntry ::= SEQUENCE {
+    cnAutoAttachActionName              SnmpAdminString,
+    cnAutoAttachActionVlanData          SnmpAdminString,
+    cnAutoAttachActionPvid              Integer32,
+    cnAutoAttachActionPortMode          INTEGER,
+    cnAutoAttachActionRowStatus         RowStatus,
+    cnAutoAttachActionUserPriority      Integer32,
+    cnAutoAttachActionQosTrust          INTEGER,
+    cnAutoAttachActionUplinkData        SnmpAdminString,
+    cnAutoAttachActionPoePriority       INTEGER,
+    cnAutoAttachActionPvidUpdateReset   INTEGER,
+    cnAutoAttachActionProtectedPort     INTEGER,
+    cnAutoAttachActionCambiumSync       INTEGER,
+    cnAutoAttachActionPortSpeed         INTEGER,
+    cnAutoAttachActionPortAdr           INTEGER,
+    cnAutoAttachActionAutoVoip          INTEGER
+}
+
+cnAutoAttachActionName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (1..65))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Name for the action specification.
+
+        Action is localized if the name includes
+        a localization ('@localizationValue')
+        suffix. The base action name is 1..32
+        characters while the localization value
+        is 0..32 characters (excluding the
+        localization suffix indicator '@')."
+
+    ::= { cnAutoAttachActionEntry 1 }
+
+cnAutoAttachActionVlanData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..100))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies VLAN IDs to be associated with 
+        an interface. VLAN data specified using a
+        string format with VLAN values comma-separated
+        (e.g., '10,20,30'). A maximum of 20 VLAN IDs
+        can be specified.
+
+        A zero-length string indicates that no VLAN
+        data is specified."
+
+    ::= { cnAutoAttachActionEntry 2 }
+
+cnAutoAttachActionPvid OBJECT-TYPE
+    SYNTAX         Integer32 (0..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Default/native VLAN ID for an interface.
+        A value of 0 indicates an PVID update
+        action is not requested."
+
+    ::= { cnAutoAttachActionEntry 3 }
+
+cnAutoAttachActionPortMode OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       access(2),
+                       trunk(3),
+                       hybrid(4)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Port mode for an interface. A value of
+        'none(1)' indicates that no update is
+        requested."
+
+    ::= { cnAutoAttachActionEntry 4 }
+
+cnAutoAttachActionRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the cnAutoAttachActionTable."
+
+    ::= { cnAutoAttachActionEntry 5 }
+
+cnAutoAttachActionUserPriority OBJECT-TYPE
+    SYNTAX         Integer32 (0..8)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Default user priority value for an interface.
+        A value of 8 indicates a user priority update
+        action is not requested."
+
+    ::= { cnAutoAttachActionEntry 6 }
+
+cnAutoAttachActionQosTrust OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       untrusted(2),
+                       dot1p(3),
+                       dscp(4)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "QoS trust setting for an interface. A value 
+        of 'none(1)' indicates that no update is
+        requested."
+
+    ::= { cnAutoAttachActionEntry 7 }
+
+cnAutoAttachActionUplinkData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..31))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies interfaces to be considered for
+        VLAN membership updates when VLAN membership
+        updates are initiated through processing of
+        the cnAutoAttachActionVlanData object.
+
+        Uplink interfaces are specified using interface
+        type and value notation in a string format
+        with uplink interface values comma-separated
+        (e.g., 'gi0/9,gi0/10'). A maximum of 4 uplinks
+        can be specified.
+
+        A zero-length string indicates that no uplink
+        data is specified."
+
+    ::= { cnAutoAttachActionEntry 8 }
+
+cnAutoAttachActionPoePriority OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       critical(2),
+                       high(3),
+                       low(4)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "PoE priority setting for an interface. A 
+        value of 'none(1)' indicates that no update 
+        is requested."
+
+    ::= { cnAutoAttachActionEntry 9 }
+
+cnAutoAttachActionPvidUpdateReset OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "PVID update modifier setting. When 'enabled(1)',
+        if the port PVID is updated when a policy applied,
+        the port will be bounced (shutdown/no shutdown).
+        If 'disabled(2)', the port is not bounced."
+
+    ::= { cnAutoAttachActionEntry 10 }
+
+cnAutoAttachActionProtectedPort OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       enabled(2),
+                       disabled(3)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Protected port setting. When 'enabled(2)', the
+        port will be made protected in terms of VLAN
+        operation. If 'disabled(3)', the port will not 
+        operate as a protected port."
+
+    ::= { cnAutoAttachActionEntry 11 }
+
+cnAutoAttachActionCambiumSync OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       enabled(2),
+                       disabled(3)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Cambium Sync setting. When 'enabled(2)', the
+        the Cambium Sync signal will be generated on   
+        the port. If 'disabled(3)', Cambium Sync will
+        not be generated on the port.
+
+        If a device does not support this functionality,
+        the value of this attribute is silently ignored."
+
+    ::= { cnAutoAttachActionEntry 12 }
+
+cnAutoAttachActionPortSpeed OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       negotiated10Mbps(2),
+                       negotiated100Mbps(3),
+                       negotiated1Gbps(4),
+                       negotiated2500Mbps(5),
+                       forced10Mbps(6),
+                       forced100Mbps(7),
+                       forced1Gbps(8),
+                       forced2500Mbps(9)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Port Speed setting. Supports enabling (the
+        'negotiated' options) or disabling (the 'forced'
+        option) port speed auto-negotiation and sets
+        the negotiated maximum or hardcoded speed.
+
+        If a device does not support this functionality,
+        the value of this attribute is silently ignored."
+
+    ::= { cnAutoAttachActionEntry 13 }
+
+cnAutoAttachActionPortAdr OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       enabled(2),
+                       disabled(3)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Port Automatic Device Recovery (ADR) setting.
+        Supports enabling or disabling the ADR status
+        for a port.
+
+        If a device does not support this functionality,
+        the value of this attribute is silently ignored."
+
+    ::= { cnAutoAttachActionEntry 14 }
+
+cnAutoAttachActionAutoVoip OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Automatic voice device processing (Auto-VoIP).
+        Supports enabling or disabling automatic voice
+        device processing. When 'enabled(1)', port settings
+        are updated to support a connected VoIP device 
+        leveraging the global voice VLAN settings. 
+
+        If global voice VLAN settings are not defined or
+        if a device does not support this functionality,
+        the value of this attribute is silently ignored."
+
+    ::= { cnAutoAttachActionEntry 15 }
+
+--
+-- Auto-Attach Policy Table support        
+--
+
+cnAutoAttachPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the policy specifications 
+        for the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 13 }
+
+cnAutoAttachPolicyEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the policy specifications 
+        for the Auto-Attach application."
+
+    INDEX { cnAutoAttachPolicyName }
+    ::= { cnAutoAttachPolicyTable 1 }
+
+CnAutoAttachPolicyEntry ::= SEQUENCE {
+    cnAutoAttachPolicyName            SnmpAdminString,
+    cnAutoAttachPolicyStatus          INTEGER,
+    cnAutoAttachPolicyPrecedence      Integer32,
+    cnAutoAttachPolicyRuleName        SnmpAdminString,
+    cnAutoAttachPolicyRuleType        INTEGER,
+    cnAutoAttachPolicyRuleDeviceData  SnmpAdminString,
+    cnAutoAttachPolicyActionName      SnmpAdminString,
+    cnAutoAttachPolicyActionVlanData  SnmpAdminString,
+    cnAutoAttachPolicyActionPvid      Integer32,
+    cnAutoAttachPolicyActionPortMode  INTEGER,
+    cnAutoAttachPolicyApplied         Counter32,
+    cnAutoAttachPolicyExpired         Counter32,
+    cnAutoAttachPolicyErrors          Counter32,
+    cnAutoAttachPolicyRowStatus       RowStatus,
+    cnAutoAttachPolicyPortList        SnmpAdminString
+}
+
+cnAutoAttachPolicyName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Name for the policy specification."
+
+    ::= { cnAutoAttachPolicyEntry 1 }
+
+cnAutoAttachPolicyStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Status of the policy specification. A
+        'enabled(1)' policy can be applied to an
+        interface based on device detection. A
+        'disabled(2)' policy will never be applied.
+        Disabling a policy that is currently applied
+        to an interface deactivates the policy on
+        the interface."
+
+    ::= { cnAutoAttachPolicyEntry 2 }
+
+cnAutoAttachPolicyPrecedence OBJECT-TYPE
+    SYNTAX         Integer32 (0..100)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Precedence to use for selecting a policy
+        when multiple policies match a device. A
+        policy with a lower precedence value is 
+        applied before a policy with a higher 
+        precedence value. 
+
+        If a zero precedence value is specified, 
+        the default precedence value 50 is used."
+
+    ::= { cnAutoAttachPolicyEntry 3 }
+
+cnAutoAttachPolicyRuleName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Name of the rule specification that is 
+        referenced by the policy. The rule must 
+        be defined to be referenced.
+        
+        Rule name and rule type/device data are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 4 }
+
+cnAutoAttachPolicyRuleType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       lldpAny(2),
+                       lldpCapabilities(3),
+                       lldpSystemName(4),
+                       lldpSystemDescription(5),
+                       lldpChassisId(6),
+                       lldpPortId(7),
+                       lldpPortDescription(8),
+                       macOui(9),
+                       macFullAddress(10)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Rule type identifier. The rule type determines
+        how a device is identified using data associated
+        with the device (e.g., using exported LLDP TLV 
+        data, device MAC address data, etc.).
+        
+        Rule name and rule type/device data are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 5 }
+
+cnAutoAttachPolicyRuleDeviceData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..60))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies the data that is used to identify a
+        device. Data application depends on the associated 
+        detection method (cnAutoAttachPolicyRuleType).
+        
+        Rule name and rule type/device data are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 6 }
+
+cnAutoAttachPolicyActionName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Name of the action specification that is 
+        referenced by the policy. The action must 
+        be defined to be referenced.
+        
+        Action name and VLAN data/pvid/port mode are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 7 }
+
+cnAutoAttachPolicyActionVlanData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..100))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies VLAN IDs to be associated with 
+        an interface. VLAN data specified using a
+        string format with VLAN values comma-separated
+        (e.g., '10,20,30'). A maximum of 20 VLAN IDs
+        can be specified.
+        
+        A zero-length string indicates that no VLAN
+        data is specified.
+
+        Action name and VLAN data/pvid/port mode are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 8 }
+
+cnAutoAttachPolicyActionPvid OBJECT-TYPE
+    SYNTAX         Integer32 (0..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Default/native VLAN ID for an interface.
+        A value of 0 indicates an PVID update action 
+        is not requested.
+        
+        Action name and VLAN data/pvid/port mode are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 9 }
+
+cnAutoAttachPolicyActionPortMode OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       none(1),
+                       access(2),
+                       trunk(3),
+                       hybrid(4)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Port mode for an interface. A value of
+        'none(1)' indicates that no update is
+        requested.
+        
+        Action name and VLAN data/pvid/port mode are 
+        mutually-exclusive and can't be configured 
+        in the same policy."
+
+    ::= { cnAutoAttachPolicyEntry 10 }
+
+cnAutoAttachPolicyApplied OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times this policy specification
+        has been applied to an interface."
+
+    ::= { cnAutoAttachPolicyEntry 11 }
+
+cnAutoAttachPolicyExpired OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times this policy specification
+        has expired on an interface."
+
+    ::= { cnAutoAttachPolicyEntry 12 }
+
+cnAutoAttachPolicyErrors OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times an error has occurred
+        during application/expiration of this policy 
+        specification on an interface."
+
+    ::= { cnAutoAttachPolicyEntry 13 }
+
+cnAutoAttachPolicyRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the cnAutoAttachPolicyTable."
+
+    ::= { cnAutoAttachPolicyEntry 14 }
+
+cnAutoAttachPolicyPortList OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..200))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies interfaces to be considered during
+        policy match criteria evaluation. If interface
+        data is specified, only interfaces that are
+        identified by this attribute are considered
+        potential policy matches. 
+
+        Policy interfaces are specified using interface
+        type and value notation in a string format
+        with individual interfaces and interface ranges
+        comma-separated (e.g., 'gi0/3,gi0/8-10,po123').
+
+        A zero-length string indicates that no policy
+        interface data is specified and that the policy
+        is applicable to all ports."
+
+    ::= { cnAutoAttachPolicyEntry 15 }
+
+--
+-- Auto-Attach Script Table support        
+--
+
+cnAutoAttachScriptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachScriptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the script definitions 
+        for the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 14 }
+
+cnAutoAttachScriptEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachScriptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the script definitions 
+        for the Auto-Attach application."
+
+    INDEX { cnAutoAttachScriptName }
+    ::= { cnAutoAttachScriptTable 1 }
+
+CnAutoAttachScriptEntry ::= SEQUENCE {
+    cnAutoAttachScriptName            SnmpAdminString,
+    cnAutoAttachScriptActionVlanData  SnmpAdminString,
+    cnAutoAttachScriptActionPvid      Integer32,
+    cnAutoAttachScriptRowStatus       RowStatus
+}
+
+cnAutoAttachScriptName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Name for the script definition."
+
+    ::= { cnAutoAttachScriptEntry 1 }
+
+cnAutoAttachScriptActionVlanData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..100))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies VLAN IDs to be associated with 
+        an interface. VLAN data specified using a
+        string format with VLAN values comma-separated
+        (e.g., '10,20,30'). A maximum of 20 VLAN IDs
+        can be specified.
+
+        A zero-length string indicates that no VLAN
+        data is specified."
+        
+    ::= { cnAutoAttachScriptEntry 2 }
+
+cnAutoAttachScriptActionPvid OBJECT-TYPE
+    SYNTAX         Integer32 (0..4094)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Default/native VLAN ID for an interface.
+        A value of 0 indicates a PVID update action
+        is not requested."
+
+    ::= { cnAutoAttachScriptEntry 3 }
+
+cnAutoAttachScriptRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the cnAutoAttachScriptTable."
+
+    ::= { cnAutoAttachScriptEntry 4 }
+
+--
+-- Auto-Attach Condensed Neighbor Table support
+--
+
+cnAutoAttachCondensedNbrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachCondensedNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains port-specific condensed 
+        neighbor data used by the Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 15 }
+
+cnAutoAttachCondensedNbrEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachCondensedNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port-specific condensed neighbor data used by
+        the Auto-Attach application. Data is derived from
+        LLDP and the MAC address table at the time the
+        table data is queried."
+
+    INDEX { cnAutoAttachCondensedNbrIfIndex }
+    ::= { cnAutoAttachCondensedNbrTable 1 }
+
+CnAutoAttachCondensedNbrEntry ::= SEQUENCE {
+    cnAutoAttachCondensedNbrIfIndex           Integer32,
+    cnAutoAttachCondensedNbrName              SnmpAdminString,
+    cnAutoAttachCondensedNbrLldpChassisId     SnmpAdminString,
+    cnAutoAttachCondensedNbrLldpPortId        SnmpAdminString,
+    cnAutoAttachCondensedNbrLldpSystemName    SnmpAdminString,
+    cnAutoAttachCondensedNbrLldpSystemDesc    SnmpAdminString,
+    cnAutoAttachCondensedNbrLldpMgmtIpv4Addr  SnmpAdminString,
+    cnAutoAttachCondensedNbrMacAddress        OCTET STRING,
+    cnAutoAttachCondensedNbrClassification    SnmpAdminString
+}
+
+cnAutoAttachCondensedNbrIfIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Interface (ifIndex) identifier attribute."
+
+    ::= { cnAutoAttachCondensedNbrEntry 1 }
+
+cnAutoAttachCondensedNbrName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..20))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Interface name used to identify the port
+        for configuration and monitoring."
+
+    ::= { cnAutoAttachCondensedNbrEntry 2 }
+
+cnAutoAttachCondensedNbrLldpChassisId OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "LLDP Chassis ID data associated with the 
+        device connected to the port."
+
+    ::= { cnAutoAttachCondensedNbrEntry 3 }
+
+cnAutoAttachCondensedNbrLldpPortId OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "LLDP Port ID data associated with the 
+        device connected to the port."
+
+    ::= { cnAutoAttachCondensedNbrEntry 4 }
+
+cnAutoAttachCondensedNbrLldpSystemName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "LLDP System Name data associated with the 
+        device connected to the port."
+
+    ::= { cnAutoAttachCondensedNbrEntry 5 }
+
+cnAutoAttachCondensedNbrLldpSystemDesc OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "LLDP System Description data associated 
+        with the device connected to the port."
+
+    ::= { cnAutoAttachCondensedNbrEntry 6 }
+
+cnAutoAttachCondensedNbrLldpMgmtIpv4Addr OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..15))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "LLDP Mgmt IPv4 Address data associated 
+        with the device connected to the port."
+
+    ::= { cnAutoAttachCondensedNbrEntry 7 }
+
+cnAutoAttachCondensedNbrMacAddress OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0 | 17))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The MAC address associated with the device
+        connected to the port. The MAC address is  
+        returned in xx:xx:xx:xx:xx:xx format.
+
+        If a single MAC address is associated with 
+        the port, it is returned.
+
+        If multiple MAC addresses are present, the 
+        MAC address associated with LLDP information 
+        is returned, if available. If LLDP data is
+        not available, a broadcast MAC address value
+        is returned. 
+
+        Otherwise a NULL address value (length zero)
+        is returned."
+
+    ::= { cnAutoAttachCondensedNbrEntry 8 }
+
+cnAutoAttachCondensedNbrClassification OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Presents the device's class memberships
+        based on the currently defined neighbor
+        class data (cnAutoAttachNbrClassTable) 
+        and the LLDP device System Description
+        data."
+
+    ::= { cnAutoAttachCondensedNbrEntry 9 }
+
+--
+-- Auto-Attach scalar attributes
+--
+
+cnAutoAttachGlobalUplinkData OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..31))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies interfaces to be considered for
+        VLAN membership updates when VLAN membership
+        updates are initiated by a policy being 
+        applied to a port.
+
+        Uplink interfaces are specified using interface
+        type and value notation in a string format
+        with uplink interface values comma-separated
+        (e.g., 'gi0/9,gi0/10'). A maximum of 4 uplinks
+        can be specified.
+
+        A zero-length string indicates that no uplink
+        data is specified.
+
+        If uplink data is specified globally as well
+        as through an action, the action data takes
+        precedence when a policy is applied to a 
+        port."
+
+    ::= { cnAutoAttachObjects 16 }
+
+cnAutoAttachAutoVlanStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "When Auto-VLAN is enabled, dynamic PBA rules,
+        actions and policies can be created and deleted
+        based on received LLDP frames that contain PBA 
+        TLV data. When disabled, received LLDP PBA TLV 
+        data is ignored on all ports.
+        
+        Per-port processing of LLDP PBA TLV data is
+        controlled through the cnAutoAttachPortTlvTxEnable
+        object. The global setting takes precedence
+        over the per-port settings." 
+
+    DEFVAL         { enabled }
+    ::= { cnAutoAttachObjects 17 }
+
+--
+-- Auto-Attach Condensed Neighbor Table support extensions
+--
+
+cnAutoAttachNbrClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachNbrClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains neighbor classification 
+        data that is used to support filtering of the
+        Condensed Neighbor Table data."
+
+    ::= { cnAutoAttachObjects 18 }
+
+cnAutoAttachNbrClassEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachNbrClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Associates a predefined neighbor class with a
+        string that can be used to identify devices as
+        class members based on processed LLDP data."
+
+    INDEX { cnAutoAttachNbrClassType, cnAutoAttachNbrClassIdentifier }
+    ::= { cnAutoAttachNbrClassTable 1 }
+
+CnAutoAttachNbrClassEntry ::= SEQUENCE {
+    cnAutoAttachNbrClassType              INTEGER,
+    cnAutoAttachNbrClassIdentifier        SnmpAdminString,
+    cnAutoAttachNbrClassIdentifierType    INTEGER,
+    cnAutoAttachNbrClassStorageType       StorageType,
+    cnAutoAttachNbrClassRowStatus         RowStatus
+}
+
+cnAutoAttachNbrClassType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       other(1),
+                       bridge(2),
+                       ap(3),
+                       router(4),
+                       phone(5),
+                       radio(6),
+                       camera(7),
+                       cambium(8),
+                       cambiumCnMatrix(9),
+                       cambiumCnPilot(10)
+                   }
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Device class groups."
+
+    ::= { cnAutoAttachNbrClassEntry 1 }
+
+cnAutoAttachNbrClassIdentifier OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE(1..255))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Specifies the data used to identify a device 
+        as a member of class cnAutoAttachNbrClassType 
+        based on processed LLDP or MAC address data."
+
+    ::= { cnAutoAttachNbrClassEntry 2 }
+
+cnAutoAttachNbrClassIdentifierType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       lldp(1),
+                       macOui(2),
+                       macAddress(3)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies whether the class identifier data
+        represents LLDP or MAC address data."
+
+    DEFVAL        { lldp }
+    ::= { cnAutoAttachNbrClassEntry 3 }
+
+cnAutoAttachNbrClassStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Storage type associated with the 
+        cnAutoAttachNbrClassTable entry."
+
+    ::= { cnAutoAttachNbrClassEntry 4 }
+
+cnAutoAttachNbrClassRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created 
+        and deleted in the cnAutoAttachNbrClassTable."
+
+    ::= { cnAutoAttachNbrClassEntry 5 }
+
+--
+-- Auto-Attach scalar attributes
+--
+
+cnAutoAttachDeviceLocalization OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies the device localization string.
+
+        Localization is used by PBA to support
+        device-specific interpretation of various
+        PBA components (e.g., actions).
+
+        A zero-length string indicates that no device
+        localization data is specified."
+
+    ::= { cnAutoAttachObjects 19 }
+
+--
+-- PBA MAC List File Table support
+--
+
+cnAutoAttachMacListFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CnAutoAttachMacListFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MAC list file data
+        for the PBA/Auto-Attach application."
+
+    ::= { cnAutoAttachObjects 20 }
+
+cnAutoAttachMacListFileEntry OBJECT-TYPE
+    SYNTAX      CnAutoAttachMacListFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC list file data related to the
+        PBA/Auto-Attach application."
+
+    INDEX { cnAutoAttachMacListFileName }
+    ::= { cnAutoAttachMacListFileTable 1 }
+
+CnAutoAttachMacListFileEntry ::= SEQUENCE {
+    cnAutoAttachMacListFileName       SnmpAdminString,
+    cnAutoAttachMacListFileMacCount   Integer32,
+    cnAutoAttachMacListFileStatus     INTEGER,
+    cnAutoAttachMacListFileRefresh    INTEGER,
+    cnAutoAttachMacListFileRowStatus  RowStatus
+}
+
+cnAutoAttachMacListFileName OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE (1..128))
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Name of the MAC list file associated
+        with this entry."
+
+    ::= { cnAutoAttachMacListFileEntry 1 }
+
+cnAutoAttachMacListFileMacCount OBJECT-TYPE
+    SYNTAX         Integer32 (1..1000)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Count of MAC addresses in the file."
+
+    ::= { cnAutoAttachMacListFileEntry 2 }
+
+cnAutoAttachMacListFileStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       other(1),
+                       pendingDownload(2),
+                       downloading(3),
+                       downloaded(4),
+                       failedDownload(5)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "MAC list file status indication."
+
+    ::= { cnAutoAttachMacListFileEntry 3 }
+
+cnAutoAttachMacListFileRefresh OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "MAC list file refresh status. Controls
+        if a file download is initiated only
+        when a new entry is created (disabled)
+        or also when an existing entry is 
+        updated (enabled)."
+
+    DEFVAL         { enabled }
+    ::= { cnAutoAttachMacListFileEntry 4 }
+
+cnAutoAttachMacListFileRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the cnAutoAttachMacListFileTable."
+
+    ::= { cnAutoAttachMacListFileEntry 5 }
+
+--
+-- PBA data file download support
+--
+
+cnAutoAttachFileDownloadType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       macListFile(1)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "Specifies the type of PBA data file
+        to be downloaded."
+
+    DEFVAL         { 1 }
+    ::= { cnAutoAttachObjects 21 }
+
+cnAutoAttachFileDownloadPath OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies the path of the PBA data file
+        to be downloaded to the switch. The target
+        file name is appended to the download path
+        for SFTP and SCP transfer modes."
+
+    ::= { cnAutoAttachObjects 22 }
+
+cnAutoAttachFileDownloadTransferMode OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       tftp(1),
+                       sftp(2),
+                       scp(5)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies the transfer mechanism used to 
+        download a PBA data file to the switch."
+
+    DEFVAL  { tftp }
+    ::= { cnAutoAttachObjects 23 }
+
+cnAutoAttachFileDownloadFromIpAddrType OBJECT-TYPE
+    SYNTAX         InetAddressType
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Specifies the address type of the target
+        device from which the PBA data file will be
+        downloaded. Standard address types of IPv4, 
+        IPv6 unicast address and DNS are supported."
+
+    ::= { cnAutoAttachObjects 24 }
+
+cnAutoAttachFileDownloadFromIpvx OBJECT-TYPE
+    SYNTAX         InetAddress
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Address of device from which the PBA data
+        file will be downloaded. Address format is
+        dictated by the associated address type."
+
+    ::= { cnAutoAttachObjects 25 }
+
+cnAutoAttachFileDownloadUsername OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE(0..20))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+       "Specifies the user name that is required 
+       for downloading a PBA data file using SFTP
+       and SCP transfer modes. Ignored for transfer
+       mode TFTP."
+
+    ::= { cnAutoAttachObjects 26 }
+
+cnAutoAttachFileDownloadPassword OBJECT-TYPE
+    SYNTAX         SnmpAdminString (SIZE(0..20))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+       "Specifies the password that is required 
+       for downloading a PBA data file using SFTP
+       and SCP transfer modes. Ignored for transfer
+       mode TFTP. Always returns a zero-length 
+       string when queried."
+
+    ::= { cnAutoAttachObjects 27 }
+
+--
+-- Auto-Attach notification objects
+--
+
+cnAutoAttachRemoteElemSysDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The string value used to identify the system description
+        of the remote system distributed through LLDP." 
+    REFERENCE
+        "IEEE 802.1AB-2004 9.5.7.2"
+
+    ::= { cnAutoAttachNotifyObjects 1 }
+
+cnAutoAttachRemoteElemMgmtOid OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The OID value used to identify the type of 
+        hardware component or protocol entity associated 
+        with the management address advertised by the 
+        remote system agent distributed through LLDP."
+    REFERENCE
+        "IEEE 802.1AB-2004 9.5.9.8"
+
+    ::= { cnAutoAttachNotifyObjects 2 }
+
+--
+-- Auto-Attach notifications
+--
+
+cnAutoAttachInterfacePolicyApplied NOTIFICATION-TYPE
+    OBJECTS        {
+                       ifIndex,
+                       cnAutoAttachPortActivePolicyName,
+                       cnAutoAttachRemoteElemSysDescr,  
+                       cnAutoAttachRemoteElemMgmtOid 
+                   }
+    STATUS         current
+    DESCRIPTION
+        "This notification is generated when Auto-Attach 
+        operation applies a policy to an interface."
+
+    ::= { cnAutoAttachNotifications 1 }
+
+cnAutoAttachInterfacePolicyExpired NOTIFICATION-TYPE
+    OBJECTS        {
+                       ifIndex,
+                       cnAutoAttachPortActivePolicyName
+                   }
+    STATUS         current
+    DESCRIPTION
+        "This notification is generated when Auto-Attach 
+        operation removes policy settings from an interface."
+
+    ::= { cnAutoAttachNotifications 2 }
+
+END
+

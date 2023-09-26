@@ -1,0 +1,205 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+ARICENT-PING-MIB DEFINITIONS ::= BEGIN 
+ 
+ IMPORTS 
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress, 
+    Counter32, Integer32,
+    enterprises            FROM SNMPv2-SMI
+    RowStatus  FROM SNMPv2-TC; 
+
+fsPingMIB MODULE-IDENTITY
+     LAST-UPDATED "202201250000Z"
+     ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+     CONTACT-INFO "support@aricent.com"
+     DESCRIPTION " This mib is for Ping module"
+
+     REVISION "202201250000Z"
+     DESCRIPTION "Added limited continuous ping
+                 support for Web usage."
+
+     REVISION "201209050000Z"
+     DESCRIPTION " This mib is for Ping module"
+
+::= { enterprises futuresoftware(2076) 106} 
+
+fsPingMIBObjects OBJECT IDENTIFIER ::= { fsPingMIB 1 }
+
+--This is the MIB for IP Ping functionality
+
+fsPingTable	  OBJECT-TYPE
+     SYNTAX  SEQUENCE OF FsPingEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+	    "This object specifies an entity's IP Ping Table."
+     ::= { fsPingMIBObjects 1 }
+
+fsPingEntry	  OBJECT-TYPE
+     SYNTAX  FsPingEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+	    "This object specifies the information about a particular IP ping
+	  Instance.Objects in this table can not be updated when
+        the PingStatus is in progress."
+     INDEX	{ fsPingIndex }
+     ::= { fsPingTable 1 }
+
+FsPingEntry  ::=	  
+SEQUENCE {
+     fsPingIndex          Integer32,
+     fsPingDest		  IpAddress,
+     fsPingTimeout	  Integer32,
+     fsPingTries	  Integer32,
+     fsPingDataSize       Integer32,
+     fsPingStatus         INTEGER,
+     fsPingSendCount	  Integer32,
+     fsPingAverageTime	  Integer32,
+     fsPingMaxTime	  Integer32,
+     fsPingMinTime	  Integer32,
+     fsPingSuccesses	  Counter32,
+     fsPingEntryStatus    RowStatus,
+     fsPingHostName       OCTET STRING,
+     fsPingContInterval   Integer32
+}
+
+fsPingIndex         OBJECT-TYPE
+     SYNTAX      Integer32 (0..2147483647)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object specifies an unique value that identifies the Ping Entry."
+     ::= { fsPingEntry 1 }
+
+fsPingDest	    OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This object specifies the IP address of the node to be pinged."
+     ::= { fsPingEntry 2 }
+
+fsPingTimeout	    OBJECT-TYPE
+     SYNTAX      Integer32 (1..100)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the time in seconds after which the entity waiting
+	 for the ping response times out."
+     DEFVAL { 1 }
+     ::= { fsPingEntry 3 }
+
+fsPingTries	    OBJECT-TYPE
+     SYNTAX      Integer32 (1..1000)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the number of times the given node address is to be
+	  pinged."
+     DEFVAL { 3 }
+     ::= { fsPingEntry 4 }
+
+fsPingDataSize    OBJECT-TYPE
+     SYNTAX      Integer32  (0..2080)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the size of the data portion of the PING PDU in bytes."
+     DEFVAL { 64 }
+     ::= { fsPingEntry 5 }
+
+fsPingStatus	    OBJECT-TYPE
+     SYNTAX      INTEGER {
+        notinitiated (1),
+        progress  (2),
+        completed (3)
+     }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object specifies the current status of the Ping Entry."
+     ::= { fsPingEntry 6 }
+
+fsPingSendCount OBJECT-TYPE
+     SYNTAX      Integer32 (0..2147483647)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the total number of packets sent to destination."
+     ::= { fsPingEntry 7 }
+
+fsPingAverageTime	  OBJECT-TYPE
+     SYNTAX      Integer32 (0..2147483647)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the average value of the round trip time in milli seconds
+	 to this destination."
+     ::= { fsPingEntry 8 }
+
+fsPingMaxTime	 OBJECT-TYPE
+     SYNTAX      Integer32 (0..2147483647)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the maximum value of the round trip time in milli seconds
+	 to this destination."
+     ::= { fsPingEntry 9 }
+
+fsPingMinTime	  OBJECT-TYPE
+     SYNTAX      Integer32 (0..2147483647)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	     "This object specifies the minimum value of the round trip time in milli seconds
+          to this destination."
+     ::= { fsPingEntry 10 }
+     
+fsPingSuccesses OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object specifies the number of ping responses received."
+     ::= { fsPingEntry 11 }
+
+fsPingEntryStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+          "This object specifies the status of this table entry. Once the entry status is
+           set to active, the associate entry cannot be modified until
+           the sequence completes (PingStatus is completed).Management
+           station created the Ping Entries should take care of 
+           deletion. Entry Can be made active only if PingDestination is
+           configured."
+
+     ::= { fsPingEntry 12 }
+
+fsPingHostName OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (0..255))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+      "This object specifies the DNS host name 
+      used to send echo requests."
+     ::= { fsPingEntry 13 }
+
+fsPingContInterval OBJECT-TYPE
+     SYNTAX      Integer32 (0..3600)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Specifies the interval for continuous ping operations.
+         A value of 0 indicates that continuous ping generation 
+         is not enabled. Other values indicate that continuous 
+         ping is enabled and that a new ping attempt (based on 
+         other entry settings) will be initiated periodically 
+         per the current interval value."
+
+     DEFVAL { 0 }
+     ::= { fsPingEntry 14 }
+
+END

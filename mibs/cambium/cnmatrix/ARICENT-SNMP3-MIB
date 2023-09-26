@@ -1,0 +1,947 @@
+-- Copyright (C) 2006-2012 Aricent Group. All Rights Reserved
+
+ARICENT-SNMP3-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+          MODULE-IDENTITY, OBJECT-TYPE, enterprises, 
+          Counter32, Unsigned32, NOTIFICATION-TYPE
+              FROM SNMPv2-SMI
+          RowStatus, StorageType, TruthValue
+              FROM SNMPv2-TC
+          SnmpTagValue, snmpTargetAddrEntry
+              FROM SNMP-TARGET-MIB
+          SnmpAdminString, SnmpEngineID
+              FROM SNMP-FRAMEWORK-MIB
+          InetAddress, InetAddressType
+              FROM INET-ADDRESS-MIB;
+
+  futuresnmp3 MODULE-IDENTITY
+    LAST-UPDATED "202210260000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION
+            "The MIB module is for managing  SNMP Inform message statistics and
+            Agentx-subagent configuration/statistics objects in SNMP
+            Version 3."
+
+    REVISION "202210260000Z"
+    DESCRIPTION
+            "Reset SNMP community (v1/v2c) and user (v3) data object defined."
+
+    REVISION "202103300000Z"
+    DESCRIPTION
+            "Added objects in support of shortcut SNMP community (v1/v2c) and
+            secured user (v3) configuration for cnMaestro/XMS platforms."
+
+    REVISION "201209050000Z"
+    DESCRIPTION
+            "The MIB module is for managing  SNMP Inform message statistics and
+            Agentx-subagent configuration/statistics objects in SNMP 
+            Version 3."
+        ::=  { enterprises futuresoftware(2076) 112 }
+
+-- ------------------------------------------------------------  
+-- groups in the MIB  
+-- ------------------------------------------------------------ 
+
+        futuresnmpagentx      OBJECT IDENTIFIER ::= { futuresnmp3 15 }
+        futuresnmptraps       OBJECT IDENTIFIER ::= { futuresnmp3 20 }
+        fsSnmpTarget          OBJECT IDENTIFIER ::= { futuresnmp3 25 }
+        cnSnmpAgentMgmtCfg    OBJECT IDENTIFIER ::= { futuresnmp3 30 }
+
+-- SCALAR_TABLE_BEGIN
+
+          snmpInInformResponses OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Total number of SNMP Inform responses
+                           received by the Agent from manager."
+              ::=  { futuresnmp3 1 }
+
+          snmpOutInformRequests OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Total number of SNMP Inform requests
+                           sent by the Agent to manager."
+              ::=  { futuresnmp3 2 }
+
+          snmpInformDrops OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Total number of SNMP Inform messages
+                           dropped by the Agent after retransmission."
+              ::=  { futuresnmp3 3 }
+
+          snmpInformAwaitingAck OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Total number of SNMP Inform messages for
+                           which Acknowledgement is expected from
+                           manager."
+              ::=  { futuresnmp3 4 }
+            
+          snmpListenTrapPort OBJECT-TYPE
+              SYNTAX  Unsigned32 (1..65535)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Contains Port Number on which snmp trap
+                           message are sent to manager."
+              DEFVAL { 162 }
+              ::=  { futuresnmp3 5 }
+
+          snmpOverTcpStatus OBJECT-TYPE
+              SYNTAX      INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "To Enable sending SNMP messages over TCP 
+                           If its enabled all the SNMP messages  
+                           will be send over TCP instead of UDP."
+              DEFVAL { disabled }
+              ::=  { futuresnmp3 6 }
+
+          snmpListenTcpPort OBJECT-TYPE
+              SYNTAX  Unsigned32 (1..65535)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Contains Port Number on which snmp message
+                           are sent to manager over TCP."
+              DEFVAL { 161 }
+              ::=  { futuresnmp3 7 }
+
+          snmpTrapOverTcpStatus OBJECT-TYPE
+              SYNTAX      INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "To Enable sending SNMP Trap messages over TCP 
+                           If its enabled all the SNMP traps will be send 
+                           over TCP instead of TCP."
+              DEFVAL { disabled }
+              ::=  { futuresnmp3 8 }
+
+          snmpListenTcpTrapPort OBJECT-TYPE
+              SYNTAX  Unsigned32 (1..65535)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Contains Port Number on which snmp trap
+                           message are sent to manager over TCP."
+              DEFVAL { 162 }
+              ::=  { futuresnmp3 9 }
+
+-- SCALAR_TABLE_END
+
+-- the SNMP Statistics group
+--
+-- a collection of objects providing basic instrumentation and
+-- control of INFORM Messages from an SNMP entity.
+
+-- Inform Counters Table
+-- Statistical information on INFORM PDUs generated by the Agent for
+-- various Managers are registered in the inform counters table.
+
+     snmpInformCntTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SnmpInformCntEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "The SNMP Inform Counters Table is used to store the
+            statistics of the INFORM PDUs sent from the device."
+              ::= { futuresnmp3 10 }
+
+          snmpInformCntEntry OBJECT-TYPE
+              SYNTAX  SnmpInformCntEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Each entry contains one Manager entry with INFORM
+                      Statistics."
+              INDEX   { snmpInformTgtAddrName }
+              ::= { snmpInformCntTable 1 }
+
+          SnmpInformCntEntry ::=
+              SEQUENCE {
+                  snmpInformTgtAddrName
+                      SnmpAdminString,
+                  snmpInformSent
+                      Counter32,
+                  snmpInformAwaitAck
+                      Counter32,
+                  snmpInformRetried
+                      Counter32,
+                  snmpInformDropped
+                      Counter32,
+                  snmpInformFailed
+                      Counter32,
+                  snmpInformResponses
+                      Counter32
+              }
+
+          snmpInformTgtAddrName OBJECT-TYPE
+              SYNTAX  SnmpAdminString (SIZE(1..32))
+              MAX-ACCESS not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "The IpAddress corresponding to the Remote SNMP Entity
+                       configured to receive INFORM notifications. The Index
+                       corresponds to an entry in snmpTargetAddrTable"
+              ::= { snmpInformCntEntry 1 }
+
+          snmpInformSent OBJECT-TYPE
+              SYNTAX     Counter32
+              MAX-ACCESS read-only
+              STATUS     current
+              DESCRIPTION
+                     "The total number of INFORM messages delivered from the
+                      SNMP entity to the transport service."
+              ::= { snmpInformCntEntry 2 }
+
+          snmpInformAwaitAck OBJECT-TYPE
+              SYNTAX     Counter32
+              MAX-ACCESS read-only
+              STATUS     current
+              DESCRIPTION
+                     "The total number of INFORM messages waiting to be
+                      acknowledged by the remote SNMP Entity "
+              ::= { snmpInformCntEntry 3 }
+
+          snmpInformRetried OBJECT-TYPE
+              SYNTAX     Counter32
+              MAX-ACCESS read-only
+              STATUS     current
+              DESCRIPTION
+                     "The total number of INFORM messages retransmitted to the
+                      remote SNMP Entity from the SNMP entity"
+              ::= { snmpInformCntEntry 4 }
+
+          snmpInformDropped OBJECT-TYPE
+             SYNTAX     Counter32
+             MAX-ACCESS read-only
+             STATUS     current
+             DESCRIPTION
+                      "The total number of unacknowledged INFORM messages
+                       discarded by the SNMP entity to make room for new INFORMs."
+              ::= { snmpInformCntEntry 5 }
+
+          snmpInformFailed OBJECT-TYPE
+             SYNTAX     Counter32
+             MAX-ACCESS read-only
+             STATUS     current
+             DESCRIPTION
+                     "The total number of INFORM messages failed to receive an
+                      Acknowledgement from the remote SNMP entity."
+              ::= { snmpInformCntEntry 6 }
+
+          snmpInformResponses OBJECT-TYPE
+             SYNTAX     Counter32
+             MAX-ACCESS read-only
+             STATUS     current
+             DESCRIPTION
+                     "The total number of INFORM ACK messages received as
+                      Acknowledgement from the remote SNMP entity."
+              ::= { snmpInformCntEntry 7 }
+
+-- SCALAR_TABLE_BEGIN
+          snmpColdStartTrapControl OBJECT-TYPE
+             SYNTAX      INTEGER { enabled(1), disabled(2) }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION 
+                    "This object is used to enable/disable coldStart Trap."
+             ::= { futuresnmp3 11 }
+
+          snmpAgentControl OBJECT-TYPE
+             SYNTAX      INTEGER { enabled(1), disabled(2) }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION 
+                    "This object is used to enable/disable the SNMP agent.
+                     Agent and Agentx both can not be enabled at the same time"
+             DEFVAL     { enabled }
+             ::= { futuresnmp3 12 }
+
+          snmpAllowedPduVersions OBJECT-TYPE
+             SYNTAX      INTEGER { v3(1), v1v2(2), v1v2v3(3)}
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION 
+                    "This object is used to configure the SNMP PDU versions
+                     for which the agent should respond"
+             DEFVAL      { v1v2v3 }
+             ::= { futuresnmp3 13 }
+          
+          snmpMinimumSecurityRequired OBJECT-TYPE
+             SYNTAX      INTEGER { none(1), authenticated(2), encrypted(3) }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION 
+                    "This object will configure the minimum security level
+                     required for the SNMPv3 PDU"
+             DEFVAL      { none }
+             ::= { futuresnmp3 14 }
+
+ snmpInRollbackErrs OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Total number of SNMP Rollback 
+                           operations that failed in the Agent."
+              ::=  { futuresnmp3 16 }
+
+	snmpProxyListenTrapPort OBJECT-TYPE
+              SYNTAX  Unsigned32(1..65535)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Contains Port Number on which Proxy listens 
+                           for trap and inform messages from the Agent."
+              DEFVAL { 162 }
+              ::=  { futuresnmp3 17 }
+
+
+-- SCALAR_TABLE_END
+
+   fsSnmpProxyTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF FsSnmpProxyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The table of translation parameters used by proxy forwarder
+            applications for forwarding SNMP messages. 
+			
+			The table will store the registered OID's pertaining to the
+			agents. Every Entry will store the OID, with its Proxy Type,
+			ParamsIn expected, and information about the Target where
+			the message has to be forwarded.
+			"
+       ::= { futuresnmp3 18 }
+
+   fsSnmpProxyEntry OBJECT-TYPE
+       SYNTAX      FsSnmpProxyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A set of translation parameters used by a proxy forwarder
+            application for forwarding SNMP messages.
+
+            Entries in the fsSnmpProxyTable are created and deleted
+            using the fsSnmpProxyMibRowStatus object."
+       INDEX { IMPLIED fsSnmpProxyMibName }
+       ::= { fsSnmpProxyTable 1 }
+
+   FsSnmpProxyEntry ::= SEQUENCE {
+       fsSnmpProxyMibName               SnmpAdminString,
+       fsSnmpProxyMibType            	INTEGER,
+       fsSnmpProxyMibId					OBJECT IDENTIFIER,
+       fsSnmpProxyMibTargetParamsIn     SnmpAdminString,
+       fsSnmpProxyMibSingleTargetOut    SnmpAdminString,
+       fsSnmpProxyMibMultipleTargetOut  SnmpTagValue,
+       fsSnmpProxyMibStorageType        StorageType,
+       fsSnmpProxyMibRowStatus          RowStatus
+   }
+
+   fsSnmpProxyMibName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..32))
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "The locally arbitrary, but unique identifier associated
+            with this fsSnmpProxyEntry."
+       ::= { fsSnmpProxyEntry 1 }
+
+   fsSnmpProxyMibType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       read(1),
+                       write(2),
+                       trap(3),
+                       inform(4)
+                   }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The type of message that may be forwarded using
+            the translation parameters defined by this entry."
+       ::= { fsSnmpProxyEntry 2 }
+
+   fsSnmpProxyMibId OBJECT-TYPE
+       SYNTAX      OBJECT IDENTIFIER
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The MibId contained in messages that
+            may be forwarded using the translation parameters
+            defined by this entry."
+       ::= { fsSnmpProxyEntry 3 }
+
+   fsSnmpProxyMibTargetParamsIn OBJECT-TYPE
+       SYNTAX      SnmpAdminString
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object selects an entry in the snmpTargetParamsTable.
+            The selected entry is used to determine which row of the
+            fsSnmpProxyTable to use for forwarding received messages."
+       ::= { fsSnmpProxyEntry 4 }
+
+   fsSnmpProxyMibSingleTargetOut OBJECT-TYPE
+       SYNTAX      SnmpAdminString
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object selects a management target defined in the
+            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The
+            selected target is defined by an entry in the
+            snmpTargetAddrTable whose index value (snmpTargetAddrName)
+            is equal to this object.
+
+            This object is only used when selection of a single
+            target is required (i.e. when forwarding an incoming
+            read or write request)."
+       ::= { fsSnmpProxyEntry 5 }
+
+   fsSnmpProxyMibMultipleTargetOut OBJECT-TYPE
+       SYNTAX      SnmpTagValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object selects a set of management targets defined
+            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).
+
+            This object is only used when selection of multiple
+            targets is required (i.e. when forwarding an incoming
+            notification)."
+       ::= { fsSnmpProxyEntry 6 }
+
+   fsSnmpProxyMibStorageType OBJECT-TYPE
+       SYNTAX      StorageType
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The storage type of this conceptual row.
+            Conceptual rows having the value 'permanent' need not
+            allow write-access to any columnar objects in the row."
+       DEFVAL { nonVolatile }
+       ::= { fsSnmpProxyEntry 7 }
+
+   fsSnmpProxyMibRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The status of this conceptual row.
+
+            To create a row in this table, a manager must
+            set this object to either createAndGo(4) or
+            createAndWait(5).
+
+            The following objects may not be modified while the
+            value of this object is active(1):
+                - fsSnmpProxyMibType
+                - fsSnmpProxyMibId
+                - fsSnmpProxyMibTargetParamsIn
+                - fsSnmpProxyMibSingleTargetOut
+                - fsSnmpProxyMibMultipleTargetOut"
+       ::= { fsSnmpProxyEntry 8 }
+
+
+-- SCALAR_TABLE_BEGIN
+
+    fsSnmpListenAgentPort OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "contains port number on which snmp agent
+                     listens."
+       DEFVAL { 161 }
+       ::= { futuresnmp3 19 }
+
+    fsSnmpEngineID OBJECT-TYPE
+        SYNTAX       SnmpEngineID
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The snmpEngineID of the entity."
+        ::= { futuresnmp3 21 }
+       
+    fsSnmpResetCommAndUserData OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Clears SNMP Community and USM User
+            table entries. Setting this attribute
+            to 'true(1)' clears all read-write
+            entries. The value 'false(2)' is 
+            returned when the attribute is queried."
+
+        DEFVAL       { false }
+        ::= { futuresnmp3 22 }
+
+-- SCALAR_TABLE_END
+
+-- ------------------------------------------------------------------ 
+-- The future SNMP agentx Group
+-- ------------------------------------------------------------------ 
+
+     snmpAgentxTransportDomain OBJECT-TYPE
+             SYNTAX  INTEGER {
+                               tcp(1)
+                             }
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION "It specifies the transport domain to be used. 
+                          The subagent transport domain must be in sync 
+                          with the master agents transport domain."
+             DEFVAL    { tcp }
+             ::=  { futuresnmpagentx 1 }
+
+     snmpAgentxMasterAgentAddr OBJECT-TYPE
+             SYNTAX   OCTET STRING (SIZE (4|16))
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION "This object defines the address of the master agent."
+             ::=  { futuresnmpagentx 2 }
+     
+     snmpAgentxMasterAgentPortNo OBJECT-TYPE
+             SYNTAX   Unsigned32
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION "This object defines the port number of the master agent."
+             DEFVAL    { 705 }
+             ::=  { futuresnmpagentx 3 }
+
+     snmpAgentxSubAgentInPkts OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION "The total number of agentx packets received 
+                          by the subagent" 
+             ::=  { futuresnmpagentx 4 }
+     
+     snmpAgentxSubAgentOutPkts OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION "The total number of agentx packets transmitted 
+                          by the subagent" 
+             ::=  { futuresnmpagentx 5 }
+     
+     snmpAgentxSubAgentPktDrops OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION "The total number of agentx packet dropped 
+                          by the subagent" 
+             ::=  { futuresnmpagentx 6 }
+     
+     snmpAgentxSubAgentParseDrops OBJECT-TYPE
+             SYNTAX  Counter32
+             MAX-ACCESS  read-only
+             STATUS  current
+             DESCRIPTION "The total number of agentx packet dropped 
+                          by the subagent due to parse error." 
+             ::=  { futuresnmpagentx 7 }
+
+    snmpAgentxSubAgentInOpenFail OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx response messages 
+                         received by the subagent with OpenFailed(256) 
+                         error code."
+            ::= { futuresnmpagentx 8 }
+
+    snmpAgentxSubAgentOpenPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-open-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 9 }
+    
+    snmpAgentxSubAgentInClosePktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-close-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 10 }
+    
+    snmpAgentxSubAgentOutClosePktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-close-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 11 }
+    
+    snmpAgentxSubAgentIdAllocPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-IndexAllocate-pdus 
+                         transmitted by the subagent."
+            ::= { futuresnmpagentx 12 }
+    
+    snmpAgentxSubAgentIdDllocPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-IndexDeAllocate-pdus 
+                         transmitted by the subagent."
+            ::= { futuresnmpagentx 13 }
+            
+    snmpAgentxSubAgentRegPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-register-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 14 }
+    
+    snmpAgentxSubAgentUnRegPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-unregister-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 15 }
+    
+    snmpAgentxSubAgentAddCapsCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-AddAgentCaps-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 16 }
+
+    snmpAgentxSubAgentRemCapsCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-RemoveAgentCaps-pdus 
+                         transmitted by the subagent."
+            ::= { futuresnmpagentx 17 }
+
+    snmpAgentxSubAgentNotifyPktCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-notify-pdus 
+                         transmitted by the subagent."
+            ::= { futuresnmpagentx 18 }
+            
+    snmpAgentxSubAgentPingCnt OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-Ping-pdus 
+                         transmitted by the subagent."
+            ::= { futuresnmpagentx 19 }
+
+    snmpAgentxSubAgentInGets OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-Get-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 20 }
+    
+    snmpAgentxSubAgentInGetNexts OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-GetNext-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 21 }
+    
+    snmpAgentxSubAgentInGetBulks OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-GetBulk-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 22 }
+    
+    snmpAgentxSubAgentInTestSets OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-TestSet-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 23 }
+    
+    snmpAgentxSubAgentInCommits OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-CommitSet-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 24 }
+
+    snmpAgentxSubAgentInCleanups OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-CleanupSet-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 25 }
+
+    snmpAgentxSubAgentInUndos OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-UndoSet-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 26 }
+    
+    snmpAgentxSubAgentOutResponse OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-Response-pdus transmitted
+                         by the subagent."
+            ::= { futuresnmpagentx 27 }
+    
+    snmpAgentxSubAgentInResponse OBJECT-TYPE
+            SYNTAX     Counter32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION "The total number of agentx-Response-pdus received
+                         by the subagent."
+            ::= { futuresnmpagentx 28 }
+
+     snmpAgentxSubAgentControl OBJECT-TYPE
+           SYNTAX      INTEGER { enabled(1), disabled(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION 
+                "This object is used to enable/disable the SNMP agentx subagent.
+                 Agent and Agentx both can not be enabled at the same time"
+           DEFVAL     { disabled }
+           ::= { futuresnmpagentx 29 }
+      
+     snmpAgentxContextName OBJECT-TYPE 
+            SYNTAX      OCTET STRING (SIZE (0..32)) 
+            MAX-ACCESS  read-write 
+            STATUS      current 
+            DESCRIPTION  
+            "This object is used to configure the context name which is 
+            used during Subagent Registration with the Master agent" 
+            ::= { futuresnmpagentx 30 } 
+
+
+-- SNMP Trap & Notifications
+
+snmpMIBRegisteredTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsSnmpListenAgentPort 
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when a MIB is registered with SNMP Agent"
+   ::= { futuresnmptraps 1 }
+
+snmpMIBDeRegisteredTrap NOTIFICATION-TYPE
+        OBJECTS {
+            fsSnmpListenAgentPort 
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when a MIB is de-registered with SNMP Agent"
+   ::= { futuresnmptraps 2 }
+   
+   fsSnmpTrapFilterTable  OBJECT-TYPE
+        SYNTAX             SEQUENCE OF FsSnmpTrapFilterEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+             "This table contains the Trap-OID entries that is set
+        during disabling of traps and is used to filter the
+        traps that are disabled."
+        ::= { futuresnmptraps 3 }
+   
+    fsSnmpTrapFilterEntry OBJECT-TYPE
+        SYNTAX             FsSnmpTrapFilterEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+             "The individual entry in the above table."
+        INDEX   { IMPLIED fsSnmpTrapFilterOID }
+        ::= { fsSnmpTrapFilterTable 1 }
+
+     FsSnmpTrapFilterEntry  ::=
+        SEQUENCE   {
+                        fsSnmpTrapFilterOID 
+                          OBJECT IDENTIFIER,
+                        fsSnmpTrapFilterRowStatus 
+                          RowStatus
+                   }
+
+     fsSnmpTrapFilterOID    OBJECT-TYPE
+        SYNTAX             OBJECT IDENTIFIER
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+            "Index of this table. The OID entry for which 
+            the trap has to be filtered."
+        ::= { fsSnmpTrapFilterEntry 1 }
+
+     fsSnmpTrapFilterRowStatus   OBJECT-TYPE
+        SYNTAX            RowStatus
+        MAX-ACCESS        read-create
+        STATUS            current
+        DESCRIPTION
+             "Denotes the RowStatus of the Trap Filter Entry."
+        ::= { fsSnmpTrapFilterEntry 2 } 
+
+-- *******************************************************************
+--  SNMP Target Address Table extension - Starts
+-- *******************************************************************
+     fsSnmpTargetAddrTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF FsSnmpTargetAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+             "This Table is a proprietary extension to the
+              standard snmpTargetAddrEntry."
+        ::= { fsSnmpTarget 1 }
+
+     fsSnmpTargetAddrEntry OBJECT-TYPE
+        SYNTAX       FsSnmpTargetAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+          "This object specifies an entry in the 
+          fsSnmpTargetAddrTable. This object contains the additional 
+          operational characteristics of SNMPv3 Target MIB apart 
+          from snmpTargetAddrEntry."
+      AUGMENTS    { snmpTargetAddrEntry }
+      ::= { fsSnmpTargetAddrTable 1 }
+
+
+FsSnmpTargetAddrEntry ::=
+      SEQUENCE {
+         fsSnmpTargetHostName
+         OCTET STRING
+       }
+fsSnmpTargetHostName OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (0..255))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+      "This object configures the DNS host name."
+     ::= { fsSnmpTargetAddrEntry 1 }
+
+-- *******************************************************************
+--  Cambium SNMP Agent Management Configuration Extensions
+-- *******************************************************************
+
+fsSnmpCnMgmtReadOnlyCommunity OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A human readable string representing the default management
+         read-only community string."
+
+    ::= { cnSnmpAgentMgmtCfg 1 }
+
+fsSnmpCnMgmtReadWriteCommunity OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A human readable string representing the default management
+         read-write community string."
+
+    ::= { cnSnmpAgentMgmtCfg 2 }
+
+fsSnmpCnMgmtTrapRcvrIpAddress OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..48))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default management SNMP Trap Receiver IP address."
+
+    ::= { cnSnmpAgentMgmtCfg 3 }
+
+fsSnmpCnMgmtUsmUserAuthProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    md5(2),
+                    sha(3),
+                    sha224(4),
+                    sha256(5),
+                    sha384(6),
+                    sha512(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication protocol options for use with the default
+         management user."
+
+    ::= { cnSnmpAgentMgmtCfg 4 }
+
+fsSnmpCnMgmtUsmUserPrivProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    des(2),
+                    tdes(3),
+                    aes(4),
+                    aes192(5),
+                    aes256(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Privacy protocol options for use with the default
+         management user."
+
+    ::= { cnSnmpAgentMgmtCfg 5 }
+
+fsSnmpCnMgmtUsmUserAccess OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    readOnly(1),
+                    readWrite(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Management object access options for use with 
+         the default management user."
+
+    ::= { cnSnmpAgentMgmtCfg 6 }
+
+fsSnmpCnMgmtUsmUserAuthKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(8..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Octets representing the default management 
+         user authentication key."
+
+    ::= { cnSnmpAgentMgmtCfg 7 }
+
+fsSnmpCnMgmtUsmUserPrivKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(8..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Octets representing the default management 
+         user privacy key."
+
+    ::= { cnSnmpAgentMgmtCfg 8 }
+
+fsSnmpCnMgmtUsmUserName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A human readable string representing the default 
+         management user name."
+
+    ::= { cnSnmpAgentMgmtCfg 9 }
+
+END

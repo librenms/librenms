@@ -1,0 +1,220 @@
+-- Copyright (C) 2009-2012 Aricent Group . All Rights Reserved
+
+ARICENT-MIPING-MIB DEFINITIONS ::= BEGIN 
+ 
+ IMPORTS 
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress, 
+    Counter32, Integer32,
+    enterprises            FROM SNMPv2-SMI
+    RowStatus  FROM SNMPv2-TC; 
+
+    fsMIPingMIB MODULE-IDENTITY
+    LAST-UPDATED "202201250000Z"
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com"
+    DESCRIPTION
+        " This mib module is for Ping with virutal routing support."
+
+    REVISION "202201250000Z"
+    DESCRIPTION
+        "Added limited continuous ping support for Web usage."
+
+    REVISION "201209050000Z"
+    DESCRIPTION
+        " This mib module is for Ping with virutal routing support."
+
+    ::= { enterprises  aricent-communication-holding-ltd(29601) iss(2) 36 }
+
+    fsMIPingMIBObjects OBJECT IDENTIFIER ::= { fsMIPingMIB 1 }
+
+--This is the MIB for IP Ping functionality
+
+    fsMIPingTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsMIPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "This entity's IP Ping Table"
+     ::= { fsMIPingMIBObjects 1 }
+
+    fsMIPingEntry  OBJECT-TYPE
+    SYNTAX      FsMIPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contains the information about a particular IP ping
+         Instance. Objects in this table can not be updated when
+         the PingStatus is in progress"
+     INDEX { fsMIPingIndex }
+     ::= { fsMIPingTable 1 }
+
+    FsMIPingEntry ::= SEQUENCE {
+        fsMIPingIndex          Integer32,
+        fsMIPingDest           IpAddress,
+        fsMIPingContextId      Integer32,
+        fsMIPingTimeout        Integer32,
+        fsMIPingTries          Integer32,
+        fsMIPingDataSize       Integer32,
+        fsMIPingStatus         INTEGER,
+        fsMIPingSendCount      Integer32,
+        fsMIPingAverageTime    Integer32,
+        fsMIPingMaxTime        Integer32,
+        fsMIPingMinTime        Integer32,
+        fsMIPingSuccesses      Counter32,
+        fsMIPingEntryStatus    RowStatus,
+        fsMIPingHostName       OCTET STRING,
+        fsMIPingContInterval   Integer32
+}
+
+    fsMIPingIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value that identifies the Ping Entry"
+    ::= { fsMIPingEntry 1 }
+
+    fsMIPingDest OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the node to be pinged."
+    ::= { fsMIPingEntry 2 }
+
+    fsMIPingContextId OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The Virtual Router for which the ping session is initiated.
+         The reachability of the destination will be determined in 
+         the specified VR."
+    DEFVAL { 0 }
+    ::= { fsMIPingEntry 3 }
+
+    fsMIPingTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds after which the entity waiting
+         for the ping response times out."
+    DEFVAL { 1 }
+    ::= { fsMIPingEntry 4 }
+
+    fsMIPingTries  OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of times the given node address is to be
+         pinged."
+    DEFVAL { 3 }
+    ::= { fsMIPingEntry 5 }
+
+    fsMIPingDataSize  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2080)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The size of the data portion of the PING PDU in bytes"
+    DEFVAL { 64 }
+    ::= { fsMIPingEntry 6 }
+
+    fsMIPingStatus        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notinitiated (1),
+        progress  (2),
+        completed (3)
+     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the Ping Entry"
+    ::= { fsMIPingEntry 7 }
+
+    fsMIPingSendCount OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets sent to destination."
+    ::= { fsMIPingEntry 8 }
+
+    fsMIPingAverageTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average value of the round trip time in milli seconds
+         to this destination."
+    ::= { fsMIPingEntry 9 }
+
+    fsMIPingMaxTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum value of the round trip time in milli seconds
+         to this destination."
+    ::= { fsMIPingEntry 10 }
+
+    fsMIPingMinTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum value of the round trip time in milli seconds
+         to this destination."
+    ::= { fsMIPingEntry 11 }
+     
+     fsMIPingSuccesses OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The number of ping responses received."
+     ::= { fsMIPingEntry 12 }
+
+    fsMIPingEntryStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry.  Once the entry status is
+         set to active, the associate entry cannot be modified until
+         the sequence completes (PingStatus is completed).Management
+         station created the Ping Entries should take care of 
+         deletion. Entry Can be made active only if PingDestination is
+         configured"
+
+    ::= { fsMIPingEntry 13 }
+
+   
+     fsMIPingHostName OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (0..255))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object specifies the DNS host name
+          used to send echo requests."
+
+     ::= { fsMIPingEntry 14 }
+ 
+     fsMIPingContInterval OBJECT-TYPE
+     SYNTAX      Integer32 (0..3600)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Specifies the interval for continuous ping operations.
+         A value of 0 indicates that continuous ping generation 
+         is not enabled. Other values indicate that continuous 
+         ping is enabled and that a new ping attempt (based on 
+         other entry settings) will be initiated periodically 
+         per the current interval value."
+
+     DEFVAL { 0 }
+     ::= { fsMIPingEntry 15 }
+
+END

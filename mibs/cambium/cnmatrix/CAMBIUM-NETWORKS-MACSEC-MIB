@@ -1,0 +1,167 @@
+-- Copyright (C) Cambium Networks. All Rights Reserved. --
+-- This MIB contains tables used to configure a switch running --
+-- Port MAC security --
+CAMBIUM-NETWORKS-MACSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32, Unsigned32,
+    enterprises, NOTIFICATION-TYPE, Counter32, IpAddress, Gauge32
+         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress, TruthValue,
+    DisplayString, DateAndTime
+         FROM SNMPv2-TC;
+
+cnMacSecMib MODULE-IDENTITY
+    LAST-UPDATED "202111280000Z"     -- November 28, 2021
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the
+        MAC Security feature."
+
+    REVISION "202111280000Z"     -- November 28, 2021
+    DESCRIPTION "Ver 2: Fixed cnMacSecPortTable format."
+
+    REVISION "202106040000Z"     -- June 4, 2021
+    DESCRIPTION "Ver 1:  Initial version."
+
+    ::= {  enterprises cambium(17713) cnMatrix(24) 10 }
+
+    MacSecViolationMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The action taken in case of a violation."
+    SYNTAX      INTEGER { protect(1), restrict(2), shutdown(3) }
+
+-- ***************************************************************************
+--                         Groups in the MIB
+-- ***************************************************************************
+    cnMacSecPort      OBJECT IDENTIFIER ::= { cnMacSecMib 1 }
+-- ***************************************************************************
+--                               GROUPS
+-- ***************************************************************************
+
+    cnMacSecPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CnMacSecPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "MAC Security configuration for a port."
+    ::= { cnMacSecPort 1 }
+
+    cnMacSecPortEntry OBJECT-TYPE
+        SYNTAX      CnMacSecPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each row instance gives the attached MAC 
+            Security configuration for a port."
+        INDEX { cnMacSecPortIndex }
+    ::= { cnMacSecPortTable 1 }
+
+    CnMacSecPortEntry ::= SEQUENCE {
+        cnMacSecPortIndex                   Integer32,
+        cnMacSecPortStatus 	            Integer32,
+        cnMacSecPortMode                    MacSecViolationMode,	
+	cnMacSecPortMaxAddr                 Integer32,
+	cnMacSecPortNumAddr                 Integer32,
+	cnMacSecPortNumViolations           Gauge32,
+	cnMacSecPortLastViolationAddr       MacAddress,
+	cnMacSecPortLastViolationTime       DateAndTime
+    }
+
+    cnMacSecPortIndex OBJECT-TYPE
+        SYNTAX         Integer32(1..52)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Port (ifIndex) identifier attribute"
+
+    ::= { cnMacSecPortEntry 1 }
+
+    cnMacSecPortStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "The administrative status of the MAC Security feature for the port."
+        DEFVAL  { 0 }
+
+	::= { cnMacSecPortEntry 2 }
+    
+    cnMacSecPortMode OBJECT-TYPE
+        SYNTAX         MacSecViolationMode
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "The action taken in case of a violation."
+        DEFVAL  { protect }
+
+	::= { cnMacSecPortEntry 3 }
+
+    cnMacSecPortMaxAddr OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "The maximum number of MAC addresses allowed on the port."
+        DEFVAL  { 1 }
+
+	::= { cnMacSecPortEntry 4 }
+
+    cnMacSecPortNumAddr OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The current number of MAC addresses learned on the port."
+
+	::= { cnMacSecPortEntry 5 }
+
+    cnMacSecPortNumViolations OBJECT-TYPE
+        SYNTAX         Gauge32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "An incremental count of MAC addresses that were not allowed on the port, due to the maximum numbers of addresses being reached."
+
+	::= { cnMacSecPortEntry 6 }
+    
+   cnMacSecPortLastViolationAddr OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The last MAC address to violate the maximum number of addresses on the port."
+
+	::= { cnMacSecPortEntry 7 }
+
+   cnMacSecPortLastViolationTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The time at which the last violation occured on the port."
+
+	::= { cnMacSecPortEntry 8 }
+
+    cnMacSecGlobalDebug OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "The global debug flag for MAC Security."
+
+	::= { cnMacSecMib 2 }
+    
+   cnMacSecDebugOption OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "The debug option bits for MAC Security"
+
+	::= { cnMacSecMib 3 } 
+    
+END

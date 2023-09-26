@@ -1,0 +1,1064 @@
+-- Copyright (C) 2015 Aricent. All Rights Reserved.
+
+    ARICENT-LLDP-MED-MIB DEFINITIONS ::= BEGIN 
+ 
+    IMPORTS 
+      MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, NOTIFICATION-TYPE, 
+      Counter32, Gauge32
+          FROM SNMPv2-SMI
+      TruthValue, RowStatus, DisplayString
+          FROM SNMPv2-TC
+      SnmpAdminString
+          FROM SNMP-FRAMEWORK-MIB
+      InterfaceIndex
+          FROM IF-MIB
+      LldpChassisId, lldpRemChassisId, lldpRemPortId
+          FROM LLDP-MIB
+      lldpV2PortConfigEntry, lldpV2RemTimeMark, lldpV2RemLocalIfIndex, lldpV2RemLocalDestMACAddress, 
+      lldpV2RemIndex, lldpV2LocPortIfIndex
+          FROM LLDP-V2-MIB
+      LldpV2PortId, LldpV2ChassisIdSubtype, LldpV2ChassisId, LldpV2DestAddressTableIndex
+          FROM LLDP-V2-TC-MIB 
+      LldpXMedDeviceClass, LldpXMedCapabilities, PolicyAppType, LocationSubtype, lldpXMedLocLocationEntry,
+      lldpXMedRemLocationSubtype FROM LLDP-EXT-MED-MIB;
+
+fsLldpMed MODULE-IDENTITY
+         LAST-UPDATED "201506230000Z"
+         ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+         CONTACT-INFO "support@aricent.com"
+         DESCRIPTION
+            "The proprietary MIB module for LLDP MED."
+     REVISION "201506230000Z"
+         DESCRIPTION
+         "The Initial version of LLDP-MED Proprietary MIB file."
+         ::=  { enterprises aricent-communication-holding-ltd(29601) iss(2) 101 }
+
+
+-- ------------------------------------------------------------
+-- Groups in the proprietary LLDP MED module.
+-- ------------------------------------------------------------
+
+      fsLldpMedLocalConfig    OBJECT IDENTIFIER ::= { fsLldpMed 1 }
+      fsLldpMedRemoteConfig   OBJECT IDENTIFIER ::= { fsLldpMed 2 }
+      fsLldpMedStatistics     OBJECT IDENTIFIER ::= { fsLldpMed 3 }
+      fsLldpMedNotification   OBJECT IDENTIFIER ::= { fsLldpMed 4 }
+      fsLldpMedNotifyObjects  OBJECT IDENTIFIER ::= { fsLldpMed 5 }
+
+
+
+------------------------------------------------------------------------------
+-- LLDP MED LOCAL CONFIG GROUP
+------------------------------------------------------------------------------
+
+fsLldpMedPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpMedPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table controls the selection of LLDP-MED TLVs to be transmitted
+            on individual ports."
+    ::= { fsLldpMedLocalConfig 1 }
+
+fsLldpMedPortConfigEntry  OBJECT-TYPE
+    SYNTAX      FsLldpMedPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the LLDP-MED configuration information that controls the
+            transmission of the MED organizationally defined TLVs on
+            LLDP transmission capable ports.
+
+            This object augments the lldpV2PortConfigEntry of
+            the LLDP-MIB, therefore it is only present along with the port
+            configuration defined by the associated lldpV2PortConfigEntry
+            entry.
+
+            Each active fsLldpMedPortConfigEntry must be stored and
+            retrieved from non-volatile storage (along with the
+            corresponding lldpV2PortConfigEntry) after a re-initialization
+            of the management system."
+    AUGMENTS { lldpV2PortConfigEntry }
+    ::= { fsLldpMedPortConfigTable 1 }
+
+FsLldpMedPortConfigEntry ::= SEQUENCE {
+    fsLldpMedPortCapSupported        LldpXMedCapabilities,
+    fsLldpMedPortConfigTLVsTxEnable  LldpXMedCapabilities
+}
+
+fsLldpMedPortCapSupported  OBJECT-TYPE
+    SYNTAX      LldpXMedCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the bitmap that includes the MED
+            organizationally defined a  set of LLDP
+            TLVs whose transmission is possible for the respective port
+            on the LLDP agent of the device. Each bit in the bitmap corresponds
+            to an LLDP-MED subtype associated with a specific TIA TR41.4 MED
+            optional TLV. If the bit is set, the agent supports the
+            corresponding TLV."
+
+    ::= { fsLldpMedPortConfigEntry  1 }
+
+fsLldpMedPortConfigTLVsTxEnable  OBJECT-TYPE
+    SYNTAX      LldpXMedCapabilities
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object includes the MED organizationally defined a set of LLDP
+            TLVs whose transmission is allowed on the local LLDP agent by
+            the network management.  Each bit in the bitmap corresponds
+            to an LLDP-MED subtype associated with a specific TIA TR41.4 MED
+            optional TLV. If the bit is set, the agent will send the
+            corresponding TLV if the respective capability is supported per
+            port.
+
+            Setting a bit with in this object for a non-supported capability
+            shall have no functional effect and will result in an inconsistent
+            value error returned to the management application.
+
+            There are other rules and restrictions that prevent arbitrary
+            combinations of TLVs to be enabled on LLDP-MED devices according to
+            the device classes. These rules are defined in Section 10.2.1,
+            Tables 5 - 9 of ANSI/TIA-1057. In case a management application
+            attempts to set this object to a value that does not follow the rules,
+            the set operation shall have and will result in an inconsistent
+            value error returned to the management application.
+
+            Setting this object to an empty set is valid and effectively
+            disables LLDP-MED on a per-port basis by disabling transmission of
+            all MED organizational TLVs. In this case the remote tables objects
+            in the LLDP-MED MIB corresponding to the respective port will not
+            be populated.
+
+            The default value for fsLldpMedPortConfigTLVsTxEnable object
+            is an empty set, which means no enumerated values are set.
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+
+    ::= { fsLldpMedPortConfigEntry  2 }
+
+---
+--- fsLldpMedLocMediaPolicyTable: Local Media Policy Information Table
+---
+
+fsLldpMedLocMediaPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpMedLocMediaPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per policy type per port
+             of media policy information (as a part of the MED
+             organizational extension) on the local system known
+             to this agent."
+    ::= { fsLldpMedLocalConfig 2 }
+
+fsLldpMedLocMediaPolicyEntry OBJECT-TYPE
+    SYNTAX      FsLldpMedLocMediaPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies information about a particular policy on a specific
+             port component."
+    INDEX   { lldpV2LocPortIfIndex, fsLldpMedLocMediaPolicyAppType }
+    ::= { fsLldpMedLocMediaPolicyTable 1 }
+
+FsLldpMedLocMediaPolicyEntry ::= SEQUENCE {
+              fsLldpMedLocMediaPolicyAppType        PolicyAppType,
+              fsLldpMedLocMediaPolicyVlanID         Integer32,
+              fsLldpMedLocMediaPolicyPriority       Integer32,
+              fsLldpMedLocMediaPolicyDscp           Integer32,
+              fsLldpMedLocMediaPolicyUnknown        TruthValue,
+              fsLldpMedLocMediaPolicyTagged         TruthValue,
+              fsLldpMedLocMediaPolicyRowStatus      RowStatus
+}
+
+fsLldpMedLocMediaPolicyAppType OBJECT-TYPE
+    SYNTAX      PolicyAppType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the media type that defines the primary function of the
+             application for the policy advertised by an endpoint."
+    ::= { fsLldpMedLocMediaPolicyEntry 1 }
+
+fsLldpMedLocMediaPolicyVlanID  OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..4094|4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object specifies an extension of the VLAN Identifier for the port,
+             as defined in IEEE 802.1P-1998.
+
+             A value of 1 through 4094 is used to define a valid PVID."
+
+    ::= { fsLldpMedLocMediaPolicyEntry 2 }
+
+fsLldpMedLocMediaPolicyPriority  OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object contains the value of the 802.1p priority
+            which is associated with the given port on the
+            local system."
+    ::= { fsLldpMedLocMediaPolicyEntry 3 }
+
+fsLldpMedLocMediaPolicyDscp  OBJECT-TYPE
+    SYNTAX      Integer32 (0..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object contains the value of the Differentiated Service
+            Code Point (DSCP) as defined in IETF RFC 2474 and RFC 2475
+            which is associated with the given port on the local system."
+
+    ::= { fsLldpMedLocMediaPolicyEntry 4 }
+
+fsLldpMedLocMediaPolicyUnknown  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object indicates that the
+             network policy for the specified application type is
+             currently unknown when the value is set as 'true'.  In this case, the VLAN ID, the
+             layer 2 priority and the DSCP value fields are ignored.
+             This object indicates that this network policy
+             is defined when the value is set as 'false'."
+    ::= { fsLldpMedLocMediaPolicyEntry 5 }
+
+
+fsLldpMedLocMediaPolicyTagged  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object indicates that the application is using a
+             tagged VLAN when the value set as 'true'.
+             This object  indicates that for the specific application
+             the device either is using an untagged VLAN or does not
+             support port based VLAN operation when the value set as 'false'.  In this case, both the
+             VLAN ID and the Layer 2 priority fields are ignored and
+             only the DSCP value has relevance "
+    ::= { fsLldpMedLocMediaPolicyEntry 6 }
+
+fsLldpMedLocMediaPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object creates, modifies, and/or deletes a row
+             in the table. All the objects in a row can be modified 
+             only when the value of this object in the corresponding 
+             conceptual row is not 'active'. To modify one or 
+             more of the objects in this conceptual rows:
+             a. change the row status to 'notInService',
+             b. change the values of the row
+             c. change the row status to 'active'
+            The fsLldpMedLocMediaPolicyRowStatus may be changed to 
+            'active' if all the managed objects in the conceptual row
+            are assigned with valid values."
+    ::= { fsLldpMedLocMediaPolicyEntry 7 }
+
+
+--- Location Information
+--- Local Location Information transmitted to an endpoint
+--- fsLldpMedLocLocationTable - Location Information
+---
+
+fsLldpMedLocLocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpMedLocLocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table specifies the augmented MIB of lldpXMedLocLocationTable.
+             Currently, this MIB table contains Row Status object to control 
+             the creation, deletion and modification of each row in lldpXMedLocLocationTable.
+
+            The information in this table MUST be stored in non-volatile-memory
+            and persist over restart/reboot sequences."
+    ::= { fsLldpMedLocalConfig 3 }
+
+fsLldpMedLocLocationEntry OBJECT-TYPE
+    SYNTAX      FsLldpMedLocLocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object is used to augment the lldpXMedLocLocationEntry of
+            the LLDP-EXT-MED-MIB, therefore it is only present along with the location 
+            configuration defined by the associated lldpXMedLocLocationEntry
+            entry."
+
+    AUGMENTS { lldpXMedLocLocationEntry }
+
+    ::= { fsLldpMedLocLocationTable 1 }
+
+FsLldpMedLocLocationEntry ::= SEQUENCE {
+              fsLldpMedLocLocationRowStatus      RowStatus
+}
+
+fsLldpMedLocLocationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object is used to create, modify, and/or delete a row
+             in the table. All the objects in a row can be modified 
+             only when the value of this object in the corresponding 
+             conceptual row is not 'active'. To modify one or 
+             more of the objects in this conceptual rows:
+             a. change the row status to 'notInService',
+             b. change the values of the row
+             c. change the row status to 'active'
+            The fsLldpMedLocLocationRowStatus may be changed to 
+            'active' if all the managed objects in the conceptual row
+            are assigned with valid values."
+
+    ::= { fsLldpMedLocLocationEntry 1 }
+
+
+------------------------------------------------------------------------------
+-- LLDP MED REMOTE CONFIG GROUP
+------------------------------------------------------------------------------
+
+-- fsLLdpXMedRemCapabilitiesTable
+-- this table is read by a manager to determine what capabilities
+-- exists and are enabled on the remote system connected to the port
+
+-- The information in this table is based upon the information advertised
+-- by the remote device and received on each port in the capabilities TLV
+
+
+fsLldpXMedRemCapabilitiesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpXMedRemCapabilitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table displays LLDP-MED capabilities of remote devices
+            connected to individual ports."
+    ::= { fsLldpMedRemoteConfig 1 }
+
+fsLldpXMedRemCapabilitiesEntry  OBJECT-TYPE
+    SYNTAX      FsLldpXMedRemCapabilitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies LLDP-MED capabilities of remote devices connected to the device
+            ports and communicating via LLDP-MED.
+
+            The remote tables in the LLDP-MED MIB excepting this table may be
+            sparsely populate. An entry in one of these table is meaningful
+            and shall be populated by the agent only if the corresponding bits
+            for the respective function are set in the objects in this table. "
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex }
+    ::= { fsLldpXMedRemCapabilitiesTable 1 }
+
+FsLldpXMedRemCapabilitiesEntry ::= SEQUENCE {
+      fsLldpXMedRemCapSupported  LldpXMedCapabilities,
+      fsLldpXMedRemCapCurrent    LldpXMedCapabilities,
+      fsLldpXMedRemDeviceClass   LldpXMedDeviceClass
+}
+fsLldpXMedRemCapSupported  OBJECT-TYPE
+    SYNTAX      LldpXMedCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the bitmap that includes the MED
+            organizationally defined a set of LLDP
+            TLVs whose transmission is possible on the LLDP agent of the remote
+            device connected to this port. Each bit in the bitmap corresponds
+            to an LLDP-MED subtype associated with a specific TIA TR41.4 MED
+            optional TLV. If the bit is set, the agent has the capability
+            to support the corresponding TLV."
+    ::= { fsLldpXMedRemCapabilitiesEntry  1 }
+
+fsLldpXMedRemCapCurrent  OBJECT-TYPE
+    SYNTAX      LldpXMedCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the bitmap that includes the MED
+            organizationally defined a set of LLDP
+            TLVs whose transmission is possible on the LLDP agent of the remote
+            device connected to this port. Each bit in the bitmap corresponds
+            to an LLDP-MED subtype associated with a specific TIA TR41.4 MED
+            optional TLV. If the bit is set, the agent currently supports the
+            corresponding TLV."
+    ::= { fsLldpXMedRemCapabilitiesEntry  2 }
+
+fsLldpXMedRemDeviceClass    OBJECT-TYPE
+    SYNTAX      LldpXMedDeviceClass
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies a device Class as advertised by the device remotely connected to the
+             port."
+    ::= { fsLldpXMedRemCapabilitiesEntry 3 }
+
+---
+---
+--- fsLldpXMedRemMediaPolicyTable: Remote Media Policy Table
+---
+fsLldpXMedRemMediaPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpXMedRemMediaPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains media policy information as advertised
+            by the remote system.
+
+            This table may be sparsely populated. Entries in this table are
+            relevant only if the networkPolicy(0) bits in the
+            fsLldpXMedRemCapSupported and fsLldpXMedRemCapCurrent objects of the
+            corresponding ports are set."
+    ::= { fsLldpMedRemoteConfig 2 }
+
+fsLldpXMedRemMediaPolicyEntry OBJECT-TYPE
+    SYNTAX      FsLldpXMedRemMediaPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies information about the per port per policy type policy
+             information for a particular physical network connection."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex,
+              fsLldpXMedRemMediaPolicyAppType }
+
+    ::= { fsLldpXMedRemMediaPolicyTable 1 }
+
+FsLldpXMedRemMediaPolicyEntry ::= SEQUENCE {
+              fsLldpXMedRemMediaPolicyAppType        PolicyAppType,
+              fsLldpXMedRemMediaPolicyVlanID         Integer32,
+              fsLldpXMedRemMediaPolicyPriority       Integer32,
+              fsLldpXMedRemMediaPolicyDscp           Integer32,
+              fsLldpXMedRemMediaPolicyUnknown        TruthValue,
+              fsLldpXMedRemMediaPolicyTagged         TruthValue
+}
+
+fsLldpXMedRemMediaPolicyAppType OBJECT-TYPE
+    SYNTAX      PolicyAppType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the media type that defines the primary function of the
+             application for the policy advertised by the endpoint connected
+             remotely to this port."
+    ::= { fsLldpXMedRemMediaPolicyEntry 1 }
+
+fsLldpXMedRemMediaPolicyVlanID  OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..4094|4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies an extension of the VLAN Identifier for the remote system
+             connected to this port, as defined in IEEE 802.1P-1998.
+
+             A value of 1 through 4094 is used to define a valid PVID."
+
+    ::= { fsLldpXMedRemMediaPolicyEntry 2 }
+
+fsLldpXMedRemMediaPolicyPriority  OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object contains the value of the 802.1p priority
+            which is associated with the remote system connected at
+            given port."
+    ::= { fsLldpXMedRemMediaPolicyEntry 3 }
+
+fsLldpXMedRemMediaPolicyDscp  OBJECT-TYPE
+    SYNTAX      Integer32 (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object contains the value of the Differentiated Service
+            Code Point (DSCP) as defined in IETF RFC 2474 and RFC 2475
+            which is associated with remote system connected at the port."
+    ::= { fsLldpXMedRemMediaPolicyEntry 4 }
+
+fsLldpXMedRemMediaPolicyUnknown  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object indicates that the
+             network policy for the specified application type is
+             currently unknown when the value is set as 'true'.  In this case, the VLAN ID, the
+             layer 2 priority and the DSCP value fields are ignored.
+             This object indicates that this network policy
+             is defined when the value is set as 'false'."
+    ::= { fsLldpXMedRemMediaPolicyEntry 5 }
+
+fsLldpXMedRemMediaPolicyTagged  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object indicates that the application is using a
+             tagged VLAN when the value is set as 'true'.
+             This object indicates that for the specific application
+             the device either is using an untagged VLAN or does not
+             support port based VLAN operation when the value is set as 'false'.  In this case, both the
+             VLAN ID and the Layer 2 priority fields are ignored and
+             only the DSCP value has relevance "
+    ::= { fsLldpXMedRemMediaPolicyEntry 6 }
+
+
+---
+--- fsLldpXMedRemInventoryTable - Remote Inventory Information
+---
+---
+
+fsLldpXMedRemInventoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpXMedRemInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains inventory information as advertised
+            by the remote system.
+
+            This table may be sparsely populated. Entries in this table are
+            relevant only if the inventory(2) bits in the
+            fsLldpXMedRemCapSupported and fsLldpXMedRemCapCurrent objects of the
+            corresponding ports are set "
+    ::= { fsLldpMedRemoteConfig 3 }
+
+fsLldpXMedRemInventoryEntry OBJECT-TYPE
+    SYNTAX      FsLldpXMedRemInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies information about inventory information for the remote devices
+             connected to the ports."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex }
+    ::= { fsLldpXMedRemInventoryTable 1 }
+
+FsLldpXMedRemInventoryEntry ::= SEQUENCE {
+              fsLldpXMedRemHardwareRev           SnmpAdminString,
+              fsLldpXMedRemFirmwareRev           SnmpAdminString,
+              fsLldpXMedRemSoftwareRev           SnmpAdminString,
+              fsLldpXMedRemSerialNum             SnmpAdminString,
+              fsLldpXMedRemMfgName               SnmpAdminString,
+              fsLldpXMedRemModelName             SnmpAdminString,
+              fsLldpXMedRemAssetID               SnmpAdminString
+              }
+
+fsLldpXMedRemHardwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific hardware revision string
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 1 }
+
+fsLldpXMedRemFirmwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific firmware revision string
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 2 }
+
+fsLldpXMedRemSoftwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific software revision string
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 3 }
+
+fsLldpXMedRemSerialNum    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific serial number
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 4 }
+
+fsLldpXMedRemMfgName    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific manufacturer name
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 5 }
+
+fsLldpXMedRemModelName    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific model name
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 6 }
+
+fsLldpXMedRemAssetID    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the vendor-specific asset tracking identifier
+            as advertised by the remote endpoint."
+    ::= { fsLldpXMedRemInventoryEntry 7 }
+
+
+-- ------------------------------------------------------------------
+-- The LLDP MED Statistics
+-- ------------------------------------------------------------------
+
+
+fsLldpMedStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpMedStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table containing LLDP MED transmission statistics for
+            individual port/destination address combinations."
+    ::= { fsLldpMedStatistics 1 }
+
+fsLldpMedStatsEntry   OBJECT-TYPE
+     SYNTAX      FsLldpMedStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "This object specifies LLDP MED frame transmission statistics for a particular port
+             and destination MAC address.
+
+             All counter values in a particular entry shall be
+             maintained on a continuing basis and shall not be deleted
+             upon expiration of rxInfoTTL timing counters in the LLDP
+             remote systems MIB of the receipt of a shutdown frame from
+             a remote LLDP agent.
+
+             All statistical counters associated with a particular
+             port on the local LLDP agent become frozen whenever the
+             adminStatus is disabled for the same port."
+
+     INDEX  { fsLldpMedStatsIfIndex,
+              fsLldpMedStatsDestMACAddress }
+     ::= { fsLldpMedStatsTable 1 }
+
+FsLldpMedStatsEntry ::= SEQUENCE {
+      fsLldpMedStatsIfIndex                         InterfaceIndex,
+      fsLldpMedStatsDestMACAddress                  LldpV2DestAddressTableIndex,
+      fsLldpMedStatsTxFramesTotal                   Counter32,
+      fsLldpMedStatsRxFramesTotal                   Counter32,
+      fsLldpMedStatsRxFramesDiscardedTotal          Counter32,
+      fsLldpMedStatsRxTLVsDiscardedTotal            Counter32,
+      fsLldpMedStatsRxCapTLVsDiscarded              Counter32,
+      fsLldpMedStatsRxPolicyTLVsDiscarded           Counter32,
+      fsLldpMedStatsRxInventoryTLVsDiscarded        Counter32,
+      fsLldpMedStatsRxLocationTLVsDiscarded         Counter32,
+      fsLldpMedStatsRxExPowerMDITLVsDiscarded       Counter32,
+      fsLldpMedStatsRxCapTLVsDiscardedReason        DisplayString,
+      fsLldpMedStatsRxPolicyDiscardedReason         DisplayString,
+      fsLldpMedStatsRxInventoryDiscardedReason      DisplayString,
+      fsLldpMedStatsRxLocationDiscardedReason       DisplayString,
+      fsLldpMedStatsRxExPowerDiscardedReason        DisplayString
+}
+
+fsLldpMedStatsIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the interface index value that is used to identify the port
+            associated with this entry. Its value is an index
+            into the interfaces MIB
+
+            The value of this object is used as an index to the
+            fsLldpMedStatsTable."
+    ::= { fsLldpMedStatsEntry 1 }
+
+fsLldpMedStatsDestMACAddress   OBJECT-TYPE
+    SYNTAX      LldpV2DestAddressTableIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the index value that is used to identify the destination
+            MAC address associated with this entry. Its value identifies
+            the row in the lldpV2DestAddressTable where the MAC address
+            can be found.
+
+            The value of this object is used as an index to the
+            fsLldpMedStatsTable."
+    ::= { fsLldpMedStatsEntry 2 }
+fsLldpMedStatsTxFramesTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP-MED frames transmitted by
+            the LLDP agent on the indicated port to the destination MAC address
+            associated with this row of the table."
+    ::= { fsLldpMedStatsEntry 3 }
+
+fsLldpMedStatsRxFramesTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of valid LLDP-MED frames received
+            by the LLDP agent on the indicated port, while this LLDP agent is enabled."
+    ::= { fsLldpMedStatsEntry 4 }
+
+fsLldpMedStatsRxFramesDiscardedTotal OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "LLDP frames"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object specifies the number of LLDP-MED frames received by the LLDP agent on
+            the indicated port, and then discarded for any reason.
+            This counter can provide an indication that LLDP header
+            formatting problems may exist with the local LLDP agent in
+            the sending system or that LLDPDU validation problems may
+            exist with the local LLDP agent in the receiving system."
+   ::= { fsLldpMedStatsEntry 5 }
+
+fsLldpMedStatsRxTLVsDiscardedTotal  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP-MED TLVs discarded for any
+            reason by the LLDP agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 6 }
+
+fsLldpMedStatsRxCapTLVsDiscarded  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP MED Capability TLVs discarded for any reason by this LLDP
+            agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 7 }
+
+fsLldpMedStatsRxPolicyTLVsDiscarded  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP MED Network Policy TLVs discarded for any reason by this LLDP
+            agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 8 }
+
+fsLldpMedStatsRxInventoryTLVsDiscarded  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP MED Inventory TLVs discarded for any reason by this LLDP
+            agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 9 }
+
+fsLldpMedStatsRxLocationTLVsDiscarded  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP MED Location TLVs discarded for any reason by this LLDP
+            agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 10 }
+
+fsLldpMedStatsRxExPowerMDITLVsDiscarded OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "TLVs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the number of LLDP MED Extended Power Via MDI TLVs discarded for any 
+             reason by this LLDP agent on the indicated port."
+
+    ::= { fsLldpMedStatsEntry 11 }
+
+fsLldpMedStatsRxCapTLVsDiscardedReason OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the reason for last discarded LLDP MED Capability TLV"
+
+    ::= { fsLldpMedStatsEntry 12 }
+
+fsLldpMedStatsRxPolicyDiscardedReason OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the reason for last discarded LLDP MED Network Policy TLV"
+
+    ::= { fsLldpMedStatsEntry 13 }
+
+fsLldpMedStatsRxInventoryDiscardedReason OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the reason for last discarded LLDP MED Inventory TLV"
+
+    ::= { fsLldpMedStatsEntry 14 }
+
+fsLldpMedStatsRxLocationDiscardedReason OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the reason for last discarded LLDP MED Location
+             Identification TLV"
+
+    ::= { fsLldpMedStatsEntry 15 }
+
+fsLldpMedStatsRxExPowerDiscardedReason OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "This object specifies the reason for last discarded LLDP MED Extended
+             Power-via-MDI TLV"
+
+    ::= { fsLldpMedStatsEntry 16 }
+
+fsLldpMedClearStats OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object clears all the LLDP MED Counters and assigns FALSE to it
+        when it is set to TRUE.
+     	The default value of this object is FALSE"
+
+    DEFVAL { false }
+        ::= {  fsLldpMedStatistics 2 }
+
+
+-- ------------------------------------------------------------------
+-- The LLDP MED Notification Group
+-- ------------------------------------------------------------------
+fsLldpMedTrapObjects  OBJECT IDENTIFIER ::= { fsLldpMedNotifyObjects 1}
+
+fsLldpXMedMediaPolicyAppType OBJECT-TYPE
+    SYNTAX      PolicyAppType 
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the media type that defines the primary function of the
+             application for the policy advertised by an endpoint."
+    ::= { fsLldpMedTrapObjects 1 }
+
+fsLldpMedTraps OBJECT IDENTIFIER ::= { fsLldpMedNotification 0 }
+
+
+fsLldpMedPolicyMismatch NOTIFICATION-TYPE
+    OBJECTS    { lldpRemChassisId,
+                 lldpRemPortId,
+                 fsLldpXMedMediaPolicyAppType }
+
+   STATUS       current
+   DESCRIPTION
+           "This object specifies the notification that is generated when the policy mismatch 
+            is observed in between local and remote media end devices"
+     ::= { fsLldpMedTraps 1 }
+
+
+     
+--- fsLldpXMedRemLocationTable - Remote Location Information
+---
+
+fsLldpXMedRemLocationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpXMedRemLocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains Location information as advertised
+            by the remote system.
+
+            This table may be sparsely populated. Entries in this table are
+            relevant only if the Location(3) bits in the
+            fsLldpXMedRemCapSupported and fsLldpXMedRemCapCurrent objects of the
+            corresponding ports are set."
+    ::= { fsLldpMedRemoteConfig 4 }
+
+fsLldpXMedRemLocationEntry OBJECT-TYPE
+    SYNTAX      FsLldpXMedRemLocationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object specifies information about Location information 
+            for the remote devices connected to the ports."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex,
+              lldpXMedRemLocationSubtype}
+    ::= { fsLldpXMedRemLocationTable 1 }
+
+FsLldpXMedRemLocationEntry ::= SEQUENCE {
+              fsLldpXMedRemLocationInfo       OCTET STRING
+              }
+
+fsLldpXMedRemLocationInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the location information advertised by 
+            the remote endpoint. Parsing of this information is dependent 
+            upon the location subtype, as defined by the value of the 
+            corresponding fsLldpXMedRemLocationSubType object. "
+    ::= { fsLldpXMedRemLocationEntry 1 }
+
+
+--- fsLldpXMedRemXPoEPDTable - Extended PoE PD Information from the remote device
+---
+
+fsLldpXMedRemXPoEPDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsLldpXMedRemXPoEPDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains extended PoE information as advertised
+            by the remote devices of PD type.
+
+            This table may be sparsely populated. Entries in this table are
+            relevant only if the extendedPD(5) bits in the
+            fsLldpXMedRemCapSupported and fsLldpXMedRemCapCurrent objects of the
+            corresponding ports are set."
+    ::= { fsLldpMedRemoteConfig 5 }
+
+fsLldpXMedRemXPoEPDEntry OBJECT-TYPE
+    SYNTAX      FsLldpXMedRemXPoEPDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about XPoEPD information for the remote devices
+             connected to the ports."
+    INDEX   { lldpV2RemTimeMark,
+              lldpV2RemLocalIfIndex,
+              lldpV2RemLocalDestMACAddress,
+              lldpV2RemIndex}
+    ::= { fsLldpXMedRemXPoEPDTable 1 }
+
+FsLldpXMedRemXPoEPDEntry ::= SEQUENCE {
+              fsLldpXMedRemXPoEDeviceType       INTEGER,
+              fsLldpXMedRemXPoEPDPowerReq       Gauge32,
+              fsLldpXMedRemXPoEPDPowerSource    INTEGER,
+              fsLldpXMedRemXPoEPDPowerPriority  INTEGER
+              }
+
+fsLldpXMedRemXPoEDeviceType OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                    unknown(1),
+                    pseDevice(2),
+                    pdDevice(3),
+                    none(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Defines the type of Power-via-MDI (Power over Ethernet) advertised
+             by the remote device.
+
+             A value pseDevice(2) indicates that the device is advertised as a
+             Power Sourcing Entity (PSE).
+
+             A value pdDevice(3) indicates that the device is advertised as a
+             Powered Device (PD).
+
+             A value none(4) indicates that the device does not support PoE."
+    REFERENCE
+            "ANSI/TIA-1057, Section 10.2.5.1"
+    ::= { fsLldpXMedRemXPoEPDEntry 1 }
+
+
+fsLldpXMedRemXPoEPDPowerReq  OBJECT-TYPE
+    SYNTAX      Gauge32 (0..1023)
+    UNITS      "tenth of watt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object contains the value of the power required by a
+            PD connected remotely to the port
+            expressed in units of 0.1 watts."
+    REFERENCE
+            " ANSI/TIA-1057, Section 10.2.5.4 "
+    ::= { fsLldpXMedRemXPoEPDEntry 2 }
+
+fsLldpXMedRemXPoEPDPowerSource OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                    unknown(1),
+                    fromPSE(2),
+                    local(3),
+                    localAndPSE(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the type of Power Source advertised as being used
+             by the device connected remotely to the port.
+
+             A value fromPSE(2) indicates that the device advertises its power
+             source as received from a PSE.
+
+             A value local(3) indicates that the device advertises its power
+             source as local.
+
+             A value localAndPSE(4) indicates that the device advertises its
+             power source as using both local and PSE power."
+    REFERENCE
+            "ANSI/TIA-1057, Section 10.2.5.2"
+    ::= { fsLldpXMedRemXPoEPDEntry 3 }
+
+fsLldpXMedRemXPoEPDPowerPriority OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                    unknown(1),
+                    critical(2),
+                    high(3),
+                    low(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the priority advertised as being required by the PD
+             connected remotely to the port.
+
+             A value critical(2) indicates that the device advertises its power
+             Priority as critical, as per RFC 3621.
+
+             A value high(3) indicates that the device advertises its power
+             Priority as high, as per RFC 3621.
+
+             A value low(4) indicates that the device advertises its power
+             Priority as low, as per RFC 3621."
+    REFERENCE
+            "ANSI/TIA-1057, Section 10.2.5.3"
+    ::= { fsLldpXMedRemXPoEPDEntry 4 }
+END 

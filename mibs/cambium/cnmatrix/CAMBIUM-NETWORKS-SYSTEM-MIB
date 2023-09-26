@@ -1,0 +1,401 @@
+CAMBIUM-NETWORKS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, enterprises, Integer32, IpAddress
+                FROM SNMPv2-SMI
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        DateAndTime, TruthValue, DisplayString
+                FROM SNMPv2-TC
+        InetAddress, InetAddressType
+                FROM INET-ADDRESS-MIB;
+
+cnSystem MODULE-IDENTITY
+    LAST-UPDATED "202209011200Z" -- September 1, 2022
+    ORGANIZATION
+        "Cambium Networks Inc."
+    CONTACT-INFO
+        "Cambium Networks Support"
+    DESCRIPTION
+        "This module contains MIB definitions for common cnMatrix system functions."
+    REVISION "202209011200Z" -- September 1, 2022
+    DESCRIPTION
+        "Added cnArpBroadCastRateLimit"
+    REVISION "202205271900Z" -- May 27, 2022
+    DESCRIPTION
+        "Added cnHttpClientPasswordType"
+    REVISION "202204081800Z" -- April 8, 2022
+    DESCRIPTION
+        "Added cambiumPasswordEncryption"
+    REVISION "202112181800Z" -- December 18, 2021
+    DESCRIPTION
+        "Added cambiumSystemLoginBanner and cambiumSystemMotdBanner"
+    REVISION "202108181800Z" -- August 18, 2021
+    DESCRIPTION
+        "Added HTTP client configuration parameters:"
+    REVISION "202105061800Z" -- May 6, 2021
+    DESCRIPTION
+        "Added MSTP reset action object:
+            - cambiumMstpReset"
+    REVISION "202103021800Z" -- March 3, 2021
+    DESCRIPTION
+        "Added reset button parameter:
+            - cambiumSystemResetButton"
+    REVISION "202102151800Z" -- February 15, 2021
+    DESCRIPTION 
+        "added cambiumReloadDefault and cambiumReloadPartialDefault"
+    REVISION "202010231800Z" -- October 23, 2020
+    DESCRIPTION
+        "Added system clock parameters:
+            - cambiumSystemClock
+            - cambiumSystemTimezoneName
+            - cambiumSystemTimezoneOffset
+            - cambiumSystemSummerTimeName
+            - cambiumSystemSummerTimeOffset
+            - cambiumSystemSummerTimeStart
+            - cambiumSystemSummerTimeEnd
+            - cambiumSystemRecurringSummerTimeStart
+            - cambiumSystemRecurringSummerTimeEnd
+            - cambiumSystemSummerTimeMode
+        Changed module name from system to cnSystem"
+   
+    REVISION "202006251800Z" -- June 25, 2020
+    DESCRIPTION
+        "Added cambiumXMSInterface scalars"
+
+    REVISION "201903141800Z" -- March 14, 2019
+    DESCRIPTION
+        "Initial Production Version."
+
+
+::= { enterprises cambium(17713) cnMatrix(24) 4 }
+
+cnHttpClient OBJECT IDENTIFIER ::= { cnSystem 24 }
+cnCpuRateLimits OBJECT IDENTIFIER ::= { cnSystem 27 }
+
+cambiumScheduledReload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Schedules a reload if the relative time or absolute time object is set"
+    DEFVAL      { false }
+    ::= { cnSystem 1 }
+
+cambiumReloadRelativeTime OBJECT-TYPE
+    SYNTAX     Integer32 (60..86400)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Specifies the amount of time in seconds until the device will reboot.
+          The reboot time is relative to the moment when cambiumScheduledReload is set to true.
+          In order to set the relative time, the absolute time must be zero."
+    ::= { cnSystem 2 }
+
+cambiumReloadAbsoluteTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the time and date when the device will reboot.
+         The device will not reboot unless cambiumScheduledReload is set to true.
+         In order to set the absolute time, the relative time must be zero."
+    ::= { cnSystem 3 }
+
+cambiumReloadReason OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Specifies the reason for the next reboot"
+    ::= { cnSystem 4 }
+
+cambiumLastReloadReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the reason of the last reboot"
+    ::= { cnSystem 5 }
+
+cambiumStpMode OBJECT-TYPE
+    SYNTAX     Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Spanning tree mode"
+    ::= { cnSystem 6 }
+
+cambiumXMSInterfaceIP OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the IP address of the interface used to connect to the XMS cloud"
+    ::= { cnSystem 7 }
+
+cambiumXMSInterfaceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the IP address mask of the interface used to connect to the XMS cloud"
+    ::= { cnSystem 8 }
+
+cambiumXMSInterfaceVLANId OBJECT-TYPE
+    SYNTAX     Integer32 (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the VLAN id of the interface used to connect to the XMS cloud"
+    ::= { cnSystem 9 }
+
+cambiumSystemClock OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the time and date."
+    ::= { cnSystem 10 }
+
+cambiumSystemTimezoneName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(3..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the timezone designation."
+    DEFVAL      { "UTC" }
+    ::= { cnSystem 11 }
+
+cambiumSystemTimezoneOffset OBJECT-TYPE
+    SYNTAX      Integer32 (-1439..1439)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the timezone offset from UTC in minutes."
+    DEFVAL      { 0 }
+    ::= { cnSystem 12 }
+
+cambiumSystemSummerTimeName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(3..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the summer-time designation."
+    DEFVAL      { "UTC" }
+    ::= { cnSystem 13 }
+
+cambiumSystemSummerTimeOffset OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the summer-time (also known as Daylight
+        Saving Time) offset from local time in minutes."
+    DEFVAL      { 0 }
+    ::= { cnSystem 14 }
+
+cambiumSystemSummerTimeStart OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the time and date when the one-shot
+        summer-time (also known as Daylight Saving Time) will start
+        having effect."
+    ::= { cnSystem 15 }
+
+cambiumSystemSummerTimeEnd OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the time and date when the one-shot
+        summer-time (also known as Daylight Saving Time) will stop
+        having effect."
+    ::= { cnSystem 16 }
+
+cambiumSystemRecurringSummerTimeStart OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(12))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the time of the year when the recurring
+        summer-time (also known as Daylight Saving Time) will start
+        having effect. The expected format is M.n.d/hh:mm,
+        where M is the month of the year (1 <= M <= 12), n is the week
+        of the month (1 <= n <= 5), week 5 representing the last week,
+        d is the day of the week (0 <= d <= 6), 0 representing Sunday,
+        hh and mm are the hour and minutes respectively."
+    ::= { cnSystem 17 }
+
+cambiumSystemRecurringSummerTimeEnd OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(12))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the time of the year when the recurring
+        summer-time (also known as Daylight Saving Time) will stop
+        having effect. The expected format is M.n.d/hh:mm,
+        where M is the month of the year (1 <= M <= 12), n is the week
+        of the month (1 <= n <= 5), week 5 representing the last week,
+        d is the day of the week (0 <= d <= 6), 0 representing Sunday,
+        hh and mm are the hour and minutes respectively."
+    ::= { cnSystem 18 }
+
+cambiumSystemSummerTimeMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                                none(1),
+                                one-shot(2),
+                                recurring(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies if summer-time (also known as Daylight Saving Time)
+        will take effect and wether it will take effect only once,
+        starting and ending at the configured start and end date and
+        time, or it will take effect every year, starting and ending
+        at the configured recurring start and end date and time."
+    DEFVAL      { none }
+    ::= { cnSystem 19 }
+
+cambiumReloadDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Boots the switch and configures the factory default settings"
+    DEFVAL      { false }
+    ::= { cnSystem 20 }
+
+cambiumReloadPartialDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Boots the switch and configures the partial default settings"
+    DEFVAL      { false }
+    ::= { cnSystem 21 }
+
+cambiumSystemResetButton OBJECT-TYPE
+    SYNTAX      INTEGER {
+                                enable(1),
+                                disable(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Displays and sets the functionality of the physical reset button."
+    ::= { cnSystem 22 }
+
+cambiumMstpReset OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action object that resets mstp when it comes set. Only use with cloud(CnMaestro or XMS)"
+    DEFVAL      { 0 }
+    ::= { cnSystem 23 }
+
+cnHttpClientProxyAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the internetwork layer address used for HTTP proxy.
+        The value of cnHttpClientProxyAddressType specifies how this
+        address is to be interpreted."
+    DEFVAL {""}
+    ::= { cnHttpClient 1 }
+
+cnHttpClientProxyAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of the internetwork layer address used for HTTP proxy.
+        Thi object indicates how the value of cnHttpClientProxyAddress
+        is to be interpreted."
+    DEFVAL { 0 }
+    ::= { cnHttpClient 2 }
+
+cnHttpClientProxyPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination TCP port for the HTTP proxy."
+    DEFVAL { 8080 }
+    ::= { cnHttpClient 3 }
+
+cnHttpClientUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The username that the HTTP client will use to authenticate"
+    DEFVAL { "" }
+    ::= { cnHttpClient 4 }
+
+cnHttpClientPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The password that the HTTP client will use to authenticate"
+    DEFVAL { "" }
+    ::= { cnHttpClient 5 }
+
+cnHttpClientPasswordType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            unencrypted-password (0),
+                            type-7 (7)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is used to indicate how the client password must be interpreted."
+    DEFVAL { unencrypted-password }
+    ::= { cnHttpClient 6 }
+
+cambiumSystemLoginBanner OBJECT-TYPE
+    SYNTAX         OCTET STRING(SIZE(0..900))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Displayed before login"
+    DEFVAL { "" }
+
+    ::= { cnSystem 25 }
+
+cambiumSystemMotdBanner OBJECT-TYPE
+    SYNTAX         OCTET STRING(SIZE(0..900))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "Displayed after login"
+    DEFVAL { "" }
+
+    ::= { cnSystem 26 }
+
+cnArpBroadCastRateLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 100..65500)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Rate-limit for ARP request messages going into the CPU."
+    DEFVAL { 1000 }
+    ::= { cnCpuRateLimits 1 }
+
+cambiumPasswordEncryption OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If true, all passwords in the configuration will be encrypted."
+    DEFVAL { false }
+
+    ::= { cnSystem 28 }
+END
+

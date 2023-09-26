@@ -1,0 +1,378 @@
+CAMBIUM-NETWORKS-GPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32, Integer32, Counter32, enterprises
+            FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+            FROM IF-MIB
+    RowStatus, TruthValue
+            FROM SNMPv2-TC;
+
+cnGpsMib MODULE-IDENTITY
+    LAST-UPDATED "202006290000Z"     -- June 29, 2020
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the WISP GPS support."
+
+    REVISION "202006290000Z"     -- June 29, 2020
+    DESCRIPTION
+        "Initial version."
+
+    ::= { enterprises 17713 24 5 }
+
+cnGpsObjects  OBJECT IDENTIFIER ::= { cnGpsMib 0 }
+
+cnGpsInternalSourceAdminStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "The current admin status of the internal GPS-sync source (i.e. antenna)."
+    DEFVAL         { 1 }
+    ::= { cnGpsObjects 1 }
+
+cnGpsExternalSourceAdminStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "The current admin status of the external GPS-sync source (i.e. uGPS port w/ cnPulse)."
+    DEFVAL         { 1 }
+    ::= { cnGpsObjects 2 }
+
+cnGpsPortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CnGpsPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of por-port entries containing control and status information related to GPS-sync"
+       ::= { cnGpsObjects 3 }
+
+cnGpsPortEntry OBJECT-TYPE
+       SYNTAX      CnGpsPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Per-port entry for control and status information related to GPS-sync"
+       INDEX    { cnGpsPortIndex  }
+       ::= { cnGpsPortTable 1 }
+
+CnGpsPortEntry ::= SEQUENCE {
+       cnGpsPortIndex             Integer32,
+       cnGpsPortOutputAdminStatus INTEGER
+}
+
+cnGpsPortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the ethernet port index for GPS-sync capable ports"
+       ::= { cnGpsPortEntry 1 }
+
+cnGpsPortOutputAdminStatus OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the ethernet port admin status for GPS-sync capable ports"
+       ::= { cnGpsPortEntry 2 }
+
+cnGpsSignalStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       not-set(0),
+                       not-enabled-sources(1),
+                       not-acquired(2),
+                       acquired(3)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The current status of the GPS 1pps signal (acquired from uGPS port and/or cnPulse)."
+    DEFVAL         { 0 }
+    ::= { cnGpsObjects 4 }
+
+cnGpsTrapMsg NOTIFICATION-TYPE
+    OBJECTS {
+                cnGpsSignalStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is changed whenever a status change is detected for the GPS 1pps signal."
+    ::= { cnGpsObjects 5 }
+
+cnGpsSourcePowerCycle OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       not-set(0),
+                       internal(1),
+                       external(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object is used for power-cycling the internal or the external GPS source.
+         The value of this object reflects the last source which was power-cycled."
+    DEFVAL         { 0 }
+    ::= { cnGpsObjects 6 }
+
+cnGpsInternalTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the current time determined by the internal GPS"
+    ::= { cnGpsObjects 7 }
+
+cnGpsExternalTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the current time determined by the external GPS"
+    ::= { cnGpsObjects 8 }
+
+cnGpsInternalLatitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the latitude determined by the internal GPS"
+    ::= { cnGpsObjects 9 }
+
+cnGpsExternalLatitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the latitude determined by the external GPS"
+    ::= { cnGpsObjects 10 }
+
+cnGpsInternalLongitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the longitude determined by the internal GPS"
+    ::= { cnGpsObjects 11 }
+
+cnGpsExternalLongitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the longitude determined by the external GPS"
+    ::= { cnGpsObjects 12 }
+
+cnGpsInternalSignalQuality OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fix-not-valid(1),
+                        gps-fix(2),
+                        diff-gps-fix(3),
+                        rtk-fixed(4),
+                        rtk-float(5)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the signal quality determined by the internal GPS"
+    ::= { cnGpsObjects 13 }
+
+cnGpsExternalSignalQuality OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        fix-not-valid(1),
+                        gps-fix(2),
+                        diff-gps-fix(3),
+                        rtk-fixed(4),
+                        rtk-float(5)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the signal quality determined by the external GPS"
+    ::= { cnGpsObjects 14 }
+
+cnGpsInternalAntennaAltitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS antenna altitude. It also contains the unit of measurement"
+    ::= { cnGpsObjects 15 }
+
+cnGpsExternalAntennaAltitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS antenna altitude. It also contains the unit of measurement"
+    ::= { cnGpsObjects 16 }
+
+cnGpsInternalAntennaBaseAltitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS antenna base altitude. It also contains the unit of measurement"
+    ::= { cnGpsObjects 17 }
+
+cnGpsExternalAntennaBaseAltitude OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS antenna base altitude. It also contains the unit of measurement"
+    ::= { cnGpsObjects 18 }
+
+cnGpsInternalSelectionMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        automatic(1),
+                        manual(2)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS selection mode"
+    ::= { cnGpsObjects 19 }
+
+cnGpsExternalSelectionMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        automatic(1),
+                        manual(2)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS selection mode"
+    ::= { cnGpsObjects 20 }
+
+cnGpsInternalLocalizationType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        no-fix(1),
+                        two-D(2),
+                        three-D(3)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS localization type (2D, 3D)"
+    ::= { cnGpsObjects 21 }
+
+cnGpsExternalLocalizationType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        no-fix(1),
+                        two-D(2),
+                        three-D(3)
+                      }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS localization type (2D, 3D)"
+    ::= { cnGpsObjects 22 }
+
+cnGpsInternalPdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS position dilution of precision"
+    ::= { cnGpsObjects 23 }
+
+cnGpsExternalPdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS position dilution of precision"
+    ::= { cnGpsObjects 24 }
+
+cnGpsInternalHdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS horizontal dilution of precision"
+    ::= { cnGpsObjects 25 }
+
+cnGpsExternalHdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS horizontal dilution of precision"
+    ::= { cnGpsObjects 26 }
+
+cnGpsInternalVdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS vertical dilution of precision"
+    ::= { cnGpsObjects 27 }
+
+cnGpsExternalVdop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS vertical dilution of precision"
+    ::= { cnGpsObjects 28 }
+
+cnGpsInternalSv OBJECT-TYPE
+    SYNTAX      Integer32(0..24)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS number of satelites in view"
+    ::= { cnGpsObjects 29 }
+
+cnGpsExternalSv OBJECT-TYPE
+    SYNTAX         Integer32(0..24)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS number of satelites in view"
+    ::= { cnGpsObjects 30 }
+
+cnGpsInternalSu OBJECT-TYPE
+    SYNTAX      Integer32(0..24)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the internal GPS number of satelites in use"
+    ::= { cnGpsObjects 31 }
+
+cnGpsExternalSu OBJECT-TYPE
+    SYNTAX         Integer32(0..24)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object reads the external GPS number of satelites in use"
+    ::= { cnGpsObjects 32 }
+
+cnGpsExternalSourcePower OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       power-on(1),
+                       power-off(2)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object is used for power-on/power-off the external GPS source."
+    DEFVAL         { 2 }
+    ::= { cnGpsObjects 33 }
+END

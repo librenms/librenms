@@ -1,0 +1,746 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+ARICENT-IGMP-MIB DEFINITIONS ::= BEGIN
+   IMPORTS 
+    OBJECT-TYPE, IpAddress, Counter32, Integer32, enterprises, 
+    MODULE-IDENTITY, Unsigned32 FROM SNMPv2-SMI
+    RowStatus  FROM SNMPv2-TC
+    InterfaceIndex FROM IF-MIB; 
+
+fsigmpMIB MODULE-IDENTITY
+    LAST-UPDATED "201209050000Z" 
+    ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+    CONTACT-INFO "support@aricent.com" 
+
+    DESCRIPTION	 "The MIB module for management of IGMP Routers"
+    REVISION	 "201209050000Z"
+    DESCRIPTION	 "Initial Version"
+::= { enterprises futuresoftware (2076) 36 }
+   
+fsigmp		OBJECT IDENTIFIER ::= { fsigmpMIB 1 }
+
+          fsIgmpGlobalStatus  OBJECT-TYPE
+              SYNTAX  INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                      "This variable controls the global status of
+                      the IGMP protocol in the router. It must be
+                      made up for protocol functioning.Making this
+                      object 'disabled' will remove all dynamic multicast 
+                      entries stop all the timers for route entries and 
+                      disables IGMP on all the IGMP enabled interfaces.  
+                      Default value of this entry will be 'disabled'."
+              DEFVAL  { disabled }
+              ::= { fsigmp 1 }
+
+	  fsIgmpTraceLevel OBJECT-TYPE
+	      SYNTAX  INTEGER
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+		"This is used to enable Trace Statements in IGMP Module.
+                A four byte integer value is specified for enabling the level
+                of tracing.Each Bit in the four byte integer variable represents
+                a level of Trace. The bits represents the levels as
+                follows: 4096 - Data Path, 8192 - Control Plane,16384- Rx, 32768- Tx, 
+		65535 -for all trace levels. The remaining
+                bits are unused. The combination of levels are also allowed.
+                For example if the bits 4096 and 8192 are set, then the Trace
+                statements related to Data Path and Control Plane will be printed.
+                The administrator have to enter the corresponding integer value
+                 for the bits set. For example if bits 4096 and 8192 are set then
+                 admin has to give the value 12288."
+	      DEFVAL  { 0 }
+	      ::= { fsigmp 2 }
+	fsIgmpDebugLevel OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                " This is used to enable Debug Statements in IGMP Module.
+                A four byte integer value is specified for enabling the level
+                of debugging.Each Bit in the four byte integer variable represents
+                a level of Debug. The bits represents the levels as
+                follows: 1 - I/O, 2 - Group, 4 - Query, 8 - Timer, 16 - NP, 
+		32 - Init Shut, 64 - OS resources, 128 - Buffer, 256 - Entry, 
+	        512 - Exit, 1024 - Management.  The remaining bits are unused. 
+		The combination of levels are also allowed.
+                For example if the bits 1 and 2 are set, then the Debug
+                statements related to Group and I/O  will be printed.
+                The administrator have to enter the corresponding integer value
+                 for the bits set. For example if bits 1 and 2 are set then
+                 admin has to give the value 3."
+              DEFVAL  { 0 }
+              ::= { fsigmp 3 }
+-- SCALAR_TABLE_END fsigmp
+
+
+	  --	  ************************************************
+	  --		       IGMP INTERFACE TABLE
+	  --	  ************************************************
+
+	  fsIgmpInterfaceTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsIgmpInterfaceEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP Statistic information 
+                       for all the ports in the system."
+	      ::= { fsigmp 4  }
+
+	  fsIgmpInterfaceEntry OBJECT-TYPE
+	      SYNTAX  FsIgmpInterfaceEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains the necessary information of IGMP
+		       statistics on a logical interface."
+	      INDEX   { fsIgmpInterfaceIfIndex }
+	      ::= { fsIgmpInterfaceTable 1 }
+
+	  FsIgmpInterfaceEntry ::=
+	      SEQUENCE {
+                  fsIgmpInterfaceIfIndex			        InterfaceIndex, 
+                  fsIgmpInterfaceAdminStatus			    INTEGER,
+                  fsIgmpInterfaceFastLeaveStatus		    INTEGER,
+                  fsIgmpInterfaceOperStatus		    	    INTEGER,
+                  fsIgmpInterfaceIncomingPkts			    Counter32,
+                  fsIgmpInterfaceIncomingJoins			    Counter32,
+                  fsIgmpInterfaceIncomingLeaves			    Counter32,
+                  fsIgmpInterfaceIncomingQueries		    Counter32,
+                  fsIgmpInterfaceOutgoingQueries	 	    Counter32,
+                  fsIgmpInterfaceRxGenQueries 			    Counter32, 
+                  fsIgmpInterfaceRxGrpQueries   	   	    Counter32, 
+                  fsIgmpInterfaceRxGrpAndSrcQueries	 	    Counter32, 
+                  fsIgmpInterfaceRxv1v2Reports  	        Counter32, 
+                  fsIgmpInterfaceRxv3Reports    	        Counter32, 
+                  fsIgmpInterfaceTxGenQueries   	        Counter32, 
+                  fsIgmpInterfaceTxGrpQueries   	        Counter32, 
+                  fsIgmpInterfaceTxGrpAndSrcQueries	 	    Counter32, 
+                  fsIgmpInterfaceTxv1v2Reports  	        Counter32, 
+                  fsIgmpInterfaceTxv3Reports    	        Counter32, 
+                  fsIgmpInterfaceTxv2Leaves     	        Counter32, 
+                  fsIgmpInterfaceChannelTrackStatus	 	    INTEGER,
+		  fsIgmpInterfaceGroupListId    	        Unsigned32,
+		  fsIgmpInterfaceLimit          	        Unsigned32,
+		  fsIgmpInterfaceCurGrpCount    	        Unsigned32,
+		  fsIgmpInterfaceCKSumError     	        Counter32,
+		  fsIgmpInterfacePktLenError    	        Counter32,
+		  fsIgmpInterfacePktsWithLocalIP 	        Counter32,
+		  fsIgmpInterfaceSubnetCheckFailure             Counter32,
+		  fsIgmpInterfaceQryFromNonQuerier	  	Counter32,
+		  fsIgmpInterfaceReportVersionMisMatch	        Counter32,
+		  fsIgmpInterfaceQryVersionMisMatch		Counter32,
+		  fsIgmpInterfaceUnknownMsgType			Counter32,
+		  fsIgmpInterfaceInvalidV1Report	        Counter32,
+		  fsIgmpInterfaceInvalidV2Report	        Counter32,
+		  fsIgmpInterfaceInvalidV3Report	        Counter32,
+		  fsIgmpInterfaceRouterAlertCheckFailure	Counter32,
+		  fsIgmpInterfaceIncomingSSMPkts	        Counter32,
+		  fsIgmpInterfaceInvalidSSMPkts		        Counter32,
+		  fsIgmpInterfaceJoinPktRate		        Integer32
+	      }
+
+          fsIgmpInterfaceIfIndex OBJECT-TYPE 
+          SYNTAX     InterfaceIndex 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The ifIndex value of the interface for which IGMP is 
+                  enabled." 
+          ::= { fsIgmpInterfaceEntry 1 } 
+
+	  fsIgmpInterfaceAdminStatus OBJECT-TYPE
+             SYNTAX  INTEGER {
+		     up   (1),
+		     down  (2)
+		    }
+	      MAX-ACCESS  read-write
+	      STATUS  current
+	      DESCRIPTION
+                      " This gives the Administrative Status of the Interface."
+              DEFVAL { up }
+	      ::= { fsIgmpInterfaceEntry 2 }
+
+	  fsIgmpInterfaceFastLeaveStatus  OBJECT-TYPE
+	      SYNTAX  INTEGER {
+		     disable (0),
+		     enable  (1)
+		    }
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+    	          "This variable controls the fast leave feature of the 
+                  IGPMV3 protocol. Making this object 'enable'supports
+                  immediate intimation to the Multicast Routing  Protocol
+                  on the last member leaving the Group. 
+                  Making this object 'disable' will not support fast leave
+		  support. Default value of this entry will 
+                  be 'disable'. This must be enabled only on those interfaces
+                  where there is single host. This can also be enabled on
+                  those interfaces having more than one hosts only if all are 
+                  v3 hosts in V3 Mode. "
+	      DEFVAL  { disable }
+	      ::= { fsIgmpInterfaceEntry 3 }
+
+
+	  fsIgmpInterfaceOperStatus OBJECT-TYPE
+              SYNTAX      INTEGER {
+                 up          (1),
+                 down        (2)
+              }
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+                      " This gives the Operational Status of the Interface."
+	      ::= { fsIgmpInterfaceEntry 4 }
+
+	  fsIgmpInterfaceIncomingPkts OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The total number of IGMP Packets received by the router"
+	      ::= { fsIgmpInterfaceEntry 5 }
+
+	  fsIgmpInterfaceIncomingJoins  OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming JoinGroupMessage  counter."
+	      ::= { fsIgmpInterfaceEntry 6 }
+
+	  fsIgmpInterfaceIncomingLeaves	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming LeaveGroupMessage counter."
+	      ::= { fsIgmpInterfaceEntry 7 }
+
+	  fsIgmpInterfaceIncomingQueries	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Incoming Queries counter."
+	      ::= { fsIgmpInterfaceEntry 8 }
+
+	  fsIgmpInterfaceOutgoingQueries	OBJECT-TYPE
+	      SYNTAX  Counter32
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Total Outgoing Queries counter."
+	      ::= { fsIgmpInterfaceEntry 9 }
+
+    fsIgmpInterfaceRxGenQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of General Queries received on this
+                 interface."
+        ::= { fsIgmpInterfaceEntry 10 }
+    
+    fsIgmpInterfaceRxGrpQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group specific queries received 
+                 on this interface. This object is specific to IGMP Proxy
+                 implementation."
+        ::= { fsIgmpInterfaceEntry 11 }
+               
+    fsIgmpInterfaceRxGrpAndSrcQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group and source specific 
+                 queries received on this interface. This object is specific
+                 to IGMP Proxy implementation."
+        ::= { fsIgmpInterfaceEntry 12 }
+    
+    fsIgmpInterfaceRxv1v2Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv1 and IGMPv2 reports 
+                 received on this interface."
+        ::= { fsIgmpInterfaceEntry 13 }
+    
+    fsIgmpInterfaceRxv3Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMPv3 reports received 
+                 on this interface."
+        ::= { fsIgmpInterfaceEntry 14 }
+    
+    fsIgmpInterfaceTxGenQueries  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of General queries sent on this 
+                 interface."
+        ::= { fsIgmpInterfaceEntry 15 }
+    
+    fsIgmpInterfaceTxGrpQueries OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group specific queries sent 
+                 on this interface."
+        ::= { fsIgmpInterfaceEntry 16 }
+               
+    fsIgmpInterfaceTxGrpAndSrcQueries  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of Group and source specific 
+                 queries sent on this interface."
+        ::= { fsIgmpInterfaceEntry 17 }
+    
+    fsIgmpInterfaceTxv1v2Reports OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMP v1/v2 reports sent
+                 on this interface. This object is specific
+                 to IGMP Proxy implementation."
+        ::= { fsIgmpInterfaceEntry 18 }
+    
+    fsIgmpInterfaceTxv3Reports  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMP v3 reports sent 
+                 on this interface. This object is specific to IGMP Proxy
+                 implementation."
+        ::= { fsIgmpInterfaceEntry 19 }
+    
+    fsIgmpInterfaceTxv2Leaves  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Indicates the number of IGMP v2 leaves sent on 
+                 this interface. This object is specific to IGMP Proxy
+                 implementation."
+        ::= { fsIgmpInterfaceEntry 20 }
+    
+
+      fsIgmpInterfaceChannelTrackStatus  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+		   disable (0),
+		   enable  (1)
+		  }
+	    MAX-ACCESS   read-write
+	    STATUS   current
+	    DESCRIPTION
+    	        "This variable controls the explicit channel tracking 
+                feature of the IGPMV3 protocol. Configuring this object as
+                'enable' makes the router to keep track of each individual 
+                host that is joined to a particular multicast group or channel.
+                Making this object 'disable' will not support explicit channel
+                tracking feature support. Default value of this entry will 
+                be 'disable'. 
+                This must be enabled only on IGMPv3 interfaces."
+	    DEFVAL  { disable }
+	    ::= { fsIgmpInterfaceEntry 21 }
+	  fsIgmpInterfaceGroupListId OBJECT-TYPE
+	      SYNTAX  Unsigned32(0..4294967295)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicate the except group list id for an interface.This grouplist will be exempted for limiting on this interface"
+        ::= { fsIgmpInterfaceEntry 22 }
+    
+	  fsIgmpInterfaceLimit OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..4096)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the total number of multicast groups that can be allowed for this interface. If fsIgmpInterfaceCurGrpCount reaches this InterfaceLimit value then no membership reports will be honored on this interface except the grouplist mapped to this interface"
+        ::= { fsIgmpInterfaceEntry 23 }
+
+	  fsIgmpInterfaceCurGrpCount OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..4096)
+	      MAX-ACCESS   read-only
+	      STATUS   current
+	      DESCRIPTION
+         	 "This object specifies the current count of groups that were added to the interface.This counter will be incremented for each valid membership report on this interface and decremented for leave report if fsIgmpInterfaceLimit is configured for this interface."
+        ::= { fsIgmpInterfaceEntry 24 }
+
+	  fsIgmpInterfaceCKSumError  OBJECT-TYPE
+	  SYNTAX		Counter32
+	  MAX-ACCESS	read-only
+	  STATUS		current
+	  DESCRIPTION
+	  "This object displays the number of packets received with checksum error on an interface."
+	  ::= { fsIgmpInterfaceEntry 25 }
+
+	  fsIgmpInterfacePktLenError  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets received with 
+	  packet length error on an interface."
+	  ::= { fsIgmpInterfaceEntry 26 }
+
+
+	  fsIgmpInterfacePktsWithLocalIP  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets received on an interface with
+	  local IP address as source address."
+	  ::= { fsIgmpInterfaceEntry 27 }
+
+	  fsIgmpInterfaceSubnetCheckFailure  OBJECT-TYPE
+	  SYNTAX            Counter32
+	  MAX-ACCESS        read-only
+	  STATUS            current
+	  DESCRIPTION
+	  "This object displays the number of packets dropped due to subnet check failure."
+	  ::= { fsIgmpInterfaceEntry 28 }
+
+
+      fsIgmpInterfaceQryFromNonQuerier  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of queries received from a non-querier on an interface."
+      ::= { fsIgmpInterfaceEntry 29 }
+
+
+      fsIgmpInterfaceReportVersionMisMatch  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of reports received by with version mismatch on an interface."
+      ::= { fsIgmpInterfaceEntry 30 }
+
+
+      fsIgmpInterfaceQryVersionMisMatch  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of queries received with version mismatch on an interface."
+      ::= { fsIgmpInterfaceEntry 31 }
+
+      fsIgmpInterfaceUnknownMsgType  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of packets received with unknown message type on an interface."
+      ::= { fsIgmpInterfaceEntry 32 }
+
+      fsIgmpInterfaceInvalidV1Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V2 reports received on an interface."
+      ::= { fsIgmpInterfaceEntry 33 }
+
+
+      fsIgmpInterfaceInvalidV2Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V2 reports received on an interface."
+      ::= { fsIgmpInterfaceEntry 34 }
+
+
+      fsIgmpInterfaceInvalidV3Report  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid V3 reports received on an interface."
+      ::= { fsIgmpInterfaceEntry 35 }
+
+      fsIgmpInterfaceRouterAlertCheckFailure  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of packets dropped due to router alert check failure."
+      ::= { fsIgmpInterfaceEntry 36 }
+
+      fsIgmpInterfaceIncomingSSMPkts  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of V3 reports received on an interface for SSM group range."
+      ::= { fsIgmpInterfaceEntry 37 }
+
+      fsIgmpInterfaceInvalidSSMPkts  OBJECT-TYPE
+      SYNTAX            Counter32
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+      "This object displays the number of invalid SSM v3 reports received on an interface."
+      ::= { fsIgmpInterfaceEntry 38 }
+
+      fsIgmpInterfaceJoinPktRate  OBJECT-TYPE
+      SYNTAX            Integer32
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+      "This object specifies the rate at which the join packets can be received on an interface."
+      DEFVAL { 0 }
+      ::= { fsIgmpInterfaceEntry 39 }
+
+
+	  --	  ************************************************
+	  --		       IGMP CACHE TABLE
+	  --	  ************************************************
+
+	  fsIgmpCacheTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsIgmpCacheEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP group statistic information"
+	      ::= { fsigmp 5  }
+
+	  fsIgmpCacheEntry OBJECT-TYPE
+	      SYNTAX  FsIgmpCacheEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains the necessary Statistics of Multicast
+		       Groups"
+	      INDEX   { fsIgmpCacheAddress, fsIgmpCacheIfIndex  }
+	      ::= { fsIgmpCacheTable 1 }
+
+	  FsIgmpCacheEntry ::=
+	      SEQUENCE {
+                  fsIgmpCacheAddress    
+                      IpAddress, 
+                  fsIgmpCacheIfIndex     
+                      InterfaceIndex, 
+		  fsIgmpCacheGroupCompMode
+		      INTEGER
+	      }
+
+          fsIgmpCacheAddress OBJECT-TYPE 
+          SYNTAX     IpAddress 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The IP multicast group address for which this entry 
+                  contains information." 
+          ::= { fsIgmpCacheEntry 1 } 
+       
+          fsIgmpCacheIfIndex OBJECT-TYPE 
+          SYNTAX     InterfaceIndex 
+          MAX-ACCESS not-accessible 
+          STATUS     current 
+          DESCRIPTION 
+                  "The interface for which this entry contains information for 
+                  an IP multicast group address." 
+          ::= { fsIgmpCacheEntry 2 } 
+ 
+	  fsIgmpCacheGroupCompMode OBJECT-TYPE
+	      SYNTAX  INTEGER
+	      MAX-ACCESS  read-only
+	      STATUS  current
+	      DESCRIPTION
+		      "The Group Compatibility Mode of the particular Group."
+	      ::= { fsIgmpCacheEntry 3 }
+
+	  --	  ************************************************
+	  --		       IGMP GROUPLIST TABLE
+	  --	  ************************************************
+
+	  fsIgmpGroupListTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsIgmpGroupListEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP grouplist information. Multiple range of groups will be grouped to a list and list can be mapped to an interface to exempt limit on that interface. Group list can be configured for IPv4 multicast addresses."
+	      ::= { fsigmp 6  }
+
+	  fsIgmpGroupListEntry OBJECT-TYPE
+	      SYNTAX  FsIgmpGroupListEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains information related to IGMP grouplist "
+	      INDEX   { fsIgmpGrpListId,fsIgmpGrpIP,fsIgmpGrpPrefixLen }
+	      ::= { fsIgmpGroupListTable 1 }
+
+	  FsIgmpGroupListEntry ::=
+	      SEQUENCE {
+                  fsIgmpGrpListId    
+                     Unsigned32, 
+                  fsIgmpGrpIP     
+                      IpAddress, 
+		          fsIgmpGrpPrefixLen
+                      IpAddress,
+                  fsIgmpGrpListRowStatus
+	           	      RowStatus
+	      }
+	  fsIgmpGrpListId OBJECT-TYPE
+	      SYNTAX  Unsigned32(1..4294967295)
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Id of Group List"
+	      ::= { fsIgmpGroupListEntry 1 }
+
+	  fsIgmpGrpIP OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Group IP address."
+	      ::= { fsIgmpGroupListEntry 2 }
+	  fsIgmpGrpPrefixLen OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Prefix Length."
+	      ::= { fsIgmpGroupListEntry 3 }
+	  fsIgmpGrpListRowStatus OBJECT-TYPE
+	      SYNTAX  RowStatus
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "RowStatus of GroupList record"
+	      ::= { fsIgmpGroupListEntry 4 }
+
+	  --	  ************************************************
+	  --		       IGMP SCALAR GROUP
+	  --	  ************************************************
+
+fsIgmpScalarGroup OBJECT IDENTIFIER ::= {fsigmp 7}
+	  fsIgmpGlobalLimit OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..4096)
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the total number of multicast groups can be allowed globally.If the counter fsIgmpGlobalCurGrpCount reaches this limit value then no membership reports will be honored for any interface."
+	      ::= { fsIgmpScalarGroup 1 }
+    
+	  fsIgmpGlobalCurGrpCount OBJECT-TYPE
+	      SYNTAX  Unsigned32 (1..4096)
+	      MAX-ACCESS   read-only
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the current count of groups that were added. If this reaches to fsIgmpGlobalLimit no membership reports will be honored for any interface.This Counter will be incremented for each valid membership report and decremented for each leave report if fsIgmpGlobalLimit is configured."
+	      ::= { fsIgmpScalarGroup 2 }
+
+      fsIgmpSSMMapStatus  OBJECT-TYPE
+              SYNTAX  INTEGER { enabled(1), disabled(2) }
+              MAX-ACCESS   read-write
+              STATUS   current
+              DESCRIPTION
+                      "This variable controls the global status of
+                      the SSM Mapping functionality in the router. 
+                      When the SSM map status is enabled, if SSM mapping
+                      is configured for a set of groups, then on receving 
+                      ( * G) join from the IGMP hosts, the router translates
+                      the (* G) into (S G) entry with the configured 
+                      source address. Making this object 'disabled' will 
+                      remove all dynamic multicast entries learnt via SSM
+                      mapped group and source addresses.
+                      Default value of this variable will be 'disabled'."
+              DEFVAL  { disabled }
+              ::= { fsIgmpScalarGroup 3 }
+
+
+	  --	  ************************************************
+	  --		       IGMP SSM MAP Group TABLE
+	  --	  ************************************************
+
+	  fsIgmpSSMMapGroupTable OBJECT-TYPE
+	      SYNTAX  SEQUENCE OF FsIgmpSSMMapGroupEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "This table contains the IGMP SSM Mapped group and source information. 
+               Multiple range of groups will be mapped to a single source address."               
+	      ::= { fsigmp 8  }
+
+	  fsIgmpSSMMapGroupEntry OBJECT-TYPE
+	      SYNTAX  FsIgmpSSMMapGroupEntry
+	      MAX-ACCESS  not-accessible
+	      STATUS  current
+	      DESCRIPTION
+		      "Each entry contains information about the range of group address 
+               mapped to source address."
+	      INDEX   { fsIgmpSSMMapStartGrpAddress,fsIgmpSSMMapEndGrpAddress,fsIgmpSSMMapSourceAddress }
+	      ::= { fsIgmpSSMMapGroupTable 1 }
+
+	  FsIgmpSSMMapGroupEntry ::=
+	      SEQUENCE {
+                  fsIgmpSSMMapStartGrpAddress    
+                     IpAddress, 
+                  fsIgmpSSMMapEndGrpAddress     
+                      IpAddress, 
+		          fsIgmpSSMMapSourceAddress
+                      IpAddress,
+                  fsIgmpSSMMapRowStatus
+	           	      RowStatus
+	      }
+
+	  fsIgmpSSMMapStartGrpAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Start Group IP address for which SSM mapping 
+              has to be applied."
+	      ::= { fsIgmpSSMMapGroupEntry 1 }
+
+	  fsIgmpSSMMapEndGrpAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the End Group IP address upto which SSM mapping 
+              has to be applied."
+	      ::= { fsIgmpSSMMapGroupEntry 2 }
+
+	  fsIgmpSSMMapSourceAddress OBJECT-TYPE
+	      SYNTAX  IpAddress
+	      MAX-ACCESS   not-accessible
+	      STATUS   current
+	      DESCRIPTION
+         	 "This indicates the Source IP address that has to be mapped to
+              the given group IP address range."
+	      ::= { fsIgmpSSMMapGroupEntry 3 }
+
+	  fsIgmpSSMMapRowStatus OBJECT-TYPE
+	      SYNTAX  RowStatus
+	      MAX-ACCESS   read-write
+	      STATUS   current
+	      DESCRIPTION
+         	 "RowStatus of SSM Mapped Multicast Group record"
+	      ::= { fsIgmpSSMMapGroupEntry 4 }
+
+END

@@ -1,0 +1,107 @@
+-- Copyright (C) Cambium Networks. All Rights Reserved. --
+-- This MIB contains tables used to configure a switch running --
+-- IPV6 RA Guard --
+CAMBIUM-NETWORKS-IPV6-ND-RA-GUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32, Unsigned32,
+    enterprises, NOTIFICATION-TYPE, Counter32, IpAddress,
+    Gauge32
+         FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress, TruthValue,
+    DisplayString
+         FROM SNMPv2-TC
+    dot1qTpFdbPort
+         FROM Q-BRIDGE-MIB
+    dot1qStaticUnicastEntry
+         FROM Q-BRIDGE-MIB
+    dot1qVlanStaticEntry
+         FROM Q-BRIDGE-MIB
+    VlanIdOrNone
+         FROM Q-BRIDGE-MIB
+    dot1qTpFdbEntry, PortList
+         FROM Q-BRIDGE-MIB;
+
+cnRAGuardMib MODULE-IDENTITY
+    LAST-UPDATED "202111280000Z"     -- November 28, 2021
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the
+        IPV6 RA Guard feature."
+
+    REVISION "202111280000Z"     -- November 28, 2021
+    DESCRIPTION "Ver 2: Fixed cnRAGuardIfCfgTable definition."
+
+    REVISION "202104090000Z"     -- April 9, 2021
+    DESCRIPTION "Ver 1:  Initial version."
+
+    ::= {  enterprises cambium(17713) cnMatrix(24) 9 }
+
+    RAGuardPolicy ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "IPv6 RA Guard pollicy applied to the port."
+    SYNTAX      INTEGER { router(0), host(1) }
+
+-- ***************************************************************************
+--                         Groups in the MIB
+-- ***************************************************************************
+    cnRAGuardIfCfg      OBJECT IDENTIFIER ::= { cnRAGuardMib 1 }
+-- ***************************************************************************
+--                               GROUPS
+-- ***************************************************************************
+
+    cnRAGuardIfCfgTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CnRAGuardIfCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "RA Guard policy for a port."
+    ::= { cnRAGuardIfCfg 1 }
+
+    cnRAGuardIfCfgEntry OBJECT-TYPE
+        SYNTAX      CnRAGuardIfCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each row instance gives the attached RA Guard policy for a port."
+        INDEX { cnRAGuardIfCfgIfIndex }
+    ::= { cnRAGuardIfCfgTable 1 }
+
+    CnRAGuardIfCfgEntry ::= SEQUENCE {
+        cnRAGuardIfCfgIfIndex               Integer32,
+        cnRAGuardIfCfgPolicy 	            RAGuardPolicy,
+	cnRAGuardIfCounter                  Gauge32
+    }
+
+    cnRAGuardIfCfgIfIndex OBJECT-TYPE
+        SYNTAX         Integer32(1..52)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Port (ifIndex) identifier attribute"
+
+    ::= { cnRAGuardIfCfgEntry 1 }
+
+    cnRAGuardIfCfgPolicy OBJECT-TYPE
+        SYNTAX         RAGuardPolicy
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "Attach the specified RA guard policy to the port."
+        DEFVAL  { router }
+
+	::= { cnRAGuardIfCfgEntry 2 }
+
+    cnRAGuardIfCounter OBJECT-TYPE
+        SYNTAX         Gauge32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The number of IPV6 ND RA packets patching the attached policy."
+
+    ::= { cnRAGuardIfCfgEntry 3 }
+
+END

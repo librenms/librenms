@@ -1,0 +1,187 @@
+CAMBIUM-NETWORKS-CABLE-DIAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32, Integer32, Counter32, enterprises
+            FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+            FROM IF-MIB
+    RowStatus, TruthValue
+            FROM SNMPv2-TC;
+
+cnCableDiagMib MODULE-IDENTITY
+    LAST-UPDATED "202011160000Z"     -- Nov 16, 2020
+    ORGANIZATION "Cambium Networks, Inc."
+    CONTACT-INFO "cambiumnetworks.com"
+    DESCRIPTION
+        "This MIB module contains objects related to the cable diagnostics support."
+
+    REVISION "202011160000Z"     -- Nov 16, 2020
+    DESCRIPTION
+        "Initial version."
+    ::= { enterprises 17713 24 7 }
+
+cnCableDiagObjects  OBJECT IDENTIFIER ::= { cnCableDiagMib 0 }
+
+cnCableDiagPortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF CnCableDiagPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of por-port entries containing control and status information related to cable diagnostics"
+       ::= { cnCableDiagObjects 1 }
+
+cnCableDiagPortEntry OBJECT-TYPE
+       SYNTAX      CnCableDiagPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Per-port entry for control and status information related to cable diagnostics"
+       INDEX    { cnCableDiagPortIndex  }
+       ::= { cnCableDiagPortTable 1 }
+
+CnCableDiagPortEntry ::= SEQUENCE {
+       cnCableDiagPortIndex        Integer32,
+       cnCableDiagTestResultPair1  INTEGER,
+       cnCableDiagTestResultPair2  INTEGER,
+       cnCableDiagTestResultPair3  INTEGER,
+       cnCableDiagTestResultPair4  INTEGER,
+       cnCableDiagFaultLengthPair1 Integer32,
+       cnCableDiagFaultLengthPair2 Integer32,
+       cnCableDiagFaultLengthPair3 Integer32,
+       cnCableDiagFaultLengthPair4 Integer32,
+       cnCableDiagTimeStamp        Integer32,
+       cnCableDiagStartTest        INTEGER
+}
+
+cnCableDiagPortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely defines the ethernet port index"
+       ::= { cnCableDiagPortEntry 1 }
+
+cnCableDiagTestResultPair1 OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          pair-ok(1),
+                          pair-open(2),
+                          same-pair-short(3),
+                          cross-pair-short(4),
+                          pair-busy(5),
+                          test-in-progress(6),
+                          test-failed(7),
+                          no-test(8)
+                      }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the results of the cable diagnostics test"
+       ::= { cnCableDiagPortEntry 2 }
+
+cnCableDiagTestResultPair2 OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          pair-ok(1),
+                          pair-open(2),
+                          same-pair-short(3),
+                          cross-pair-short(4),
+                          pair-busy(5),
+                          test-in-progress(6),
+                          test-failed(7),
+                          no-test(8)
+                      }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the results of the cable diagnostics test"
+       ::= { cnCableDiagPortEntry 3 }
+
+cnCableDiagTestResultPair3 OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          pair-ok(1),
+                          pair-open(2),
+                          same-pair-short(3),
+                          cross-pair-short(4),
+                          pair-busy(5),
+                          test-in-progress(6),
+                          test-failed(7),
+                          no-test(8)
+                      }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the results of the cable diagnostics test"
+       ::= { cnCableDiagPortEntry 4 }
+
+cnCableDiagTestResultPair4 OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          pair-ok(1),
+                          pair-open(2),
+                          same-pair-short(3),
+                          cross-pair-short(4),
+                          pair-busy(5),
+                          test-in-progress(6),
+                          test-failed(7),
+                          no-test(8)
+                      }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the results of the cable diagnostics test"
+       ::= { cnCableDiagPortEntry 5 }
+
+cnCableDiagFaultLengthPair1 OBJECT-TYPE
+       SYNTAX         Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the length at which the fault occurs"
+       ::= { cnCableDiagPortEntry 6 }
+
+cnCableDiagFaultLengthPair2 OBJECT-TYPE
+       SYNTAX         Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the length at which the fault occurs"
+       ::= { cnCableDiagPortEntry 7 }
+
+cnCableDiagFaultLengthPair3 OBJECT-TYPE
+       SYNTAX         Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the length at which the fault occurs"
+       ::= { cnCableDiagPortEntry 8 }
+
+cnCableDiagFaultLengthPair4 OBJECT-TYPE
+       SYNTAX         Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the length at which the fault occurs"
+       ::= { cnCableDiagPortEntry 9 }
+
+cnCableDiagTimeStamp OBJECT-TYPE
+       SYNTAX         Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This object uniquely identifies the UNIX time stamp of the last successfull test"
+       ::= { cnCableDiagPortEntry 10 }
+
+cnCableDiagStartTest OBJECT-TYPE
+       SYNTAX         INTEGER {
+                          start-test(1),
+                          default-value(2)
+                      }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "This object starts the cable diagnostics cable tester. For reading results use other objects."
+       ::= { cnCableDiagPortEntry 11 }
+END

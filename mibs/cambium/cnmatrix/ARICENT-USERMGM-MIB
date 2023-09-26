@@ -1,0 +1,308 @@
+-- Copyright (C) 2012 Aricent Group . All Rights Reserved
+
+ARICENT-USERMGM-MIB DEFINITIONS ::= BEGIN
+   
+IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE,
+     Unsigned32, Integer32, enterprises    
+     FROM SNMPv2-SMI
+
+     RowStatus, DisplayString   
+     FROM SNMPv2-TC;
+
+---   futuresoftware OBJECT IDENTIFIER ::= { enterprises 2076 }    
+
+fsusrMgmt MODULE-IDENTITY
+        LAST-UPDATED "202203240000Z"
+        ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+        CONTACT-INFO "support@aricent.com"
+        DESCRIPTION
+                 "This MIB implementation is used to maintain User
+                  account management"
+        REVISION "202203240000Z"
+        DESCRIPTION "Added fsusrMgmtUserPasswordType"
+        REVISION "201209050000Z"
+        DESCRIPTION
+                 "This MIB implementation is used to maintain User
+                  account management"
+
+          ::= { enterprises  aricent-communication-holding-ltd(29601) iss(2) 70 }
+
+
+fsusrMgmtStats          OBJECT IDENTIFIER ::= { fsusrMgmt 1 }
+fsusrMgmtUserList       OBJECT IDENTIFIER ::= { fsusrMgmt 2 }
+
+
+fsusrMgmtStatsNumOfUsers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of users who have created account."
+    ::= { fsusrMgmtStats 1 }
+
+fsusrMgmtStatsActiveUsers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of users who have currently logged in
+         via different sessions will be tracked here."
+    ::= { fsusrMgmtStats 2 }
+
+
+fsusrMgmtMinPasswordLen OBJECT-TYPE
+    SYNTAX      Unsigned32 (8..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the minimum length of password by
+        the administrator. Minimum length value must be 8"
+    ::= { fsusrMgmtStats 3 }
+
+fsusrMgmtPasswdValidationChars OBJECT-TYPE
+    SYNTAX      Unsigned32(0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the type of characters to be 
+         considered for password validation rules. Following 
+         four type of characters are considered - Alphabetical
+         lower case, Alphabetical upper case, numerical and 
+         special characters. This object takes values as bit mask. 
+
+         BIT 0 - Alphabetical lower case characters.
+         BIT 1 - Alphabetical upper case characters.
+         BIT 2 - Numeric characters.
+         BIT 3 - Special characters.
+
+         Note: BIT 0 - Least significant bit
+               BIT 3 - Most significant bit
+ 
+         For example, setting the password validation as 3 
+         (i.e., 0011), will enable validation corresponds to 
+         first (i.e., lower case) and second bit (i.e., upper case).
+         Setting all the bits enables validation of lower case, 
+         upper case, numeric and special symbols in password.
+ 
+         By default, all flags will be enabled." 
+    DEFVAL { 15 }
+    ::= { fsusrMgmtStats 4 }
+
+fsusrMgmtPasswdValidateNoOfLowerCase OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the minimum number of lower case
+         characters that are to be present in the password. If 
+         the given password has less than the configured number of
+         lower case characters, it will not be allowed."
+    DEFVAL { 1 }
+    ::= { fsusrMgmtStats 5 }
+
+fsusrMgmtPasswdValidateNoOfUpperCase OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the minimum number of upper case
+         characters that are to be present in the password. If 
+         the given password has less than the configured number of 
+         upper case characters, it will not be allowed."
+    DEFVAL { 1 }
+    ::= { fsusrMgmtStats 6 }
+
+fsusrMgmtPasswdValidateNoOfNumericals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the minimum number of numerical
+         characters that are to be present in the password. If
+         the given password has less than the configured number of 
+         numerical characters, it will not be allowed."
+    DEFVAL { 1 }
+    ::= { fsusrMgmtStats 7 }
+
+fsusrMgmtPasswdValidateNoOfSplChars OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to configure the minimum number of special
+         characters that are to be present in the password. If
+         the given password has less than the configured number of 
+         special characters, it will not be allowed."
+    DEFVAL { 1 }
+    ::= { fsusrMgmtStats 8 }
+
+fsusrMgmtPasswdMaxLifeTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..366)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The time after which the user password has to be expired (in days).
+        By Default, the Password Max Life Time is set to 0 and password wont
+        expire."
+    DEFVAL { 0 }
+    ::= { fsusrMgmtStats 9 }
+
+fsusrMgmtStatsEnableUsers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of enabled users"
+    ::= { fsusrMgmtStats 10 }
+
+fsusrMgmtStatsDisableUsers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of disabled users"
+    ::= { fsusrMgmtStats 11 }
+
+fsusrMgmtTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF FsUsrMgmtEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "This fsusrMgmtTable table contains the user account 
+         details. User login information like username, 
+         password, previlege, number of logins happened are 
+         stored in this table."
+    ::= { fsusrMgmtUserList 1 }
+
+fsusrMgmtEntry OBJECT-TYPE
+    SYNTAX      FsUsrMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table entry of a user account."
+    INDEX       { fsusrMgmtUserName, fsusrMgmtAuthString }
+    ::= { fsusrMgmtTable 1 }
+
+FsUsrMgmtEntry   ::= SEQUENCE {
+        fsusrMgmtUserName         DisplayString,
+        fsusrMgmtAuthString       DisplayString,
+        fsusrMgmtUserPassword     DisplayString,
+        fsusrMgmtUserPrivilege    Unsigned32,
+        fsusrMgmtUserLoginCount   Integer32, 
+        fsusrMgmtUserStatus       INTEGER,
+        fsusrMgmtUserLockRelTime  Unsigned32,
+        fsusrMgmtUserRowStatus    RowStatus,
+        fsusrMgmtUserConfirmPwd   DisplayString,
+        fsusrMgmtUserPasswordType INTEGER
+}
+
+fsusrMgmtUserName    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the login user. Name must be unique 
+         to differ from other user."
+    ::= { fsusrMgmtEntry 1 }
+
+fsusrMgmtAuthString    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (6..42))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is to provide security to configure User management via SNMP. 
+         The format of fsusrMgmtAuthString shall be `adminusername:password`.
+         Values for this fsusrMgmtTable can be set only when this index is 
+         set with proper string format (ie. default/admin username and password
+         should be known to the user to add/edit the entry in this table)."
+    ::= { fsusrMgmtEntry 2 }
+
+fsusrMgmtUserPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8..500))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enter the text values for password. This value
+         is used to login along with the user name"
+    DEFVAL { "Password123#" }
+    ::= { fsusrMgmtEntry 3 }
+
+fsusrMgmtUserPrivilege OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The privilege number of the user. Each user are 
+         created with privilege value to set the level of 
+         access of that user."
+    DEFVAL { 1 }
+    ::= { fsusrMgmtEntry 4 }
+
+fsusrMgmtUserLoginCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To track number of times login and logout has happened.
+         This count is incremented irrespective of any mode of 
+         user login via cli, web, telnet or ssh."
+    ::= { fsusrMgmtEntry 5 }
+
+fsusrMgmtUserStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable      (1),
+        disable     (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is to indicate the user status it can be enable or disable
+         By Default the Status of user is enable."
+    DEFVAL { enable }
+    ::= { fsusrMgmtEntry 6 }
+
+fsusrMgmtUserLockRelTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time after which the password locked user can be released
+         automatically."
+    DEFVAL { 0 }
+    ::= { fsusrMgmtEntry 7 }
+
+
+fsusrMgmtUserRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The row status of the entry."
+   ::= { fsusrMgmtEntry 8 }
+
+fsusrMgmtUserConfirmPwd  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8..500))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enter the text values for confirmation password. This field is used
+        to confirm the password with the fsusrMgmtUserPassword"
+    DEFVAL { "Password123#" }
+    ::= { fsusrMgmtEntry 9 }
+
+fsusrMgmtUserPasswordType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unencrypted-password (0),
+                        unencrypted-secret (1),
+                        type-2 (2),
+                        type-7 (7)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is used to indicate how the password must be interpreted."
+    DEFVAL { unencrypted-password }
+    ::= { fsusrMgmtEntry 10 }
+
+END

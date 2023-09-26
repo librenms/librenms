@@ -1,0 +1,735 @@
+
+IEEE8021-PB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+    ieee802dot1mibs, IEEE8021PbbComponentIdentifierOrZero,
+    IEEE8021PbbComponentIdentifier, IEEE8021BridgePortNumber,
+    IEEE8021PortAcceptableFrameTypes, IEEE8021PriorityValue
+        FROM IEEE8021-TC-MIB
+    ieee8021BridgeBasePortComponentId, ieee8021BridgeBasePort
+        FROM IEEE8021-BRIDGE-MIB
+    VlanId, VlanIdOrNone
+        FROM Q-BRIDGE-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+ieee8021PbMib MODULE-IDENTITY
+    LAST-UPDATED "200810150000Z" -- October 15, 2008
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+
+          Contact: David Levi
+           Postal: 4655 GREAT AMERICA PARKWAY
+                   SANTA CLARA, CALIFORNIA
+                   95054
+                   USA
+              Tel: +1-408-495-5138
+           E-mail: dlevi@nortel.com"
+    DESCRIPTION
+        "Provider Bridge MIB module for managing 802.1ad.
+
+         Unless otherwise indicated, the references in this MIB
+         module are to IEEE 802.1Q-2005 as amended by IEEE 802.1ad,
+         IEEE 802.1ak, IEEE 802.1ag and IEEE 802.1ah.
+
+         Copyright (C) IEEE.
+         This version of this MIB module is part of IEEE802.1Q;
+         see the draft itself for full legal notices."
+    REVISION     "200810150000Z" -- October 15, 2008
+    DESCRIPTION
+        "Initial version."
+    ::= { ieee802dot1mibs 5 }
+
+ieee8021PbNotifications  OBJECT IDENTIFIER ::= { ieee8021PbMib 0 }
+ieee8021PbObjects        OBJECT IDENTIFIER ::= { ieee8021PbMib 1 }
+ieee8021PbConformance    OBJECT IDENTIFIER ::= { ieee8021PbMib 2 }
+
+-- ===========================================================
+-- ieee8021PbVidTranslationTable:
+-- ===========================================================
+
+ieee8021PbVidTranslationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbVidTranslationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to configure the VID Translation Table
+        defined in 12.13.2 a) of 802.1Q-2006.  The VID
+        Translation Table is used to implement a bi-directional
+        mapping between a local S-VID, used in data and protocol
+        frames transmitted and received through a CNP or PNP,
+        and a relay S-VID, used by the filtering and forwarding
+        process.  Each row in this table is indexed by component,
+        port, and local S-VID value and indicates the relay S-VID
+        value to be used for the specified S-VID.  If no entry for
+        a component, port, and local-svid is present in this table
+        is present then the relay S-VID used for a frame received
+        on that port with the local S-VID value will be the S-VID
+        that has the same numeric value as the local S-VID of the
+        received frame.
+
+        Entries in this table must be persistent over power up
+        restart/reboot."
+    REFERENCE   "12.13.2 a), 12.13.2.1, 12.13.2.2"
+    ::= { ieee8021PbObjects 1 }
+
+ieee8021PbVidTranslationEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbVidTranslationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for the S-VID translation table which includes 
+        both the Local and Relay S-VIDs between which the PNP or CNP
+        translates.
+
+        Note that the component ID of entries in this table must refer
+        to the S-VLAN Component of a Provider Bridge."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort,
+            ieee8021PbVidTranslationLocalVid }
+    ::= { ieee8021PbVidTranslationTable 1 }
+
+Ieee8021PbVidTranslationEntry ::= SEQUENCE {
+      ieee8021PbVidTranslationLocalVid
+          VlanId,
+      ieee8021PbVidTranslationRelayVid
+          VlanId,
+      ieee8021PbVidTranslationRowStatus
+          RowStatus
+}
+
+ieee8021PbVidTranslationLocalVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The S-VID on received(transmitted) at the ISS of a CNP or PNP."
+    ::= { ieee8021PbVidTranslationEntry 1 }
+
+ieee8021PbVidTranslationRelayVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated S-VID delivered(received) over the EISS from a
+        CNP or PNP.  The default value of this object on creation will
+        be the value of the corresponding instance of
+        ieee8021PbVidTranslationLocalVid."
+    ::= { ieee8021PbVidTranslationEntry 2 }
+
+ieee8021PbVidTranslationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of an entry in this table, and is
+        used to create/delete entries.
+
+        It is an implementation specific decision as to whether any
+        column in this table may be set while the corresponding
+        instance of this object is valid(1)."
+    ::= { ieee8021PbVidTranslationEntry 3 }
+
+-- ===========================================================
+-- ieee8021PbCVidRegistrationTable:
+-- ===========================================================
+
+ieee8021PbCVidRegistrationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbCVidRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table used in a CEP to create the mapping between a C-VID
+        and a service represented by an S-VID.
+
+        Note that the component ID of entries in this table must refer
+        to the S-VLAN component of a Provider Edge Bridge and the Port
+        Number must refer to the port number of the Customer Edge Port
+        associated with that S-VLAN component.
+
+        Entries in this table must be persistent over power up
+        restart/reboot."
+    REFERENCE   "12.13.3.1, 12.13.3.2"
+    ::= { ieee8021PbObjects 2 }
+
+ieee8021PbCVidRegistrationEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbCVidRegistrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An element of the C-VID registration table accessed by PB
+        C-VLAN component, Customer Edge Port bridge port number, and
+        C-VID.  Each element contains the mapping between a C-VID and
+        the S-VID which carries the service and booleans for handling
+        untagged frames at the PEP and CEP."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort,
+            ieee8021PbCVidRegistrationCVid }
+    ::= { ieee8021PbCVidRegistrationTable 1 }
+
+Ieee8021PbCVidRegistrationEntry ::= SEQUENCE {
+      ieee8021PbCVidRegistrationCVid
+          VlanId,
+      ieee8021PbCVidRegistrationSVid
+          VlanId,
+      ieee8021PbCVidRegistrationUntaggedPep
+          TruthValue,
+      ieee8021PbCVidRegistrationUntaggedCep
+          TruthValue,
+      ieee8021PbCVidRegistrationRowStatus
+          RowStatus
+}
+
+ieee8021PbCVidRegistrationCVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "C-VID of this C-VID registration entry."
+    ::= { ieee8021PbCVidRegistrationEntry 1 }
+
+ieee8021PbCVidRegistrationSVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "S-VID for this C-VID registration entry."
+    ::= { ieee8021PbCVidRegistrationEntry 2 }
+
+ieee8021PbCVidRegistrationUntaggedPep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A flag indicating if this C-VID should be carried untagged
+        at the PEP.  A value of true(1) means untagged."
+    DEFVAL { true }
+    ::= { ieee8021PbCVidRegistrationEntry 3 }
+
+ieee8021PbCVidRegistrationUntaggedCep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A flag indicating if this C-VID should be carried untagged
+        at the CEP.  A value of true(1) means untagged."
+    DEFVAL { true }
+    ::= { ieee8021PbCVidRegistrationEntry 4 }
+
+ieee8021PbCVidRegistrationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of an entry in this table, and is
+        used to create/delete entries.
+
+        The value of ieee8021PbCVidRegistrationSVid must be set before
+        an entry in this table can be made valid.
+
+        It is an implementation specific decision as to whether any
+        column in this table may be set while the corresponding
+        instance of this object is valid(1)."
+    ::= { ieee8021PbCVidRegistrationEntry 5 }
+
+-- ===========================================================
+-- ieee8021PbEdgePortTable:
+-- ===========================================================
+
+ieee8021PbEdgePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbEdgePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Provider Edge Port (PEP) table which indicate the subset of
+        parameters needed for each PEP."
+    REFERENCE   "12.13.3.3, 12.13.3.4"
+    ::= { ieee8021PbObjects 3 }
+
+ieee8021PbEdgePortEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbEdgePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the PEP table indexed by ComponentID and S-VID and
+        containing parameters used to configure ingress filtering on
+        the PEP, thus affecting traffic transiting from the provider
+        network to the customer edge port.  The columns allow the
+        default C-VID value and default User Priority to be specified
+        and PEP's ingress filtering operation to be controlled.
+
+        Note that the component ID of entries in this table must refer
+        to an S-VLAN component of a provider edge bridge and the Bridge
+        Port number must refer to the port number of a Customer Edge
+        Port associated with that S-Vlan component."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort,
+            ieee8021PbEdgePortSVid }
+    ::= { ieee8021PbEdgePortTable 1 }
+
+Ieee8021PbEdgePortEntry ::= SEQUENCE {
+      ieee8021PbEdgePortSVid
+          VlanId,
+      ieee8021PbEdgePortPVID
+          VlanId,
+      ieee8021PbEdgePortDefaultUserPriority
+          IEEE8021PriorityValue,
+      ieee8021PbEdgePortAcceptableFrameTypes
+          IEEE8021PortAcceptableFrameTypes,
+      ieee8021PbEdgePortEnableIngressFiltering
+          TruthValue
+}
+
+ieee8021PbEdgePortSVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The 12 bit S-VID associated with the PEP."
+    ::= { ieee8021PbEdgePortEntry 1 }
+
+ieee8021PbEdgePortPVID OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit C-VID to be used for untagged frames received at
+        the Provider Edge Port."
+    ::= { ieee8021PbEdgePortEntry 2 }
+
+ieee8021PbEdgePortDefaultUserPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An integer range 0-7 to be used for untagged frames received
+        at the Provider Edge Port."
+    ::= { ieee8021PbEdgePortEntry 3 }
+
+ieee8021PbEdgePortAcceptableFrameTypes OBJECT-TYPE
+    SYNTAX      IEEE8021PortAcceptableFrameTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "the Acceptable Frame Types for frames received at the PEP.
+        The permissible values for the parameter are:
+            1) Admit all frames;
+            2) Admit only Untagged and Priority-Tagged frames;
+            3) Admit only VLAN-Tagged frames;
+            4) Admit only Untagged frames;"
+    DEFVAL { admitAll }
+    ::= { ieee8021PbEdgePortEntry 4 }
+
+ieee8021PbEdgePortEnableIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Filtering parameter for frames received at the PEP.
+        The permissible values for the parameter are:
+            true(1)  Enabled;
+            false(2) Disabled."
+    DEFVAL { true }
+    ::= { ieee8021PbEdgePortEntry 5 }
+
+-- ===========================================================
+-- ieee8021PbServicePriorityRegenerationTable:
+-- ===========================================================
+
+ieee8021PbServicePriorityRegenerationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbServicePriorityRegenerationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The priority regeneration table for this PEP."
+    REFERENCE   "12.13.3.5, 12.13.3.6"
+    ::= { ieee8021PbObjects 4 }
+
+ieee8021PbServicePriorityRegenerationEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbServicePriorityRegenerationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An element of the PEP priority regeneration table indexed
+        by Component ID, bridge port number, S-VID, and received
+        priority.  Each element contains the regenerated priority.
+
+        Note that the component ID of entries in this table must refer
+        to the S-VLAN component of a Provider Edge Bridge and the Port
+        Number must refer to the port number of the Customer Edge Port
+        associated with that S-VLAN component."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort,
+            ieee8021PbServicePriorityRegenerationSVid,
+            ieee8021PbServicePriorityRegenerationReceivedPriority }
+    ::= { ieee8021PbServicePriorityRegenerationTable 1 }
+
+Ieee8021PbServicePriorityRegenerationEntry ::= SEQUENCE {
+      ieee8021PbServicePriorityRegenerationSVid
+          VlanId,
+      ieee8021PbServicePriorityRegenerationReceivedPriority
+          IEEE8021PriorityValue,
+      ieee8021PbServicePriorityRegenerationRegeneratedPriority
+          IEEE8021PriorityValue
+}
+
+ieee8021PbServicePriorityRegenerationSVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "S-VID for this regeneration table entry."
+    ::= { ieee8021PbServicePriorityRegenerationEntry 1 }
+
+ieee8021PbServicePriorityRegenerationReceivedPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Received priority for this regeneration table entry."
+    ::= { ieee8021PbServicePriorityRegenerationEntry 2 }
+
+ieee8021PbServicePriorityRegenerationRegeneratedPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The regenerated priority contained in this regeneration table
+        entry."
+    ::= { ieee8021PbServicePriorityRegenerationEntry 3 }
+
+-- ===========================================================
+-- ieee8021PbCnpTable
+-- ===========================================================
+
+ieee8021PbCnpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbCnpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used for dynamic creation and deletion of
+        Customer Network Ports on S-components or I-components.
+        Creation of an entry in this table will implicitly also
+        create a corresponding entry in the ieee8021BridgeBasePortTable.
+
+        Entries in this table must be persistent across reinitializations
+        of the management system."
+    REFERENCE   "12.3.3"
+    ::= { ieee8021PbObjects 5 }
+
+ieee8021PbCnpEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbCnpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents a dynamically created Customer Network Port."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort }
+    ::= { ieee8021PbCnpTable 1 }
+
+Ieee8021PbCnpEntry ::= SEQUENCE {
+    ieee8021PbCnpCComponentId
+        IEEE8021PbbComponentIdentifierOrZero,
+    ieee8021PbCnpSVid
+        VlanIdOrNone,
+    ieee8021PbCnpRowStatus
+        RowStatus
+}
+
+ieee8021PbCnpCComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifierOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The component ID of the C-Vlan component if this is an
+        internal customer network port.  The value must be 0 for
+        an external customer network port.
+
+        This value must be consistent with the value of the
+        corresponding instance of ieee8021PbCnpSVid.
+        Both must be non-zero, or both must be zero."
+    ::= { ieee8021PbCnpEntry 1 }
+
+ieee8021PbCnpSVid OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The S-VID for service for an internal customer network port.
+        For an external port, this value must be 0.
+
+        This value must be consistent with the value of the
+        corresponding instance of ieee8021PbCnpCComponentId.
+        Both must be non-zero, or both must be zero."
+    ::= { ieee8021PbCnpEntry 2 }
+
+ieee8021PbCnpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used for creation/deletion of entries in
+        this table.
+
+        All columns in this table must have valid values before
+        this object can be set to active(1).
+
+        While the value of this object is active(1), the values
+        of other columns in the same entry may not be modified."
+    ::= { ieee8021PbCnpEntry 3 }
+
+-- ===========================================================
+-- ieee8021PbPnpTable
+-- ===========================================================
+
+ieee8021PbPnpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbPnpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used for dynamic creation and deletion of
+        Provider Network Ports on S-components or B-components.
+        Creation of an entry in this table will implicitly also
+        create a corresponding entry in the ieee8021BridgeBasePortTable.
+
+        Entries in this table must be persistent across reinitializations
+        of the management system."
+    REFERENCE   "12.13.3"
+    ::= { ieee8021PbObjects 6 }
+
+ieee8021PbPnpEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbPnpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents a dynamically created Provider Network Port."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort }
+    ::= { ieee8021PbPnpTable 1 }
+
+Ieee8021PbPnpEntry ::= SEQUENCE {
+    ieee8021PbPnpRowStatus
+        RowStatus
+}
+
+ieee8021PbPnpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used for creation/deletion of entries in
+        this table."
+    ::= { ieee8021PbPnpEntry 1 }
+
+-- ===========================================================
+-- ieee8021PbCepTable
+-- ===========================================================
+
+ieee8021PbCepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021PbCepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table is used to create Customer Edge Ports, CEPs, on a
+        provider edge bridge.  It is indexed by the ComponentId of the
+        PEB's S-Component and by the port number for the CEP.  Note that
+        the CEP's port number belongs to the set of port numbers
+        associated with the PEB's S-Component.
+
+        Entries in this table must be persistent across reinitializations
+        of the management system.  However, note that some column values,
+        as noted below, may change across system reinitializations."
+    ::= { ieee8021PbObjects 7 }
+
+ieee8021PbCepEntry OBJECT-TYPE
+    SYNTAX      Ieee8021PbCepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of the ieee8021PbCepTable.  Note that the component
+         index must refer to the S-Component of a PEB, and that the port
+         number for the CEP is allocated from the port number space of
+         that S-Component."
+    INDEX { ieee8021BridgeBasePortComponentId,
+            ieee8021BridgeBasePort }
+    ::= { ieee8021PbCepTable 1 }
+
+Ieee8021PbCepEntry ::= 
+    SEQUENCE {
+        ieee8021PbCepCComponentId  IEEE8021PbbComponentIdentifier,
+        ieee8021PbCepCepPortNumber IEEE8021BridgePortNumber,
+        ieee8021PbCepRowStatus     RowStatus
+    }
+
+ieee8021PbCepCComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This column is an implmentation specific column that may be
+         used to map the C component associated with this CEP to other
+         tables within the system, such as the Entity MIB.  This
+         column may not be created or modified by management station
+         action.  A value of 0 is always legal, and non-zero values
+         will be interpreted in an implementation specific manner.
+         The value of this column may or may not persist across system
+         restarts."
+    ::= { ieee8021PbCepEntry 1 }
+
+ieee8021PbCepCepPortNumber  OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This column is an implementation specific column that may be
+         used to map the CEP to other tables within the system, for
+         example the Entity MIB.  This column may not be created or
+         modified by management station action.  A value of 0 is
+         always legal, and non-zero values will be interpreted in an
+         implementation specific manner.  The value of this column
+         may or may not persist across system restarts."
+    ::= { ieee8021PbCepEntry 2 }
+
+ieee8021PbCepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { ieee8021PbCepEntry 3 }
+
+-- =============================================================
+-- Conformance Information
+-- =============================================================
+
+ieee8021PbGroups
+    OBJECT IDENTIFIER ::= { ieee8021PbConformance 1 }
+ieee8021PbCompliances
+    OBJECT IDENTIFIER ::= { ieee8021PbConformance 2 }
+
+-- =============================================================
+-- Units of conformance
+-- =============================================================
+
+ieee8021PbVidTranslationGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbVidTranslationRelayVid,
+        ieee8021PbVidTranslationRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects used to represent a PB
+        C-VID/S-VID translation."
+    ::= { ieee8021PbGroups 1 }
+
+ieee8021PbCVidRegistrationGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbCVidRegistrationSVid,
+        ieee8021PbCVidRegistrationUntaggedPep,
+        ieee8021PbCVidRegistrationUntaggedCep,
+        ieee8021PbCVidRegistrationRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects used to represent a CEP translation."
+    ::= { ieee8021PbGroups 2 }
+
+ieee8021PbEdgePortGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbEdgePortPVID,
+        ieee8021PbEdgePortDefaultUserPriority,
+        ieee8021PbEdgePortAcceptableFrameTypes,
+        ieee8021PbEdgePortEnableIngressFiltering
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects user to represent a PEP."
+    ::= { ieee8021PbGroups 3 }
+
+ieee8021PbServicePriorityRegenerationGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbServicePriorityRegenerationRegeneratedPriority
+    }
+    STATUS      current
+    DESCRIPTION
+        "A regenerated priority value for a PEP."
+    ::= { ieee8021PbGroups 4 }
+
+ieee8021PbDynamicCnpGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbCnpCComponentId,
+        ieee8021PbCnpSVid,
+        ieee8021PbCnpRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A set of objects used for dynamic creation and deletion
+        of customer network ports."
+    ::= { ieee8021PbGroups 5 }
+
+ieee8021PbDynamicPnpGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbPnpRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A set of objects used for dynamic creation and deletion
+        of provider network ports."
+    ::= { ieee8021PbGroups 6 }
+
+ieee8021PbDynamicCepGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021PbCepCComponentId,
+        ieee8021PbCepCepPortNumber,
+        ieee8021PbCepRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A set of objects used for dynamic creation and deletion
+        of customer edge ports."
+    ::= { ieee8021PbGroups 7 }
+
+-- =============================================================
+-- Compliance statements
+-- =============================================================
+
+ieee8021PbCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for device support of Provider
+         Bridge services."
+
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021PbVidTranslationGroup,
+            ieee8021PbCVidRegistrationGroup,
+            ieee8021PbEdgePortGroup,
+            ieee8021PbServicePriorityRegenerationGroup
+        }
+
+        GROUP       ieee8021PbDynamicCnpGroup
+        DESCRIPTION
+            "This group is optional and supports dynamic creation
+            and deletion of customer network ports."
+
+        GROUP       ieee8021PbDynamicPnpGroup
+        DESCRIPTION
+            "This group is optional and supports dynamic creation
+            and deletion of provider network ports."
+
+        GROUP       ieee8021PbDynamicCepGroup
+        DESCRIPTION
+            "This group is optional and supports dynamic creation
+            and deletion of customer edge ports."
+
+    ::= { ieee8021PbCompliances 1 }
+
+END
+
