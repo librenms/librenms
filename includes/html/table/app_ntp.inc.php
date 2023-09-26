@@ -6,9 +6,9 @@ $options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
-$first = ($vars['current'] * 10) - 1;           // Which record do we start on.
-$last = $first + $vars['rowCount'];    // Which record do we end on.
-$showAll = ($vars['rowCount'] == -1) ? true : false;
+$first = ($vars['current'] * $vars['rowCount']) - 1;      // Which record do we start on.
+$last = $first + $vars['rowCount'];                       // Which record do we end on.
+$showAll = ($vars['rowCount'] == -1) ? true : false;      // Show all devices y/n
 $count = 0;
 // Loop through each device in the component array
 foreach ($components as $devid => $comp) {
