@@ -10,6 +10,7 @@ $link_array = [
 print_optionbar_start();
 
 echo generate_link('General', $link_array);
+echo ' | ' . generate_link('Pools & Subnets', $link_array, ['app_page'=>'pools']);
 echo ' | ' . generate_link('Leases', $link_array, ['app_page'=>'leases']);
 
 print_optionbar_end();
@@ -25,6 +26,54 @@ if (!isset($vars['app_page'])) {
         'dhcp-stats_networks_current' => 'Networks Current',
         'dhcp-stats_networks_max'     => 'Networks Max',
     ];
+} elseif (isset($vars['app_page']) && $vars['app_page'] == 'pools') {
+    $pools = $app->data['pools'] ?? [];
+    print_optionbar_start();
+    echo '<center><b>Pools</b></center>';
+    $pool_table = [
+        'headers' => [
+            'First IP',
+            'Last IP',
+            'Max',
+            'In Use',
+            'Use%',
+        ],
+        'rows' => [],
+    ];
+    foreach ($pools as $key => $pool) {
+        $pool_table['rows'][$key]=[
+            $pool['first_ip'],
+            $pool['last_ip'],
+            $pool['max'],
+            $pool['cur'],
+            $pool['percent'],
+        ];
+    }
+    echo render_table($pool_table);
+    print_optionbar_end();
+
+    $subnets = $app->data['networks'] ?? [];
+    print_optionbar_start();
+    echo '<center><b>Subnets</b></center>';
+    $subnets_table = [
+        'headers' => [
+            'Subnet',
+            'Max',
+            'In Use',
+            'Use%',
+        ],
+        'rows' => [],
+    ];
+    foreach ($subnets as $key => $subnet) {
+        $subnets_table['rows'][$key]=[
+            $subnet['network'],
+            $subnet['max'],
+            $subnet['cur'],
+            $subnet['percent'],
+        ];
+    }
+    echo render_table($subnets_table);
+    print_optionbar_end();
 } elseif (isset($vars['app_page']) && $vars['app_page'] == 'leases') {
     $leases = $app->data['found_leases'] ?? [];
     $table_info = [
