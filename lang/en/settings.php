@@ -30,6 +30,7 @@ return [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
             'ldap' => ['name' => 'LDAP Settings'],
+            'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
@@ -1259,6 +1260,16 @@ return [
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
             ],
         ],
+        'radius' => [
+            'default_roles' => [
+                'description' => 'Default user roles',
+                'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
+            ],
+            'enforce_roles' => [
+                'description' => 'Enforce roles at login',
+                'help' => 'If enabled, roles will be set to the ones specified by the Filter-ID attribute or radius.default_roles at login.  Otherwise, they will be set when the user is created and never changed after that.',
+            ],
+        ],
         'reporting' => [
             'error' => [
                 'description' => 'Send Error Reports',
@@ -1267,6 +1278,10 @@ return [
             'usage' => [
                 'description' => 'Send Usage Reports',
                 'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
+            ],
+            'dump_errors' => [
+                'description' => 'Dump debug errors (Will break your install)',
+                'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
             ],
         ],
         'route_purge' => [
@@ -1311,6 +1326,10 @@ return [
         'service_poller_enabled' => [
             'description' => 'Enable Polling',
             'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        ],
+        'service_master_timeout' => [
+            'description' => 'Master Dispatcher Timeout',
+            'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
         ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',

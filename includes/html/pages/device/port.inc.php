@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;

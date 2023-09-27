@@ -54,7 +54,7 @@ class Pushbullet extends Transport
                     'title' => 'Access Token',
                     'name' => 'pushbullet-token',
                     'descr' => 'Pushbullet Access Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

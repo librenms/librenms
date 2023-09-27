@@ -29,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -45,23 +46,13 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
-        switch ($alSeverity) {
-            case 'critical':
-                $logSeverity = 5;
-                break;
-            case 'major':
-                $logSeverity = 4;
-                break;
-            case 'minor':
-                $logSeverity = 3;
-                break;
-            case 'cleared':
-                $logSeverity = 1;
-                break;
-            default:
-                $logSeverity = 2;
-                break;
-        }
+        $logSeverity = match ($alSeverity) {
+            'critical' => Severity::Error,
+            'major' => Severity::Warning,
+            'minor' => Severity::Notice,
+            'cleared' => Severity::Ok,
+            default => Severity::Info,
+        };
 
         $almDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmDescr'));
         $almObjName = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmObjectName'));

@@ -59,6 +59,12 @@ interface SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface;
 
     /**
+     * Set MIBs to use for this query. Base mibs are included by default.
+     * They will be appended to existing mibs unless $append is set to false.
+     */
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface;
+
+    /**
      * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
      * OIDs will be walked in order, so you may want to put your OIDs in a specific order.
      */
@@ -127,5 +133,5 @@ interface SnmpQueryInterface
      * Translate an OID.
      * Call numeric method prior output numeric OID.
      */
-    public function translate(string $oid, ?string $mib = null): string;
+    public function translate(string $oid): string;
 }

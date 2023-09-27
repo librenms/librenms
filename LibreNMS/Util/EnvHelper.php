@@ -163,7 +163,7 @@ class EnvHelper
             $parts = explode('=', $line, 2);
             if (isset($parts[1])
                 && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
-                && ! preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
+                && ! preg_match('/^(".*"|\'.*\')$/', trim($parts[1])) // not already quoted
             ) {
                 return trim($parts[0]) . '="' . trim($parts[1]) . '"';
             }

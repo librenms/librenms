@@ -44,7 +44,7 @@ class RoutingController implements DeviceTab
             'bgp' => $device->bgppeers()->count(),
             'vrf' => $device->vrfs()->count(),
             'cef' => $device->cefSwitching()->count(),
-            'mpls' => $device->mplsLsps()->count(),
+            'mpls' => $device->mplsServices()->count(),
             'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
             'loadbalancer_rservers' => $device->rServers()->count(),
             'ipsec_tunnels' => $device->ipsecTunnels()->count(),

@@ -35,8 +35,8 @@ The changelog is also updated and will reference the release number
 and date so you can see what changes have been made since the last release.
 
 To switch to using stable branches you can set
-`lnms config:set update_channel release` and then switch
-to the latest release branch with:
+`lnms config:set update_channel release`
 
-`cd /opt/librenms && git fetch --tags && git checkout $(git describe
---tags $(git rev-list --tags --max-count=1))`
+This will pause updates until the next stable release, at that time LibreNMS will
+update to the stable release and continue to only update to stable releases.
+Downgrading is not supported on LibreNMS and will likely cause bugs.

@@ -9,8 +9,7 @@ use LibreNMS\Util\Debug;
 $options = getopt('u:rldvh');
 if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
- -l             List all users (checks that auth can enumerate all allowed users)
- -d             Enable debug output
+] -d             Enable debug output
  -v             Enable verbose debug output
  -h             Display this help message
 ';
@@ -86,17 +85,6 @@ try {
         if (! $bind_success) {
             print_error('Could not bind to AD, you will not be able to use the API or alert AD users');
         }
-    }
-
-    if (isset($options['l'])) {
-        $users = $authorizer->getUserlist();
-        $output = array_map(function ($user) {
-            return "{$user['username']} ({$user['user_id']})";
-        }, $users);
-
-        echo 'Users: ' . implode(', ', $output) . PHP_EOL;
-        echo 'Total users: ' . count($users) . PHP_EOL;
-        exit;
     }
 
     $test_username = $options['u'];

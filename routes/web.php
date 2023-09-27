@@ -6,7 +6,6 @@ use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
-use App\Http\Controllers\Widgets;
 use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
+
+    Route::get('nac', 'NacController@index');
 
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
@@ -165,6 +166,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
             Route::get('device-group', 'DeviceGroupController')->name('ajax.select.device-group');
             Route::get('port-group', 'PortGroupController')->name('ajax.select.port-group');
+            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('eventlog', 'EventlogController')->name('ajax.select.eventlog');
             Route::get('graph', 'GraphController')->name('ajax.select.graph');
             Route::get('graph-aggregate', 'GraphAggregateController')->name('ajax.select.graph-aggregate');
@@ -173,6 +175,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('syslog', 'SyslogController')->name('ajax.select.syslog');
             Route::get('location', 'LocationController')->name('ajax.select.location');
             Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
+            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('service', 'ServiceController')->name('ajax.select.service');
             Route::get('template', 'ServiceTemplateController')->name('ajax.select.template');
             Route::get('poller-group', 'PollerGroupController')->name('ajax.select.poller-group');
@@ -193,7 +196,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('location', 'LocationController');
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
-            Route::post('port-nac', 'PortNacController');
+            Route::post('port-nac', 'PortNacController')->name('table.port-nac');
             Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');

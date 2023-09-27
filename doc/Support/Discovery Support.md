@@ -48,6 +48,10 @@ If you need to debug the output of discovery-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
+You also may use `-m` to pass a list of comma-separated modules.
+Please refer to [Command options](#command-options) of discovery.php.
+Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
+
 If you want to switch back to discovery.php then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`

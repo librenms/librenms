@@ -1,0 +1,274 @@
+mib: PK-SOFTWARE-APPLIANCE-V2
+modules:
+    os:
+        version: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-systemVersion.0
+    sensors:
+        percent:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-internal-databaseUsage
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-internal-databaseUsage
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.3.1.4.{{ $index }}'
+                    descr: 'Internal Database Usage %'
+                    group: 'Database'
+                    index: pk-SAV2-internal-databaseUsage
+                    warn_limit: 80
+                    high_limit: 95
+        state:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-authentication-service-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-authentication-service-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.1.{{ $index }}'
+                    descr: 'Authentication'
+                    group: 'Service Status'
+                    index: pk-SAV2-authentication-service-status
+                    state_name: pk-SAV2-authentication-service-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-crs-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-crs-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.2.{{ $index }}'
+                    descr: 'Container Runtime'
+                    group: 'Service Status'
+                    index: pk-SAV2-crs-status
+                    state_name: pk-SAV2-crs-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-documentation-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-documentation-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.3.{{ $index }}'
+                    descr: 'Documentation'
+                    group: 'Service Status'
+                    index: pk-SAV2-documentation-status
+                    state_name: pk-SAV2-documentation-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-monitoring-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-monitoring-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.4.{{ $index }}'
+                    descr: 'Monitoring'
+                    group: 'Service Status'
+                    index: pk-SAV2-monitoring-status
+                    state_name: pk-SAV2-monitoring-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-persistence-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-persistence-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.5.{{ $index }}'
+                    descr: 'Persistent Data Store'
+                    group: 'Service Status'
+                    index: pk-SAV2-persistence-status
+                    state_name: pk-SAV2-persistence-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-snmp-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-snmp-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.6.{{ $index }}'
+                    descr: 'SNMP'
+                    group: 'Service Status'
+                    index: pk-SAV2-snmp-status
+                    state_name: pk-SAV2-snmp-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-spc-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-spc-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.7.{{ $index }}'
+                    descr: 'Support Package Creator'
+                    group: 'Service Status'
+                    index: pk-SAV2-spc-status
+                    state_name: pk-SAV2-spc-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vs-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vs-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.8.{{ $index }}'
+                    descr: 'Valuestore'
+                    group: 'Service Status'
+                    index: pk-SAV2-vs-status
+                    state_name: pk-SAV2-vs-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vsapi-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vsapi-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.9.{{ $index }}'
+                    descr: 'Valuestore API'
+                    group: 'Service Status'
+                    index: pk-SAV2-vsapi-status
+                    state_name: pk-SAV2-vsapi-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-webconf-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-webconf-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.10.{{ $index }}'
+                    descr: 'Webconf'
+                    group: 'Service Status'
+                    index: pk-SAV2-webconf-status
+                    state_name: pk-SAV2-webconf-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vault-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-vault-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.1.11.{{ $index }}'
+                    descr: 'Vault'
+                    group: 'Service Status'
+                    index: pk-SAV2-vault-status
+                    state_name: pk-SAV2-vault-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-networkLink-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-networkLink-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.2.1.{{ $index }}'
+                    descr: 'Network Link'
+                    group: 'Network Status'
+                    index: pk-SAV2-networkLink-status
+                    state_name: pk-SAV2-networkLink-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-internal-database-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-internal-database-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.3.1.1.{{ $index }}'
+                    descr: 'Internal Database'
+                    group: 'Service Status'
+                    index: pk-SAV2-internal-database-status
+                    state_name: pk-SAV2-internal-database-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-ejbca-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-ejbca-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.5.1.1.{{ $index }}'
+                    descr: 'EJBCA'
+                    group: 'Application Status'
+                    index: pk-SAV2-ejbca-status
+                    state_name: pk-SAV2-ejbca-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-ejbcaHealthCheck
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-ejbcaHealthCheck
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.5.1.3.{{ $index }}'
+                    descr: 'EJBCA Health Check'
+                    group: 'Application Status'
+                    index: pk-SAV2-ejbcaHealthCheck
+                    state_name: pk-SAV2-ejbcaHealthChecks
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-signserver-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-signserver-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.5.2.1.{{ $index }}'
+                    descr: 'SignServer'
+                    group: 'Application Status'
+                    index: pk-SAV2-signserver-status
+                    state_name: pk-SAV2-signserver-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-signserverHealthCheck
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-signserverHealthCheck
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.5.2.3.{{ $index }}'
+                    descr: 'SignServer Health Check'
+                    group: 'Application Status'
+                    index: pk-SAV2-signserverHealthCheck
+                    state_name: pk-SAV2-signserverHealthCheck
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-luna7-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-luna7-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.6.2.{{ $index }}'
+                    descr: 'Luna 7 HSM'
+                    group: 'HSM Status'
+                    index: pk-SAV2-hsm-driver-luna7-status
+                    state_name: pk-SAV2-hsm-driver-luna7-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-softhsm-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-softhsm-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.6.1.{{ $index }}'
+                    descr: 'SoftHSM'
+                    group: 'HSM Status'
+                    index: pk-SAV2-hsm-driver-softhsm-status
+                    state_name: pk-SAV2-hsm-driver-softhsm-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-utimaco-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-utimaco-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.6.3.1.{{ $index }}'
+                    descr: 'Utimaco'
+                    group: 'HSM Status'
+                    index: pk-SAV2-hsm-driver-utimaco-status
+                    state_name: pk-SAV2-hsm-driver-utimaco-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }
+                -
+                    oid: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-ncipher-status
+                    value: PK-SOFTWARE-APPLIANCE-V2::pk-SAV2-hsm-driver-ncipher-status
+                    num_oid: '.1.3.6.1.4.1.22408.1.4.1.6.4.{{ $index }}'
+                    descr: 'nCipher'
+                    group: 'HSM Status'
+                    index: pk-SAV2-hsm-driver-ncipher-status
+                    state_name: pk-SAV2-hsm-driver-ncipher-status
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fault' }
+                        -  { value: -1, generic: 3, graph: 1, descr: 'Internal Error' }

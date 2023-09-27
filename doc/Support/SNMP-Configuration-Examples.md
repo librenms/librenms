@@ -461,6 +461,16 @@ firewall-cmd --reload
 service snmpd restart
 ```
 
+### Arch Linux (snmpd v2)
+
+1. Install SNMP Package `pacman -S net-snmp`
+2. create SNMP folder `mkdir /etc/snmp/`
+3. set community `echo rocommunity read_only_community_string >> /etc/snmp/snmpd.conf`
+4. set contact `echo syscontact Firstname Lastname >> /etc/snmp/snmpd.conf`
+5. set location `echo syslocation L69 4RX >> /etc/snmp/snmpd.conf`
+6. enable startup `systemctl enable snmpd.service`
+7. start snmp `systemctl restart snmpd.service`
+
 ### Windows Server 2008 R2
 
 1. Log in to your Windows Server 2008 R2

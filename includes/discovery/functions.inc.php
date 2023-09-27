@@ -18,7 +18,7 @@ use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
@@ -119,7 +119,6 @@ function discover_device(&$device, $force_module = false)
     // Reset $valid array
     $device['attribs'] = DeviceCache::getPrimary()->getAttribs();
 
-    $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
@@ -155,7 +154,7 @@ function discover_device(&$device, $force_module = false)
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
+                \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
                 report($e);
 
                 // Re-throw exception if we're in CI
@@ -178,14 +177,6 @@ function discover_device(&$device, $force_module = false)
             echo "Module [ $module ] disabled globally.\n\n";
         }
     }
-
-    $device_time = round(microtime(true) - $device_start, 3);
-
-    dbUpdate(['last_discovered' => ['NOW()'], 'last_discovered_timetaken' => $device_time], 'devices', '`device_id` = ?', [$device['device_id']]);
-
-    echo "Discovered in $device_time seconds\n";
-
-    echo PHP_EOL;
 
     return true;
 }
@@ -847,10 +838,10 @@ function ignore_storage($os, $descr)
 }
 
 /**
- * @param $valid
+ * @param  $valid
  * @param  OS  $os
- * @param $sensor_type
- * @param $pre_cache
+ * @param  $sensor_type
+ * @param  $pre_cache
  */
 function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
@@ -877,8 +868,10 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
+            $count = 0;
 
             foreach ($raw_data as $index => $snmp_data) {
+                $count++;
                 $user_function = null;
                 if (isset($data['user_func'])) {
                     $user_function = $data['user_func'];
@@ -886,7 +879,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
                 $data['value'] = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
 
-                $snmp_value = $snmp_data[$data['value']];
+                $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
@@ -937,8 +930,8 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
-                    $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
-                    $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
+                    $divisor = (int) (isset($data['divisor']) ? (YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['divisor'] ?? 1));
+                    $multiplier = (int) (isset($data['multiplier']) ? (YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache) ?: 1) : ($sensor_options['multiplier'] ?? 1));
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
@@ -969,7 +962,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         $value = ($value / $divisor) * $multiplier;
                     }
 
-                    echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
+                    echo "$descr: Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
@@ -991,7 +984,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type']);
+                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
 
                     if ($sensor_class === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);
@@ -1003,7 +996,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 }
 
 /**
- * @param $types
+ * @param  $types
  * @param  OS  $os
  * @param  array  $pre_cache
  */
@@ -1200,7 +1193,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 /**
  * check if we should skip this sensor from discovery
  *
- * @param $device
+ * @param  $device
  * @param  string  $sensor_class
  * @param  string  $sensor_descr
  * @return bool

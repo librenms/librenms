@@ -39,8 +39,8 @@ var outages_grid = $("#outages").bootgrid({
     {
         return {
             device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
-            to: "' . addcslashes($vars['to'], '"') . '",
-            from: "' . addcslashes($vars['from'], '"') . '",
+            to: "' . htmlspecialchars($vars['to']) . '",
+            from: "' . htmlspecialchars($vars['from']) . '",
         };
     },
     url: "' . url('/ajax/table/outages') . '"

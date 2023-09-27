@@ -194,7 +194,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
-        'location' => generate_link($alert['location'], ['page' => 'devices', 'location' => $alert['location']]),
+        'location' => generate_link(htmlspecialchars($alert['location']), ['page' => 'devices', 'location' => $alert['location']]),
         'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],

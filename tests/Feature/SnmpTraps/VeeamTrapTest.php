@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class VeeamTrapTest extends SnmpTrapTestCase
 {
     public function testVeeamBackupJobCompleted(): void
@@ -19,7 +21,7 @@ VEEAM-MIB::backupJobResult Success
 TRAP,
             'SNMP Trap: Backup Job Success - SureBackup Job 1 - comment',
             'Could not handle VEEAM-MIB::traps job completed',
-            [1, 'backup']
+            [Severity::Ok, 'backup']
         );
     }
 
@@ -38,7 +40,7 @@ VEEAM-MIB::backupJobResult Warning
 TRAP,
             'SNMP Trap: Backup Job Warning - SureBackup Job 1 - comment',
             'Could not handle VEEAM-MIB::traps job completed warning',
-            [4, 'backup'],
+            [Severity::Warning, 'backup'],
         );
     }
 
@@ -57,7 +59,7 @@ VEEAM-MIB::backupJobResult Failed
 TRAP,
             'SNMP Trap: Backup Job Failed - SureBackup Job 1 - comment',
             'Could not handle VEEAM-MIB::traps job completed failed',
-            [5, 'backup'],
+            [Severity::Error, 'backup'],
         );
     }
 
@@ -76,7 +78,7 @@ VEEAM-MIB::vmBackupResult Success
 TRAP,
             'SNMP Trap: VM backup Success - vmname1 Job: Linux taeglich low - comment',
             'Could not handle VEEAM-MIB::traps backup completed',
-            [1, 'backup'],
+            [Severity::Ok, 'backup'],
         );
     }
 
@@ -95,7 +97,7 @@ VEEAM-MIB::vmBackupResult Warning
 TRAP,
             'SNMP Trap: VM backup Warning - vmname1 Job: Linux taeglich low - comment',
             'Could not handle VEEAM-MIB::traps backup completed warning',
-            [4, 'backup'],
+            [Severity::Warning, 'backup'],
         );
     }
 
@@ -114,7 +116,7 @@ VEEAM-MIB::vmBackupResult Failed
 TRAP,
             'SNMP Trap: VM backup Failed - vmname1 Job: Linux taeglich low - comment',
             'Could not handle VEEAM-MIB::traps backup completed failed',
-            [5, 'backup'],
+            [Severity::Error, 'backup'],
         );
     }
 }

@@ -64,7 +64,7 @@
                 },
                 "required": ["type"],
                 "additionalProperties": false,
-                "oneOf": [
+                "anyOf": [
                     {
                         "properties": {
                             "type": {"const": "select"},
@@ -98,6 +98,21 @@
                     },
                     {
                         "properties": {
+                            "type": {"const": "group-role-map"},
+                            "options": {
+                                "type": "object",
+                                "properties": {
+                                    "groupPlaceholder": {"type": "string"}
+                                },
+                                "additionalProperties": false
+                            },
+                            "validate": {
+                                "minProperties": 1
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
                             "type": {
                                 "type": "string",
                                 "enum": [
@@ -112,7 +127,6 @@
                                     "float",
                                     "graph",
                                     "snmp3auth",
-                                    "ldap-groups",
                                     "ad-groups",
                                     "oxidized-maps",
                                     "executable",

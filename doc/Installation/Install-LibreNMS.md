@@ -101,7 +101,7 @@ su - librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
-Sometime when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
+Sometimes when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
 ```
 wget https://getcomposer.org/composer-stable.phar
 mv composer-stable.phar /usr/bin/composer
@@ -681,5 +681,5 @@ page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-helpa). You
+help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-help). You
 can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

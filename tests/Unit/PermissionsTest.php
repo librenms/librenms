@@ -30,7 +30,6 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
 use LibreNMS\Tests\TestCase;
-use Mockery\Mock;
 
 class PermissionsTest extends TestCase
 {

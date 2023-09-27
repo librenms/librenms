@@ -74,7 +74,7 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = (int) LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+        $tmp_user->can_modify_passwd = LegacyAuth::getType() == 'mysql' ? 1 : 0; // default to true mysql
 
         return view('user.create', [
             'user' => $tmp_user,
@@ -92,13 +92,14 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request, FlasherInterface $flasher)
     {
-        $user = $request->only(['username', 'realname', 'email', 'descr', 'level', 'can_modify_passwd']);
+        $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
         $user['auth_type'] = LegacyAuth::getType();
         $user['can_modify_passwd'] = $request->get('can_modify_passwd'); // checkboxes are missing when unchecked
 
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
+        $user->setRoles($request->get('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
         $this->updateTimezone($user, $request->get('timezone'));
@@ -184,6 +185,7 @@ class UserController extends Controller
         }
 
         $user->fill($request->validated());
+        $user->setRoles($request->get('roles', []));
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             $flasher->addSuccess(__('Updated dashboard for :username', ['username' => $user->username]));

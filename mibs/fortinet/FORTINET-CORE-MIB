@@ -29,7 +29,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fortinet MODULE-IDENTITY
-    LAST-UPDATED "202001300000Z"
+    LAST-UPDATED "202111150000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -39,6 +39,9 @@ fortinet MODULE-IDENTITY
         "
     DESCRIPTION 
         "MIB module for Fortinet network devices."
+    REVISION    "202111150000Z"
+    DESCRIPTION
+        "Registered FortiNACMib OIDs"
     REVISION    "202001300000Z"
     DESCRIPTION
         "Registered FortiExtenderMib OIDs"
@@ -193,6 +196,7 @@ fnCoreMib OBJECT IDENTIFIER ::= { fortinet 100 }
 -- fnFortiDDoSCMMib   OBJECT IDENTIFIER ::= { fortinet 119 }
 -- fnFortiAPMib       OBJECT IDENTIFIER ::= { fortinet 120 }
 -- fnFortiExtenderMib OBJECT IDENTIFIER ::= { fortinet 121 }
+-- fnFortiNACMib      OBJECT IDENTIFIER ::= { fortinet 122 }
 --
 
 --

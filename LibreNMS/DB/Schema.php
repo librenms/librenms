@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
-use PDOException;
 use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
 
@@ -111,25 +110,6 @@ class Schema
         }
 
         return $this->schema;
-    }
-
-    /**
-     * Get the schema version from the previous schema system
-     */
-    public static function getLegacySchema(): int
-    {
-        try {
-            $db = \LibreNMS\DB\Eloquent::DB();
-            if ($db) {
-                return (int) $db->table('dbSchema')
-                    ->orderBy('version', 'DESC')
-                    ->value('version');
-            }
-        } catch (PDOException $e) {
-            // return default
-        }
-
-        return 0;
     }
 
     /**

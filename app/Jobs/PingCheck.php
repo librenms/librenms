@@ -122,7 +122,6 @@ class PingCheck implements ShouldQueue
                 continue;
             }
 
-            dump($line);
             if (preg_match_all(
                 '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/m',
                 $line,
@@ -226,7 +225,6 @@ class PingCheck implements ShouldQueue
      */
     private function recordData(string $hostname, string $status, float $rtt = 0): void
     {
-        dump(get_defined_vars());
         if (Debug::isVerbose()) {
             echo "Attempting to record data for $hostname... ";
         }

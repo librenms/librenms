@@ -26,7 +26,6 @@
 namespace LibreNMS\Exceptions;
 
 use Illuminate\Database\QueryException;
-use Illuminate\Http\Response;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 
 class DatabaseConnectException extends \Exception implements UpgradeableException
@@ -61,9 +60,9 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
             'message' => "$title: " . $this->getMessage(),
-        ]) : response()->view('errors.generic', [
+        ], 503) : response()->view('errors.generic', [
             'title' => $title,
             'content' => $this->getMessage(),
-        ]);
+        ], 503);
     }
 }

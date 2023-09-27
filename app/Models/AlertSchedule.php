@@ -198,7 +198,7 @@ class AlertSchedule extends Model
                             })
                             // Check we are on the correct day of the week
                             ->where(function ($query) use ($localDayNum) {
-                                $query->where('recurring_day', 'like', "%${localDayNum}%")
+                                $query->where('recurring_day', 'like', "%{$localDayNum}%")
                                     ->orWhereNull('recurring_day');
                             });
                     });
