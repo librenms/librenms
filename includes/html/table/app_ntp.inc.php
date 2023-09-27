@@ -6,8 +6,9 @@ $options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
-$first = $vars['current'] - 1;           // Which record do we start on.
-$last = $first + $vars['rowCount'];    // Which record do we end on.
+$first = ($vars['current'] - 1) * $vars['rowCount']; // Which record do we start on.
+$last = $first + $vars['rowCount']; // Which record do we end on.
+$showAll = $vars['rowCount'] == -1; // Show all devices y/n
 $count = 0;
 // Loop through each device in the component array
 foreach ($components as $devid => $comp) {
@@ -48,7 +49,7 @@ foreach ($components as $devid => $comp) {
             $count++;
 
             // If this record is in the range we want.
-            if (($count > $first) && ($count <= $last)) {
+            if ($showAll || (($count > $first) && ($count <= $last))) {
                 $device_link = generate_device_link($device, null, ['tab' => 'apps', 'app' => 'ntp']);
 
                 $graph_array = [];
