@@ -9,7 +9,7 @@ FUTURESOFT-OSPF-MIB DEFINITIONS ::= BEGIN
                                                  FROM SNMPv2-SMI
       TruthValue, RowStatus, DateAndTime, DisplayString  FROM SNMPv2-TC
       ospfVirtNbrEntry, AreaID, RouterID, BigMetric,
-      Status, PositiveInteger, InterfaceIndex, TOSType,
+      Status, PositiveInteger, InterfaceIndexOrZero, TOSType,
       ospfRouterId, ospfNbrRtrId, ospfVirtIfEntry,
       ospfIfEntry
 
@@ -811,7 +811,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
    
    FutOspfIfEntry ::= SEQUENCE {
        futOspfIfIpAddress    IpAddress,
-       futOspfAddressLessIf  InterfaceIndex,
+       futOspfAddressLessIf  InterfaceIndexOrZero,
        futOspfIfOperState    INTEGER,
        futOspfIfPassive      TruthValue,
        futOspfIfNbrCount     Gauge32,
@@ -843,7 +843,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        ::=  { futOspfIfEntry 1 }
    
    futOspfAddressLessIf OBJECT-TYPE
-       SYNTAX      InterfaceIndex (0..65535)
+       SYNTAX      InterfaceIndexOrZero (0..65535)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION
@@ -1078,7 +1078,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
    
    FutOspfIfMD5AuthEntry ::= SEQUENCE {
        futOspfIfMD5AuthIpAddress         IpAddress,
-       futOspfIfMD5AuthAddressLessIf     InterfaceIndex,
+       futOspfIfMD5AuthAddressLessIf     InterfaceIndexOrZero,
        futOspfIfMD5AuthKeyId             Integer32,
        futOspfIfMD5AuthKey               OCTET STRING,
        futOspfIfMD5AuthKeyStartAccept    Integer32,
@@ -1097,7 +1097,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        ::=  { futOspfIfMD5AuthEntry 1 }
    
    futOspfIfMD5AuthAddressLessIf OBJECT-TYPE
-       SYNTAX      InterfaceIndex (0..65535)
+       SYNTAX      InterfaceIndexOrZero (0..65535)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION
@@ -1330,7 +1330,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
    
    FutOspfNbrEntry ::= SEQUENCE {
        futOspfNbrIpAddr            IpAddress,
-       futOspfNbrAddressLessIndex  InterfaceIndex,
+       futOspfNbrAddressLessIndex  InterfaceIndexOrZero,
        futOspfNbrDBSummaryQLen     Gauge32,
        futOspfNbrLSReqQLen         Gauge32,
        futOspfNbrRestartHelperStatus
@@ -1353,7 +1353,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        ::=  { futOspfNbrEntry 1 }
    
    futOspfNbrAddressLessIndex OBJECT-TYPE
-       SYNTAX      InterfaceIndex (0..65535)
+       SYNTAX      InterfaceIndexOrZero (0..65535)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION
@@ -1459,7 +1459,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        futOspfRouteAreaId          IpAddress,
        futOspfRouteCost            BigMetric,
        futOspfRouteType2Cost       BigMetric,
-       futOspfRouteInterfaceIndex  InterfaceIndex
+       futOspfRouteInterfaceIndex  InterfaceIndexOrZero
        }
    
    futOspfRouteIpAddr OBJECT-TYPE
@@ -1541,7 +1541,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        ::=  { futOspfRoutingEntry 8 }
    
    futOspfRouteInterfaceIndex OBJECT-TYPE
-       SYNTAX InterfaceIndex
+       SYNTAX InterfaceIndexOrZero
        MAX-ACCESS  read-only
        STATUS      current
        DESCRIPTION
@@ -1569,7 +1569,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
    
    FutOspfSecIfEntry ::= SEQUENCE {
        futOspfPrimIpAddr           IpAddress,
-       futOspfPrimAddresslessIf    InterfaceIndex,
+       futOspfPrimAddresslessIf    InterfaceIndexOrZero,
        futOspfSecIpAddr            IpAddress,
        futOspfSecIpAddrMask        IpAddress,
        futOspfSecIfStatus          RowStatus
@@ -1584,7 +1584,7 @@ futOspfOasGroup      OBJECT IDENTIFIER ::= { futospf 102 }
        ::=  { futOspfSecIfEntry 1 }
    
    futOspfPrimAddresslessIf OBJECT-TYPE
-       SYNTAX InterfaceIndex (0..65535)
+       SYNTAX InterfaceIndexOrZero (0..65535)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION
@@ -2745,7 +2745,7 @@ FutOspfVirtNbrEntry ::=
    
    FutOspfIfAuthEntry ::= SEQUENCE {
        futOspfIfAuthIpAddress         IpAddress,
-       futOspfIfAuthAddressLessIf     InterfaceIndex,
+       futOspfIfAuthAddressLessIf     InterfaceIndexOrZero,
        futOspfIfAuthKeyId             Integer32,
        futOspfIfAuthKey               OCTET STRING,
        futOspfIfAuthKeyStartAccept    DateAndTime,
@@ -2764,7 +2764,7 @@ FutOspfVirtNbrEntry ::=
        ::=  { futOspfIfAuthEntry 1 }
    
    futOspfIfAuthAddressLessIf OBJECT-TYPE
-       SYNTAX      InterfaceIndex (0..65535)
+       SYNTAX      InterfaceIndexOrZero (0..65535)
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION

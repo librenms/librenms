@@ -20,7 +20,7 @@
       LldpV2PortId, LldpV2ChassisIdSubtype, LldpV2ChassisId, LldpV2DestAddressTableIndex
           FROM LLDP-V2-TC-MIB 
       LldpXMedDeviceClass, LldpXMedCapabilities, PolicyAppType, LocationSubtype, lldpXMedLocLocationEntry,
-      lldpXMedRemLocationSubtype FROM LLDP-EXT-MED-MIB;
+      lldpXMedRemLocationSubtype FROM LLDP-EXT-MED-CAMBIUM-MIB;
 
 fsLldpMed MODULE-IDENTITY
          LAST-UPDATED "201506230000Z"

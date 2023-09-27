@@ -1,8 +1,8 @@
 modules:
     os:
-        hardware: LLDP-EXT-MED-MIB::lldpXMedLocModelName.0
-        version: LLDP-EXT-MED-MIB::lldpXMedLocSoftwareRev.0
-        serial: LLDP-EXT-MED-MIB::lldpXMedLocSerialNum.0
+        hardware: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocModelName.0
+        version: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocSoftwareRev.0
+        serial: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocSerialNum.0
     processors:
         data:
             -
