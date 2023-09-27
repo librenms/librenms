@@ -170,13 +170,13 @@ class AlertUtil
     {
         return User::whereNot('email', '')->where(function (Builder $query) use ($results) {
             if ($device_ids = array_filter(Arr::pluck($results, 'device_id'))) {
-                $query->orWhereHas('devicesOwned', fn($q) => $q->whereIn('devices_perms.device_id', $device_ids));
+                $query->orWhereHas('devicesOwned', fn ($q) => $q->whereIn('devices_perms.device_id', $device_ids));
             }
             if ($port_ids = array_filter(Arr::pluck($results, 'port_id'))) {
-                $query->orWhereHas('portsOwned', fn($q) => $q->whereIn('ports_perms.port_id', $port_ids));
+                $query->orWhereHas('portsOwned', fn ($q) => $q->whereIn('ports_perms.port_id', $port_ids));
             }
             if ($bill_ids = array_filter(Arr::pluck($results, 'bill_id'))) {
-                $query->orWhereHas('bills', fn($q) => $q->whereIn('bill_perms.bill_id', $bill_ids));
+                $query->orWhereHas('bills', fn ($q) => $q->whereIn('bill_perms.bill_id', $bill_ids));
             }
         })->pluck('realname', 'email')->all();
     }
