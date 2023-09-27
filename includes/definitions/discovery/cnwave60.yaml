@@ -1,0 +1,45 @@
+mib: TERRAGRAPH-RADIO-MIB
+modules:
+  os:
+    sysDescr_regex: '/^Cambium cnWave (?<hardware>.*) (?:Client|Distribution) Node, Version (?<version>.*)$/'
+  sensors:
+    dbm:
+      data:
+        -
+          oid: tgRadioInterfacesTable
+          value: rssi
+          num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.7.{{ $index }}'
+          descr: '{{ $ifName }} RSSI'
+          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          index: 'rssi.{{ $index }}'
+        -
+          oid: tgRadioInterfacesTable
+          value: snr
+          num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.6.{{ $index }}'
+          descr: '{{ $ifName }} SNR'
+          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          index: 'snr.{{ $index }}'
+    state:
+      data:
+        - 
+          oid: tgRadioInterfacesTable
+          value: mcs
+          num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.5.{{ $index }}'
+          descr: '{{ $ifName }} MCS'
+          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          index: 'mcs.{{ $index }}'
+          states:
+            - { value: 0, descr: mcs0, graph: 1, generic: 1 }
+            - { value: 1, descr: mcs1, graph: 1, generic: 1 }
+            - { value: 2, descr: mcs2, graph: 1, generic: 1 }
+            - { value: 3, descr: mcs3, graph: 1, generic: 1 }
+            - { value: 4, descr: mcs4, graph: 1, generic: 2 }
+            - { value: 5, descr: mcs5, graph: 1, generic: 2 }
+            - { value: 6, descr: mcs6, graph: 1, generic: 2 }
+            - { value: 7, descr: mcs7, graph: 1, generic: 2 }
+            - { value: 8, descr: mcs8, graph: 1, generic: 0 }
+            - { value: 9, descr: mcs9, graph: 1, generic: 0 }
+            - { value: 10, descr: mcs10, graph: 1, generic: 0 }
+            - { value: 11, descr: mcs10, graph: 1, generic: 0 }
+            - { value: 12, descr: mcs12, graph: 1, generic: 0 }
+            - { value: 13, descr: mcs13, graph: 1, generic: 0 }
