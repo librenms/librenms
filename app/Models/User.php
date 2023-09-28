@@ -228,12 +228,22 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
+    public function bills(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Bill::class, 'bill_perms', 'user_id', 'bill_id');
+    }
+
     public function devices()
     {
         // pseudo relation
         return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
             return $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this));
         });
+    }
+
+    public function devicesOwned(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
     public function deviceGroups(): BelongsToMany
@@ -247,8 +257,13 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
+            return $this->portsOwned();
         }
+    }
+
+    public function portsOwned(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
     public function dashboards(): HasMany
