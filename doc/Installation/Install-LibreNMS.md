@@ -101,7 +101,7 @@ su - librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
-Sometime when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
+Sometimes when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
 ```
 wget https://getcomposer.org/composer-stable.phar
 mv composer-stable.phar /usr/bin/composer

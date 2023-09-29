@@ -402,7 +402,9 @@ if (Config::get('enable_ports_poe')) {
 
         foreach ($port_stats_poe as $p_index => $p_stats) {
             $if_id = $port_ent_to_if[$p_index];
-            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            if (is_array($port_stats[$if_id])) {
+                $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            }
         }
     }
 }

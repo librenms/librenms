@@ -10,10 +10,18 @@ should show that we take things seriously.
 As with any system of this nature, we highly recommend that you
 restrict access to the install via a firewall or VPN.
 
+Please ensure you keep your install [up to date](Updating.md).
+
+### Enable HTTPS
+
 It is also highly recommended that the Web interface is protected with
 an SSL certificate such as ones provided by [LetsEncrypt](http://www.letsencrypt.org).
 
-Please ensure you keep your install [up to date](Updating.md).
+### Secure Session Cookies
+
+Once you have enabled HTTPS for your install, you should set `SESSION_SECURE_COOKIE=true`
+in your .env file.  This will require cookies to be transferred by secure protocol and
+prevent any MiM attacks against it.
 
 ### Trusted Proxies
 

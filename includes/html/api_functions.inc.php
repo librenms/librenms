@@ -1083,7 +1083,7 @@ function get_port_info(Illuminate\Http\Request $request)
  */
 function search_ports(Illuminate\Http\Request $request): JsonResponse
 {
-    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName']);
+    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName', 'ifAlias']);
     $field = $request->route('field');
     $search = $request->route('search');
 
