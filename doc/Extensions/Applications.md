@@ -954,9 +954,9 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools and the required Perl
-modules. Under Ubuntu/Debian just run `apt install dhcpd-pools
+modules. Under Ubuntu/Debian just run `apt install
 cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64` or under FreeBSD
-`pkg install dhcpd-pools p5-JSON p5-MIME-Base64 p5-App-cpanminus ; cpanm Net::ISC::DHCPd::Leases`.
+`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus ; cpanm Net::ISC::DHCPd::Leases`.
 
 ### SNMP Extend
 
@@ -967,16 +967,10 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp -O /etc/snm
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/dhcp.py
+chmod +x /etc/snmp/dhcp
 ```
 
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
-```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
-```
-Key 'leasefile' specifies the path to your lease file.
-
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend dhcpstats /etc/snmp/dhcp
 ```
@@ -985,7 +979,8 @@ The following options are also supported.
 
 | Option     | Description                     |
 |------------|---------------------------------|
-| `-l $file` | Path to lease file              |
+| `-c $file` | Path to dhcpd.conf.             |
+| `-l $file` | Path to lease file.             |
 | `-Z`       | Enable GZip+Base64 compression. |
 | `-d`       | Do not de-dup.                  |
 
