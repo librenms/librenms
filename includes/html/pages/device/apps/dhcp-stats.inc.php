@@ -10,7 +10,7 @@ $link_array = [
 print_optionbar_start();
 
 echo generate_link('General', $link_array);
-echo ' | ' . generate_link('Pools & Subnets', $link_array, ['app_page'=>'pools']);
+echo ' | ' . generate_link('Pools', $link_array, ['app_page'=>'pools']);
 echo ' | ' . generate_link('Leases', $link_array, ['app_page'=>'leases']);
 
 print_optionbar_end();
@@ -32,6 +32,7 @@ if (!isset($vars['app_page'])) {
     echo '<center><b>Pools</b></center>';
     $pool_table = [
         'headers' => [
+            'CIDR',
             'First IP',
             'Last IP',
             'Max',
@@ -42,6 +43,7 @@ if (!isset($vars['app_page'])) {
     ];
     foreach ($pools as $key => $pool) {
         $pool_table['rows'][$key]=[
+            $pool['cidr'],
             $pool['first_ip'],
             $pool['last_ip'],
             $pool['max'],
@@ -52,15 +54,47 @@ if (!isset($vars['app_page'])) {
     echo render_table($pool_table);
     print_optionbar_end();
 
+    print_optionbar_start();
+    echo '<center><b>Subnets Details</b></center>';
+    print_optionbar_start();
+    $pool_detail_table=[
+        'headers'=>[
+            'Key',
+            'Value',
+        ]
+    ];
+    foreach ($pools as $pool_key => $pool) {
+        // re-init the pool tail rows
+        unset($pool_detail_table['rows']);
+        $pool_detail_table['rows']=[];
+        echo '<center><b>'.$pool['cidr'].', '.$pool['first_ip'].'-'.$pool['last_ip'].'</b></center>';
+        $option_row_int=0;
+        unset($pool['cur']);
+        unset($pool['max']);
+        unset($pool['percent']);
+        foreach ($pool as $pool_option => $option_value) {
+            $pool_detail_table['rows'][$option_row_int]=[
+                $pool_option,
+                $option_value
+            ];
+            $option_row_int++;
+        }
+        echo render_table($pool_detail_table);
+    }
+    print_optionbar_end();
+    print_optionbar_end();
+
+
     $subnets = $app->data['networks'] ?? [];
     print_optionbar_start();
-    echo '<center><b>Subnets</b></center>';
+    echo '<center><b>Networks</b></center>';
     $subnets_table = [
         'headers' => [
-            'Subnet',
+            'Name',
             'Max',
             'In Use',
             'Use%',
+            'Pools',
         ],
         'rows' => [],
     ];
@@ -70,6 +104,7 @@ if (!isset($vars['app_page'])) {
             $subnet['max'],
             $subnet['cur'],
             $subnet['percent'],
+            json_encode($subnet['pools']),
         ];
     }
     echo render_table($subnets_table);
