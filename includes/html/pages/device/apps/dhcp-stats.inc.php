@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Port;
+
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -124,6 +126,20 @@ if (!isset($vars['app_page'])) {
         'rows' => [],
     ];
     foreach ($leases as $key => $lease) {
+        // look and see if we know what that mac belongs to and if so create a link for the device and port
+        $mac=$lease['hw_address'];
+        $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
+        if (isset($port)) {
+            $mac= $mac.' ('.
+                generate_device_link(['device_id'=>$port->device_id]).', '.
+                generate_port_link([
+                    'label' => $port->label,
+                    'port_id' => $port->port_id,
+                    'ifName' => $port->ifName,
+                    'device_id' => $port->device_id,
+            ]).')';
+        }
+
         if ($lease['client_hostname'] != '') {
             $lease['client_hostname'] = base64_decode($lease['client_hostname']);
         }
@@ -133,9 +149,9 @@ if (!isset($vars['app_page'])) {
         $table_info['rows'][$key]=[
             $lease['ip'],
             $lease['state'],
-            $lease['hw_address'],
-            $lease['starts'],
-            $lease['ends'],
+            $mac,
+            strftime('%FT%TZ', $lease['starts']),
+            strftime('%FT%TZ', $lease['ends']),
             $lease['client_hostname'],
             $lease['vendor_class_identifier'],
         ];
