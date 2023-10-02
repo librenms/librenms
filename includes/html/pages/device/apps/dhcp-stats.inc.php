@@ -66,11 +66,14 @@ if (!isset($vars['app_page'])) {
         ]
     ];
     foreach ($pools as $pool_key => $pool) {
-        // re-init the pool tail rows
+        // re-init the rows the pools detail table
         unset($pool_detail_table['rows']);
         $pool_detail_table['rows']=[];
+        // display it this way as a CIDR may have more than one pool defined for it
+        // especially true if both IPv4 and IPv6 are in use
         echo '<center><b>'.$pool['cidr'].', '.$pool['first_ip'].'-'.$pool['last_ip'].'</b></center>';
         $option_row_int=0;
+        // remove these as they are stats and no options related info for the subnet
         unset($pool['cur']);
         unset($pool['max']);
         unset($pool['percent']);
@@ -85,7 +88,6 @@ if (!isset($vars['app_page'])) {
     }
     print_optionbar_end();
     print_optionbar_end();
-
 
     $subnets = $app->data['networks'] ?? [];
     print_optionbar_start();
@@ -150,6 +152,7 @@ if (!isset($vars['app_page'])) {
             $lease['ip'],
             $lease['state'],
             $mac,
+            // display the time as UTC as that keeps things most simple
             strftime('%FT%TZ', $lease['starts']),
             strftime('%FT%TZ', $lease['ends']),
             $lease['client_hostname'],
