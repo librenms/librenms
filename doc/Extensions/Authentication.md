@@ -305,6 +305,9 @@ can be assigned a specially formatted string to assign a single role to the user
 
 The string to send in `Filter-ID` reply attribute must start with `librenms_role_` followed by the role name.
 For example to set the admin role send `librenms_role_admin`
+- `librenms_role_normal` - Sets the normal user level.
+- `librenms_role_admin` - Sets the administrator level.
+- `librenms_role_global-read` - Sets the global read level
 
 LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
 role that is set in your config.
