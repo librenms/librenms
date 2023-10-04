@@ -539,7 +539,11 @@ class PollerQueueManager(QueueManager):
         if self.lock(device_id, timeout=self.config.poller.frequency):
             logger.info("Polling device {}".format(device_id))
 
-            args = ("device:poll", device_id, "-vv") if self.config.debug else ("device:poll", device_id, "-q")
+            args = (
+                ("device:poll", device_id, "-vv")
+                if self.config.debug
+                else ("device:poll", device_id, "-q")
+            )
             exit_code, output = LibreNMS.call_script("lnms", args)
 
             if self.config.log_output:
