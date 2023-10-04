@@ -24,10 +24,12 @@ use App\Models\Device;
 use App\Models\Sla;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\Datastore;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 class Slas implements Module
 {
@@ -39,6 +41,11 @@ class Slas implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof SlaDiscovery;
     }
 
     /**
@@ -56,6 +63,11 @@ class Slas implements Module
         }
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof SlaPolling;
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -63,7 +75,7 @@ class Slas implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, Datastore $datastore): void
     {
         if ($os instanceof SlaPolling) {
             // Gather our SLA's from the DB.

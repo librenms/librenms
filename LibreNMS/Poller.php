@@ -41,7 +41,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -94,15 +93,15 @@ class Poller
             PollingDevice::dispatch($this->device);
             $this->os = OS::make($this->deviceArray);
 
-            $helper = new ConnectivityHelper($this->device);
-            $helper->saveMetrics();
-
             $measurement = Measurement::start('poll');
             $measurement->manager()->checkpoint(); // don't count previous stats
 
-            if ($helper->isUp()) {
-                $this->pollModules();
-            }
+            $helper = new ConnectivityHelper($this->device);
+            $helper->saveMetrics();
+            $helper->isUp(); // check and save status
+
+            $this->pollModules();
+
             $measurement->end();
 
             if (empty($this->module_override)) {
@@ -163,8 +162,6 @@ class Poller
 
     private function pollModules(): void
     {
-        $this->filterModules();
-
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
@@ -174,24 +171,33 @@ class Poller
         include_once base_path('includes/common.php');
         include_once base_path('includes/polling/functions.inc.php');
         include_once base_path('includes/snmp.inc.php');
-        include_once base_path('includes/datastore.inc.php');  // remove me
 
-        foreach (Config::get('poller_modules') as $module => $module_status) {
-            if ($this->isModuleEnabled($module, $module_status)) {
-                $start_memory = memory_get_usage();
-                $module_start = microtime(true);
-                $this->logger->info("\n#### Load poller module $module ####");
+        $datastore = app('Datastore');
 
-                try {
-                    $instance = Module::fromName($module);
-                    $instance->poll($this->os);
-                } catch (Throwable $e) {
-                    // isolate module exceptions so they don't disrupt the polling process
-                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
-                    report($e);
+        foreach (array_keys(Config::get('poller_modules')) as $module) {
+            $module_status = Module::status($module, $this->device, $this->isModuleManuallyEnabled($module));
+            $should_poll = false;
+
+            try {
+                $instance = Module::fromName($module);
+                $should_poll = $instance->shouldPoll($this->os, $module_status);
+
+                if ($should_poll) {
+                    $start_memory = memory_get_usage();
+                    $module_start = microtime(true);
+                    $this->logger->info("\n#### Load poller module $module ####");
+                    $this->logger->debug($module_status);
+
+                    $instance->poll($this->os, $datastore);
                 }
+            } catch (Throwable $e) {
+                // isolate module exceptions so they don't disrupt the polling process
+                $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
+                \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
+                report($e);
+            }
 
+            if ($should_poll) {
                 app(MeasurementManager::class)->printChangedStats();
                 $this->saveModulePerformance($module, $module_start, $start_memory);
                 $this->logger->info("#### Unload poller module $module ####\n");
@@ -216,43 +222,9 @@ class Poller
         $this->os->enableGraph('poller_modules_perf');
     }
 
-    private function isModuleEnabled(string $module, bool $global_status): bool
+    private function isModuleManuallyEnabled(string $module): ?bool
     {
-        if (! empty($this->module_override)) {
-            if (in_array($module, $this->module_override)) {
-                $this->logger->debug("Module $module manually enabled");
-
-                return true;
-            }
-
-            return false;
-        }
-
-        $os_module_status = Config::get("os.{$this->device->os}.poller_modules.$module");
-        $device_attrib = $this->device->getAttrib('poll_' . $module);
-        $this->logger->debug(sprintf('Modules status: Global %s OS %s Device %s',
-            $global_status ? '+' : '-',
-            $os_module_status === null ? ' ' : ($os_module_status ? '+' : '-'),
-            $device_attrib === null ? ' ' : ($device_attrib ? '+' : '-')
-        ));
-
-        if ($device_attrib
-            || ($os_module_status && $device_attrib === null)
-            || ($global_status && $os_module_status === null && $device_attrib === null)) {
-            return true;
-        }
-
-        $reason = $device_attrib !== null ? 'by device'
-                : ($os_module_status === null || $os_module_status ? 'globally' : 'by OS');
-        $this->logger->debug("Module [ $module ] disabled $reason");
-
-        return false;
-    }
-
-    private function moduleExists(string $module): bool
-    {
-        return class_exists(StringHelpers::toClass($module, '\\LibreNMS\\Modules\\'))
-            || is_file("includes/polling/$module.inc.php");
+        return empty($this->module_override) ? null : in_array($module, $this->module_override);
     }
 
     private function buildDeviceQuery(): Builder
@@ -313,7 +285,7 @@ class Poller
                 Config::set("poller_submodules.$module", $existing_submodules);
             }
 
-            if (! $this->moduleExists($module)) {
+            if (! Module::exists($module)) {
                 unset($this->module_override[$index]);
                 continue;
             }
@@ -322,21 +294,6 @@ class Poller
         }
 
         $this->printModules();
-    }
-
-    private function filterModules(): void
-    {
-        if ($this->device->snmp_disable) {
-            // only non-snmp modules
-            Config::set('poller_modules', array_intersect_key(Config::get('poller_modules'), [
-                'availability' => true,
-                'ipmi' => true,
-                'unix-agent' => true,
-            ]));
-        } else {
-            // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
-        }
     }
 
     private function printDeviceInfo(?string $group): void

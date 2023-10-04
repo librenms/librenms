@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Util;
 
+use App\Models\Device;
+use LibreNMS\Config;
 use LibreNMS\Modules\LegacyModule;
+use LibreNMS\Polling\ModuleStatus;
 
 class Module
 {
@@ -34,5 +37,21 @@ class Module
         $module_class = StringHelpers::toClass($name, '\\LibreNMS\\Modules\\');
 
         return class_exists($module_class) ? new $module_class : new LegacyModule($name);
+    }
+
+    public static function status(string $name, Device $device, ?bool $manual = null): ModuleStatus
+    {
+        return new ModuleStatus(
+            Config::get('poller_modules.' . $name),
+            Config::get("os.{$device->os}.poller_modules.$name"),
+            $device->getAttrib('poll_' . $name),
+            $manual,
+        );
+    }
+
+    public static function exists(string $module): bool
+    {
+        return class_exists(StringHelpers::toClass($module, '\\LibreNMS\\Modules\\'))
+            || is_file(base_path("includes/polling/$module.inc.php"));
     }
 }

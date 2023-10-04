@@ -129,7 +129,6 @@ function discover_device(&$device, $force_module = false)
     }
 
     $discovery_devices = Config::get('discovery_modules', []);
-    $discovery_devices = ['core' => true] + $discovery_devices;
 
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
