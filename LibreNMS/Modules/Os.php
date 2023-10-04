@@ -75,7 +75,7 @@ class Os implements Module
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
-            $os->pollOS();
+            $os->pollOS($datastore);
         } else {
             // legacy poller files
             global $graphs, $device;

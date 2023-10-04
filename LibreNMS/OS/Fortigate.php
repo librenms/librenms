@@ -45,7 +45,7 @@ class Fortigate extends Fortinet implements
         $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $sessions = snmp_get($this->getDeviceArray(), 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
         if (is_numeric($sessions)) {
@@ -57,7 +57,7 @@ class Fortigate extends Fortinet implements
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDeviceArray(), 'fortigate_sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'fortigate_sessions', $tags, $fields);
             $this->enableGraph('fortigate_sessions');
         }
 
@@ -71,7 +71,7 @@ class Fortigate extends Fortinet implements
             ];
 
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDeviceArray(), 'fortigate_cpu', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'fortigate_cpu', $tags, $fields);
             $this->enableGraph('fortigate_cpu');
         }
     }

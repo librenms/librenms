@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\RRD\RrdDefinition;
 
 class Slas implements Module
 {
@@ -86,6 +87,17 @@ class Slas implements Module
                 // We have SLA's, lets go!!!
                 $os->pollSlas($slas);
                 $os->getDevice()->slas()->saveMany($slas);
+
+                // The base RRD
+                foreach ($slas as $sla) {
+                    $datastore->put($device, 'sla', [
+                        'sla_nr' => $sla->sla_nr,
+                        'rrd_name' => ['sla', $sla->sla_nr],
+                        'rrd_def' => RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000),
+                    ], [
+                        'rtt' => $sla->rtt,
+                    ]);
+                }
             }
         }
     }

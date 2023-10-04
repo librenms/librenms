@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -37,7 +38,7 @@ class Rutos2xx extends OS implements
     WirelessSnrDiscovery,
     WirelessRssiDiscovery
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Mobile Data Usage
         $usage = snmp_get_multi_oid($this->getDeviceArray(), [
@@ -59,7 +60,7 @@ class Rutos2xx extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
             $this->enableGraph('rutos_2xx_mobileDataUsage');
         }
     }

@@ -28,6 +28,7 @@ namespace LibreNMS;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
@@ -268,9 +269,14 @@ class Poller
     private function initRrdDirectory(): void
     {
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
-        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
-            mkdir($host_rrd);
-            $this->logger->info("Created directory : $host_rrd");
+        if (Config::get('rrd.enable', true) && ! Config::get('rrdcached') && ! is_dir($host_rrd)) {
+            try {
+                mkdir($host_rrd);
+                $this->logger->info("Created directory : $host_rrd");
+            } catch (\ErrorException $e) {
+                Eventlog::log("Failed to create rrd directory: $host_rrd", $this->device);
+                $this->logger->error($e);
+            }
         }
     }
 
