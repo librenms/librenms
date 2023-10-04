@@ -565,7 +565,7 @@ class Vrp extends OS implements
                     break;
             }
 
-            d_echo('The following datasources were collected for #' . $sla->sla_nr. ":\n");
+            d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
             d_echo($collected);
         }
     }
