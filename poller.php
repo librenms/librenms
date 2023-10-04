@@ -23,7 +23,6 @@
  * Modified 4/17/19
  * @author Heath Barnhart <hbarnhart@kanren.net>
  */
-
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
@@ -51,7 +50,7 @@ if (empty($options['h'])) {
 
 $arguments = [
     'device spec' => $options['h'],
-    '--verbose' => isset($options['v']) ? 3 : (isset($options['d']) ? 2 : 1)
+    '--verbose' => isset($options['v']) ? 3 : (isset($options['d']) ? 2 : 1),
 ];
 
 if (isset($options['m'])) {
