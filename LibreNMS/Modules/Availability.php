@@ -105,7 +105,7 @@ class Availability implements Module
      */
     public function cleanup(Device $device): void
     {
-        $os->getDevice()->availability()->delete();
+        $device->availability()->delete();
     }
 
     /**

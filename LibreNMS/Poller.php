@@ -178,15 +178,15 @@ class Poller
         foreach (array_keys(Config::get('poller_modules')) as $module) {
             $module_status = Module::status($module, $this->device, $this->isModuleManuallyEnabled($module));
             $should_poll = false;
+            $start_memory = memory_get_usage();
+            $module_start = microtime(true);
 
             try {
                 $instance = Module::fromName($module);
                 $should_poll = $instance->shouldPoll($this->os, $module_status);
 
                 if ($should_poll) {
-                    $start_memory = memory_get_usage();
-                    $module_start = microtime(true);
-                    $this->logger->info("\n#### Load poller module $module ####");
+                    $this->logger->info("#### Load poller module $module ####\n");
                     $this->logger->debug($module_status);
 
                     $instance->poll($this->os, $datastore);
@@ -199,6 +199,7 @@ class Poller
             }
 
             if ($should_poll) {
+                $this->logger->info('');
                 app(MeasurementManager::class)->printChangedStats();
                 $this->saveModulePerformance($module, $module_start, $start_memory);
                 $this->logger->info("#### Unload poller module $module ####\n");

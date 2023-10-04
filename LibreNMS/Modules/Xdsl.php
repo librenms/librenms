@@ -70,9 +70,9 @@ class Xdsl implements Module
      */
     public function discover(OS $os): void
     {
-        //discover if any port has dsl data. We use the pollXdsl functions, with the store parameter set to false
-        $this->pollAdsl($os, false);
-        $this->pollVdsl($os, false);
+        //discover if any port has dsl data. We use the pollXdsl functions, with the datastore parameter ommitted
+        $this->pollAdsl($os);
+        $this->pollVdsl($os);
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool

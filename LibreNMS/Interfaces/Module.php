@@ -61,7 +61,7 @@ interface Module
      * Run frequently (default every 5 minutes)
      *
      * @param  \LibreNMS\OS  $os
-     * @param  \LibreNMS\Interfaces\DataStorageInterface  $datastore
+     * @param  \LibreNMS\Interfaces\Data\DataStorageInterface  $datastore
      */
     public function poll(OS $os, DataStorageInterface $datastore): void;
 

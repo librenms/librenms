@@ -90,7 +90,7 @@ class Slas implements Module
 
                 // The base RRD
                 foreach ($slas as $sla) {
-                    $datastore->put($device, 'sla', [
+                    $datastore->put($os->getDeviceArray(), 'sla', [
                         'sla_nr' => $sla->sla_nr,
                         'rrd_name' => ['sla', $sla->sla_nr],
                         'rrd_def' => RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000),

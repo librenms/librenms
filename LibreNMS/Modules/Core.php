@@ -298,7 +298,7 @@ class Core implements Module
 
             $os->enableGraph('uptime');
 
-            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
+            Log::info('Uptime: ' . Time::formatInterval($uptime));
             $device->uptime = $uptime;
         }
     }

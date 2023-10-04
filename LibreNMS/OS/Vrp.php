@@ -542,15 +542,7 @@ class Vrp extends OS implements
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            $datastore->put($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -568,13 +560,13 @@ class Vrp extends OS implements
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    $datastore->put($device, 'sla', $tags, $icmp);
-                    $fields = array_merge($fields, $icmp);
+                    app('Datastore')->put($device, 'sla', $tags, $icmp);
+                    $collected = array_merge($collected, $icmp);
                     break;
             }
 
-            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo('The following datasources were collected for #' . $sla->sla_nr. ":\n");
+            d_echo($collected);
         }
     }
 }
