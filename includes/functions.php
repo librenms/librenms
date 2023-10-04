@@ -24,7 +24,6 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
 
-
 /**
  * Parse cli discovery or poller modules and set config for this run
  *

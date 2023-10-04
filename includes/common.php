@@ -445,7 +445,6 @@ function is_customoid_graph($type, $subtype)
     return false;
 } // is_customoid_graph
 
-
 function search_phrase_column($c)
 {
     global $searchPhrase;
