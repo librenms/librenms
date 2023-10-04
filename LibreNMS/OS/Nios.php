@@ -25,12 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Nios extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         //#############
         // Create ddns update rrd
@@ -59,7 +60,7 @@ class Nios extends \LibreNMS\OS implements OSPolling
         ];
 
         $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), 'ib_dns_dyn_updates', $tags, $fields);
+        $datastore->put($this->getDeviceArray(), 'ib_dns_dyn_updates', $tags, $fields);
         $this->enableGraph('ib_dns_dyn_updates');
 
         //#################
@@ -83,7 +84,7 @@ class Nios extends \LibreNMS\OS implements OSPolling
         ];
 
         $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), 'ib_dns_performance', $tags, $fields);
+        $datastore->put($this->getDeviceArray(), 'ib_dns_performance', $tags, $fields);
         $this->enableGraph('ib_dns_performance');
 
         //#################
@@ -113,7 +114,7 @@ class Nios extends \LibreNMS\OS implements OSPolling
         ];
 
         $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), 'ib_dns_request_return_codes', $tags, $fields);
+        $datastore->put($this->getDeviceArray(), 'ib_dns_request_return_codes', $tags, $fields);
         $this->enableGraph('ib_dns_request_return_codes');
 
         //#################
@@ -158,7 +159,7 @@ class Nios extends \LibreNMS\OS implements OSPolling
         ];
 
         $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), 'ib_dhcp_messages', $tags, $fields);
+        $datastore->put($this->getDeviceArray(), 'ib_dhcp_messages', $tags, $fields);
         $this->enableGraph('ib_dhcp_messages');
     }
 }
