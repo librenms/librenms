@@ -33,6 +33,7 @@ use LibreNMS\Util\UserFuncHelper;
  * @param  string  $method  name of process discoverying this device
  * @param  array|null  $interface  Interface this device was discovered on
  * @return false|int
+ *
  * @throws InvalidIpException
  */
 function discover_new_device($hostname, $device, $method, $interface = null)
