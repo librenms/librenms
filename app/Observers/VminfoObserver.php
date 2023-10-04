@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Eventlog;
 use App\Models\Vminfo;
+use LibreNMS\Enum\Severity;
 
 class VminfoObserver
 {
@@ -15,7 +16,7 @@ class VminfoObserver
      */
     public function created(Vminfo $vminfo)
     {
-        Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', 3, $vminfo->vmwVmVMID);
+        Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
     }
 
     /**
@@ -39,7 +40,7 @@ class VminfoObserver
      */
     public function deleted(Vminfo $vminfo)
     {
-        Eventlog::log('Virtual Machine removed: ' . $vminfo->vmwVmDisplayName, $vminfo->device_id, 'vm', 4, $vminfo->vmwVmVMID);
+        Eventlog::log('Virtual Machine removed: ' . $vminfo->vmwVmDisplayName, $vminfo->device_id, 'vm', Severity::Warning, $vminfo->vmwVmVMID);
     }
 
     /**
