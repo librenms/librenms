@@ -93,7 +93,7 @@ class Availability implements Module
 
             // output info
             $human_duration = Time::formatInterval($duration, parts: 1);
-            echo str_pad($human_duration, 7) . ' : ' . $avail->availability_perc . '%' . PHP_EOL;
+            \Log::info(str_pad($human_duration, 7) . ' : ' . $avail->availability_perc . '%');
         }
 
         // cleanup
