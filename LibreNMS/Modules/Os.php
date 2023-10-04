@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Location;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
@@ -71,11 +72,11 @@ class Os implements Module
 
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
-                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', 5);
+                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', Severity::Error);
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
             } elseif (! empty($device['os_group']) && is_file(base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php'))) {
                 // OS Group Specific
-                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', 5);
+                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', Severity::Error);
                 include base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php');
             }
 
