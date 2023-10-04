@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
@@ -40,7 +41,7 @@ class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
         }
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // TODO move to count sensor
         $sessions = snmp_get($this->getDeviceArray(), 'firewallSessions64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
@@ -50,7 +51,7 @@ class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
             $fields = ['fw_sessions' => $sessions];
 
             $tags = compact('rrd_def');
-            app('Datastore')->put($this->getDeviceArray(), 'barracuda_firewall_sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'barracuda_firewall_sessions', $tags, $fields);
             $this->enableGraph('barracuda_firewall_sessions');
         }
     }

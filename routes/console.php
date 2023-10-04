@@ -86,28 +86,6 @@ Artisan::command('poller:discovery
     (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Discover information about existing devices, defines what will be polled'));
 
-Artisan::command('poller:poll
-    {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, odd, even, all') . '}
-    {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-    {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
-', function () {
-    $command = [base_path('poller.php'), '-h', $this->argument('device spec')];
-    if ($this->option('no-data')) {
-        array_push($command, '-r', '-f', '-p');
-    }
-    if ($this->option('modules')) {
-        $command[] = '-m';
-        $command[] = $this->option('modules');
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Poll data from devices as defined by discovery'));
-
 Artisan::command('poller:alerts', function () {
     $command = [base_path('alerts.php')];
     if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {

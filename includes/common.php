@@ -168,21 +168,11 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
 
-function table_from_entity_type($type)
-{
-    // Fuck you, english pluralisation.
-    if ($type == 'storage') {
-        return $type;
-    } else {
-        return $type . 's';
-    }
-}
-
 function get_entity_by_id_cache($type, $id)
 {
     global $entity_cache;
 
-    $table = table_from_entity_type($type);
+    $table = $type == 'storage' ? $type : $type . 's';
 
     if (is_array($entity_cache[$type][$id])) {
         $entity = $entity_cache[$type][$id];
@@ -200,18 +190,6 @@ function get_port_by_id($port_id)
         $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
         if (is_array($port)) {
             return $port;
-        } else {
-            return false;
-        }
-    }
-}
-
-function get_sensor_by_id($sensor_id)
-{
-    if (is_numeric($sensor_id)) {
-        $sensor = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
-        if (is_array($sensor)) {
-            return $sensor;
         } else {
             return false;
         }
@@ -297,24 +275,9 @@ function strgen($length = 16)
     return $string;
 }
 
-function getpeerhost($id)
-{
-    return dbFetchCell('SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = ?', [$id]);
-}
-
-function getifindexbyid($id)
-{
-    return dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?', [$id]);
-}
-
 function getifbyid($id)
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
-}
-
-function getifdescrbyid($id)
-{
-    return dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getidbyname($hostname)
@@ -449,13 +412,6 @@ function get_graph_subtypes($type, $device = null)
     return $types;
 } // get_graph_subtypes
 
-function get_smokeping_files($device)
-{
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
-
-    return $smokeping->findFiles();
-}
-
 function generate_smokeping_file($device, $file = '')
 {
     $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
@@ -488,26 +444,6 @@ function is_customoid_graph($type, $subtype)
 
     return false;
 } // is_customoid_graph
-
-//
-// maintain a simple cache of objects
-//
-
-function object_add_cache($section, $obj)
-{
-    global $object_cache;
-    $object_cache[$section][$obj] = true;
-} // object_add_cache
-
-function object_is_cached($section, $obj)
-{
-    global $object_cache;
-    if (is_array($object_cache) && array_key_exists($obj, $object_cache)) {
-        return $object_cache[$section][$obj];
-    } else {
-        return false;
-    }
-} // object_is_cached
 
 function search_phrase_column($c)
 {
@@ -876,19 +812,6 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
-}
-
-/**
- * Generate a class name from a lowercase string containing - or _
- * Remove - and _ and camel case words
- *
- * @param  string  $name  The string to convert to a class name
- * @param  string  $namespace  namespace to prepend to the name for example: LibreNMS\
- * @return string Class name
- */
-function str_to_class($name, $namespace = null)
-{
-    return \LibreNMS\Util\StringHelpers::toClass($name, $namespace);
 }
 
 /**

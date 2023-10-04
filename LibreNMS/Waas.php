@@ -25,17 +25,18 @@
 
 namespace LibreNMS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Waas extends OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $connections = \SnmpQuery::get('CISCO-WAN-OPTIMIZATION-MIB::cwoTfoStatsActiveOptConn.0')->value();
 
         if (is_numeric($connections)) {
-            data_update($this->getDeviceArray(), 'waas_cwotfostatsactiveoptconn', [
+            $datastore->put($this->getDeviceArray(), 'waas_cwotfostatsactiveoptconn', [
                 'rrd_def' => RrdDefinition::make()->addDataset('connections', 'GAUGE', 0),
             ], [
                 'connections' => $connections,

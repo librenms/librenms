@@ -28,8 +28,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -43,6 +45,11 @@ class PrinterSupplies implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
     /**
@@ -63,6 +70,11 @@ class PrinterSupplies implements Module
         $this->syncModels($os->getDevice(), 'printerSupplies', $data);
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -70,10 +82,14 @@ class PrinterSupplies implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies;
+
+        if (empty($toner_data)) {
+            return; // no data to poll
+        }
 
         $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
 
@@ -90,7 +106,7 @@ class PrinterSupplies implements Module
                 'rrd_oldname' => ['toner', $toner['supply_descr']],
                 'index'       => $toner['supply_index'],
             ];
-            data_update($device, 'toner', $tags, $tonerperc);
+            $datastore->put($device, 'toner', $tags, $tonerperc);
 
             // Log empty supplies (but only once)
             if ($tonerperc == 0 && $toner['supply_current'] > 0) {

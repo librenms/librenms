@@ -720,7 +720,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'rrd_def' => $rrd_def,
             ];
 
-            data_update($this->getDeviceArray(), 'sap', $tags, $fields);
+            app('Datastore')->put($this->getDeviceArray(), 'sap', $tags, $fields);
             $this->enableGraph('sap');
         }
 
