@@ -29,8 +29,10 @@ use App\Models\Device;
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 class Stp implements Module
 {
@@ -42,6 +44,11 @@ class Stp implements Module
     public function dependencies(): array
     {
         return ['ports', 'vlans'];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
     public function discover(OS $os): void
@@ -61,7 +68,12 @@ class Stp implements Module
         echo PHP_EOL;
     }
 
-    public function poll(OS $os): void
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
 
