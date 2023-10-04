@@ -32,7 +32,8 @@ class ModuleStatus
         public ?bool $os = null,
         public ?bool $device = null,
         public ?bool $manual = null,
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {

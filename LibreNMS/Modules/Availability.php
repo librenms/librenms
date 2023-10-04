@@ -36,7 +36,6 @@ use LibreNMS\Util\Time;
 
 class Availability implements Module
 {
-
     /**
      * @inheritDoc
      */
@@ -87,7 +86,7 @@ class Availability implements Module
             $datastore->put($os->getDeviceArray(), 'availability', [
                 'name' => $duration,
                 'rrd_def' => RrdDefinition::make()->addDataset('availability', 'GAUGE', 0, 100),
-                'rrd_name' => ['availability', $duration]
+                'rrd_name' => ['availability', $duration],
             ], [
                 'availability' => $avail,
             ]);
