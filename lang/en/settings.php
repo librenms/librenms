@@ -283,6 +283,14 @@ return [
             'description' => 'Check certificate',
             'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.',
         ],
+        'auth_ad_debug' => [
+            'description' => 'Debug',
+            'help' => 'Show detailed error messages, do not leave this enabled as it can leak data.',
+        ],
+        'auth_ad_domain' => [
+            'description' => 'Active Directory Domain',
+            'help' => 'Active Directory Domain Example: example.com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -291,6 +299,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ad_require_groupmembership' => [
+            'description' => 'Require group membership',
+            'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users',
@@ -298,10 +310,6 @@ return [
         'auth_ad_url' => [
             'description' => 'Active Directory Server(s)',
             'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
-        ],
-        'auth_ad_domain' => [
-            'description' => 'Active Directory Domain',
-            'help' => 'Active Directory Domain Example: example.com',
         ],
         'auth_ldap_attr' => [
             'uid' => [
