@@ -29,8 +29,10 @@ use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Component;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
@@ -64,12 +66,45 @@ class LegacyModule implements Module
         $this->name = $name;
     }
 
-    public function discover(OS $os): void
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        // TODO: Implement discover() method.
+        return $this->shouldPoll($os, $status);
     }
 
-    public function poll(OS $os): void
+    public function discover(OS $os): void
+    {
+        if (! is_file(base_path("includes/discovery/$this->name.inc.php"))) {
+            echo "Module $this->name does not exist, please remove it from your configuration";
+
+            return;
+        }
+
+        $device = &$os->getDeviceArray();
+        $device['attribs'] = $os->getDevice()->attribs->toArray();
+        Debug::disableErrorReporting(); // ignore errors in legacy code
+
+        include_once base_path('includes/datastore.inc.php');
+        include_once base_path('includes/dbFacile.php');
+        include base_path("includes/discovery/$this->name.inc.php");
+
+        Debug::enableErrorReporting(); // and back to normal
+    }
+
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        if (! $status->isEnabled()) {
+            return false;
+        }
+
+        if (! $os->getDevice()->status) {
+            return false;
+        }
+
+        // all legacy modules require snmp except ipmi and unix-agent
+        return ! $os->getDevice()->snmp_disable || in_array($this->name, ['ipmi', 'unix-agent']);
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if (! is_file(base_path("includes/polling/$this->name.inc.php"))) {
             echo "Module $this->name does not exist, please remove it from your configuration";
@@ -81,6 +116,7 @@ class LegacyModule implements Module
         $device['attribs'] = $os->getDevice()->attribs->toArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
+        include_once base_path('includes/datastore.inc.php');
         include_once base_path('includes/dbFacile.php');
         include base_path("includes/polling/$this->name.inc.php");
 

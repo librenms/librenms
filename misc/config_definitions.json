@@ -1080,6 +1080,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
+        },
         "discovery_modules.os": {
             "order": 230,
             "group": "discovery",
@@ -1427,12 +1434,16 @@
             "section": "availability",
             "order": 1,
             "default": [
-                "86400",
-                "604800",
-                "2592000",
-                "31536000"
+                86400,
+                604800,
+                2592000,
+                31536000
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "int"
+            }
         },
         "graphing.availability_consider_maintenance": {
             "group": "poller",
@@ -4693,6 +4704,13 @@
         },
         "plugin_dir": {
             "type": "directory"
+        },
+        "poller_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
         },
         "poller_modules.unix-agent": {
             "order": 420,

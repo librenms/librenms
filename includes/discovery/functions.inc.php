@@ -128,14 +128,13 @@ function discover_device(&$device, $force_module = false)
         return false;
     }
 
-    $discovery_devices = Config::get('discovery_modules', []);
-    $discovery_devices = ['core' => true] + $discovery_devices;
+    $discovery_modules = ['core' => true] + Config::get('discovery_modules', []);
 
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
     $measurements->checkpoint(); // don't count previous stats
 
-    foreach ($discovery_devices as $module => $module_status) {
+    foreach ($discovery_modules as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
