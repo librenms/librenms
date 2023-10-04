@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\BgpPeer;
-use App\Models\Device;
 use Carbon\Carbon;
 
 $name = 'bird2';
@@ -151,7 +150,7 @@ foreach ($protocolsData as $protocol) {
     ]);
 
     $bgpPeer->device_id = $device['device_id'];
-    $bgpPeer->astext = get_astext($protocol['neighbor_as']);
+    $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
     $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower($protocol['bgp_state']);

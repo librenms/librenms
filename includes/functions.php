@@ -24,46 +24,6 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
 
-function array_sort_by_column($array, $on, $order = SORT_ASC)
-{
-    $new_array = [];
-    $sortable_array = [];
-
-    if (count($array) > 0) {
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                foreach ($v as $k2 => $v2) {
-                    if ($k2 == $on) {
-                        $sortable_array[$k] = $v2;
-                    }
-                }
-            } else {
-                $sortable_array[$k] = $v;
-            }
-        }
-
-        switch ($order) {
-            case SORT_ASC:
-                asort($sortable_array);
-                break;
-            case SORT_DESC:
-                arsort($sortable_array);
-                break;
-        }
-
-        foreach ($sortable_array as $k => $v) {
-            $new_array[$k] = $array[$k];
-        }
-    }
-
-    return $new_array;
-}
-
-function only_alphanumeric($string)
-{
-    return preg_replace('/[^a-zA-Z0-9]/', '', $string);
-}
-
 /**
  * Parse cli discovery or poller modules and set config for this run
  *
@@ -246,7 +206,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $existing = device_has_ip($ip)) {
+    if ($force_add !== true && $existing = Device::findByIp($ip)) {
         throw new HostIpExistsException($host, $existing->hostname, $ip);
     }
 
@@ -506,11 +466,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext(string|int|null $asn): string
-{
-    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
-}
-
 /**
  * Log events to the event table
  *
@@ -528,17 +483,6 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
     }
 
     \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
-}
-
-// Parse string with emails. Return array with email (as key) and name (as value)
-function parse_email($emails)
-{
-    return \LibreNMS\Util\Mail::parseEmails($emails);
-}
-
-function send_mail($emails, $subject, $message, $html = false)
-{
-    return \LibreNMS\Util\Mail::send($emails, $subject, $message, $html);
 }
 
 function hex2str($hex)
@@ -562,28 +506,6 @@ function snmp_hexstring($hex)
 function isHexString($str)
 {
     return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($str));
-}
-
-// Include all .inc.php files in $dir
-function include_dir($dir, $regex = '')
-{
-    global $device, $valid;
-
-    if ($regex == '') {
-        $regex = "/\.inc\.php$/";
-    }
-
-    if ($handle = opendir(Config::get('install_dir') . '/' . $dir)) {
-        while (false !== ($file = readdir($handle))) {
-            if (filetype(Config::get('install_dir') . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                d_echo('Including: ' . Config::get('install_dir') . '/' . $dir . '/' . $file . "\n");
-
-                include Config::get('install_dir') . '/' . $dir . '/' . $file;
-            }
-        }
-
-        closedir($handle);
-    }
 }
 
 /**
@@ -749,29 +671,6 @@ function normalize_snmp_ip_address($data)
     return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]);
 }
 
-function guidv4($data)
-{
-    // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
-    // From: Jack http://stackoverflow.com/users/1338292/ja%CD%A2ck
-    assert(strlen($data) == 16);
-
-    $data[6] = chr(ord($data[6]) & 0x0F | 0x40); // set version to 0100
-    $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
-
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-}
-
-function target_to_id($target)
-{
-    if ($target[0] . $target[1] == 'g:') {
-        $target = 'g' . dbFetchCell('SELECT id FROM device_groups WHERE name = ?', [substr($target, 2)]);
-    } else {
-        $target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?', [$target]);
-    }
-
-    return $target;
-}
-
 function fix_integer_value($value)
 {
     if ($value < 0) {
@@ -781,17 +680,6 @@ function fix_integer_value($value)
     }
 
     return $return;
-}
-
-/**
- * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
- *
- * @param  string  $ip
- * @return \App\Models\Device|false
- */
-function device_has_ip($ip)
-{
-    return Device::findByIp($ip);
 }
 
 /**
@@ -1122,24 +1010,6 @@ function getCIMCentPhysical($location, &$entphysical, &$index)
     } // end if - Level 1
 } // end function
 
-/* idea from https://php.net/manual/en/function.hex2bin.php comments */
-function hex2bin_compat($str)
-{
-    if (strlen($str) % 2 !== 0) {
-        trigger_error(__FUNCTION__ . '(): Hexadecimal input string must have an even length', E_USER_WARNING);
-    }
-
-    return pack('H*', $str);
-}
-
-if (! function_exists('hex2bin')) {
-    // This is only a hack
-    function hex2bin($str)
-    {
-        return hex2bin_compat($str);
-    }
-}
-
 function q_bridge_bits2indices($hex_data)
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
@@ -1215,7 +1085,7 @@ function cache_peeringdb()
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
                     foreach ($peers ?? [] as $index => $peer) {
-                        $peer_name = get_astext($peer->{'asn'});
+                        $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {
                             $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
