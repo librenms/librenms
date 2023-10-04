@@ -316,9 +316,6 @@ function poll_device($device, $force_module = false)
                 'ipmi' => true,
                 'unix-agent' => true,
             ]));
-        } else {
-            // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
 
         // update $device array status

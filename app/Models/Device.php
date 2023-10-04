@@ -81,6 +81,7 @@ class Device extends BaseModel
     ];
 
     protected $casts = [
+        'inserted' => 'datetime',
         'last_polled' => 'datetime',
         'status' => 'boolean',
     ];
