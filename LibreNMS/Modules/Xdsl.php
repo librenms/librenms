@@ -32,7 +32,7 @@ use App\Models\PortVdsl;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -87,7 +87,7 @@ class Xdsl implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         //only do polling if at least one portAdsl was discovered
         if ($os->getDevice()->portsAdsl()->exists()) {
@@ -128,7 +128,7 @@ class Xdsl implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      */
-    private function pollAdsl(OS $os, ?Datastore $datastore = null): Collection
+    private function pollAdsl(OS $os, ?DataStorageInterface $datastore = null): Collection
     {
         $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->table(1);
         $adslPorts = new Collection;
@@ -168,7 +168,7 @@ class Xdsl implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      */
-    private function pollVdsl(OS $os, ?Datastore $datastore = null): Collection
+    private function pollVdsl(OS $os, ?DataStorageInterface $datastore = null): Collection
     {
         $vdsl = \SnmpQuery::hideMib()->walk(['VDSL2-LINE-MIB::xdsl2ChannelStatusTable', 'VDSL2-LINE-MIB::xdsl2LineTable'])->table(1);
         $vdslPorts = new Collection;
@@ -201,7 +201,7 @@ class Xdsl implements Module
         return $this->syncModels($os->getDevice(), 'portsVdsl', $vdslPorts);
     }
 
-    private function storeAdsl(PortAdsl $port, array $data, int $ifIndex, OS $os, Datastore $datastore): void
+    private function storeAdsl(PortAdsl $port, array $data, int $ifIndex, OS $os, DataStorageInterface $datastore): void
     {
         $rrd_def = RrdDefinition::make()
             ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
@@ -261,7 +261,7 @@ class Xdsl implements Module
         ], $fields);
     }
 
-    private function storeVdsl(PortVdsl $port, array $data, int $ifIndex, OS $os, Datastore $datastore): void
+    private function storeVdsl(PortVdsl $port, array $data, int $ifIndex, OS $os, DataStorageInterface $datastore): void
     {
         // Attainable
         $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusAttainableRate', [

@@ -27,7 +27,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -68,7 +68,7 @@ class Availability implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $os->enableGraph('availability');
 

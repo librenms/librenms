@@ -31,7 +31,7 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
@@ -91,7 +91,7 @@ class Isis implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $adjacencies = $os->getDevice()->isisAdjacencies;
 

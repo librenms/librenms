@@ -29,7 +29,7 @@ use App\Models\Device;
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -73,7 +73,7 @@ class Stp implements Module
         return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
 

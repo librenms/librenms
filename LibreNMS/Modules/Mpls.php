@@ -30,7 +30,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MplsPolling;
@@ -111,7 +111,7 @@ class Mpls implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof MplsPolling) {
             $device = $os->getDevice();

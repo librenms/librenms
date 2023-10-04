@@ -26,7 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
@@ -197,7 +197,7 @@ class Netstats implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($this->types as $type => $interface) {
             if ($os instanceof $interface) {

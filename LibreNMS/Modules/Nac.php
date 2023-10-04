@@ -28,7 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\PortsNac;
 use App\Observers\ModuleModelObserver;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
@@ -72,7 +72,7 @@ class Nac implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)

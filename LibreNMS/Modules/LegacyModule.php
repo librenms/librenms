@@ -29,7 +29,7 @@ use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Component;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -104,7 +104,7 @@ class LegacyModule implements Module
         return ! $os->getDevice()->snmp_disable || in_array($this->name, ['ipmi', 'unix-agent']);
     }
 
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if (! is_file(base_path("includes/polling/$this->name.inc.php"))) {
             echo "Module $this->name does not exist, please remove it from your configuration";

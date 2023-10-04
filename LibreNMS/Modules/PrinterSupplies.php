@@ -28,7 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -82,7 +82,7 @@ class PrinterSupplies implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies;

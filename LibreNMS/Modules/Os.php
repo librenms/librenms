@@ -27,7 +27,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Polling\ModuleStatus;
@@ -71,7 +71,7 @@ class Os implements Module
         return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
-    public function poll(\LibreNMS\OS $os, Datastore $datastore): void
+    public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {

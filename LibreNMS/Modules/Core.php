@@ -30,7 +30,7 @@ use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -100,7 +100,7 @@ class Core implements Module
         return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
         $oids = [];
@@ -259,7 +259,7 @@ class Core implements Module
         return true;
     }
 
-    private function calculateUptime(OS $os, ?string $sysUpTime, Datastore $datastore): void
+    private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
         global $agent_data;
         $device = $os->getDevice();

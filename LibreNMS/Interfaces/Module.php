@@ -26,7 +26,7 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 
@@ -61,9 +61,9 @@ interface Module
      * Run frequently (default every 5 minutes)
      *
      * @param  \LibreNMS\OS  $os
-     * @param  \LibreNMS\Interfaces\Datastore  $datastore
+     * @param  \LibreNMS\Interfaces\DataStorageInterface  $datastore
      */
-    public function poll(OS $os, Datastore $datastore): void;
+    public function poll(OS $os, DataStorageInterface $datastore): void;
 
     /**
      * Remove all DB data for this module.

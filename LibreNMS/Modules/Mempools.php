@@ -30,7 +30,7 @@ use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
@@ -82,7 +82,7 @@ class Mempools implements Module
         return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $mempools = $os->getDevice()->mempools;
 
@@ -94,7 +94,7 @@ class Mempools implements Module
             ? $os->pollMempools($mempools)
             : $this->defaultPolling($os, $mempools);
 
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os) {
+        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore) {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {

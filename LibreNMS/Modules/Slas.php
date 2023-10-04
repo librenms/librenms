@@ -24,7 +24,7 @@ use App\Models\Device;
 use App\Models\Sla;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\Datastore;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -75,7 +75,7 @@ class Slas implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os, Datastore $datastore): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof SlaPolling) {
             // Gather our SLA's from the DB.
