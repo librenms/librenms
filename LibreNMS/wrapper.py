@@ -103,7 +103,7 @@ wrappers = {
     },
     "poller": {
         "executable": "lnms",
-        "option": "device:poll",
+        "option": "device:poll -q",
         "table_name": "devices",
         "memc_touch_time": 10,
         "stepping": 300,
