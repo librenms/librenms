@@ -226,7 +226,18 @@ class Poller
 
     private function isModuleManuallyEnabled(string $module): ?bool
     {
-        return empty($this->module_override) ? null : in_array($module, $this->module_override);
+        if (empty($this->module_override)) {
+            return null;
+        }
+
+        foreach ($this->module_override as $override) {
+            [$override_module] = explode('/', $override);
+            if ($module == $override_module) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function buildDeviceQuery(): Builder
