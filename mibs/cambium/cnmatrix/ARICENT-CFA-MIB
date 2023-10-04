@@ -1,0 +1,3699 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+   ARICENT-CFA-MIB DEFINITIONS ::= BEGIN
+      
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Counter32,Counter64, 
+      enterprises, IpAddress, Unsigned32,
+      Integer32, NOTIFICATION-TYPE, TimeTicks    FROM SNMPv2-SMI
+      SnmpAdminString                            FROM SNMP-FRAMEWORK-MIB
+      ifIndex,InterfaceIndex,ifEntry,ifType      FROM IF-MIB
+      VlanId,PortList                            FROM Q-BRIDGE-MIB
+      TruthValue, MacAddress, RowStatus,
+      TimeStamp, DisplayString, StorageType      FROM SNMPv2-TC;
+            
+ 
+--    futuresoftware OBJECT IDENTIFIER ::= { enterprises 2076 }
+
+      fscfa MODULE-IDENTITY
+         LAST-UPDATED "202106110000Z" 
+         ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+         CONTACT-INFO "support@aricent.com"
+
+         DESCRIPTION
+            " The MIB module for CFA. "
+
+         REVISION "202106110000Z" 
+         DESCRIPTION
+            "Cambium update: added read-only ifMainPrevDesc 
+            object to export the previous description for an
+            interface."
+
+         REVISION "202005240000Z" 
+         DESCRIPTION
+            "Cambium update: added read-only ifMainName 
+            object to export interface name data that is
+            used to configure various tables by the
+            management applications."
+
+         REVISION "201908260000Z" 
+         DESCRIPTION
+            "Cambium update: added ifMainNeighborId to
+            support per-interface condensed neighbor
+            identification. Defined the ifVlanIpTable
+            to support short-cut interface creation and
+            IP address configuration."
+
+         REVISION "201209050000Z" 
+         DESCRIPTION
+            "The revised version of the MIB for CFA
+            release 1.1.0.0. "
+         REVISION "199912171330Z" 
+         DESCRIPTION
+            "The first version of the MIB for CFA
+            release 1.0.0.0. "
+      ::=  { enterprises futuresoftware (2076) 27 } 
+
+
+      if OBJECT IDENTIFIER ::= { fscfa 1 }
+
+      ff OBJECT IDENTIFIER ::= { fscfa 2 }
+
+      fm OBJECT IDENTIFIER ::= { fscfa 3 }
+
+      traps OBJECT IDENTIFIER ::= { fscfa 4 }
+
+      pa OBJECT IDENTIFIER ::= { fscfa 5 }
+
+-- Cfa If Group
+-- This group defines objects for Interface Management.
+
+      ifMaxInterfaces         OBJECT-TYPE
+         SYNTAX               InterfaceIndex
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "Specifies the maximum number of interfaces that can
+            be present in the system."
+         ::= { if 1 }
+
+      ifMaxPhysInterfaces  OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        read-write
+         STATUS            deprecated
+         DESCRIPTION
+            "Specifies the maximum number of physical interfaces 
+            that can be present in the system."
+         ::= { if 2 }
+
+      ifAvailableIndex     OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        read-only
+         STATUS            current
+         DESCRIPTION
+            "Shows an ifIndex which is available for creation of
+            any new virtual (non-physical) interface in the system.
+            This ifIndex value can be used for creation of interfaces
+            in the ifMainTable or any media-specif MIB. For creation
+            of physical interfaces, any free ifIndex between 1 and
+            ifMaxPhysInterfaces can be used."
+         ::= { if 3 }
+
+
+-- ifMainTable
+-- This table is used for the management of all the interfaces in the
+-- system. 
+         
+      ifMainTable          OBJECT-TYPE
+         SYNTAX            SEQUENCE OF IfMainEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "A list of all the interface entries in the system. 
+            This table contains objects which are applicable to all
+            types of interfaces in the system. This table is a 
+            proprietary extension to the standard ifTable and 
+            ifXTable. The index to this table has the semantics of
+            the MIB-2 ifIndex."
+         ::= { if 4 }
+
+      ifMainEntry          OBJECT-TYPE
+         SYNTAX            IfMainEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing management information applicable
+            to a particular interface."
+         INDEX { ifMainIndex }
+         ::= { ifMainTable 1 }
+
+      IfMainEntry ::=
+         SEQUENCE {
+            ifMainIndex              InterfaceIndex,
+            ifMainType               INTEGER,
+            ifMainMtu                Integer32,
+            ifMainAdminStatus        INTEGER,
+            ifMainOperStatus         INTEGER,
+            ifMainEncapType          INTEGER,
+            ifMainBrgPortType        INTEGER,
+            ifMainRowStatus          RowStatus,
+            ifMainSubType            INTEGER, 
+            ifMainNetworkType        INTEGER,
+            ifMainWanType            INTEGER,
+            ifMainDesc               DisplayString,
+            ifMainStorageType        StorageType,
+            ifMainExtSubType         INTEGER,
+            ifMainPortRole           INTEGER,
+            ifMainUfdOperStatus      INTEGER,
+            ifMainUfdGroupId         Integer32,
+            ifMainUfdDownlinkDisabledCount Counter32,
+            ifMainUfdDownlinkEnabledCount  Counter32,
+            ifMainDesigUplinkStatus        TruthValue,
+            ifMainEncapDot1qVlanId   Integer32,
+            ifMainNeighborId         SnmpAdminString,
+            ifMainName               SnmpAdminString,
+            ifMainPrevDesc           DisplayString
+            }
+
+      ifMainIndex          OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        read-only 
+         STATUS            current
+         DESCRIPTION
+            "A unique value, greater than zero, for each
+            interface. This object is identical to the ifIndex
+            of the standard MIB-2 ifTable." 
+         ::= { ifMainEntry 1 }
+
+      ifMainType      OBJECT-TYPE
+         SYNTAX       INTEGER {
+                        rfc877x25(5), -- X.25
+                        ethernetCsmacd(6), -- Ethernet/802.3
+                        iso88025TokenRing(9), -- Token Ring
+                        ppp(23), -- PPP link
+                        softwareLoopback(24), -- Loopback Interface
+                        frameRelay(32), -- Frame Relay DTE port
+                        miox25(38), -- multiprotocol over x.25
+                                    -- used for X.25 VCs
+                        aal5(49), -- AAL5 over ATM
+			propVirtual (53), -- Proprietary Virtual Interface
+                        async(84), -- ASYNC
+                        frameRelayMPI(92), -- multiprotocol
+                                           -- over FR
+                                           -- used for FR VCs
+                                           -- and sub-interfaces
+                        pppMultilinkBundle(108), -- PPP Multilink
+                                                 -- Bundle
+                        ipOverAtm(114), -- IPoA virtual
+                        hdlc(118), -- HDLC port
+                        tunnel(131), -- Encapsulation interface   
+                        atmSubInterface(134), -- VCs under IPoA
+                        l3ipvlan(136), -- Layer3 VLAN interface
+                        mplsTunnel (150), -- MPLS Tunnel Virtual Interface
+                        ieee8023ad(161), -- Link Aggregation Mib
+                        mpls (166), -- MPLS
+                        teLink (200), -- TE Link Interface
+                        brgPort(209), -- Bridge port used for creating virtual
+                                      -- ports in PBB and EVB
+                        ifPwType (246), -- Pseudowire interface type 
+			            ilan(247), -- Internal-lan 
+            			pip (248) -- Virtual (Internal) Provider Instance port 
+                        } -- These are the currently supported 
+                          -- interfaces. More can be added at a
+                          -- later time.
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+            "The type/protocol of interface. Specification of
+            the object is mandatory for all interfaces. This
+            value should be specified after the row creation
+            in the ifMainTable and before setting any other
+            object in this table. Once the type is specified,
+            it cannot be changed - the interface should be
+            deleted for changing the type of the interface.
+
+            The ethernetCsmacd(6), iso88025TokenRing(9), aal5(49),
+            async(84) and hdlc(118) are physical interfaces while
+            all other types are virtual or logical interfaces.
+            
+	    Specific ifIndex ranges are reserved for different interface types.
+	    Creation of different types of interfaces is possible only within 
+	    their corresponding ifIndex range. So the ifMainType should be 
+	    configured corresponding to the  ifIndex range reserved for that 
+	    particular interface type.
+
+            For creation of physical interface types, it is mandatory to
+            specify the handle to the device driver using the ifAlias
+            object of the standard ifXTable before specifying the type.
+            This handle could be something like eth1 or /dev/abcd.
+
+	    pip interface type will be used vritual Provider Instance port in 
+	    PBB bridge mode. physical PIPs can be created using ethernetCsmacd .
+
+	    Following is the mapping of different port types and there ifmaintype values.
+	    
+	    External ports
+	    --------------
+	    Port:	    ifmaintype		Port type
+	    -------------------------------------------------------------------
+	    CNP- Ctagged         6 - customerNetworkPortCtagged   (9)
+	    CNP - Port based	 6 - customerNetworkPortPortBased (2)
+	    CNP- Stagged         6 - customerNetworkPortStagged   (3)
+	    PNP                  6 - providerNetworkPort          (1)
+	    PIP                  6 - providerInstancePort         (11)
+	    CBP                  6 - customerBackbonePort         (12)
+        UAP                  6 - uplinkAccessPort             (13)
+
+ 
+	    Internal ports
+	    --------------
+	    VIP 209 - virtualInstancePort     (10)
+	    PIP 248 - providerInstancePort    (11)
+	    CBP 209 - customerBackbonePort    (12)
+        SBP 209 - stationFacingBridgePort (14)
+	
+	    brgPort will be used to create virtual PBB ports other than PIPs.
+        (ie) brgPort is used to create logical ports VIPs, CBPs and SBPs.
+
+	    The propVirtual type denotes properietary logical interfaces. These
+	    type of interfaces can be associated with a {physical interface, 
+	    switch instance} for the purpose of sharing the physical interface 
+	    to more than one context and thus realising Switch Instance Sharing 
+	    of a physical interface."
+         ::= { ifMainEntry 2 }
+
+      ifMainMtu            OBJECT-TYPE
+         SYNTAX            Integer32
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "The MTU for the interface as shown to the higher
+            interface sub-layer (this value should not include
+            the encapsulation or header added by the interface).
+            If IP is operating over the interface, then this 
+            value indicates the IP MTU over this interface.
+            
+            For changing the MTU of any interface, the interface
+            must be brought down first - changing MTU while the
+            interface is administratively up is not permitted.
+            
+            If not specified during interface creation, a default
+            value is assigned based on the ifMainType given to
+            the particular interface.
+            
+            While configuring for logical VLAN interfaces, care
+            should be taken to, configure this value as the
+            lowest of the MTU values of the member ports."
+         ::= { ifMainEntry 3 }
+
+      ifMainAdminStatus    OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              up(1),   -- ready to pass packets
+                              down(2),
+                              testing(3),   -- in some test mode
+                              loopback(4) --loopback mode
+                              }
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "The desired state of the interface. This object
+            can be set only when the ifMainRowStatus of the
+            interface is active. This object has the semantics
+            of the ifAdminStatus of the standard ifTable.
+            
+            The testing(3) state indicates that no operational 
+            packets can be passed - this state is not currently
+            supported. 
+            
+            When a managed system initializes, all 
+            interfaces start with ifMainAdminStatus in the
+            down(2) state, it's a default state also. As a result
+            of either explicit management action or per 
+            configuration information retained by the managed
+            system, ifMainAdminStatus is then changed to
+            the up (1) state (or remains in the
+            down(2) state)."
+         DEFVAL { down } 
+         ::= { ifMainEntry 4 }
+
+      ifMainOperStatus     OBJECT-TYPE
+         SYNTAX            INTEGER  {
+                              up(1),        -- ready to pass packets
+                              down(2),
+                              testing(3),   -- in some test mode
+                              unknown(4),   -- status can not be
+                                            -- determined for
+                                            -- some reason.
+                              dormant(5),
+                              notPresent(6), -- some component is
+                                             -- missing
+                              lowerLayerDown(7) -- down due to state
+                                                --  of lower-layer
+                                                -- interface(s).
+                              }
+         MAX-ACCESS        read-only
+         STATUS            current
+         DESCRIPTION
+            "The current operational state of the interface.
+            The testing (3) state indicates that no operational
+            packets can be passed - this state is not supported
+            currently. 
+            
+            If ifMainAdminStatus is down (2)
+            then ifMainOperStatus would be down (2). If
+            ifMainAdminStatus is changed to up (1) then
+            ifMainOperStatus should change to up (1) if the
+            interface is ready to transmit and receive
+            work traffic; it should change to dormant (5)
+            the interface is waiting for external actions
+            (such as a serial line waiting for an incoming
+            connection); it should change to lowerLayerDown(7)
+            state if it cannot be made up as the interface sub-layer
+            below it is down; it should remain in the down (2) state
+            if and only if there is a fault that prevents it
+            from going to the up (1) state; it should remain in
+            the notPresent (6) state if the interface has
+            missing (typically, hardware) components.
+            
+            The status unknown(4) is shown when it is not possible
+            to determine the exact status of the interface - e.g.
+            the interface sub-layer is performing negotiations - 
+            during this period the interface is not up but at the
+            same time, it is not a fault condition and hence it
+            cannot be shown as down - in such periods the status
+            is shown as unknown.
+            
+            This object has the semantics of the ifOperStatus of the
+            standard ifTable."
+         ::= { ifMainEntry 5 }
+
+      ifMainEncapType         OBJECT-TYPE
+         SYNTAX               INTEGER {
+                                 other(1),
+                                 nlpid(2), -- NLPID based encap
+                                           -- in the case of FR
+                                           -- and multiplexed
+                                           -- NLPID encap for X.25
+                                 nlpidSnap(3), -- NLPID-SNAP based
+                                                -- encap in the case
+                                                -- of FR and multiplexed
+                                                -- NLPID-SNAP encap for
+                                                -- X.25.
+                                 cudNlpid(4),   -- dedicated NLPID for
+                                                -- X.25 only
+                                 cudNlpidSnap(5),   -- dedicated
+                                                      -- NLPID-SNAP for
+                                                      -- X.25 only
+                                 llcSnap(6),   -- for ATM VCs only
+                                 vcMultiplexed(7),  -- for ATM VCs only
+                                 ethernetV2(8) -- for Ethernet interfaces
+                                 }
+         MAX-ACCESS           read-write
+         STATUS               current
+         DESCRIPTION
+            "The encapsulation type to be used over the interface.
+
+            For Ethernet interfaces, the default encapsulation
+            type is ethernetV2(8). The other possible encapsulation
+            is llcSnap(6). If other(1) is specified then an
+            automatic encapsulation type learning method is used
+            in ARP for determining the encapsulation for unicast
+            destinations while the multicast and broadcast destinations
+            use ethernetV2(8).
+
+            For PPP and MLPPP interfaces, the encapsulation type can
+            only be other(1) and this is the default value.
+
+            For FR VCs, the value can be nlpid(2) (for carrying protocols
+            which have NLPID) or nlpidSnap(3) (for other protocols). The
+            default is nlpid(2) and the types of protocols supported are
+            inferred from the stack-layering implemented over the
+            interface.
+
+            For X.25 VCs, the value can be nlpid(2) or nlpidSnap(3) 
+            (where the VC can carry multiplexed protocol traffic with
+            each data packet containing the NLPID or SNAP header) or
+            cudNlpid(4) or cudNlpidSnap(5) (where the CUD specifies
+            the NLPID of the protocol or SNAP and the data packets do
+            not contain these headers - for dedicated VCs). The default 
+            is cudNlpid(4).
+            
+            For ATM VCs, the default is llcSnap(6) but the 
+            vcMultiplexed(7) encapsulation is also supported.
+				
+            This object is not applicable to other interfaces."
+         ::= { ifMainEntry 6 }
+
+      ifMainBrgPortType      OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             providerNetworkPort           (1),
+                             customerNetworkPortPortBased  (2),
+                             customerNetworkPortStagged    (3),
+                             customerEdgePort              (4),
+                             propCustomerEdgePort          (5),
+                             propCustomerNetworkPort       (6),
+                             propProviderNetworkPort       (7),
+                             customerBridgePort            (8),
+                             customerNetworkPortCtagged    (9),
+			     virtualInstancePort  	   (10),	
+			     providerInstancePort	   (11),
+			     customerBackbonePort	   (12),
+                 uplinkAccessPort          (13),
+                 stationFacingBridgePort   (14)
+
+         }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The Bridge port type of this specified switch port.
+           Bridge Port type can be specified only for switch ports and not for 
+           router ports, IVR interfaces and I-LAN Interfaces.
+
+           providerNetworkPort - Port Connected to a single Provider.
+           SVLAN Classification is based on only the PVID configured for the 
+           port for untagged packets.
+
+           customerNetworkPortPortBased - Port in the S-VLAN component that 
+           can transmit or received frames for single customer. 
+           All packets received on this port, are mapped to one single service 
+           instance identified by the PVID of that Port.
+           Acceptable Port Type will be always Admit only Untagged or Priority 
+           Tagged Frames on this port.
+
+           customerNetworkPortStagged - Port in the S-VLAN component that 
+           can transmit or received frames for single customer. 
+           VLAN classification on this interface will be based on the S-tag 
+           received or on the PVID of the port. Ingress Filtering will be 
+           always enabled on this port.
+
+           customerEdgePort - Port in a Provider Edge Bridge connected to a 
+           single customer. Multiple services can be provide on this port.
+           The Packets received on this interface will be first classified 
+           to a CVLAN. CVLAN classification can be based on the Vid 
+           in the C-Tag present in the packet (if it C-tagged packet) or from 
+           the pvid of the port. Service instance selection (S-VLAN selection) 
+           for a frame is done based on the entry present in the C-VID 
+           registration table for the pair (C-VID, reception Port). 
+           CustomerEdgePort configuration is allowed only in Provider Edge 
+           Bridges.
+
+           propCustomerEdgePort - Port connected to a single customer, where 
+           multiple services can be provided based on only Proprietary SVLAN 
+           classification tables. S-VLAN classification will not happen based on
+           C-VID registration table on this port. propCustomerEdgePort 
+           configuration is allowed only in Provider Edge Bridges.
+
+           propCustomerNetworkPort - Port connected to a single customer, where 
+           multiple service can be provided based on CVLANs by assigning one of 
+           the Proprietary SVLAN classification tables to this port. The 
+           services can also be assigned using other proprietary SVLAN 
+           classification tables where CVLAN is not the index of the table.
+
+           propProviderNetworkPort - Port connected to a Q-in-Q Bridge located
+           inside Provider Network. This port is part of S-VLAN component. 
+           If packets to be tagged and sent out of this port will have 0x8100
+           as the ether type. Similarly pakcets with standard Q tag (ether type
+           as 0x8100) received will be considered as S-Tagged packets. 
+
+           customerBridgePort - Type of the port to be used in customer 
+           bridges as well in Provider(Q-in-Q) bridges. This type is not valid 
+           in Provider Core bridges as well as Provider Edge bridge. 
+	   
+	   customerNetworkPortCtagged - Port in the I component that 
+           can transmit or received frames for single customer. 
+           VLAN classification on this interface will be based on the C-tag 
+           received or on the default CVID of the port. Ingress Filtering will be 
+           always enabled on this port.
+	   
+	   virtualInstancePort - A Bridge Port on an I-component in a Backbone Edge Bridge 
+	   that provides access to a single backbone service instance.
+	   
+	   providerInstancePort - The set of Virtual Instance Ports that are supported
+	   by a single instance of the ISS.
+	   
+	   customerBackbonePort	- A Backbone Edge Bridge Port that can receive and transmit
+	   I-tagged frames for multiple customers, and assign B-VIDs and translate I-SID on
+	   the basis of the received I-SID.
+
+       Edge Virtual Briding (EVB) technology is used in Data Center Networks. 
+       The uplinkAccessPort (UAP) and stationFacingBridgePort (SBP) types are 
+       applicable when the bridge operates in EVB environment.
+
+       uplinkAccessPort - A port on a Port-mapping S-VLAN component that
+       connects an EVB Bridge with an EVB Station.
+       
+       stationFacingBridgePort - A port that is part of the C-VLAN component of 
+       EVB Bridge which has one-to-one relationship with a S-Channel Access Port
+       in the port-mapping S-VLAN component. 
+
+           In Customer bridges and in Provider Bridges only customerPort option
+           is allowed.
+
+   	   In Provider backbone bridge only customerNetworkPort, providerNetworkPort
+	   and customerBackbonePort type of ports are allowed.
+
+           Bridge Port Type cannot be set for a port-channel port, if some 
+           physical ports are aggregated in it.
+           Also Bridge Port type cannot be set for a port, if part of a 
+           port-channel.
+
+           Whenever the Bridge port type changes, the previous configuration 
+           associated with the port will be flushed.
+
+           For example. 
+           
+           whenever CNP(STagged) and PNP port types are changed to any 
+           other port type,
+             - The unicast entries learnt on this port and 
+             - The VID translation table entries associated with the port 
+               will be flushed.
+
+           Whenever CEP port type is changed to any other port type,
+             - The unicast entries learnt on this port
+             - The C-VID registration table entries associated with the port
+             - The PEP configuration table entries
+             - The service priority regeneration table entries 
+             will be flushed.
+
+             Even the vlan membership of the port will be removed when the 
+             Pbport type is changed."
+
+         DEFVAL { 8 }
+         ::= { ifMainEntry 7 }
+
+      ifMainRowStatus      OBJECT-TYPE
+         SYNTAX            RowStatus
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "A RowStatus variable for addition, deletion and in-activation
+            of the interfaces. Specification of the object is mandatory
+            for all interfaces.
+            
+            When the status is active, the interface is created and
+            ready to use in the respective protocol modules.
+            
+            When the status is notInService, the interface has not been
+            registered with the respective protocol modules and as such
+            those modules are not aware of the existence of the interface
+            - creation is hence, incomplete. Setting an active interface
+            to notInService results in de-registration/deletion of the
+            interface from the respective protocol modules and all the
+            configurations associated with that interface in those modules
+            may be lost.
+            
+            Deletion of an interface, may affect the status of other
+            interfaces which are layered above or below it in the Interface
+            Stack (ifStackTable) and may result in other interfaces being
+            made notReady or notInService."
+         ::= { ifMainEntry 8 }
+
+     ifMainSubType    OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              extremeEther(251),
+                              fastEther(252),
+                              gigabitEthernet(253),
+                              xlEthernet(254),
+                              notApplicable(255)
+                           }
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+           "This object stores the subType value of the specified interface.
+            Configuration of this object is not mandatory.By default
+            Sub type value will be updated based on the hardware link speed.
+
+            For non Ethernet interfaces, the object defaults to notApplicable.
+            notApplicable is valid only for non Ethernet interfaces."
+
+         ::= { ifMainEntry 9 }
+
+      ifMainNetworkType      OBJECT-TYPE
+         SYNTAX       INTEGER {
+                        lan(1), 
+                        wan(2) 
+                              }
+         MAX-ACCESS           read-write
+         STATUS               current
+         DESCRIPTION
+            "This object indicates whether this interface is a 
+             WAN or LAN link.
+      
+             The default value for this object varies according
+             to the interface type. All interfaces of type radio (71),
+             ieee8023ad (161) and l3ipvlan (136) are LAN interfaces.
+             Fast ethernet interfaces are considered LAN interfaces
+             while Gigabit ethernet interfaces are considered WAN
+             interfaces at start-up.
+             Interfaces of any other type are WAN interfaces.
+             
+             This object can be set only for ethernet interfaces or
+             l3ipvlan. For changing the network type of an ethernet 
+             interface or l3ipvlan, the interface must be brought 
+             down first - changing network type while the interface 
+             is administratively up is not permitted."
+         ::= { ifMainEntry 10 }
+         
+      ifMainWanType      OBJECT-TYPE
+         SYNTAX       INTEGER {
+                        other(0), 
+                        private(1), 
+                        public(2) 
+                              }
+         MAX-ACCESS           read-write
+         STATUS               current
+         DESCRIPTION
+            "This object indicates whether this interface is a 
+             private or public WAN link.
+
+             This object is applicable only for PPP interfaces and 
+             ethernet WAN interfaces. For other interfaces the value
+             cannot be set and a get always returns the value OTHER. 
+
+             For PPP and ethernet WAN interfaces the default value is PUBLIC.
+             By default, public WAN links, have a default route associated
+             with them. When the WAN type is set as PRIVATE, no default route
+             is created for this interface. The value OTHER can never be set.
+
+             For changing the type of a WAN interface, the interface
+             must be brought down first - changing WAN type while the
+             interface is administratively up is not permitted."
+             ::= { ifMainEntry 11 }
+
+      ifMainDesc	OBJECT-TYPE
+             SYNTAX		DisplayString
+             MAX-ACCESS	read-write
+             STATUS		current
+             DESCRIPTION	
+             "A textual string which contains the description about an interface."
+
+             ::= { ifMainEntry 12 }
+
+      ifMainStorageType      OBJECT-TYPE
+             SYNTAX	   StorageType
+             MAX-ACCESS	   read-create
+             STATUS	   current
+             DESCRIPTION   
+             "The storage type for this conceptual row in the ifMainTable.
+             Conceptual rows having the value 'permanent' need not allow 
+             write-access to any columnar object in the row.
+             only volatile and nonVolatile are allowed for this object"
+        DEFVAL { nonVolatile }
+             ::= { ifMainEntry 13 }
+
+      ifMainExtSubType    OBJECT-TYPE
+             SYNTAX            INTEGER {
+                                          sisp(0),
+                                          attachmentCircuit(1),
+                                          openflow(2)
+                                        }
+             MAX-ACCESS        read-write
+             STATUS            current
+             DESCRIPTION
+             "This object stores the subType value of the specified interface.
+              These sub types are specified for the ifMainType-propVirtual."
+  
+              ::= { ifMainEntry 14 }
+
+     ifMainPortRole    OBJECT-TYPE
+            SYNTAX            INTEGER {
+                                         uplink(1),
+                                         downlink(2)
+                                      }
+            MAX-ACCESS        read-write
+            STATUS            current
+            DESCRIPTION
+            "This object is for indicating the port role for each interface.
+
+             A port is termed as uplink port when it is connected to the
+             network. 
+             
+             A port is termed as downlink when it is connected towards host 
+             end-points"
+
+            DEFVAL { downlink }
+            ::= { ifMainEntry 15 }
+
+      ifMainUfdOperStatus    OBJECT-TYPE
+             SYNTAX         INTEGER {
+                                     up(1),
+                                     down(2),
+                                     ufdErrorDisabled(3)
+                                    }
+             MAX-ACCESS        read-only
+             STATUS            current
+             DESCRIPTION
+             "This object is for indicating the Uplink Failure Detection(UFD) 
+             port operational status for each interface. 
+
+             Uplink Failure Detection(UFD) operational status of the uplink 
+             port is same as the operational status of the port.
+             
+             For the downlink ports this object takes a value which is 
+             dependent on the combined operational status of the uplink ports
+             present in the group to which this port belongs to. 
+             
+             If all the uplink ports in the Uplink Failure Detection(UFD) group
+             are down, the operational status of all the active downlink ports 
+             is ufdErrorDisabled and the operational status of 
+             all the inactive downlink ports is Down.
+
+             When the interface is not in the group and it's ifMainOperStatus 
+             is up, the interface Uplink Failure Detection(UFD) operational 
+             status is up.
+
+             When the interface is not in the group and it's ifMainOperStatus 
+             is not up, the port Uplink Failure Detection(UFD) operational 
+             status is down."
+            
+             ::= { ifMainEntry 16 }
+
+      ifMainUfdGroupId OBJECT-TYPE
+            SYNTAX      Integer32 (0..65535)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+            "An identifier that uniquely identifies the group. Each group has
+             uplink interfaces to monitor and downlink interfaces to disable.
+             The UFD group Id value zero indicates that the port is not
+             present in any group. By setting the UFD Group Id value to zero,
+             we are deleting the port from the ufd group to which it belongs to."
+            ::= { ifMainEntry 17 }
+
+      ifMainUfdDownlinkDisabledCount     OBJECT-TYPE
+         SYNTAX            Counter32 
+         MAX-ACCESS        read-only
+         STATUS            deprecated
+         DESCRIPTION
+            "A counter which indicates the number of times
+            that downlink ports in the group were automatically
+            disabled because of all uplink ports failure in the group."
+         ::= { ifMainEntry 18 }
+
+      ifMainUfdDownlinkEnabledCount     OBJECT-TYPE
+         SYNTAX            Counter32
+         MAX-ACCESS        read-only
+         STATUS            deprecated
+         DESCRIPTION
+            "A counter which indicates the number of times
+            that downlink ports in the group were automatically
+            enabled because of any one uplink ports back to function in the group."
+         ::= { ifMainEntry 19 }
+
+ifMainDesigUplinkStatus OBJECT-TYPE
+          SYNTAX            TruthValue
+          MAX-ACCESS        read-write
+          STATUS            current
+          DESCRIPTION
+             "This object specifies whether this interface is designated uplink 
+              or not.
+              
+              A port is termed as designated uplink when the port is connected
+              to the network and it has more preference over all the uplink 
+              ports. Broadcast/unknown multicast will use this designated 
+              port to reach uplink.
+ 
+              When the status is set to True, the port acts as designated uplink.
+              This designated uplink port is used in split horizon feature.
+              This object is different from the Uplink Failure Detection (UFD)
+              designated uplink port object called ifUfdGroupDesigUplinkPort.
+              Where ifUfdGroupDesigUplinkPort is unique per UFD group and in 
+              each group the designated uplink port differs in UFD whereas 
+              this object is specific for all the available physical interfaces.
+            
+              This configuration is allowed only on uplink port which is 
+              configured through ifMainPortRole.
+              Configuring any uplink port as designated uplink port overrides the 
+              previous designated uplink port configuration since it is allowed
+              to have only one designated uplink port in the system."
+          DEFVAL { false }
+          ::= { ifMainEntry 20 }
+
+          ifMainEncapDot1qVlanId OBJECT-TYPE
+            SYNTAX      Integer32 (0..4094)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+           "This object specifies the VLAN identifier assigned  to Layer 3
+            Subinterface for association in the porting layer. This object 
+            is available only when the interface is set as Layer3 SubInterface."
+
+         DEFVAL { 0 }
+         ::= { ifMainEntry 21 }
+
+          ifMainNeighborId OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE(0..255))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "A string identifying the device connected to the interface.
+                The neighbor ID is derived from LLDP data that is currently 
+                associated with the interface."
+
+            DEFVAL { "" }
+            ::= { ifMainEntry 22}
+
+          ifMainName OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE(0..32))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "A string identifying the device interface that can
+                be used to unambiguously identify the interface when 
+                configuring interface settings in various tables
+                that identify ports by name."
+
+            DEFVAL { "" }
+            ::= { ifMainEntry 23}
+
+          ifMainPrevDesc OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE (0..255))
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "A textual string which contains the previous 
+                description for the interface."
+
+            DEFVAL { "" }
+            ::= { ifMainEntry 24}
+
+-- ifIpTable
+-- This table is used for the management of the interfaces in the
+-- system which are registered with IP. 
+      
+      ifIpTable            OBJECT-TYPE
+         SYNTAX            SEQUENCE OF IfIpEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "A list of all the interface entries in the system which
+            are registered with IP.
+                  
+            This table contains objects which are applicable for the
+            management of IP over the network interfaces
+            in the system. 
+               
+            This table is a extension to the ifMainTable. 
+            The index to this table has the semantics of
+            the ifMainIndex of the ifMainTable.
+                  
+            Entries are created automatically in this table for
+            any interface sub-layer which is layer below IP using
+            the ifStackTable. Similarly, entries are deleted from
+            this table when the interface's layering below IP is
+            removed."
+         ::= { if 5 }
+
+      ifIpEntry            OBJECT-TYPE
+         SYNTAX            IfIpEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing management information applicable
+            to a particular interface over which IP is operating."
+         INDEX { ifMainIndex }
+         ::= { ifIpTable 1 }
+
+      IfIpEntry ::=
+         SEQUENCE {
+            ifIpAddrAllocMethod   INTEGER,
+            ifIpAddr              IpAddress,
+            ifIpSubnetMask        IpAddress,
+            ifIpBroadcastAddr     IpAddress,
+            ifIpForwardingEnable  TruthValue,
+            ifIpAddrAllocProtocol INTEGER,
+            ifIpDestMacAddress    MacAddress,
+            ifIpUnnumAssocIPIf    InterfaceIndex,
+            ifIpIntfStatsEnable   TruthValue,
+            ifIpPortVlanId        Integer32
+            }
+
+      ifIpAddrAllocMethod  OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              manual(1),  -- To be set by Manager
+                              negotiation(2), -- obtained from peer
+                              dynamic(3),
+			      none(4)  -- none of the above
+                              } -- Currently only
+                                -- these method possible.
+         MAX-ACCESS        read-write 
+         STATUS            current
+         DESCRIPTION
+            "The mechanism to be used for allocation of IP
+            address for this interface. 
+            
+            The value negotiation can be used only for PPP
+            and MLPPP interfaces which support obtaining of
+            IP addresses through negotiation.
+
+            The dynamic(3) option takes an IP 
+            address dynamically from the available 
+            server (dhcp/bootp/rarp) according to the
+            protocol specified in ifIpAddrAllocProtocol. 
+
+            If the method specified is manual and the IP 
+            address is not provided (then the interface   
+            would be treated as a un-numbered interface."
+         DEFVAL { none }
+         ::= { ifIpEntry 1 }
+
+      ifIpAddr             OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write 
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP address given to this
+            interface. The specification of this object is
+            mandatory for all network interfaces (Ethernet,
+            FR VC, IPoA interface, PPP link - not under MP,
+            MP interface and X.25 VC). If the interface is
+            not a network interface then the default value
+            of 0.0.0.0 is assigned and the interface is
+            treated as a un-numbered interface by IP."
+         DEFVAL { '00000000'H } 
+         ::= { ifIpEntry 2 }
+
+      ifIpSubnetMask       OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write 
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP Subnet Mask for this
+            interface. The value should be specified only
+            for network interfaces and any valid VLSM is
+            accepted. 
+            
+            If not specified, this object takes the default
+            subnet mask value based on the class of the IP
+            address configured for the interface."
+         ::= { ifIpEntry 3 }
+
+      ifIpBroadcastAddr    OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP broadcast address for this
+            interface. The value should be specified only
+            for network interfaces and any valid broadcast
+            address based on a valid VLSM is accepted. 
+            
+            If not specified, this object takes the default
+            value based on the class of the IP
+            address configured for the interface."
+         ::= { ifIpEntry 4 }
+
+      ifIpForwardingEnable OBJECT-TYPE
+         SYNTAX            TruthValue
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies whether IP forwarding is enable on
+            this interface. Disabling IP forwarding on an
+            interface will result in packets which are to
+            be forwarded on that interface being dropped
+            and ICMP error messages being generated for the
+            packets."
+         DEFVAL { true } 
+         ::= { ifIpEntry 5 }
+
+      ifIpAddrAllocProtocol  OBJECT-TYPE
+         SYNTAX              INTEGER {
+                                rarp(1),
+                                dhcp(2)
+                              } 
+         MAX-ACCESS        read-write 
+         STATUS            current
+         DESCRIPTION
+           "Specifies the protocol to be used to obtain
+            IP address for this interface.  This object is
+            valid only when ifIpAddrAllocMethod is set to
+            dynamic (3). 
+
+	    When ifIpAddrAllocMethod option is dhcp(2)
+	    dhcp-client tries for dynamic IP address from 
+	    server for maximum number of retries. If couldn't
+	    able to receive any IP address, then sets back to 
+	    default IP address.
+
+            Currently rarp (1) option is not
+            supported. The assigned value will be effective
+            only when the interface admin status changes"
+         DEFVAL { dhcp }
+         ::= { ifIpEntry 6 }
+  
+         ifIpDestMacAddress   OBJECT-TYPE
+         SYNTAX            MacAddress
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "The unicast Peer MacAddress for unnumbered interface.
+            This Object needs to be configured mandatorily for proper
+            forwarding of IP packets over unnumbered interfaces.This object
+            needs to be set to avoid ARP resolution failure on corresponding 
+            interfaces. For MPLS-TP networks, MacAddress can be unicast or
+            multicast (01:00:5E:90:00:00) Mac Address."
+         ::= { ifIpEntry 7 }
+ 
+         ifIpUnnumAssocIPIf OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "This object stores the interface index of the interface associated
+             with the unnumbered interface. The source IP addresses used over
+             the Unnumbered interface in relation to the destination IP address
+             are borrowed from the associated interface."
+         ::= { ifIpEntry 8 }
+
+       ifIpIntfStatsEnable OBJECT-TYPE
+         SYNTAX            TruthValue
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "This object specifies whether statistics collection is enabled on the IP 
+             interface. 
+             
+             When the status is set to True, statistics collection will be started on the IP interface. 
+             Retrieval of statistics on the L3 interface is possible only when the status is 
+             set to True.
+             
+             When the status is set to False, statistics collection will be stopped on the IP interface. 
+             Retrieval of statistics on the L3 interface is not be possible when the status is 
+             set to False."
+         DEFVAL { false }
+         ::= { ifIpEntry 9 }
+
+       ifIpPortVlanId OBJECT-TYPE
+         SYNTAX            Integer32 (0..4094)
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+           "This object specifies the VLAN identifier assigned  to router-ports
+            for association in the porting layer. This object is meant for the
+            chipsets when the porting layer demands VLAN identifier association
+            to realize router ports. This object is available only when the
+            physical interface is set as router-port.
+
+            The default value 0 is applicable for L3 VLAN interfaces and for
+            chipsets that do not support this MIB feature"
+         DEFVAL { 0 }
+         ::= { ifIpEntry 10 }
+ 
+-- ifWanTable
+-- This table is used for specification of media specific configuration
+-- parameters which are applicable to WAN interfaces.
+      
+      ifWanTable           OBJECT-TYPE
+         SYNTAX            SEQUENCE OF IfWanEntry
+         MAX-ACCESS        not-accessible
+         STATUS            deprecated
+         DESCRIPTION
+            "A list of all the WAN interfaces in the system.
+                  
+            This table contains objects which are applicable for the
+            management of WAN interfaces like PPP, MP bundle and
+            FR/X.25/ATM VCs in the system.
+               
+            This table is a extension to the ifMainTable. 
+            The index to this table has the semantics of
+            the ifMainIndex of the ifMainTable.
+                  
+            Entries are created automatically in this table when
+            any WAN interface is created in the ifMainTable. The 
+            ppp(23), miox25(38), frameRelayMPI(92), 
+            pppMultilinkBundle(108) and atmSubInterface(134)
+            interfaces have entries in this table. The entries
+            in this table are deleted when the interfaces are
+            deleted from the ifMainTable."
+         ::= { if 6 }
+
+      ifWanEntry           OBJECT-TYPE
+         SYNTAX            IfWanEntry
+         MAX-ACCESS        not-accessible
+         STATUS            deprecated
+         DESCRIPTION
+            "An entry containing management information applicable
+            to a WAN interface."
+         INDEX { ifMainIndex }
+         ::= { ifWanTable 1 }
+
+      IfWanEntry ::=
+         SEQUENCE {
+            ifWanInterfaceType      INTEGER,
+            ifWanConnectionType     INTEGER,
+            ifWanVirtualPathId      Integer32,
+            ifWanVirtualCircuitId   Integer32,
+            ifWanPeerMediaAddress   OCTET STRING,
+            ifWanSustainedSpeed     Integer32,
+            ifWanPeakSpeed          Integer32,
+            ifWanMaxBurstSize       Integer32,
+            ifWanIpQosProfileIndex  Integer32,
+            ifWanIdleTimeout        Integer32,
+            ifWanPeerIpAddr         IpAddress,
+            ifWanRtpHdrComprEnable  TruthValue,
+            ifWanPersistence        INTEGER
+            }
+
+      ifWanInterfaceType   OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              ppp(23), -- PPP link
+                              miox25(38), -- multiprotocol over x.25
+                                          -- used for X.25 VCs
+                              frameRelayMPI(92), -- multiprotocol
+                                                 -- over FR
+                                                 -- used for FR VCs
+                                                 -- and sub-interfaces
+                              pppMultilinkBundle(108), -- PPP Multilink
+                                                       -- Bundle
+                              atmSubInterface(134) -- VCs under IPoA
+                                                   -- for QoS purpose
+                              } 
+         MAX-ACCESS        read-only
+         STATUS            deprecated
+         DESCRIPTION
+            "The type of the WAN interface. This is
+            same as if MIB-2 ifType and ifMainType."
+         ::= { ifWanEntry 1 }
+
+      ifWanConnectionType  OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              other(0),
+                              permanent(1),
+                              switched(2)
+                              }
+         MAX-ACCESS        read-write
+         STATUS            deprecated
+         DESCRIPTION
+            "The type of WAN connection. This object
+            will not be applicable to PPP and MLPPP
+            interfaces and will have the value other(0).
+            For all other interfaces the default value
+            is permanent(1). 
+            
+            It is possible to pre-configure a SVC through
+            this table. The actual SVC establishment may
+            take place when there is data to be sent or
+            through some other system policy."
+         ::= { ifWanEntry 2 }
+
+      ifWanVirtualPathId   OBJECT-TYPE
+         SYNTAX            Integer32
+         MAX-ACCESS        read-write
+         STATUS            deprecated
+         DESCRIPTION
+            "The VPI for ATM VCs. This object
+            will not be applicable to other
+            interfaces and will have the value 0."
+         DEFVAL { 0 } 
+         ::= { ifWanEntry 3 }
+
+      ifWanVirtualCircuitId   OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The VCI for ATM VCs, DLCI for Frame Relay VCs and
+            the channel identifier for X.25 VCs.
+
+            For SVCs this object is read-only, the value will be 
+            assigned after the SVC establishment.
+            
+            This object will not be applicable to PPP and
+            MLPPP interfaces and will have the value 0."
+         DEFVAL { 0 } 
+         ::= { ifWanEntry 4 }
+
+      ifWanPeerMediaAddress   OBJECT-TYPE
+         SYNTAX               OCTET STRING (SIZE (0..40))
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The Media Address of the peer to whom this 
+            connection is to be established.
+            
+            For ATM VCs this can be in E.164, NSAP or either of these along
+            with the subaddress. For Frame Relay VCs this is in
+            E.164 and for X.25 VCs it is in X.121 format.
+
+            For SVCs this object is mandatory, for PVCs it is
+            optional.
+            
+            This object will not be applicable to PPP and
+            MLPPP interfaces and will have the value 0."
+         ::= { ifWanEntry 5 }
+
+      ifWanSustainedSpeed     OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The sustained or minimum gauranteed speed of
+            the interface. This is semantically similar to
+            the CIR for FR and SCR for ATM. The value to be
+            assigned is the CIR or SCR as the case may be.
+            This value is used by IP-QoS.
+
+            For PPP links this object should be given the value
+            of the speed of the lower link. For MP this value
+            is the sum of the speed of all the lower PPP links.
+
+            If the value is not specified then the system default 
+            values are taken based on the type of the interface."
+         ::= { ifWanEntry 6 }
+
+      ifWanPeakSpeed          OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The maximum speed available on the interface. 
+            This is semantically similar to the CIR+EIR for FR
+            and PCR for ATM. This value is used by IP-QoS.
+
+            For PPP links this object should be given the value
+            of the speed of the lower link. For MP this value
+            is the sum of the speed of all the lower PPP links.
+
+            If the value is not specified then the ifWanSustatinedSpeed
+            values are taken as the peak speed values."
+         ::= { ifWanEntry 7 }
+
+      ifWanMaxBurstSize       OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The maximum burst size in bytes that the interface
+            can sustain. This is semantically similar to the Bc for FR
+            and MBS for ATM. This value is used by IP-QoS.
+
+            For PPP links this object should be given the value
+            of the speed of the lower link. For MP this value
+            is the sum of the speed of all the lower PPP links.
+
+            If the value is not specified then the system default
+            values are taken based on the type of interface."
+         ::= { ifWanEntry 8 }
+
+      ifWanIpQosProfileIndex  OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The index of an IP-QoS profile which is configured
+            in the IP-QoS MIB. Assigning the index of the profile
+            results in instantiation of that profile for the
+            interface. 
+
+            This object is optional and may be specified only for
+            assigning an IP-QoS profile - if not specified then no
+            profile is applied to this interface - default value
+            is then the invalid index 0."
+         DEFVAL { 0 }
+         ::= { ifWanEntry 9 }
+
+      ifWanIdleTimeout        OBJECT-TYPE
+         SYNTAX               Integer32
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The minimum duration (in seconds) to wait before
+            disconnecting an idle established circuit/interface. (a
+            default value of 0 where not required) Specification
+            of the object is optional for all interfaces; if not
+            specified the system default value is assumed on the basis
+            of the IfType specified."
+         DEFVAL { 0 }
+         ::= { ifWanEntry 10 }
+
+      ifWanPeerIpAddr         OBJECT-TYPE
+         SYNTAX               IpAddress
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The IP address of the peer to whom this interface is
+            established with. Specification of this value is optional
+            for all interfaces.
+            
+            For PPP and MLPPP interfaces, this value if specified
+            is used during IPCP negotiation for assigning IP address
+            to the peer. This object stores the configured peer IP
+            address and this object is not updated with the actual
+            IP address of the peer.
+            
+            For other interfaces, this value is either configured
+            for peers who do not have InARP support or this object
+            is instantiated after the peer IP address is obtained 
+            after InARP."
+         DEFVAL { '00000000'H }
+         ::= { ifWanEntry 11 }
+
+      ifWanRtpHdrComprEnable  OBJECT-TYPE
+         SYNTAX               TruthValue
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "Enable or disable the RTP header compression on the
+            WAN interface. This object is writable for only those
+            interface which are registered with IP. If the RTP
+            header compression negotiation with the peer fails then
+            this object is reset to false."
+         DEFVAL { false }
+         ::= { ifWanEntry 12 }
+
+      ifWanPersistence        OBJECT-TYPE
+         SYNTAX               INTEGER {
+                                 other(1),
+                                 demand(2)
+                                 }
+         MAX-ACCESS           read-write
+         STATUS               deprecated
+         DESCRIPTION
+            "The persistence of the WAN interface in the system.
+             
+             Demand(2) circuits are pre-configured but are opened only 
+             when there is some data to be sent (these interfaces are 
+             administratively UP, but operationally DORMANT and they are 
+             made UP dynamically whenever there is any data to be sent 
+             over the interface). The demand circuit configuration 
+             continues to persist in the system.
+
+             Alll other WAN interface which do not fall under the above
+             categories are to be configured as other(1) which is the
+             default value."
+         DEFVAL { other }
+         ::= { ifWanEntry 13 }
+
+
+-- ifAutoCktProfileTable
+-- This table is used for the specification of the automatic circuit 
+-- profile for the WAN interface in the system.
+         
+      ifAutoCktProfileTable   OBJECT-TYPE
+         SYNTAX               SEQUENCE OF IfAutoProfileEntry
+         MAX-ACCESS           not-accessible
+         STATUS               deprecated
+         DESCRIPTION
+            "A list of all the automatic circuit profiles in the system. 
+            This table contains objects which are useful for configuration
+            of an automatic circuit profile for a given interface.
+            The profile specified here is used for the configuration of
+            all the incoming calls on the specified interface. The new
+            interfaces are assigned MIB-2 ifIndex upon creation. The
+            interface is deleted once the circuit is closed."
+         ::= { if 7 }
+
+      ifAutoProfileEntry   OBJECT-TYPE
+         SYNTAX            IfAutoProfileEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing information applicable
+            to an automatic circuit profile for an interface."
+         INDEX { ifAutoProfileIfIndex }
+         ::= { ifAutoCktProfileTable 1 }
+
+      IfAutoProfileEntry ::=
+         SEQUENCE {
+            ifAutoProfileIfIndex             InterfaceIndex,
+            ifAutoProfileIfType              INTEGER,
+            ifAutoProfileIpAddrAllocMethod   INTEGER,
+            ifAutoProfileDefIpSubnetMask     IpAddress,
+            ifAutoProfileDefIpBroadcastAddr  IpAddress,
+            ifAutoProfileIdleTimeout         Integer32,
+            ifAutoProfileEncapType           INTEGER,
+            ifAutoProfileIpQosProfileIndex   Integer32,
+            ifAutoProfileRowStatus           RowStatus
+            }
+
+      ifAutoProfileIfIndex OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        not-accessible
+         STATUS            deprecated
+         DESCRIPTION
+            "The MIB-2 ifIndex of the interface for which
+            this automatic circuit profile is applicable.
+            All incoming calls on this interface will be
+            handled/configured according to this profile."
+         ::= { ifAutoProfileEntry 1 }
+
+      ifAutoProfileIfType  OBJECT-TYPE
+         SYNTAX            INTEGER {
+                              rfc877x25(5), -- X.25
+                              frameRelay(32), -- Frame Relay DTE port
+                              aal5(49), -- AAL5 over ATM
+                              ipOverAtm(114) -- IPoA virtual
+                              } 
+         MAX-ACCESS        read-only
+         STATUS            deprecated
+         DESCRIPTION
+            "The type of the WAN interface. This is
+            same as if MIB-2 ifType and ifMainType."
+         ::= { ifAutoProfileEntry 2 }
+
+      ifAutoProfileIpAddrAllocMethod   OBJECT-TYPE
+         SYNTAX                        INTEGER {
+                                          other(1),  -- obtained by other 
+                                                     -- means or not required
+                                          negotiation(2), -- obtained from peer
+                                          localAddressPool(3)
+                                          }   -- Currently only
+                                             -- these method possible.
+         MAX-ACCESS                    read-create
+         STATUS                        deprecated
+         DESCRIPTION
+            "The mechanism to be used for allocation of IP
+            address for this interface. 
+            
+            The value negotiation can be used only if PPP
+            or MLPPP interfaces are to run over the automatic
+            circuits.
+
+            The localAddressPool(3) option takes an IP 
+            address dynamically from the IP address pool
+            specified by the ifAutoProfileIpAddrPoolIndex.
+
+            If the method specified is other(1) then either
+            the IP address is not required or is obtained 
+            by some other method."
+         DEFVAL { other }
+         ::= { ifAutoProfileEntry 3 }
+
+      ifAutoProfileDefIpSubnetMask  OBJECT-TYPE
+         SYNTAX                     IpAddress
+         MAX-ACCESS                 read-create
+         STATUS                     deprecated
+         DESCRIPTION
+            "Specifies the default IP Subnet Mask for this
+            profile. The value should be specified only
+            for network interfaces and any valid VLSM is
+            accepted. 
+            
+            If not specified, this object takes the default
+            subnet mask value based on the class of the IP
+            address configured for the interface."
+         ::= { ifAutoProfileEntry 4 }
+
+      ifAutoProfileDefIpBroadcastAddr  OBJECT-TYPE
+         SYNTAX                        IpAddress
+         MAX-ACCESS                    read-create
+         STATUS                        deprecated
+         DESCRIPTION
+            "Specifies the default IP broadcast address for this
+            interface. Any valid broadcast
+            address based on a valid VLSM is accepted. 
+            
+            If not specified, this object takes the default
+            value based on the class of the IP
+            address configured for the interface."
+         ::= { ifAutoProfileEntry 5 }
+
+      ifAutoProfileIdleTimeout   OBJECT-TYPE
+         SYNTAX                  Integer32
+         MAX-ACCESS              read-create
+         STATUS                  deprecated
+         DESCRIPTION
+            "The minimum duration (in seconds) to wait before
+            disconnecting an idle automatic circuit. Specification
+            of the object is mandatory."
+         ::= { ifAutoProfileEntry 6 }
+
+      ifAutoProfileEncapType  OBJECT-TYPE
+         SYNTAX               INTEGER {
+                                 other(1),
+                                 nlpid(2), -- NLPID based encap
+                                           -- in the case of FR
+                                           -- and multiplexed
+                                           -- NLPID encap for X.25
+                                 nlpidSnap(3), -- NLPID-SNAP based
+                                                -- encap in the case
+                                                -- of FR and multiplexed
+                                                -- NLPID-SNAP encap for
+                                                -- X.25.
+                                 cudNlpid(4),   -- dedicated NLPID for
+                                                -- X.25 only
+                                 cudNlpidSnap(5),   -- dedicated
+                                                      -- NLPID-SNAP for
+                                                      -- X.25 only
+                                 llcSnap(6),   -- for ATM VCs only
+                                 vcMultiplexed(7)   -- for ATM VCs only
+                                 }
+         MAX-ACCESS           read-create
+         STATUS               deprecated
+         DESCRIPTION
+            "The encapsulation type to be used over the automatic 
+            circuit.
+
+            For FR interface, the value can be nlpid(2) (for carrying protocols
+            which have NLPID) or nlpidSnap(3) (for other protocols). The
+            default is nlpid(2) and the types of protocols supported are
+            inferred from the stack-layering implemented over the
+            interface.
+
+            For X.25 interface, the value can be nlpid(2) or nlpidSnap(3) 
+            (where the VC can carry multiplexed protocol traffic with
+            each data packet containing the NLPID or SNAP header) or
+            cudNlpid(4) or cudNlpidSnap(5) (where the CUD specifies
+            the NLPID of the protocol or SNAP and the data packets do
+            not contain these headers - for dedicated VCs). The default 
+            is cudNlpid(4).
+            
+            For ATM interface, the default is llcSnap(6) but the 
+            vcMultiplexed(7) encapsulation is also supported."
+         ::= { ifAutoProfileEntry 7 }
+
+      ifAutoProfileIpQosProfileIndex   OBJECT-TYPE
+         SYNTAX                        Integer32
+         MAX-ACCESS                    read-create
+         STATUS                        deprecated
+         DESCRIPTION
+            "The index of an IP-QoS profile which is configured
+            in the IP-QoS MIB. Assigning the index of the profile
+            results in instantiation of that profile for any
+            automatic circuit which is instantiated based on this
+            profile (and a corresponding profile is instantiated
+            in the IP-QoS table also).
+
+            This object is optional and may be specified only for
+            assigning an IP-QoS profile - if not specified then no
+            profile is applied to this interface - default value
+            is then the invalid index 0."
+         DEFVAL { 0 }
+         ::= { ifAutoProfileEntry 8 }
+
+      ifAutoProfileRowStatus  OBJECT-TYPE
+         SYNTAX               RowStatus
+         MAX-ACCESS           read-create
+         STATUS               deprecated
+         DESCRIPTION
+            "A RowStatus object for creation of automatic circuit
+            profile on a per interface basis.
+            
+            It is necessary to create the parent FR,X.25 or ATM/IPoA
+            interface before creating the automatic circuit profile
+            for that interface.
+            
+            The profile is deleted once the parent interface is 
+            deleted from the system.
+
+            Setting this object to notInService for an active profile
+            will result in the profile being not applied to any new
+            automatic circuit, but the existing circuits would not
+            be affected. Similarly, deleting a profile would not affect
+            existing circuits which have used that profile."
+         ::= { ifAutoProfileEntry 9 }
+
+
+-- ifIvrTable
+-- This table is used for the Inter VLAN Routing related 
+-- configurations for each interface such as converting Bridged interfaces
+-- to Routed interfaces and vice-versa.
+
+      ifIvrTable              OBJECT-TYPE
+         SYNTAX               SEQUENCE OF IfIvrEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A list of all the interfaces in the system with IVR related
+            configurations.
+
+            This table is an extension to the ifMainTable. The index to 
+            this table has the semantics of the ifMainIndex of the 
+            ifMainTable."
+         ::= { if 8 }
+
+      ifIvrEntry           OBJECT-TYPE
+         SYNTAX            IfIvrEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing IVR-related information applicable
+            to a interface."
+         INDEX { ifMainIndex }
+         ::= { ifIvrTable 1 }
+         
+      IfIvrEntry ::=
+         SEQUENCE {
+            ifIvrBridgedIface
+               TruthValue
+            }
+
+      ifIvrBridgedIface     OBJECT-TYPE
+         SYNTAX            TruthValue 
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Indicates if this interface is a Bridged interface
+            or not. 
+            A value of 'TRUE' indicates that this interface is 
+            a Bridged interface and is capable of performing 
+            bridging of packets through this interface.
+            A value of 'FALSE' indicates that this 
+            interface is a Routed interface and is capable of
+            performing routing of packets through this interface." 
+         ::= { ifIvrEntry 1 }
+
+-- Added the following two scalars for setting or resetting the VLAN
+-- List for the management interface.
+
+       ifSetMgmtVlanList OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..512))
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "A string of octets containing one bit per VLAN. The
+           first octet corresponds to VLANs with VlanId values
+           1 through 8; the second octet to VLANs 9 through
+           16 etc.  The most significant bit of each octet
+           corresponds to the lowest VlanId value in that octet.
+           This is the set of vlans configured by management to associate 
+           with the management interface." 
+           ::= { if 9 }
+       
+       ifResetMgmtVlanList OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..512))
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "A string of octets containing one bit per VLAN. The
+           first octet corresponds to VLANs with VlanId values
+           1 through 8; the second octet to VLANs 9 through
+           16 etc.  The most significant bit of each octet
+           corresponds to the lowest VlanId value in that octet.
+           This is the set of vlans configured by management to dis-associate 
+           from the management interface.
+           Get operation is not allowed for this object."
+
+           ::= { if 10 }
+
+-- ifSecondaryIpAddressTable
+-- This table is to configure secondary ip address over the interfaces
+-- registered with IP. 
+      
+      ifSecondaryIpAddressTable  OBJECT-TYPE
+         SYNTAX            SEQUENCE OF IfSecondaryIpAddressEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "A list of secondary IP addresses configured over the 
+            interfaces registered with IP.
+                  
+            This table is a extension to the ifMainTable. 
+            The index to this table has the semantics of
+            the ifMainIndex of the ifMainTable.
+            
+            Secondary IpAddress configuration should not override the 
+            primary ip address configured for any of the interface
+            
+            Updation of entries in this table are not allowd when 
+            RowStatus is active"
+                  
+         ::= { if 11 }
+
+      ifSecondaryIpAddressEntry       OBJECT-TYPE
+         SYNTAX            IfSecondaryIpAddressEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry contains the information associated with the
+            secondary(additional) ip address configured to a particular 
+            interface."
+         INDEX { ifMainIndex , ifSecondaryIpAddress}
+         ::= { ifSecondaryIpAddressTable 1 }
+
+      IfSecondaryIpAddressEntry ::=
+         SEQUENCE {
+            ifSecondaryIpAddress       IpAddress,
+            ifSecondaryIpSubnetMask    IpAddress,
+            ifSecondaryIpBroadcastAddr IpAddress,
+            ifSecondaryIpRowStatus     RowStatus
+            }
+
+      ifSecondaryIpAddress         OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        not-accessible 
+         STATUS            current
+         DESCRIPTION
+            "Specifies the Secondary IP address associated with the 
+            interface"
+         ::= {ifSecondaryIpAddressEntry  1 }
+
+      ifSecondaryIpSubnetMask     OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write 
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP Subnet Mask associted with the
+            secondary ip address configuration. The value should be 
+            specified only for network interfaces and any valid 
+            VLSM is accepted. 
+            
+            If not specified, this object takes the default
+            subnet mask value based on the class of the IP
+            address configured for the interface."
+         ::= { ifSecondaryIpAddressEntry 2 }
+
+      ifSecondaryIpBroadcastAddr    OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP broadcast address associated with
+            the configured secondary IP address. The value should be 
+            specified only for network interfaces and any valid 
+            broadcast address based on a valid VLSM is accepted. 
+            
+            If not specified, this object takes the default
+            value based on the class of the IP
+            address configured for the interface."
+         ::= { ifSecondaryIpAddressEntry 3 }
+
+      ifSecondaryIpRowStatus OBJECT-TYPE
+         SYNTAX            RowStatus
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "This object is used to manage creation and deletion of rows
+             in this table."
+         ::= { ifSecondaryIpAddressEntry 4 }
+
+-- ----------------------------------------------------------------------------
+-- ifMainExtTable
+-- This table is used for the additional management of the interfaces in the
+-- system. 
+-- ----------------------------------------------------------------------------
+
+ifMainExtTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IfMainExtEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table is an extension to the ifMainTable."
+   ::= { if 12 }
+
+ifMainExtEntry OBJECT-TYPE
+   SYNTAX      IfMainExtEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "An entry containing additional management information
+       applicable to a particular interface."
+  AUGMENTS    { ifMainEntry }
+    ::= { ifMainExtTable 1 }
+
+IfMainExtEntry ::=
+   SEQUENCE {
+      ifMainExtMacAddress           MacAddress,
+      ifMainExtSysSpecificPortID    Unsigned32,
+      ifMainExtInterfaceType        INTEGER,
+      ifMainExtPortSecState         INTEGER,
+      ifMainExtInPkts               Counter32,
+      ifMainExtLinkUpEnabledStatus  INTEGER,
+      ifMainExtLinkUpDelayTimer     Unsigned32,
+      ifMainExtLinkUpRemainingTime Unsigned32
+
+   }
+
+      ifMainExtMacAddress     OBJECT-TYPE
+         SYNTAX            MacAddress 
+         MAX-ACCESS        read-create 
+         STATUS            current
+         DESCRIPTION
+            "The unicast MacAddress for each interface.
+            The Macaddress can be set only when ifMainAdminStatus for the 
+            interface is down(2). The object is valid only for 
+            interfaces that have the ifMainType set as ethernetCsmacd(6) or 
+            ieee8023ad(161). 
+            Configuration of this object is not mandatory. If this object is
+            not configured, the default Macaddress for the interface is obtained
+            from the system."
+         ::= { ifMainExtEntry 8 }
+
+       ifMainExtSysSpecificPortID    OBJECT-TYPE
+         SYNTAX                     Unsigned32
+         MAX-ACCESS                 read-write
+         STATUS                     current
+         DESCRIPTION
+            "System specific index configured for the port. 
+             It provides a different numbering space other than the 
+             IfIndex to identify ports. 
+             Valid range for this object is from 1 to 16384.
+             The value 0 is not allowed to be set. On reading the object 
+             0 is returned only if no other value has been configured."
+         DEFVAL { 0 }
+         ::= { ifMainExtEntry 9 }
+
+      ifMainExtInterfaceType OBJECT-TYPE
+         SYNTAX      INTEGER {
+      	    frontpanelport        (1),
+      	    backplaneport         (2)
+         }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+            "This object reflects the usage of this interface, whether it is a 
+        	frontpanel interface or a backplane interface used for interswitching
+        	in distributed environments.
+
+        	frontpanelport - 
+        	The interface behaves as a normal interface visible to the management
+        	and other protocols.
+
+        	backplaneport - 
+        	This port operates as back plane interface in the system enabling
+        	communication across the line cards present in the system.  This
+        	interface will be masked from the management control for all the
+        	protocol related operations. This can be used in distributed 
+        	environments wherein protocols are ran over every individual line 
+        	cards to achieve better CPU utilization and performance. Proprietary 
+        	PDU and tailored control PDU flow out of this interface to keep the 
+        	system information intact across the line cards present in the system. 
+        	This can be enabled only over the physical interface and not over any 
+        	other interface."
+
+        DEFVAL { 1 }
+        ::= { ifMainExtEntry 10}
+
+      ifMainExtPortSecState OBJECT-TYPE
+         SYNTAX        INTEGER {
+                            untrusted (0),
+                            trusted (1)
+         }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+           "The interface port security state says whether the port is connected
+           to trusted hosts or not. If a port is trusted, the packets coming
+           on that ports will also be trusted. By default all the ports will be
+           untrusted. If the interface is part of a port channel it cannot be set."
+
+         DEFVAL { trusted }
+         ::={ ifMainExtEntry 11 }
+
+      ifMainExtInPkts  OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+          "Total number of packets received on this interface. This includes the
+           total of Unicast, Multicast and Broadcast packets received on a interface."
+
+         ::={ ifMainExtEntry 12 }
+
+        ifMainExtLinkUpEnabledStatus    OBJECT-TYPE
+         SYNTAX                     INTEGER  { enabled(1), disabled(2) }
+         MAX-ACCESS                 read-write
+         STATUS                     current
+         DESCRIPTION
+           "This enables or disables Link Up Delay functionality in this port. 
+            A value of  'enabled'(1) indicates  that, operational status of the 
+            link is suspended for a configured delay time 'ifMainExtLinkUpDelayTimer'.
+            A value of 'disabled' (2) indicates  that  the operational status of the
+            link is not delayed and indicated to the higher layers immediately."
+
+         DEFVAL  { disabled }
+            ::= { ifMainExtEntry 13}
+
+       ifMainExtLinkUpDelayTimer    OBJECT-TYPE
+         SYNTAX                     Unsigned32
+         UNITS                      "seconds"
+         MAX-ACCESS                 read-write
+         STATUS                     current
+         DESCRIPTION
+            "This configures the delay timer for the link up enabled interface.
+             It takes the timer value (in seconds) minimum value as 1 and 
+             maximum value as 1000."
+
+         DEFVAL { 2 }
+         ::= { ifMainExtEntry 14}
+
+       ifMainExtLinkUpRemainingTime    OBJECT-TYPE
+         SYNTAX                         Unsigned32
+         MAX-ACCESS                     read-only
+         STATUS                         current
+         DESCRIPTION
+            "This object is for displaying the pending time left 
+             for the link Operation Status to be made UP."
+
+         ::= { ifMainExtEntry 15}
+-- ----------------------------------------------------------------------------
+-- CFA Custom TLV Table
+-- ----------------------------------------------------------------------------
+
+ifCustTLVTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IfCustTLVEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table allows generic TLV data to be configured per-port.
+       It may be used to store any port-specific information that 
+       is required by any application."
+          
+   ::= { if 13 }
+
+ifCustTLVEntry OBJECT-TYPE
+   SYNTAX      IfCustTLVEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Entry about the TLV information"
+   INDEX { ifMainIndex, ifCustTLVType }
+   ::= { ifCustTLVTable 1 }
+
+IfCustTLVEntry ::=
+   SEQUENCE {
+      ifCustTLVType       Unsigned32,
+      ifCustTLVLength     Unsigned32,
+      ifCustTLVValue      DisplayString,
+      ifCustTLVRowStatus  RowStatus
+   }
+
+ifCustTLVType  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Type of the TLV Information."
+   ::= { ifCustTLVEntry 1 }
+
+ifCustTLVLength  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "Length of the TLV Information. 
+       Specification of this object is mandatory for ifCustTLVRowStatus to
+       be made active. Length should be configured after the row creation in 
+       ifCustTLVTable and before configuring the ifCustTLVValue. 
+       The value 0 is not allowed to be set."
+   ::= { ifCustTLVEntry 2 }
+
+ifCustTLVValue OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "Value of the TLV Information. The default value is 0."
+   ::= { ifCustTLVEntry 3 }
+
+ifCustTLVRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "RowStatus of the Corresponding Entry."
+   ::= { ifCustTLVEntry 4 }
+   
+-- ----------------------------------------------------------------------------
+-- CFA Custom OpaqueAttributes Table
+-- ----------------------------------------------------------------------------
+
+ifCustOpaqueAttrTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IfCustOpaqueAttrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This table allows generic integer attributes to be configured 
+       per-port. These attributes will be opaque from ISS's point of 
+       view and will not be processed/understood by ISS."
+   ::= { if 14 }
+
+ifCustOpaqueAttrEntry OBJECT-TYPE
+   SYNTAX      IfCustOpaqueAttrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Entry for every opaque attribute on each port."
+   INDEX { ifMainIndex, ifCustOpaqueAttributeID }
+   ::= { ifCustOpaqueAttrTable 1 }
+
+IfCustOpaqueAttrEntry ::=
+   SEQUENCE {
+      ifCustOpaqueAttributeID      INTEGER,
+      ifCustOpaqueAttribute        Unsigned32,
+      ifCustOpaqueRowStatus        RowStatus        
+   }
+
+ifCustOpaqueAttributeID  OBJECT-TYPE
+   SYNTAX           INTEGER{
+                       opaqueAttr1 (1), 
+                       opaqueAttr2 (2), 
+                       opaqueAttr3 (3), 
+                       opaqueAttr4 (4)
+                       } 
+   MAX-ACCESS       not-accessible
+   STATUS           current
+   DESCRIPTION
+      "OpaqueAttribute ID  configured on the port. Four opaque attributes are
+       supported on each port"
+   ::= { ifCustOpaqueAttrEntry 1 }
+
+ifCustOpaqueAttribute OBJECT-TYPE
+   SYNTAX                Unsigned32
+   MAX-ACCESS            read-create
+   STATUS                current
+   DESCRIPTION
+      "Value for the Opaque attribute.This value can be altered when 
+      ifCustOpaqueRowStatus is ACTIVE."
+   DEFVAL { 0 }
+   ::= { ifCustOpaqueAttrEntry 2 }
+
+
+ifCustOpaqueRowStatus OBJECT-TYPE
+   SYNTAX                RowStatus
+   MAX-ACCESS            read-create
+   STATUS                current
+   DESCRIPTION
+      "RowStatus of the Corresponding Entry. NOT_IN_SERVICE value is not
+      supported."
+   ::= { ifCustOpaqueAttrEntry 3 }
+
+-- ===========================================================
+-- I-LAN Interface configuration table
+-- ===========================================================
+
+ifBridgeILanIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfBridgeILanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This table is used to read the status of an I-Lan interface
+         created from Iftable. An I-LAN Interface is
+          used to create internal connections between bridge ports in a
+          802.1 device.  An I-LAN Interfaces can be directly associated
+          with a set of bridge ports.  An I-LAN Interfaces can also be
+          used as a stacking interface to relate other interfaces before
+          association to bridge ports.
+
+          For example, an I-LAN interface can be created to link traffic
+          between a PIP and a CBP.  This involves creation of an interface
+          of type iLan with a corresponding entry made in the ifTable. 
+          
+          The IfIndex corresponding to the ILAN is put in the IlanifTable.
+          A CBP is created in a B Component of IfType internal and  CBP 
+          related IfEntry is stacked upon the IfEntry of the I-LAN using 
+          the IfStackTable.  Similarly, a PIP is created in a I Component
+          of IfType internal and  PIP related IfEntry is stacked upon the
+          IfEntry of the I-LAN using the IfStackTable. 
+          Finally, a VIP is created with ifType internal on the I-Component
+          and is associated with the PIP, thus completing the path from 
+          the I-Component's MAC relay to the CBP on the B-Component.
+
+          Entries in this table must be persistent over power up
+          restart/reboot."
+    ::= { if 15 }
+
+ifBridgeILanIfEntry OBJECT-TYPE
+    SYNTAX      IfBridgeILanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry consists of a Status to get the I-Lan interface status"
+    INDEX       { ifIndex }
+    ::= { ifBridgeILanIfTable 1 }
+
+IfBridgeILanIfEntry ::=
+    SEQUENCE {
+        ifBridgeILanIfStatus
+            INTEGER
+    }
+
+ifBridgeILanIfStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                       active (1),
+                       outOfService (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to read the status of an I-Lan interface
+         created from Iftable."
+    ::= { ifBridgeILanIfEntry 1 }
+-- ======================================================
+-- IfType Protocol Deny Table.
+-- ======================================================
+ifTypeProtoDenyTable    OBJECT-TYPE
+    SYNTAX              SEQUENCE OF IfTypeProtoDenyEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+    "A table to configure the interface types and bridge port types accessible 
+    to various protocol(s). This table will indicate whether
+    a particular type of interface is to be created or be visible
+    in the given protocol module. An entry in this table will cause the 
+    particular type of interface to be denied from being accessed by the 
+    protocol i.e. the particular type of interface will not be created
+    (i.e. visible) in the given protocol." 
+    ::= { if 16 }
+
+ifTypeProtoDenyEntry    OBJECT-TYPE
+    SYNTAX              IfTypeProtoDenyEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+    "Each entry in this table will give the interface type and bridge port type 
+    that will not be accessible to the protocol for the mentioned context.
+    Only valid and allowed combinations of ifTypeProtoDenyMainType and
+    ifTypeProtoDenyBrgPortType must be configured by the administrator."
+    INDEX { ifTypeProtoDenyContextId, ifTypeProtoDenyMainType, 
+            ifTypeProtoDenyBrgPortType, ifTypeProtoDenyProtocol }
+    ::= { ifTypeProtoDenyTable 1 }
+
+IfTypeProtoDenyEntry    ::= 
+    SEQUENCE {
+        ifTypeProtoDenyContextId    Unsigned32,
+        ifTypeProtoDenyMainType     INTEGER,
+        ifTypeProtoDenyBrgPortType  INTEGER,
+        ifTypeProtoDenyProtocol     INTEGER,
+        ifTypeProtoDenyRowStatus    RowStatus
+        }
+
+ifTypeProtoDenyContextId    OBJECT-TYPE
+    SYNTAX                  Unsigned32 (0..255)
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+    "Identifies a virtual context in which to deny access of the given interface 
+    type and bridge port type to a protocol."
+    ::= { ifTypeProtoDenyEntry 1 }
+
+ifTypeProtoDenyMainType OBJECT-TYPE
+   SYNTAX               INTEGER {
+                          ethernetCsmacd(6), -- Ethernet/802.3
+                          propVirtual (53), -- Proprietary Virtual Interface
+                          ieee8023ad(161), -- Link Aggregation Mib
+                          brgPort(209), -- Bridge port used for creating virtual ports in PBB
+  	                      pip (248) -- Virtual (Internal) Provider Instance port 
+
+                          } -- These are the currently supported 
+                            -- interfaces. More can be added at a
+                            -- later time.
+   MAX-ACCESS           not-accessible
+   STATUS               current
+   DESCRIPTION
+   "This object type refers to the ifMainType.
+    The interface types that are currently supported by this table are 
+    ethernetCsmacd(6), propVirtual(53), ieee8023ad(161), brgPort(209) and 
+    pip(248)." 
+    ::= { ifTypeProtoDenyEntry 2 }
+
+ifTypeProtoDenyBrgPortType  OBJECT-TYPE
+    SYNTAX                  INTEGER {
+                              providerNetworkPort           (1),
+                              customerNetworkPortPortBased  (2),
+                              customerNetworkPortStagged    (3),
+                              customerEdgePort              (4),
+                              propCustomerEdgePort          (5),
+                              propCustomerNetworkPort       (6),
+                              propProviderNetworkPort       (7),
+                              customerBridgePort            (8),
+                              customerNetworkPortCtagged    (9),
+						      virtualInstancePort  	       (10),	
+						      providerInstancePort	       (11),
+						      customerBackbonePort	       (12)
+                            }
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+    "This object type refers to ifMainBrgPortType."
+    ::= { ifTypeProtoDenyEntry 3 }
+
+ifTypeProtoDenyProtocol     OBJECT-TYPE
+    SYNTAX                  INTEGER {
+                                pnac(1),
+                                la(2),
+                                xstp(3),
+                                vlan(4),
+                                garp(5),
+                                mrp(6),
+                                pbb(7),
+                                ecfm(8),
+                                elmi(9),
+                                snoop(10),
+                                lldp(11),
+                                bridge(12),
+                                qos(13)
+                            }
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+    "Identifies the protocol for which the corresponding interface type and 
+    bridge port type will not be accessible/visible."
+    ::= {ifTypeProtoDenyEntry 4 }
+
+ifTypeProtoDenyRowStatus    OBJECT-TYPE
+    SYNTAX                  RowStatus
+    MAX-ACCESS              read-write
+    STATUS                  current
+    DESCRIPTION
+    "Indicates the status of the row. Valid values are 'createAndGo' and
+    'destroy'. A row can be created in this table by assigning the value 
+    'createAndGo' for the status object which will cause the entry to become 
+    active. An 'active' entry will identify the interface type and bridge port 
+    type that will not be acccessible to the specified protocol for the context. 
+    In other words, interfaces of the given interface type and bridge port 
+    type will not be visible/created in the given protocol.
+    An 'active' row can be deleted by assigning the value 'destroy' to 
+    the status. Once the entry is destroyed then all the interfaces of the 
+    specified interface type and bridge port type will be accessible to the 
+    specified protocol for the context."
+    ::= {ifTypeProtoDenyEntry 5 }
+
+-- Debug Trace SCALAR object
+ifmDebug OBJECT-TYPE 
+   SYNTAX      Unsigned32 (0..4294967295)
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Enables the tracing in the selected submodule in CFA. A 32 bit 
+      integer is used to store the Tracing level in the specified module.
+       Different Tracing Levels -
+         BIT 0 - Initialisation and Shutdown Trace.
+         BIT 1 - Management trace.
+         BIT 2 - Data path trace.
+         BIT 3 - Control Plane trace.
+         BIT 4 - Packet Dump.
+         BIT 5 - OS Resource trace.
+         BIT 6 - All Failure trace (All failures including Packet Validation)
+         BIT 7 - Buffer Trace.
+
+       Different submodule tracing.
+        BIT 25 - ENET packet dump.
+        BIT 26 - IP packet dump.
+        BIT 27 - ARP packet dump.
+        BIT 28 - Exit Trace used during intialization.
+        BIT 29 - Error messages.
+
+       The remaining bits are reserved. The combination of levels and 
+       submodules are allowed i.e. Tracing can be allowed at all failure 
+       and data path level in All submodules by setting the BIT 
+       appropriately.
+       For Example, setting the debug value to the following bit stream, 
+          00000000000000010000000000000100 will enable data path trace 
+       prints in CFA module. Multiple submodules and multiple levels can
+       be combined by setting the corresponding bits.
+       For Example, setting the debug value to the following bit stream,
+          00000000000000110000000000001100 will enable data path and 
+       control plane trace prints in CFA and CFA Priority modules.
+       
+       Note : BIT0 is the least significant bit and BIT31 is the most
+       significant bit."
+   ::= { if 17 }
+
+-- ifIvrMappingTable
+-- Mapping of multiple Vlans to IVR interfaces.
+
+      ifIvrMappingTable  	OBJECT-TYPE
+         SYNTAX               SEQUENCE OF IfIvrMappingEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+           "This table is used to configure the list of vlans to be 
+            associated for an IVR interface.
+            The primary Index to this table can only be a IVR interface."
+         ::= { if 18 }
+
+      ifIvrMappingEntry    OBJECT-TYPE
+         SYNTAX            IfIvrMappingEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "Each entry in this table gives an assoicated vlan to an IVR 
+             interface."
+         INDEX { ifMainIndex, ifIvrAssociatedVlan }
+         ::= { ifIvrMappingTable 1 }
+ 
+      IfIvrMappingEntry ::=
+         SEQUENCE {
+                ifIvrAssociatedVlan 	        VlanId,
+        	ifIvrMappingRowStatus		RowStatus
+            }
+
+      ifIvrAssociatedVlan OBJECT-TYPE
+         SYNTAX            VlanId
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "This object specifies one of the associated VLANs for a given
+             IVR interface. Vlan Id associated with an IVR interface during
+             IVR interface creation, should not be configured as 
+             ifIvrAssociatedVlan for that IVR interface.
+             ifIvrAssociatedVlan and the primary vlan (vlan associated with 
+             IVR during IVR creation) for an IVR interface should be in the 
+             same Layer 2 context."
+         ::= { ifIvrMappingEntry 1 }
+
+      ifIvrMappingRowStatus   OBJECT-TYPE
+         SYNTAX            	RowStatus
+         MAX-ACCESS        	read-create
+         STATUS            	current
+         DESCRIPTION
+            "Denotes the Row Status for port isolation table entry.
+             Only 'CreateAndGo' and 'destroy' values are allowed for this
+             object. 'CreateAndWait' and 'notInService' values are not allowed.
+             Example:
+                To add vlans 2, 3 as associated vlans to an IVR interface with
+                interface index as 10 in this table, the following sequence 
+                to be followed:
+        
+                   1. Set the ifIvrMappingRowStatus as 'CreateAndGo' for the
+                      entry with index 
+                      (ifMainIndex = 10, ifIvrAssociatedVlan = 2)
+                   2. Set the ifIvrMappingRowStatus as 'CreateAndGo' for the
+                      entry with index 
+                      (ifMainIndex = 10, ifIvrAssociatedVlan = 3)
+        
+                To delete vlan 3 from the list of associated vlans for an IVR 
+                interface with IfIndex = 10 ports, do the following:
+                      Set the ifIvrMappingRowStatus as 'destroy' for the
+                      entry with index 
+                      (ifMainIndex = 10, ifIvrAssociatedVlan = 3)."
+         ::= { ifIvrMappingEntry 2 }
+
+-- Cfa Ff Group
+-- This group defines objects for Management of the Fast Forwarding
+-- feature of the CFA.
+
+      ffFastForwardingEnable     OBJECT-TYPE
+         SYNTAX                  TruthValue
+         MAX-ACCESS              read-write
+         STATUS                  deprecated 
+         DESCRIPTION
+            "This object permits the enabling and disabling of 
+            the Fast Forwarding feature in the router. Setting of 
+            this variable to TRUE(1) enables fast-forwarding and 
+            setting it to FALSE(2) disables it."
+         DEFVAL { false } 
+         ::= { ff 1 }
+
+      ffCacheSize                OBJECT-TYPE
+         SYNTAX                  Integer32 (10..65535)
+         MAX-ACCESS              read-write
+         STATUS                  deprecated 
+         DESCRIPTION
+            "This object permits the resizing of the Host
+            Cache. This object can be changed only when
+            the Fast Forwarding Mechanism is disabled.
+            For changing the Cache Size, The Fast-Forwarding
+            Mechanism should be disabled first (this will
+            result in loss of all current entries in the 
+            cache) and then enabled again after specifying
+            the new size."
+         ::= { ff 2 }
+
+      ffIpChecksumValidationEnable     OBJECT-TYPE
+         SYNTAX                        TruthValue
+         MAX-ACCESS                    read-write
+         STATUS                        deprecated 
+         DESCRIPTION
+            "This object permits the enabling and disabling of
+            the validation of the IP Checksum for incoming 
+            IP packets. Setting of this variable to TRUE(1) enables 
+            the checksum validation and setting it to FALSE(2) 
+            disables it."
+         DEFVAL { true } 
+         ::= { ff 3 }
+
+      ffCachePurgeCount    OBJECT-TYPE
+         SYNTAX            Counter32
+         MAX-ACCESS        read-only
+         STATUS            deprecated 
+         DESCRIPTION
+            "A counter which indicates the number of times the
+            entries in the Host Cache Table were purged due 
+            to cache overflow."
+         ::= { ff 4 }
+
+      ffCacheLastPurgeTime       OBJECT-TYPE
+         SYNTAX                  TimeStamp
+         MAX-ACCESS              read-only
+         STATUS                  deprecated 
+         DESCRIPTION
+            "Indicates the SysUpTime when the last purging of
+            entries in the Host Cache Table took place."
+         ::= { ff 5 }
+
+      ffStaticEntryInvalidTrapEnable   OBJECT-TYPE
+         SYNTAX                        TruthValue
+         MAX-ACCESS                    read-write
+         STATUS                        deprecated 
+         DESCRIPTION
+            "Permits enabling and disabling of the generation of 
+            ffStaticEntryInvalid SNMP Enterprise Trap when a static
+            entry becomes invalid. When its value is TRUE(1), the 
+            trap is generated when a static entry become invalid."
+         DEFVAL { true } 
+         ::= { ff 6 }
+
+      ffCurrentStaticEntryInvalidCount    OBJECT-TYPE
+         SYNTAX                           Counter32
+         MAX-ACCESS                       read-only
+         STATUS                           deprecated 
+         DESCRIPTION
+            "A counter which indicates the number of static
+            entries in the Host Cache Table that are 
+            currently invalid."
+         ::= { ff 7 }
+
+      ffTotalEntryCount                   OBJECT-TYPE
+         SYNTAX                           Counter32
+         MAX-ACCESS                       read-only
+         STATUS                           deprecated 
+         DESCRIPTION
+            "A counter which indicates the total number of
+            entries in the Host Cache Table."
+         ::= { ff 8 }
+
+      ffStaticEntryCount                  OBJECT-TYPE
+         SYNTAX                           Counter32
+         MAX-ACCESS                       read-only
+         STATUS                           deprecated 
+         DESCRIPTION
+            "A counter which indicates the number of static
+            entries in the Host Cache Table."
+         ::= { ff 9 }
+
+      ffTotalPktsFastForwarded            OBJECT-TYPE
+         SYNTAX                           Counter32
+         MAX-ACCESS                       read-only
+         STATUS                           deprecated 
+         DESCRIPTION
+            "A counter which indicates the number of packets
+            that were successfully fast-forwarded by the
+            host cache mechanism."
+         ::= { ff 10 }
+
+-- ffTable
+-- This table shows the current status of the Host Cache in the
+-- system. 
+
+      ffHostCacheTable     OBJECT-TYPE
+         SYNTAX            SEQUENCE OF FfHostCacheEntry
+         MAX-ACCESS        not-accessible
+         STATUS            deprecated 
+         DESCRIPTION
+            "This table has entries corresponding to the current 
+            entries in the Host Cache. The entries in this table
+            can be added, deleted or modified."
+         ::= { ff 11 }
+
+      ffHostCacheEntry     OBJECT-TYPE
+         SYNTAX            FfHostCacheEntry
+         MAX-ACCESS        not-accessible
+         STATUS            deprecated 
+         DESCRIPTION
+            "An Entry consisting of all the information 
+            about an entry in the Host Cache."
+         INDEX { ffHostCacheDestAddr }
+         ::= { ffHostCacheTable 1 }
+
+      FfHostCacheEntry ::=
+         SEQUENCE {
+            ffHostCacheDestAddr              IpAddress,
+            ffHostCacheNextHopAddr           IpAddress,
+            ffHostCacheIfIndex               InterfaceIndex,
+            ffHostCacheNextHopMediaAddr      OCTET STRING,
+            ffHostCacheHits                  Counter32,
+            ffHostCacheLastHitTime           TimeStamp,
+            ffHostCacheEntryType             INTEGER,
+            ffHostCacheRowStatus             RowStatus
+            }
+
+      ffHostCacheDestAddr        OBJECT-TYPE
+         SYNTAX                  IpAddress
+         MAX-ACCESS              not-accessible 
+         STATUS                  deprecated 
+         DESCRIPTION
+            "The IP address of the destination host. "
+         ::= { ffHostCacheEntry 1 }
+
+      ffHostCacheNextHopAddr     OBJECT-TYPE
+         SYNTAX                  IpAddress
+         MAX-ACCESS              read-create
+         STATUS                  deprecated 
+         DESCRIPTION
+            "The IP address of the next-hop to which a packet 
+            for this host are forwarded. This could be same as 
+            ffHostCacheDestAddr if the next-hop is the end-host 
+            as well. 
+               
+            When creating a static entry, this object 
+            should be set with the IP address of the next-hop 
+            (router) for a host which is not directly connected 
+            to our system and with the IP address of the host 
+            itself for a host which is directly connected to us.
+               
+            A set on this object for an entry whose 
+            ffHostCacheEntryType is dynamic is not permitted."
+         ::= { ffHostCacheEntry 2 }
+
+      ffHostCacheIfIndex         OBJECT-TYPE
+         SYNTAX                  InterfaceIndex
+         MAX-ACCESS              read-create
+         STATUS                  deprecated 
+         DESCRIPTION
+            "Identifies the MIB-2 ifIndex of the outgoing
+            interface over which packets to this host are sent.
+            When creating a static entry, this object should be
+            set with the ifIndex of our network interface 
+            for reaching the specified next-hop. 
+               
+            It is mandatory to specify the next-hop IP address
+            using the ffHostCacheNextHopAddr before setting this
+            value. The specified ifIndex should be that of an
+            interface which is registered with IP.
+               
+            A set on this object for an entry
+            whose ffHostCacheEntryType is dynamic is not 
+            permitted."
+         ::= { ffHostCacheEntry 3 }
+
+      ffHostCacheNextHopMediaAddr      OBJECT-TYPE
+         SYNTAX                        OCTET STRING (SIZE (0..6))
+         MAX-ACCESS                    read-create
+         STATUS                        deprecated 
+         DESCRIPTION
+            "Provides the media address of the next-hop
+            to which the packet for this host is to be sent to.
+
+            It is mandatory to specify the next-hop IP address
+            and the outgoing ifIndex using the 
+            ffHostCacheNextHopAddr and ffHostCacheIfIndex
+            respectively before setting this value.
+
+            This object must be specified for hosts, which are
+            reached through the interfaces of ethernetCsmacd(6) 
+            and iso88025TokenRing(9) type. The value for such 
+            interfaces would be the MAC address as per the
+            representation used for the particular media.
+               
+            For interfaces of type ppp(23) and 
+            pppMultilinkBundle(108), this object must have the
+            default value 0. 
+                  
+            For virtual circuit interfaces (type miox25(38) and 
+            frameRelayMPI(92)), this object must have the MIB-2
+            ifIndex assigned to the respective virtual circuit.
+                     
+            For virtual interfaces (type ipOverAtm(114) and
+            frameRelay(32)), this object MAY be used to (optionally)
+            specify the MIB-2 ifIndex assigned to the outgoing
+            virtual circuit. If not specified the value would be
+            obtained automatically from the respective modules.
+            
+            A set on this object for an entry whose 
+            ffHostCacheEntryType is dynamic is not permitted."
+         ::= { ffHostCacheEntry 4 }
+
+      ffHostCacheHits      OBJECT-TYPE
+         SYNTAX            Counter32
+         MAX-ACCESS        read-only
+         STATUS            deprecated 
+         DESCRIPTION
+            "Indicates the total number of packets fast-
+            forwarded to this host."
+         ::= { ffHostCacheEntry 5 }
+
+      ffHostCacheLastHitTime     OBJECT-TYPE
+         SYNTAX                  TimeStamp
+         MAX-ACCESS              read-only
+         STATUS                  deprecated 
+         DESCRIPTION
+            "Indicates the SysUpTime when the last packet
+            was fast-forwarded to this host."
+         ::= { ffHostCacheEntry 6 }
+
+      ffHostCacheEntryType       OBJECT-TYPE
+         SYNTAX                  INTEGER {
+                                    static(1),
+                                    dynamic (2)
+                                    }
+         MAX-ACCESS              read-create
+         STATUS                  deprecated 
+         DESCRIPTION
+            "An object, which indicates the type of this Host Cache 
+            entry. 
+               
+            A static entry is an entry created by the Network 
+            Manager and is not purged by the system. Such entries
+            would be invalidated due to route or other changes
+            but will continue to remain in the Host Cache.
+               
+            Dynamic entries are those entries which have been learnt by 
+            the system and which can be purged in the event of 
+            a cache overflow or invalidation due to route or other
+            changes. 
+               
+            All entries created through SNMP must set this object to 
+            static otherwise." 
+         DEFVAL { static } 
+         ::= { ffHostCacheEntry 7 }
+
+      ffHostCacheRowStatus       OBJECT-TYPE
+         SYNTAX                  RowStatus
+         MAX-ACCESS              read-create
+         STATUS                  deprecated 
+         DESCRIPTION
+            "A RowStatus object for addition/deletion of Host
+            Cache entries. It also indicates the status of the
+            entry. 
+               
+            Set action is not allowed for notInService(2). An entry,
+            which has become invalid due to a route failure or 
+            address resolution failure, would have the status 
+            'notInService'. 
+               
+            An entry for a host for which the link layer 
+            information can be cached but the information is 
+            not currently available would have the status 'notReady'.
+               
+            All active entries with all possible information 
+            complete would have the value 'active'."
+         ::= { ffHostCacheEntry 8 }
+
+
+-- Cfa Fm Group
+-- This group defines objects for Fault Management features.
+
+      fmMemoryResourceTrapEnable    OBJECT-TYPE
+         SYNTAX                     TruthValue
+         MAX-ACCESS                 read-write
+         STATUS                     deprecated 
+         DESCRIPTION
+            "Permits the enabling and disabling of 
+            fmLowMemoryResource Trap when a memory 
+            allocation failure is encountered in the 
+            module."
+         DEFVAL { true }
+         ::= { fm 1 }
+
+      fmTimersResourceTrapEnable    OBJECT-TYPE
+         SYNTAX                     TruthValue
+         MAX-ACCESS                 read-write
+         STATUS                     deprecated 
+         DESCRIPTION
+            "Permits the enabling and disabling of 
+            fmLowTimerResource Trap when a request 
+            for a timer fails in the module."
+         DEFVAL { true }
+         ::= { fm 2 }
+ 
+      fmTracingEnable           OBJECT-TYPE
+         SYNTAX                 Integer32
+         MAX-ACCESS             read-write
+         STATUS                 deprecated 
+         DESCRIPTION
+            "Permits the enabling and disabling of 
+            the generation of the log/trace messages
+            throughout the module. This object acts
+            as a Tracing Level Flag and specifies
+            the level of trace or log to be enabled in 
+            the module."
+         DEFVAL { 0 }
+         ::= { fm 3 }
+
+      fmMemAllocFailCount    OBJECT-TYPE
+         SYNTAX              Counter32
+         MAX-ACCESS          read-only
+         STATUS              current
+         DESCRIPTION
+            "Maintains a count of the number of times
+            when a failure was encountered while memory
+            allocation operation in the module."
+         ::= { fm 4 }
+
+      fmTimerReqFailCount    OBJECT-TYPE
+         SYNTAX              Counter32
+         MAX-ACCESS          read-only
+         STATUS              current
+         DESCRIPTION
+            "Maintains a count of the number of times
+            when a failure was encountered while requesting
+            a timer in the module."
+         ::= { fm 5 }
+
+
+  -- Notifications or Traps
+
+      trapPrefix  OBJECT IDENTIFIER ::= { traps 0 }
+
+      fmLowTimerResource       NOTIFICATION-TYPE
+         OBJECTS {
+            fmTimerReqFailCount   
+            }
+         STATUS                    deprecated 
+         DESCRIPTION
+            "This trap is generated whenever there is a failure in
+            a timer related operation in the module.
+               
+            This trap is generated only when the value of the 
+            fmTimersResouceTrapEnable object is TRUE(1)."
+         ::= { trapPrefix 1 }
+
+      fmLowBufferResource         NOTIFICATION-TYPE
+         OBJECTS {
+            fmMemAllocFailCount
+            }
+         STATUS                  deprecated 
+         DESCRIPTION
+            "This trap is generated when a memory allocation 
+            failure occurs in the module. This 
+            trap is generated only when the value of the 
+            fmMemoryResourceTrapEnable object is TRUE(1)."
+         ::= { trapPrefix 2 }
+
+      ffStaticEntryInvalid       NOTIFICATION-TYPE
+         OBJECTS {
+            ffHostCacheIfIndex,
+            ffHostCacheEntryType 
+            }
+         STATUS                  deprecated 
+         DESCRIPTION
+            "This trap is generated when a static entry
+            in the ffHostCacheTable becomes invalid
+            due to a route deletion or address resolution failure. This 
+            trap is generated only when the value of the 
+            ffStaticEntryInvalidTrapEnable object is TRUE (1)."
+         ::= { trapPrefix 3 }
+
+      ifCreated       NOTIFICATION-TYPE
+         OBJECTS {
+            ifMainIndex
+            }
+         STATUS                  current 
+         DESCRIPTION
+            "This trap is generated when interface Row Status
+            is Active or interface is created."
+         ::= { trapPrefix 4 }
+
+      ifDeleted       NOTIFICATION-TYPE
+         OBJECTS {
+            ifMainIndex
+            }
+         STATUS                  current 
+         DESCRIPTION
+            "This trap is generated when interface Row Status
+            is Destroy or interface is deleted."
+         ::= { trapPrefix 5 }
+
+
+      ifUfdEnabled       NOTIFICATION-TYPE
+         OBJECTS {
+            ifMainIndex,
+            ifMainUfdOperStatus
+            }
+         STATUS                  current
+         DESCRIPTION
+            "This trap is generated when the interface's Uplink Failure 
+             Detection(UFD) operational status is moved from UFD error
+             disabled to Up state"
+         ::= { trapPrefix 6 }
+
+      ifUfdErrorDisabled       NOTIFICATION-TYPE
+         OBJECTS {
+            ifMainIndex,
+            ifMainUfdOperStatus
+            }
+         STATUS                  current
+         DESCRIPTION
+            "This trap is generated when the interface's Uplink Failure 
+             Detection(UFD) operational status is moved from Up to UFD 
+             error disabled state"
+         ::= { trapPrefix 7 }
+
+           -- Implementation of the of 64 bit Error Counters
+
+
+          ifHCErrorTable    OBJECT-TYPE
+          SYNTAX      SEQUENCE OF IfHCErrorEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+          "A list of interface entries.  The number of entries is
+          given by the value of ifNumber.  This table contains
+          additional objects for the interface table."
+          ::= { if 19 }
+
+          ifHCErrorEntry        OBJECT-TYPE
+          SYNTAX      IfHCErrorEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+          "An entry containing additional management information
+          applicable to a particular interface."
+          AUGMENTS    { ifEntry }
+          ::= { ifHCErrorTable 1 }
+
+
+          IfHCErrorEntry ::=
+          SEQUENCE {
+           
+              ifHCInDiscards            Counter64,
+              ifHCInErrors              Counter64,
+              ifHCInUnknownProtos       Counter64,
+              ifHCOutDiscards           Counter64,
+              ifHCOutErrors             Counter64
+          }
+
+
+          ifHCInDiscards OBJECT-TYPE
+            SYNTAX      Counter64
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+             "The number of inbound packets which were chosen to be
+              discarded even though no errors had been detected to prevent
+              their being deliverable to a higher-layer protocol.  One
+              possible reason for discarding such a packet could be to
+              free up buffer space.
+
+              Discontinuities in the value of this counter can occur at
+              re-initialization of the management system, and at other
+              times as indicated by the value of  ifCounterDiscontinuityTime.
+              This object is a 64-bit version of ifInDiscards"
+               ::= { ifHCErrorEntry 1 }
+
+          ifHCInErrors OBJECT-TYPE
+
+             SYNTAX      Counter64
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+              "For packet-oriented interfaces, the number of inbound
+               packets that contained errors preventing them from being
+               deliverable to a higher-layer protocol.  For character-
+               oriented or fixed-length interfaces, the number of inbound
+               transmission units that contained errors preventing them
+               from being deliverable to a higher-layer protocol.
+
+               Discontinuities in the value of this counter can occur at
+               re-initialization of the management system, and at other
+               times as indicated by the value of ifCounterDiscontinuityTime.
+               This object is a 64-bit version of ifInErrors"
+                ::= { ifHCErrorEntry 2 }
+
+           ifHCInUnknownProtos OBJECT-TYPE
+        
+            SYNTAX      Counter64
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+             "For packet-oriented interfaces, the number of packets
+              received via the interface which were discarded because of
+              an unknown or unsupported protocol.  For character-oriented
+              or fixed-length interfaces that support protocol
+              multiplexing the number of transmission units received via
+              the interface which were discarded because of an unknown or
+              unsupported protocol.  For any interface that does not
+              support protocol multiplexing, this counter will always be
+              0.
+              Discontinuities in the value of this counter can occur at
+              re-initialization of the management system, and at other
+              times as indicated by the value of  ifCounterDiscontinuityTime.
+              This object is a 64-bit version of ifInUnknownProtos"
+               ::= {ifHCErrorEntry 3 }
+
+           ifHCOutDiscards OBJECT-TYPE
+             SYNTAX      Counter64
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+              "The number of outbound packets which were chosen to be
+               discarded even though no errors had been detected to prevent
+               their being transmitted.  One possible reason for discarding
+               such a packet could be to free up buffer space.
+
+               Discontinuities in the value of this counter can occur at
+               re-initialization of the management system, and at other
+               times as indicated by the value of ifCounterDiscontinuityTime.
+               This object is a 64-bit version of ifOutDiscards"
+               ::= { ifHCErrorEntry 4 }
+
+           ifHCOutErrors OBJECT-TYPE
+            SYNTAX      Counter64
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+             "For packet-oriented interfaces, the number of outbound
+              packets that could not be transmitted because of errors.
+              For character-oriented or fixed-length interfaces, the
+              number of outbound transmission units that could not be
+              transmitted because of errors.
+
+              Discontinuities in the value of this counter can occur at
+              re-initialization of the management system, and at other
+              times as indicated by the value of  ifCounterDiscontinuityTime.
+              This object is a 64-bit version of ifHCOutErrors"
+              ::= { ifHCErrorEntry 5}
+
+       ifSecurityBridging		OBJECT-TYPE
+       SYNTAX			        INTEGER {
+                                enabled(1),
+		                        disabled(2)
+	                                   }           
+       MAX-ACCESS		read-write
+       STATUS			current
+       DESCRIPTION
+       "Enables or Disables Security for Bridged Packets globally."
+       DEFVAL  { disabled }
+       ::=	{ if 20 }
+
+       ifSetSecVlanList OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..512))
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "A string of octets containing one bit per VLAN. The
+           first octet corresponds to VLANs with VlanId values
+           1 through 8; the second octet to VLANs 9 through
+           16 etc.  The most significant bit of each octet
+           corresponds to the lowest VlanId value in that octet.
+           Packets Bridged on these VLAN's should be Secured"
+           ::= { if 21 }
+       
+       ifResetSecVlanList OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..512))
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "A string of octets containing one bit per VLAN. The
+           first octet corresponds to VLANs with VlanId values
+           1 through 8; the second octet to VLANs 9 through
+           16 etc.  The most significant bit of each octet
+           corresponds to the lowest VlanId value in that octet.
+           This is the set of vlans  to dis-associate security
+           for Packets Bridged on these VLAN's"
+
+           ::= { if 22 }
+
+       ifSecIvrIfIndex  OBJECT-TYPE
+       SYNTAX           Integer32
+       MAX-ACCESS       read-write
+       STATUS           current
+       DESCRIPTION
+       "An Integer which Indicates the IfIndex of IVR Interface used in 
+       Security Processing of Bridged Traffic "
+       ::= {if 23}
+
+-- ifAvailableIndexTable Table
+-- This is to get the next available index for a given iftype
+
+    ifAvailableIndexTable   OBJECT-TYPE
+       SYNTAX   SEQUENCE OF IfAvailableIndexEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION 
+           "This table returns the next available free interface
+            index for the given interface type"
+       ::= {if 24}
+
+    ifAvailableIndexEntry   OBJECT-TYPE
+       SYNTAX            IfAvailableIndexEntry
+       MAX-ACCESS        not-accessible
+       STATUS            current 
+       DESCRIPTION 
+        "This is an entry in the ifAvailableFreeIndex Table"
+       INDEX { ifType }
+       ::= { ifAvailableIndexTable 1 }
+
+    IfAvailableIndexEntry ::=
+       SEQUENCE{
+            ifAvailableFreeIndex  InterfaceIndex
+            }
+
+    ifAvailableFreeIndex          OBJECT-TYPE
+      SYNTAX            InterfaceIndex
+      MAX-ACCESS        read-only 
+      STATUS            current
+      DESCRIPTION
+       "This is the next available free interfac index for a given ifType"
+      ::= { ifAvailableIndexEntry 1 }
+
+
+-- Cfa Packet Analyser Group
+-- This group defines objects for Packet Analyser
+
+-- This table is used for analysing the incoming packet and to increment  
+-- the counter if pattern is matching as per given input
+         
+    fsPacketAnalyserTable          OBJECT-TYPE
+        SYNTAX                     SEQUENCE OF FsPacketAnalyserTable
+        MAX-ACCESS                 not-accessible
+        STATUS                     current
+        DESCRIPTION
+             " This table is used by the Packet Analyser for 
+               Pattern matching on particular ports"
+        ::= { pa 1 }
+
+    fsPacketAnalyserEntry           OBJECT-TYPE
+         SYNTAX                     FsPacketAnalyserTable
+         MAX-ACCESS                 not-accessible
+         STATUS                     current
+         DESCRIPTION
+            "An entry containing Pattern matching information 
+            used by the Packet analyser"
+         INDEX { fsPacketAnalyserIndex }
+         ::= { fsPacketAnalyserTable 1 }
+
+    FsPacketAnalyserTable ::=
+        SEQUENCE {
+            fsPacketAnalyserIndex        Unsigned32,
+            fsPacketAnalyserWatchValue   DisplayString,
+            fsPacketAnalyserWatchMask    DisplayString,
+            fsPacketAnalyserWatchPorts   PortList,
+            fsPacketAnalyserMatchPorts   PortList,
+            fsPacketAnalyserCounter      Counter32,
+            fsPacketAnalyserTime         TimeTicks,
+            fsPacketAnalyserCreateTime   TimeTicks,
+            fsPacketAnalyserStatus       RowStatus
+            }
+
+    fsPacketAnalyserIndex   OBJECT-TYPE
+        SYNTAX               Unsigned32
+        MAX-ACCESS           not-accessible
+        STATUS               current
+        DESCRIPTION
+            " An arbitrary integer value, greater than zero,
+              which uniquely identifies a pattern to be matched"
+        ::= { fsPacketAnalyserEntry 1 }
+
+    fsPacketAnalyserWatchValue   OBJECT-TYPE
+        SYNTAX               DisplayString (SIZE (0..1600))
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            " This represents the pattern which is to be matched  
+              in the packet to be analysed by the packet analyser"
+        ::= { fsPacketAnalyserEntry 2 }
+
+    fsPacketAnalyserWatchMask    OBJECT-TYPE
+        SYNTAX               DisplayString (SIZE (0..1600))
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            " The mask for the pattern to be matched by the packet analyser"  
+        ::= { fsPacketAnalyserEntry 3 }
+
+    fsPacketAnalyserWatchPorts   OBJECT-TYPE
+        SYNTAX               PortList
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            " Specifies the complete set of ports over which the pattern is
+              to be matched by the packet analyser"
+        ::= { fsPacketAnalyserEntry 4 }
+
+    fsPacketAnalyserMatchPorts OBJECT-TYPE
+        SYNTAX               PortList
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            " Specifies the complete set of ports over which the pattern is 
+              matched by the packet analyser"
+        ::= { fsPacketAnalyserEntry 5 }
+
+    fsPacketAnalyserCounter  OBJECT-TYPE
+        SYNTAX                Counter32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+            " Number of times the pattern was matched over the watched ports"
+        ::= { fsPacketAnalyserEntry 6 }
+
+    fsPacketAnalyserTime    OBJECT-TYPE
+        SYNTAX                TimeTicks
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+            " The value of sysUpTime when the pattern was last matched"
+        ::= { fsPacketAnalyserEntry 7 }
+
+    fsPacketAnalyserCreateTime    OBJECT-TYPE
+        SYNTAX                TimeTicks
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+            " The value of sysUpTime when the system was initiated"
+        ::= { fsPacketAnalyserEntry 8 }
+
+    fsPacketAnalyserStatus   OBJECT-TYPE
+        SYNTAX                RowStatus
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+            " Specifies the Row Status for the entry in this table"
+        ::= { fsPacketAnalyserEntry 9 }
+
+    fsPacketTransmitterTable          OBJECT-TYPE
+        SYNTAX                     SEQUENCE OF FsPacketTransmitterTable
+        MAX-ACCESS                 not-accessible
+        STATUS                     current
+        DESCRIPTION
+             " This table is used by the Packet Transmitter for 
+               sending the packets on particular ports"
+        ::= { pa 2 }
+
+    fsPacketTransmitterEntry           OBJECT-TYPE
+         SYNTAX                     FsPacketTransmitterTable
+         MAX-ACCESS                 not-accessible
+         STATUS                     current
+         DESCRIPTION
+            "An entry containing Packet information 
+            used by the Packet Transmitter"
+         INDEX { fsPacketTransmitterIndex }
+         ::= { fsPacketTransmitterTable 1 }
+
+    FsPacketTransmitterTable ::=
+        SEQUENCE {
+            fsPacketTransmitterIndex        Unsigned32,
+            fsPacketTransmitterValue        DisplayString,
+            fsPacketTransmitterPort         PortList,
+            fsPacketTransmitterInterval     TimeTicks,
+            fsPacketTransmitterCount        Unsigned32,
+            fsPacketTransmitterStatus       RowStatus
+            }
+
+    fsPacketTransmitterIndex   OBJECT-TYPE
+        SYNTAX               Unsigned32
+        MAX-ACCESS           not-accessible
+        STATUS               current
+        DESCRIPTION
+            " An arbitrary integer value, greater than zero,
+              which uniquely identifies a packet to be sent"
+        ::= { fsPacketTransmitterEntry 1 }
+
+    fsPacketTransmitterValue   OBJECT-TYPE
+        SYNTAX               DisplayString (SIZE (0..1600))
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            " This represents the pattern which is to be sent  
+              through the given port by the packet transmitter"
+        ::= { fsPacketTransmitterEntry 2 }
+
+    fsPacketTransmitterPort   OBJECT-TYPE
+        SYNTAX               PortList
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            " Specifies the port over which the packet is to be sent by 
+            the packet transmitter"
+        ::= { fsPacketTransmitterEntry 3 }
+
+    fsPacketTransmitterInterval  OBJECT-TYPE
+        SYNTAX                TimeTicks
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+            " The Time interval for sending the packet over the port in seconds"
+        ::= { fsPacketTransmitterEntry 4 }
+
+    fsPacketTransmitterCount  OBJECT-TYPE
+        SYNTAX                Unsigned32
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+            " Number of packet to be sent over the ports "
+        ::= { fsPacketTransmitterEntry 5 }
+
+    fsPacketTransmitterStatus   OBJECT-TYPE
+        SYNTAX                RowStatus
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+            " Specifies the Row Status for the entry in this table"
+        ::= { fsPacketTransmitterEntry 6 }
+
+-- ifACTable
+-- This table is used for the Attachment Circuit related
+-- configurations.
+
+      ifACTable              OBJECT-TYPE
+         SYNTAX               SEQUENCE OF IfACEntry
+         MAX-ACCESS           not-accessible
+         STATUS               current
+         DESCRIPTION
+            "A list of Attachment Circuit interface related
+            configurations. Attachment Circuit is a virtual interface
+            that is a  combination of physical port and customer vlan
+            identifier or it is a virtual interface that contains
+            underlying physical port alone.
+
+            This table is an extension to the ifMainTable. The index to
+            this table has the semantics of the ifMainIndex of the
+            ifMainTable."
+         ::= { if 25 }
+
+      ifACEntry           OBJECT-TYPE
+         SYNTAX            IfACEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION
+            "An entry containing AC-related information applicable
+            to attachment cirucit interface only."
+         INDEX { ifMainIndex }
+         ::= { ifACTable 1 }
+
+      IfACEntry ::=
+         SEQUENCE {
+            ifACPortIdentifier          InterfaceIndex,
+            ifACCustomerVlan            VlanId
+            }
+
+      ifACPortIdentifier    OBJECT-TYPE
+         SYNTAX            InterfaceIndex
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "This is the physical interface on which the attachment
+            circuit interface is present. The operational status of the
+            attachment circuit interface depends on this port's operational
+            status. That is if the operational status of ifACPortIdentifier's
+            is UP or DOWN, then the operational status of the AC interface
+            will be UP or DOWN respectively."
+         ::= { ifACEntry 1 }
+
+      ifACCustomerVlan    OBJECT-TYPE
+         SYNTAX            VlanId
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "This is the customer vlan present for the attachment circuit
+            interface. This object alone can not determine the attachment
+            circuit interface. To determine that, this object should be together
+            present with the ifACPortIdentifier.This is the optional paramater."
+         ::= { ifACEntry 2 }
+
+
+     ifUfdSystemControl OBJECT-TYPE
+         SYNTAX      INTEGER  { 
+                               start(1),
+                               shutdown(2)
+                              }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+          "The administrative system control status of the Uplink Failure 
+           Detection(UFD) module.
+           The value 'start' (1) indicates that the Uplink Failure
+           Detection(UFD) feature should be started in the system and all 
+           resources required by Uplink Failure Detection(UFD) module should
+           be allocated.
+           The value 'shutdown' (2) indicates that the Uplink Failure 
+           Detection(UFD) feature should be shutdown in the device and all 
+           allocated memory must be released."
+         DEFVAL { shutdown }
+         ::= { if 26 }
+
+
+     ifUfdModuleStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                               enabled(1),
+                               disabled(2)
+                               }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               "This read write objects gives actual status of the Uplink 
+                Failure Detection(UFD). 
+                When Uplink Failure Detection(UFD) is enabled, UFD starts 
+                functioning. When the UFD is disabled all the dynamically 
+                allocated memory will be freed and Uplink Failure Detection
+                (UFD) stops functioning."
+         DEFVAL { disabled }
+          ::= { if 27 }
+
+   ifSplitHorizonSysControl OBJECT-TYPE
+        SYNTAX      INTEGER  { start(1), shutdown(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "The administrative system control status               
+              requested by management for Split Horizon. 
+              The value 'start' (1) indicates  that all 
+              resources required for split horizon 
+              should be allocated  and Split horizon 
+              should be supported in the device on all  
+              ports. The value 'shutdown' (2) indicates 
+              that Split Horizon should be shutdown in 
+              the device on all ports and all allocated 
+              memory must be released."
+       DEFVAL { shutdown }
+        ::= { if 28 }
+
+   ifSplitHorizonModStatus OBJECT-TYPE                                                                                                                                   
+      SYNTAX  
+      INTEGER  { enabled(1), disabled(2) }                                                                                                                   
+      MAX-ACCESS  read-write
+      STATUS      current                                                                                                                                             
+      DESCRIPTION
+           "The administrative module status requested 
+           by  management for Split Horizon.This
+           enables or disables Split horizon in the        
+           system.   A value of  'enabled'(1) indicates 
+           that split horizon must be enabled in all the 
+           ports in the system.A value of 'disabled' (2) 
+           indicates  that split horizon must be 
+           disabled in all the ports in the system ."                                                                                   
+    DEFVAL  { disabled }
+      ::= { if 29 }
+
+
+-- ifUfdGroupTable
+-- This table is used for the Uplink Failure Detection(UFD) Group information
+
+     ifUfdGroupTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF IfUfdGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+             "This table contains a list of all the Uplink Failure Detection
+             (UFD).  Group entries in the system.
+            
+             This table is a extension to the ifMainTable. The index to this 
+             table is the group id. Entries are created when the group id is 
+             created in this table."
+        ::= { if 30 }
+
+    ifUfdGroupEntry OBJECT-TYPE
+        SYNTAX     IfUfdGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "An entry containing group information with
+            uplink/downlink port count and status of the group."
+
+        INDEX { ifUfdGroupId }
+        ::= { ifUfdGroupTable 1 }
+
+     IfUfdGroupEntry ::=
+            SEQUENCE {
+                 ifUfdGroupId                Integer32,
+                 ifUfdGroupName              DisplayString,
+                 ifUfdGroupStatus            INTEGER,
+                 ifUfdGroupUplinkPorts       PortList,
+                 ifUfdGroupDownlinkPorts     PortList,
+                 ifUfdGroupDesigUplinkPort   InterfaceIndex,
+                 ifUfdGroupUplinkCount       Integer32,
+                 ifUfdGroupDownlinkCount     Integer32,
+                 ifUfdGroupRowStatus         RowStatus
+                     }
+
+     ifUfdGroupId OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           "An identifier that uniquely identifies the 
+            group Entry in this table."
+        ::= { ifUfdGroupEntry 1 }
+
+    ifUfdGroupName    OBJECT-TYPE
+       SYNTAX   DisplayString (SIZE (1..32))
+       MAX-ACCESS   read-write
+       STATUS   current
+       DESCRIPTION
+           "This object is used to identity the Uplink Failure Detection
+           (UFD) Group-name."
+         ::= { ifUfdGroupEntry 2 }
+ 
+    ifUfdGroupStatus    OBJECT-TYPE
+         SYNTAX            INTEGER {
+                                     up(1),
+                                     down(2)
+                                   }
+         MAX-ACCESS        read-only
+         STATUS            current
+         DESCRIPTION
+            "This object for indicating the status of the group.
+             The group status can be set 'up' only when any one uplink 
+             port is in admin and operationally 'UP' state in the group. 
+             The group status can be set 'down' only when all uplink  
+             ports within the group is in admin and operationally 'DOWN' or
+             none uplink ports assigned in the group."
+         DEFVAL { down }
+         ::= { ifUfdGroupEntry 3 }
+
+    ifUfdGroupUplinkPorts   OBJECT-TYPE
+        SYNTAX               PortList
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            "Specifies the complete set of uplink ports which are mapped with
+             group"
+        ::= { ifUfdGroupEntry 4 }
+
+    ifUfdGroupDownlinkPorts OBJECT-TYPE
+        SYNTAX               PortList
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            "Specifies the complete set of downlink ports which are mapped
+             with group"
+        ::= { ifUfdGroupEntry 5 }
+
+    ifUfdGroupDesigUplinkPort OBJECT-TYPE
+        SYNTAX               InterfaceIndex
+        MAX-ACCESS           read-write
+        STATUS               deprecated
+        DESCRIPTION
+            "A port is termed as designated uplink when the port is connected
+             to the network and it has more preference to a particular set of
+             uplink ports.
+             
+             Broadcast/unknown multicast will use this designated port to 
+             reach uplink."
+
+        ::= { ifUfdGroupEntry 6 }
+
+     ifUfdGroupUplinkCount     OBJECT-TYPE
+         SYNTAX            Integer32 (1..48)
+         MAX-ACCESS        read-only
+         STATUS            current
+         DESCRIPTION
+            "A counter which indicates the number of
+            Uplink ports within the group"
+         ::= { ifUfdGroupEntry 7 }
+
+     ifUfdGroupDownlinkCount     OBJECT-TYPE
+         SYNTAX            Integer32 (1..48)
+         MAX-ACCESS        read-only
+         STATUS            current
+         DESCRIPTION
+            "A counter which indicates the number of
+             Downlink ports within the group"
+         ::= { ifUfdGroupEntry 8 }
+
+     
+    ifUfdGroupRowStatus    OBJECT-TYPE
+         SYNTAX            RowStatus
+         MAX-ACCESS        read-create
+         STATUS            current
+         DESCRIPTION
+            "This object is used to manage creation and deletion of rows
+             in this Uplink Failure Detection(UFD) group table."
+         ::= { ifUfdGroupEntry 9 }
+
+   ifLinkUpEnabledStatus OBJECT-TYPE                                                                                                                       
+      SYNTAX
+      INTEGER  { enabled(1), disabled(2) }
+      MAX-ACCESS  read-write
+      STATUS      current                                                                                                                                    
+      DESCRIPTION
+           "This enables or disables Link Up Delay functionality in the System.
+            A value of  'enabled'(1) indicates  that, operational status of the
+            link is suspended for a configured delay time 'ifMainExtLinkUpDelayTimer'.
+            A value of 'disabled' (2) indicates  that  the operational status of the
+            link is not delayed and indicated to the higher layers immediately."
+
+    DEFVAL  { disabled }
+      ::= { if 31 }
+
+-- Secondary IP address configuration for OOB interface for local node and remote node
+
+    ifOOBNode0SecondaryIpAddress        OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the secondary IP address associated with the 
+             OOB interface of Node0"
+         DEFVAL { '00000000'H }
+         ::= { if 32 }
+
+    ifOOBNode0SecondaryIpMask        OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP Subnet Mask associted with the
+            secondary ip address of OOB interface in node0. 
+
+            If not specified, this object takes the default
+            subnet mask value based on the class of the IP
+            address configured for the interface."
+         ::= { if 33 }
+
+
+
+    ifOOBNode1SecondaryIpAddress         OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the secondary IP address associated with the 
+             OOB interface of Node1  "
+
+         DEFVAL { '00000000'H }
+         ::= { if 34 }
+
+    ifOOBNode1SecondaryIpMask            OBJECT-TYPE
+         SYNTAX            IpAddress
+         MAX-ACCESS        read-write
+         STATUS            current
+         DESCRIPTION
+            "Specifies the IP Subnet Mask associted with the
+            secondary ip address of OOB interface in node1. 
+
+            If not specified, this object takes the default
+            subnet mask value based on the class of the IP
+            address configured for the interface."
+         ::= { if 35 }
+
+--
+-- Interface VLAN IP Table support
+--
+
+ifVlanIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfVlanIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains L3 interface attributes 
+        that are used for manipulating entries in 
+        various tables. 
+
+        ifVlanIpTable entry creation, modification and 
+        deletion results in related actions being 
+        performed for the ifMainTable and the ifIpTable. 
+        Likewise, data returned through ifVlanIpTable 
+        table queries is derived from these tables."
+
+    ::= { if 36 }
+
+ifVlanIpEntry OBJECT-TYPE
+    SYNTAX      IfVlanIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the L3 interface settings 
+        for a specific VLAN on the device."
+
+    INDEX { ifVlanIpVlanId }
+    ::= { ifVlanIpTable 1 }
+
+IfVlanIpEntry ::= SEQUENCE {
+    ifVlanIpVlanId           VlanId,
+    ifVlanIpIfIndex          InterfaceIndex,
+    ifVlanIpAdminStatus      INTEGER,
+    ifVlanIpAddrAllocMethod  INTEGER,
+    ifVlanIpAddr             IpAddress,
+    ifVlanIpSubnetMask       IpAddress,
+    ifVlanIpRowStatus        RowStatus
+}
+
+ifVlanIpVlanId OBJECT-TYPE
+    SYNTAX         VlanId
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "VLAN ID for the L3 interface specification."
+
+    ::= { ifVlanIpEntry 1 }
+
+ifVlanIpIfIndex OBJECT-TYPE
+    SYNTAX         InterfaceIndex
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The ifIndex associated with the VLAN ID for
+        this L3 interface specification. An ifIndex
+        is automatically allocated when a new entry
+        is created. The ifIndex and related settings
+        are automatically deleted when an entry is
+        destroyed."
+
+    ::= { ifVlanIpEntry 2 }
+
+ifVlanIpAdminStatus OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       enabled(1),
+                       disabled(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The desired state of the interface. This 
+        attribute has similar semantics to the 
+        ifAdminStatus object of the standard ifTable."
+
+    DEFVAL { enabled } 
+    ::= { ifVlanIpEntry 3 }
+
+ifVlanIpAddrAllocMethod OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       manual(1),
+                       dynamic(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The mechanism to be used for allocation of 
+        the IPv4 address for this L3 VLAN interface." 
+            
+    ::= { ifVlanIpEntry 4 }
+
+ifVlanIpAddr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies the IPv4 address assigned to 
+        this L3 VLAN interface.
+
+        A valid IpAddress value is required when 
+        creating a new entry and the associated
+        address allocation method is 'manual'. A
+        zero IpAddress value is required when
+        creating a new entry and the associated
+        address allocation method is 'dynamic'."
+
+    ::= { ifVlanIpEntry 5 }
+
+ifVlanIpSubnetMask OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "Specifies the IPv4 address subnet mask
+        assigned to this L3 VLAN interface.
+
+        A valid subnet mask value is required when 
+        creating a new entry and the associated
+        address allocation method is 'manual'. A
+        zero subnet mask value is required when
+        creating a new entry and the associated
+        address allocation method is 'dynamic'."
+
+    ::= { ifVlanIpEntry 6 }
+
+ifVlanIpRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows entries to be created, modified
+        and deleted in the ifVlanIpTable. Values 'createAndWait', 
+        'active' and 'destroy' are supported for Sets.
+
+        The rowStatus value of the underlying ifMainEntry is
+        returned when entry data is queried.
+
+        Entry creation requires data for all read-create
+        attributes to be specified with a 'createAndWait' 
+        RowStatus value.
+
+        The ifVlanIpAdminStatus is the only value that can
+        be modified in an existing entry. This action is 
+        performed by specifying the requested admin status
+        with a 'active' RowStatus value.
+
+        Table entries are deleted with a 'destroy' RowStatus.
+        No other attributes need to be specified for this
+        action to be performed."
+
+    ::= { ifVlanIpEntry 10 }
+
+END
