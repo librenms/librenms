@@ -61,7 +61,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $af_list = [];
 
         foreach ($peerlist as $peer) {
-            $peer['astext'] = get_astext($peer['as']);
+            $peer['astext'] = \LibreNMS\Util\AutonomousSystem::get($peer['as'])->name();
 
             add_bgp_peer($device, $peer);
 
