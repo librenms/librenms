@@ -29,11 +29,12 @@ use App\Models\Eventlog;
 use App\Models\TnmsneInfo;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         echo 'TNMS-NBI-MIB: enmsNETable';
 

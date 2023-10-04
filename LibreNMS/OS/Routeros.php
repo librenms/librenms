@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
@@ -466,7 +467,7 @@ class Routeros extends OS implements
         return $sensors;
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
 
@@ -478,7 +479,7 @@ class Routeros extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
             $this->enableGraph('routeros_leases');
         }
 
@@ -492,7 +493,7 @@ class Routeros extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
     }

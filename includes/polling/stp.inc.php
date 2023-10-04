@@ -20,4 +20,4 @@ if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\Stp())->poll($os);
+(new \LibreNMS\Modules\Stp())->poll($os, app('Datastore'));
